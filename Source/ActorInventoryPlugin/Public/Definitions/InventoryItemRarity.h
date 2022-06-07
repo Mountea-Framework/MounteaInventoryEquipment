@@ -27,12 +27,6 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE int32 GetRarityID() const
-	{
-		return RarityID;
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE FLinearColor GetRarityColor() const
 	{
 		return RarityColor;
@@ -50,9 +44,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetRarityColor(const FLinearColor& Color);
 
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetRarityID(const int32& ID);
-
 #pragma endregion SETTERS
 
 #pragma region VARIABLES
@@ -64,9 +55,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	FLinearColor RarityColor;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	int32 RarityID;
 
 #pragma endregion VARIABLES
 };

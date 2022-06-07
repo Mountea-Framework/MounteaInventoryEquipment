@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "InventoryCategory.generated.h"
 
+#define LOCTEXT_NAMESPACE "Inventory Category"
+
 /**
  * 
  */
@@ -14,23 +16,19 @@ class ACTORINVENTORYPLUGIN_API UInventoryCategory : public UObject
 {
 	GENERATED_BODY()
 
+public:
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE FName GetCategoryName() const
+	FORCEINLINE FText GetCategoryName() const
 	{
 		return CategoryName;
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE int32 GetCategoryID() const
-	{
-		return CategoryID;
-	}
-	
 protected:
 	
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	FName CategoryName;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	int32 CategoryID;
 };
+
+#undef LOCTEXT_NAMESPACE

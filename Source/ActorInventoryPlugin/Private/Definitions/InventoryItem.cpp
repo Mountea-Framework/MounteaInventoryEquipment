@@ -12,3 +12,8 @@ void UInventoryItem::SetItemRarity(const TSubclassOf<UInventoryItemRarity> Rarit
 {
 	ItemRarity = Rarity;
 }
+
+void UInventoryItem::SetItemThumbnail(UTexture2D* Thumbnail)
+{
+	ItemThumbnail = Thumbnail;
+}

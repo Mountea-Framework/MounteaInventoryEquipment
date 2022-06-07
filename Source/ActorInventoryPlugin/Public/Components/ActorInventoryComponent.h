@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Helpers/InventoryHelpers.h"
 #include "ActorInventoryComponent.generated.h"
+
+class UInventoryItem;
 
 /**
  * Implement an Actor component for inventory.
@@ -15,7 +18,7 @@
  *
  * @see https://sites.google.com/view/dominikpavlicek/home/documentation
  */
-UCLASS(ClassGroup=(Inventory), Blueprintable, hideCategories=(Collision, AssetUserData, Cooking, ComponentTick), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Component", ShortTooltip="Implement an Actor component for inventory."))
+UCLASS(ClassGroup=(Inventory), Blueprintable, hideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Component", ShortTooltip="Implement an Actor component for inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -30,5 +33,8 @@ protected:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+private:
+
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TArray<UInventoryItem*> InventoryItems;
 };

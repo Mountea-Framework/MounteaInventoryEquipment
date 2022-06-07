@@ -7,7 +7,6 @@ UInventoryItemRarity::UInventoryItemRarity()
 {
 	SetRarityName("Common");
 	SetRarityColor(FLinearColor::Gray);
-	SetRarityID(0);
 }
 
 void UInventoryItemRarity::SetRarityName(const FName& Name)
@@ -18,9 +17,4 @@ void UInventoryItemRarity::SetRarityName(const FName& Name)
 void UInventoryItemRarity::SetRarityColor(const FLinearColor& Color)
 {
 	RarityColor = Color;
-}
-
-void UInventoryItemRarity::SetRarityID(const int32& ID)
-{
-	RarityID = ID;
 }

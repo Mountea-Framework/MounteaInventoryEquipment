@@ -19,7 +19,7 @@ public:
 	/**
 	 * Returns Inventory Manager from PlayerController.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject", CompactNodeTitle="Inventory Manager"))
 	static class UActorInventoryManagerComponent* GetInventoryManager(const UObject* WorldContextObject);
 	
 };
