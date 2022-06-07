@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "InventoryCategory.generated.h"
+#include "InventoryRarity.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class ACTORINVENTORYPLUGIN_API UInventoryCategory : public UObject
+class ACTORINVENTORYPLUGIN_API UInventoryRarity : public UObject
 {
 	GENERATED_BODY()
 

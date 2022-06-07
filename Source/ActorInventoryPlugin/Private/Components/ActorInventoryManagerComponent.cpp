@@ -14,4 +14,7 @@ void UActorInventoryManagerComponent::BeginPlay()
 	
 }
 
-
+TArray<TSubclassOf<UInventoryCategory>> UActorInventoryManagerComponent::GetInventoryCategories() const
+{
+	return AllowedCategories;
+}

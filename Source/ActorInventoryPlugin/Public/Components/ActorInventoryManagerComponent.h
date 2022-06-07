@@ -18,6 +18,9 @@ public:
 	
 	UActorInventoryManagerComponent();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	TArray<TSubclassOf<UInventoryCategory>> GetInventoryCategories() const;
+
 protected:
 	
 	virtual void BeginPlay() override;
@@ -26,8 +29,9 @@ protected:
 	 * List of allowed Categories to be displayed in the Inventory.
 	 * Only selected Categories will be displayed.
 	 * Only valid Categories will be displayed.
+	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TArray<TSubclassOf<UInventoryCategory>> AllowedCategories;
 		
 };
