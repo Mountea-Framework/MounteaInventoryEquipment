@@ -17,3 +17,13 @@ void UInventoryItem::SetItemThumbnail(UTexture2D* Thumbnail)
 {
 	ItemThumbnail = Thumbnail;
 }
+
+void UInventoryItem::SetItemTittle(const FText& Text)
+{
+	ItemTittle = Text;
+}
+
+void UInventoryItem::SetItemDescription(const FText& Text)
+{
+	ItemDescription = Text;
+}

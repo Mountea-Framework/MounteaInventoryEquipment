@@ -68,25 +68,31 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetItemThumbnail(UTexture2D* Thumbnail);
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void SetItemTittle(const FText& Text);
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void SetItemDescription(const FText& Text);
+
 #pragma endregion SETTERS
 
 #pragma region VARIABLES
 	
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, BlueprintBaseOnly))
 	TSubclassOf<UInventoryCategory> ItemCategory;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, BlueprintBaseOnly))
 	TSubclassOf<UInventoryItemRarity> ItemRarity;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
 	UTexture2D* ItemThumbnail = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
 	FText ItemTittle = LOCTEXT("ItemTittle", "Default Object");
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory", meta=(MultiLine=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, MultiLine=true))
 	FText ItemDescription = LOCTEXT("ItemDescription", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
 #pragma endregion VARIABLES

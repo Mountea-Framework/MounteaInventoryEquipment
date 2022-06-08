@@ -69,7 +69,7 @@ protected:
 	 * Only valid Categories will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, NoElementDuplicate, BlueprintBaseOnly))
 	TArray<TSubclassOf<UInventoryCategory>> AllowedCategories;
 
 	/**
@@ -78,7 +78,7 @@ protected:
 	 * Only valid Rarities will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, NoElementDuplicate, BlueprintBaseOnly))
 	TArray<TSubclassOf<UInventoryItemRarity>> AllowedRarities;
 };
 
