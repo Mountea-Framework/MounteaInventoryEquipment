@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
 #include "Helpers/InventoryHelpers.h"
+
 #include "ActorInventoryComponent.generated.h"
 
 class UInventoryItem;
@@ -33,8 +35,12 @@ protected:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-private:
+protected:
 
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	//TODO: TSet would be nice, but I would like to allow multiple instances of same item (like an ammo stacks).
+	/**
+	 * List of Items that are currently in Inventory.
+	 */
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TArray<UInventoryItem*> InventoryItems;
 };

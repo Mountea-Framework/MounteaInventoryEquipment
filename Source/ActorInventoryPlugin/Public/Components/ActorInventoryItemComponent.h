@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+
 #include "Helpers/InventoryHelpers.h"
+
 #include "ActorInventoryItemComponent.generated.h"
 
 class UInventoryItem;
