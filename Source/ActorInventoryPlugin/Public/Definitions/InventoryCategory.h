@@ -24,11 +24,19 @@ public:
 		return CategoryName;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE TSubclassOf<UInventoryCategory> GetParentCategory() const
+	{
+		return ParentCategory;
+	}
+	
 protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	TSubclassOf<UInventoryCategory> ParentCategory = nullptr;
 };
 
 #undef LOCTEXT_NAMESPACE

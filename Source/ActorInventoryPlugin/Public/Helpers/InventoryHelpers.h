@@ -40,15 +40,15 @@ struct FItemQuantityData
 	GENERATED_BODY()
 
 	// How many Items will be added to Inventory
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
 	int32 DefaultAmount = 1;
 
 	// Defines whether stacking multiple Item instances of this Item is allowed
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly))
-	bool bIsStackable = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
+	uint8 bIsStackable : 1;
 
 	// If stacking is possible, how much is allowed to stack
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
 	int32 MaxStackAmount = 99;
 };
 
@@ -60,31 +60,33 @@ struct FInventoryItemData : public FTableRowBase
 {
 	GENERATED_BODY();
 
-public:
-
 	// Category of Item
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=""))
 	TSubclassOf<UInventoryCategory> ItemCategory;
 
 	// Rarity of Item
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=""))
 	TSubclassOf<UInventoryItemRarity> ItemRarity;
 
 	// Item thumbnail texture, can be null
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
 	UTexture2D* ItemThumbnail = nullptr;
 
 	// Tittle/Name of Item
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
 	FText ItemTittle = LOCTEXT("ItemTittle", "Default Object");
 
 	// Description of Item
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true, MultiLine=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, MultiLine=true))
 	FText ItemDescription = LOCTEXT("ItemDescription", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 	
 	// Item Quantity
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Data", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
 	FItemQuantityData ItemQuantityData;
+
+	// Item Mesh. Static and Skeletal Mesh allowed.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, AllowedClasses="StaticMesh, SkeletalMesh"))
+	UStreamableRenderAsset* ItemMesh = nullptr;
 };
 
 #undef LOCTEXT_NAMESPACE

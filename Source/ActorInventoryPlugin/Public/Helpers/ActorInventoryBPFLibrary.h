@@ -17,7 +17,7 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryBPFLibrary : public UBlueprintFunc
 public:
 
 	/**
-	 * Returns Inventory Manager from PlayerController.
+	 * Returns Inventory Manager from GameState or nullptr if not specified.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject", CompactNodeTitle="Inventory Manager"))
 	static class UActorInventoryManagerComponent* GetInventoryManager(const UObject* WorldContextObject);

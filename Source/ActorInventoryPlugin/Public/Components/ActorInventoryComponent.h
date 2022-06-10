@@ -29,6 +29,12 @@ public:
 
 	UActorInventoryComponent();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE TArray<FInventoryItemData> GetInventoryItems() const
+	{
+		return InventoryItems;
+	}
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -42,5 +48,5 @@ protected:
 	 * List of Items that are currently in Inventory.
 	 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	TArray<UInventoryItem*> InventoryItems;
+	TArray<FInventoryItemData> InventoryItems;
 };

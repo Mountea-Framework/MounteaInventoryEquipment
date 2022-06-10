@@ -7,7 +7,7 @@
 // Log category definition
 ACTORINVENTORYPLUGIN_API DECLARE_LOG_CATEGORY_EXTERN(LogActorInventory, Display, All);
 
-#define AIP_LOG(Verbosity, Format, ...) \
+#define AInvP_LOG(Verbosity, Format, ...) \
 { \
-	UE_LOG(LogActorInvenotry, Verbosity, Format, ##__VA_ARGS__); \
+	UE_LOG(LogActorInventory, Verbosity, Format, ##__VA_ARGS__); \
 }

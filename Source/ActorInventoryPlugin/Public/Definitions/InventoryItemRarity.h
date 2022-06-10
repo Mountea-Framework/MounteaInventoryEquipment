@@ -16,8 +16,6 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemRarity : public UObject
 
 	UInventoryItemRarity();
 
-#pragma region GETTERS
-
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
@@ -32,11 +30,6 @@ public:
 		return RarityColor;
 	}
 
-#pragma endregion GETTERS
-
-#pragma region SETTERS
-
-public:
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetRarityName(const FName& Name);
@@ -44,17 +37,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetRarityColor(const FLinearColor& Color);
 
-#pragma endregion SETTERS
 
-#pragma region VARIABLES
 	
-protected:
-	
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true))
 	FName RarityName;
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true))
 	FLinearColor RarityColor;
-
-#pragma endregion VARIABLES
+	
 };

@@ -13,6 +13,8 @@ class UInventoryItemRarity;
 
 #define LOCTEXT_NAMESPACE "Inventory Item"
 
+// TODO: Delete and use Inventory Instead
+
 /**
  * 
  */
@@ -23,9 +25,7 @@ class ACTORINVENTORYPLUGIN_API UInventoryItem : public UObject
 
 	UInventoryItem(){};
 
-	explicit UInventoryItem(const FInventoryItemData& ItemData)
-	: Item(ItemData)
-	{};
+	explicit UInventoryItem(const FInventoryItemData& ItemData) : Item(ItemData){};
 
 public:
 	
@@ -37,9 +37,9 @@ public:
 		
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetItem(const FInventoryItemData& ItemValues);
-	
-protected:
 
+protected:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
 	FInventoryItemData Item;
 };
