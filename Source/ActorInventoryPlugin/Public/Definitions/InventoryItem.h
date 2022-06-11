@@ -3,17 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
 #include "Helpers/InventoryHelpers.h"
 
 #include "InventoryItem.generated.h"
 
-class UInventoryCategory;
-class UInventoryItemRarity;
 
 #define LOCTEXT_NAMESPACE "Inventory Item"
-
-// TODO: Delete and use Inventory Instead
 
 /**
  * 
@@ -25,8 +20,6 @@ class ACTORINVENTORYPLUGIN_API UInventoryItem : public UObject
 
 	UInventoryItem(){};
 
-	explicit UInventoryItem(const FInventoryItemData& ItemData) : Item(ItemData){};
-
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
@@ -36,8 +29,12 @@ public:
 	}
 		
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetItem(const FInventoryItemData& ItemValues);
+	void SetItem(const FInventoryItemData& ItemValues)
+	{
+		Item = ItemValues;
+	}
 
+	
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))

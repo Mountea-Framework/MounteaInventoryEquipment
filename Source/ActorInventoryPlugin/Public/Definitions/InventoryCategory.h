@@ -12,7 +12,7 @@
  * 
  */
 UCLASS(Blueprintable)
-class ACTORINVENTORYPLUGIN_API UInventoryCategory : public UObject
+class ACTORINVENTORYPLUGIN_API UInventoryCategory : public UDataAsset
 {
 	GENERATED_BODY()
 

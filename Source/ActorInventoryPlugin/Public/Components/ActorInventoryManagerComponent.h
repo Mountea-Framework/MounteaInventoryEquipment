@@ -13,6 +13,7 @@
 
 class UInventoryCategory;
 class UInventoryItemRarity;
+class UInventoryItem;
 
 UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Manager", ShortTooltip="Inventory Manager responsible for Adding and Removing Items from Inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryManagerComponent : public UActorComponent
@@ -22,6 +23,15 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryManagerComponent : public UActorCo
 public:
 	
 	UActorInventoryManagerComponent();
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer);
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer);
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	TArray<UInventoryItem*> GetItemsFromInventory(APlayerController* OwningPlayer) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management")
 	FORCEINLINE TSet<TSubclassOf<UInventoryCategory>> GetInventoryCategories() const
@@ -87,18 +97,22 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory", meta=(DeprecatedFunction, DeprecatedMessage="Use this function with caution as this might be really performance heavy."))
 	void UpdateCategories();
-	
+
 protected:
 	
 	virtual void BeginPlay() override;
-
-	//TODO: TSet
 
 	/**
 	 * If Category is added to Allowed Categories, should we allow its parent Categories as well?
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	uint8 bAutoAllowParentCategories : 1;
+
+	/**
+	 * Defines how deep the search for Parent category iterates. Higher the value, higher the performance impact and more precise result.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory", meta=(EditCondition="bAutoAllowParentCategories", UIMin=1, ClampMin=1))
+	int32 MaxRecursionDepth =  6;
 	
 	/**
 	 * List of allowed Categories to be displayed in the Inventory.
@@ -106,7 +120,7 @@ protected:
 	 * Only valid Categories will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, NoElementDuplicate, BlueprintBaseOnly))
+	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSet<TSubclassOf<UInventoryCategory>> AllowedCategories;
 
 	/**
@@ -115,11 +129,12 @@ protected:
 	 * Only valid Rarities will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, NoElementDuplicate, BlueprintBaseOnly))
+	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSet<TSubclassOf<UInventoryItemRarity>> AllowedRarities;
 
 private:
 	
-	void AddParentCategory(const TSubclassOf<UInventoryCategory>& Category);
+	void AddParentCategory(const TSubclassOf<UInventoryCategory>& Category, int32& DepthIndex);
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 };
+

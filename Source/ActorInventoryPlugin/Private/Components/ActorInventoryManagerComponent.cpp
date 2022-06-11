@@ -1,12 +1,77 @@
 // Copyright Dominik Pavlicek 2022. All Rights Reserved.
 
 #include "Components/ActorInventoryManagerComponent.h"
+#include "Components/ActorInventoryComponent.h"
+#include "Definitions/InventoryItem.h"
 
 UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
+
+void UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer)
+{
+	if (OwningPlayer)
+	{
+		TArray<UActorComponent*> InventoryComponents = OwningPlayer->GetComponentsByInterface(UActorInventoryInterface::StaticClass());
+
+		if (InventoryComponents.Num())
+		{
+			// Only one inventory per player
+			UActorComponent* InventoryComponent = InventoryComponents[0];
+
+			if (InventoryComponent)
+			{
+				TScriptInterface<IActorInventoryInterface> InventoryInterface;
+				InventoryInterface.SetObject(InventoryComponent);
+				InventoryInterface.SetInterface(Cast<IActorInventoryInterface>(InventoryComponent));
+
+				if (InventoryInterface)
+				{
+					InventoryInterface->AddItemToInventory(Item);
+				}
+			}
+		}
+	}
+}
+
+void UActorInventoryManagerComponent::AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer)
+{
+	for (UInventoryItem* Itr : Items)
+	{
+		AddItemToInventory(Itr, OwningPlayer);
+	}
+}
+
+TArray<UInventoryItem*>  UActorInventoryManagerComponent::GetItemsFromInventory(APlayerController* OwningPlayer) const
+{
+	if (OwningPlayer)
+	{
+		TArray<UActorComponent*> InventoryComponents = OwningPlayer->GetComponentsByInterface(UActorInventoryInterface::StaticClass());
+
+		if (InventoryComponents.Num())
+		{
+			// Only one inventory per player
+			UActorComponent* InventoryComponent = InventoryComponents[0];
+
+			if (InventoryComponent)
+			{
+				TScriptInterface<IActorInventoryInterface> InventoryInterface;
+				InventoryInterface.SetObject(InventoryComponent);
+				InventoryInterface.SetInterface(Cast<IActorInventoryInterface>(InventoryComponent));
+
+				if (InventoryInterface)
+				{
+					return InventoryInterface->GetInventoryItems();
+				}
+			}
+		}
+	}
+
+	return TArray<UInventoryItem*>();
+}
+
 void UActorInventoryManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -28,7 +93,7 @@ void UActorInventoryManagerComponent::AddAllowedCategory(const TSubclassOf<UInve
 {
 	if(!ContainsAllowedCategory(Category))
 	{
-		AllowedCategories.Add(Category);
+		AllowedCategories.Emplace(Category);
 	}
 }
 
@@ -72,7 +137,7 @@ void UActorInventoryManagerComponent::AddAllowedRarity(const TSubclassOf<UInvent
 {
 	if (!ContainsAllowedRarity(Rarity))
 	{
-		AllowedRarities.Add(Rarity);
+		AllowedRarities.Emplace(Rarity);
 	}
 }
 
@@ -118,28 +183,35 @@ void UActorInventoryManagerComponent::UpdateCategories()
 		{
 			if (!ContainsAllowedCategory(Itr))
 			{
-				AddParentCategory(Itr);
+				int32 SearchDepth = 1;
+				AddParentCategory(Itr, SearchDepth);
 			}
 		}
 	}
 }
 
-void UActorInventoryManagerComponent::AddParentCategory(const TSubclassOf<UInventoryCategory>& Category)
+void UActorInventoryManagerComponent::AddParentCategory(const TSubclassOf<UInventoryCategory>& Category, int32& DepthIndex)
 {
+	if (DepthIndex > MaxRecursionDepth)
+	{
+		return;
+	}
+	
 	if(Category->GetClass())
 	{
 		if (ContainsAllowedCategory(Category))
 		{
-			AInvP_LOG(Warning, TEXT("Category Already there!"))
 			return;
 		}
 		else
 		{
-			AInvP_LOG(Warning, TEXT("Adding new Category!"))
 			AddAllowedCategory(Category);
+			
+			DepthIndex++;
+			
 			if (Category.GetDefaultObject() && Category.GetDefaultObject()->GetParentCategory())
 			{
-				AddParentCategory(Category.GetDefaultObject()->GetParentCategory());
+				AddParentCategory(Category.GetDefaultObject()->GetParentCategory(), DepthIndex);
 			}
 		}
 	}

@@ -10,7 +10,7 @@
  * 
  */
 UCLASS(Blueprintable)
-class ACTORINVENTORYPLUGIN_API UInventoryItemRarity : public UObject
+class ACTORINVENTORYPLUGIN_API UInventoryItemRarity : public UDataAsset
 {
 	GENERATED_BODY()
 
@@ -29,15 +29,12 @@ public:
 	{
 		return RarityColor;
 	}
-
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetRarityName(const FName& Name);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetRarityColor(const FLinearColor& Color);
-
-
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true))
 	FName RarityName;
