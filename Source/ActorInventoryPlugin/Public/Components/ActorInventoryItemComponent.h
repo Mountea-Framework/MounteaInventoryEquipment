@@ -23,16 +23,16 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent final : public UActo
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE TArray<FInventoryItemData> GetItemDefinition() const
+	FORCEINLINE FInventoryItemData GetItemDefinition() const
 	{
-		return Items;
+		return Item;
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetItemDefinition(const TArray<FInventoryItemData> SetItems);
+	void SetItemDefinition(const FInventoryItemData NewItem);
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	TArray<FInventoryItemData> Items;
+	UPROPERTY(EditDefaultsOnly, Category="Inventory", meta=(ShowOnlyInnerProperties="true"))
+	FInventoryItemData Item;
 };

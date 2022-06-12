@@ -30,11 +30,14 @@ public:
 		return ParentCategory;
 	}
 	
-protected:
+public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UTexture2D* CategoryTexture = nullptr;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	TSubclassOf<UInventoryCategory> ParentCategory = nullptr;
 };

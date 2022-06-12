@@ -5,11 +5,14 @@
 #include "Definitions/InventoryItem.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
 #include "Helpers/ActorInventoryPluginLog.h"
+#include "Widgets/InventoryWidget.h"
 
 UActorInventoryComponent::UActorInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
+
+	InventoryWidgetClass = UInventoryWidget::StaticClass();
 }
 
 void UActorInventoryComponent::BeginPlay()
@@ -30,8 +33,9 @@ void UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 	{
 		return;
 	}
-	
+
 	InventoryItems.Emplace(Item);
+	OnInventoryUpdated.Broadcast(this);
 }
 
 void UActorInventoryComponent::AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems)
@@ -74,4 +78,29 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 			}
 		} 
 	}
+}
+
+FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()
+{
+	return OnInventoryUpdated;
+}
+
+void UActorInventoryComponent::SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
+{
+	InventoryWidgetClass = NewInventoryWidgetClass;
+}
+
+void UActorInventoryComponent::SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget)
+{
+	InventoryWidget = NewInventoryWidget;
+}
+
+UInventoryWidget* UActorInventoryComponent::GetInventoryWidgetPtr() const
+{
+	return InventoryWidget;
+}
+
+TSubclassOf<UInventoryWidget> UActorInventoryComponent::GetInventoryWidgetClass() const
+{
+	return InventoryWidgetClass;
 }

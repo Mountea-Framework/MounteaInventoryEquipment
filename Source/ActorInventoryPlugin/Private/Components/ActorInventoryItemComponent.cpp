@@ -3,7 +3,7 @@
 
 #include "Components/ActorInventoryItemComponent.h"
 
-void UActorInventoryItemComponent::SetItemDefinition(const TArray<FInventoryItemData> SetItems)
+void UActorInventoryItemComponent::SetItemDefinition(const FInventoryItemData NewItem)
 {
-	Items = SetItems;
+	Item = NewItem;
 }
