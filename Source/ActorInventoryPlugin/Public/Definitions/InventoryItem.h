@@ -39,6 +39,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
 	FInventoryItemData Item;
+	
 };
 
 #undef LOCTEXT_NAMESPACE

@@ -83,13 +83,13 @@ void UActorInventoryManagerComponent::ClearAllowedCategories()
 	AllowedCategories.Empty();
 }
 
-void UActorInventoryManagerComponent::SetAllowedCategories(const TSet<TSubclassOf<UInventoryCategory>>& Categories)
+void UActorInventoryManagerComponent::SetAllowedCategories(TSet<UInventoryCategory*>& Categories)
 {
 	ClearAllowedCategories();
 	AllowedCategories = Categories;
 }
 
-void UActorInventoryManagerComponent::AddAllowedCategory(const TSubclassOf<UInventoryCategory>& Category)
+void UActorInventoryManagerComponent::AddAllowedCategory(UInventoryCategory* Category)
 {
 	if(!ContainsAllowedCategory(Category))
 	{
@@ -97,15 +97,15 @@ void UActorInventoryManagerComponent::AddAllowedCategory(const TSubclassOf<UInve
 	}
 }
 
-void UActorInventoryManagerComponent::AddAllowedCategories(const TSet<TSubclassOf<UInventoryCategory>>& Categories)
+void UActorInventoryManagerComponent::AddAllowedCategories(TSet<UInventoryCategory*>& Categories)
 {
-	for (const TSubclassOf<UInventoryCategory> Itr : Categories)
+	for (const auto Itr : Categories)
 	{
 		AddAllowedCategory(Itr);
 	}
 }
 
-void UActorInventoryManagerComponent::RemoveAllowedCategory(const TSubclassOf<UInventoryCategory>& Category)
+void UActorInventoryManagerComponent::RemoveAllowedCategory(UInventoryCategory* Category)
 {
 	if (ContainsAllowedCategory(Category))
 	{
@@ -113,9 +113,9 @@ void UActorInventoryManagerComponent::RemoveAllowedCategory(const TSubclassOf<UI
 	}
 }
 
-void UActorInventoryManagerComponent::RemoveAllowedCategories(const TSet<TSubclassOf<UInventoryCategory>>& Categories)
+void UActorInventoryManagerComponent::RemoveAllowedCategories(TSet<UInventoryCategory*>& Categories)
 {
-	for (const TSubclassOf<UInventoryCategory> Itr : Categories)
+	for (const auto Itr : Categories)
 	{
 		RemoveAllowedCategory(Itr);
 	}
@@ -127,13 +127,13 @@ void UActorInventoryManagerComponent::ClearAllowedRarities()
 	AllowedRarities.Empty();
 }
 
-void UActorInventoryManagerComponent::SetAllowedRarities(const TSet<TSubclassOf<UInventoryItemRarity>>& Rarities)
+void UActorInventoryManagerComponent::SetAllowedRarities(const TSet<UInventoryItemRarity*>& Rarities)
 {
 	ClearAllowedRarities();
 	AllowedRarities = Rarities;
 }
 
-void UActorInventoryManagerComponent::AddAllowedRarity(const TSubclassOf<UInventoryItemRarity>& Rarity)
+void UActorInventoryManagerComponent::AddAllowedRarity(UInventoryItemRarity* Rarity)
 {
 	if (!ContainsAllowedRarity(Rarity))
 	{
@@ -141,15 +141,15 @@ void UActorInventoryManagerComponent::AddAllowedRarity(const TSubclassOf<UInvent
 	}
 }
 
-void UActorInventoryManagerComponent::AddAllowedRarities(const TSet<TSubclassOf<UInventoryItemRarity>>& Rarities)
+void UActorInventoryManagerComponent::AddAllowedRarities(const TSet<UInventoryItemRarity*>& Rarities)
 {
-	for (const TSubclassOf<UInventoryItemRarity>& Itr : Rarities)
+	for (const auto Itr : Rarities)
 	{
 		AddAllowedRarity(Itr);	
 	}
 }
 
-void UActorInventoryManagerComponent::RemoveAllowedRarity(const TSubclassOf<UInventoryItemRarity>& Rarity)
+void UActorInventoryManagerComponent::RemoveAllowedRarity(const UInventoryItemRarity* Rarity)
 {
 	if (ContainsAllowedRarity(Rarity))
 	{
@@ -157,9 +157,9 @@ void UActorInventoryManagerComponent::RemoveAllowedRarity(const TSubclassOf<UInv
 	}
 }
 
-void UActorInventoryManagerComponent::RemoveAllowedRarities(const TSet<TSubclassOf<UInventoryItemRarity>>& Rarities)
+void UActorInventoryManagerComponent::RemoveAllowedRarities(const TSet<UInventoryItemRarity*>& Rarities)
 {
-	for (const TSubclassOf<UInventoryItemRarity> Itr : Rarities)
+	for (const auto Itr : Rarities)
 	{
 		RemoveAllowedRarity(Itr);
 	}
@@ -169,17 +169,17 @@ void UActorInventoryManagerComponent::UpdateCategories()
 {
 	if (bAutoAllowParentCategories)
 	{
-		TSet<TSubclassOf<UInventoryCategory>> ParentCategories;
+		TSet<UInventoryCategory*> ParentCategories;
 		
-		for (const TSubclassOf<UInventoryCategory>& Itr : AllowedCategories)
+		for (const auto Itr : AllowedCategories)
 		{
-			if (Itr.GetDefaultObject() && Itr.GetDefaultObject()->GetParentCategory() && !ContainsAllowedCategory(Itr.GetDefaultObject()->GetParentCategory()))
+			if (Itr && Itr->GetParentCategory() && !ContainsAllowedCategory(Itr->GetParentCategory()))
 			{
-				ParentCategories.Add(Itr.GetDefaultObject()->GetParentCategory());
+				ParentCategories.Add(Itr->GetParentCategory());
 			}
 		}
 
-		for (const TSubclassOf<UInventoryCategory>& Itr : ParentCategories)
+		for (const auto Itr : ParentCategories)
 		{
 			if (!ContainsAllowedCategory(Itr))
 			{
@@ -190,7 +190,7 @@ void UActorInventoryManagerComponent::UpdateCategories()
 	}
 }
 
-void UActorInventoryManagerComponent::AddParentCategory(const TSubclassOf<UInventoryCategory>& Category, int32& DepthIndex)
+void UActorInventoryManagerComponent::AddParentCategory(UInventoryCategory* Category, int32& DepthIndex)
 {
 	if (DepthIndex > MaxRecursionDepth)
 	{
@@ -209,9 +209,9 @@ void UActorInventoryManagerComponent::AddParentCategory(const TSubclassOf<UInven
 			
 			DepthIndex++;
 			
-			if (Category.GetDefaultObject() && Category.GetDefaultObject()->GetParentCategory())
+			if (Category && Category->GetParentCategory())
 			{
-				AddParentCategory(Category.GetDefaultObject()->GetParentCategory(), DepthIndex);
+				AddParentCategory(Category->GetParentCategory(), DepthIndex);
 			}
 		}
 	}

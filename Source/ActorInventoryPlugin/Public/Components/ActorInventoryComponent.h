@@ -86,11 +86,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=""))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
 	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")

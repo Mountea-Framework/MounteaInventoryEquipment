@@ -34,13 +34,13 @@ public:
 	TArray<UInventoryItem*> GetItemsFromInventory(APlayerController* OwningPlayer) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management")
-	FORCEINLINE TSet<TSubclassOf<UInventoryCategory>> GetInventoryCategories() const
+	FORCEINLINE TSet<UInventoryCategory*> GetInventoryCategories() const
 	{
 		return AllowedCategories;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management")
-	FORCEINLINE TSet<TSubclassOf<UInventoryItemRarity>> GetInventoryRarities() const
+	FORCEINLINE TSet<UInventoryItemRarity*> GetInventoryRarities() const
 	{
 		return AllowedRarities;
 	}
@@ -50,22 +50,22 @@ public:
 	void ClearAllowedCategories();
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
-	void SetAllowedCategories(const TSet<TSubclassOf<UInventoryCategory>>& Categories);
+	void SetAllowedCategories(TSet<UInventoryCategory*>& Categories);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
-	void AddAllowedCategory(const TSubclassOf<UInventoryCategory>& Category);
+	void AddAllowedCategory(UInventoryCategory* Category);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
-	void AddAllowedCategories(const TSet<TSubclassOf<UInventoryCategory>>& Categories);
+	void AddAllowedCategories(TSet<UInventoryCategory*>& Categories);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
-	void RemoveAllowedCategory(const TSubclassOf<UInventoryCategory>& Category);
+	void RemoveAllowedCategory(UInventoryCategory* Category);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
-	void RemoveAllowedCategories(const TSet<TSubclassOf<UInventoryCategory>>& Categories);
+	void RemoveAllowedCategories(TSet<UInventoryCategory*>& Categories);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
-	FORCEINLINE bool ContainsAllowedCategory(const TSubclassOf<UInventoryCategory>& Category) const
+	FORCEINLINE bool ContainsAllowedCategory(const UInventoryCategory* Category) const
 	{
 		return AllowedCategories.Contains(Category);
 	}
@@ -75,22 +75,22 @@ public:
 	void ClearAllowedRarities();
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
-	void SetAllowedRarities(const TSet<TSubclassOf<UInventoryItemRarity>>& Rarities);
+	void SetAllowedRarities(const TSet<UInventoryItemRarity*>& Rarities);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
-	void AddAllowedRarity(const TSubclassOf<UInventoryItemRarity>& Rarity);
+	void AddAllowedRarity(UInventoryItemRarity* Rarity);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
-	void AddAllowedRarities(const TSet<TSubclassOf<UInventoryItemRarity>>& Rarities);
+	void AddAllowedRarities(const TSet<UInventoryItemRarity*>& Rarities);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
-	void RemoveAllowedRarity(const TSubclassOf<UInventoryItemRarity>& Rarity);
+	void RemoveAllowedRarity(const UInventoryItemRarity* Rarity);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
-	void RemoveAllowedRarities(const TSet<TSubclassOf<UInventoryItemRarity>>& Rarities);
+	void RemoveAllowedRarities(const TSet<UInventoryItemRarity*>& Rarities);
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
-	FORCEINLINE bool ContainsAllowedRarity(const TSubclassOf<UInventoryItemRarity>& Rarity) const
+	FORCEINLINE bool ContainsAllowedRarity(const UInventoryItemRarity* Rarity) const
 	{
 		return AllowedRarities.Contains(Rarity);
 	}
@@ -121,7 +121,7 @@ protected:
 	 * Display order is equal order in Array.
 	 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
-	TSet<TSubclassOf<UInventoryCategory>> AllowedCategories;
+	TSet<UInventoryCategory*> AllowedCategories;
 
 	/**
 	 * List of allowed Rarities to be displayed in the Inventory.
@@ -130,11 +130,11 @@ protected:
 	 * Display order is equal order in Array.
 	 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
-	TSet<TSubclassOf<UInventoryItemRarity>> AllowedRarities;
+	TSet<UInventoryItemRarity*> AllowedRarities;
 
 private:
 	
-	void AddParentCategory(const TSubclassOf<UInventoryCategory>& Category, int32& DepthIndex);
+	void AddParentCategory(UInventoryCategory* Category, int32& DepthIndex);
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 };
 

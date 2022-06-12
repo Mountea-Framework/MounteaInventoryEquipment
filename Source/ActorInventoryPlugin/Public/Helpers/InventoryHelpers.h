@@ -64,9 +64,25 @@ public:
 		bIsStackable == Other.bIsStackable &&
 		MaxStackAmount == Other.MaxStackAmount;
 	}
+};
 
+USTRUCT(BlueprintType, Blueprintable)
+struct FInventoryCategoryData
+{
+	GENERATED_BODY()
 
+	// Name of this Category, useful for UI
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
 
+	// Icon of this Category, useful for UI
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UTexture2D* CategoryTexture = nullptr;
+
+	// Parent Category of this one, useful for Inventory sorting, however, optional
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UInventoryCategory* ParentCategory = nullptr;
+	
 };
 
 /**
@@ -80,7 +96,8 @@ struct FInventoryItemData : public FTableRowBase
 	FInventoryItemData() : ItemQuantityData() {};
 
 	FInventoryItemData(const FInventoryItemData& Other)
-		: ItemCategory(Other.ItemCategory)
+		: ItemDataGUID(FGuid::NewGuid())
+		, ItemCategory(Other.ItemCategory)
 		, ItemRarity(Other.ItemRarity)
 		, ItemThumbnail(Other.ItemThumbnail)
 		, ItemTittle(Other.ItemTittle)
@@ -91,18 +108,19 @@ struct FInventoryItemData : public FTableRowBase
 	{}
 
 private:
-	
+
+	UPROPERTY(VisibleAnywhere, Category="Item Data|GUID")
 	FGuid ItemDataGUID = FGuid::NewGuid();
 
 public:
 	
 	// Category of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=""))
-	TSubclassOf<UInventoryCategory> ItemCategory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
+	UInventoryCategory* ItemCategory = nullptr;
 
 	// Rarity of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=""))
-	TSubclassOf<UInventoryItemRarity> ItemRarity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
+	UInventoryItemRarity* ItemRarity = nullptr;
 
 	// Item thumbnail texture, can be null
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
@@ -125,7 +143,7 @@ public:
 	UStreamableRenderAsset* ItemMesh = nullptr;
 
 	// Actor to spawn from this Item.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=""))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
 	TSoftClassPtr<AActor> SpawnItemClass = nullptr;
 
 public:
@@ -133,13 +151,15 @@ public:
 	inline bool operator==(const FInventoryItemData& Other) const
 	{
 		return
-		ItemCategory.GetDefaultObject() == Other.ItemCategory.GetDefaultObject() &&
+		ItemDataGUID == Other.ItemDataGUID; /* &&
+		ItemCategory == Other.ItemCategory &&
 		ItemRarity.GetDefaultObject() == Other.ItemRarity.GetDefaultObject() &&
 		ItemTittle.ToString() == Other.ItemTittle.ToString() &&
 		ItemDescription.ToString() == Other.ItemDescription.ToString() &&
 		ItemThumbnail == Other.ItemThumbnail &&
 		ItemMesh == Other.ItemMesh &&
-		ItemQuantityData == Other.ItemQuantityData;	
+		ItemQuantityData == Other.ItemQuantityData;
+		*/
 	}
 
 	inline bool operator!=(const FInventoryItemData& Other) const
@@ -149,6 +169,7 @@ public:
 
 	inline FInventoryItemData& operator=(const FInventoryItemData& Other)
 	{
+		ItemDataGUID = Other.ItemDataGUID;
 		ItemCategory = Other.ItemCategory;
 		ItemRarity = Other.ItemRarity;
 		ItemThumbnail = Other.ItemThumbnail;

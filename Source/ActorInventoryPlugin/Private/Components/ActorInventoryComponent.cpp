@@ -4,7 +4,6 @@
 
 #include "Definitions/InventoryItem.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
-#include "Helpers/ActorInventoryPluginLog.h"
 #include "Widgets/InventoryWidget.h"
 
 UActorInventoryComponent::UActorInventoryComponent()
@@ -20,11 +19,6 @@ void UActorInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	InventoryManager = UActorInventoryBPFLibrary::GetInventoryManager(this);
-}
-
-void UActorInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 void UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
@@ -63,8 +57,6 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 			{
 				const FInventoryItemData* Row = SourceTable->FindRow<FInventoryItemData>(Itr, ContextString);
 				
-				AInvP_LOG(Warning, TEXT("%s"), *ContextString)
-				
 				if (Row)
 				{
 					UInventoryItem* NewItem = NewObject<UInventoryItem>(UInventoryItem::StaticClass());
@@ -85,7 +77,7 @@ FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()
 	return OnInventoryUpdated;
 }
 
-void UActorInventoryComponent::SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
+void UActorInventoryComponent::SetInventoryWidgetClass(const TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
 {
 	InventoryWidgetClass = NewInventoryWidgetClass;
 }

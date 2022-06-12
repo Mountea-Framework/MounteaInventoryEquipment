@@ -18,12 +18,14 @@ class ACTORINVENTORYPLUGIN_API UInventoryWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
-	TScriptInterface<IActorInventoryInterface> OwningInventory = nullptr;
-
+	
 	virtual bool Initialize() override;
 
 	UFUNCTION(BlueprintImplementableEvent, Category="Inventory")
 	void RefreshWidget(UActorComponent* InventoryInterface);
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory")
+	TScriptInterface<IActorInventoryInterface> OwningInventory = nullptr;
 };
