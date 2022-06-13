@@ -13,5 +13,10 @@ UCLASS()
 class ACTORINVENTORYPLUGIN_API UInventoryItemWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+protected:
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
+	class UInventoryItem* Item = nullptr;
 	
 };

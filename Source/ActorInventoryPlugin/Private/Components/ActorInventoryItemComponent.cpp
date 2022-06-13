@@ -6,6 +6,11 @@
 #include "Definitions/InventoryItem.h"
 #include "Helpers/ActorInventoryPluginLog.h"
 
+void UActorInventoryItemComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
 {
 	FInventoryItemData ReturnDefinition;
@@ -21,10 +26,10 @@ FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
 			}
 			break;
 		case EInventoryItemSetup::EIIS_FromDataTable:
-			if (SourceItemTable.DataTable)
+			if (SourceItemRow.DataTable)
 			{
 				static const FString ContextString(TEXT(""));
-				const FInventoryItemData* Row = SourceItemTable.DataTable->FindRow<FInventoryItemData>(SourceItemTable.RowContents, ContextString);
+				const FInventoryItemData* Row = SourceItemRow.DataTable->FindRow<FInventoryItemData>(SourceItemRow.RowName, ContextString);
 				if (ContextString.IsEmpty())
 				{
 					ReturnDefinition = *Row;
@@ -47,24 +52,6 @@ void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent&
 
 	if (PropertyName == "DataTable")
 	{
-		const UDataTable* Table = SourceItemTable.DataTable;
-		
-		if (Table)
-		{
-			if (Table->GetRowStruct())
-			{
-				const UScriptStruct* InventoryRowStruct = Table->GetRowStruct();
-				if (InventoryRowStruct->IsChildOf(FInventoryItemData::StaticStruct()))
-				{
-					AInvP_LOG(Warning, TEXT("[UActorInventoryItemComponent] Valid Table"))
-				}
-				else
-				{
-					AInvP_LOG(Warning, TEXT("[UActorInventoryItemComponent] Invalid Table"))
-
-					//SourceItemTable.DataTable = nullptr;
-				}
-			}
-		}
+		// ...
 	}
 }

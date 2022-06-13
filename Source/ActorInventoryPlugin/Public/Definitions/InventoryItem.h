@@ -34,6 +34,14 @@ public:
 		Item = ItemValues;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE bool IsValidItem() const
+	{
+		return
+		Item.ItemCategory != nullptr &&
+		Item.ItemRarity != nullptr;
+	}
+
 	
 protected:
 	
