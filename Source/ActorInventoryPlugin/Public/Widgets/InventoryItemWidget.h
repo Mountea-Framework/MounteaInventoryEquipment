@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryItemWidget.generated.h"
 
+// DELME
+// replaced by UInventoryItemSlot
+
 /**
  * 
  */
