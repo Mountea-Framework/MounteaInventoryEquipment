@@ -3,3 +3,17 @@
 
 #include "Definitions/InventoryCategory.h"
 
+void UInventoryCategory::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName PropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.GetPropertyName() : NAME_None;
+
+	if (PropertyName == "ParentCategory")
+	{
+		if (CategoryData.ParentCategory == this)
+		{
+			CategoryData.ParentCategory = nullptr;
+		}
+	}
+}

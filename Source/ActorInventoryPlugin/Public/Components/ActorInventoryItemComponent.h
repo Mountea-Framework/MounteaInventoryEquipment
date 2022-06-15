@@ -9,6 +9,15 @@
 
 #include "ActorInventoryItemComponent.generated.h"
 
+UENUM()
+enum class EInventoryItemSetup : uint8
+{
+	EIIS_FromItem		UMETA(DisplayName="From Item"),
+	EIIS_FromDataTable	UMETA(DisplayName="From Data Table"),
+
+	EIIS_Default		UMETA(Hidden)
+};
+
 class UInventoryItem;
 
 /**
@@ -23,16 +32,21 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent final : public UActo
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE TArray<FInventoryItemData> GetItemDefinition() const
-	{
-		return Items;
-	}
-
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetItemDefinition(const TArray<FInventoryItemData> SetItems);
+	FInventoryItemData GetItemDefinition() const;
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	TArray<FInventoryItemData> Items;
+	UPROPERTY(EditAnywhere, Category="Inventory")
+	EInventoryItemSetup SetupMode = EInventoryItemSetup::EIIS_FromItem;
+
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault))
+	TSubclassOf<UInventoryItem> SourceItem = nullptr;
+
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromDataTable", EditConditionHides, NoResetToDefault, ShowOnlyInnerProperties))
+	FDataTableRowHandle SourceItemRow;
+	
+protected:
+
+	virtual void BeginPlay() override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

@@ -4,12 +4,14 @@
 
 #include "Definitions/InventoryItem.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
-#include "Helpers/ActorInventoryPluginLog.h"
+#include "Widgets/InventoryWidget.h"
 
 UActorInventoryComponent::UActorInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
+
+	InventoryWidgetClass = UInventoryWidget::StaticClass();
 }
 
 void UActorInventoryComponent::BeginPlay()
@@ -19,19 +21,15 @@ void UActorInventoryComponent::BeginPlay()
 	InventoryManager = UActorInventoryBPFLibrary::GetInventoryManager(this);
 }
 
-void UActorInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
 void UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 {
 	if (IsItemInInventory(Item))
 	{
 		return;
 	}
-	
+
 	InventoryItems.Emplace(Item);
+	OnInventoryUpdated.Broadcast(this);
 }
 
 void UActorInventoryComponent::AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems)
@@ -59,8 +57,6 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 			{
 				const FInventoryItemData* Row = SourceTable->FindRow<FInventoryItemData>(Itr, ContextString);
 				
-				AInvP_LOG(Warning, TEXT("%s"), *ContextString)
-				
 				if (Row)
 				{
 					UInventoryItem* NewItem = NewObject<UInventoryItem>(UInventoryItem::StaticClass());
@@ -74,4 +70,29 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 			}
 		} 
 	}
+}
+
+FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()
+{
+	return OnInventoryUpdated;
+}
+
+void UActorInventoryComponent::SetInventoryWidgetClass(const TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
+{
+	InventoryWidgetClass = NewInventoryWidgetClass;
+}
+
+void UActorInventoryComponent::SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget)
+{
+	InventoryWidget = NewInventoryWidget;
+}
+
+UInventoryWidget* UActorInventoryComponent::GetInventoryWidgetPtr() const
+{
+	return InventoryWidget;
+}
+
+TSubclassOf<UInventoryWidget> UActorInventoryComponent::GetInventoryWidgetClass() const
+{
+	return InventoryWidgetClass;
 }

@@ -12,7 +12,6 @@
 
 class UInventoryItem;
 
-
 /**
  * Implement an Actor component for inventory.
  *
@@ -30,6 +29,8 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryComponent : public UActorComponent
 public:	
 
 	UActorInventoryComponent();
+
+#pragma region InventoryInterface
 
 public:
 
@@ -51,14 +52,48 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) override;
 	
+	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
+
+#pragma region InventoryWidget
+
+public:
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass) override;
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) override;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual UInventoryWidget* GetInventoryWidgetPtr() const override;
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual TSubclassOf<UInventoryWidget> GetInventoryWidgetClass() const override;
+
+
+#pragma endregion InventoryWidget
+
+#pragma region Events
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnInventoryUpdated OnInventoryUpdated;
+
+#pragma endregion Events
+
+#pragma endregion InventoryInterface
+	
 protected:
 
 	virtual void BeginPlay() override;
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
+	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
+	UInventoryWidget* InventoryWidget = nullptr;
+	
 	/**
 	 * List of Items that are currently in Inventory.
 	 */

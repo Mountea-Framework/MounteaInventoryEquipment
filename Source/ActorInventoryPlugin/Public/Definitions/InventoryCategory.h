@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/InventoryHelpers.h"
 #include "UObject/NoExportTypes.h"
 #include "InventoryCategory.generated.h"
+
 
 #define LOCTEXT_NAMESPACE "Inventory Category"
 
@@ -21,22 +23,32 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE FText GetCategoryName() const
 	{
-		return CategoryName;
+		return CategoryData.CategoryName;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE TSubclassOf<UInventoryCategory> GetParentCategory() const
+	FORCEINLINE UTexture2D* GetCategoryIcon() const
 	{
-		return ParentCategory;
+		return CategoryData.CategoryTexture;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE UInventoryCategory* GetParentCategory() const
+	{
+		return CategoryData.ParentCategory;
 	}
 	
 protected:
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
-	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
-	TSubclassOf<UInventoryCategory> ParentCategory = nullptr;
+	// Category Data
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
+	FInventoryCategoryData CategoryData;
+
+	// Unique GUID identifier for this record
+	UPROPERTY(VisibleAnywhere, Category="Inventory|GUID")
+	FGuid Guid = FGuid::NewGuid();
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };
 
 #undef LOCTEXT_NAMESPACE

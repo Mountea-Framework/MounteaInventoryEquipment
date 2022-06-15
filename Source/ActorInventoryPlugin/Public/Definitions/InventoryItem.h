@@ -34,11 +34,20 @@ public:
 		Item = ItemValues;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE bool IsValidItem() const
+	{
+		return
+		Item.ItemCategory != nullptr &&
+		Item.ItemRarity != nullptr;
+	}
+
 	
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
 	FInventoryItemData Item;
+	
 };
 
 #undef LOCTEXT_NAMESPACE
