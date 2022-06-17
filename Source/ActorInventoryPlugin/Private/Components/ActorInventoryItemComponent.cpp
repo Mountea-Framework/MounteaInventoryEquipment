@@ -52,6 +52,7 @@ void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent&
 
 	if (PropertyName == "DataTable")
 	{
+		// Todo: Show message that the table is invalid
 		// ...
 	}
 }
