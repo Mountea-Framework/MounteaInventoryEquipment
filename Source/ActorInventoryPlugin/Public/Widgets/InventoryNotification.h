@@ -1,0 +1,39 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "Helpers/InventoryHelpers.h"
+#include "InventoryNotification.generated.h"
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationExpired, class UInventoryNotification*, EppiredNotification);
+
+/**
+ * 
+ */
+UCLASS()
+class ACTORINVENTORYPLUGIN_API UInventoryNotification : public UUserWidget
+{
+	GENERATED_BODY()
+
+	virtual void NativeConstruct() override;
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
+	FNotificationInfo NotificationInfo;
+		
+	UPROPERTY()
+	FTimerHandle Expiration_TimeHandle;
+
+private:
+
+	void OnNotificationExpiredCallback();
+
+public:
+
+	UPROPERTY(BlueprintAssignable, Category="Inventory")
+	FOnNotificationExpired OnNotificationExpired;
+};

@@ -10,7 +10,7 @@ UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
-void UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer)
+bool UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer)
 {
 	if (OwningPlayer)
 	{
@@ -29,19 +29,29 @@ void UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, A
 
 				if (InventoryInterface)
 				{
-					InventoryInterface->AddItemToInventory(Item);
+					UInventoryItem* NewItem = NewObject<UInventoryItem>();
+					NewItem->SetItem(Item->GetItem());
+					
+					return InventoryInterface->AddItemToInventory(Item);
 				}
 			}
 		}
 	}
+
+	return false;
 }
 
-void UActorInventoryManagerComponent::AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer)
+bool UActorInventoryManagerComponent::AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer)
 {
 	for (UInventoryItem* Itr : Items)
 	{
-		AddItemToInventory(Itr, OwningPlayer);
+		if (!AddItemToInventory(Itr, OwningPlayer))
+		{
+			return false;
+		}
 	}
+
+	return true;
 }
 
 TArray<UInventoryItem*>  UActorInventoryManagerComponent::GetItemsFromInventory(APlayerController* OwningPlayer) const

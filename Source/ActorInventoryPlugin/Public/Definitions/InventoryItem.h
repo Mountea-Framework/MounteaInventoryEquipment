@@ -20,10 +20,14 @@ class ACTORINVENTORYPLUGIN_API UInventoryItem : public UObject
 
 	UInventoryItem(){};
 
+	explicit UInventoryItem(FInventoryItemData& ItemData)
+	: Item(ItemData)
+	{};
+
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE FInventoryItemData GetItem() const
+	FORCEINLINE FInventoryItemData& GetItem()
 	{
 		return Item;
 	}

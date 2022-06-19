@@ -11,6 +11,7 @@
 #include "ActorInventoryComponent.generated.h"
 
 class UInventoryItem;
+class UInventoryNotificationContainer;
 
 /**
  * Implement an Actor component for inventory.
@@ -35,41 +36,75 @@ public:
 public:
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	virtual void AddItemToInventory(UInventoryItem* Item) override;
+	virtual bool AddItemToInventory(UInventoryItem* Item) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual void AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems) override;
+	virtual bool AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual void RemoveItemsFromInventory(const TArray<UInventoryItem*>& ListOfItems) override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void RemoveItemFromInventory(UInventoryItem* Item) override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void SubtractItemFromInventory(UInventoryItem* Item) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual void SubtractItemsFromInventory(const TArray<UInventoryItem*>& ListOfItems) override;
+	
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual TArray<UInventoryItem*> GetInventoryItems() const override {return InventoryItems; };
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void SetInventoryItems(const TArray<UInventoryItem*> Items) override {InventoryItems = Items; }
+	
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual int32 GetItemQuantity(UInventoryItem* Item) const override;
+
+	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const override;
+	virtual bool FindItemByGUID(const FGuid& Guid) const override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UInventoryItem* GetItemFromInventory(const FInventoryItemData& ItemData) const override;
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual bool IsItemInInventory(const UInventoryItem* Item) const override;
+	virtual bool IsItemInInventory(UInventoryItem* Item) const override;
+	
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) override;
+
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
+	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
 
 #pragma region InventoryWidget
 
 public:
 	
-	UFUNCTION(BlueprintCallable, Category="Inventory")
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
 	virtual void SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass) override;
 	
-	UFUNCTION(BlueprintCallable, Category="Inventory")
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) override;
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const override;
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	virtual TSubclassOf<UInventoryWidget> GetInventoryWidgetClass() const override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE UInventoryNotificationContainer* GetNotificationContainerPtr() const
+	{
+		return InventoryNotificationContainer;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetNotificationContainerPtr(UInventoryNotificationContainer* Widget);
 
 #pragma endregion InventoryWidget
 
@@ -77,6 +112,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnInventoryUpdated OnInventoryUpdated;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnInventoryUpdateRequestProcessed OnInventoryUpdateRequestProcessed;
 
 #pragma endregion Events
 
@@ -93,6 +131,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
+	UInventoryNotificationContainer* InventoryNotificationContainer = nullptr;
 	
 	/**
 	 * List of Items that are currently in Inventory.

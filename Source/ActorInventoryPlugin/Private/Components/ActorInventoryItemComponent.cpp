@@ -19,7 +19,7 @@ FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
 		case EInventoryItemSetup::EIIS_FromItem:
 			if (SourceItem)
 			{
-				if (const UInventoryItem* Item = Cast<UInventoryItem>(SourceItem->GetDefaultObject(true)))
+				if (UInventoryItem* Item = Cast<UInventoryItem>(SourceItem->GetDefaultObject(true)))
 				{
 					ReturnDefinition = Item->GetItem();
 				}

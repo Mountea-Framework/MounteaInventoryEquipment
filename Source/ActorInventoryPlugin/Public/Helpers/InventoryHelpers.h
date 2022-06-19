@@ -42,27 +42,41 @@ USTRUCT(BlueprintType, Blueprintable)
 struct FItemQuantityData
 {
 	GENERATED_BODY()
-	
-	// How many Items will be added to Inventory
+
+public:
+
+	// How many instances are in Inventory
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
-	int32 DefaultAmount = 1;
+	int32 Quantity = 1;
+
+	// How many Items of this one are allowed in Inventory
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
+	int32 MaxQuantity = 99;
+		
+	/**
+	 * How many Items will be processed to Inventory
+	 * > 0 means adding to inventory
+	 * < 0 means removing from inventory
+	 */ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
+	int32 ProcessAmount = 1;
 
 	// Defines whether stacking multiple Item instances of this Item is allowed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
 	uint8 bIsStackable : 1;
 
-	// If stacking is possible, how much is allowed to stack
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
-	int32 MaxStackAmount = 99;
-
 public:
-
+	
 	inline bool operator==(const FItemQuantityData& Other) const
 	{
 		return
-		DefaultAmount == Other.DefaultAmount &&
 		bIsStackable == Other.bIsStackable &&
-		MaxStackAmount == Other.MaxStackAmount;
+		MaxQuantity == Other.MaxQuantity;
+	}
+
+	inline bool operator!=(const FItemQuantityData& Other) const
+	{
+		return !(*this==Other);
 	}
 };
 
@@ -151,15 +165,25 @@ public:
 	inline bool operator==(const FInventoryItemData& Other) const
 	{
 		return
-		ItemDataGUID == Other.ItemDataGUID; /* &&
 		ItemCategory == Other.ItemCategory &&
-		ItemRarity.GetDefaultObject() == Other.ItemRarity.GetDefaultObject() &&
+		ItemRarity == Other.ItemRarity &&
 		ItemTittle.ToString() == Other.ItemTittle.ToString() &&
 		ItemDescription.ToString() == Other.ItemDescription.ToString() &&
 		ItemThumbnail == Other.ItemThumbnail &&
 		ItemMesh == Other.ItemMesh &&
 		ItemQuantityData == Other.ItemQuantityData;
-		*/
+	}
+
+	inline bool operator==(FInventoryItemData& Other) const
+	{
+		return
+		ItemCategory == Other.ItemCategory &&
+		ItemRarity == Other.ItemRarity &&
+		ItemTittle.ToString() == Other.ItemTittle.ToString() &&
+		ItemDescription.ToString() == Other.ItemDescription.ToString() &&
+		ItemThumbnail == Other.ItemThumbnail &&
+		ItemMesh == Other.ItemMesh &&
+		ItemQuantityData == Other.ItemQuantityData;
 	}
 
 	inline bool operator!=(const FInventoryItemData& Other) const
@@ -181,7 +205,56 @@ public:
 		
 		return *this;
 	}
-	
+
+	FORCEINLINE void UpdateItemQuantity(const int32 AddAmount)
+	{
+		ItemQuantityData.Quantity += AddAmount;
+	}
+
+	FORCEINLINE FGuid GetGuid() const
+	{
+		return ItemDataGUID;
+	}
+
+	FORCEINLINE bool CompareGuid(const FGuid& Other) const
+	{
+		return ItemDataGUID == Other;
+	}
+};
+
+/**
+ * 
+ */
+USTRUCT(BlueprintType, Blueprintable)
+struct FNotificationInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UTexture2D* NotificationTexture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText NotificationText = LOCTEXT("NotificationInfo", "Item has been added successfully to Inventory");
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ShowDuration = 3.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FLinearColor IconTint = FLinearColor::White;
 };
 
 #undef LOCTEXT_NAMESPACE
+
+/**
+ * 
+ */
+UENUM(BlueprintType)
+enum class EInventoryContext : uint8
+{
+	EIC_Success						UMETA(DisplayName="Succes"),
+	EIC_Success_SplitStack			UMETA(DisplayName="Succes - Split Stacks"),
+	EIC_Failed_InvalidItem			UMETA(DisplayName="Failed - Invalid Item"),
+	EIC_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
+
+	Default UMETA(Hidden)
+};

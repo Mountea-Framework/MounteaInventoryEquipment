@@ -14,6 +14,8 @@
 class UInventoryCategory;
 class UInventoryItemRarity;
 class UInventoryItem;
+class UInventoryNotification;
+class UInventoryNotificationContainer;
 
 UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Manager", ShortTooltip="Inventory Manager responsible for Adding and Removing Items from Inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryManagerComponent : public UActorComponent
@@ -25,10 +27,10 @@ public:
 	UActorInventoryManagerComponent();
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer);
+	bool AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer);
+	bool AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	TArray<UInventoryItem*> GetItemsFromInventory(APlayerController* OwningPlayer) const;
@@ -98,6 +100,57 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory", meta=(DeprecatedFunction, DeprecatedMessage="Use this function with caution as this might be really performance heavy."))
 	void UpdateCategories();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Notifications")
+	FORCEINLINE TMap<EInventoryContext, FNotificationInfo> GetNotificationsInfo () const
+	{
+		return NotificationInfo;
+	}
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory|Notifications")
+	FNotificationInfo GetNotificationInfo(const EInventoryContext Context)
+	{
+		if (NotificationInfo.Contains(Context))
+		{
+			return NotificationInfo[Context];
+		}
+
+		return FNotificationInfo();
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|Notifications")
+	FORCEINLINE UTexture2D* GetNotificationIcon(const EInventoryContext Context)
+	{
+		if (NotificationInfo.Contains(Context))
+		{
+			return NotificationInfo[Context].NotificationTexture;
+		}
+
+		return nullptr;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|Notifications")
+	FORCEINLINE FText GetNotificationText(const EInventoryContext Context)
+	{
+		if (NotificationInfo.Contains(Context))
+		{
+			return NotificationInfo[Context].NotificationText;
+		}
+
+		return FText::FromString("Default notification message!");
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Notifications")
+	FORCEINLINE TSubclassOf<UInventoryNotificationContainer> GetNotificationContainerClass () const
+	{
+		return NotificationContainerClass;
+	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Notifications")
+	FORCEINLINE TSubclassOf<UInventoryNotification> GetNotificationClass () const
+	{
+		return NotificationClass;
+	}
+	
 protected:
 	
 	virtual void BeginPlay() override;
@@ -105,13 +158,13 @@ protected:
 	/**
 	 * If Category is added to Allowed Categories, should we allow its parent Categories as well?
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Categories")
 	uint8 bAutoAllowParentCategories : 1;
 
 	/**
 	 * Defines how deep the search for Parent category iterates. Higher the value, higher the performance impact and more precise result.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory", meta=(EditCondition="bAutoAllowParentCategories", UIMin=1, ClampMin=1))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Categories", meta=(EditCondition="bAutoAllowParentCategories", UIMin=1, ClampMin=1))
 	int32 MaxRecursionDepth =  6;
 	
 	/**
@@ -120,7 +173,7 @@ protected:
 	 * Only valid Categories will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSet<UInventoryCategory*> AllowedCategories;
 
 	/**
@@ -129,8 +182,17 @@ protected:
 	 * Only valid Rarities will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|Rarities", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSet<UInventoryItemRarity*> AllowedRarities;
+
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
+	TMap<EInventoryContext, FNotificationInfo> NotificationInfo;
+
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	TSubclassOf<UInventoryNotification> NotificationClass;
 
 private:
 	
