@@ -230,16 +230,16 @@ struct FNotificationInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	UTexture2D* NotificationTexture;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	FText NotificationText = LOCTEXT("NotificationInfo", "Item has been added successfully to Inventory");
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	float ShowDuration = 3.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	FLinearColor IconTint = FLinearColor::White;
 };
 

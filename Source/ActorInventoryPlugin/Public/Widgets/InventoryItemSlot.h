@@ -21,6 +21,12 @@ protected:
 	{
 		return Item != nullptr;
 	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void ClearItem()
+	{
+		Item = nullptr;
+	}
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
 	class UInventoryItem* Item = nullptr;
