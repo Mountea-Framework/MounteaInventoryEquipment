@@ -15,6 +15,24 @@ UActorInventoryComponent::UActorInventoryComponent()
 	InventoryWidgetClass = UInventoryWidget::StaticClass();
 }
 
+void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInventoryLayout)
+{
+	InventoryLayout = InInventoryLayout;
+}
+
+void UActorInventoryComponent::SaveToInventoryLayout(FIntPoint& SlotCoordinates, UInventoryItemSlot* Slot)
+{
+	if (InventoryLayout.SavedInventoryLayout.Contains(SlotCoordinates))
+	{
+		InventoryLayout.SavedInventoryLayout.Remove(SlotCoordinates);
+		InventoryLayout.SavedInventoryLayout.Add(SlotCoordinates, Slot);
+	}
+	else
+	{
+		InventoryLayout.SavedInventoryLayout.Add(SlotCoordinates, Slot);
+	}
+}
+
 void UActorInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -291,6 +309,11 @@ FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()
 FOnInventoryUpdateRequestProcessed& UActorInventoryComponent::GetInventoryRequestProcessedHandle()
 {
 	return OnInventoryUpdateRequestProcessed;
+}
+
+FOnInventoryLayoutSaveRequested& UActorInventoryComponent::GetInventoryLayoutUpdateRequestHandle()
+{
+	return OnInventoryLayoutSaveRequested;
 }
 
 void UActorInventoryComponent::SetInventoryWidgetClass(const TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)

@@ -80,6 +80,7 @@ public:
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
+	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() override;
 
 #pragma region InventoryWidget
 
@@ -116,9 +117,24 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnInventoryUpdateRequestProcessed OnInventoryUpdateRequestProcessed;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnInventoryLayoutSaveRequested OnInventoryLayoutSaveRequested;
+
 #pragma endregion Events
 
 #pragma endregion InventoryInterface
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryLayout(const FInventoryLayout& InInventoryLayout);
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SaveToInventoryLayout(FIntPoint& SlotCoordinates, class UInventoryItemSlot* Slot);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE FInventoryLayout GetInventoryLayout() const
+	{
+		return InventoryLayout;
+	}
 	
 protected:
 
@@ -132,6 +148,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
+	TSubclassOf<UInventoryNotificationContainer> InventoryNotificationContainerClass;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryNotificationContainer* InventoryNotificationContainer = nullptr;
 	
@@ -141,6 +160,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TArray<UInventoryItem*> InventoryItems;
 
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
+	FInventoryLayout InventoryLayout;
+	
 private:
 
 	UPROPERTY()

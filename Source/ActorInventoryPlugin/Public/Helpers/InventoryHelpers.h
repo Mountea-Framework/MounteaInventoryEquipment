@@ -243,6 +243,18 @@ struct FNotificationInfo
 	FLinearColor IconTint = FLinearColor::White;
 };
 
+USTRUCT(BlueprintType, Blueprintable)
+struct FInventoryLayout
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	FIntPoint InventoryLayout = FIntPoint(10,6);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	TMap<FIntPoint, class UInventoryItemSlot*> SavedInventoryLayout;
+};
+
 #undef LOCTEXT_NAMESPACE
 
 /**

@@ -21,8 +21,11 @@ protected:
 	
 	virtual bool Initialize() override;
 
-	UFUNCTION(BlueprintImplementableEvent, Category="Inventory")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Inventory")
 	void RefreshWidget(UActorComponent* InventoryInterface);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Inventory")
+	void SaveItemLayout(const FIntPoint& SlotCoordinates, class UInventoryItemSlot* SlotWidget);
 
 protected:
 

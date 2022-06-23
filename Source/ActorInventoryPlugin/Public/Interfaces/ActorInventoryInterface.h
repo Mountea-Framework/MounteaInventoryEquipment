@@ -11,6 +11,7 @@ enum class EInventoryContext : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, UActorComponent*, InventoryComponent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdateRequestProcessed, EInventoryContext, Context);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryLayoutSaveRequested, const FIntPoint&, SlotCoordinates, class UInventoryItemSlot*, Slot);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -64,5 +65,6 @@ public:
 
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;
+	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() = 0;
 
 };
