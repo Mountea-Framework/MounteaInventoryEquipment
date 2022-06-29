@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Helpers/InventoryHelpers.h"
 #include "InventoryItemSlot.generated.h"
+
 
 /**
  * 
@@ -16,19 +18,25 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlot : public UUserWidget
 
 protected:
 
+	virtual bool Initialize() override;
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE bool DoesHaveItem() const
 	{
-		return Item != nullptr;
+		return ItemSlotData.Item != nullptr;
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void ClearItem()
 	{
-		Item = nullptr;
+		ItemSlotData.Item = nullptr;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	void SlotUpdated(const FInventorySlotData& Data);
+
+protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
-	class UInventoryItem* Item = nullptr;
-	
+	FInventorySlotData ItemSlotData;
 };

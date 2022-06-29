@@ -43,7 +43,8 @@ public:
 	{
 		return
 		Item.ItemCategory != nullptr &&
-		Item.ItemRarity != nullptr;
+		Item.ItemRarity != nullptr &&
+		Item.ItemQuantityData.Quantity <= Item.ItemQuantityData.MaxQuantity;
 	}
 
 	

@@ -2,6 +2,7 @@
 
 #include "Components/ActorInventoryComponent.h"
 
+#include "Definitions/InventoryCategory.h"
 #include "Definitions/InventoryItem.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
 #include "Helpers/ActorInventoryPluginLog.h"
@@ -20,7 +21,7 @@ void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInve
 	InventoryLayout = InInventoryLayout;
 }
 
-void UActorInventoryComponent::SaveToInventoryLayout(FIntPoint& SlotCoordinates, UInventoryItemSlot* Slot)
+void UActorInventoryComponent::SaveToInventoryLayout(FIntPoint& SlotCoordinates, FInventorySlotData& Slot)
 {
 	if (InventoryLayout.SavedInventoryLayout.Contains(SlotCoordinates))
 	{
@@ -40,10 +41,37 @@ void UActorInventoryComponent::BeginPlay()
 	InventoryManager = UActorInventoryBPFLibrary::GetInventoryManager(this);
 }
 
+void UActorInventoryComponent::SplitItemByCategory(FInventoryItemData& NewItemData, FInventoryItemData& ExistingItemData)
+{
+	if (NewItemData.ItemCategory && ExistingItemData.ItemCategory)
+	{
+		// Calculate how much to Allowed Maximum is left
+		int32 AmountToLeave = NewItemData.ItemQuantityData.Quantity - (ExistingItemData.ItemCategory->GetMaxQuantityPerStack() - ExistingItemData.ItemQuantityData.Quantity);
+		
+		// Add up to Maximum Allowed Stack
+		ExistingItemData.ItemQuantityData.Quantity = ExistingItemData.ItemCategory->GetMaxQuantityPerStack();
+
+		while (AmountToLeave > 0)
+		{
+			FInventoryItemData CreatedItemData = NewItemData;
+			// Subtract added from New Item
+			CreatedItemData.ItemQuantityData.Quantity = FMath::Min(ExistingItemData.ItemCategory->GetMaxQuantityPerStack(), AmountToLeave);
+
+			UInventoryItem* SplitItem = NewObject<UInventoryItem>();
+			SplitItem->SetItem(CreatedItemData);
+
+			AmountToLeave -= ExistingItemData.ItemCategory->GetMaxQuantityPerStack();
+						
+			AddItemToInventory(SplitItem);
+		}
+	}
+}
+
 bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 {
 	EInventoryContext InventoryContext = EInventoryContext::Default;
-	
+
+	// Invalid Ptr
 	if (!Item)
 	{
 		InventoryContext = EInventoryContext::EIC_Failed_InvalidItem;
@@ -52,60 +80,88 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 		return false;
 	}
 
+	// Invalid Item
+	if (!(Item->IsValidItem()))
+	{
+		InventoryContext = EInventoryContext::EIC_Failed_InvalidItem;
+		OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
+		
+		return false;
+	}
+
 	// Cache data
-	FInventoryItemData& NewItemData = Item->GetItem();
-	const int32 ProcessAmount = NewItemData.ItemQuantityData.ProcessAmount;
+	FInventoryItemData& AddingItemData = Item->GetItem();
+	const int32 ProcessAmount = AddingItemData.ItemQuantityData.Quantity;
 	
-	if (UInventoryItem* ExistingItem = GetItemFromInventory(NewItemData))
+	if (UInventoryItem* ExistingItem = GetItemFromInventory(AddingItemData))
 	{
 		FInventoryItemData& ExistingItemData = ExistingItem->GetItem();
+		
+		const int32 PredictedAmount = ExistingItemData.ItemQuantityData.Quantity + ProcessAmount;
 
 		const bool bIsStacking = ExistingItemData.ItemQuantityData.bIsStackable;
-		const bool bLimitReached =
+		const bool bWouldReachLimit =
 		(
-			NewItemData.ItemQuantityData.ProcessAmount + ExistingItemData.ItemQuantityData.Quantity
+			PredictedAmount
 			>
 			ExistingItemData.ItemQuantityData.MaxQuantity
 		);
-
+		const bool bWouldApplyToLimit =
+		(
+			PredictedAmount == ExistingItemData.ItemQuantityData.MaxQuantity
+		);
+		
 		// Decisions
-		if (bIsStacking) // Can Stack, validate over MaxQuantity
+		if (bIsStacking) // Can Stack, set Quantity to Max and maybe Leave something
 		{
-			if (bLimitReached)
+			if (bWouldReachLimit)
 			{
-				const int32 QuantityToAdd = ExistingItemData.ItemQuantityData.MaxQuantity - ExistingItemData.ItemQuantityData.Quantity;
+				AddingItemData.ItemQuantityData.Quantity = PredictedAmount - ExistingItemData.ItemQuantityData.MaxQuantity;
+				ExistingItemData.ItemQuantityData.Quantity = ExistingItemData.ItemQuantityData.MaxQuantity;
 				
-				if (QuantityToAdd == 0)
-				{
-					InventoryContext = EInventoryContext::EIC_Failed_LimitReached;
-					OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
-
-					return false;
-				}
-
-				InventoryContext = EInventoryContext::EIC_Success_SplitStack;
+				InventoryContext = EInventoryContext::EIC_Failed_LimitReached;
 				OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
 
-				ExistingItemData.ItemQuantityData.Quantity = FMath::Min
-				(
-					ExistingItemData.ItemQuantityData.Quantity + NewItemData.ItemQuantityData.ProcessAmount,
-					ExistingItemData.ItemQuantityData.MaxQuantity
-				);
-
-				// Subtract added from New Item
-				NewItemData.ItemQuantityData.Quantity =- QuantityToAdd;
-				
 				return false;
 			}
-			else
+			else if (bWouldApplyToLimit)
 			{
-
 				InventoryContext = EInventoryContext::EIC_Success;
 				OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
 				
 				ExistingItemData.ItemQuantityData.Quantity += ProcessAmount;
 
 				return true;
+			}
+			else
+			{
+				if (ExistingItemData.ItemCategory)
+				{
+					if(PredictedAmount > ExistingItemData.ItemCategory->GetMaxQuantityPerStack())
+					{
+						SplitItemByCategory(AddingItemData, ExistingItemData);
+						
+						InventoryContext = EInventoryContext::EIC_Success_SplitStack;
+						OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
+						
+						return true;
+					}
+					else
+					{
+						InventoryContext = EInventoryContext::EIC_Success;
+						OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
+				
+						ExistingItemData.ItemQuantityData.Quantity += ProcessAmount;
+
+						return true;
+					}
+				}
+				else 
+				{
+					InventoryContext = EInventoryContext::EIC_Failed_InvalidItem;
+					OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
+					return false;
+				}
 			}
 		}
 		else // Cannot Stack
@@ -120,19 +176,30 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 	{
 		const bool bLimitReached =
 		(
-			NewItemData.ItemQuantityData.ProcessAmount
+			AddingItemData.ItemQuantityData.Quantity
 			>
-			NewItemData.ItemQuantityData.MaxQuantity
+			AddingItemData.ItemQuantityData.MaxQuantity
 		);
 
 		if (bLimitReached) // Clamp
 		{
-			NewItemData.ItemQuantityData.Quantity = FMath::Min(NewItemData.ItemQuantityData.ProcessAmount, NewItemData.ItemQuantityData.MaxQuantity);
+			FInventoryItemData NewItemData = AddingItemData;
+			
+			if (AddingItemData.ItemCategory)
+			{
+				SplitItemByCategory(AddingItemData, NewItemData);
+			}
+			
+			NewItemData.ItemQuantityData.Quantity = FMath::Min(AddingItemData.ItemQuantityData.Quantity, AddingItemData.ItemQuantityData.MaxQuantity);
+			AddingItemData.ItemQuantityData.Quantity -= NewItemData.ItemQuantityData.Quantity;
 
 			InventoryContext = EInventoryContext::EIC_Success_SplitStack;
 			OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
+			
+			UInventoryItem* NewItem = NewObject<UInventoryItem>();
+			NewItem->SetItem(NewItemData);
 		
-			InventoryItems.Emplace(Item);
+			InventoryItems.Emplace(NewItem);
 
 			return false;
 		}
@@ -148,6 +215,14 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 	}
 
 	return false;
+}
+
+void UActorInventoryComponent::AddItemToInventory_Internal(UInventoryItem* Item, const int32 Amount)
+{
+	if (Item)
+	{
+		AInvP_LOG(Warning, TEXT("Adding %d of %s"), Amount, *Item->GetName())
+	}
 }
 
 bool UActorInventoryComponent::AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems)
@@ -181,9 +256,8 @@ void UActorInventoryComponent::RemoveItemFromInventory(UInventoryItem* Item)
 	}
 }
 
-void UActorInventoryComponent::SubtractItemFromInventory(UInventoryItem* Item)
+void UActorInventoryComponent::SubtractItemFromInventory(UInventoryItem* Item, int32 Amount)
 {
-	FString ContextString = FString("");
 	EInventoryContext InventoryContext = EInventoryContext::Default;
 	
 	if (!Item)
@@ -194,18 +268,30 @@ void UActorInventoryComponent::SubtractItemFromInventory(UInventoryItem* Item)
 		return;
 	}
 
-	// Only Process removing Items and reuse existing function
-	if (Item->GetItem().ItemQuantityData.ProcessAmount < 0)
+	// Cache data
+	const FInventoryItemData& NewItemData = Item->GetItem();
+	
+	if (UInventoryItem* ExistingItem = GetItemFromInventory(NewItemData))
 	{
-		AddItemToInventory(Item);
+		if (ExistingItem->GetItem().ItemQuantityData.Quantity - Amount <= 0)
+		{
+			RemoveItemFromInventory(ExistingItem);
+		}
+		else
+		{
+			ExistingItem->GetItem().ItemQuantityData.Quantity -= Amount;
+		}
+
+		InventoryContext = EInventoryContext::EIC_Success_RemovedItem;
+		OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
 	}
 }
 
-void UActorInventoryComponent::SubtractItemsFromInventory(const TArray<UInventoryItem*>& ListOfItems)
+void UActorInventoryComponent::SubtractItemsFromInventory(const TMap<UInventoryItem*, int32>& ListOfItems)
 {
 	for (const auto Itr : ListOfItems)
 	{
-		SubtractItemFromInventory(Itr);
+		SubtractItemFromInventory(Itr.Key, Itr.Value);
 	}
 
 	OnInventoryUpdated.Broadcast(this);

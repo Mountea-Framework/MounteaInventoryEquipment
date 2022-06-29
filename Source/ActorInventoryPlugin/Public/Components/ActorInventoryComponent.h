@@ -38,6 +38,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual bool AddItemToInventory(UInventoryItem* Item) override;
 
+	void AddItemToInventory_Internal(UInventoryItem* Item, const int32 Amount);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual bool AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems) override;
 
@@ -48,10 +50,10 @@ public:
 	virtual void RemoveItemFromInventory(UInventoryItem* Item) override;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	virtual void SubtractItemFromInventory(UInventoryItem* Item) override;
+	virtual void SubtractItemFromInventory(UInventoryItem* Item, int32 Amount) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual void SubtractItemsFromInventory(const TArray<UInventoryItem*>& ListOfItems) override;
+	virtual void SubtractItemsFromInventory(const TMap<UInventoryItem*, int32>& ListOfItems) override;
 	
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
@@ -128,7 +130,7 @@ public:
 	void SetInventoryLayout(const FInventoryLayout& InInventoryLayout);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
-	void SaveToInventoryLayout(FIntPoint& SlotCoordinates, class UInventoryItemSlot* Slot);
+	void SaveToInventoryLayout(FIntPoint& SlotCoordinates, FInventorySlotData& Slot);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	FORCEINLINE FInventoryLayout GetInventoryLayout() const
@@ -139,15 +141,18 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+	void SplitItemByCategory(FInventoryItemData& NewItemData, FInventoryItemData& ExistingItemData);
 
 protected:
 
+	// TODO: move to manager
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
 	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
-
+	
+	// TODO: move to manager
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
 	TSubclassOf<UInventoryNotificationContainer> InventoryNotificationContainerClass;
 	

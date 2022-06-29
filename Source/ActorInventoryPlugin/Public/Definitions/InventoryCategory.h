@@ -37,6 +37,12 @@ public:
 	{
 		return CategoryData.ParentCategory;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE int32 GetMaxQuantityPerStack() const
+	{
+		return CategoryData.MaxQuantityPerStack;
+	}
 	
 protected:
 

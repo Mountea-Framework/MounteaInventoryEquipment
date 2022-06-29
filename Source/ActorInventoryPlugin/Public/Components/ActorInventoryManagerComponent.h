@@ -194,6 +194,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSubclassOf<UInventoryNotification> NotificationClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|Quantity", meta=(NoResetToDefault))
+	int32 DefaultMaxStacking = 99;
+	
 private:
 	
 	void AddParentCategory(UInventoryCategory* Category, int32& DepthIndex);

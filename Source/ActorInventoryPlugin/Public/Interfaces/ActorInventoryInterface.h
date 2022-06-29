@@ -41,8 +41,8 @@ public:
 	virtual void RemoveItemsFromInventory(const TArray<UInventoryItem*>& ListOfItems) = 0;
 	virtual void RemoveItemFromInventory(UInventoryItem* Item) = 0;
 
-	virtual void SubtractItemsFromInventory(const TArray<UInventoryItem*>& ListOfItems) = 0;
-	virtual void SubtractItemFromInventory(UInventoryItem* Item) = 0;
+	virtual void SubtractItemsFromInventory(const TMap<UInventoryItem*, int32>& ListOfItems) = 0;
+	virtual void SubtractItemFromInventory(UInventoryItem* Item, const int32 Amount) = 0;
 	
 	virtual void SetInventoryItems(const TArray<UInventoryItem*> Items) = 0;
 	

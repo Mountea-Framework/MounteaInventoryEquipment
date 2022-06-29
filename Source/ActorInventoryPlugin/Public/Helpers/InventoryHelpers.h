@@ -52,14 +52,6 @@ public:
 	// How many Items of this one are allowed in Inventory
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
 	int32 MaxQuantity = 99;
-		
-	/**
-	 * How many Items will be processed to Inventory
-	 * > 0 means adding to inventory
-	 * < 0 means removing from inventory
-	 */ 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
-	int32 ProcessAmount = 1;
 
 	// Defines whether stacking multiple Item instances of this Item is allowed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
@@ -71,7 +63,8 @@ public:
 	{
 		return
 		bIsStackable == Other.bIsStackable &&
-		MaxQuantity == Other.MaxQuantity;
+		MaxQuantity == Other.MaxQuantity &&
+		Quantity == Other.Quantity;
 	}
 
 	inline bool operator!=(const FItemQuantityData& Other) const
@@ -88,7 +81,10 @@ struct FInventoryCategoryData
 	// Name of this Category, useful for UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	int32 MaxQuantityPerStack = 99;
+	
 	// Icon of this Category, useful for UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	UTexture2D* CategoryTexture = nullptr;
@@ -244,6 +240,19 @@ struct FNotificationInfo
 };
 
 USTRUCT(BlueprintType, Blueprintable)
+struct FInventorySlotData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	class UInventoryItem* Item = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	int32 Quantity;
+	
+};
+
+USTRUCT(BlueprintType, Blueprintable)
 struct FInventoryLayout
 {
 	GENERATED_BODY()
@@ -252,7 +261,7 @@ struct FInventoryLayout
 	FIntPoint InventoryLayout = FIntPoint(10,6);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
-	TMap<FIntPoint, class UInventoryItemSlot*> SavedInventoryLayout;
+	TMap<FIntPoint, FInventorySlotData> SavedInventoryLayout;
 };
 
 #undef LOCTEXT_NAMESPACE
@@ -265,6 +274,7 @@ enum class EInventoryContext : uint8
 {
 	EIC_Success						UMETA(DisplayName="Succes"),
 	EIC_Success_SplitStack			UMETA(DisplayName="Succes - Split Stacks"),
+	EIC_Success_RemovedItem			UMETA(DisplayName="Success - Removed Item"),
 	EIC_Failed_InvalidItem			UMETA(DisplayName="Failed - Invalid Item"),
 	EIC_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
 
