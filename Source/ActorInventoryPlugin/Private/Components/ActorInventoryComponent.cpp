@@ -54,6 +54,9 @@ void UActorInventoryComponent::SplitItemByCategory(FInventoryItemData& NewItemDa
 		while (AmountToLeave > 0)
 		{
 			FInventoryItemData CreatedItemData = NewItemData;
+			//CreatedItemData.ForceGUID(NewItemData.GetGuid());
+
+			//TODO: GUIDS!
 			// Subtract added from New Item
 			CreatedItemData.ItemQuantityData.Quantity = FMath::Min(ExistingItemData.ItemCategory->GetMaxQuantityPerStack(), AmountToLeave);
 
@@ -92,8 +95,22 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 	// Cache data
 	FInventoryItemData& AddingItemData = Item->GetItem();
 	const int32 ProcessAmount = AddingItemData.ItemQuantityData.Quantity;
+
+	UInventoryItem* ExistingItem = nullptr;
+	if(FindItemByGUID(AddingItemData.GetGuid()))
+	{
+		ExistingItem = GetItemByGUID(AddingItemData.GetGuid());
+	}
+	else if (FindItemByData(AddingItemData))
+	{
+		ExistingItem = GetItemByData(AddingItemData);
+	}
+	else if (FindItemByClass(Item->StaticClass()))
+	{
+		ExistingItem = GetItemByClass(Item->StaticClass());
+	}
 	
-	if (UInventoryItem* ExistingItem = GetItemFromInventory(AddingItemData))
+	if (ExistingItem)
 	{
 		FInventoryItemData& ExistingItemData = ExistingItem->GetItem();
 		
@@ -139,6 +156,7 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 				{
 					if(PredictedAmount > ExistingItemData.ItemCategory->GetMaxQuantityPerStack())
 					{
+						// TODO: Split should not affect InventoryItems array, but there should be layout data only
 						SplitItemByCategory(AddingItemData, ExistingItemData);
 						
 						InventoryContext = EInventoryContext::EIC_Success_SplitStack;
@@ -217,14 +235,6 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 	return false;
 }
 
-void UActorInventoryComponent::AddItemToInventory_Internal(UInventoryItem* Item, const int32 Amount)
-{
-	if (Item)
-	{
-		AInvP_LOG(Warning, TEXT("Adding %d of %s"), Amount, *Item->GetName())
-	}
-}
-
 bool UActorInventoryComponent::AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems)
 {
 	
@@ -271,7 +281,7 @@ void UActorInventoryComponent::SubtractItemFromInventory(UInventoryItem* Item, i
 	// Cache data
 	const FInventoryItemData& NewItemData = Item->GetItem();
 	
-	if (UInventoryItem* ExistingItem = GetItemFromInventory(NewItemData))
+	if (UInventoryItem* ExistingItem = GetItemByData(NewItemData))
 	{
 		if (ExistingItem->GetItem().ItemQuantityData.Quantity - Amount <= 0)
 		{
@@ -308,7 +318,7 @@ int32 UActorInventoryComponent::GetItemQuantity(UInventoryItem* Item) const
 
 bool UActorInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const
 {
-	for (const UInventoryItem* Itr : InventoryItems)
+	for (const auto Itr : InventoryItems)
 	{
 		if (Itr && Itr->GetClass() == ItemClass)
 		{
@@ -321,9 +331,9 @@ bool UActorInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem>
 
 bool UActorInventoryComponent::FindItemByGUID(const FGuid& Guid) const
 {
-	for (UInventoryItem* Itr : InventoryItems)
+	for (const auto Itr : InventoryItems)
 	{
-		if (Itr && Itr->GetItem().GetGuid() == Guid)
+		if (Itr && Itr->GetItem().CompareGuid(Guid))
 		{
 			return true;
 		}
@@ -332,7 +342,19 @@ bool UActorInventoryComponent::FindItemByGUID(const FGuid& Guid) const
 	return false;
 }
 
-UInventoryItem* UActorInventoryComponent::GetItemFromInventory(const FInventoryItemData& ItemData) const
+bool UActorInventoryComponent::FindItemByData(const FInventoryItemData& Data) const
+{
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem() == Data)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+UInventoryItem* UActorInventoryComponent::GetItemByData(const FInventoryItemData& ItemData) const
 {
 	for (auto& Itr: InventoryItems)
 	{
@@ -343,6 +365,73 @@ UInventoryItem* UActorInventoryComponent::GetItemFromInventory(const FInventoryI
 	}
 	
 	return nullptr;
+}
+
+TArray<UInventoryItem*> UActorInventoryComponent::GetItemsByData(const FInventoryItemData& ItemData) const
+{
+	TArray<UInventoryItem*> ReturnItems;
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem() == ItemData && !ReturnItems.Contains(Itr))
+		{
+			ReturnItems.Add(Itr);
+		}
+	}
+
+	return ReturnItems;
+}
+
+UInventoryItem* UActorInventoryComponent::GetItemByGUID(const FGuid& Guid) const
+{
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().CompareGuid(Guid))
+		{
+			return Itr;
+		}
+	}
+
+	return nullptr;
+}
+
+TArray<UInventoryItem*> UActorInventoryComponent::GetItemsByGUID(const FGuid& Guid) const
+{
+	TArray<UInventoryItem*> ReturnItems;
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().CompareGuid(Guid) && !ReturnItems.Contains(Itr))
+		{
+			ReturnItems.Add(Itr);
+		}
+	}
+
+	return ReturnItems;
+}
+
+UInventoryItem* UActorInventoryComponent::GetItemByClass(const TSubclassOf<UInventoryItem>& Class) const
+{
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->StaticClass() == Class)
+		{
+			return Itr;
+		}
+	}
+	return nullptr;
+}
+
+TArray<UInventoryItem*> UActorInventoryComponent::GetItemsByClass(const TSubclassOf<UInventoryItem>& Class) const
+{
+	TArray<UInventoryItem*> ReturnItems;
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->StaticClass() == Class && !ReturnItems.Contains(Itr))
+		{
+			ReturnItems.Add(Itr);
+		}
+	}
+
+	return ReturnItems;
 }
 
 bool UActorInventoryComponent::IsItemInInventory(UInventoryItem* Item) const

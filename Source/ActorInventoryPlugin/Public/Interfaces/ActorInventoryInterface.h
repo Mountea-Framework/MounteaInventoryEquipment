@@ -51,9 +51,15 @@ public:
 
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const = 0;
 	virtual bool FindItemByGUID(const FGuid& Guid) const = 0;
+	virtual bool FindItemByData(const FInventoryItemData& Data) const = 0;
 	virtual bool IsItemInInventory(UInventoryItem* Item) const = 0;
 
-	virtual UInventoryItem* GetItemFromInventory(const FInventoryItemData& ItemData) const = 0;
+	virtual UInventoryItem* GetItemByData(const FInventoryItemData& ItemData) const = 0;
+	virtual TArray<UInventoryItem*> GetItemsByData(const FInventoryItemData& ItemData) const = 0;
+	virtual UInventoryItem* GetItemByGUID(const FGuid& Guid) const = 0;
+	virtual TArray<UInventoryItem*> GetItemsByGUID(const FGuid& Guid) const = 0;
+	virtual UInventoryItem* GetItemByClass(const TSubclassOf<UInventoryItem>& Class) const = 0;
+	virtual TArray<UInventoryItem*> GetItemsByClass(const TSubclassOf<UInventoryItem>& Class) const = 0;
 	
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) = 0;
 

@@ -216,6 +216,11 @@ public:
 	{
 		return ItemDataGUID == Other;
 	}
+
+	FORCEINLINE void ForceGUID(const FGuid& Other)
+	{
+		ItemDataGUID = Other;
+	}
 };
 
 /**

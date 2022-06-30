@@ -38,8 +38,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual bool AddItemToInventory(UInventoryItem* Item) override;
 
-	void AddItemToInventory_Internal(UInventoryItem* Item, const int32 Amount);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual bool AddItemsToInventory(const TArray<UInventoryItem*>& ListOfItems) override;
 
@@ -54,28 +52,45 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual void SubtractItemsFromInventory(const TMap<UInventoryItem*, int32>& ListOfItems) override;
-	
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual TArray<UInventoryItem*> GetInventoryItems() const override {return InventoryItems; };
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void SetInventoryItems(const TArray<UInventoryItem*> Items) override {InventoryItems = Items; }
-	
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual TArray<UInventoryItem*> GetInventoryItems() const override {return InventoryItems; };
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual int32 GetItemQuantity(UInventoryItem* Item) const override;
+	
 
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const override;
 	virtual bool FindItemByGUID(const FGuid& Guid) const override;
-
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	virtual UInventoryItem* GetItemFromInventory(const FInventoryItemData& ItemData) const override;
+	virtual bool FindItemByData(const FInventoryItemData& Data) const override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual bool IsItemInInventory(UInventoryItem* Item) const override;
-	
 
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UInventoryItem* GetItemByData(const FInventoryItemData& ItemData) const override;
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual TArray<UInventoryItem*> GetItemsByData(const FInventoryItemData& ItemData) const override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UInventoryItem* GetItemByGUID(const FGuid& Guid) const override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual TArray<UInventoryItem*> GetItemsByGUID(const FGuid& Guid) const override;
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UInventoryItem* GetItemByClass(const TSubclassOf<UInventoryItem>& Class) const override;
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual TArray<UInventoryItem*> GetItemsByClass(const TSubclassOf<UInventoryItem>& Class) const override;
+
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) override;
 
