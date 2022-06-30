@@ -104,17 +104,11 @@ public:
 public:
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
-	virtual void SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass) override;
-	
-	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const override;
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
-	virtual TSubclassOf<UInventoryWidget> GetInventoryWidgetClass() const override;
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	FORCEINLINE UInventoryNotificationContainer* GetNotificationContainerPtr() const
 	{
@@ -159,17 +153,10 @@ protected:
 	void SplitItemByCategory(FInventoryItemData& NewItemData, FInventoryItemData& ExistingItemData);
 
 protected:
-
-	// TODO: move to manager
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
-	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
-	
-	// TODO: move to manager
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
-	TSubclassOf<UInventoryNotificationContainer> InventoryNotificationContainerClass;
+
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryNotificationContainer* InventoryNotificationContainer = nullptr;

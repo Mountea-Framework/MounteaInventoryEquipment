@@ -63,9 +63,7 @@ public:
 	
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) = 0;
 
-	virtual void SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass) = 0;
-	virtual TSubclassOf<UInventoryWidget> GetInventoryWidgetClass() const = 0;
-
+	
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) = 0;
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;
 

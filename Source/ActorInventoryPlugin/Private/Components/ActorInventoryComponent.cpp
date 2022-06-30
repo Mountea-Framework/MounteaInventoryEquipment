@@ -6,14 +6,11 @@
 #include "Definitions/InventoryItem.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
 #include "Helpers/ActorInventoryPluginLog.h"
-#include "Widgets/InventoryWidget.h"
 
 UActorInventoryComponent::UActorInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
-
-	InventoryWidgetClass = UInventoryWidget::StaticClass();
 }
 
 void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInventoryLayout)
@@ -96,6 +93,7 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 	FInventoryItemData& AddingItemData = Item->GetItem();
 	const int32 ProcessAmount = AddingItemData.ItemQuantityData.Quantity;
 
+	// Get Existing Item
 	UInventoryItem* ExistingItem = nullptr;
 	if(FindItemByGUID(AddingItemData.GetGuid()))
 	{
@@ -104,10 +102,6 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 	else if (FindItemByData(AddingItemData))
 	{
 		ExistingItem = GetItemByData(AddingItemData);
-	}
-	else if (FindItemByClass(Item->StaticClass()))
-	{
-		ExistingItem = GetItemByClass(Item->StaticClass());
 	}
 	
 	if (ExistingItem)
@@ -491,11 +485,6 @@ FOnInventoryLayoutSaveRequested& UActorInventoryComponent::GetInventoryLayoutUpd
 	return OnInventoryLayoutSaveRequested;
 }
 
-void UActorInventoryComponent::SetInventoryWidgetClass(const TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
-{
-	InventoryWidgetClass = NewInventoryWidgetClass;
-}
-
 void UActorInventoryComponent::SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget)
 {
 	InventoryWidget = NewInventoryWidget;
@@ -504,11 +493,6 @@ void UActorInventoryComponent::SetInventoryWidgetPtr(UInventoryWidget* NewInvent
 UInventoryWidget* UActorInventoryComponent::GetInventoryWidgetPtr() const
 {
 	return InventoryWidget;
-}
-
-TSubclassOf<UInventoryWidget> UActorInventoryComponent::GetInventoryWidgetClass() const
-{
-	return InventoryWidgetClass;
 }
 
 void UActorInventoryComponent::SetNotificationContainerPtr(UInventoryNotificationContainer* Widget)

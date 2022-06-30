@@ -16,6 +16,7 @@ class UInventoryItemRarity;
 class UInventoryItem;
 class UInventoryNotification;
 class UInventoryNotificationContainer;
+class UInventoryWidget;
 
 UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Manager", ShortTooltip="Inventory Manager responsible for Adding and Removing Items from Inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryManagerComponent : public UActorComponent
@@ -150,6 +151,15 @@ public:
 	{
 		return NotificationClass;
 	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryWidget> GetInventoryWidgetClass() const
+	{
+		return InventoryWidgetClass;
+	}
 	
 protected:
 	
@@ -190,6 +200,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
+	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
+	TSubclassOf<UInventoryNotificationContainer> InventoryNotificationContainerClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSubclassOf<UInventoryNotification> NotificationClass;

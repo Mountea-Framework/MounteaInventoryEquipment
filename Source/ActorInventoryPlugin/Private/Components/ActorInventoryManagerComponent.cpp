@@ -3,11 +3,14 @@
 #include "Components/ActorInventoryManagerComponent.h"
 #include "Components/ActorInventoryComponent.h"
 #include "Definitions/InventoryItem.h"
+#include "Widgets/InventoryWidget.h"
 
 UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
+
+	InventoryWidgetClass = UInventoryWidget::StaticClass();
 }
 
 bool UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer)
@@ -80,6 +83,11 @@ TArray<UInventoryItem*>  UActorInventoryManagerComponent::GetItemsFromInventory(
 	}
 
 	return TArray<UInventoryItem*>();
+}
+
+void UActorInventoryManagerComponent::SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
+{
+	InventoryWidgetClass = NewInventoryWidgetClass;
 }
 
 void UActorInventoryManagerComponent::BeginPlay()
