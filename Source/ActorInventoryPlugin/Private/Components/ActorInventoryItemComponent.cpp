@@ -9,6 +9,18 @@
 void UActorInventoryItemComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	const auto TempItem = NewObject<UInventoryItem>();
+	TempItem->SetItem(GetItemDefinition());
+	
+	if (TempItem && TempItem->IsValidItem())
+	{
+		Item = TempItem;
+	}
+	else
+	{
+		Item = nullptr;
+	}
 }
 
 FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
@@ -19,9 +31,9 @@ FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
 		case EInventoryItemSetup::EIIS_FromItem:
 			if (SourceItem)
 			{
-				if (UInventoryItem* Item = Cast<UInventoryItem>(SourceItem->GetDefaultObject(true)))
+				if (UInventoryItem* TempItem = Cast<UInventoryItem>(SourceItem->GetDefaultObject(true)))
 				{
-					ReturnDefinition = Item->GetItem();
+					ReturnDefinition = TempItem->GetItem();
 				}
 			}
 			break;

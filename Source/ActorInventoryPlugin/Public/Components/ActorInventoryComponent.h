@@ -62,9 +62,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual int32 GetItemQuantity(UInventoryItem* Item) const override;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual void GetInventorySlotsData(TArray<FInventorySlotData>& SlotData) override;
 	
 
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const override;
@@ -171,9 +168,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
 	FInventoryLayout InventoryLayout;
-
-	UPROPERTY(VisibleAnywhere, Category="Inventory")
-	TArray<FInventorySlotData> InventorySlotsData;
 	
 private:
 

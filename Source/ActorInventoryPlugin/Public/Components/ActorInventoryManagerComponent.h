@@ -197,21 +197,17 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
 	TMap<EInventoryContext, FNotificationInfo> NotificationInfo;
-
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
-	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
-	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", meta=(BlueprintBaseOnly=true))
-	TSubclassOf<UInventoryNotificationContainer> InventoryNotificationContainerClass;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
-	TSubclassOf<UInventoryNotification> NotificationClass;
+	
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|Quantity", meta=(NoResetToDefault))
-	int32 DefaultMaxStacking = 99;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true))
+	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true))
+	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true))
+	TSubclassOf<UInventoryNotification> NotificationClass;
 	
 private:
 	

@@ -130,10 +130,10 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 					}
 					
 					OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
-				
 					ExistingItemData.ItemQuantityData.Quantity += ProcessAmount;
-					
+				
 					return true;
+
 				}
 				else 
 				{
@@ -270,11 +270,6 @@ int32 UActorInventoryComponent::GetItemQuantity(UInventoryItem* Item) const
 		return Item->GetItem().ItemQuantityData.Quantity;
 	}
 	return 0;
-}
-
-void UActorInventoryComponent::GetInventorySlotsData(TArray<FInventorySlotData>& SlotData)
-{
-	SlotData = InventorySlotsData;
 }
 
 bool UActorInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const

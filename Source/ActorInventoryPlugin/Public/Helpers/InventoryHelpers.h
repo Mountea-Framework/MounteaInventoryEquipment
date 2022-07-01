@@ -278,7 +278,7 @@ UENUM(BlueprintType)
 enum class EInventoryContext : uint8
 {
 	EIC_Success						UMETA(DisplayName="Succes"),
-	EIC_Success_SplitStack			UMETA(DisplayName="Succes - Split Stacks"),
+	EIC_Success_SplitStack			UMETA(DisplayName="Success - Split Stacks"),
 	EIC_Success_RemovedItem			UMETA(DisplayName="Success - Removed Item"),
 	EIC_Failed_InvalidItem			UMETA(DisplayName="Failed - Invalid Item"),
 	EIC_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),

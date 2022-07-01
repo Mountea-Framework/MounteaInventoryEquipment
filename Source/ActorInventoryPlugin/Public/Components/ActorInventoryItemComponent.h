@@ -31,8 +31,14 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent final : public UActo
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	UFUNCTION()
 	FInventoryItemData GetItemDefinition() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE UInventoryItem* GetItem() const
+	{
+		return Item;
+	}
 
 protected:
 
@@ -46,6 +52,9 @@ protected:
 	FDataTableRowHandle SourceItemRow;
 	
 protected:
+
+	UPROPERTY(VisibleAnywhere)
+	UInventoryItem* Item = nullptr;
 
 	virtual void BeginPlay() override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
