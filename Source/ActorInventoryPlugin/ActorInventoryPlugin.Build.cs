@@ -29,7 +29,8 @@ public class ActorInventoryPlugin : ModuleRules
 			new string[]
 			{
 				"Core",
-				"UMG"
+				"UMG",
+				"InventoryEditorNotifications"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -43,7 +44,7 @@ public class ActorInventoryPlugin : ModuleRules
 				"UMG",
 				"Slate",
 				"SlateCore",
-				"Projects",
+				"Projects"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

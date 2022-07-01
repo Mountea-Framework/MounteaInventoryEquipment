@@ -29,7 +29,7 @@ public:
 
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Inventory|Notifications")
-	void DisplayNewNotification(FNotificationInfo Notification);
+	void DisplayNewNotification(FInventoryNotificationInfo Notification);
 
 	FORCEINLINE TArray<UInventoryNotification*> GetNotifications() const
 	{

@@ -28,6 +28,11 @@
 				"PS4",
 				"XboxOne"
 			]
+		},
+		{
+			"Name": "InventoryEditorNotifications",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
 		}
 	]
 }

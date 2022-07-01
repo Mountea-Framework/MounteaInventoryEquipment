@@ -227,7 +227,7 @@ public:
  * 
  */
 USTRUCT(BlueprintType, Blueprintable)
-struct FNotificationInfo
+struct FInventoryNotificationInfo
 {
 	GENERATED_BODY()
 

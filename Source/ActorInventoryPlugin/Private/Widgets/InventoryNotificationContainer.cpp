@@ -25,7 +25,7 @@ void UInventoryNotificationContainer::RemoveExpiredNotification_Implementation(U
 	}
 }
 
-void UInventoryNotificationContainer::DisplayNewNotification_Implementation(FNotificationInfo Notification)
+void UInventoryNotificationContainer::DisplayNewNotification_Implementation(FInventoryNotificationInfo Notification)
 {
 	//...
 }

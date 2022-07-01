@@ -23,7 +23,7 @@ class ACTORINVENTORYPLUGIN_API UInventoryNotification : public UUserWidget
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
-	FNotificationInfo NotificationInfo;
+	FInventoryNotificationInfo NotificationInfo;
 		
 	UPROPERTY()
 	FTimerHandle Expiration_TimeHandle;

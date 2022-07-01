@@ -116,20 +116,20 @@ public:
 #pragma region Notifications
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Notifications")
-	FORCEINLINE TMap<EInventoryContext, FNotificationInfo> GetNotificationsInfo () const
+	FORCEINLINE TMap<EInventoryContext, FInventoryNotificationInfo> GetNotificationsInfo () const
 	{
 		return NotificationInfo;
 	}
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Notifications")
-	FNotificationInfo GetNotificationInfo(const EInventoryContext Context)
+	FInventoryNotificationInfo GetNotificationInfo(const EInventoryContext Context)
 	{
 		if (NotificationInfo.Contains(Context))
 		{
 			return NotificationInfo[Context];
 		}
 
-		return FNotificationInfo();
+		return FInventoryNotificationInfo();
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|Notifications")
@@ -248,7 +248,7 @@ protected:
 	TSet<UInventoryItemRarity*> AllowedRarities;
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
-	TMap<EInventoryContext, FNotificationInfo> NotificationInfo;
+	TMap<EInventoryContext, FInventoryNotificationInfo> NotificationInfo;
 	
 	
 

@@ -53,7 +53,7 @@ protected:
 	
 protected:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY()
 	UInventoryItem* Item = nullptr;
 
 	virtual void BeginPlay() override;
