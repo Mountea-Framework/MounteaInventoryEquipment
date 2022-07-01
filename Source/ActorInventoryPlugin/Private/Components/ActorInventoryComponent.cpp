@@ -38,35 +38,6 @@ void UActorInventoryComponent::BeginPlay()
 	InventoryManager = UActorInventoryBPFLibrary::GetInventoryManager(this);
 }
 
-void UActorInventoryComponent::SplitItemByCategory(FInventoryItemData& NewItemData, FInventoryItemData& ExistingItemData)
-{
-	if (NewItemData.ItemCategory && ExistingItemData.ItemCategory)
-	{
-		// Calculate how much to Allowed Maximum is left
-		int32 AmountToLeave = NewItemData.ItemQuantityData.Quantity - (ExistingItemData.ItemCategory->GetMaxQuantityPerStack() - ExistingItemData.ItemQuantityData.Quantity);
-		
-		// Add up to Maximum Allowed Stack
-		ExistingItemData.ItemQuantityData.Quantity = ExistingItemData.ItemCategory->GetMaxQuantityPerStack();
-
-		while (AmountToLeave > 0)
-		{
-			FInventoryItemData CreatedItemData = NewItemData;
-			//CreatedItemData.ForceGUID(NewItemData.GetGuid());
-
-			//TODO: GUIDS!
-			// Subtract added from New Item
-			CreatedItemData.ItemQuantityData.Quantity = FMath::Min(ExistingItemData.ItemCategory->GetMaxQuantityPerStack(), AmountToLeave);
-
-			UInventoryItem* SplitItem = NewObject<UInventoryItem>();
-			SplitItem->SetItem(CreatedItemData);
-
-			AmountToLeave -= ExistingItemData.ItemCategory->GetMaxQuantityPerStack();
-						
-			AddItemToInventory(SplitItem);
-		}
-	}
-}
-
 bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 {
 	EInventoryContext InventoryContext = EInventoryContext::Default;
@@ -125,7 +96,7 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 		// Decisions
 		if (bIsStacking) // Can Stack, set Quantity to Max and maybe Leave something
 		{
-			if (bWouldReachLimit)
+			if (bWouldReachLimit) // Add to Max, leave something
 			{
 				AddingItemData.ItemQuantityData.Quantity = PredictedAmount - ExistingItemData.ItemQuantityData.MaxQuantity;
 				ExistingItemData.ItemQuantityData.Quantity = ExistingItemData.ItemQuantityData.MaxQuantity;
@@ -135,38 +106,34 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 
 				return false;
 			}
-			else if (bWouldApplyToLimit)
+			else if (bWouldApplyToLimit) // Add to Max, leave nothing
 			{
 				InventoryContext = EInventoryContext::EIC_Success;
 				OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
 				
-				ExistingItemData.ItemQuantityData.Quantity += ProcessAmount;
+				ExistingItemData.ItemQuantityData.Quantity = ExistingItemData.ItemQuantityData.MaxQuantity;
+				AddingItemData.ItemQuantityData.Quantity = 0;
 
 				return true;
 			}
-			else
+			else // Add all
 			{
 				if (ExistingItemData.ItemCategory)
 				{
 					if(PredictedAmount > ExistingItemData.ItemCategory->GetMaxQuantityPerStack())
 					{
-						// TODO: Split should not affect InventoryItems array, but there should be layout data only
-						SplitItemByCategory(AddingItemData, ExistingItemData);
-						
 						InventoryContext = EInventoryContext::EIC_Success_SplitStack;
-						OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
-						
-						return true;
 					}
 					else
 					{
 						InventoryContext = EInventoryContext::EIC_Success;
-						OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
-				
-						ExistingItemData.ItemQuantityData.Quantity += ProcessAmount;
-
-						return true;
 					}
+					
+					OnInventoryUpdateRequestProcessed.Broadcast(InventoryContext);
+				
+					ExistingItemData.ItemQuantityData.Quantity += ProcessAmount;
+					
+					return true;
 				}
 				else 
 				{
@@ -196,11 +163,6 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 		if (bLimitReached) // Clamp
 		{
 			FInventoryItemData NewItemData = AddingItemData;
-			
-			if (AddingItemData.ItemCategory)
-			{
-				SplitItemByCategory(AddingItemData, NewItemData);
-			}
 			
 			NewItemData.ItemQuantityData.Quantity = FMath::Min(AddingItemData.ItemQuantityData.Quantity, AddingItemData.ItemQuantityData.MaxQuantity);
 			AddingItemData.ItemQuantityData.Quantity -= NewItemData.ItemQuantityData.Quantity;
@@ -308,6 +270,11 @@ int32 UActorInventoryComponent::GetItemQuantity(UInventoryItem* Item) const
 		return Item->GetItem().ItemQuantityData.Quantity;
 	}
 	return 0;
+}
+
+void UActorInventoryComponent::GetInventorySlotsData(TArray<FInventorySlotData>& SlotData)
+{
+	SlotData = InventorySlotsData;
 }
 
 bool UActorInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const

@@ -49,6 +49,8 @@ public:
 	virtual TArray<UInventoryItem*> GetInventoryItems() const = 0;
 	virtual int32 GetItemQuantity(UInventoryItem* Item) const = 0;
 
+	virtual void GetInventorySlotsData(TArray<FInventorySlotData>& SlotData) = 0;
+
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const = 0;
 	virtual bool FindItemByGUID(const FGuid& Guid) const = 0;
 	virtual bool FindItemByData(const FInventoryItemData& Data) const = 0;
