@@ -18,6 +18,9 @@ class UInventoryNotification;
 class UInventoryNotificationContainer;
 class UInventoryWidget;
 
+/**
+ * 
+ */
 UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Manager", ShortTooltip="Inventory Manager responsible for Adding and Removing Items from Inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryManagerComponent : public UActorComponent
 {
@@ -27,6 +30,10 @@ public:
 	
 	UActorInventoryManagerComponent();
 
+public:
+
+#pragma region Items
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	bool AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer);
 
@@ -48,6 +55,9 @@ public:
 		return AllowedRarities;
 	}
 
+#pragma endregion
+
+#pragma region Categories
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
 	void ClearAllowedCategories();
@@ -73,6 +83,9 @@ public:
 		return AllowedCategories.Contains(Category);
 	}
 
+#pragma endregion
+
+#pragma region Rarities
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
 	void ClearAllowedRarities();
@@ -97,10 +110,11 @@ public:
 	{
 		return AllowedRarities.Contains(Rarity);
 	}
-	
-	UFUNCTION(BlueprintCallable, Category="Inventory", meta=(DeprecatedFunction, DeprecatedMessage="Use this function with caution as this might be really performance heavy."))
-	void UpdateCategories();
 
+#pragma endregion 
+
+#pragma region Notifications
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Notifications")
 	FORCEINLINE TMap<EInventoryContext, FNotificationInfo> GetNotificationsInfo () const
 	{
@@ -152,6 +166,10 @@ public:
 		return NotificationClass;
 	}
 
+#pragma endregion 
+
+#pragma region Inventory
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
 	void SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass);
 
@@ -160,10 +178,44 @@ public:
 	{
 		return InventoryWidgetClass;
 	}
+
+#pragma endregion
+
+#pragma region Settings
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Settings")
+	FORCEINLINE bool IsDragDropAllowed() const
+	{
+		return bAllowDragDrop;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Settings")
+	FORCEINLINE bool IsSplittingAllowed() const
+	{
+		return bAllowPackSplit;
+	}
+
+#pragma endregion 
 	
 protected:
 	
 	virtual void BeginPlay() override;
+
+protected:
+	
+	/**
+	 * If allowed, Item Slots are allowed to be Grabbed and Dropped.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	uint8 bAllowDragDrop : 1;
+
+	/**
+	 * If allowed, Item Pack can be split into multiple Packs.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	uint8 bAllowPackSplit : 1;
+
+	
 
 	/**
 	 * If Category is added to Allowed Categories, should we allow its parent Categories as well?
@@ -210,8 +262,8 @@ protected:
 	TSubclassOf<UInventoryNotification> NotificationClass;
 	
 private:
-	
+
+	void UpdateCategories();
 	void AddParentCategory(UInventoryCategory* Category, int32& DepthIndex);
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 };
-

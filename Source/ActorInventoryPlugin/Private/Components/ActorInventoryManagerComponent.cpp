@@ -1,7 +1,6 @@
 // Copyright Dominik Pavlicek 2022. All Rights Reserved.
 
 #include "Components/ActorInventoryManagerComponent.h"
-#include "Components/ActorInventoryComponent.h"
 #include "Definitions/InventoryItem.h"
 #include "Widgets/InventoryWidget.h"
 
@@ -12,6 +11,13 @@ UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 
 	InventoryWidgetClass = UInventoryWidget::StaticClass();
 }
+
+void UActorInventoryManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+
 
 bool UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer)
 {
@@ -85,15 +91,13 @@ TArray<UInventoryItem*>  UActorInventoryManagerComponent::GetItemsFromInventory(
 	return TArray<UInventoryItem*>();
 }
 
+
+
 void UActorInventoryManagerComponent::SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
 {
 	InventoryWidgetClass = NewInventoryWidgetClass;
 }
 
-void UActorInventoryManagerComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
 
 
 void UActorInventoryManagerComponent::ClearAllowedCategories()
@@ -138,6 +142,7 @@ void UActorInventoryManagerComponent::RemoveAllowedCategories(TSet<UInventoryCat
 		RemoveAllowedCategory(Itr);
 	}
 }
+
 
 
 void UActorInventoryManagerComponent::ClearAllowedRarities()
@@ -207,6 +212,8 @@ void UActorInventoryManagerComponent::UpdateCategories()
 		}
 	}
 }
+
+
 
 void UActorInventoryManagerComponent::AddParentCategory(UInventoryCategory* Category, int32& DepthIndex)
 {
