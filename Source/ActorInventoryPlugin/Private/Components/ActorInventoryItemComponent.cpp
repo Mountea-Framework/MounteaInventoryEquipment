@@ -76,7 +76,7 @@ void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent&
 				if (!(InventoryRowStruct->IsChildOf(FInventoryItemData::StaticStruct())))
 				{
 					const FString ErrorMessage = FString::Printf(TEXT("INVALID DATA TABLE: %s structure is not supported!"), *InventoryRowStruct->GetDisplayNameText().ToString());
-					FEditorHelper::DisplayWarningEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f);
+					FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
 				}
 			}
 		}
