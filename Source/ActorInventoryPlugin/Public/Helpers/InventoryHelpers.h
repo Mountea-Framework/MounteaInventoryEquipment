@@ -73,6 +73,9 @@ public:
 	}
 };
 
+/**
+ * 
+ */
 USTRUCT(BlueprintType, Blueprintable)
 struct FInventoryCategoryData
 {
@@ -224,26 +227,33 @@ public:
 };
 
 /**
- * 
+ * In-game Inventory Notification Info.
  */
 USTRUCT(BlueprintType, Blueprintable)
 struct FInventoryNotificationInfo
 {
 	GENERATED_BODY()
 
+	// Icon Texture to be displayed.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
-	UTexture2D* NotificationTexture;
+	UTexture2D* NotificationTexture = nullptr;
 
+	// Notification text to be displayed.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	FText NotificationText = LOCTEXT("NotificationInfo", "Item has been added successfully to Inventory");
 
+	// Duration for how long the notification will be visible.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	float ShowDuration = 3.f;
 
+	// Notification icon Tint.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	FLinearColor IconTint = FLinearColor::White;
 };
 
+/**
+ * 
+ */
 USTRUCT(BlueprintType, Blueprintable)
 struct FInventorySlotData
 {
@@ -257,6 +267,9 @@ struct FInventorySlotData
 	
 };
 
+/**
+ * 
+ */
 USTRUCT(BlueprintType, Blueprintable)
 struct FInventoryLayout
 {
