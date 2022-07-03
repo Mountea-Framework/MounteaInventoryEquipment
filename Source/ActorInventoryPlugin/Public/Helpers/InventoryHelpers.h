@@ -221,7 +221,7 @@ public:
 	UStreamableRenderAsset* ItemMesh = nullptr;
 
 	// Actor to spawn from this Item.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSoftClassPtr<AActor> SpawnItemClass = nullptr;
 
 public:

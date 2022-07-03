@@ -18,7 +18,7 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlotDrag : public UUserWidget
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
-	FInventorySlotData SourceSlotData;
+	class UInventoryItemSlot* SourceSlotData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
 	FIntPoint SourceSlotCoordinates;
