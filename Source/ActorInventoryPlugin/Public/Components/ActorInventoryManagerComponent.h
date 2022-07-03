@@ -321,6 +321,7 @@ protected:
 	
 private:
 
+	void ValidateCategories();
 	void UpdateCategories();
 	void AddParentCategory(UInventoryCategory* Category, int32& DepthIndex);
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;

@@ -9,7 +9,7 @@
 
 #include "ActorInventoryItemComponent.generated.h"
 
-UENUM()
+UENUM(BlueprintType, Blueprintable)
 enum class EInventoryItemSetup : uint8
 {
 	EIIS_FromItem		UMETA(DisplayName="From Item"),
@@ -45,7 +45,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Inventory")
 	EInventoryItemSetup SetupMode = EInventoryItemSetup::EIIS_FromItem;
 
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault))
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryItem> SourceItem = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromDataTable", EditConditionHides, NoResetToDefault, ShowOnlyInnerProperties))

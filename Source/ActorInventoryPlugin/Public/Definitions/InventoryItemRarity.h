@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/InventoryHelpers.h"
 #include "UObject/NoExportTypes.h"
 #include "InventoryItemRarity.generated.h"
+
+#define LOCTEXT_NAMESPACE "Inventory Rarity"
 
 /**
  * 
@@ -14,32 +17,30 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemRarity : public UDataAsset
 {
 	GENERATED_BODY()
 
-	UInventoryItemRarity();
-
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE FName GetRarityName() const
+	FORCEINLINE FText GetRarityName() const
 	{
-		return RarityName;
+		return InventoryRarityData.RarityName;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE FLinearColor GetRarityColor() const
 	{
-		return RarityColor;
+		return InventoryRarityData.RarityColor;
 	}
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetRarityName(const FName& Name);
+	void SetRarityName(const FText& Name);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetRarityColor(const FLinearColor& Color);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true))
-	FName RarityName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true))
-	FLinearColor RarityColor;
+protected:
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true, ShowOnlyInnerProperties=true))
+	FInventoryRarityData InventoryRarityData;
 };
+
+#undef LOCTEXT_NAMESPACE

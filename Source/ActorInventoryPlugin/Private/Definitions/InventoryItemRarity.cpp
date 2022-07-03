@@ -3,18 +3,12 @@
 
 #include "Definitions/InventoryItemRarity.h"
 
-UInventoryItemRarity::UInventoryItemRarity()
+void UInventoryItemRarity::SetRarityName(const FText& Name)
 {
-	SetRarityName("Common");
-	SetRarityColor(FLinearColor::Gray);
-}
-
-void UInventoryItemRarity::SetRarityName(const FName& Name)
-{
-	RarityName = Name;
+	InventoryRarityData.RarityName = Name;
 }
 
 void UInventoryItemRarity::SetRarityColor(const FLinearColor& Color)
 {
-	RarityColor = Color;
+	InventoryRarityData.RarityColor = Color;
 }

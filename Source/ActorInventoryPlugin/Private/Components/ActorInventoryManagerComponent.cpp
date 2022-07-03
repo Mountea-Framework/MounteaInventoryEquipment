@@ -207,6 +207,11 @@ void UActorInventoryManagerComponent::RemoveAllowedRarities(const TSet<UInventor
 	}
 }
 
+void UActorInventoryManagerComponent::ValidateCategories()
+{
+	//...
+}
+
 void UActorInventoryManagerComponent::UpdateCategories()
 {
 	if (bAutoAllowParentCategories)
@@ -270,5 +275,7 @@ void UActorInventoryManagerComponent::PostEditChangeChainProperty(FPropertyChang
 	if (PropertyName == "AllowedCategories")
 	{
 		UpdateCategories();
+
+		ValidateCategories();
 	}
 };

@@ -46,13 +46,15 @@ public:
 		Item.ItemRarity != nullptr &&
 		Item.ItemQuantityData.Quantity <= Item.ItemQuantityData.MaxQuantity;
 	}
-
 	
 protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
 	FInventoryItemData Item;
-	
+
+protected:
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };
 
 #undef LOCTEXT_NAMESPACE
