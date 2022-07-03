@@ -31,5 +31,5 @@ A best way to describe the usage is to take a look or play the demo build.
 
 ## Additional Documentation and Acknowledgments
 
-* Trello board: TBA
+* Trello board: https://trello.com/b/PX8YBie0/actor-inventory-plugin
 * Documentation: https://sites.google.com/view/dominikpavlicek/home/documentation 
