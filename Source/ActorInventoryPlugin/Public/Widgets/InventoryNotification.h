@@ -13,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationExpired, class UInven
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryNotification : public UUserWidget
 {
 	GENERATED_BODY()

@@ -81,6 +81,20 @@ struct FInventoryCategoryData
 {
 	GENERATED_BODY()
 
+	FInventoryCategoryData()
+	{
+		bIsAllCategories = false;
+	};
+	
+	FInventoryCategoryData(const FText& CategoryName, const int32 MaxQuantityPerStack, UTexture2D* CategoryTexture,
+		UInventoryCategory* ParentCategory, const uint8 IsAllCategories = false)
+		: CategoryName(CategoryName),
+		  MaxQuantityPerStack(MaxQuantityPerStack),
+		  CategoryTexture(CategoryTexture),
+		  ParentCategory(ParentCategory),
+		  bIsAllCategories(IsAllCategories)
+	{}
+
 	// Name of this Category, useful for UI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
@@ -95,6 +109,19 @@ struct FInventoryCategoryData
 	// Parent Category of this one, useful for Inventory sorting, however, optional
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	UInventoryCategory* ParentCategory = nullptr;
+
+protected:
+
+	// If true, works as placeholder for all categories
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	uint8 bIsAllCategories : 1;
+
+public:
+
+	FORCEINLINE	bool IsAllCategories() const
+	{
+		return bIsAllCategories;
+	}
 	
 };
 

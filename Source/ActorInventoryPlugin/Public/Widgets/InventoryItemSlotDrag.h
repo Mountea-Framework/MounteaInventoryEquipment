@@ -4,14 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Helpers/InventoryHelpers.h"
 #include "InventoryItemSlotDrag.generated.h"
 
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryItemSlotDrag : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
+	FInventorySlotData SourceSlotData;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
+	FIntPoint SourceSlotCoordinates;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
+	FIntPoint TargetSlotCoordinates;
 };

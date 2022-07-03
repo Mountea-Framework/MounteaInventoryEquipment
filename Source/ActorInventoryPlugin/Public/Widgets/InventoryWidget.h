@@ -12,7 +12,7 @@ class UActorInventoryInterface;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()

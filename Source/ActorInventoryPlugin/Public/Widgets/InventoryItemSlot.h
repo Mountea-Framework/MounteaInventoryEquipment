@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryItemSlot : public UUserWidget
 {
 	GENERATED_BODY()
