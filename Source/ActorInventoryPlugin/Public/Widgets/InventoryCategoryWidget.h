@@ -11,7 +11,7 @@ class UInventoryCategory;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryCategoryWidget : public UUserWidget
 {
 	GENERATED_BODY()

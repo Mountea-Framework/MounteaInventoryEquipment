@@ -9,17 +9,13 @@ UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 
-	InventoryWidgetClass = UInventoryWidget::StaticClass();
-}
-
-void UActorInventoryManagerComponent::BeginPlay()
-{
-	Super::BeginPlay();
+	bAllowDragDrop = true;
+	bAllowPackSplit = true;
+	bAllowAllCategoriesCategory = true;
 }
 
 
-
-bool UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer)
+bool UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer) const
 {
 	if (OwningPlayer)
 	{
@@ -50,7 +46,7 @@ bool UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, A
 	return false;
 }
 
-bool UActorInventoryManagerComponent::AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer)
+bool UActorInventoryManagerComponent::AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer) const
 {
 	for (UInventoryItem* Itr : Items)
 	{
@@ -93,11 +89,34 @@ TArray<UInventoryItem*>  UActorInventoryManagerComponent::GetItemsFromInventory(
 
 
 
-void UActorInventoryManagerComponent::SetInventoryWidgetClass(TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
+void UActorInventoryManagerComponent::SetInventoryWidgetClass(const TSubclassOf<UInventoryWidget> NewInventoryWidgetClass)
 {
 	InventoryWidgetClass = NewInventoryWidgetClass;
 }
 
+void UActorInventoryManagerComponent::SetInventoryCategoryWidgetClass(
+	const TSubclassOf<UInventoryCategoryWidget> NewInventoryCategoryWidgetClass)
+{
+	InventoryCategoryClass = NewInventoryCategoryWidgetClass;
+}
+
+void UActorInventoryManagerComponent::SetInventoryItemSlotWidgetClass(
+	const TSubclassOf<UInventoryItemSlot> NewInventoryItemSlotClass)
+{
+	InventorySlotClass = NewInventoryItemSlotClass;
+}
+
+void UActorInventoryManagerComponent::SetInventoryItemTooltipWidgetClass(
+	const TSubclassOf<UInventoryItemSlotTooltip> NewInventoryItemSlotTooltipClass)
+{
+	InventorySlotTooltipClass = NewInventoryItemSlotTooltipClass;
+}
+
+void UActorInventoryManagerComponent::SetInventoryItemDragDropWidgetClass(
+	const TSubclassOf<UInventoryItemSlotDrag> NewInventoryItemSlotDragDropClass)
+{
+	InventorySlotDragClass = NewInventoryItemSlotDragDropClass;
+}
 
 
 void UActorInventoryManagerComponent::ClearAllowedCategories()
@@ -188,6 +207,11 @@ void UActorInventoryManagerComponent::RemoveAllowedRarities(const TSet<UInventor
 	}
 }
 
+void UActorInventoryManagerComponent::ValidateCategories()
+{
+	//...
+}
+
 void UActorInventoryManagerComponent::UpdateCategories()
 {
 	if (bAutoAllowParentCategories)
@@ -251,5 +275,7 @@ void UActorInventoryManagerComponent::PostEditChangeChainProperty(FPropertyChang
 	if (PropertyName == "AllowedCategories")
 	{
 		UpdateCategories();
+
+		ValidateCategories();
 	}
 };

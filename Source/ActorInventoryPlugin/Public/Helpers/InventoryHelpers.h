@@ -33,8 +33,6 @@ static FORCEINLINE FString GetEnumValueAsString(const FString& Name, TEnum Value
 class UInventoryCategory;
 class UInventoryItemRarity;
 
-#define LOCTEXT_NAMESPACE "InventoryItemData"
-
 /**
  * Item Quantity Definition.
  */
@@ -73,6 +71,33 @@ public:
 	}
 };
 
+#pragma region InventoryRarityData
+
+#define LOCTEXT_NAMESPACE "InventoryRarityData"
+
+USTRUCT(BlueprintType, Blueprintable)
+struct FInventoryRarityData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	FText RarityName = LOCTEXT("InventoryRarity", "Common");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true, MultiLine))
+	FText RarityDescription = LOCTEXT("InventoryRarityDescription", "Most common items in the world.");
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	FLinearColor RarityColor = FLinearColor::Gray;
+};
+
+#undef LOCTEXT_NAMESPACE
+
+#pragma endregion 
+
+#pragma region InventoryCategorydata
+
+#define LOCTEXT_NAMESPACE "InventoryCategoryData"
+
 /**
  * 
  */
@@ -81,22 +106,62 @@ struct FInventoryCategoryData
 {
 	GENERATED_BODY()
 
-	// Name of this Category, useful for UI
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
-	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
+	FInventoryCategoryData()
+	{
+		bIsAllCategories = false;
+	};
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	FInventoryCategoryData(const FText& CategoryName, const FText& CategoryDescription, const int32 MaxQuantityPerStack, UTexture2D* CategoryTexture,
+		UInventoryCategory* ParentCategory, const uint8 IsAllCategories = false)
+		: CategoryName(CategoryName),
+	      CategoryDescription(CategoryDescription),
+		  MaxQuantityPerStack(MaxQuantityPerStack),
+		  CategoryTexture(CategoryTexture),
+		  ParentCategory(ParentCategory),
+		  bIsAllCategories(IsAllCategories)
+	{}
+
+	// Name of this Category, useful for UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
+
+	// Description text of this Category, useful for UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true, MultiLine))
+	FText CategoryDescription = LOCTEXT("InventoryCategoryDescription", "Description Text.");
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	int32 MaxQuantityPerStack = 99;
 	
 	// Icon of this Category, useful for UI
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	UTexture2D* CategoryTexture = nullptr;
 
 	// Parent Category of this one, useful for Inventory sorting, however, optional
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	UInventoryCategory* ParentCategory = nullptr;
+
+protected:
+
+	// If true, works as placeholder for all categories
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory")
+	uint8 bIsAllCategories : 1;
+
+public:
+
+	FORCEINLINE	bool IsAllCategories() const
+	{
+		return bIsAllCategories;
+	}
 	
 };
+
+#undef LOCTEXT_NAMESPACE
+
+#pragma endregion 
+
+#pragma region InventoryItemData
+
+#define LOCTEXT_NAMESPACE "InventoryItemData"
 
 /**
  * Data of the Inventory Item.
@@ -226,6 +291,14 @@ public:
 	}
 };
 
+#undef LOCTEXT_NAMESPACE
+
+#pragma endregion 
+
+#pragma region NotificationInfo
+
+#define LOCTEXT_NAMESPACE "InventoryNotificationData"
+
 /**
  * In-game Inventory Notification Info.
  */
@@ -250,6 +323,10 @@ struct FInventoryNotificationInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	FLinearColor IconTint = FLinearColor::White;
 };
+
+#undef LOCTEXT_NAMESPACE
+
+#pragma endregion 
 
 /**
  * 
@@ -281,8 +358,6 @@ struct FInventoryLayout
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	TMap<FIntPoint, FInventorySlotData> SavedInventoryLayout;
 };
-
-#undef LOCTEXT_NAMESPACE
 
 /**
  * 

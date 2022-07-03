@@ -12,7 +12,7 @@ class UInventoryNotification;
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryNotificationContainer : public UUserWidget
 {
 	GENERATED_BODY()

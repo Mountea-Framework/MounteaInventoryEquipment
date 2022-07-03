@@ -7,7 +7,6 @@
 
 #include "Definitions/InventoryCategory.h"
 #include "Helpers/InventoryHelpers.h"
-#include "Helpers/ActorInventoryPluginLog.h"
 
 #include "ActorInventoryManagerComponent.generated.h"
 
@@ -17,6 +16,10 @@ class UInventoryItem;
 class UInventoryNotification;
 class UInventoryNotificationContainer;
 class UInventoryWidget;
+class UInventoryItemSlot;
+class UInventoryItemSlotTooltip;
+class UInventoryItemSlotDrag;
+class UInventoryCategoryWidget;
 
 /**
  * 
@@ -35,10 +38,10 @@ public:
 #pragma region Items
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	bool AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer);
+	bool AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer) const;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	bool AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer);
+	bool AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer) const;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	TArray<UInventoryItem*> GetItemsFromInventory(APlayerController* OwningPlayer) const;
@@ -179,6 +182,42 @@ public:
 		return InventoryWidgetClass;
 	}
 
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryCategoryWidgetClass(const TSubclassOf<UInventoryCategoryWidget> NewInventoryCategoryWidgetClass);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryCategoryWidget> GetInventoryCategoryWidgetClass() const
+	{
+		return InventoryCategoryClass;
+	}
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryItemSlotWidgetClass(const TSubclassOf<UInventoryItemSlot> NewInventoryItemSlotClass);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryItemSlot> GetInventoryItemSlotWidgetClass() const
+	{
+		return InventorySlotClass;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryItemTooltipWidgetClass(const TSubclassOf<UInventoryItemSlotTooltip> NewInventoryItemSlotTooltipClass);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryItemSlotTooltip> GetInventoryItemSlotTooltipWidgetClass() const
+	{
+		return InventorySlotTooltipClass;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryItemDragDropWidgetClass(const TSubclassOf<UInventoryItemSlotDrag> NewInventoryItemSlotDragDropClass);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryItemSlotDrag> GetInventoryItemSlotDragWidgetClass() const
+	{
+		return InventorySlotDragClass;
+	}
+
 #pragma endregion
 
 #pragma region Settings
@@ -196,12 +235,10 @@ public:
 	}
 
 #pragma endregion 
-	
-protected:
-	
-	virtual void BeginPlay() override;
 
 protected:
+
+#pragma region GeneralSettings
 	
 	/**
 	 * If allowed, Item Slots are allowed to be Grabbed and Dropped.
@@ -215,7 +252,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
 	uint8 bAllowPackSplit : 1;
 
-	
+	/**
+	 * If Allowed, a new "empty" category shall be created in UI.
+	 * If that category is selected, Category filter is reset and all Items will be displayed.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	uint8 bAllowAllCategoriesCategory : 1;
 
 	/**
 	 * If Category is added to Allowed Categories, should we allow its parent Categories as well?
@@ -250,19 +292,36 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
 	TMap<EInventoryContext, FInventoryNotificationInfo> NotificationInfo;
 	
-	
+#pragma endregion
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true))
+#pragma region Subclasses
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|General", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	TSubclassOf<UInventoryCategoryWidget> InventoryCategoryClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	TSubclassOf<UInventoryItemSlot> InventorySlotClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	TSubclassOf<UInventoryItemSlotTooltip> InventorySlotTooltipClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	TSubclassOf<UInventoryItemSlotDrag> InventorySlotDragClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryNotification> NotificationClass;
+
+#pragma endregion 
 	
 private:
 
+	void ValidateCategories();
 	void UpdateCategories();
 	void AddParentCategory(UInventoryCategory* Category, int32& DepthIndex);
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;

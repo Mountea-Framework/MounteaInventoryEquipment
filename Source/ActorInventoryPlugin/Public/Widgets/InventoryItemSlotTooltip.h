@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryItemSlotTooltip : public UUserWidget
 {
 	GENERATED_BODY()
