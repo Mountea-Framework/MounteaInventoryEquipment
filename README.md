@@ -1,6 +1,6 @@
 # ActorInventoryPlugin
 
-Component tool for smart and semi-modular Actor Inventory.
+Component tool for smart and semi-modular data driven Actor Inventory.
 Developed with Designers in mind to allow you as easy as possible implementation while maintaining high scalability and diverse options to tweak everything to your liking.
 
 ### Prerequisites
@@ -13,10 +13,8 @@ The things you need before running this plugin.
 
 A step by step guide that will tell you how to get the development environment up and running.
 
-```
 $ Download the branch you are interested in
 $ Instal the plugin to your Game Project (within /Plugin folder)
-```
 
 ## Usage
 
