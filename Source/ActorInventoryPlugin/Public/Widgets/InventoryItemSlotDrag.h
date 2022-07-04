@@ -7,6 +7,8 @@
 #include "Helpers/InventoryHelpers.h"
 #include "InventoryItemSlotDrag.generated.h"
 
+class UInventoryItemSlot;
+
 /**
  * 
  */
@@ -15,10 +17,16 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlotDrag : public UUserWidget
 {
 	GENERATED_BODY()
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE UInventoryItemSlot* GetSourceSlotData() const
+	{
+		return SourceSlotData;
+	}
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
-	class UInventoryItemSlot* SourceSlotData;
+	UInventoryItemSlot* SourceSlotData = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
 	FIntPoint SourceSlotCoordinates;
