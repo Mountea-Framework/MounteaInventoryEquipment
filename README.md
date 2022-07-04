@@ -13,8 +13,8 @@ The things you need before running this plugin.
 
 A step by step guide that will tell you how to get the development environment up and running.
 
-$ Download the branch you are interested in
-$ Instal the plugin to your Game Project (within /Plugin folder)
+* Download the branch you are interested in
+* Instal the plugin to your Game Project (within /Plugin folder)
 
 ## Usage
 
