@@ -86,6 +86,12 @@ public:
 		return AllowedCategories.Contains(Category);
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Categories")
+	FORCEINLINE bool IsGeneralCategoryAllowed() const
+	{
+		return bAllowGeneralCategory;
+	}
+
 #pragma endregion
 
 #pragma region Rarities
@@ -257,7 +263,7 @@ protected:
 	 * If that category is selected, Category filter is reset and all Items will be displayed.
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
-	uint8 bAllowAllCategoriesCategory : 1;
+	uint8 bAllowGeneralCategory : 1;
 
 	/**
 	 * If Category is added to Allowed Categories, should we allow its parent Categories as well?

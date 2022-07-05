@@ -5,7 +5,7 @@
 
 #include "Helpers/ActorInventoryPluginLog.h"
 
-void UInventoryItemSlot::OnSlotUpdated_Implementation(const FInventorySlotData SlotData)
+void UInventoryItemSlot::OnSlotUpdated_Implementation(const FInventorySlotData& SlotData)
 {
 	UpdateItemSlot(SlotData);
 }

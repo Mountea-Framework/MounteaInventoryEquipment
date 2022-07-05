@@ -9,7 +9,7 @@
 
 class UInventoryItemSlot;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDropped, const FInventorySlotData, DataAfterDropped);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDropped, const FInventorySlotData&, DataAfterDropped);
 
 /**
  * 

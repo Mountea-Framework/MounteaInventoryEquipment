@@ -19,7 +19,7 @@ public:
 
 	// Event called once this Slot has been updated.
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	void OnSlotUpdated(const FInventorySlotData SlotData);
+	void OnSlotUpdated(const FInventorySlotData& SlotData);
 
 protected:
 
