@@ -189,7 +189,7 @@ struct FInventoryItemData : public FTableRowBase
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="Item Data|GUID")
-	FGuid ItemDataGUID = FGuid();
+	FGuid ItemDataGUID = FGuid::NewGuid();;
 
 public:
 	
