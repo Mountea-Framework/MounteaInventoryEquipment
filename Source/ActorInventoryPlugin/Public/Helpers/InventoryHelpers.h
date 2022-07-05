@@ -171,7 +171,8 @@ struct FInventoryItemData : public FTableRowBase
 {
 	GENERATED_BODY();
 
-	FInventoryItemData() : ItemQuantityData() {};
+	FInventoryItemData() : ItemQuantityData()
+	{};
 
 	FInventoryItemData(const FInventoryItemData& Other)
 		: ItemDataGUID(FGuid::NewGuid())
@@ -188,7 +189,7 @@ struct FInventoryItemData : public FTableRowBase
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="Item Data|GUID")
-	FGuid ItemDataGUID = FGuid::NewGuid();
+	FGuid ItemDataGUID = FGuid();
 
 public:
 	

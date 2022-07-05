@@ -5,6 +5,11 @@
 
 #include "Helpers/ActorInventoryPluginLog.h"
 
+void UInventoryItemSlot::OnSlotUpdated_Implementation(const FInventorySlotData& SlotData)
+{
+	UpdateItemSlot(SlotData);
+}
+
 bool UInventoryItemSlot::Initialize()
 {
 	if(Super::Initialize())
@@ -15,8 +20,7 @@ bool UInventoryItemSlot::Initialize()
 	return false;
 }
 
-void UInventoryItemSlot::SlotUpdated_Implementation(const FInventorySlotData& Data)
+void UInventoryItemSlot::UpdateItemSlot(const FInventorySlotData& Data)
 {
-	AInvP_LOG(Warning, TEXT("SlotUpdated"))
 	ItemSlotData = Data;
 }

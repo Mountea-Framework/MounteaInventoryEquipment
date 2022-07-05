@@ -11,7 +11,7 @@ UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 
 	bAllowDragDrop = true;
 	bAllowPackSplit = true;
-	bAllowAllCategoriesCategory = true;
+	bAllowGeneralCategory = true;
 }
 
 

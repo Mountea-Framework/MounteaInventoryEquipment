@@ -7,7 +7,6 @@
 #include "Helpers/InventoryHelpers.h"
 #include "InventoryItemSlot.generated.h"
 
-
 /**
  * 
  */
@@ -15,6 +14,12 @@ UCLASS(Abstract)
 class ACTORINVENTORYPLUGIN_API UInventoryItemSlot : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+
+	// Event called once this Slot has been updated.
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	void OnSlotUpdated(const FInventorySlotData& SlotData);
 
 protected:
 
@@ -25,16 +30,17 @@ protected:
 	{
 		return ItemSlotData.Item != nullptr;
 	}
-
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void ClearItem()
 	{
-		ItemSlotData.Item = nullptr;
+		ItemSlotData = FInventorySlotData();
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	void SlotUpdated(const FInventorySlotData& Data);
-
+private:
+	
+	void UpdateItemSlot(const FInventorySlotData& Data);
+	
 protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
