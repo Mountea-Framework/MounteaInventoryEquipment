@@ -54,6 +54,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Inventory|GUID")
 	FGuid Guid = FGuid::NewGuid();
 
+	// TODO: List of actions and keys to action
+	// Example: Keyboard::E, UInventoryItemAction (DataAsset probably)
+
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };
 
