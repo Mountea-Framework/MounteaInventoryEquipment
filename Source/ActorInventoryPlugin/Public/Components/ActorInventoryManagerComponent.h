@@ -20,6 +20,7 @@ class UInventoryItemSlot;
 class UInventoryItemSlotTooltip;
 class UInventoryItemSlotDrag;
 class UInventoryCategoryWidget;
+class UInventoryItemSlotSplit;
 
 /**
  * 
@@ -219,6 +220,15 @@ public:
 	void SetInventoryItemDragDropWidgetClass(const TSubclassOf<UInventoryItemSlotDrag> NewInventoryItemSlotDragDropClass);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryItemSlotSplit> GetInventoryItemSlotSplitClass() const
+	{
+		return InventorySlotSplitClass;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryItemSlotSplitClass(const TSubclassOf<UInventoryItemSlotSplit>& NewInventoryItemSlotSplitClass);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	FORCEINLINE TSubclassOf<UInventoryItemSlotDrag> GetInventoryItemSlotDragWidgetClass() const
 	{
 		return InventorySlotDragClass;
@@ -316,6 +326,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlotDrag> InventorySlotDragClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	TSubclassOf<UInventoryItemSlotSplit> InventorySlotSplitClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;

@@ -45,4 +45,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
 	FInventorySlotData ItemSlotData;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (ExposeOnSpawn = true))
+	class UInventoryWidget* OwningInventoryWidget = nullptr;
 };

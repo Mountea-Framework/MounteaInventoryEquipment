@@ -118,6 +118,12 @@ void UActorInventoryManagerComponent::SetInventoryItemDragDropWidgetClass(
 	InventorySlotDragClass = NewInventoryItemSlotDragDropClass;
 }
 
+void UActorInventoryManagerComponent::SetInventoryItemSlotSplitClass(
+	const TSubclassOf<UInventoryItemSlotSplit>& NewInventoryItemSlotSplitClass)
+{
+	InventorySlotSplitClass = NewInventoryItemSlotSplitClass;
+}
+
 
 void UActorInventoryManagerComponent::ClearAllowedCategories()
 {
