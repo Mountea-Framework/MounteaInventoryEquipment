@@ -131,6 +131,12 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnInventoryLayoutSaveRequested OnInventoryLayoutSaveRequested;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnKeyPressed OnKeyPressed;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnKeyReleased OnKeyReleased;
+
 #pragma endregion Events
 
 #pragma endregion InventoryInterface

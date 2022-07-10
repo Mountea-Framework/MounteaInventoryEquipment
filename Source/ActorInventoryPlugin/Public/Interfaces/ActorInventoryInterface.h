@@ -8,10 +8,14 @@
 #include "ActorInventoryInterface.generated.h"
 
 enum class EInventoryContext : uint8;
+class UActorInventoryComponent;
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, UActorComponent*, InventoryComponent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdateRequestProcessed, EInventoryContext, Context);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryLayoutSaveRequested, const FIntPoint&, SlotCoordinates, class UInventoryItemSlot*, Slot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyPressed, const FKey&, PressedKey);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyReleased, const FKey&, ReleasedKey);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -68,6 +72,7 @@ public:
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) = 0;
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;
 
+	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() = 0;
