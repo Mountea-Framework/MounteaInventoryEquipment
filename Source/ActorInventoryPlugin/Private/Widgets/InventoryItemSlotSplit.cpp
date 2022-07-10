@@ -3,3 +3,13 @@
 
 #include "Widgets/InventoryItemSlotSplit.h"
 
+void UInventoryItemSlotSplit::Init_Implementation(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot)
+{
+	OriginSlot = NewOriginSlot;
+	TargetSlot = NewTargetSlot;
+}
+
+void UInventoryItemSlotSplit::SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget)
+{
+	OwningWidget = NewOwningWidget;
+}

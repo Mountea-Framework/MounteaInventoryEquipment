@@ -44,7 +44,8 @@ public class ActorInventoryPlugin : ModuleRules
 				"UMG",
 				"Slate",
 				"SlateCore",
-				"Projects"
+				"Projects",
+				"InputCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

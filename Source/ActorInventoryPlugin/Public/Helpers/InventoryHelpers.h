@@ -33,6 +33,8 @@ static FORCEINLINE FString GetEnumValueAsString(const FString& Name, TEnum Value
 class UInventoryCategory;
 class UInventoryItemRarity;
 
+#pragma region ItemQuantity
+
 /**
  * Item Quantity Definition.
  */
@@ -70,6 +72,8 @@ public:
 		return !(*this==Other);
 	}
 };
+
+#pragma endregion
 
 #pragma region InventoryRarityData
 
@@ -159,6 +163,70 @@ public:
 
 #pragma endregion 
 
+#pragma region InventoryItemAdditionalData
+
+#define LOCTEXT_NAMESPACE "InventoryItemAdditionalData"
+
+/**
+ * Data of the Inventory Item.
+ */
+USTRUCT(BlueprintType, Blueprintable)
+struct FInventoryItemAdditionalData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FInventoryItemAdditionalData()
+	{
+		bHasWeight = true;
+	};
+
+	FInventoryItemAdditionalData(const FInventoryItemAdditionalData& Other)
+	: ItemBasePrice(Other.ItemBasePrice)
+	, ItemDurability(Other.ItemDurability)
+	, bHasWeight(Other.bHasWeight)
+	, ItemWeight(Other.ItemWeight)
+	, PriceDurabilityRatio(Other.PriceDurabilityRatio)
+	{};
+
+public:
+
+	// Price of Item
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin=0, ClampMin=0))
+	float ItemBasePrice = 10.f;
+
+	// Durability of Item
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0, ClampMin = 0, UIMax=1, ClampMax=1))
+	float ItemDurability = 1.f;
+
+	// Defines whether the Item has weight or not 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true))
+	uint8 bHasWeight : 1;
+
+	// Weight of Item
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0, ClampMin = 0, Units="Kilograms", EditCondition ="bHasWeight==true"))
+	float ItemWeight = 1.5f;
+
+	// How much does Durability affects the Price
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0.1, ClampMin = 0.1))
+	float PriceDurabilityRatio = 1.f;
+
+public:
+
+	inline FInventoryItemAdditionalData& operator=(const FInventoryItemAdditionalData& Other)
+	{
+		ItemBasePrice = Other.ItemBasePrice;
+		ItemDurability = Other.ItemDurability;
+		ItemWeight = Other.ItemWeight;
+		PriceDurabilityRatio = Other.PriceDurabilityRatio;
+
+		return *this;
+	}
+};
+
+#undef LOCTEXT_NAMESPACE
+
+#pragma endregion
+
 #pragma region InventoryItemData
 
 #define LOCTEXT_NAMESPACE "InventoryItemData"
@@ -169,7 +237,7 @@ public:
 USTRUCT(BlueprintType, Blueprintable)
 struct FInventoryItemData : public FTableRowBase
 {
-	GENERATED_BODY();
+	GENERATED_BODY()
 
 	FInventoryItemData() : ItemQuantityData()
 	{};
@@ -216,6 +284,10 @@ public:
 	// Item Quantity
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
 	FItemQuantityData ItemQuantityData;
+
+	// Item Quantity
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data", meta = (ExposeOnSpawn = true, ShowOnlyInnerProperties))
+	FInventoryItemAdditionalData ItemAdditionalData;
 
 	// Item Mesh. Static and Skeletal Mesh allowed. For preview only.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, AllowedClasses="StaticMesh, SkeletalMesh"))
@@ -329,6 +401,7 @@ struct FInventoryNotificationInfo
 
 #pragma endregion 
 
+#pragma region InventorySlotData
 /**
  * 
  */
@@ -344,7 +417,9 @@ struct FInventorySlotData
 	int32 Quantity;
 	
 };
+#pragma endregion
 
+#pragma region InventoryLayout
 /**
  * 
  */
@@ -359,6 +434,7 @@ struct FInventoryLayout
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	TMap<FIntPoint, FInventorySlotData> SavedInventoryLayout;
 };
+#pragma endregion 
 
 /**
  * 
@@ -366,7 +442,7 @@ struct FInventoryLayout
 UENUM(BlueprintType)
 enum class EInventoryContext : uint8
 {
-	EIC_Success						UMETA(DisplayName="Succes"),
+	EIC_Success						UMETA(DisplayName="Success"),
 	EIC_Success_SplitStack			UMETA(DisplayName="Success - Split Stacks"),
 	EIC_Success_RemovedItem			UMETA(DisplayName="Success - Removed Item"),
 	EIC_Failed_InvalidItem			UMETA(DisplayName="Failed - Invalid Item"),
