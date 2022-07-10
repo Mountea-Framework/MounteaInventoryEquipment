@@ -29,6 +29,6 @@ protected:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
 	TScriptInterface<IActorInventoryInterface> OwningInventory = nullptr;
 };

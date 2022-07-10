@@ -7,6 +7,7 @@
 #include "InventoryItemSlotSplit.generated.h"
 
 class UInventoryItemSlot;
+class UInventoryWidget;
 
 /**
  * 
@@ -18,6 +19,26 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlotSplit : public UUserWidget
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
-	void Init(const UInventoryItemSlot* OriginSlot, const UInventoryItemSlot* TargetSlot);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot);
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE bool IsValid() const
+	{
+		return OriginSlot != nullptr && TargetSlot != nullptr;
+	}
+	
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
+	UInventoryWidget* OwningWidget = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
+	UInventoryItemSlot* OriginSlot = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
+	UInventoryItemSlot* TargetSlot = nullptr;
 };

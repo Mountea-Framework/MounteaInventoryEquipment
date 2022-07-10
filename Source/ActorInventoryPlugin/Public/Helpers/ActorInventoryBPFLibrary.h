@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InventoryHelpers.h"
+#include "Definitions/InventoryItem.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ActorInventoryBPFLibrary.generated.h"
 
@@ -21,5 +23,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject", CompactNodeTitle="Inventory Manager"))
 	static class UActorInventoryManagerComponent* GetInventoryManager(const UObject* WorldContextObject);
-	
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject"))
+	static bool HasValidItem(const FInventorySlotData& ItemData)
+	{
+		return ItemData.Item != nullptr && ItemData.Item->IsValidItem();
+	}
 };
