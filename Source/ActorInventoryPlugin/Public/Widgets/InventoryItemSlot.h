@@ -7,6 +7,8 @@
 #include "Helpers/InventoryHelpers.h"
 #include "InventoryItemSlot.generated.h"
 
+class UInventoryWidget;
+
 /**
  * 
  */
@@ -20,7 +22,7 @@ public:
 	// Event called once this Slot has been updated.
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
 	void OnSlotUpdated(const FInventorySlotData& SlotData);
-
+	
 protected:
 
 	virtual bool Initialize() override;
@@ -47,5 +49,5 @@ protected:
 	FInventorySlotData ItemSlotData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (ExposeOnSpawn = true))
-	class UInventoryWidget* OwningInventoryWidget = nullptr;
+	UInventoryWidget* OwningInventoryWidget = nullptr;
 };
