@@ -30,4 +30,8 @@ A best way to describe the usage is to take a look or play the demo build.
 ## Additional Documentation and Acknowledgments
 
 * Trello board: https://trello.com/b/PX8YBie0/actor-inventory-plugin
+<<<<<<< HEAD
 * Documentation: https://mounteaframework.atlassian.net/wiki/spaces/MF/pages/33281/
+=======
+* Documentation: https://mounteaframework.atlassian.net/wiki/spaces/MF/pages/33281/ 
+>>>>>>> 4.26

@@ -9,6 +9,17 @@
 class UInventoryItemSlot;
 class UInventoryWidget;
 
+UENUM(BlueprintType)
+enum class ESplitType : uint8
+{
+	EST_MERGE_SameInv	UMETA(DisplayName="MERGE - Same Inventory"),
+	EST_SPLIT_SameInv	UMETA(DisplayName="SPLIT - Same Inventory"),
+	EST_Merge_DiffInv	UMETA(DisplayName="MERGE - Different Inventories"),
+	EST_SPLIT_DiffInv	UMETA(DisplayName="SPLIT - Different Inventories"),
+
+	Default				UMETA(Hidden)
+};
+
 /**
  * 
  */
@@ -30,8 +41,20 @@ public:
 	{
 		return OriginSlot != nullptr && TargetSlot != nullptr;
 	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void SetSplitType(const ESplitType& NewSplitType);
 	
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	ESplitType SplitType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	TArray<FKey> CancelKeys;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
+	TArray<FKey> ConfirmKeys;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
 	UInventoryWidget* OwningWidget = nullptr;
