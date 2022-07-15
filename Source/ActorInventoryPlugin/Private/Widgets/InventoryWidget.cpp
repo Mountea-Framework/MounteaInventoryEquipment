@@ -14,7 +14,7 @@ bool UInventoryWidget::Initialize()
 		{
 			TArray<UActorComponent*> InventoryInterfaces = GetOwningPlayer()->GetComponentsByInterface(UActorInventoryInterface::StaticClass());
 
-			if (InventoryInterfaces.Num() > 0)
+			if (InventoryInterfaces.IsValidIndex(0))
 			{
 				if(UActorComponent* InventoryInterface = InventoryInterfaces[0])
 				{
@@ -25,9 +25,6 @@ bool UInventoryWidget::Initialize()
 					FOnInventoryUpdated& UpdateHandle = OwningInventory->GetUpdateEventHandle();
 					UpdateHandle.AddUniqueDynamic(this, &UInventoryWidget::RefreshWidget);
 
-					FOnInventoryLayoutSaveRequested& LayoutSaveRequestedHandle = OwningInventory->GetInventoryLayoutUpdateRequestHandle();
-					LayoutSaveRequestedHandle.AddUniqueDynamic(this, &UInventoryWidget::SaveItemLayout);
-
 					return true;
 				}
 			}
@@ -37,11 +34,11 @@ bool UInventoryWidget::Initialize()
 	return false;
 }
 
-void UInventoryWidget::SaveItemLayout_Implementation(const FIntPoint& SlotCoordinates, class UInventoryItemSlot* SlotWidget)
+void UInventoryWidget::SaveInventorySlot_Implementation(const FInventorySlotData& InventorySlot)
 {
-	AInvP_LOG(Warning, TEXT("SaveItemLayout"))
 	if (OwningInventory)
 	{
-		OwningInventory->GetInventoryLayoutUpdateRequestHandle().Broadcast(SlotCoordinates, SlotWidget);
+		OwningInventory->GetInventoryLayoutUpdateRequestHandle().Broadcast(InventorySlot);
 	}
 }
+

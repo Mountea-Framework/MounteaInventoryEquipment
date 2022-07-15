@@ -257,7 +257,7 @@ struct FInventoryItemData : public FTableRowBase
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="Item Data|GUID")
-	FGuid ItemDataGUID = FGuid::NewGuid();;
+	FGuid ItemDataGUID = FGuid::NewGuid();
 
 public:
 	
@@ -410,11 +410,20 @@ struct FInventorySlotData
 {
 	GENERATED_BODY()
 
+	FInventorySlotData() : Quantity(0), bCreatedManually(false)
+	{};
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	class UInventoryItem* Item = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	int32 Quantity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	uint8 bCreatedManually : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	FIntPoint SlotCoordinates = FIntPoint(0,0);
 	
 };
 #pragma endregion

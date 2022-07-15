@@ -21,14 +21,27 @@ protected:
 	
 	virtual bool Initialize() override;
 
+public:
+
+	/**
+	 * @brief 
+	 * @param InventoryInterface 
+	 */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Inventory")
 	void RefreshWidget(UActorComponent* InventoryInterface);
 
+	/**
+	 * @brief 
+	 * @param InventorySlot 
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Inventory")
-	void SaveItemLayout(const FIntPoint& SlotCoordinates, class UInventoryItemSlot* SlotWidget);
+	void SaveInventorySlot(const FInventorySlotData& InventorySlot);
 
 protected:
 
+	/**
+	 * @brief 
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
 	TScriptInterface<IActorInventoryInterface> OwningInventory = nullptr;
 };

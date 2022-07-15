@@ -19,6 +19,9 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlot : public UUserWidget
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE FInventorySlotData GetItemData() const {return ItemSlotData; };
+
 	// Event called once this Slot has been updated.
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
 	void OnSlotUpdated(const FInventorySlotData& SlotData);
@@ -41,7 +44,7 @@ protected:
 
 private:
 	
-	void UpdateItemSlot(const FInventorySlotData& Data);
+	void UpdateItemSlot(const FInventorySlotData& SlotData);
 	
 protected:
 	

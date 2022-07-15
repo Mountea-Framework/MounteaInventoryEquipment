@@ -4,10 +4,16 @@
 #include "Widgets/InventoryItemSlot.h"
 
 #include "Helpers/ActorInventoryPluginLog.h"
+#include "Widgets/InventoryWidget.h"
 
 void UInventoryItemSlot::OnSlotUpdated_Implementation(const FInventorySlotData& SlotData)
 {
 	UpdateItemSlot(SlotData);
+
+	if (OwningInventoryWidget)
+	{
+		OwningInventoryWidget->SaveInventorySlot(SlotData);
+	}
 }
 
 bool UInventoryItemSlot::Initialize()
@@ -20,7 +26,7 @@ bool UInventoryItemSlot::Initialize()
 	return false;
 }
 
-void UInventoryItemSlot::UpdateItemSlot(const FInventorySlotData& Data)
+void UInventoryItemSlot::UpdateItemSlot(const FInventorySlotData& SlotData)
 {
-	ItemSlotData = Data;
+	ItemSlotData = SlotData;
 }

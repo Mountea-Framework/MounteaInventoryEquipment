@@ -18,16 +18,31 @@ void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInve
 	InventoryLayout = InInventoryLayout;
 }
 
-void UActorInventoryComponent::SaveToInventoryLayout(FIntPoint& SlotCoordinates, FInventorySlotData& Slot)
+void UActorInventoryComponent::SaveToInventoryLayoutBP_Implementation(const FInventorySlotData& Slot)
 {
-	if (InventoryLayout.SavedInventoryLayout.Contains(SlotCoordinates))
+	SaveToInventoryLayout(Slot);
+}
+
+void UActorInventoryComponent::SaveToInventoryLayout(const FInventorySlotData& Slot)
+{
+	// Check whether SavedLayout Contains any Values
+	if (InventoryLayout.SavedInventoryLayout.Contains(Slot.SlotCoordinates))
 	{
-		InventoryLayout.SavedInventoryLayout.Remove(SlotCoordinates);
-		InventoryLayout.SavedInventoryLayout.Add(SlotCoordinates, Slot);
+		// Validate Slot
+		// If Valid, override Slot data
+		if (Slot.Item != nullptr && Slot.Quantity > 0)
+		{
+			InventoryLayout.SavedInventoryLayout[Slot.SlotCoordinates] = Slot;
+		}
+		// If Invalid, remove
+		else
+		{
+			InventoryLayout.SavedInventoryLayout.Remove(Slot.SlotCoordinates);
+		}
 	}
 	else
 	{
-		InventoryLayout.SavedInventoryLayout.Add(SlotCoordinates, Slot);
+		InventoryLayout.SavedInventoryLayout.Add(Slot.SlotCoordinates, Slot);
 	}
 }
 
@@ -461,3 +476,5 @@ void UActorInventoryComponent::SetNotificationContainerPtr(UInventoryNotificatio
 {
 	InventoryNotificationContainer = Widget;
 }
+
+
