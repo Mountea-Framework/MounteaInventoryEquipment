@@ -30,7 +30,7 @@ void UActorInventoryComponent::SaveToInventoryLayout(const FInventorySlotData& S
 	{
 		// Validate Slot
 		// If Valid, override Slot data
-		if (Slot.Item != nullptr && Slot.Quantity > 0)
+		if (Slot.Item != nullptr && Slot.Quantity > 0 && Slot.bCreatedManually)
 		{
 			InventoryLayout.SavedInventoryLayout[Slot.SlotCoordinates] = Slot;
 		}
@@ -42,7 +42,10 @@ void UActorInventoryComponent::SaveToInventoryLayout(const FInventorySlotData& S
 	}
 	else
 	{
-		InventoryLayout.SavedInventoryLayout.Add(Slot.SlotCoordinates, Slot);
+		if (Slot.bCreatedManually)
+		{
+			InventoryLayout.SavedInventoryLayout.Add(Slot.SlotCoordinates, Slot);
+		}
 	}
 }
 
