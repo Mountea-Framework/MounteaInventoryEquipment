@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "InventoryCategoryWidget.generated.h"
 
+class UInventoryWidget;
 class UInventoryCategory;
 
 /**
@@ -16,15 +17,23 @@ class ACTORINVENTORYPLUGIN_API UInventoryCategoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE UInventoryCategory* GetCategoryDefinition() const
 	{
 		return ParentCategory;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	void OnCategorySelected();
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
 	UInventoryCategory* ParentCategory = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
+	UInventoryWidget* OwningInventory = nullptr;
 	
 };

@@ -93,6 +93,27 @@ public:
 		return bAllowGeneralCategory;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Categories")
+	bool ValidateCategory(const FGuid& CategoryGUID) const;
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory|Categories")
+	FORCEINLINE UInventoryCategory* GetDefaultCategory() const
+	{
+		if (DefaultCategory)
+		{
+			return DefaultCategory;
+		}
+		else
+		{
+			if (AllowedCategories.Num() > 0)
+			{
+				return AllowedCategories.Array()[0];
+			}
+		}
+
+		return nullptr;
+	}
+
 #pragma endregion
 
 #pragma region Rarities
@@ -250,6 +271,9 @@ public:
 		return bAllowPackSplit;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Validation")
+	bool IsValidCategory(const FGuid& CategoryGUID) const;
+
 #pragma endregion 
 
 protected:
@@ -286,6 +310,13 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Categories", meta=(EditCondition="bAutoAllowParentCategories", UIMin=1, ClampMin=1))
 	int32 MaxRecursionDepth =  6;
+
+	/**
+	 * Default Category which will be set when opening Inventory.
+	 * If left empty, first from Allowed Categories will be used instead.
+	 */
+	UPROPERTY(EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UInventoryCategory* DefaultCategory = nullptr;
 	
 	/**
 	 * List of allowed Categories to be displayed in the Inventory.

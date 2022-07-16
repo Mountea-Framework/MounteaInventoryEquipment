@@ -44,6 +44,12 @@ public:
 		return CategoryData.MaxQuantityPerStack;
 	}
 	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE FGuid GetCategoryGUID() const
+	{
+		return Guid;
+	}
+	
 protected:
 
 	// Category Data

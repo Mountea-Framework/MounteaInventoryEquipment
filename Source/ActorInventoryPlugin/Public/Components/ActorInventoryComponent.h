@@ -120,6 +120,22 @@ public:
 
 #pragma endregion InventoryWidget
 
+#pragma region Layout
+
+	/**
+	 * @brief This function should be called whenever you want to updated Saved Inventory Layout.
+	 * @param Slot 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory|UI", meta=(DisplayName="Save To Inventory Layout"))
+	void SaveToInventoryLayoutBP(const FInventorySlotData& Slot);
+	
+	/**
+	 * @brief 
+	 * @param Slot 
+	 */
+	virtual void SaveToInventoryLayout(const FInventorySlotData& Slot) override;
+	
+
 #pragma region Events
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
@@ -143,10 +159,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
 	void SetInventoryLayout(const FInventoryLayout& InInventoryLayout);
-
-	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
-	void SaveToInventoryLayout(FIntPoint& SlotCoordinates, FInventorySlotData& Slot);
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	FORCEINLINE FInventoryLayout GetInventoryLayout() const
 	{
