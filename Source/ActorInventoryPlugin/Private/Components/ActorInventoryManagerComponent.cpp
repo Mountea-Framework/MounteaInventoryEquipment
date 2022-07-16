@@ -124,6 +124,19 @@ void UActorInventoryManagerComponent::SetInventoryItemSlotSplitClass(
 	InventorySlotSplitClass = NewInventoryItemSlotSplitClass;
 }
 
+bool UActorInventoryManagerComponent::IsValidCategory(const FGuid& CategoryGUID) const
+{
+	for(const auto Itr : AllowedCategories)
+	{
+		if (Itr && Itr->GetCategoryGUID() == CategoryGUID)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 void UActorInventoryManagerComponent::ClearAllowedCategories()
 {
@@ -169,6 +182,18 @@ void UActorInventoryManagerComponent::RemoveAllowedCategories(TSet<UInventoryCat
 }
 
 
+bool UActorInventoryManagerComponent::ValidateCategory(const FGuid& CategoryGUID) const
+{
+	for (const auto Itr : AllowedCategories)
+	{
+		if (Itr && Itr->GetCategoryGUID() == CategoryGUID)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 void UActorInventoryManagerComponent::ClearAllowedRarities()
 {

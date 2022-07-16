@@ -20,6 +20,7 @@ bool UInventoryItemSlot::Initialize()
 {
 	if(Super::Initialize())
 	{
+		
 		return true;
 	}
 

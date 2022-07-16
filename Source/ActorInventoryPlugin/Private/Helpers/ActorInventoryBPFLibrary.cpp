@@ -19,3 +19,4 @@ UActorInventoryManagerComponent* UActorInventoryBPFLibrary::GetInventoryManager(
 	
 	return nullptr;
 }
+
