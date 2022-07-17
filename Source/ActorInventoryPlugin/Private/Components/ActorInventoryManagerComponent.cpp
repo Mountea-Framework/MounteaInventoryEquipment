@@ -1,8 +1,14 @@
 // Copyright Dominik Pavlicek 2022. All Rights Reserved.
 
 #include "Components/ActorInventoryManagerComponent.h"
+
 #include "Definitions/InventoryItem.h"
+#include "Helpers/ActorInventoryPluginLog.h"
 #include "Widgets/InventoryWidget.h"
+
+#if WITH_EDITOR
+#include "EditorHelper.h"
+#endif
 
 UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 {
@@ -248,9 +254,47 @@ void UActorInventoryManagerComponent::RemoveAllowedRarities(const TSet<UInventor
 	}
 }
 
-void UActorInventoryManagerComponent::ValidateCategories()
+#if WITH_EDITOR
+
+bool UActorInventoryManagerComponent::ValidateCategories(const bool bShouldCheckForFlags)
 {
-	// TODO: If more than only one Generic Category, show error message
+	bool bResult = true;
+
+	if (bShouldCheckForFlags)
+	{
+		const bool bShouldValidate = GetOwner()  && HasAnyFlags(RF_LoadCompleted);
+
+		if (!bShouldValidate)
+		{
+			return true;
+		}
+	}
+		
+	int32 GenericCategories = 0;
+	for (const auto Itr : AllowedCategories)
+	{
+		
+		if (Itr == nullptr)
+		{
+			const FText ErrorMessage = FText::FromString(TEXT("ALLOWED CATEGORIES CONTAIN EMPTY RECORD!"));
+			FEditorHelper::DisplayEditorNotification(ErrorMessage, SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+			
+			bResult = false;
+		}
+
+		if (Itr && Itr->GetCategoryData().IsAllCategories())
+		{
+			GenericCategories++;
+			if (GenericCategories > 1)
+			{
+				const FText ErrorMessage = FText::FromString(TEXT("ALLOWED CATEGORIES CONTAIN MORE THAN ONE GENERIC CATEGORY!"));
+				FEditorHelper::DisplayEditorNotification(ErrorMessage, SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+				bResult = false;
+			}
+		}
+	}
+
+	return bResult;
 }
 
 void UActorInventoryManagerComponent::UpdateCategories()
@@ -277,7 +321,6 @@ void UActorInventoryManagerComponent::UpdateCategories()
 		}
 	}
 }
-
 
 void UActorInventoryManagerComponent::AddParentCategory(UInventoryCategory* Category, int32& DepthIndex)
 {
@@ -308,14 +351,27 @@ void UActorInventoryManagerComponent::AddParentCategory(UInventoryCategory* Cate
 
 void UActorInventoryManagerComponent::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
 {
-	Super::PostEditChangeChainProperty(PropertyChangedEvent);
-
 	const FName PropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.GetPropertyName() : NAME_None;
 
 	if (PropertyName == "AllowedCategories")
 	{
 		UpdateCategories();
 
-		ValidateCategories();
+		if(!ValidateCategories(true)) return;
 	}
-};
+	
+	Super::PostEditChangeChainProperty(PropertyChangedEvent);
+}
+
+EDataValidationResult UActorInventoryManagerComponent::IsDataValid(TArray<FText>& ValidationErrors)
+{
+	if (!ValidateCategories(false))
+	{
+		const FText ErrorMessage = FText::FromString(TEXT("Allowed Categories validation failed!"));
+		ValidationErrors.Add(ErrorMessage);
+		
+		return EDataValidationResult::Invalid;
+	}
+	return Super::IsDataValid(ValidationErrors);
+}
+#endif
