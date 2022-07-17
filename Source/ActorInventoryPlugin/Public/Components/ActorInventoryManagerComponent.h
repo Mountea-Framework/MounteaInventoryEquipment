@@ -62,6 +62,9 @@ public:
 #pragma endregion
 
 #pragma region Categories
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Categories")
+	TArray<UInventoryCategory*> GetAllowedCategories() const;
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
 	void ClearAllowedCategories();
@@ -92,7 +95,7 @@ public:
 	{
 		return bAllowGeneralCategory;
 	}
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Categories")
 	bool ValidateCategory(const FGuid& CategoryGUID) const;
 	
@@ -117,6 +120,9 @@ public:
 #pragma endregion
 
 #pragma region Rarities
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Rarity")
+	TArray<UInventoryItemRarity*> GetAllowedRarities() const;
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
 	void ClearAllowedRarities();

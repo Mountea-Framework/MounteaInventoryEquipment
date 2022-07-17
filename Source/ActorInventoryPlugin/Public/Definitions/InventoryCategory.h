@@ -49,6 +49,12 @@ public:
 	{
 		return Guid;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE FInventoryCategoryData GetCategoryData() const
+	{ 
+		return CategoryData;
+	}
 	
 protected:
 

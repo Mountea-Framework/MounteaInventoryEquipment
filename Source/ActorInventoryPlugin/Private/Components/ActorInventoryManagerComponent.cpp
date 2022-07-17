@@ -138,6 +138,11 @@ bool UActorInventoryManagerComponent::IsValidCategory(const FGuid& CategoryGUID)
 }
 
 
+TArray<UInventoryCategory*> UActorInventoryManagerComponent::GetAllowedCategories() const
+{
+	return AllowedCategories.Array();
+}
+
 void UActorInventoryManagerComponent::ClearAllowedCategories()
 {
 	AllowedCategories.Empty();
@@ -195,6 +200,11 @@ bool UActorInventoryManagerComponent::ValidateCategory(const FGuid& CategoryGUID
 	return false;
 }
 
+TArray<UInventoryItemRarity*> UActorInventoryManagerComponent::GetAllowedRarities() const
+{
+	return  AllowedRarities.Array();
+}
+
 void UActorInventoryManagerComponent::ClearAllowedRarities()
 {
 	AllowedRarities.Empty();
@@ -240,7 +250,7 @@ void UActorInventoryManagerComponent::RemoveAllowedRarities(const TSet<UInventor
 
 void UActorInventoryManagerComponent::ValidateCategories()
 {
-	//...
+	// TODO: If more than only one Generic Category, show error message
 }
 
 void UActorInventoryManagerComponent::UpdateCategories()
@@ -267,7 +277,6 @@ void UActorInventoryManagerComponent::UpdateCategories()
 		}
 	}
 }
-
 
 
 void UActorInventoryManagerComponent::AddParentCategory(UInventoryCategory* Category, int32& DepthIndex)
