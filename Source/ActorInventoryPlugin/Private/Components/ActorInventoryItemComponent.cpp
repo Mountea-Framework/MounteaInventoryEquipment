@@ -6,7 +6,7 @@
 #include "Definitions/InventoryItem.h"
 
 #if WITH_EDITOR
-#include "InventoryEditorNotifications/Public/EditorHelper.h"
+#include "EditorHelper.h"
 #endif
 
 void UActorInventoryItemComponent::BeginPlay()
