@@ -377,8 +377,11 @@ protected:
 	
 private:
 
-	void ValidateCategories();
+	bool ValidateCategories(const bool bShouldCheckForFlags = true);
+	
 	void UpdateCategories();
 	void AddParentCategory(UInventoryCategory* Category, int32& DepthIndex);
+	
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
+	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 };
