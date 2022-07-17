@@ -37,6 +37,13 @@ bool UInventoryWidget::Initialize()
 void UInventoryWidget::SetSelectedCategory(const FGuid& CategoryGUID)
 {
 	SelectedCategory = CategoryGUID;
+
+	OnCategorySelected(CategoryGUID);
+}
+
+void UInventoryWidget::OnCategorySelected_Implementation(const FGuid CategoryGUID)
+{
+	// ...
 }
 
 void UInventoryWidget::SaveInventorySlot_Implementation(const FInventorySlotData& InventorySlot)
