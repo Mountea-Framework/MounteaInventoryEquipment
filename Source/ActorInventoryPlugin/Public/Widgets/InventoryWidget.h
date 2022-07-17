@@ -39,6 +39,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetSelectedCategory(const FGuid& CategoryGUID);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	void OnCategorySelected(const FGuid CategoryGUID);
 	
 protected:
 
