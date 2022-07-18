@@ -26,8 +26,4 @@ A best way to describe the usage is to take a look or play the demo build.
 
 * Master: A development branch, should be always relevant to most current Engine version.
 * Version Branch: A development branch for specified Engine version
-
-## Additional Documentation and Acknowledgments
-
-* Trello board: https://trello.com/b/PX8YBie0/actor-inventory-plugin
-* Documentation: https://mounteaframework.atlassian.net/wiki/spaces/MF/pages/33281/
+* Version Dev Branch: Unstable Dev branch for each Engine version
