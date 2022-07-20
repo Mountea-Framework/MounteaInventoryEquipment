@@ -1,37 +1,29 @@
-## Welcome to GitHub Pages
+# ActorInventoryPlugin
 
-You can use the [editor on GitHub](https://github.com/Mountea-Framework/ActorInventoryPlugin/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Component tool for smart and semi-modular data driven Actor Inventory.
+Developed with Designers in mind to allow you as easy as possible implementation while maintaining high scalability and diverse options to tweak everything to your liking.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Prerequisites
 
-### Markdown
+The things you need before running this plugin.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* Unreal Engine (supports from 4.26 to newest version)
 
-```markdown
-Syntax highlighted code block
+### Installation
 
-# Header 1
-## Header 2
-### Header 3
+A step by step guide that will tell you how to get the development environment up and running.
 
-- Bulleted
-- List
+* Download the branch you are interested in
+* Instal the plugin to your Game Project (within /Plugin folder)
 
-1. Numbered
-2. List
+## Usage
 
-**Bold** and _Italic_ and `Code` text
+A best way to describe the usage is to take a look or play the demo build.
+* Video: TBA
+* Build: TBA
 
-[Link](url) and ![Image](src)
-```
+### Branches
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Mountea-Framework/ActorInventoryPlugin/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+* Master: A development branch, should be always relevant to most current Engine version.
+* Version Branch: A development branch for specified Engine version
+* Version Dev Branch: Unstable Dev branch for each Engine version
