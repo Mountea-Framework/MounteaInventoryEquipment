@@ -94,6 +94,34 @@ public:
 		return AllowedCategories.Contains(Category);
 	}
 
+	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
+	FORCEINLINE bool ContainsAllowedCategoryGuid(const FGuid& CategoryGUID) const
+	{
+		for (const auto Itr : AllowedCategories)
+		{
+			if (Itr && Itr->GetCategoryGUID() == CategoryGUID)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
+	FORCEINLINE UInventoryCategory* GetCategoryByGUID(const FGuid& CategoryGUID)
+	{
+		for (const auto Itr : AllowedCategories)
+		{
+			if (Itr && Itr->GetCategoryGUID() == CategoryGUID)
+			{
+				return Itr;
+			}
+		}
+
+		return nullptr;
+	}
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Categories")
 	FORCEINLINE bool IsGeneralCategoryAllowed() const
 	{
