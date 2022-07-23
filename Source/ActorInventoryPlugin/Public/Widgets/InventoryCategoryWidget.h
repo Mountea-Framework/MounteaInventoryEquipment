@@ -29,7 +29,7 @@ public:
 	void OnCategorySelected();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	void OnCategoryUnselected(const FGuid& SelectedCategoryGUID);
+	void OnSelectedCategoryUpdated(const FGuid& SelectedCategoryGUID);
 
 protected:
 

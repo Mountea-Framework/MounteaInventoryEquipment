@@ -14,7 +14,7 @@ void UInventoryCategoryWidget::OnCategorySelected_Implementation()
 	}
 }
 
-void UInventoryCategoryWidget::OnCategoryUnselected_Implementation(const FGuid& SelectedCategoryGUID)
+void UInventoryCategoryWidget::OnSelectedCategoryUpdated_Implementation(const FGuid& SelectedCategoryGUID)
 {
 	//...
 }
