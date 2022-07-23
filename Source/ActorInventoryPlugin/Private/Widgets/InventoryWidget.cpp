@@ -43,7 +43,7 @@ void UInventoryWidget::SetSelectedCategory(const FGuid& CategoryGUID)
 
 void UInventoryWidget::OnCategorySelected_Implementation(const FGuid CategoryGUID)
 {
-	// ...
+	OnCategoryUpdated.Broadcast(SelectedCategory);
 }
 
 void UInventoryWidget::SaveInventorySlot_Implementation(const FInventorySlotData& InventorySlot)

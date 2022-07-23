@@ -20,6 +20,47 @@ UActorInventoryManagerComponent::UActorInventoryManagerComponent()
 	bAllowGeneralCategory = true;
 }
 
+void UActorInventoryManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Categories Cleanup
+	{
+		const UInventoryCategory* GenericCategory = nullptr;
+		TArray<UInventoryCategory*> InvalidCategories;
+	
+		for (int i = 0; i < AllowedCategories.Num(); i++)
+		{
+			if (AllowedCategories.Array().IsValidIndex(i))
+			{
+				const auto Itr = AllowedCategories.Array()[i];
+
+				if (Itr == nullptr)
+				{
+					InvalidCategories.Add(Itr);
+				}
+			
+				if (Itr && Itr->GetCategoryData().IsAllCategories())
+				{
+					if (!GenericCategory)
+					{
+						GenericCategory = Itr;
+					}
+					else
+					{
+						InvalidCategories.Add(Itr);
+					}
+				}
+			}
+		}
+
+		for (const auto Itr : InvalidCategories)
+		{
+			AllowedCategories.Remove(Itr);
+		}
+	}
+}
+
 
 bool UActorInventoryManagerComponent::AddItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer) const
 {

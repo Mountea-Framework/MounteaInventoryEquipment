@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
 	void OnCategorySelected();
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	void OnCategoryUnselected(const FGuid& SelectedCategoryGUID);
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))

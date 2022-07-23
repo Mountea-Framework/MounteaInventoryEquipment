@@ -13,3 +13,8 @@ void UInventoryCategoryWidget::OnCategorySelected_Implementation()
 		OwningInventory->SetSelectedCategory(ParentCategory->GetCategoryGUID());
 	}
 }
+
+void UInventoryCategoryWidget::OnCategoryUnselected_Implementation(const FGuid& SelectedCategoryGUID)
+{
+	//...
+}

@@ -34,6 +34,10 @@ public:
 	
 	UActorInventoryManagerComponent();
 
+protected:
+
+	virtual void BeginPlay() override;
+
 public:
 
 #pragma region Items
