@@ -21,6 +21,7 @@ class UInventoryItemSlotTooltip;
 class UInventoryItemSlotDrag;
 class UInventoryCategoryWidget;
 class UInventoryItemSlotSplit;
+class UInventoryCategoryTooltip;
 
 /**
  * 
@@ -67,7 +68,7 @@ public:
 
 #pragma region Categories
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Categories")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Categories")
 	TArray<UInventoryCategory*> GetAllowedCategories() const;
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
@@ -128,10 +129,10 @@ public:
 		return bAllowGeneralCategory;
 	}
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Categories")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Categories")
 	bool ValidateCategory(const FGuid& CategoryGUID) const;
 	
-	UFUNCTION(BlueprintCallable, Category="Inventory|Categories")
+	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
 	FORCEINLINE UInventoryCategory* GetDefaultCategory() const
 	{
 		if (DefaultCategory)
@@ -153,7 +154,7 @@ public:
 
 #pragma region Rarities
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Rarity")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Rarity")
 	TArray<UInventoryItemRarity*> GetAllowedRarities() const;
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
@@ -255,6 +256,12 @@ public:
 	FORCEINLINE TSubclassOf<UInventoryCategoryWidget> GetInventoryCategoryWidgetClass() const
 	{
 		return InventoryCategoryClass;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryCategoryTooltip> GetInventoryCategoryTooltipWidgetClass() const
+	{
+		return InventoryCategoryTooltipClass;
 	}
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
@@ -386,6 +393,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryWidget> InventoryCategoryClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	TSubclassOf<UInventoryCategoryTooltip> InventoryCategoryTooltipClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlot> InventorySlotClass;

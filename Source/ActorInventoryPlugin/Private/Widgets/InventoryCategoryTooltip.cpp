@@ -3,3 +3,7 @@
 
 #include "Widgets/InventoryCategoryTooltip.h"
 
+void UInventoryCategoryTooltip::InitializeTooltip_Implementation(UInventoryCategoryWidget* NewOwningCategoryWidget)
+{
+	OwningCategoryWidget = NewOwningCategoryWidget;
+}
