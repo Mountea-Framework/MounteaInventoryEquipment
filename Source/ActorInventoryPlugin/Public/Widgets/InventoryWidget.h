@@ -9,6 +9,8 @@
 
 class UActorInventoryInterface;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCategoryUpdated, const FGuid&, CategoryGUID);
+
 /**
  * 
  */
@@ -20,6 +22,11 @@ class ACTORINVENTORYPLUGIN_API UInventoryWidget : public UUserWidget
 protected:
 	
 	virtual bool Initialize() override;
+
+public:
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnCategoryUpdated OnCategoryUpdated;
 
 public:
 

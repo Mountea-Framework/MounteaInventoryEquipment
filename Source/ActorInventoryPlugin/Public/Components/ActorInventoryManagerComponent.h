@@ -21,6 +21,7 @@ class UInventoryItemSlotTooltip;
 class UInventoryItemSlotDrag;
 class UInventoryCategoryWidget;
 class UInventoryItemSlotSplit;
+class UInventoryCategoryTooltip;
 
 /**
  * 
@@ -33,6 +34,10 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryManagerComponent : public UActorCo
 public:
 	
 	UActorInventoryManagerComponent();
+
+protected:
+
+	virtual void BeginPlay() override;
 
 public:
 
@@ -63,7 +68,7 @@ public:
 
 #pragma region Categories
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Categories")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Categories")
 	TArray<UInventoryCategory*> GetAllowedCategories() const;
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
@@ -90,16 +95,44 @@ public:
 		return AllowedCategories.Contains(Category);
 	}
 
+	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
+	FORCEINLINE bool ContainsAllowedCategoryGuid(const FGuid& CategoryGUID) const
+	{
+		for (const auto Itr : AllowedCategories)
+		{
+			if (Itr && Itr->GetCategoryGUID() == CategoryGUID)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
+	FORCEINLINE UInventoryCategory* GetCategoryByGUID(const FGuid& CategoryGUID)
+	{
+		for (const auto Itr : AllowedCategories)
+		{
+			if (Itr && Itr->GetCategoryGUID() == CategoryGUID)
+			{
+				return Itr;
+			}
+		}
+
+		return nullptr;
+	}
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Categories")
 	FORCEINLINE bool IsGeneralCategoryAllowed() const
 	{
 		return bAllowGeneralCategory;
 	}
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Categories")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Categories")
 	bool ValidateCategory(const FGuid& CategoryGUID) const;
 	
-	UFUNCTION(BlueprintCallable, Category="Inventory|Categories")
+	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Categories")
 	FORCEINLINE UInventoryCategory* GetDefaultCategory() const
 	{
 		if (DefaultCategory)
@@ -121,7 +154,7 @@ public:
 
 #pragma region Rarities
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Rarity")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management|Rarity")
 	TArray<UInventoryItemRarity*> GetAllowedRarities() const;
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Management|Rarity")
@@ -223,6 +256,12 @@ public:
 	FORCEINLINE TSubclassOf<UInventoryCategoryWidget> GetInventoryCategoryWidgetClass() const
 	{
 		return InventoryCategoryClass;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryCategoryTooltip> GetInventoryCategoryTooltipWidgetClass() const
+	{
+		return InventoryCategoryTooltipClass;
 	}
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
@@ -354,6 +393,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryWidget> InventoryCategoryClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	TSubclassOf<UInventoryCategoryTooltip> InventoryCategoryTooltipClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlot> InventorySlotClass;
