@@ -68,6 +68,8 @@ protected:
 
 	// TODO: List of actions and keys to action
 	// Example: Keyboard::E, UInventoryItemAction (DataAsset probably)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowAbstract=False))
+	TArray<class UInventoryKeyAction*> CategoryKeyActions;
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };
