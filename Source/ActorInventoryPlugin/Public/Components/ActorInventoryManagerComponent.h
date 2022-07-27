@@ -24,7 +24,13 @@ class UInventoryItemSlotSplit;
 class UInventoryCategoryTooltip;
 
 /**
+ * Implement a GameState component for Inventory Manager.
+ *
+ * An Inventory Manager Component is a non-transient component that contains Inventory settings and definitions.
+ *
+ * Networking is not implemented.
  * 
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Manager
  */
 UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Manager", ShortTooltip="Inventory Manager responsible for Adding and Removing Items from Inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryManagerComponent : public UActorComponent

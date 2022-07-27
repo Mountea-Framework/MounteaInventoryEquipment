@@ -18,9 +18,9 @@ class UInventoryNotificationContainer;
  *
  * An Inventory Component is a non-transient component that enables its owning Actor to manage Inventory Items.
  *
- * @warning Networking is not implemented.
+ * Networking is not implemented.
  *
- * @see https://sites.google.com/view/dominikpavlicek/home/documentation
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Component
  */
 UCLASS(ClassGroup=(Inventory), Blueprintable, hideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Component", ShortTooltip="Implement an Actor component for inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryComponent : public UActorComponent, public IActorInventoryInterface

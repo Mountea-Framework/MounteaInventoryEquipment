@@ -7,9 +7,7 @@ DECLARE_LOG_CATEGORY_EXTERN(ActorInventoryPluginEditor, All, All);
 class FActorInventoryPluginEditor : public IModuleInterface
 {
 public:
-	
-	FActorInventoryPluginEditor();
-	
+
 	/* Called when the module is loaded */
 	virtual void StartupModule() override;
 
@@ -17,6 +15,16 @@ public:
 	virtual void ShutdownModule() override;
 
 private:
+
 	
 	TSharedPtr<class FInventoryCategoryAssetActions> InventoryCategoryAssetActions;
+	TSharedPtr<class FInventoryRarityAssetActions> InventoryRarityAssetsActions;
+	TSharedPtr<class FInventoryKeyActionAssetActions> InventoryKeyActionAssetActions;
+	
+	TSharedPtr<class FInventoryItemAssetActions> InventoryItemAssetActions;
+	/*
+	TSharedPtr<class FInventoryManagerAssetActions> InventoryManagerAssetActions;
+	TSharedPtr<class FInventoryComponentAssetActions> InventoryComponentAssetActions;
+	*/
+	
 };

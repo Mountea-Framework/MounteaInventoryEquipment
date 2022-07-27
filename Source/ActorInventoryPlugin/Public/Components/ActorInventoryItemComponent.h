@@ -23,6 +23,8 @@ class UInventoryItem;
 /**
  * Helper Component which defines that Actor is Inventory Item.
  * Usable for Pickups, like Weapons.
+ *
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Component
  */
 UCLASS( ClassGroup=(Inventory), meta=(BlueprintSpawnableComponent), HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation) )
 class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent final : public UActorComponent
@@ -45,8 +47,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Inventory")
 	EInventoryItemSetup SetupMode = EInventoryItemSetup::EIIS_FromItem;
 
+	// TODO: lets use SourceItemPtr instead
 	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryItem> SourceItem = nullptr;
+
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault, AllowAbstract=false))
+	UInventoryItem* SourceItemPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromDataTable", EditConditionHides, NoResetToDefault, ShowOnlyInnerProperties))
 	FDataTableRowHandle SourceItemRow;
