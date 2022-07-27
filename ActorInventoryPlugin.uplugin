@@ -33,6 +33,11 @@
 			"Name": "InventoryEditorNotifications",
 			"Type": "Editor",
 			"LoadingPhase": "PostEngineInit"
+		},
+		{
+			"Name": "ActorInventoryPluginEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
 		}
 	]
 }
