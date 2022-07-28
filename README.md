@@ -29,5 +29,5 @@ A best way to describe the usage is to take a look or play the demo build.
 
 ## Additional Documentation and Acknowledgments
 
-* Trello board: https://trello.com/b/PX8YBie0/actor-inventory-plugin
-* Documentation: https://mounteaframework.atlassian.net/wiki/spaces/MF/pages/33281/ 
+* Roadmap: https://github.com/orgs/Mountea-Framework/projects/1
+* Documentation: https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki 
