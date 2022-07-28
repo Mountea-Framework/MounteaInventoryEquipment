@@ -24,8 +24,9 @@ A best way to describe the usage is to take a look or play the demo build.
 
 ### Branches
 
-* Master: A development branch, should be always relevant to most current Engine version.
-* Version Branch: A development branch for specified Engine version
+* Master: A development branch, should be always relevant to most current Engine version
+* Version Branch: A stable branch for specified Engine version
+* Version_Dev Branch: A development branch for specified Engine version
 
 ## Additional Documentation and Acknowledgments
 
