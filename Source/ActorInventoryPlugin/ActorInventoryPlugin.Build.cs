@@ -42,9 +42,6 @@ public class ActorInventoryPlugin : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"UMG",
-				"Slate",
-				"SlateCore",
-				"Projects",
 				"InputCore"
 				// ... add private dependencies that you statically link with here ...	
 			}

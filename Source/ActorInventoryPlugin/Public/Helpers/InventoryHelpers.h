@@ -445,6 +445,69 @@ struct FInventoryLayout
 };
 #pragma endregion 
 
+#pragma region InventoryKeyActionData
+
+#define LOCTEXT_NAMESPACE "InventoryKeyActionData"
+
+USTRUCT(BlueprintType)
+struct FInventoryKeyActionData
+{
+	GENERATED_BODY()
+	
+	FInventoryKeyActionData()
+	{
+		PlatformName = LOCTEXT("ActionKey", "Default");
+		ActionKey = FKey(TEXT("E"));
+		ActionKeyTexture = nullptr;
+	};
+
+	FInventoryKeyActionData(const FText& InName, const FKey& InKey, UTexture* InTexture) :
+		PlatformName(InName),
+		ActionKey(InKey),
+		ActionKeyTexture(InTexture)
+	{};
+
+	FInventoryKeyActionData(const FInventoryKeyActionData& Other) :
+		PlatformName(Other.PlatformName),
+		ActionKey(Other.ActionKey),
+		ActionKeyTexture(Other.ActionKeyTexture)
+	{};
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	FText PlatformName = LOCTEXT("ActionKey", "Default");;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	FKey ActionKey;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	UTexture* ActionKeyTexture = nullptr;
+
+public:
+	
+	bool operator==(const FInventoryKeyActionData& Other) const
+	{
+		return
+		PlatformName.ToString().Equals(Other.PlatformName.ToString()) &&
+		ActionKey == Other.ActionKey &&
+		ActionKeyTexture == Other.ActionKeyTexture;
+	}
+
+	bool operator!=(const FInventoryKeyActionData& Other) const
+	{
+		return
+		!(*this == Other);
+	}
+	
+	static friend uint32 GetTypeHash(const FInventoryKeyActionData& ActionKeyData)
+	{
+		return FCrc::MemCrc32(&ActionKeyData, sizeof(FInventoryKeyActionData));
+	}
+};
+
+#undef LOCTEXT_NAMESPACE
+
+#pragma endregion 
+
 /**
  * 
  */

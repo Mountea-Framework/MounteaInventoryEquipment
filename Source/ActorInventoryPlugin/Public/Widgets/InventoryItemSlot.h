@@ -25,6 +25,10 @@ public:
 	// Event called once this Slot has been updated.
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory|Item Slot")
 	void OnSlotUpdated(const FInventorySlotData& SlotData);
+
+	// Event called once this Slot has been updated.
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory|Item Slot")
+	void OnSlotInspected();
 	
 protected:
 

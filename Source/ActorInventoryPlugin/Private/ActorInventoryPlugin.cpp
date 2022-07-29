@@ -9,6 +9,7 @@
 
 void FActorInventoryPluginModule::StartupModule()
 {
+	/*
 	// Components Thumbnails and Icons 
     {
         InventorySet = MakeShareable(new FSlateStyleSet("Inventory Style"));
@@ -53,14 +54,17 @@ void FActorInventoryPluginModule::StartupModule()
 	        }
         }
     }
+    */
 }
 
 void FActorInventoryPluginModule::ShutdownModule()
 {
+	/*
 	{
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventorySet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryManagerSet->GetStyleSetName());
 	}
+	*/
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -16,6 +16,11 @@ void UInventoryItemSlot::OnSlotUpdated_Implementation(const FInventorySlotData& 
 	}
 }
 
+void UInventoryItemSlot::OnSlotInspected_Implementation()
+{
+	// ...
+}
+
 bool UInventoryItemSlot::Initialize()
 {
 	if(Super::Initialize())

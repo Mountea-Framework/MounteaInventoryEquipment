@@ -55,6 +55,9 @@ public:
 	{ 
 		return CategoryData;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE TArray<class UInventoryKeyAction*> GetCategoryKeyActions() const { return CategoryKeyActions; };
 	
 protected:
 
@@ -68,6 +71,8 @@ protected:
 
 	// TODO: List of actions and keys to action
 	// Example: Keyboard::E, UInventoryItemAction (DataAsset probably)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowAbstract=False))
+	TArray<class UInventoryKeyAction*> CategoryKeyActions;
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

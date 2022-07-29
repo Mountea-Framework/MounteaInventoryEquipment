@@ -25,6 +25,9 @@ bool UInventoryWidget::Initialize()
 					FOnInventoryUpdated& UpdateHandle = OwningInventory->GetUpdateEventHandle();
 					UpdateHandle.AddUniqueDynamic(this, &UInventoryWidget::RefreshWidget);
 
+					FOnItemInspected& ItemInspected = OwningInventory->GetItemInspectedHandle();
+					ItemInspected.AddUniqueDynamic(this, &UInventoryWidget::OnItemInspected);
+
 					return true;
 				}
 			}

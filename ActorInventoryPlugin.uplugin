@@ -30,9 +30,14 @@
 			]
 		},
 		{
+			"Name": "ActorInventoryPluginEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
 			"Name": "InventoryEditorNotifications",
 			"Type": "Editor",
-			"LoadingPhase": "PostEngineInit"
+			"LoadingPhase": "Default"
 		}
 	]
 }

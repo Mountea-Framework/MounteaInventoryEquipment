@@ -9,13 +9,15 @@
 
 enum class EInventoryContext : uint8;
 class UActorInventoryComponent;
-
+class UInventoryItem;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, UActorComponent*, InventoryComponent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdateRequestProcessed, EInventoryContext, Context);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryLayoutSaveRequested, const FInventorySlotData&, Slot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyPressed, const FKey&, PressedKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyReleased, const FKey&, ReleasedKey);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemInspected, UInventoryItem*, InspectedItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemActionRequested, const UInventoryItem*, InventoryItem, const FGuid&, ActionGuid);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -73,9 +75,13 @@ public:
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) = 0;
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;
 
+	virtual void ProcessItemKeyAction(const UInventoryItem* ForItem, const FGuid& ActionGuid) = 0;
+
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() = 0;
+	virtual FOnItemInspected& GetItemInspectedHandle() = 0;
+	virtual FOnItemActionRequested& GetItemActionRequestedHandle() = 0;
 
 };

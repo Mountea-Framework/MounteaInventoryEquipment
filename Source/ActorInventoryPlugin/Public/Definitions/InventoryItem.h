@@ -11,7 +11,11 @@
 #define LOCTEXT_NAMESPACE "Inventory Item"
 
 /**
- * 
+ * Inventory Item Object.
+ * This is Object which defines what Item is being possessed by InventoryItemComponent.
+ * Inventory Items are stored in Inventory Component.
+ *
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Object
  */
 UCLASS(BlueprintType, Blueprintable)
 class ACTORINVENTORYPLUGIN_API UInventoryItem : public UObject

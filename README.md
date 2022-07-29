@@ -24,6 +24,11 @@ A best way to describe the usage is to take a look or play the demo build.
 
 ### Branches
 
-* Master: A development branch, should be always relevant to most current Engine version.
-* Version Branch: A development branch for specified Engine version
-* Version Dev Branch: Unstable Dev branch for each Engine version
+* Master: A development branch, should be always relevant to most current Engine version
+* Version Branch: A stable branch for specified Engine version
+* Version_Dev Branch: A development branch for specified Engine version
+
+## Additional Documentation and Acknowledgments
+
+* Roadmap: https://github.com/orgs/Mountea-Framework/projects/1
+* Documentation: https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki 

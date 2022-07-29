@@ -18,9 +18,9 @@ class UInventoryNotificationContainer;
  *
  * An Inventory Component is a non-transient component that enables its owning Actor to manage Inventory Items.
  *
- * @warning Networking is not implemented.
+ * Networking is not implemented.
  *
- * @see https://sites.google.com/view/dominikpavlicek/home/documentation
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Component
  */
 UCLASS(ClassGroup=(Inventory), Blueprintable, hideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Inventory Component", ShortTooltip="Implement an Actor component for inventory."))
 class ACTORINVENTORYPLUGIN_API UActorInventoryComponent : public UActorComponent, public IActorInventoryInterface
@@ -98,6 +98,8 @@ public:
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() override;
+	virtual FOnItemInspected& GetItemInspectedHandle() override;
+	virtual FOnItemActionRequested& GetItemActionRequestedHandle() override;
 
 #pragma region InventoryWidget
 
@@ -120,6 +122,7 @@ public:
 
 #pragma endregion InventoryWidget
 
+// Calling Broadcast from BP when Layout Save is requested
 #pragma region Layout
 
 	/**
@@ -134,7 +137,19 @@ public:
 	 * @param Slot 
 	 */
 	virtual void SaveToInventoryLayout(const FInventorySlotData& Slot) override;
-	
+
+#pragma endregion Layout
+
+// Calling Broadcast from BP when ActionKey is requested
+#pragma region KeyActionsMapping
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory|UI", meta=(DisplayName="Process Item Key Action"))
+	void ProcessItemKeyActionBP(const UInventoryItem* ForItem, const FGuid& ActionGuid);
+
+	UFUNCTION()
+	virtual void ProcessItemKeyAction(const UInventoryItem* ForItem, const FGuid& ActionGuid) override;
+
+#pragma endregion KeyActionsMapping
 
 #pragma region Events
 
@@ -152,6 +167,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnKeyReleased OnKeyReleased;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnItemInspected OnItemInspected;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnItemActionRequested OnItemActionRequested;
 
 #pragma endregion Events
 

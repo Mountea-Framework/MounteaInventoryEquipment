@@ -5,6 +5,7 @@
 
 #include "Components/ActorInventoryManagerComponent.h"
 #include "Definitions/InventoryItem.h"
+#include "Definitions/InventoryKeyAction.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -65,5 +66,48 @@ UInventoryCategory* UActorInventoryBPFLibrary::GetGenericCategory(const UObject*
 	}
 		
 	return nullptr;
+}
+
+UInventoryKeyAction* UActorInventoryBPFLibrary::FindKeyAction(const UObject* WorldContextObject, const FGuid& Guid, const UInventoryCategory* Category)
+{
+	if (Category)
+	{
+		if (IsValidKeyAction(WorldContextObject, Guid))
+		{
+			for (UInventoryKeyAction* Itr : Category->GetCategoryKeyActions())
+			{
+				if (Itr && Itr->GetActionGuid() == Guid)
+				{
+					return Itr;
+				}
+			}
+		}
+	}
+	
+	return nullptr;
+}
+
+bool UActorInventoryBPFLibrary::IsValidKeyAction(const UObject* WorldContextObject, const FGuid& Guid)
+{
+	if (const UActorInventoryManagerComponent* InventoryManager = GetInventoryManager(WorldContextObject))
+	{
+		TArray<UInventoryCategory*> Categories = InventoryManager->GetAllowedCategories();
+		for (const auto ItrCategory : Categories)
+		{
+			if (ItrCategory)
+			{
+				auto KeyActions = ItrCategory->GetCategoryKeyActions();
+
+				for (const UInventoryKeyAction* ItrAction : KeyActions)
+				{
+					if (ItrAction && ItrAction->GetActionGuid() == Guid)
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
 }
 
