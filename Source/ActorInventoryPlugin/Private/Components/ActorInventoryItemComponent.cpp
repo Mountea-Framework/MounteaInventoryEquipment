@@ -4,6 +4,7 @@
 #include "Components/ActorInventoryItemComponent.h"
 
 #include "Definitions/InventoryItem.h"
+#include "Helpers/ActorInventoryPluginLog.h"
 
 #if WITH_EDITOR
 #include "EditorHelper.h"
@@ -13,16 +14,38 @@ void UActorInventoryItemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const auto TempItem = NewObject<UInventoryItem>();
-	TempItem->SetItem(GetItemDefinition());
-	
-	if (TempItem && TempItem->IsValidItem())
+	if (SetupMode == EInventoryItemSetup::EIIS_FromItem)
 	{
-		Item = TempItem;
+		if (( SourceItem && !SourceItem->IsValidItem() ) || !GetOwner() || !SourceItem)
+		{
+			SourceItem = nullptr;
+			if (GetOwner())
+			{
+				AInvP_LOG(Error, TEXT("[UActorInventoryItemComponent] %s owned by %s contains Invalid Data definition!"), *GetName(), *GetOwner()->GetName())
+			}
+
+			Deactivate();
+		}
 	}
-	else
+
+	if (SetupMode == EInventoryItemSetup::EIIS_FromDataTable)
 	{
-		Item = nullptr;
+		if (const auto DataTable = SourceItemRow.DataTable)
+		{
+			if (DataTable->GetRowStruct())
+			{
+				const UScriptStruct* InventoryRowStruct = DataTable->GetRowStruct();
+				if (!(InventoryRowStruct->IsChildOf(FInventoryItemData::StaticStruct())))
+				{
+					if (GetOwner())
+					{
+						AInvP_LOG(Error, TEXT("[UActorInventoryItemComponent] %s owned by %s contains Invalid Data Structure!"), *GetName(), *GetOwner()->GetName())
+					}
+
+					Deactivate();
+				}
+			}
+		}
 	}
 }
 
@@ -34,10 +57,7 @@ FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
 		case EInventoryItemSetup::EIIS_FromItem:
 			if (SourceItem)
 			{
-				if (UInventoryItem* TempItem = Cast<UInventoryItem>(SourceItem->GetDefaultObject(true)))
-				{
-					ReturnDefinition = TempItem->GetItem();
-				}
+				return SourceItem->GetItem();
 			}
 			break;
 		case EInventoryItemSetup::EIIS_FromDataTable:
@@ -59,14 +79,70 @@ FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
 	return ReturnDefinition;
 }
 
+#if WITH_EDITOR
+
 void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-#if WITH_EDITOR
+
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
 	const FName PropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.GetPropertyName() : NAME_None;
 
 	if (PropertyName == "DataTable")
+	{
+		if (SetupMode == EInventoryItemSetup::EIIS_FromDataTable)
+		{
+			if (const auto DataTable = SourceItemRow.DataTable)
+			{
+				if (DataTable->GetRowStruct())
+				{
+					const UScriptStruct* InventoryRowStruct = DataTable->GetRowStruct();
+					if (!(InventoryRowStruct->IsChildOf(FInventoryItemData::StaticStruct())))
+					{
+						const FString ErrorMessage = FString::Printf(TEXT("INVALID DATA TABLE: %s structure is not supported!"), *InventoryRowStruct->GetDisplayNameText().ToString());
+						FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+					}
+				}
+			}
+		}
+	}
+
+	if (PropertyName == "SourceItem")
+	{
+		if (!SourceItem)
+		{
+			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM: Source Item must be selected!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+		}
+
+		if (SourceItem && !SourceItem->IsValidItem())
+		{
+			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM: Source Item is not valid!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+
+		}
+	}
+}
+
+EDataValidationResult UActorInventoryItemComponent::IsDataValid(TArray<FText>& ValidationErrors)
+{
+	if (Super::IsDataValid(ValidationErrors) == EDataValidationResult::Invalid)
+	{
+		return EDataValidationResult::Invalid;	
+	}
+	
+	AInvP_LOG(Warning, TEXT("IsDataValid called"))
+	
+	if (SetupMode == EInventoryItemSetup::EIIS_FromItem)
+	{
+		if (!SourceItem || ( SourceItem && !SourceItem->IsValidItem() ))
+		{
+			ValidationErrors.Add(FText::FromString(TEXT("Source Item is not Valid!")));
+			return EDataValidationResult::Invalid;
+		}
+	}
+
+	if (SetupMode == EInventoryItemSetup::EIIS_FromDataTable)
 	{
 		if (const auto DataTable = SourceItemRow.DataTable)
 		{
@@ -75,11 +151,14 @@ void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent&
 				const UScriptStruct* InventoryRowStruct = DataTable->GetRowStruct();
 				if (!(InventoryRowStruct->IsChildOf(FInventoryItemData::StaticStruct())))
 				{
-					const FString ErrorMessage = FString::Printf(TEXT("INVALID DATA TABLE: %s structure is not supported!"), *InventoryRowStruct->GetDisplayNameText().ToString());
-					FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+					ValidationErrors.Add(FText::FromString(TEXT("Source Structure is not Supported!")));
+					return EDataValidationResult::Invalid;
 				}
 			}
 		}
 	}
-#endif
+	
+	return EDataValidationResult::Valid;
 }
+
+#endif

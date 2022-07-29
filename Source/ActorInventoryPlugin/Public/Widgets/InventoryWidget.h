@@ -49,6 +49,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
 	void OnCategorySelected(const FGuid CategoryGUID);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	void OnItemInspected(UInventoryItem* InspectedItem);
 	
 protected:
 

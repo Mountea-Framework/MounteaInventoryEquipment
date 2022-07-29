@@ -55,6 +55,9 @@ public:
 	{ 
 		return CategoryData;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE TArray<class UInventoryKeyAction*> GetCategoryKeyActions() const { return CategoryKeyActions; };
 	
 protected:
 

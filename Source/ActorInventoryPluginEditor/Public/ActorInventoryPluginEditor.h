@@ -2,6 +2,8 @@
 
 #include "Modules/ModuleManager.h"
 
+class FSlateStyleSet;
+
 DECLARE_LOG_CATEGORY_EXTERN(ActorInventoryPluginEditor, All, All);
 
 class FActorInventoryPluginEditor : public IModuleInterface
@@ -16,15 +18,18 @@ public:
 
 private:
 
+	TSharedPtr<FSlateStyleSet> InventoryComponentSet;
+	TSharedPtr<FSlateStyleSet> InventoryManagerSet;
+	TSharedPtr<FSlateStyleSet> InventoryCategorySet;
+	TSharedPtr<FSlateStyleSet> InventoryRaritySet;
+	TSharedPtr<FSlateStyleSet> InventoryKeyActionsSet;
+	TSharedPtr<FSlateStyleSet> InventoryItemSet;
+
 	
 	TSharedPtr<class FInventoryCategoryAssetActions> InventoryCategoryAssetActions;
 	TSharedPtr<class FInventoryRarityAssetActions> InventoryRarityAssetsActions;
 	TSharedPtr<class FInventoryKeyActionAssetActions> InventoryKeyActionAssetActions;
 	
 	TSharedPtr<class FInventoryItemAssetActions> InventoryItemAssetActions;
-	/*
-	TSharedPtr<class FInventoryManagerAssetActions> InventoryManagerAssetActions;
-	TSharedPtr<class FInventoryComponentAssetActions> InventoryComponentAssetActions;
-	*/
 	
 };

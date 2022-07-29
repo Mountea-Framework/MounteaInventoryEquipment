@@ -15,7 +15,10 @@ public class ActorInventoryPluginEditor : ModuleRules
 			new string[]
 			{
 				"ActorInventoryPlugin",
-				"UnrealEd"
+				"UnrealEd",
+				"Projects",
+				"Slate",
+				"SlateCore",
 			}
 		);
 	}

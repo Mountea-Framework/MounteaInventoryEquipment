@@ -9,6 +9,7 @@
 #include "ActorInventoryBPFLibrary.generated.h"
 
 class UInventoryCategory;
+class UInventoryKeyAction;
 
 /**
  * Static class with useful Inventory utility functions that can be called from both Blueprint and C++
@@ -34,4 +35,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject"))
 	static UInventoryCategory*  GetGenericCategory(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject"))
+	static UInventoryKeyAction*  FindKeyAction(const UObject* WorldContextObject, const FGuid& Guid, const UInventoryCategory* Category);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject"))
+	static bool  IsValidKeyAction(const UObject* WorldContextObject, const FGuid& Guid);
 };

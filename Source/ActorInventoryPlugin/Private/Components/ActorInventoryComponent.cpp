@@ -13,6 +13,22 @@ UActorInventoryComponent::UActorInventoryComponent()
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
+void UActorInventoryComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InventoryManager = UActorInventoryBPFLibrary::GetInventoryManager(this);
+	if (!InventoryManager)
+	{
+		AInvP_LOG(Error, TEXT("[UActorInventoryComponent] Cannot find Inventory Manager! Attach Inventory Manager Component to GameState class!"))
+
+		Deactivate();
+	}
+
+	// Bind Virtual function and call BP Event
+	OnItemActionRequested.AddUniqueDynamic(this, &UActorInventoryComponent::ProcessItemKeyAction);
+}
+
 void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInventoryLayout)
 {
 	InventoryLayout = InInventoryLayout;
@@ -49,11 +65,9 @@ void UActorInventoryComponent::SaveToInventoryLayout(const FInventorySlotData& S
 	}
 }
 
-void UActorInventoryComponent::BeginPlay()
+void UActorInventoryComponent::ProcessItemKeyAction(const UInventoryItem* ForItem, const FGuid& ActionGuid)
 {
-	Super::BeginPlay();
-
-	InventoryManager = UActorInventoryBPFLibrary::GetInventoryManager(this);
+	ProcessItemKeyActionBP(ForItem, ActionGuid);
 }
 
 bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
@@ -463,6 +477,16 @@ FOnInventoryUpdateRequestProcessed& UActorInventoryComponent::GetInventoryReques
 FOnInventoryLayoutSaveRequested& UActorInventoryComponent::GetInventoryLayoutUpdateRequestHandle()
 {
 	return OnInventoryLayoutSaveRequested;
+}
+
+FOnItemInspected& UActorInventoryComponent::GetItemInspectedHandle()
+{
+	return OnItemInspected;
+}
+
+FOnItemActionRequested& UActorInventoryComponent::GetItemActionRequestedHandle()
+{
+	return OnItemActionRequested;
 }
 
 void UActorInventoryComponent::SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget)
