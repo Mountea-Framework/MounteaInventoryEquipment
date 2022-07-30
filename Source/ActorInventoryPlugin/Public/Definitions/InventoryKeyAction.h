@@ -26,6 +26,9 @@ class ACTORINVENTORYPLUGIN_API UInventoryKeyAction : public UDataAsset
 	{};
 	
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	bool ExecuteAction();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE FText GetActionName() const { return ActionName; };

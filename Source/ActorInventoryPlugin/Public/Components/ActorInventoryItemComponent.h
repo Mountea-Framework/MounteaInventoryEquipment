@@ -46,14 +46,17 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(NoResetToDefault))
 	EInventoryItemSetup SetupMode = EInventoryItemSetup::EIIS_FromItem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault, AllowAbstract=false))
-	UInventoryItem* SourceItem = nullptr;
+	TSubclassOf<UInventoryItem> SourceItemClass;
 
 	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromDataTable", EditConditionHides, NoResetToDefault, ShowOnlyInnerProperties))
 	FDataTableRowHandle SourceItemRow;
+
+	UPROPERTY(BlueprintReadOnly, Category="Inventory")
+	UInventoryItem* SourceItem = nullptr;
 	
 protected:
 

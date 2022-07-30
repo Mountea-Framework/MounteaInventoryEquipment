@@ -12,8 +12,8 @@ class UInventoryWidget;
 UENUM(BlueprintType)
 enum class EUseType : uint8
 {
-	EST_Use				UMETA(DispplayName = "Use Item"),
-	EST_Drop			UMETA(DispplayName = "Drop Item"),
+	EST_Use				UMETA(DispplayName="Use Item"),
+	EST_Drop			UMETA(DispplayName="Drop Item"),
 	EST_MERGE_SameInv	UMETA(DisplayName="MERGE - Same Inventory"),
 	EST_SPLIT_SameInv	UMETA(DisplayName="SPLIT - Same Inventory"),
 	EST_Merge_DiffInv	UMETA(DisplayName="MERGE - Different Inventories"),
