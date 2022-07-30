@@ -4,14 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "InventoryItemSlotSplit.generated.h"
+#include "InventoryItemSlotUse.generated.h"
 
 class UInventoryItemSlot;
 class UInventoryWidget;
 
 UENUM(BlueprintType)
-enum class ESplitType : uint8
+enum class EUseType : uint8
 {
+	EST_Use				UMETA(DispplayName = "Use Item"),
+	EST_Drop			UMETA(DispplayName = "Drop Item"),
 	EST_MERGE_SameInv	UMETA(DisplayName="MERGE - Same Inventory"),
 	EST_SPLIT_SameInv	UMETA(DisplayName="SPLIT - Same Inventory"),
 	EST_Merge_DiffInv	UMETA(DisplayName="MERGE - Different Inventories"),
@@ -24,7 +26,7 @@ enum class ESplitType : uint8
  * 
  */
 UCLASS(Abstract)
-class ACTORINVENTORYPLUGIN_API UInventoryItemSlotSplit : public UUserWidget
+class ACTORINVENTORYPLUGIN_API UInventoryItemSlotUse : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -43,12 +45,12 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetSplitType(const ESplitType& NewSplitType);
+	void SetUseType(const EUseType& NewUseType);
 	
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
-	ESplitType SplitType;
+	EUseType UseType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	TArray<FKey> CancelKeys;

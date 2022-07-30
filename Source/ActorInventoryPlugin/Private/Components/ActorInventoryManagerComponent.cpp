@@ -165,10 +165,10 @@ void UActorInventoryManagerComponent::SetInventoryItemDragDropWidgetClass(
 	InventorySlotDragClass = NewInventoryItemSlotDragDropClass;
 }
 
-void UActorInventoryManagerComponent::SetInventoryItemSlotSplitClass(
-	const TSubclassOf<UInventoryItemSlotSplit>& NewInventoryItemSlotSplitClass)
+void UActorInventoryManagerComponent::SetInventoryItemSlotUseClass(
+	const TSubclassOf<UInventoryItemSlotUse>& NewInventoryItemSlotUseClass)
 {
-	InventorySlotSplitClass = NewInventoryItemSlotSplitClass;
+	InventorySlotUseClass = NewInventoryItemSlotUseClass;
 }
 
 bool UActorInventoryManagerComponent::IsValidCategory(const FGuid& CategoryGUID) const
