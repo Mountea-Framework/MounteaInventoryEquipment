@@ -57,6 +57,7 @@ void FActorInventoryPluginEditor::StartupModule()
 		InventoryRaritySet = MakeShareable(new FSlateStyleSet("Inventory Rarity Style"));
 		InventoryKeyActionsSet = MakeShareable(new FSlateStyleSet("Inventory Key Actions Style"));
 		InventoryItemSet = MakeShareable(new FSlateStyleSet("Inventory Item Style"));
+		InventoryItemComponentSet = MakeShareable(new FSlateStyleSet("Inventory Item Component Style"));
     
         const TSharedPtr<IPlugin> PluginPtr = IPluginManager::Get().FindPlugin("ActorInventoryPlugin");
     
@@ -159,6 +160,22 @@ void FActorInventoryPluginEditor::StartupModule()
         			FSlateStyleRegistry::RegisterSlateStyle(*InventoryItemSet.Get());
         		}
         	}
+
+        	// Inventory Item Component
+        	{
+        		InventoryItemComponentSet->SetContentRoot(ContentDir);
+        		
+        		FSlateImageBrush* InventoryItemComponentClassThumb = new FSlateImageBrush(InventoryItemComponentSet->RootToContentDir(TEXT("Resources/InventoryItemComponent_128"), TEXT(".png")), FVector2D(128.f, 128.f));
+        		FSlateImageBrush* InventoryItemComponentClassIcon = new FSlateImageBrush(InventoryItemComponentSet->RootToContentDir(TEXT("Resources/InventoryItemComponent_16"), TEXT(".png")), FVector2D(16.f, 16.f));
+        		if (InventoryItemComponentClassThumb && InventoryItemComponentClassIcon)
+        		{
+        			InventoryItemComponentSet->Set("ClassThumbnail.ActorInventoryItemComponent", InventoryItemComponentClassThumb);
+        			InventoryItemComponentSet->Set("ClassIcon.ActorInventoryItemComponent", InventoryItemComponentClassIcon);
+     
+        			//Register the created style
+        			FSlateStyleRegistry::RegisterSlateStyle(*InventoryItemComponentSet.Get());
+        		}
+        	}
         }
     }
 }
@@ -186,6 +203,7 @@ void FActorInventoryPluginEditor::ShutdownModule()
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryRaritySet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryKeyActionsSet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemSet->GetStyleSetName());
+		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemComponentSet->GetStyleSetName());
 	}
 }
 

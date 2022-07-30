@@ -24,7 +24,7 @@ private:
 	TSharedPtr<FSlateStyleSet> InventoryRaritySet;
 	TSharedPtr<FSlateStyleSet> InventoryKeyActionsSet;
 	TSharedPtr<FSlateStyleSet> InventoryItemSet;
-
+	TSharedPtr<FSlateStyleSet> InventoryItemComponentSet;
 	
 	TSharedPtr<class FInventoryCategoryAssetActions> InventoryCategoryAssetActions;
 	TSharedPtr<class FInventoryRarityAssetActions> InventoryRarityAssetsActions;

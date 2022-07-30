@@ -27,6 +27,7 @@ class UInventoryCategoryTooltip;
  * Implement a GameState component for Inventory Manager.
  *
  * An Inventory Manager Component is a non-transient component that contains Inventory settings and definitions.
+ * Inventory Manager is responsible for valid data within the game. Inventory Manager is required for Inventory Component to work.
  *
  * Networking is not implemented.
  * 

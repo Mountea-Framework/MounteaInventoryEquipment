@@ -38,10 +38,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget);
 
+	/**
+	 * @brief Validation function which returns whether the Slot is Valid or not. Validation is different for Split/Merge and Use/Drop.
+	 * @return True if Use/Drop and OriginSlot is valid, True if Merge/Split and OriginSlot and TargetSlot are valid, default false.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE bool IsValid() const
 	{
-		return OriginSlot != nullptr && TargetSlot != nullptr;
+		switch (UseType)
+		{
+			case EUseType::EST_Use:
+			case EUseType::EST_Drop:
+				return OriginSlot != nullptr;
+			case EUseType::EST_MERGE_SameInv:
+			case EUseType::EST_SPLIT_SameInv: 
+			case EUseType::EST_Merge_DiffInv:
+			case EUseType::EST_SPLIT_DiffInv:
+				return OriginSlot != nullptr && TargetSlot != nullptr;
+			case EUseType::Default:
+			default:
+				return false;
+		}
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
