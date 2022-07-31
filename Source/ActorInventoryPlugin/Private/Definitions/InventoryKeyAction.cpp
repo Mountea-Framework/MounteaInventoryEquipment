@@ -3,6 +3,8 @@
 
 #include "Definitions/InventoryKeyAction.h"
 
+#include "Helpers/InventoryHelpers.h"
+
 
 UInventoryKeyAction::UInventoryKeyAction()
 {

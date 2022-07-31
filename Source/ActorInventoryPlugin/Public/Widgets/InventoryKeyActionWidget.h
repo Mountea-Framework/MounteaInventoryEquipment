@@ -22,7 +22,7 @@ class ACTORINVENTORYPLUGIN_API UInventoryKeyActionWidget : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE UInventoryKeyAction* GetParentKeyAction() const { return ParentKeyAction; };
+	FORCEINLINE TSubclassOf<UInventoryKeyAction> GetParentKeyAction() const { return ParentKeyAction; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE UInventoryWidget* GetParentInventoryWidget() const { return ParentInventoryWidget; };
@@ -33,7 +33,7 @@ public:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
-	UInventoryKeyAction* ParentKeyAction = nullptr;
+	TSubclassOf<UInventoryKeyAction> ParentKeyAction = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
 	UInventoryWidget* ParentInventoryWidget = nullptr;

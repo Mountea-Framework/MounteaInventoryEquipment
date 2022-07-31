@@ -20,13 +20,14 @@ class UInventoryItemSlot;
 class UInventoryItemSlotTooltip;
 class UInventoryItemSlotDrag;
 class UInventoryCategoryWidget;
-class UInventoryItemSlotSplit;
+class UInventoryItemSlotUse;
 class UInventoryCategoryTooltip;
 
 /**
  * Implement a GameState component for Inventory Manager.
  *
  * An Inventory Manager Component is a non-transient component that contains Inventory settings and definitions.
+ * Inventory Manager is responsible for valid data within the game. Inventory Manager is required for Inventory Component to work.
  *
  * Networking is not implemented.
  * 
@@ -290,20 +291,20 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
 	void SetInventoryItemDragDropWidgetClass(const TSubclassOf<UInventoryItemSlotDrag> NewInventoryItemSlotDragDropClass);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
-	FORCEINLINE TSubclassOf<UInventoryItemSlotSplit> GetInventoryItemSlotSplitClass() const
-	{
-		return InventorySlotSplitClass;
-	}
-
-	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
-	void SetInventoryItemSlotSplitClass(const TSubclassOf<UInventoryItemSlotSplit>& NewInventoryItemSlotSplitClass);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
 	FORCEINLINE TSubclassOf<UInventoryItemSlotDrag> GetInventoryItemSlotDragWidgetClass() const
 	{
 		return InventorySlotDragClass;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|UI")
+	void SetInventoryItemSlotUseClass(const TSubclassOf<UInventoryItemSlotUse>& NewInventoryItemSlotUseClass);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
+	FORCEINLINE TSubclassOf<UInventoryItemSlotUse> GetInventoryItemSlotUseWidgetClass() const
+	{
+		return InventorySlotUseClass;
 	}
 
 #pragma endregion
@@ -397,10 +398,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|General", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryWidget> InventoryCategoryClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryTooltip> InventoryCategoryTooltipClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
@@ -413,7 +414,7 @@ protected:
 	TSubclassOf<UInventoryItemSlotDrag> InventorySlotDragClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
-	TSubclassOf<UInventoryItemSlotSplit> InventorySlotSplitClass;
+	TSubclassOf<UInventoryItemSlotUse> InventorySlotUseClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;

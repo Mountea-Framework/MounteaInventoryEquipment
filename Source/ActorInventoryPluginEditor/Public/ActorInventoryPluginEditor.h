@@ -16,6 +16,9 @@ public:
 	/* Called when the module is unloaded */
 	virtual void ShutdownModule() override;
 
+	// Handle Blueprint Events
+	void HandleNewCustomKeyActionBlueprintCreated(UBlueprint* Blueprint);
+
 private:
 
 	TSharedPtr<FSlateStyleSet> InventoryComponentSet;
@@ -24,7 +27,7 @@ private:
 	TSharedPtr<FSlateStyleSet> InventoryRaritySet;
 	TSharedPtr<FSlateStyleSet> InventoryKeyActionsSet;
 	TSharedPtr<FSlateStyleSet> InventoryItemSet;
-
+	TSharedPtr<FSlateStyleSet> InventoryItemComponentSet;
 	
 	TSharedPtr<class FInventoryCategoryAssetActions> InventoryCategoryAssetActions;
 	TSharedPtr<class FInventoryRarityAssetActions> InventoryRarityAssetsActions;

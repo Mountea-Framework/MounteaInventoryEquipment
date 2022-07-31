@@ -1,6 +1,7 @@
 #include "ActorInventoryPluginEditor.h"
 
 #include "Interfaces/IPluginManager.h"
+
 #include "Styling/SlateStyleRegistry.h"
 #include "Styling/SlateStyle.h"
 
@@ -8,6 +9,10 @@
 #include "AssetActions/InventoryItemAssetActions.h"
 #include "AssetActions/InventoryKeyActionAssetActions.h"
 #include "AssetActions/InventoryRarityAssetActions.h"
+
+#include "Kismet2/KismetEditorUtilities.h"
+
+#include "Utilities/ActorInventoryEditorUtilities.h"
 
 DEFINE_LOG_CATEGORY(ActorInventoryPluginEditor);
 
@@ -57,6 +62,7 @@ void FActorInventoryPluginEditor::StartupModule()
 		InventoryRaritySet = MakeShareable(new FSlateStyleSet("Inventory Rarity Style"));
 		InventoryKeyActionsSet = MakeShareable(new FSlateStyleSet("Inventory Key Actions Style"));
 		InventoryItemSet = MakeShareable(new FSlateStyleSet("Inventory Item Style"));
+		InventoryItemComponentSet = MakeShareable(new FSlateStyleSet("Inventory Item Component Style"));
     
         const TSharedPtr<IPlugin> PluginPtr = IPluginManager::Get().FindPlugin("ActorInventoryPlugin");
     
@@ -159,8 +165,35 @@ void FActorInventoryPluginEditor::StartupModule()
         			FSlateStyleRegistry::RegisterSlateStyle(*InventoryItemSet.Get());
         		}
         	}
+
+        	// Inventory Item Component
+        	{
+        		InventoryItemComponentSet->SetContentRoot(ContentDir);
+        		
+        		FSlateImageBrush* InventoryItemComponentClassThumb = new FSlateImageBrush(InventoryItemComponentSet->RootToContentDir(TEXT("Resources/InventoryItemComponent_128"), TEXT(".png")), FVector2D(128.f, 128.f));
+        		FSlateImageBrush* InventoryItemComponentClassIcon = new FSlateImageBrush(InventoryItemComponentSet->RootToContentDir(TEXT("Resources/InventoryItemComponent_16"), TEXT(".png")), FVector2D(16.f, 16.f));
+        		if (InventoryItemComponentClassThumb && InventoryItemComponentClassIcon)
+        		{
+        			InventoryItemComponentSet->Set("ClassThumbnail.ActorInventoryItemComponent", InventoryItemComponentClassThumb);
+        			InventoryItemComponentSet->Set("ClassIcon.ActorInventoryItemComponent", InventoryItemComponentClassIcon);
+     
+        			//Register the created style
+        			FSlateStyleRegistry::RegisterSlateStyle(*InventoryItemComponentSet.Get());
+        		}
+        	}
         }
     }
+
+	// Register Pre-made Events and Functions
+	{
+		FKismetEditorUtilities::RegisterOnBlueprintCreatedCallback
+		(
+			this,
+			UInventoryKeyAction::StaticClass(),
+			FKismetEditorUtilities::FOnBlueprintCreated::CreateRaw(this, &FActorInventoryPluginEditor::HandleNewCustomKeyActionBlueprintCreated)
+		);
+	}
+
 }
 
 void FActorInventoryPluginEditor::ShutdownModule()
@@ -186,6 +219,27 @@ void FActorInventoryPluginEditor::ShutdownModule()
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryRaritySet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryKeyActionsSet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemSet->GetStyleSetName());
+		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemComponentSet->GetStyleSetName());
+	}
+}
+
+void FActorInventoryPluginEditor::HandleNewCustomKeyActionBlueprintCreated(UBlueprint* Blueprint)
+{
+	if (!Blueprint || Blueprint->BlueprintType != BPTYPE_Normal)
+	{
+		return;
+	}
+
+	Blueprint->bForceFullEditor = true;
+	UEdGraph* FunctionGraph = FActorInventoryEditorUtilities::BlueprintGetOrAddFunction
+	(
+		Blueprint,
+		GET_FUNCTION_NAME_CHECKED(UInventoryKeyAction, ExecuteAction),
+		UInventoryKeyAction::StaticClass()
+	);
+	if (FunctionGraph)
+	{
+		Blueprint->LastEditedDocuments.Add(FunctionGraph);
 	}
 }
 

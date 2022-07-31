@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Interfaces/ActorInventoryInterface.h"
 #include "InventoryWidget.generated.h"
 
+struct FInventorySlotData;
+
+class UInventoryItem;
 class UActorInventoryInterface;
+class IActorInventoryInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCategoryUpdated, const FGuid&, CategoryGUID);
 

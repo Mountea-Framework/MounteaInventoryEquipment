@@ -17,6 +17,7 @@ class UInventoryNotificationContainer;
  * Implement an Actor component for inventory.
  *
  * An Inventory Component is a non-transient component that enables its owning Actor to manage Inventory Items.
+ * Inventory Component inherits from IActorInventoryInterface to avoid direct code references.
  *
  * Networking is not implemented.
  *

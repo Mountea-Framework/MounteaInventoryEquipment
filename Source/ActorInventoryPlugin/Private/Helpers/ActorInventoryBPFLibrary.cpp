@@ -74,12 +74,18 @@ UInventoryKeyAction* UActorInventoryBPFLibrary::FindKeyAction(const UObject* Wor
 	{
 		if (IsValidKeyAction(WorldContextObject, Guid))
 		{
-			for (UInventoryKeyAction* Itr : Category->GetCategoryKeyActions())
+			for (auto Itr : Category->GetCategoryKeyActions())
 			{
+				if (Itr.Get() && Itr.GetDefaultObject()->GetActionGuid() == Guid)
+				{
+					return Itr.GetDefaultObject();
+				}
+				/* No longer using Objects
 				if (Itr && Itr->GetActionGuid() == Guid)
 				{
 					return Itr;
 				}
+				*/
 			}
 		}
 	}
@@ -98,6 +104,15 @@ bool UActorInventoryBPFLibrary::IsValidKeyAction(const UObject* WorldContextObje
 			{
 				auto KeyActions = ItrCategory->GetCategoryKeyActions();
 
+				for (auto Itr : KeyActions)
+				{
+					if (Itr.Get() && Itr.GetDefaultObject()->GetActionGuid() == Guid)
+					{
+						return true;
+					}
+				}
+				
+				/* No longer using Objects
 				for (const UInventoryKeyAction* ItrAction : KeyActions)
 				{
 					if (ItrAction && ItrAction->GetActionGuid() == Guid)
@@ -105,6 +120,7 @@ bool UActorInventoryBPFLibrary::IsValidKeyAction(const UObject* WorldContextObje
 						return true;
 					}
 				}
+				*/
 			}
 		}
 	}

@@ -4,14 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Helpers/InventoryHelpers.h"
-#include "UObject/NoExportTypes.h"
 #include "InventoryCategory.generated.h"
 
+class UInventoryKeyAction;
 
-#define LOCTEXT_NAMESPACE "Inventory Category"
+#define LOCTEXT_NAMESPACE "InventoryCategory"
 
 /**
- * 
+ * Inventory Category Data.
+ * Defines name and basic attributes of all Inventory Items which are bound to this Category.
+ *
+ * Contains Set of Key Actions, Actions that are specific to this Category, are used for Inventory Items. Use or Drop, for Example.
+ *
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Category
  */
 UCLASS(Blueprintable)
 class ACTORINVENTORYPLUGIN_API UInventoryCategory : public UDataAsset
@@ -57,7 +62,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE TArray<class UInventoryKeyAction*> GetCategoryKeyActions() const { return CategoryKeyActions; };
+	FORCEINLINE TArray<TSubclassOf<UInventoryKeyAction>> GetCategoryKeyActions() const { return CategoryKeyActions; };
 	
 protected:
 
@@ -69,10 +74,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Inventory|GUID")
 	FGuid Guid = FGuid::NewGuid();
 
-	// TODO: List of actions and keys to action
-	// Example: Keyboard::E, UInventoryItemAction (DataAsset probably)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowAbstract=False))
-	TArray<class UInventoryKeyAction*> CategoryKeyActions;
+	// List of Allowed Category Actions that can be Executed for all Items of this Category.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowAbstract=false, NoElementDuplicate=true))
+	TArray<TSubclassOf<UInventoryKeyAction>> CategoryKeyActions;
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

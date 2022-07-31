@@ -21,8 +21,10 @@ enum class EInventoryItemSetup : uint8
 class UInventoryItem;
 
 /**
- * Helper Component which defines that Actor is Inventory Item.
- * Usable for Pickups, like Weapons.
+ * Helper Component which defines that Actor has Inventory Item.
+ * This is a way to avoid Inheritance issues which might occur if using PickupItem Class. For more details visit Wiki page.
+ * 
+ * Usable for Pickups, like Weapons or Food. Does not bind owning Actor to specific type.
  *
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Component
  */
@@ -44,14 +46,17 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category="Inventory")
+	UPROPERTY(EditAnywhere, Category="Inventory", meta=(NoResetToDefault))
 	EInventoryItemSetup SetupMode = EInventoryItemSetup::EIIS_FromItem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault, AllowAbstract=false))
-	UInventoryItem* SourceItem = nullptr;
+	TSubclassOf<UInventoryItem> SourceItemClass;
 
 	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromDataTable", EditConditionHides, NoResetToDefault, ShowOnlyInnerProperties))
 	FDataTableRowHandle SourceItemRow;
+
+	UPROPERTY(BlueprintReadOnly, Category="Inventory")
+	UInventoryItem* SourceItem = nullptr;
 	
 protected:
 

@@ -16,6 +16,7 @@ void UActorInventoryItemComponent::BeginPlay()
 
 	if (SetupMode == EInventoryItemSetup::EIIS_FromItem)
 	{
+		SourceItem = SourceItemClass.GetDefaultObject();
 		if (( SourceItem && !SourceItem->IsValidItem() ) || !GetOwner() || !SourceItem)
 		{
 			SourceItem = nullptr;
@@ -43,6 +44,11 @@ void UActorInventoryItemComponent::BeginPlay()
 					}
 
 					Deactivate();
+				}
+				else
+				{
+					SourceItem = NewObject<UInventoryItem>();
+					SourceItem->SetItem(GetItemDefinition());
 				}
 			}
 		}
@@ -107,8 +113,23 @@ void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent&
 		}
 	}
 
-	if (PropertyName == "SourceItem")
+	if (PropertyName == "SourceItemClass")
 	{
+		if (!SourceItemClass)
+		{
+			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Source Item Class must be selected!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+		}
+		if (SourceItemClass)
+		{
+			if (SourceItemClass->GetClass()->IsChildOf(UInventoryItem::StaticClass()))
+			{
+				const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Valid Item Class must be selected!"));
+				FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+
+			}
+		}
+		/** Commented out as using Class Template is better for scaling.
 		if (!SourceItem)
 		{
 			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM: Source Item must be selected!"));
@@ -119,8 +140,8 @@ void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent&
 		{
 			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM: Source Item is not valid!"));
 			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
-
 		}
+		*/
 	}
 }
 
@@ -135,11 +156,28 @@ EDataValidationResult UActorInventoryItemComponent::IsDataValid(TArray<FText>& V
 	
 	if (SetupMode == EInventoryItemSetup::EIIS_FromItem)
 	{
+		if (!SourceItemClass)
+		{
+			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Source Item Class must be selected!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+		}
+		if (SourceItemClass)
+		{
+			if (SourceItemClass->GetClass() != UInventoryItem::StaticClass())
+			{
+				const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Valid Item Class must be selected!"));
+				FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+
+			}
+		}
+		
+		/** Commented out as using Class Template is better for scaling.
 		if (!SourceItem || ( SourceItem && !SourceItem->IsValidItem() ))
 		{
 			ValidationErrors.Add(FText::FromString(TEXT("Source Item is not Valid!")));
 			return EDataValidationResult::Invalid;
 		}
+		*/
 	}
 
 	if (SetupMode == EInventoryItemSetup::EIIS_FromDataTable)

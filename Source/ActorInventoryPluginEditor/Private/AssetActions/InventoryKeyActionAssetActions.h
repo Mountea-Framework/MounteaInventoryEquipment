@@ -9,18 +9,9 @@
 class FInventoryKeyActionAssetActions : public FAssetTypeActions_Base
 {
 public:
-	virtual UClass* GetSupportedClass() const override
-	{
-		return UInventoryKeyAction::StaticClass();
-	};
-	virtual FText GetName() const override
-	{
-		return INVTEXT("Inventory Action Keys");
-	};
-	virtual FColor GetTypeColor() const override
-	{
-		return FColor::Magenta;
-	};
+	virtual UClass* GetSupportedClass() const override { return UInventoryKeyAction::StaticClass(); };
+	virtual FText GetName() const override { return INVTEXT("Inventory Action Keys"); };
+	virtual FColor GetTypeColor() const override { return FColor::Magenta; };
 	virtual uint32 GetCategories() override
 	{
 		if (FModuleManager::Get().IsModuleLoaded("AssetTools"))

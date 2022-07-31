@@ -6,6 +6,8 @@
 #include "Factories/Factory.h"
 #include "InventoryItemAssetFactory.generated.h"
 
+class UInventoryItem;
+
 /**
  * 
  */
@@ -16,7 +18,13 @@ class ACTORINVENTORYPLUGINEDITOR_API UInventoryItemAssetFactory : public UFactor
 	
 public:
 
-	UInventoryItemAssetFactory();
+	UInventoryItemAssetFactory(const FObjectInitializer& ObjectInitializer);
 	
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+	virtual bool ConfigureProperties() override;
+
+private:
+	// Holds the template of the class we are building
+	UPROPERTY()
+	TSubclassOf<UInventoryItem> ParentClass;
 };
