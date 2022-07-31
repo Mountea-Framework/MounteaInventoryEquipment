@@ -4,10 +4,11 @@
 #include "Widgets/InventoryItemSlotUse.h"
 
 
-void UInventoryItemSlotUse::Init_Implementation(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot)
+void UInventoryItemSlotUse::Init_Implementation(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, const EUseType& NewUseType)
 {
 	OriginSlot = NewOriginSlot;
 	TargetSlot = NewTargetSlot;
+	UseType = NewUseType;
 }
 
 void UInventoryItemSlotUse::SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget)

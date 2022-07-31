@@ -45,6 +45,11 @@ void UActorInventoryItemComponent::BeginPlay()
 
 					Deactivate();
 				}
+				else
+				{
+					SourceItem = NewObject<UInventoryItem>();
+					SourceItem->SetItem(GetItemDefinition());
+				}
 			}
 		}
 	}

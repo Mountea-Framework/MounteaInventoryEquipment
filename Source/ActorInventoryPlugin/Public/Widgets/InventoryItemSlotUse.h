@@ -33,7 +33,7 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlotUse : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot);
+	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, const EUseType& NewUseType);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget);
