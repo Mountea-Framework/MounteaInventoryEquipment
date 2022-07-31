@@ -1,6 +1,7 @@
 #include "ActorInventoryPluginEditor.h"
 
 #include "Interfaces/IPluginManager.h"
+
 #include "Styling/SlateStyleRegistry.h"
 #include "Styling/SlateStyle.h"
 
@@ -8,6 +9,10 @@
 #include "AssetActions/InventoryItemAssetActions.h"
 #include "AssetActions/InventoryKeyActionAssetActions.h"
 #include "AssetActions/InventoryRarityAssetActions.h"
+
+#include "Kismet2/KismetEditorUtilities.h"
+
+#include "Utilities/ActorInventoryEditorUtilities.h"
 
 DEFINE_LOG_CATEGORY(ActorInventoryPluginEditor);
 
@@ -178,6 +183,17 @@ void FActorInventoryPluginEditor::StartupModule()
         	}
         }
     }
+
+	// Register Pre-made Events and Functions
+	{
+		FKismetEditorUtilities::RegisterOnBlueprintCreatedCallback
+		(
+			this,
+			UInventoryKeyAction::StaticClass(),
+			FKismetEditorUtilities::FOnBlueprintCreated::CreateRaw(this, &FActorInventoryPluginEditor::HandleNewCustomKeyActionBlueprintCreated)
+		);
+	}
+
 }
 
 void FActorInventoryPluginEditor::ShutdownModule()
@@ -204,6 +220,26 @@ void FActorInventoryPluginEditor::ShutdownModule()
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryKeyActionsSet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemSet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemComponentSet->GetStyleSetName());
+	}
+}
+
+void FActorInventoryPluginEditor::HandleNewCustomKeyActionBlueprintCreated(UBlueprint* Blueprint)
+{
+	if (!Blueprint || Blueprint->BlueprintType != BPTYPE_Normal)
+	{
+		return;
+	}
+
+	Blueprint->bForceFullEditor = true;
+	UEdGraph* FunctionGraph = FActorInventoryEditorUtilities::BlueprintGetOrAddFunction
+	(
+		Blueprint,
+		GET_FUNCTION_NAME_CHECKED(UInventoryKeyAction, ExecuteAction),
+		UInventoryKeyAction::StaticClass()
+	);
+	if (FunctionGraph)
+	{
+		Blueprint->LastEditedDocuments.Add(FunctionGraph);
 	}
 }
 

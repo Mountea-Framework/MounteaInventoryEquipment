@@ -7,7 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "InventoryItemRarity.generated.h"
 
-#define LOCTEXT_NAMESPACE "Inventory Rarity"
+#define LOCTEXT_NAMESPACE "InventoryRarity"
 
 /**
  * 

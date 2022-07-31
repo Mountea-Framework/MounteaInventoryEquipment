@@ -17,7 +17,7 @@
  *
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Object
  */
-UCLASS(BlueprintType, Blueprintable)
+UCLASS(BlueprintType, Blueprintable, EditInlineNew)
 class ACTORINVENTORYPLUGIN_API UInventoryItem : public UObject
 {
 	GENERATED_BODY()

@@ -8,9 +8,7 @@
 
 class FInventoryItemAssetActions : public FAssetTypeActions_Base
 {
-	
 public:
-	
 	virtual UClass* GetSupportedClass() const override {return UInventoryItem::StaticClass(); };
 	virtual FText GetName() const override { return FText::FromString(TEXT("Inventory Item Object")); };
 	virtual FColor GetTypeColor() const override { return FColor::Yellow; };

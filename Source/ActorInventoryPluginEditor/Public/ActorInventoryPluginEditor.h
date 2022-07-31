@@ -16,6 +16,9 @@ public:
 	/* Called when the module is unloaded */
 	virtual void ShutdownModule() override;
 
+	// Handle Blueprint Events
+	void HandleNewCustomKeyActionBlueprintCreated(UBlueprint* Blueprint);
+
 private:
 
 	TSharedPtr<FSlateStyleSet> InventoryComponentSet;
