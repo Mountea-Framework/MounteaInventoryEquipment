@@ -144,11 +144,11 @@ public:
 // Calling Broadcast from BP when ActionKey is requested
 #pragma region KeyActionsMapping
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory|UI", meta=(DisplayName="Process Item Key Action"))
-	void ProcessItemKeyActionBP(const UInventoryItem* ForItem, const FGuid& ActionGuid);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory|UI", meta=(DisplayName="Process Item Key Action"))
+	void ExecuteItemKeyActionBP(UInventoryItemSlot* ForItem, const FGuid& ActionGuid);
 
 	UFUNCTION()
-	virtual void ProcessItemKeyAction(const UInventoryItem* ForItem, const FGuid& ActionGuid) override;
+	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) override;
 
 #pragma endregion KeyActionsMapping
 

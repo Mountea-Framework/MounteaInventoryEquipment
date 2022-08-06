@@ -6,6 +6,7 @@
 #include "InventoryKeyAction.generated.h"
 
 struct FInventoryKeyActionData;
+class UInventoryItemSlot;
 
 #define LOCTEXT_NAMESPACE "InventoryKeyActions"
 
@@ -22,10 +23,11 @@ class ACTORINVENTORYPLUGIN_API UInventoryKeyAction : public UObject
 
 	UInventoryKeyAction();
 
-	UInventoryKeyAction(const FText& NewActionName, const FGuid& NewActionGuid, const TSet<FInventoryKeyActionData>& NewPlatformBasedMapping) :
+	UInventoryKeyAction(const FText& NewActionName, const FGuid& NewActionGuid, const TSet<FInventoryKeyActionData>& NewPlatformBasedMapping, UInventoryItemSlot* NewOriginSlot) :
 		ActionName(NewActionName),
 		ActionGuid(NewActionGuid),
-		PlatformBasedMapping(NewPlatformBasedMapping)
+		PlatformBasedMapping(NewPlatformBasedMapping),
+		OriginSlot(NewOriginSlot)
 	{};
 	
 public:
@@ -39,12 +41,20 @@ public:
 	 * @return Returns whether the function has been called nor not, for instance invalid Category cannot execute any actions.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	bool ExecuteAction();
-	bool ExecuteAction_Implementation()
+	bool ExecuteAction(UInventoryItemSlot* ForItem);
+	bool ExecuteAction_Implementation(UInventoryItemSlot* ForItem)
 	{
 		return false;
 	}
 
+	/**
+	 * Gets Inventory Manager.
+	 * @param InventoryContext Must be Inventory Component of the Processed Item.
+	 * @return Inventory Manager or nullptr
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(HideSelfPin=true, DefaultToSelf=true, CompactNodeTitle="Inventory Manager"))
+	static class UActorInventoryManagerComponent* GetInventoryManager(const UObject* InventoryContext);
+	
 	/** Returns Name of the Action, Use, for instance. */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE FText GetActionName() const { return ActionName; };
@@ -59,6 +69,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE TSet<FInventoryKeyActionData> GetPlatformBasedMapping() const {return PlatformBasedMapping; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE UInventoryItemSlot* GetOriginSlot() const {return OriginSlot; };
 	
 protected:
 
@@ -73,6 +86,9 @@ protected:
 	// Set of Key Mappings per Platform.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=True, ShowOnlyInnerProperties, TitleProperty="PlatformName"))
 	TSet<FInventoryKeyActionData> PlatformBasedMapping;
+
+	UPROPERTY(BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true))
+	UInventoryItemSlot* OriginSlot = nullptr;
 };
 
 #undef LOCTEXT_NAMESPACE

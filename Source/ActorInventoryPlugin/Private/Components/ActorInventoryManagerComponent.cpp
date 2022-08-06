@@ -4,6 +4,7 @@
 
 #include "Definitions/InventoryItem.h"
 #include "Helpers/ActorInventoryPluginLog.h"
+//#include "Interfaces/ActorInventoryInterface.h"
 #include "Widgets/InventoryWidget.h"
 
 #if WITH_EDITOR
@@ -104,6 +105,88 @@ bool UActorInventoryManagerComponent::AddItemsToInventory(TArray<UInventoryItem*
 	}
 
 	return true;
+}
+
+void UActorInventoryManagerComponent::RemoveItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer) const
+{
+	if (OwningPlayer)
+	{
+		TArray<UActorComponent*> InventoryComponents = OwningPlayer->GetComponentsByInterface(UActorInventoryInterface::StaticClass());
+
+		if (InventoryComponents.Num())
+		{
+			// Only one inventory per player
+			UActorComponent* InventoryComponent = InventoryComponents[0];
+
+			if (InventoryComponent)
+			{
+				TScriptInterface<IActorInventoryInterface> InventoryInterface;
+				InventoryInterface.SetObject(InventoryComponent);
+				InventoryInterface.SetInterface(Cast<IActorInventoryInterface>(InventoryComponent));
+
+				if (InventoryInterface)
+				{
+					UInventoryItem* NewItem = NewObject<UInventoryItem>();
+					NewItem->SetItem(Item->GetItem());
+					
+					InventoryInterface->RemoveItemFromInventory(Item);
+				}
+			}
+		}
+	}
+}
+
+void UActorInventoryManagerComponent::RemoveItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer) const
+{
+	if (OwningPlayer)
+	{
+		for(const auto Itr : Items)
+		{
+			RemoveItemToInventory(Itr, OwningPlayer);
+		}
+	}
+}
+
+void UActorInventoryManagerComponent::SubtractItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer,
+	const int32 Amount) const
+{
+	if (OwningPlayer)
+	{
+		TArray<UActorComponent*> InventoryComponents = OwningPlayer->GetComponentsByInterface(UActorInventoryInterface::StaticClass());
+
+		if (InventoryComponents.Num())
+		{
+			// Only one inventory per player
+			UActorComponent* InventoryComponent = InventoryComponents[0];
+
+			if (InventoryComponent)
+			{
+				TScriptInterface<IActorInventoryInterface> InventoryInterface;
+				InventoryInterface.SetObject(InventoryComponent);
+				InventoryInterface.SetInterface(Cast<IActorInventoryInterface>(InventoryComponent));
+
+				if (InventoryInterface)
+				{
+					UInventoryItem* NewItem = NewObject<UInventoryItem>();
+					NewItem->SetItem(Item->GetItem());
+					
+					InventoryInterface->SubtractItemFromInventory(Item, Amount);
+				}
+			}
+		}
+	}
+}
+
+void UActorInventoryManagerComponent::SubtractItemsToInventory(TMap<UInventoryItem*, int32> Items,
+	APlayerController* OwningPlayer) const
+{
+	if (OwningPlayer)
+	{
+		for (const auto Itr : Items)
+		{
+			SubtractItemToInventory(Itr.Key, OwningPlayer, Itr.Value);
+		}
+	}
 }
 
 TArray<UInventoryItem*>  UActorInventoryManagerComponent::GetItemsFromInventory(APlayerController* OwningPlayer) const

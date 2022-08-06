@@ -37,7 +37,7 @@ public:
 	static UInventoryCategory*  GetGenericCategory(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject"))
-	static UInventoryKeyAction*  FindKeyAction(const UObject* WorldContextObject, const FGuid& Guid, const UInventoryCategory* Category);
+	static TSubclassOf<UInventoryKeyAction> FindKeyAction(const UObject* WorldContextObject, const FGuid& Guid, const UInventoryCategory* Category);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject"))
 	static bool  IsValidKeyAction(const UObject* WorldContextObject, const FGuid& Guid);

@@ -57,6 +57,18 @@ public:
 	bool AddItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer) const;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void RemoveItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer) const;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void RemoveItemsToInventory(TArray<UInventoryItem*> Items, APlayerController* OwningPlayer) const;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void SubtractItemToInventory(UInventoryItem* Item, APlayerController* OwningPlayer, const int32 Amount) const;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void SubtractItemsToInventory(TMap<UInventoryItem*,int32> Items, APlayerController* OwningPlayer) const;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
 	TArray<UInventoryItem*> GetItemsFromInventory(APlayerController* OwningPlayer) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Management")
