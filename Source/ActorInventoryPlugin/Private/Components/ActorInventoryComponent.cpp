@@ -495,11 +495,6 @@ FOnInventoryLayoutSaveRequested& UActorInventoryComponent::GetInventoryLayoutUpd
 	return OnInventoryLayoutSaveRequested;
 }
 
-FOnItemInspected& UActorInventoryComponent::GetItemInspectedHandle()
-{
-	return OnItemInspected;
-}
-
 FOnItemActionRequested& UActorInventoryComponent::GetItemActionRequestedHandle()
 {
 	return OnItemActionRequested;

@@ -99,7 +99,6 @@ public:
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() override;
-	virtual FOnItemInspected& GetItemInspectedHandle() override;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() override;
 
 #pragma region InventoryWidget
@@ -168,9 +167,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnKeyReleased OnKeyReleased;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
-	FOnItemInspected OnItemInspected;
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnItemActionRequested OnItemActionRequested;

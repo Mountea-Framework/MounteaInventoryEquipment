@@ -18,23 +18,13 @@ void UInventoryItemSlot::OnSlotUpdated_Implementation(const FInventorySlotData& 
 
 void UInventoryItemSlot::OnSlotInspected_Implementation()
 {
-	// ...
-}
-
-void UInventoryItemSlot::OnInventoryUpdated_Implementation()
-{
-	// Recalculate this slot
-	// Check whether Item is in Inventory
+	// TODO: Validation
 }
 
 bool UInventoryItemSlot::Initialize()
 {
 	if(Super::Initialize())
 	{
-		if (OwningInventoryWidget)
-		{
-			OwningInventoryWidget->OnInventoryWidgetUpdated.AddUniqueDynamic(this, &UInventoryItemSlot::OnInventoryUpdated);
-		}
 		return true;
 	}
 

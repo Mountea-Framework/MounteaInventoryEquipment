@@ -28,9 +28,6 @@ protected:
 	virtual bool Initialize() override;
 
 public:
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
-	FOnInventoryWidgetUpdated OnInventoryWidgetUpdated;
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnCategoryUpdated OnCategoryUpdated;

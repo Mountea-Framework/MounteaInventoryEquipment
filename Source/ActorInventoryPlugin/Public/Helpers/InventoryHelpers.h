@@ -413,16 +413,16 @@ struct FInventorySlotData
 	FInventorySlotData() : Quantity(0), bCreatedManually(false)
 	{};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	class UInventoryItem* Item = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	int32 Quantity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	uint8 bCreatedManually : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	FIntPoint SlotCoordinates = FIntPoint(0,0);
 	
 };

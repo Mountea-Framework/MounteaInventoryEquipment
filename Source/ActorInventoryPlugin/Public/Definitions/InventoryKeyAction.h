@@ -44,7 +44,7 @@ public:
 	bool ExecuteAction(UInventoryItemSlot* ForItem);
 	bool ExecuteAction_Implementation(UInventoryItemSlot* ForItem)
 	{
-		return false;
+		return true;
 	}
 
 	/**

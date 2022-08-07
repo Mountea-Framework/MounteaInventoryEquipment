@@ -17,7 +17,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdateRequestProcessed, 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryLayoutSaveRequested, const FInventorySlotData&, Slot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyPressed, const FKey&, PressedKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyReleased, const FKey&, ReleasedKey);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemInspected, UInventoryItemSlot*, InspectedItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemActionRequested, UInventoryItemSlot*, InventoryItem, const FGuid&, ActionGuid);
 
 // This class does not need to be modified.
@@ -83,7 +82,6 @@ public:
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() = 0;
-	virtual FOnItemInspected& GetItemInspectedHandle() = 0;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() = 0;
 
 };
