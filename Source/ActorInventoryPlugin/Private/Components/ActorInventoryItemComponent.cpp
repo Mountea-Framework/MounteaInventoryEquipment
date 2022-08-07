@@ -120,14 +120,10 @@ void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent&
 			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Source Item Class must be selected!"));
 			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
 		}
-		if (SourceItemClass)
+		if (SourceItemClass && !(SourceItemClass->IsChildOf(UInventoryItem::StaticClass() ) ) )
 		{
-			if (SourceItemClass->GetClass()->IsChildOf(UInventoryItem::StaticClass()))
-			{
-				const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Valid Item Class must be selected!"));
-				FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
-
-			}
+			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Valid Item Class must be selected!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
 		}
 		/** Commented out as using Class Template is better for scaling.
 		if (!SourceItem)
@@ -152,8 +148,6 @@ EDataValidationResult UActorInventoryItemComponent::IsDataValid(TArray<FText>& V
 		return EDataValidationResult::Invalid;	
 	}
 	
-	AInvP_LOG(Warning, TEXT("IsDataValid called"))
-	
 	if (SetupMode == EInventoryItemSetup::EIIS_FromItem)
 	{
 		if (!SourceItemClass)
@@ -161,14 +155,11 @@ EDataValidationResult UActorInventoryItemComponent::IsDataValid(TArray<FText>& V
 			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Source Item Class must be selected!"));
 			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
 		}
-		if (SourceItemClass)
+		if (SourceItemClass && !(SourceItemClass->IsChildOf(UInventoryItem::StaticClass() ) ) )
 		{
-			if (SourceItemClass->GetClass() != UInventoryItem::StaticClass())
-			{
-				const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Valid Item Class must be selected!"));
-				FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+			const FString ErrorMessage = FString::Printf(TEXT("INVALID SOURCE ITEM Class: Valid Item Class must be selected!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
 
-			}
 		}
 		
 		/** Commented out as using Class Template is better for scaling.

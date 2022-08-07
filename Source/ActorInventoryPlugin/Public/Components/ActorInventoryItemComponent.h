@@ -28,7 +28,7 @@ class UInventoryItem;
  *
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Component
  */
-UCLASS(ClassGroup=(Inventory), HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(DisplayName = "Inventory Item Component"))
+UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(DisplayName = "Inventory Item Component", BlueprintSpawnableComponent))
 class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent : public UActorComponent
 {
 	GENERATED_BODY()
