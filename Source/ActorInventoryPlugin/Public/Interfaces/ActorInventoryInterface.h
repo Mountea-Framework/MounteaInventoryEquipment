@@ -32,7 +32,12 @@ class UInventoryWidget;
 class UInventoryItemSlot;
 
 /**
- * 
+ * Actor Inventory Interface.
+ *
+ * Interface which represents the Inventory which can be attached to any Actor.
+ * For Player, this Inventory must be Attached to PlayerController!
+ *
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Actor-Inventory-Interface
  */
 class ACTORINVENTORYPLUGIN_API IActorInventoryInterface
 {
