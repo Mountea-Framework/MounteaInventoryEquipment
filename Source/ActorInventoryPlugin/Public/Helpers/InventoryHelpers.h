@@ -295,7 +295,7 @@ public:
 
 	// Actor to spawn from this Item.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false))
-	TSoftClassPtr<AActor> SpawnItemClass = nullptr;
+	TSubclassOf<AActor> SpawnItemClass;;
 
 public:
 	

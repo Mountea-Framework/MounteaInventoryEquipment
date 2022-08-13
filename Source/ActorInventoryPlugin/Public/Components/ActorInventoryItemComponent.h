@@ -48,7 +48,8 @@ public:
 	virtual FOnUpdateSpawnedActorItem& GetSpawnActorRequestedHandle() override;
 
 protected:
-	
+
+	UFUNCTION()
 	virtual void UpdateSpawnedActorItem(const FInventoryItemData& InventoryItemData) override;
 
 public:

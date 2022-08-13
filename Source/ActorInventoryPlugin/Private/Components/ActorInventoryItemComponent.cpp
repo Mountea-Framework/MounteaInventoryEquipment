@@ -54,7 +54,7 @@ void UActorInventoryItemComponent::BeginPlay()
 		}
 	}
 
-	OnUpdateSpawnedActorItem.AddUniqueDynamic(this, &UActorInventoryItemComponent::UpdateSpawnedActorItem);
+	//OnUpdateSpawnedActorItem.AddUniqueDynamic(this, &UActorInventoryItemComponent::UpdateSpawnedActorItem);
 }
 
 FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
