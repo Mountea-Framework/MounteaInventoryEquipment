@@ -14,47 +14,49 @@ void UActorInventoryItemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (SetupMode == EInventoryItemSetup::EIIS_FromItem)
 	{
-		SourceItem = SourceItemClass.GetDefaultObject();
-		if (( SourceItem && !SourceItem->IsValidItem() ) || !GetOwner() || !SourceItem)
+		if (SetupMode == EInventoryItemSetup::EIIS_FromItem)
 		{
-			SourceItem = nullptr;
-			if (GetOwner())
+			SourceItem = SourceItemClass.GetDefaultObject();
+			if (( SourceItem && !SourceItem->IsValidItem() ) || !GetOwner() || !SourceItem)
 			{
-				AInvP_LOG(Error, TEXT("[UActorInventoryItemComponent] %s owned by %s contains Invalid Data definition!"), *GetName(), *GetOwner()->GetName())
-			}
-
-			Deactivate();
-		}
-	}
-
-	if (SetupMode == EInventoryItemSetup::EIIS_FromDataTable)
-	{
-		if (const auto DataTable = SourceItemRow.DataTable)
-		{
-			if (DataTable->GetRowStruct())
-			{
-				const UScriptStruct* InventoryRowStruct = DataTable->GetRowStruct();
-				if (!(InventoryRowStruct->IsChildOf(FInventoryItemData::StaticStruct())))
+				SourceItem = nullptr;
+				if (GetOwner())
 				{
-					if (GetOwner())
+					AInvP_LOG(Error, TEXT("[UActorInventoryItemComponent] %s owned by %s contains Invalid Data definition!"), *GetName(), *GetOwner()->GetName())
+				}
+
+				Deactivate();
+			}
+		}
+
+		if (SetupMode == EInventoryItemSetup::EIIS_FromDataTable)
+		{
+			if (const auto DataTable = SourceItemRow.DataTable)
+			{
+				if (DataTable->GetRowStruct())
+				{
+					const UScriptStruct* InventoryRowStruct = DataTable->GetRowStruct();
+					if (!(InventoryRowStruct->IsChildOf(FInventoryItemData::StaticStruct())))
 					{
-						AInvP_LOG(Error, TEXT("[UActorInventoryItemComponent] %s owned by %s contains Invalid Data Structure!"), *GetName(), *GetOwner()->GetName())
-					}
+						if (GetOwner())
+						{
+							AInvP_LOG(Error, TEXT("[UActorInventoryItemComponent] %s owned by %s contains Invalid Data Structure!"), *GetName(), *GetOwner()->GetName())
+						}
 
-					Deactivate();
-				}
-				else
-				{
-					SourceItem = NewObject<UInventoryItem>();
-					SourceItem->SetItem(GetItemDefinition());
+						Deactivate();
+					}
+					else
+					{
+						SourceItem = NewObject<UInventoryItem>();
+						SourceItem->SetItem(GetItemDefinition());
+					}
 				}
 			}
 		}
 	}
-
-	//OnUpdateSpawnedActorItem.AddUniqueDynamic(this, &UActorInventoryItemComponent::UpdateSpawnedActorItem);
+	
+	OnUpdateSpawnedActorItem.AddUniqueDynamic(this, &UActorInventoryItemComponent::UpdateSpawnedActorItem);
 }
 
 FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
@@ -92,7 +94,7 @@ FOnUpdateSpawnedActorItem& UActorInventoryItemComponent::GetSpawnActorRequestedH
 	return OnUpdateSpawnedActorItem;
 }
 
-void UActorInventoryItemComponent::UpdateSpawnedActorItem(const FInventoryItemData& InventoryItemData)
+void UActorInventoryItemComponent::UpdateSpawnedActorItem(const FInventoryItemData InventoryItemData)
 {
 	if (SourceItem)
 	{

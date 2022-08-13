@@ -36,7 +36,7 @@ class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent : public UActorCompo
 
 public:
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FInventoryItemData GetItemDefinition() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
@@ -44,18 +44,18 @@ public:
 	{
 		return SourceItem;
 	}
-
+	
 	virtual FOnUpdateSpawnedActorItem& GetSpawnActorRequestedHandle() override;
-
-protected:
-
-	UFUNCTION()
-	virtual void UpdateSpawnedActorItem(const FInventoryItemData& InventoryItemData) override;
 
 public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnUpdateSpawnedActorItem OnUpdateSpawnedActorItem;
+	
+protected:
+
+	UFUNCTION()
+	virtual void UpdateSpawnedActorItem(const FInventoryItemData InventoryItemData) override;
 
 protected:
 

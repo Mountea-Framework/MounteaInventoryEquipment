@@ -252,7 +252,7 @@ struct FInventoryItemData : public FTableRowBase
 		, ItemQuantityData(Other.ItemQuantityData)
 		, ItemMesh(Other.ItemMesh)
 		, SpawnItemClass(Other.SpawnItemClass)
-	{}
+	{};
 
 private:
 
