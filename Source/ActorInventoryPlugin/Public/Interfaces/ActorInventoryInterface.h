@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Definitions/InventoryItem.h"
 #include "UObject/Interface.h"
 #include "ActorInventoryInterface.generated.h"
 
@@ -11,6 +10,9 @@ enum class EInventoryContext : uint8;
 class UActorInventoryComponent;
 class UInventoryItem;
 class UInventoryItemSlot;
+
+struct FInventorySlotData;
+struct FInventoryItemData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, UActorComponent*, InventoryComponent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdateRequestProcessed, EInventoryContext, Context);

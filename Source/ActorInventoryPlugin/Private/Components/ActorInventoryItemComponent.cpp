@@ -53,6 +53,8 @@ void UActorInventoryItemComponent::BeginPlay()
 			}
 		}
 	}
+
+	OnUpdateSpawnedActorItem.AddUniqueDynamic(this, &UActorInventoryItemComponent::UpdateSpawnedActorItem);
 }
 
 FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
@@ -83,6 +85,19 @@ FInventoryItemData UActorInventoryItemComponent::GetItemDefinition() const
 	}
 
 	return ReturnDefinition;
+}
+
+FOnUpdateSpawnedActorItem& UActorInventoryItemComponent::GetSpawnActorRequestedHandle()
+{
+	return OnUpdateSpawnedActorItem;
+}
+
+void UActorInventoryItemComponent::UpdateSpawnedActorItem(const FInventoryItemData& InventoryItemData)
+{
+	if (SourceItem)
+	{
+		SourceItem->SetItem(InventoryItemData);
+	}
 }
 
 #if WITH_EDITOR
