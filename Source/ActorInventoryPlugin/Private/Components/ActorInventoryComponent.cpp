@@ -4,8 +4,10 @@
 
 #include "Definitions/InventoryCategory.h"
 #include "Definitions/InventoryItem.h"
+#include "Definitions/InventoryKeyAction.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
 #include "Helpers/ActorInventoryPluginLog.h"
+#include "Widgets/InventoryItemSlot.h"
 
 UActorInventoryComponent::UActorInventoryComponent()
 {
@@ -26,7 +28,7 @@ void UActorInventoryComponent::BeginPlay()
 	}
 
 	// Bind Virtual function and call BP Event
-	OnItemActionRequested.AddUniqueDynamic(this, &UActorInventoryComponent::ProcessItemKeyAction);
+	OnItemActionRequested.AddUniqueDynamic(this, &UActorInventoryComponent::ExecuteItemKeyAction);
 }
 
 void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInventoryLayout)
@@ -65,9 +67,21 @@ void UActorInventoryComponent::SaveToInventoryLayout(const FInventorySlotData& S
 	}
 }
 
-void UActorInventoryComponent::ProcessItemKeyAction(const UInventoryItem* ForItem, const FGuid& ActionGuid)
+void UActorInventoryComponent::ExecuteItemKeyActionBP_Implementation(UInventoryItemSlot* ForItem, const FGuid& ActionGuid)
 {
-	ProcessItemKeyActionBP(ForItem, ActionGuid);
+	if (ForItem && ForItem->GetItemData().Item)
+	{
+		const auto ActionToExecute = UActorInventoryBPFLibrary::FindKeyAction( this, ActionGuid, ForItem->GetItemData().Item->GetItem().ItemCategory);
+		if (ActionToExecute)
+		{
+			ActionToExecute.GetDefaultObject()->ExecuteAction(ForItem);
+		}
+	}
+}
+
+void UActorInventoryComponent::ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid)
+{
+	ExecuteItemKeyActionBP(ForItem, ActionGuid);
 }
 
 bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
@@ -204,6 +218,7 @@ bool UActorInventoryComponent::AddItemToInventory(UInventoryItem* Item)
 			
 			UInventoryItem* NewItem = NewObject<UInventoryItem>();
 			NewItem->SetItem(NewItemData);
+			NewItem->SetOwningInventory(this);
 		
 			InventoryItems.Emplace(NewItem);
 
@@ -302,6 +317,16 @@ int32 UActorInventoryComponent::GetItemQuantity(UInventoryItem* Item) const
 		return Item->GetItem().ItemQuantityData.Quantity;
 	}
 	return 0;
+}
+
+UActorInventoryComponent* UActorInventoryComponent::GetOtherInventory() const
+{
+	return OtherInventory;
+}
+
+void UActorInventoryComponent::SetOtherInventory(UActorInventoryComponent* NewOtherInventory)
+{
+	OtherInventory = NewOtherInventory;
 }
 
 bool UActorInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const
@@ -456,6 +481,7 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 					if (NewItem)
 					{
 						NewItem->SetItem(*Row);
+						NewItem->SetOwningInventory(this);
 						AddItemToInventory(NewItem);
 					}
 				}
@@ -477,11 +503,6 @@ FOnInventoryUpdateRequestProcessed& UActorInventoryComponent::GetInventoryReques
 FOnInventoryLayoutSaveRequested& UActorInventoryComponent::GetInventoryLayoutUpdateRequestHandle()
 {
 	return OnInventoryLayoutSaveRequested;
-}
-
-FOnItemInspected& UActorInventoryComponent::GetItemInspectedHandle()
-{
-	return OnItemInspected;
 }
 
 FOnItemActionRequested& UActorInventoryComponent::GetItemActionRequestedHandle()

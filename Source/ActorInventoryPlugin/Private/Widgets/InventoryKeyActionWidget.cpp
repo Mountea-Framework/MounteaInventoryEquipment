@@ -3,3 +3,5 @@
 
 #include "Widgets/InventoryKeyActionWidget.h"
 
+#include "Definitions/InventoryKeyAction.h"
+#include "Helpers/ActorInventoryPluginLog.h"

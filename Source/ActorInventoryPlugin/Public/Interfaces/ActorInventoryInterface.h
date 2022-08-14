@@ -3,21 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Definitions/InventoryItem.h"
 #include "UObject/Interface.h"
 #include "ActorInventoryInterface.generated.h"
 
 enum class EInventoryContext : uint8;
 class UActorInventoryComponent;
 class UInventoryItem;
+class UInventoryItemSlot;
+
+struct FInventorySlotData;
+struct FInventoryItemData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, UActorComponent*, InventoryComponent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdateRequestProcessed, EInventoryContext, Context);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryLayoutSaveRequested, const FInventorySlotData&, Slot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyPressed, const FKey&, PressedKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyReleased, const FKey&, ReleasedKey);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemInspected, UInventoryItem*, InspectedItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemActionRequested, const UInventoryItem*, InventoryItem, const FGuid&, ActionGuid);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemActionRequested, UInventoryItemSlot*, InventoryItem, const FGuid&, ActionGuid);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -29,9 +31,15 @@ class UActorInventoryInterface : public UInterface
 
 class UInventoryItem;
 class UInventoryWidget;
+class UInventoryItemSlot;
 
 /**
- * 
+ * Actor Inventory Interface.
+ *
+ * Interface which represents the Inventory which can be attached to any Actor.
+ * For Player, this Inventory must be Attached to PlayerController!
+ *
+ * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Actor-Inventory-Interface
  */
 class ACTORINVENTORYPLUGIN_API IActorInventoryInterface
 {
@@ -55,6 +63,8 @@ public:
 	virtual TArray<UInventoryItem*> GetInventoryItems() const = 0;
 	virtual int32 GetItemQuantity(UInventoryItem* Item) const = 0;
 
+	virtual UActorInventoryComponent* GetOtherInventory() const = 0;
+	virtual void SetOtherInventory(UActorInventoryComponent* NewOtherInventory) = 0;
 
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const = 0;
 	virtual bool FindItemByGUID(const FGuid& Guid) const = 0;
@@ -75,13 +85,12 @@ public:
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) = 0;
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;
 
-	virtual void ProcessItemKeyAction(const UInventoryItem* ForItem, const FGuid& ActionGuid) = 0;
+	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) = 0;
 
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() = 0;
-	virtual FOnItemInspected& GetItemInspectedHandle() = 0;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() = 0;
 
 };

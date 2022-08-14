@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 
 #include "Helpers/InventoryHelpers.h"
+#include "Interfaces/ActorInventorySpawnableInterface.h"
 
 #include "ActorInventoryItemComponent.generated.h"
 
@@ -28,14 +29,14 @@ class UInventoryItem;
  *
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Component
  */
-UCLASS(ClassGroup=(Inventory), HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(DisplayName = "Inventory Item Component"))
-class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent : public UActorComponent
+UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(DisplayName = "Inventory Item Component", BlueprintSpawnableComponent))
+class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent : public UActorComponent, public IActorInventorySpawnableInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FInventoryItemData GetItemDefinition() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
@@ -43,6 +44,18 @@ public:
 	{
 		return SourceItem;
 	}
+	
+	virtual FOnUpdateSpawnedActorItem& GetSpawnActorRequestedHandle() override;
+
+public:
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnUpdateSpawnedActorItem OnUpdateSpawnedActorItem;
+	
+protected:
+
+	UFUNCTION()
+	virtual void UpdateSpawnedActorItem(const FInventoryItemData InventoryItemData) override;
 
 protected:
 

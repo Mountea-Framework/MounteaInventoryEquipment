@@ -7,6 +7,8 @@
 
 #include "InventoryItem.generated.h"
 
+class IActorInventoryInterface;
+
 
 #define LOCTEXT_NAMESPACE "Inventory Item"
 
@@ -24,8 +26,9 @@ class ACTORINVENTORYPLUGIN_API UInventoryItem : public UObject
 
 	UInventoryItem(){};
 
-	explicit UInventoryItem(FInventoryItemData& ItemData)
-	: Item(ItemData)
+	explicit UInventoryItem(FInventoryItemData& ItemData, TScriptInterface<IActorInventoryInterface> Inventory)
+	: Item(ItemData),
+	OwningInventory(Inventory)
 	{};
 
 public:
@@ -50,6 +53,18 @@ public:
 		Item.ItemRarity != nullptr &&
 		Item.ItemQuantityData.Quantity <= Item.ItemQuantityData.MaxQuantity;
 	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	FORCEINLINE TScriptInterface<IActorInventoryInterface> GetOwningInventory() const
+	{
+		return OwningInventory;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	void SetOwningInventory(const TScriptInterface<IActorInventoryInterface> NewOwningInventory)
+	{
+		OwningInventory = NewOwningInventory;
+	}
 	
 protected:
 	
@@ -59,6 +74,14 @@ protected:
 protected:
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+private:
+
+	/**
+	 * @brief Owning Inventory Interface.
+	 */
+	UPROPERTY(VisibleAnywhere, Category="Inventory")
+	TScriptInterface<IActorInventoryInterface> OwningInventory = nullptr;
 };
 
 #undef LOCTEXT_NAMESPACE

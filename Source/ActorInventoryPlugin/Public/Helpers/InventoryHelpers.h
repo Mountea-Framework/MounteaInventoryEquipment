@@ -252,7 +252,7 @@ struct FInventoryItemData : public FTableRowBase
 		, ItemQuantityData(Other.ItemQuantityData)
 		, ItemMesh(Other.ItemMesh)
 		, SpawnItemClass(Other.SpawnItemClass)
-	{}
+	{};
 
 private:
 
@@ -295,7 +295,7 @@ public:
 
 	// Actor to spawn from this Item.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false))
-	TSoftClassPtr<AActor> SpawnItemClass = nullptr;
+	TSubclassOf<AActor> SpawnItemClass;;
 
 public:
 	
@@ -413,16 +413,16 @@ struct FInventorySlotData
 	FInventorySlotData() : Quantity(0), bCreatedManually(false)
 	{};
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	class UInventoryItem* Item = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	int32 Quantity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	uint8 bCreatedManually : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	FIntPoint SlotCoordinates = FIntPoint(0,0);
 	
 };

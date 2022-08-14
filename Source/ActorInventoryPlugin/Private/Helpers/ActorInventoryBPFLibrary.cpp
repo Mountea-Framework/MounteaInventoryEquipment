@@ -68,7 +68,8 @@ UInventoryCategory* UActorInventoryBPFLibrary::GetGenericCategory(const UObject*
 	return nullptr;
 }
 
-UInventoryKeyAction* UActorInventoryBPFLibrary::FindKeyAction(const UObject* WorldContextObject, const FGuid& Guid, const UInventoryCategory* Category)
+TSubclassOf<UInventoryKeyAction> UActorInventoryBPFLibrary::FindKeyAction(
+	const UObject* WorldContextObject, const FGuid& Guid, const UInventoryCategory* Category)
 {
 	if (Category)
 	{
@@ -78,7 +79,7 @@ UInventoryKeyAction* UActorInventoryBPFLibrary::FindKeyAction(const UObject* Wor
 			{
 				if (Itr.Get() && Itr.GetDefaultObject()->GetActionGuid() == Guid)
 				{
-					return Itr.GetDefaultObject();
+					return Itr;
 				}
 				/* No longer using Objects
 				if (Itr && Itr->GetActionGuid() == Guid)

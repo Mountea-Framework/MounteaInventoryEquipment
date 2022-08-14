@@ -63,7 +63,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual int32 GetItemQuantity(UInventoryItem* Item) const override;
-	
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UActorInventoryComponent* GetOtherInventory() const override;
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void SetOtherInventory(UActorInventoryComponent* NewOtherInventory) override;
 
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const override;
 	virtual bool FindItemByGUID(const FGuid& Guid) const override;
@@ -99,7 +103,6 @@ public:
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() override;
-	virtual FOnItemInspected& GetItemInspectedHandle() override;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() override;
 
 #pragma region InventoryWidget
@@ -144,11 +147,11 @@ public:
 // Calling Broadcast from BP when ActionKey is requested
 #pragma region KeyActionsMapping
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory|UI", meta=(DisplayName="Process Item Key Action"))
-	void ProcessItemKeyActionBP(const UInventoryItem* ForItem, const FGuid& ActionGuid);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory|UI", meta=(DisplayName="Process Item Key Action"))
+	void ExecuteItemKeyActionBP(UInventoryItemSlot* ForItem, const FGuid& ActionGuid);
 
 	UFUNCTION()
-	virtual void ProcessItemKeyAction(const UInventoryItem* ForItem, const FGuid& ActionGuid) override;
+	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) override;
 
 #pragma endregion KeyActionsMapping
 
@@ -168,9 +171,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnKeyReleased OnKeyReleased;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
-	FOnItemInspected OnItemInspected;
 	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnItemActionRequested OnItemActionRequested;
@@ -211,6 +211,10 @@ protected:
 	FInventoryLayout InventoryLayout;
 	
 private:
+
+	// Could be Loot Source, Shop or others
+	UPROPERTY()
+	UActorInventoryComponent* OtherInventory = nullptr;
 
 	UPROPERTY()
 	class UActorInventoryManagerComponent* InventoryManager = nullptr;

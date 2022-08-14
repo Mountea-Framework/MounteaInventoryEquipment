@@ -12,6 +12,7 @@ class UInventoryItem;
 class UActorInventoryInterface;
 class IActorInventoryInterface;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryWidgetUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCategoryUpdated, const FGuid&, CategoryGUID);
 
 /**
@@ -27,7 +28,7 @@ protected:
 	virtual bool Initialize() override;
 
 public:
-
+	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnCategoryUpdated OnCategoryUpdated;
 
@@ -54,7 +55,7 @@ public:
 	void OnCategorySelected(const FGuid CategoryGUID);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
-	void OnItemInspected(UInventoryItem* InspectedItem);
+	void OnItemInspected(class UInventoryItemSlot* InspectedItem);
 	
 protected:
 

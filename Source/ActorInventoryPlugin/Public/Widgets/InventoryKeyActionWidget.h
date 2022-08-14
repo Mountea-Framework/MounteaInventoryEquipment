@@ -10,6 +10,7 @@
 class UInventoryKeyAction;
 class UInventoryWidget;
 class UInventoryItem;
+class UInventoryItemSlot;
 
 /**
  * 
@@ -21,6 +22,11 @@ class ACTORINVENTORYPLUGIN_API UInventoryKeyActionWidget : public UUserWidget
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	void ExecuteAction(TSubclassOf<UInventoryKeyAction> Action);
+
+public:
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE TSubclassOf<UInventoryKeyAction> GetParentKeyAction() const { return ParentKeyAction; };
 
@@ -28,7 +34,7 @@ public:
 	FORCEINLINE UInventoryWidget* GetParentInventoryWidget() const { return ParentInventoryWidget; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE UInventoryItem* GetParentInventoryItem() const { return ParentInventoryItem; };
+	FORCEINLINE UInventoryItemSlot* GetParentInventoryItem() const { return ParentInventoryItem; };
 
 protected:
 
@@ -40,5 +46,5 @@ protected:
 
 	// What Item does this Action origin from
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
-	UInventoryItem* ParentInventoryItem = nullptr;
+	UInventoryItemSlot* ParentInventoryItem = nullptr;
 };
