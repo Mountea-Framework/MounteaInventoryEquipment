@@ -63,7 +63,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual int32 GetItemQuantity(UInventoryItem* Item) const override;
-	
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UActorInventoryComponent* GetOtherInventory() const override;
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void SetOtherInventory(UActorInventoryComponent* NewOtherInventory) override;
 
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const override;
 	virtual bool FindItemByGUID(const FGuid& Guid) const override;
@@ -207,6 +211,10 @@ protected:
 	FInventoryLayout InventoryLayout;
 	
 private:
+
+	// Could be Loot Source, Shop or others
+	UPROPERTY()
+	UActorInventoryComponent* OtherInventory = nullptr;
 
 	UPROPERTY()
 	class UActorInventoryManagerComponent* InventoryManager = nullptr;

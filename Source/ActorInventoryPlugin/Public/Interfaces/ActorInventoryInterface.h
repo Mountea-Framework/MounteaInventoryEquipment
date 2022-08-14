@@ -63,6 +63,8 @@ public:
 	virtual TArray<UInventoryItem*> GetInventoryItems() const = 0;
 	virtual int32 GetItemQuantity(UInventoryItem* Item) const = 0;
 
+	virtual UActorInventoryComponent* GetOtherInventory() const = 0;
+	virtual void SetOtherInventory(UActorInventoryComponent* NewOtherInventory) = 0;
 
 	virtual bool FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const = 0;
 	virtual bool FindItemByGUID(const FGuid& Guid) const = 0;

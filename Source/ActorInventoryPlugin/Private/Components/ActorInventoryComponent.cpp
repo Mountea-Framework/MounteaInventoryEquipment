@@ -319,6 +319,16 @@ int32 UActorInventoryComponent::GetItemQuantity(UInventoryItem* Item) const
 	return 0;
 }
 
+UActorInventoryComponent* UActorInventoryComponent::GetOtherInventory() const
+{
+	return OtherInventory;
+}
+
+void UActorInventoryComponent::SetOtherInventory(UActorInventoryComponent* NewOtherInventory)
+{
+	OtherInventory = NewOtherInventory;
+}
+
 bool UActorInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem> ItemClass) const
 {
 	for (const auto Itr : InventoryItems)
