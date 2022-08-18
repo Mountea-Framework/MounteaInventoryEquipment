@@ -490,6 +490,31 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 	}
 }
 
+float UActorInventoryComponent::GetInventoryWeight() const
+{
+	return InventoryWeight;
+}
+
+void UActorInventoryComponent::SetInventoryWeight(const float& NewValue)
+{
+	InventoryWeight = NewValue;
+}
+
+bool UActorInventoryComponent::UpdateInventoryWeight(const float& UpdateValue)
+{
+	if (!InventoryManager)
+	{
+		return false;
+	}
+	const float TempWeight = UpdateValue + InventoryWeight;
+	if (TempWeight < InventoryManager->GetInventoryWeightLimit())
+	{
+		InventoryWeight = TempWeight;
+		return true;
+	}
+	return false;
+}
+
 FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()
 {
 	return OnInventoryUpdated;

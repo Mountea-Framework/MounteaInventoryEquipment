@@ -324,6 +324,31 @@ public:
 #pragma region Settings
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Settings")
+	FORCEINLINE bool IsWeightLimitAllowed() const
+	{
+		return bAllowWeightLimit;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|Settings")
+	FORCEINLINE float GetInventoryWeightLimit() const
+	{
+		return WeightLimit;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|Settings")
+	void SetInventoryWeightLimit(const float NewWeightLimit)
+	{
+		WeightLimit = NewWeightLimit;
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory|Settings")
+	void UpdateWeightLimit(const float UpdateValue)
+	{
+		const float TempWeightValue = WeightLimit + UpdateValue;
+		WeightLimit = FMath::Max(0.f, TempWeightValue);
+	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Settings")
 	FORCEINLINE bool IsDragDropAllowed() const
 	{
 		return bAllowDragDrop;
@@ -343,6 +368,18 @@ public:
 protected:
 
 #pragma region GeneralSettings
+
+	/**
+	 * If allowed, Inventory is limited by Weight
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	uint8 bAllowWeightLimit : 1;
+
+	/**
+	 * Maximum Weight Limit allowed by Inventory.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings", meta=(EditCondition="bAllowWeightLimit"))
+	float WeightLimit = 50.f;
 	
 	/**
 	 * If allowed, Item Slots are allowed to be Grabbed and Dropped.

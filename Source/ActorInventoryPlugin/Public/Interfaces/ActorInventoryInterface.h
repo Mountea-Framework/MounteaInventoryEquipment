@@ -85,6 +85,10 @@ public:
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) = 0;
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;
 
+	virtual float GetInventoryWeight() const = 0;
+	virtual void SetInventoryWeight(const float& NewValue) = 0;
+	virtual bool UpdateInventoryWeight(const float& UpdateValue) = 0;
+
 	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) = 0;
 
 	

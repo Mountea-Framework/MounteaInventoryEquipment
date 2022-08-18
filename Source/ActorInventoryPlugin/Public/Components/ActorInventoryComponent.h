@@ -99,6 +99,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual float GetInventoryWeight() const override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual void SetInventoryWeight(const float& NewValue) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual bool UpdateInventoryWeight(const float& UpdateValue) override;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
@@ -209,6 +217,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
 	FInventoryLayout InventoryLayout;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
+	float InventoryWeight = 50.f;
 	
 private:
 
