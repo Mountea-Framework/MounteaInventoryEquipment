@@ -39,7 +39,7 @@ public:
 	 * @param InventoryInterface Owning Inventory. This way you can swap Owning Inventories or request up to date data.
 	 */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Inventory")
-	void RefreshWidget(UActorComponent* InventoryInterface);
+	void RefreshInventoryWidget();
 
 	/**
 	 * @brief Save Inventory Slot to Owning Inventory. Must be called with Parent Call!

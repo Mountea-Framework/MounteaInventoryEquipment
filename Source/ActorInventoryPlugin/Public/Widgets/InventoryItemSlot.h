@@ -29,6 +29,9 @@ public:
 	// Event called once this Slot has been updated.
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory|Item Slot")
 	void OnSlotInspected();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Item Slot")
+	UInventoryWidget* GetOwningInventoryWidget() const {return OwningInventoryWidget; };
 	
 protected:
 

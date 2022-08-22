@@ -103,10 +103,13 @@ public:
 	virtual float GetInventoryWeight() const override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual void SetInventoryWeight(const float& NewValue) override;
+	virtual void SetInventoryWeightLimit(const float& NewValue) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual bool UpdateInventoryWeight(const float& UpdateValue) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual float GetInventoryMaxWeight() const override;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
@@ -219,7 +222,7 @@ protected:
 	FInventoryLayout InventoryLayout;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
-	float InventoryWeight = 50.f;
+	float MaximumInventoryWeight = 50.f;
 	
 private:
 

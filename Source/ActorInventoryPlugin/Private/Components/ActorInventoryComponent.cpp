@@ -249,7 +249,7 @@ bool UActorInventoryComponent::AddItemsToInventory(const TArray<UInventoryItem*>
 		}
 	}
 
-	OnInventoryUpdated.Broadcast(this);
+	OnInventoryUpdated.Broadcast();
 	return true;
 }
 
@@ -307,7 +307,7 @@ void UActorInventoryComponent::SubtractItemsFromInventory(const TMap<UInventoryI
 		SubtractItemFromInventory(Itr.Key, Itr.Value);
 	}
 
-	OnInventoryUpdated.Broadcast(this);
+	OnInventoryUpdated.Broadcast();
 }
 
 int32 UActorInventoryComponent::GetItemQuantity(UInventoryItem* Item) const
@@ -492,12 +492,21 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 
 float UActorInventoryComponent::GetInventoryWeight() const
 {
-	return InventoryWeight;
+	float TempWeight = 0.f;
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().ItemAdditionalData.bHasWeight)
+		{
+			TempWeight += Itr->GetItem().ItemAdditionalData.ItemWeight;
+		}
+	}
+
+	return TempWeight;
 }
 
-void UActorInventoryComponent::SetInventoryWeight(const float& NewValue)
+void UActorInventoryComponent::SetInventoryWeightLimit(const float& NewValue)
 {
-	InventoryWeight = NewValue;
+	MaximumInventoryWeight = NewValue;
 }
 
 bool UActorInventoryComponent::UpdateInventoryWeight(const float& UpdateValue)
@@ -506,13 +515,18 @@ bool UActorInventoryComponent::UpdateInventoryWeight(const float& UpdateValue)
 	{
 		return false;
 	}
-	const float TempWeight = UpdateValue + InventoryWeight;
+	const float TempWeight = UpdateValue + MaximumInventoryWeight;
 	if (TempWeight < InventoryManager->GetInventoryWeightLimit())
 	{
-		InventoryWeight = TempWeight;
+		MaximumInventoryWeight = TempWeight;
 		return true;
 	}
 	return false;
+}
+
+float UActorInventoryComponent::GetInventoryMaxWeight() const
+{
+	return MaximumInventoryWeight;
 }
 
 FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()

@@ -14,7 +14,7 @@ class UInventoryItemSlot;
 struct FInventorySlotData;
 struct FInventoryItemData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, UActorComponent*, InventoryComponent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdateRequestProcessed, EInventoryContext, Context);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryLayoutSaveRequested, const FInventorySlotData&, Slot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyPressed, const FKey&, PressedKey);
@@ -86,8 +86,9 @@ public:
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;
 
 	virtual float GetInventoryWeight() const = 0;
-	virtual void SetInventoryWeight(const float& NewValue) = 0;
+	virtual void SetInventoryWeightLimit(const float& NewValue) = 0;
 	virtual bool UpdateInventoryWeight(const float& UpdateValue) = 0;
+	virtual float GetInventoryMaxWeight() const = 0;
 
 	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) = 0;
 
