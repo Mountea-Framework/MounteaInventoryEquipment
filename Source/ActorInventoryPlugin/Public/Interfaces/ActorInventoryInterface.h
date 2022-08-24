@@ -77,6 +77,8 @@ public:
 	virtual TArray<UInventoryItem*> GetItemsByGUID(const FGuid& Guid) const = 0;
 	virtual UInventoryItem* GetItemByClass(const TSubclassOf<UInventoryItem>& Class) const = 0;
 	virtual TArray<UInventoryItem*> GetItemsByClass(const TSubclassOf<UInventoryItem>& Class) const = 0;
+	virtual UInventoryItem* GetItemByCategory(const FGuid& CategoryGuid) const = 0;
+	virtual TArray<UInventoryItem*> GetItemsByCategory(const FGuid& CategoryGuid) const = 0;
 	
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) = 0;
 	virtual void SaveToInventoryLayout(const FInventorySlotData& Slot) = 0;

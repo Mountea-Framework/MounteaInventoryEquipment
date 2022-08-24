@@ -95,6 +95,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual TArray<UInventoryItem*> GetItemsByClass(const TSubclassOf<UInventoryItem>& Class) const override;
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual  UInventoryItem* GetItemByCategory(const FGuid& CategoryGuid) const override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual TArray<UInventoryItem*> GetItemsByCategory(const FGuid& CategoryGuid) const override;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) override;

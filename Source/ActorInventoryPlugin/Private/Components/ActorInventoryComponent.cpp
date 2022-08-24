@@ -263,7 +263,7 @@ void UActorInventoryComponent::RemoveItemsFromInventory(const TArray<UInventoryI
 
 void UActorInventoryComponent::RemoveItemFromInventory(UInventoryItem* Item)
 {
-	if (Item != nullptr && IsItemInInventory(Item))
+	if (Item != nullptr)
 	{
 		InventoryItems.RemoveSingle(Item);
 	}
@@ -284,7 +284,19 @@ void UActorInventoryComponent::SubtractItemFromInventory(UInventoryItem* Item, i
 	// Cache data
 	const FInventoryItemData& NewItemData = Item->GetItem();
 	
-	if (UInventoryItem* ExistingItem = GetItemByData(NewItemData))
+	UInventoryItem* ExistingItem = nullptr;
+
+	ExistingItem = GetItemByGUID(NewItemData.GetGuid());
+	if (!ExistingItem)
+	{
+		ExistingItem = GetItemByData(NewItemData);
+		if (!ExistingItem)
+		{
+			ExistingItem = GetItemByClass(Item->StaticClass());
+		}
+	}
+	
+	if (ExistingItem)
 	{
 		if (ExistingItem->GetItem().ItemQuantityData.Quantity - Amount <= 0)
 		{
@@ -447,6 +459,33 @@ TArray<UInventoryItem*> UActorInventoryComponent::GetItemsByClass(const TSubclas
 	return ReturnItems;
 }
 
+UInventoryItem* UActorInventoryComponent::GetItemByCategory(const FGuid& CategoryGuid) const
+{
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().ItemCategory && Itr->GetItem().ItemCategory->GetCategoryGUID() == CategoryGuid)
+		{
+			return Itr;
+		}
+	}
+
+	return nullptr;
+}
+
+TArray<UInventoryItem*> UActorInventoryComponent::GetItemsByCategory(const FGuid& CategoryGuid) const
+{
+	TArray<UInventoryItem*> ReturnItems;
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().ItemCategory && Itr->GetItem().ItemCategory->GetCategoryGUID() == CategoryGuid)
+		{
+			ReturnItems.Add(Itr);
+		}
+	}
+		
+	return ReturnItems;
+}
+
 bool UActorInventoryComponent::IsItemInInventory(UInventoryItem* Item) const
 {
 	if (!Item) return false;
@@ -497,7 +536,7 @@ float UActorInventoryComponent::GetInventoryWeight() const
 	{
 		if (Itr && Itr->GetItem().ItemAdditionalData.bHasWeight)
 		{
-			TempWeight += Itr->GetItem().ItemAdditionalData.ItemWeight;
+			TempWeight += ( Itr->GetItem().ItemQuantityData.Quantity * Itr->GetItem().ItemAdditionalData.ItemWeight );
 		}
 	}
 

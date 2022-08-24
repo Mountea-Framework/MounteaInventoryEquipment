@@ -43,6 +43,7 @@ public:
 	void SetItem(const FInventoryItemData& ItemValues)
 	{
 		Item = ItemValues;
+
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")

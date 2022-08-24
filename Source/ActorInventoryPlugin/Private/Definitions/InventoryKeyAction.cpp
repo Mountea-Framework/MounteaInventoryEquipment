@@ -3,14 +3,8 @@
 
 #include "Definitions/InventoryKeyAction.h"
 
-#include "Interfaces/ActorInventoryInterface.h"
-
-#include "Definitions/InventoryItem.h"
-
 #include "Helpers/ActorInventoryBPFLibrary.h"
-#include "Helpers/InventoryHelpers.h"
 
-#include "Widgets/InventoryItemSlot.h"
 #include "Widgets/InventoryWidget.h"
 
 
