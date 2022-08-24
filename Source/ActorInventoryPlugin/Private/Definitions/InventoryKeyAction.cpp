@@ -4,7 +4,8 @@
 #include "Definitions/InventoryKeyAction.h"
 
 #include "Helpers/ActorInventoryBPFLibrary.h"
-#include "Helpers/InventoryHelpers.h"
+
+#include "Widgets/InventoryWidget.h"
 
 
 UInventoryKeyAction::UInventoryKeyAction()

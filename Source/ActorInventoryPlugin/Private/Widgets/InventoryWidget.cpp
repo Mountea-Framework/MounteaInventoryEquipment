@@ -23,7 +23,7 @@ bool UInventoryWidget::Initialize()
 					OwningInventory.SetInterface(Cast<IActorInventoryInterface>(InventoryInterface));
 
 					FOnInventoryUpdated& UpdateHandle = OwningInventory->GetUpdateEventHandle();
-					UpdateHandle.AddUniqueDynamic(this, &UInventoryWidget::RefreshWidget);
+					UpdateHandle.AddUniqueDynamic(this, &UInventoryWidget::RefreshInventoryWidget);
 
 					return true;
 				}

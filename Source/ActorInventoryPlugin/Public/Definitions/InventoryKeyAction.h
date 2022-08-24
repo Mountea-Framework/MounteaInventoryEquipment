@@ -40,12 +40,9 @@ public:
 	 * 
 	 * @return Returns whether the function has been called nor not, for instance invalid Category cannot execute any actions.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
 	bool ExecuteAction(UInventoryItemSlot* ForItem);
-	bool ExecuteAction_Implementation(UInventoryItemSlot* ForItem)
-	{
-		return true;
-	}
+
 
 	/**
 	 * Gets Inventory Manager.

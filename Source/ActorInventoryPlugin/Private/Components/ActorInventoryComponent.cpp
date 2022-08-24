@@ -249,7 +249,7 @@ bool UActorInventoryComponent::AddItemsToInventory(const TArray<UInventoryItem*>
 		}
 	}
 
-	OnInventoryUpdated.Broadcast(this);
+	OnInventoryUpdated.Broadcast();
 	return true;
 }
 
@@ -263,7 +263,7 @@ void UActorInventoryComponent::RemoveItemsFromInventory(const TArray<UInventoryI
 
 void UActorInventoryComponent::RemoveItemFromInventory(UInventoryItem* Item)
 {
-	if (Item != nullptr && IsItemInInventory(Item))
+	if (Item != nullptr)
 	{
 		InventoryItems.RemoveSingle(Item);
 	}
@@ -284,7 +284,19 @@ void UActorInventoryComponent::SubtractItemFromInventory(UInventoryItem* Item, i
 	// Cache data
 	const FInventoryItemData& NewItemData = Item->GetItem();
 	
-	if (UInventoryItem* ExistingItem = GetItemByData(NewItemData))
+	UInventoryItem* ExistingItem = nullptr;
+
+	ExistingItem = GetItemByGUID(NewItemData.GetGuid());
+	if (!ExistingItem)
+	{
+		ExistingItem = GetItemByData(NewItemData);
+		if (!ExistingItem)
+		{
+			ExistingItem = GetItemByClass(Item->StaticClass());
+		}
+	}
+	
+	if (ExistingItem)
 	{
 		if (ExistingItem->GetItem().ItemQuantityData.Quantity - Amount <= 0)
 		{
@@ -307,7 +319,7 @@ void UActorInventoryComponent::SubtractItemsFromInventory(const TMap<UInventoryI
 		SubtractItemFromInventory(Itr.Key, Itr.Value);
 	}
 
-	OnInventoryUpdated.Broadcast(this);
+	OnInventoryUpdated.Broadcast();
 }
 
 int32 UActorInventoryComponent::GetItemQuantity(UInventoryItem* Item) const
@@ -447,6 +459,33 @@ TArray<UInventoryItem*> UActorInventoryComponent::GetItemsByClass(const TSubclas
 	return ReturnItems;
 }
 
+UInventoryItem* UActorInventoryComponent::GetItemByCategory(const FGuid& CategoryGuid) const
+{
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().ItemCategory && Itr->GetItem().ItemCategory->GetCategoryGUID() == CategoryGuid)
+		{
+			return Itr;
+		}
+	}
+
+	return nullptr;
+}
+
+TArray<UInventoryItem*> UActorInventoryComponent::GetItemsByCategory(const FGuid& CategoryGuid) const
+{
+	TArray<UInventoryItem*> ReturnItems;
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().ItemCategory && Itr->GetItem().ItemCategory->GetCategoryGUID() == CategoryGuid)
+		{
+			ReturnItems.Add(Itr);
+		}
+	}
+		
+	return ReturnItems;
+}
+
 bool UActorInventoryComponent::IsItemInInventory(UInventoryItem* Item) const
 {
 	if (!Item) return false;
@@ -488,6 +527,45 @@ void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTabl
 			}
 		} 
 	}
+}
+
+float UActorInventoryComponent::GetInventoryWeight() const
+{
+	float TempWeight = 0.f;
+	for (const auto Itr : InventoryItems)
+	{
+		if (Itr && Itr->GetItem().ItemAdditionalData.bHasWeight)
+		{
+			TempWeight += ( Itr->GetItem().ItemQuantityData.Quantity * Itr->GetItem().ItemAdditionalData.ItemWeight );
+		}
+	}
+
+	return TempWeight;
+}
+
+void UActorInventoryComponent::SetInventoryWeightLimit(const float& NewValue)
+{
+	MaximumInventoryWeight = NewValue;
+}
+
+bool UActorInventoryComponent::UpdateInventoryWeight(const float& UpdateValue)
+{
+	if (!InventoryManager)
+	{
+		return false;
+	}
+	const float TempWeight = UpdateValue + MaximumInventoryWeight;
+	if (TempWeight < InventoryManager->GetInventoryWeightLimit())
+	{
+		MaximumInventoryWeight = TempWeight;
+		return true;
+	}
+	return false;
+}
+
+float UActorInventoryComponent::GetInventoryMaxWeight() const
+{
+	return MaximumInventoryWeight;
 }
 
 FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()

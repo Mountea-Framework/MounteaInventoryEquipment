@@ -110,21 +110,28 @@ struct FInventoryCategoryData
 {
 	GENERATED_BODY()
 
-	FInventoryCategoryData()
+	FInventoryCategoryData(): bShowInCategories(0)
 	{
 		bIsAllCategories = false;
-	};
+		bShowInCategories = true;
+	}
+	;
 	
 	FInventoryCategoryData(const FText& CategoryName, const FText& CategoryDescription, const int32 MaxQuantityPerStack, UTexture2D* CategoryTexture,
-		UInventoryCategory* ParentCategory, const uint8 IsAllCategories = false)
-		: CategoryName(CategoryName),
-	      CategoryDescription(CategoryDescription),
+		UInventoryCategory* ParentCategory, const uint8 IsAllCategories = false, const uint8 ShowCategory = false)
+		: bShowInCategories(ShowCategory), CategoryName(CategoryName),
+		  CategoryDescription(CategoryDescription),
 		  MaxQuantityPerStack(MaxQuantityPerStack),
 		  CategoryTexture(CategoryTexture),
 		  ParentCategory(ParentCategory),
 		  bIsAllCategories(IsAllCategories)
-	{}
+	{
+	}
 
+	// Defines whether Category is displayable in List of Categories, for Instance Money is usually not displayed 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	uint8 bShowInCategories : 1;
+	
 	// Name of this Category, useful for UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
@@ -180,6 +187,14 @@ struct FInventoryItemAdditionalData : public FTableRowBase
 		bHasWeight = true;
 	};
 
+	FInventoryItemAdditionalData(const float NewBasePrice, const float NewDurability, const uint8 HasWeight, const float NewWeight, const float NewPriceRatio)
+		: ItemBasePrice(NewBasePrice)
+		, ItemDurability(NewDurability)
+		, bHasWeight(HasWeight)
+		, ItemWeight(NewWeight)
+		, PriceDurabilityRatio(NewPriceRatio)
+	{};
+
 	FInventoryItemAdditionalData(const FInventoryItemAdditionalData& Other)
 	: ItemBasePrice(Other.ItemBasePrice)
 	, ItemDurability(Other.ItemDurability)
@@ -216,10 +231,31 @@ public:
 	{
 		ItemBasePrice = Other.ItemBasePrice;
 		ItemDurability = Other.ItemDurability;
+		bHasWeight = Other.bHasWeight;
 		ItemWeight = Other.ItemWeight;
 		PriceDurabilityRatio = Other.PriceDurabilityRatio;
 
 		return *this;
+	}
+
+	inline bool operator==(FInventoryItemAdditionalData& Other) const
+	{
+		return
+		ItemBasePrice == Other.ItemBasePrice &&
+		ItemDurability == Other.ItemDurability &&
+		bHasWeight == Other.bHasWeight &&
+		ItemWeight == Other.bHasWeight &&
+		PriceDurabilityRatio == Other.PriceDurabilityRatio;
+	}
+
+	inline bool operator==(const FInventoryItemAdditionalData& Other) const
+	{
+		return
+		ItemBasePrice == Other.ItemBasePrice &&
+		ItemDurability == Other.ItemDurability &&
+		bHasWeight == Other.bHasWeight &&
+		ItemWeight == Other.bHasWeight &&
+		PriceDurabilityRatio == Other.PriceDurabilityRatio;
 	}
 };
 
@@ -250,6 +286,7 @@ struct FInventoryItemData : public FTableRowBase
 		, ItemTittle(Other.ItemTittle)
 		, ItemDescription(Other.ItemDescription)
 		, ItemQuantityData(Other.ItemQuantityData)
+		, ItemAdditionalData(Other.ItemAdditionalData)
 		, ItemMesh(Other.ItemMesh)
 		, SpawnItemClass(Other.SpawnItemClass)
 	{};
@@ -308,7 +345,8 @@ public:
 		ItemDescription.ToString() == Other.ItemDescription.ToString() &&
 		ItemThumbnail == Other.ItemThumbnail &&
 		ItemMesh == Other.ItemMesh &&
-		ItemQuantityData == Other.ItemQuantityData;
+		ItemQuantityData == Other.ItemQuantityData&&
+		ItemAdditionalData == Other.ItemAdditionalData;
 	}
 
 	inline bool operator==(FInventoryItemData& Other) const
@@ -320,7 +358,8 @@ public:
 		ItemDescription.ToString() == Other.ItemDescription.ToString() &&
 		ItemThumbnail == Other.ItemThumbnail &&
 		ItemMesh == Other.ItemMesh &&
-		ItemQuantityData == Other.ItemQuantityData;
+		ItemQuantityData == Other.ItemQuantityData &&
+		ItemAdditionalData == Other.ItemAdditionalData;
 	}
 
 	inline bool operator!=(const FInventoryItemData& Other) const
@@ -339,6 +378,7 @@ public:
 		ItemQuantityData = Other.ItemQuantityData;
 		ItemMesh = Other.ItemMesh;
 		SpawnItemClass = Other.SpawnItemClass;
+		ItemAdditionalData = Other.ItemAdditionalData;
 		
 		return *this;
 	}

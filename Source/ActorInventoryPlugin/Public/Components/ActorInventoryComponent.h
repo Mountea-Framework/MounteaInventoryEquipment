@@ -95,10 +95,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual TArray<UInventoryItem*> GetItemsByClass(const TSubclassOf<UInventoryItem>& Class) const override;
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual  UInventoryItem* GetItemByCategory(const FGuid& CategoryGuid) const override;
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual TArray<UInventoryItem*> GetItemsByCategory(const FGuid& CategoryGuid) const override;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual float GetInventoryWeight() const override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual void SetInventoryWeightLimit(const float& NewValue) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual bool UpdateInventoryWeight(const float& UpdateValue) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual float GetInventoryMaxWeight() const override;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
@@ -209,6 +226,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
 	FInventoryLayout InventoryLayout;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
+	float MaximumInventoryWeight = 50.f;
 	
 private:
 
