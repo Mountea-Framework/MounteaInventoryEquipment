@@ -46,15 +46,15 @@ struct FItemQuantityData
 public:
 
 	// How many instances are in Inventory
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
 	int32 Quantity = 1;
 
 	// How many Items of this one are allowed in Inventory
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
 	int32 MaxQuantity = 99;
 
 	// Defines whether stacking multiple Item instances of this Item is allowed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
 	uint8 bIsStackable : 1;
 
 public:
@@ -84,13 +84,13 @@ struct FInventoryRarityData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	FText RarityName = LOCTEXT("InventoryRarity", "Common");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true, MultiLine))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true, MultiLine))
 	FText RarityDescription = LOCTEXT("InventoryRarityDescription", "Most common items in the world.");
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	FLinearColor RarityColor = FLinearColor::Gray;
 };
 
@@ -129,32 +129,32 @@ struct FInventoryCategoryData
 	}
 
 	// Defines whether Category is displayable in List of Categories, for Instance Money is usually not displayed 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	uint8 bShowInCategories : 1;
 	
 	// Name of this Category, useful for UI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	FText CategoryName = LOCTEXT("InventoryCategory", "Default");
 
 	// Description text of this Category, useful for UI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true, MultiLine))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true, MultiLine))
 	FText CategoryDescription = LOCTEXT("InventoryCategoryDescription", "Description Text.");
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	int32 MaxQuantityPerStack = 99;
 	
 	// Icon of this Category, useful for UI
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	UTexture2D* CategoryTexture = nullptr;
 
 	// Parent Category of this one, useful for Inventory sorting, however, optional
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	UInventoryCategory* ParentCategory = nullptr;
 
 protected:
 
 	// If true, works as placeholder for all categories
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory")
 	uint8 bIsAllCategories : 1;
 
 public:
@@ -206,23 +206,23 @@ struct FInventoryItemAdditionalData : public FTableRowBase
 public:
 
 	// Price of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin=0, ClampMin=0))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin=0, ClampMin=0))
 	float ItemBasePrice = 10.f;
 
 	// Durability of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0, ClampMin = 0, UIMax=1, ClampMax=1))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0, ClampMin = 0, UIMax=1, ClampMax=1))
 	float ItemDurability = 1.f;
 
 	// Defines whether the Item has weight or not 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true))
 	uint8 bHasWeight : 1;
 
 	// Weight of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0, ClampMin = 0, Units="Kilograms", EditCondition ="bHasWeight==true"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0, ClampMin = 0, Units="Kilograms", EditCondition ="bHasWeight==true"))
 	float ItemWeight = 1.5f;
 
 	// How much does Durability affects the Price
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0.1, ClampMin = 0.1))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin = 0.1, ClampMin = 0.1))
 	float PriceDurabilityRatio = 1.f;
 
 public:
@@ -293,45 +293,45 @@ struct FInventoryItemData : public FTableRowBase
 
 private:
 
-	UPROPERTY(VisibleAnywhere, Category="Item Data|GUID")
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="Item Data|GUID")
 	FGuid ItemDataGUID = FGuid::NewGuid();
 
 public:
 	
 	// Category of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
 	UInventoryCategory* ItemCategory = nullptr;
 
 	// Rarity of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
 	UInventoryItemRarity* ItemRarity = nullptr;
 
 	// Item thumbnail texture, can be null
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
 	UTexture2D* ItemThumbnail = nullptr;
 
 	// Tittle/Name of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
 	FText ItemTittle = LOCTEXT("ItemTittle", "Default Object");
 
 	// Description of Item
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, MultiLine=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, MultiLine=true))
 	FText ItemDescription = LOCTEXT("ItemDescription", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 	
 	// Item Quantity
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, ShowOnlyInnerProperties))
 	FItemQuantityData ItemQuantityData;
 
 	// Item Quantity
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data", meta = (ExposeOnSpawn = true, ShowOnlyInnerProperties))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Data", meta = (ExposeOnSpawn = true, ShowOnlyInnerProperties))
 	FInventoryItemAdditionalData ItemAdditionalData;
 
 	// Item Mesh. Static and Skeletal Mesh allowed. For preview only.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, AllowedClasses="StaticMesh, SkeletalMesh"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, AllowedClasses="StaticMesh, SkeletalMesh"))
 	UStreamableRenderAsset* ItemMesh = nullptr;
 
 	// Actor to spawn from this Item.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<AActor> SpawnItemClass;;
 
 public:
@@ -421,19 +421,19 @@ struct FInventoryNotificationInfo
 	GENERATED_BODY()
 
 	// Icon Texture to be displayed.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	UTexture2D* NotificationTexture = nullptr;
 
 	// Notification text to be displayed.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	FText NotificationText = LOCTEXT("NotificationInfo", "Item has been added successfully to Inventory");
 
 	// Duration for how long the notification will be visible.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	float ShowDuration = 3.f;
 
 	// Notification icon Tint.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
 	FLinearColor IconTint = FLinearColor::White;
 };
 
@@ -453,16 +453,16 @@ struct FInventorySlotData
 	FInventorySlotData() : Quantity(0), bCreatedManually(false)
 	{};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	class UInventoryItem* Item = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	int32 Quantity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	uint8 bCreatedManually : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn=true))
 	FIntPoint SlotCoordinates = FIntPoint(0,0);
 	
 };
@@ -477,10 +477,10 @@ struct FInventoryLayout
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	FIntPoint InventoryLayout = FIntPoint(10,6);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	TMap<FIntPoint, FInventorySlotData> SavedInventoryLayout;
 };
 #pragma endregion 
@@ -513,13 +513,13 @@ struct FInventoryKeyActionData
 		ActionKeyTexture(Other.ActionKeyTexture)
 	{};
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
 	FText PlatformName = LOCTEXT("ActionKey", "Default");;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
 	FKey ActionKey;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
 	UTexture* ActionKeyTexture = nullptr;
 
 public:

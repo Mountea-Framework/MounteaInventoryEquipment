@@ -221,13 +221,13 @@ protected:
 	/**
 	 * List of Items that are currently in Inventory.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory")
 	TArray<UInventoryItem*> InventoryItems;
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
 	FInventoryLayout InventoryLayout;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	float MaximumInventoryWeight = 50.f;
 	
 private:
