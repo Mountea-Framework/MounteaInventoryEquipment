@@ -59,13 +59,13 @@ protected:
 
 protected:
 
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, Category="Inventory", meta=(NoResetToDefault))
 	EInventoryItemSetup SetupMode = EInventoryItemSetup::EIIS_FromItem;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromItem", EditConditionHides, NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryItem> SourceItemClass;
 
-	UPROPERTY(EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromDataTable", EditConditionHides, NoResetToDefault, ShowOnlyInnerProperties))
+	UPROPERTY(SaveGame, EditAnywhere, Category="Inventory", meta=(EditCondition="SetupMode==EInventoryItemSetup::EIIS_FromDataTable", EditConditionHides, NoResetToDefault, ShowOnlyInnerProperties))
 	FDataTableRowHandle SourceItemRow;
 
 	UPROPERTY(BlueprintReadOnly, Category="Inventory")

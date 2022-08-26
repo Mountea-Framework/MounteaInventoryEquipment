@@ -29,6 +29,13 @@ void UActorInventoryComponent::BeginPlay()
 
 	// Bind Virtual function and call BP Event
 	OnItemActionRequested.AddUniqueDynamic(this, &UActorInventoryComponent::ExecuteItemKeyAction);
+
+	OnInventoryOpenRequested.AddUniqueDynamic(this, &UActorInventoryComponent::UpdateInventory);
+}
+
+void UActorInventoryComponent::UpdateInventory()
+{
+	OnInventoryUpdated.Broadcast();
 }
 
 void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInventoryLayout)
@@ -501,6 +508,12 @@ bool UActorInventoryComponent::IsItemInInventory(UInventoryItem* Item) const
 	return false;
 }
 
+void UActorInventoryComponent::CloseInventory()
+{
+	SetInventoryWidgetPtr(nullptr);
+	SetOtherInventory(nullptr);
+}
+
 void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTable)
 {
 	if (SourceTable && SourceTable->RowStruct)
@@ -586,6 +599,11 @@ FOnInventoryLayoutSaveRequested& UActorInventoryComponent::GetInventoryLayoutUpd
 FOnItemActionRequested& UActorInventoryComponent::GetItemActionRequestedHandle()
 {
 	return OnItemActionRequested;
+}
+
+FOnInventoryOpenRequested& UActorInventoryComponent::GetInventoryOpenRequestedHandle()
+{
+	return OnInventoryOpenRequested;
 }
 
 void UActorInventoryComponent::SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget)

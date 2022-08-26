@@ -372,51 +372,51 @@ protected:
 	/**
 	 * If allowed, Inventory is limited by Weight
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
 	uint8 bAllowWeightLimit : 1;
 
 	/**
 	 * Maximum Weight Limit allowed by Inventory.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings", meta=(EditCondition="bAllowWeightLimit"))
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings", meta=(EditCondition="bAllowWeightLimit"))
 	float WeightLimit = 50.f;
 	
 	/**
 	 * If allowed, Item Slots are allowed to be Grabbed and Dropped.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
 	uint8 bAllowDragDrop : 1;
 
 	/**
 	 * If allowed, Item Pack can be split into multiple Packs.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
 	uint8 bAllowPackSplit : 1;
 
 	/**
 	 * If Allowed, a new "empty" category shall be created in UI.
 	 * If that category is selected, Category filter is reset and all Items will be displayed.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Settings")
 	uint8 bAllowGeneralCategory : 1;
 
 	/**
 	 * If Category is added to Allowed Categories, should we allow its parent Categories as well?
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Categories")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Categories")
 	uint8 bAutoAllowParentCategories : 1;
 
 	/**
 	 * Defines how deep the search for Parent category iterates. Higher the value, higher the performance impact and more precise result.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Categories", meta=(EditCondition="bAutoAllowParentCategories", UIMin=1, ClampMin=1))
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|Categories", meta=(EditCondition="bAutoAllowParentCategories", UIMin=1, ClampMin=1))
 	int32 MaxRecursionDepth =  6;
 
 	/**
 	 * Default Category which will be set when opening Inventory.
 	 * If left empty, first from Allowed Categories will be used instead.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	UInventoryCategory* DefaultCategory = nullptr;
 	
 	/**
@@ -425,7 +425,7 @@ protected:
 	 * Only valid Categories will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSet<UInventoryCategory*> AllowedCategories;
 
 	/**
@@ -434,41 +434,41 @@ protected:
 	 * Only valid Rarities will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|Rarities", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Rarities", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSet<UInventoryItemRarity*> AllowedRarities;
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
 	TMap<EInventoryContext, FInventoryNotificationInfo> NotificationInfo;
 	
 #pragma endregion
 
 #pragma region Subclasses
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|General", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|General", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryWidget> InventoryCategoryClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryTooltip> InventoryCategoryTooltipClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlot> InventorySlotClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlotTooltip> InventorySlotTooltipClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlotDrag> InventorySlotDragClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlotUse> InventorySlotUseClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
 	TSubclassOf<UInventoryNotification> NotificationClass;
 
 #pragma endregion 

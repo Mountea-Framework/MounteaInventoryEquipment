@@ -76,6 +76,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual bool IsItemInInventory(UInventoryItem* Item) const override;
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void CloseInventory() override;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual UInventoryItem* GetItemByData(const FInventoryItemData& ItemData) const override;
@@ -121,6 +124,7 @@ public:
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() override;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() override;
+	virtual FOnInventoryOpenRequested& GetInventoryOpenRequestedHandle() override;
 
 #pragma region InventoryWidget
 
@@ -192,6 +196,9 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnItemActionRequested OnItemActionRequested;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnInventoryOpenRequested OnInventoryOpenRequested;
+
 #pragma endregion Events
 
 #pragma endregion InventoryInterface
@@ -221,13 +228,13 @@ protected:
 	/**
 	 * List of Items that are currently in Inventory.
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory")
 	TArray<UInventoryItem*> InventoryItems;
 
-	UPROPERTY(EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
 	FInventoryLayout InventoryLayout;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	float MaximumInventoryWeight = 50.f;
 	
 private:
@@ -238,4 +245,9 @@ private:
 
 	UPROPERTY()
 	class UActorInventoryManagerComponent* InventoryManager = nullptr;
+
+private:
+
+	UFUNCTION()
+	void UpdateInventory();
 };
