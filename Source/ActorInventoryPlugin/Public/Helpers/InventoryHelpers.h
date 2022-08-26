@@ -50,7 +50,7 @@ public:
 	int32 Quantity = 1;
 
 	// How many Items of this one are allowed in Inventory
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, UIMin=1, ClampMin=1, NoResetToDefault=true))
 	int32 MaxQuantity = 99;
 
 	// Defines whether stacking multiple Item instances of this Item is allowed
@@ -206,7 +206,7 @@ struct FInventoryItemAdditionalData : public FTableRowBase
 public:
 
 	// Price of Item
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin=0, ClampMin=0))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category = "Item Additional Data", meta = (ExposeOnSpawn = true, UIMin=0, ClampMin=0, NoResetToDefault=true))
 	float ItemBasePrice = 10.f;
 
 	// Durability of Item
@@ -299,23 +299,23 @@ private:
 public:
 	
 	// Category of Item
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, NoResetToDefault=true))
 	UInventoryCategory* ItemCategory = nullptr;
 
 	// Rarity of Item
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, NoResetToDefault=true))
 	UInventoryItemRarity* ItemRarity = nullptr;
 
 	// Item thumbnail texture, can be null
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	UTexture2D* ItemThumbnail = nullptr;
 
 	// Tittle/Name of Item
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	FText ItemTittle = LOCTEXT("ItemTittle", "Default Object");
 
 	// Description of Item
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, MultiLine=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, MultiLine=true, NoResetToDefault=true))
 	FText ItemDescription = LOCTEXT("ItemDescription", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 	
 	// Item Quantity
@@ -327,11 +327,11 @@ public:
 	FInventoryItemAdditionalData ItemAdditionalData;
 
 	// Item Mesh. Static and Skeletal Mesh allowed. For preview only.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, AllowedClasses="StaticMesh, SkeletalMesh"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, AllowedClasses="StaticMesh, SkeletalMesh", NoResetToDefault=true))
 	UStreamableRenderAsset* ItemMesh = nullptr;
 
 	// Actor to spawn from this Item.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false, NoResetToDefault=true))
 	TSubclassOf<AActor> SpawnItemClass;;
 
 public:
@@ -421,19 +421,19 @@ struct FInventoryNotificationInfo
 	GENERATED_BODY()
 
 	// Icon Texture to be displayed.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	UTexture2D* NotificationTexture = nullptr;
 
 	// Notification text to be displayed.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	FText NotificationText = LOCTEXT("NotificationInfo", "Item has been added successfully to Inventory");
 
 	// Duration for how long the notification will be visible.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	float ShowDuration = 3.f;
 
 	// Notification icon Tint.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	FLinearColor IconTint = FLinearColor::White;
 };
 
@@ -480,7 +480,7 @@ struct FInventoryLayout
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
 	FIntPoint InventoryLayout = FIntPoint(10,6);
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	TMap<FIntPoint, FInventorySlotData> SavedInventoryLayout;
 };
 #pragma endregion 
@@ -513,13 +513,13 @@ struct FInventoryKeyActionData
 		ActionKeyTexture(Other.ActionKeyTexture)
 	{};
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	FText PlatformName = LOCTEXT("ActionKey", "Default");;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	FKey ActionKey;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=True))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn=true, NoResetToDefault=true))
 	UTexture* ActionKeyTexture = nullptr;
 
 public:
