@@ -121,6 +121,7 @@ public:
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() override;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() override;
+	virtual FOnInventoryOpenRequested& GetInventoryOpenRequestedHandle() override;
 
 #pragma region InventoryWidget
 
@@ -192,6 +193,9 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
 	FOnItemActionRequested OnItemActionRequested;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Inventory")
+	FOnInventoryOpenRequested OnInventoryOpenRequested;
+
 #pragma endregion Events
 
 #pragma endregion InventoryInterface
@@ -238,4 +242,9 @@ private:
 
 	UPROPERTY()
 	class UActorInventoryManagerComponent* InventoryManager = nullptr;
+
+private:
+
+	UFUNCTION()
+	void UpdateInventory();
 };

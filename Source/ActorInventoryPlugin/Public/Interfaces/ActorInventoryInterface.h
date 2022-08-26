@@ -20,6 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryLayoutSaveRequested, con
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyPressed, const FKey&, PressedKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnKeyReleased, const FKey&, ReleasedKey);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemActionRequested, UInventoryItemSlot*, InventoryItem, const FGuid&, ActionGuid);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryOpenRequested);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -99,5 +100,5 @@ public:
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() = 0;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() = 0;
-
+	virtual FOnInventoryOpenRequested& GetInventoryOpenRequestedHandle() = 0;
 };
