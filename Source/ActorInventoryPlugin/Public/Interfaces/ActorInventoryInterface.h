@@ -101,4 +101,6 @@ public:
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() = 0;
 	virtual FOnItemActionRequested& GetItemActionRequestedHandle() = 0;
 	virtual FOnInventoryOpenRequested& GetInventoryOpenRequestedHandle() = 0;
+
+	virtual void CloseInventory() = 0;
 };

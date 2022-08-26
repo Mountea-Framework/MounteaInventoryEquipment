@@ -508,6 +508,12 @@ bool UActorInventoryComponent::IsItemInInventory(UInventoryItem* Item) const
 	return false;
 }
 
+void UActorInventoryComponent::CloseInventory()
+{
+	SetInventoryWidgetPtr(nullptr);
+	SetOtherInventory(nullptr);
+}
+
 void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTable)
 {
 	if (SourceTable && SourceTable->RowStruct)

@@ -76,6 +76,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual bool IsItemInInventory(UInventoryItem* Item) const override;
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual void CloseInventory() override;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual UInventoryItem* GetItemByData(const FInventoryItemData& ItemData) const override;
