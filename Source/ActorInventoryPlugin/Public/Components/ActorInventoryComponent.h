@@ -79,6 +79,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void CloseInventory() override;
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UInventoryTypeDefinition* GetInventoryType() const override;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual UInventoryItem* GetItemByData(const FInventoryItemData& ItemData) const override;
@@ -221,6 +224,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Inventory")
+	UInventoryTypeDefinition* InventoryType = nullptr;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryNotificationContainer* InventoryNotificationContainer = nullptr;

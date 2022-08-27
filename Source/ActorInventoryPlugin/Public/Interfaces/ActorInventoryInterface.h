@@ -33,6 +33,7 @@ class UActorInventoryInterface : public UInterface
 class UInventoryItem;
 class UInventoryWidget;
 class UInventoryItemSlot;
+class UInventoryTypeDefinition;
 
 /**
  * Actor Inventory Interface.
@@ -84,6 +85,7 @@ public:
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) = 0;
 	virtual void SaveToInventoryLayout(const FInventorySlotData& Slot) = 0;
 
+	virtual UInventoryTypeDefinition* GetInventoryType() const = 0;
 	
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) = 0;
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;

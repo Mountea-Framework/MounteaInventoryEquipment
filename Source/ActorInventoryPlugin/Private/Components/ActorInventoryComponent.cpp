@@ -514,6 +514,11 @@ void UActorInventoryComponent::CloseInventory()
 	SetOtherInventory(nullptr);
 }
 
+UInventoryTypeDefinition* UActorInventoryComponent::GetInventoryType() const
+{
+	return InventoryType;
+}
+
 void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTable)
 {
 	if (SourceTable && SourceTable->RowStruct)
