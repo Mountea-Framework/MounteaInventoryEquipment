@@ -363,6 +363,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Validation")
 	bool IsValidCategory(const FGuid& CategoryGUID) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Settings")
+	FORCEINLINE FInventoryLayout GetInventoryLayout() const {return DefaultLayout; };
+
 #pragma endregion 
 
 protected:
@@ -439,6 +442,9 @@ protected:
 
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
 	TMap<EInventoryContext, FInventoryNotificationInfo> NotificationInfo;
+
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
+	FInventoryLayout DefaultLayout;
 	
 #pragma endregion
 

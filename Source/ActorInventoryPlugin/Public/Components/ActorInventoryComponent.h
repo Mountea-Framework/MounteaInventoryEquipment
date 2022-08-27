@@ -210,22 +210,19 @@ public:
 	void SetInventoryLayout(const FInventoryLayout& InInventoryLayout);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
-	FORCEINLINE FInventoryLayout GetInventoryLayout() const
-	{
-		return InventoryLayout;
-	}
-	
+	FORCEINLINE FInventoryLayout GetInventoryLayout() const;
+
 protected:
 
 	virtual void BeginPlay() override;
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
+	UInventoryTypeDefinition* InventoryType = nullptr;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Inventory")
-	UInventoryTypeDefinition* InventoryType = nullptr;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryNotificationContainer* InventoryNotificationContainer = nullptr;
@@ -236,7 +233,12 @@ protected:
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory")
 	TArray<UInventoryItem*> InventoryItems;
 
-	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
+	// Overrides default layout set in Inventory Manager
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|UI")
+	uint8 bOverrideDefaultLayout : 1;
+
+	// Custom Inventory Layout
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true, EditCondition="bOverrideDefaultLayout"))
 	FInventoryLayout InventoryLayout;
 
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")

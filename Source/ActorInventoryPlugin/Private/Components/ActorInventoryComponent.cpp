@@ -43,6 +43,29 @@ void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInve
 	InventoryLayout = InInventoryLayout;
 }
 
+FInventoryLayout UActorInventoryComponent::GetInventoryLayout() const
+{
+	if (InventoryManager)
+	{
+		if (bOverrideDefaultLayout)
+		{
+			return InventoryLayout;
+		}
+		else
+		{
+			FInventoryLayout ReturnLayout;
+			ReturnLayout.InventoryLayout =  InventoryManager->GetInventoryLayout().InventoryLayout;
+			ReturnLayout.SavedInventoryLayout = InventoryLayout.SavedInventoryLayout;
+
+			return ReturnLayout;
+		}
+	}
+	else
+	{
+		return FInventoryLayout();
+	}
+}
+
 void UActorInventoryComponent::SaveToInventoryLayoutBP_Implementation(const FInventorySlotData& Slot)
 {
 	SaveToInventoryLayout(Slot);
