@@ -28,11 +28,13 @@ private:
 	TSharedPtr<FSlateStyleSet> InventoryKeyActionsSet;
 	TSharedPtr<FSlateStyleSet> InventoryItemSet;
 	TSharedPtr<FSlateStyleSet> InventoryItemComponentSet;
+	TSharedPtr<FSlateStyleSet> InventoryTypeDefinitionSet;
 	
 	TSharedPtr<class FInventoryCategoryAssetActions> InventoryCategoryAssetActions;
 	TSharedPtr<class FInventoryRarityAssetActions> InventoryRarityAssetsActions;
 	TSharedPtr<class FInventoryKeyActionAssetActions> InventoryKeyActionAssetActions;
 	
 	TSharedPtr<class FInventoryItemAssetActions> InventoryItemAssetActions;
-	
+
+	TSharedPtr<class FInventoryTypeDefinitionAssetActions> InventoryTypeDefinitionAssetActions;
 };

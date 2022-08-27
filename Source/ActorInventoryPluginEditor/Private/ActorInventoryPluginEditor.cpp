@@ -9,6 +9,7 @@
 #include "AssetActions/InventoryItemAssetActions.h"
 #include "AssetActions/InventoryKeyActionAssetActions.h"
 #include "AssetActions/InventoryRarityAssetActions.h"
+#include "AssetActions/InventoryTypeDefinitionAssetActions.h"
 
 #include "Kismet2/KismetEditorUtilities.h"
 
@@ -52,6 +53,12 @@ void FActorInventoryPluginEditor::StartupModule()
 			InventoryKeyActionAssetActions = MakeShared<FInventoryKeyActionAssetActions>();
 			FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(InventoryKeyActionAssetActions.ToSharedRef());
 		}
+
+		// Register Inventory Type Definition Data Asset
+		{
+			InventoryTypeDefinitionAssetActions = MakeShared<FInventoryTypeDefinitionAssetActions>();
+			FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(InventoryTypeDefinitionAssetActions.ToSharedRef());
+		}
 	}
 	
 	// Components Thumbnails and Icons 
@@ -63,6 +70,7 @@ void FActorInventoryPluginEditor::StartupModule()
 		InventoryKeyActionsSet = MakeShareable(new FSlateStyleSet("Inventory Key Actions Style"));
 		InventoryItemSet = MakeShareable(new FSlateStyleSet("Inventory Item Style"));
 		InventoryItemComponentSet = MakeShareable(new FSlateStyleSet("Inventory Item Component Style"));
+		InventoryTypeDefinitionSet = MakeShareable(new FSlateStyleSet("Inventory Type Definition Style"));
     
         const TSharedPtr<IPlugin> PluginPtr = IPluginManager::Get().FindPlugin("ActorInventoryPlugin");
     
@@ -181,6 +189,22 @@ void FActorInventoryPluginEditor::StartupModule()
         			FSlateStyleRegistry::RegisterSlateStyle(*InventoryItemComponentSet.Get());
         		}
         	}
+
+        	// Inventory Type Definition
+        	{
+        		InventoryTypeDefinitionSet->SetContentRoot(ContentDir);
+        		
+        		FSlateImageBrush* InventoryTypeDefinitionClassThumb = new FSlateImageBrush(InventoryTypeDefinitionSet->RootToContentDir(TEXT("Resources/InventoryType_128"), TEXT(".png")), FVector2D(128.f, 128.f));
+        		FSlateImageBrush* InventoryTypeDefinitionClassIcon = new FSlateImageBrush(InventoryTypeDefinitionSet->RootToContentDir(TEXT("Resources/InventoryType_16"), TEXT(".png")), FVector2D(16.f, 16.f));
+        		if (InventoryTypeDefinitionClassThumb && InventoryTypeDefinitionClassIcon)
+        		{
+        			InventoryTypeDefinitionSet->Set("ClassThumbnail.InventoryTypeDefinition", InventoryTypeDefinitionClassThumb);
+        			InventoryTypeDefinitionSet->Set("ClassIcon.InventoryTypeDefinition", InventoryTypeDefinitionClassIcon);
+     
+        			//Register the created style
+        			FSlateStyleRegistry::RegisterSlateStyle(*InventoryTypeDefinitionSet.Get());
+        		}
+        	}
         }
     }
 
@@ -208,6 +232,7 @@ void FActorInventoryPluginEditor::ShutdownModule()
 			FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(InventoryCategoryAssetActions.ToSharedRef());
 			FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(InventoryRarityAssetsActions.ToSharedRef());
 			FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(InventoryKeyActionAssetActions.ToSharedRef());
+			FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(InventoryTypeDefinitionAssetActions.ToSharedRef());
 		}
 	}
 
@@ -220,6 +245,7 @@ void FActorInventoryPluginEditor::ShutdownModule()
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryKeyActionsSet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemSet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemComponentSet->GetStyleSetName());
+		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryTypeDefinitionSet->GetStyleSetName());
 	}
 }
 
