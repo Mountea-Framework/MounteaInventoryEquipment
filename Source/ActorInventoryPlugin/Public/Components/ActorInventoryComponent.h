@@ -218,7 +218,7 @@ protected:
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
 	UInventoryTypeDefinition* InventoryType = nullptr;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
@@ -257,4 +257,7 @@ private:
 
 	UFUNCTION()
 	void UpdateInventory();
+
+	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };

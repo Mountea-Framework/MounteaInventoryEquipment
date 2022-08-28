@@ -2,6 +2,10 @@
 
 #include "Components/ActorInventoryComponent.h"
 
+#if WITH_EDITOR
+#include "EditorHelper.h"
+#endif
+
 #include "Definitions/InventoryCategory.h"
 #include "Definitions/InventoryItem.h"
 #include "Definitions/InventoryKeyAction.h"
@@ -24,7 +28,18 @@ void UActorInventoryComponent::BeginPlay()
 	{
 		AInvP_LOG(Error, TEXT("[UActorInventoryComponent] Cannot find Inventory Manager! Attach Inventory Manager Component to GameState class!"))
 
-		Deactivate();
+		UnregisterComponent();
+		MarkPendingKill();
+		return;
+	}
+	
+	if (InventoryType == nullptr)
+	{
+		AInvP_LOG(Error, TEXT("[UActorInventoryComponent] Inventory Type is not Valid!"))
+
+		UnregisterComponent();
+		MarkPendingKill();
+		return;
 	}
 
 	// Bind Virtual function and call BP Event
@@ -649,4 +664,36 @@ void UActorInventoryComponent::SetNotificationContainerPtr(UInventoryNotificatio
 	InventoryNotificationContainer = Widget;
 }
 
+#if WITH_EDITOR
 
+void UActorInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName PropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.GetPropertyName() : NAME_None;
+	
+	if (PropertyName == TEXT("InventoryType"))
+	{
+		if (InventoryType == nullptr)
+		{
+			const FString ErrorMessage = FString::Printf(TEXT("INVENTORY TYPE IS NOT VALID!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+
+		}
+	}
+}
+
+
+EDataValidationResult UActorInventoryComponent::IsDataValid(TArray<FText>& ValidationErrors)
+{
+	if (InventoryType == nullptr)
+	{
+		const FText ErrorMessage = FText::FromString(TEXT("[ActorInventoryComponent] Validation failed: Inventory Type is empty!"));
+		ValidationErrors.Add(ErrorMessage);
+		
+		return EDataValidationResult::Invalid;
+	}
+	return Super::IsDataValid(ValidationErrors);
+}
+
+#endif
