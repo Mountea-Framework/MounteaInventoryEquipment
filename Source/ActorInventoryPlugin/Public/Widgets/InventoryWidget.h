@@ -3,13 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/InventoryHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryWidget.generated.h"
 
-struct FInventorySlotData;
-
 class UInventoryItem;
-class UActorInventoryInterface;
 class IActorInventoryInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryWidgetUpdated);
@@ -45,7 +43,7 @@ public:
 	 * @param InventorySlot Slot to be Saved.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Inventory")
-	void SaveInventorySlot(const FInventorySlotData& InventorySlot);
+	void SaveInventorySlot(const struct FInventorySlotData& InventorySlot);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetSelectedCategory(const FGuid& CategoryGUID);
