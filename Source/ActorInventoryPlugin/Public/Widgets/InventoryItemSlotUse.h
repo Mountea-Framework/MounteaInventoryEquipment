@@ -8,19 +8,24 @@
 
 class UInventoryItemSlot;
 class UInventoryWidget;
+class UInventoryTypeDefinition;
 
 UENUM(BlueprintType)
 enum class EUseType : uint8
 {
-	EST_Use				UMETA(DispplayName="Use Item"),
-	EST_Drop			UMETA(DispplayName="Drop Item"),
-	EST_MERGE_SameInv	UMETA(DisplayName="MERGE - Same Inventory"),
-	EST_SPLIT_SameInv	UMETA(DisplayName="SPLIT - Same Inventory"),
-	EST_Merge_DiffInv	UMETA(DisplayName="MERGE - Different Inventories"),
-	EST_SPLIT_DiffInv	UMETA(DisplayName="SPLIT - Different Inventories"),
+	EST_Use				UMETA(DispplayName="Use Item", Tooltip="Using an Item"),
+	EST_Drop			UMETA(DispplayName="Drop Item", Tooltip="Drop an Item"),
+	EST_MERGE_SameInv	UMETA(DisplayName="Merge", Tooltip="Merge in Same Inventory"),
+	EST_SPLIT_SameInv	UMETA(DisplayName="Split", Tooltip="Split in Same Inventory"),
+	EST_Merge_DiffInv	UMETA(DisplayName="Merge", Tooltip="Merge from Different Inventory"),
+	EST_SPLIT_DiffInv	UMETA(DisplayName="Split", Tooltip="Split into Different Inventory"),
+	EST_BuySell			UMETA(DisplayName="Buy or Sell"),
+	EST_Loot			UMETA(DisplayName="Loot"),
 
 	Default				UMETA(Hidden)
 };
+
+#define LOCTEXT_NAMESPACE "Inventory Use"
 
 /**
  * 
@@ -33,7 +38,7 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlotUse : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, const EUseType& NewUseType);
+	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, UInventoryTypeDefinition* NewUseType);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget);
@@ -45,6 +50,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE bool IsValid() const
 	{
+		/*
 		switch (UseType)
 		{
 			case EUseType::EST_Use:
@@ -59,15 +65,20 @@ public:
 			default:
 				return false;
 		}
+		*/
+		return true;
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetUseType(const EUseType& NewUseType);
+	void SetUseType(UInventoryTypeDefinition* NewUseType);
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	FString GetUseTypeText() const;
 	
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
-	EUseType UseType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
+	UInventoryTypeDefinition* InventoryUseType = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	TArray<FKey> CancelKeys;
@@ -84,3 +95,5 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
 	UInventoryItemSlot* TargetSlot = nullptr;
 };
+
+#undef LOCTEXT_NAMESPACE

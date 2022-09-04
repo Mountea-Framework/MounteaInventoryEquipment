@@ -44,7 +44,6 @@ void UActorInventoryComponent::BeginPlay()
 
 	// Bind Virtual function and call BP Event
 	OnItemActionRequested.AddUniqueDynamic(this, &UActorInventoryComponent::ExecuteItemKeyAction);
-
 	OnInventoryOpenRequested.AddUniqueDynamic(this, &UActorInventoryComponent::UpdateInventory);
 }
 

@@ -21,11 +21,11 @@
  * @return FString of the Value (ECC_Visibility in our example, or invalid of name not specified nor UENUM does not exist)
  */
 template<typename TEnum>
-static FORCEINLINE FString GetEnumValueAsString(const FString& Name, TEnum Value)
+static FString GetEnumValueAsString(const FString& Name, TEnum Value)
 {
 	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, *Name, true);
 	if (!enumPtr) return FString("invalid");
-	return enumPtr->GetNameByValue((int64)Value).ToString();
+	return enumPtr->GetDisplayNameTextByValue((int64)Value).ToString();
 }
 
 #pragma endregion TEMPLATES

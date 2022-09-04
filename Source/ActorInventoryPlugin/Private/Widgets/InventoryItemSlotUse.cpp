@@ -2,13 +2,14 @@
 
 
 #include "Widgets/InventoryItemSlotUse.h"
+#include "Definitions/InventoryTypeDefinition.h"
 
 
-void UInventoryItemSlotUse::Init_Implementation(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, const EUseType& NewUseType)
+void UInventoryItemSlotUse::Init_Implementation(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, UInventoryTypeDefinition* NewUseType)
 {
 	OriginSlot = NewOriginSlot;
 	TargetSlot = NewTargetSlot;
-	UseType = NewUseType;
+	InventoryUseType = NewUseType;
 }
 
 void UInventoryItemSlotUse::SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget)
@@ -16,7 +17,17 @@ void UInventoryItemSlotUse::SetOwningInventoryWidget(UInventoryWidget* NewOwning
 	OwningWidget = NewOwningWidget;
 }
 
-void UInventoryItemSlotUse::SetUseType(const EUseType& NewUseType)
+void UInventoryItemSlotUse::SetUseType(UInventoryTypeDefinition* NewUseType)
 {
-	UseType = NewUseType;
+	InventoryUseType = NewUseType;
+}
+
+FString UInventoryItemSlotUse::GetUseTypeText() const
+{
+	if (InventoryUseType)
+	{
+		return InventoryUseType->GetInventoryTypeName().ToString();
+	}
+
+	return NSLOCTEXT("Inventory Use", "Null", "Invalid").ToString();
 }
