@@ -2,10 +2,10 @@
 
 
 #include "Widgets/InventoryItemSlotUse.h"
-#include "Definitions/InventoryTypeDefinition.h"
+#include "Helpers/InventoryHelpers.h"
 
 
-void UInventoryItemSlotUse::Init_Implementation(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, UInventoryTypeDefinition* NewUseType)
+void UInventoryItemSlotUse::Init_Implementation(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, const EUseType NewUseType)
 {
 	OriginSlot = NewOriginSlot;
 	TargetSlot = NewTargetSlot;
@@ -17,17 +17,30 @@ void UInventoryItemSlotUse::SetOwningInventoryWidget(UInventoryWidget* NewOwning
 	OwningWidget = NewOwningWidget;
 }
 
-void UInventoryItemSlotUse::SetUseType(UInventoryTypeDefinition* NewUseType)
+bool UInventoryItemSlotUse::IsValid_Implementation() const
+{
+	switch (InventoryUseType)
+	{
+	case EUseType::EST_Use:
+	case EUseType::EST_Drop:
+	case EUseType::EST_Loot:
+		return OriginSlot != nullptr;
+	case EUseType::EST_Merge:
+	case EUseType::EST_Split:
+	case EUseType::EST_Trade:
+		return OriginSlot != nullptr && TargetSlot != nullptr;
+	case EUseType::Default:
+	default:
+		return false;
+	} 
+}
+
+void UInventoryItemSlotUse::SetUseType(const EUseType NewUseType)
 {
 	InventoryUseType = NewUseType;
 }
 
 FString UInventoryItemSlotUse::GetUseTypeText() const
 {
-	if (InventoryUseType)
-	{
-		return InventoryUseType->GetInventoryTypeName().ToString();
-	}
-
-	return NSLOCTEXT("Inventory Use", "Null", "Invalid").ToString();
+	return GetEnumValueAsString(FString("EUseType"), InventoryUseType);
 }
