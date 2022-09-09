@@ -10,19 +10,7 @@ class UInventoryItemSlot;
 class UInventoryWidget;
 class UInventoryTypeDefinition;
 
-UENUM(BlueprintType)
-enum class EUseType : uint8
-{
-	EST_Use				UMETA(DispplayName="Use Item", Tooltip="Using an Item"),
-	EST_Drop			UMETA(DispplayName="Drop Item", Tooltip="Drop an Item"),
-	EST_Trade			UMETA(DisplayName="Trade",	Tooltip="Buy or Sell"),
-	EST_Loot			UMETA(DisplayName="Loot",	Tooltip = "Loot from other Inventory"),
-	
-	EST_Merge			UMETA(DisplayName="Merge",	Tooltip="Merge Item"),
-	EST_Split			UMETA(DisplayName="Split",	Tooltip="Split Item"),
-
-	Default				UMETA(Hidden)
-};
+enum class EUseType : uint8;
 
 #define LOCTEXT_NAMESPACE "Inventory Use"
 
@@ -39,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
 	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, EUseType NewUseType);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	void DetermineUseType();
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget);
 

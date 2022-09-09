@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Widgets/InventoryItemSlotUse.h"
+#include "Widgets/InventoryItemSlotUse.h"
 #include "InventoryTypeDefinition.generated.h"
 
 #define LOCTEXT_NAMESPACE "InventoryTypeDefinition"
@@ -34,7 +36,7 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory", meta=(NoResetToDefault=true))
 	FText InventoryTypeName = LOCTEXT("InventoryType", "Player Inventory");
-
+	
 	/**
 	 * Unique Guid
 	 */

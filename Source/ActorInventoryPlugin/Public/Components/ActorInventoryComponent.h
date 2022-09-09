@@ -123,6 +123,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual float GetInventoryMaxWeight() const override;
 	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual bool TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory, TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item) override;
+	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
 	virtual FOnInventoryLayoutSaveRequested& GetInventoryLayoutUpdateRequestHandle() override;

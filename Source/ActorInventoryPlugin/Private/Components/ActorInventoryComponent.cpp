@@ -623,6 +623,12 @@ float UActorInventoryComponent::GetInventoryMaxWeight() const
 	return MaximumInventoryWeight;
 }
 
+bool UActorInventoryComponent::TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory,
+	TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item)
+{
+	return true;
+}
+
 FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()
 {
 	return OnInventoryUpdated;

@@ -105,4 +105,6 @@ public:
 	virtual FOnInventoryOpenRequested& GetInventoryOpenRequestedHandle() = 0;
 
 	virtual void CloseInventory() = 0;
+
+	virtual bool TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory, TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item) = 0;
 };

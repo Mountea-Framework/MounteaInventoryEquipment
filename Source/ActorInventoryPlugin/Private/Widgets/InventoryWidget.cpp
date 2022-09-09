@@ -34,6 +34,12 @@ bool UInventoryWidget::Initialize()
 	return false;
 }
 
+void UInventoryWidget::InitializeInventoryWidget_Implementation(
+	TScriptInterface<IActorInventoryInterface>& SourceInventory)
+{
+	OwningInventory = SourceInventory;
+}
+
 void UInventoryWidget::SetSelectedCategory(const FGuid& CategoryGUID)
 {
 	SelectedCategory = CategoryGUID;

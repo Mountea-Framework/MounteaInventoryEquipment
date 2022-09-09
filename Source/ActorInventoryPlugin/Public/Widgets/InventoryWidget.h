@@ -32,6 +32,9 @@ public:
 
 public:
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Inventory")
+	void InitializeInventoryWidget(TScriptInterface<IActorInventoryInterface>& SourceInventory);
+
 	/**
 	 * @brief Refreshes Inventory Widget. No C++ logic is implemented yet.
 	 */
@@ -53,7 +56,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
 	void OnItemInspected(class UInventoryItemSlot* InspectedItem);
-	
+
 protected:
 
 	/**

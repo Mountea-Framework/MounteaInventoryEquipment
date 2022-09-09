@@ -562,3 +562,20 @@ enum class EInventoryContext : uint8
 
 	Default UMETA(Hidden)
 };
+
+
+UENUM(BlueprintType)
+enum class EUseType : uint8
+{
+	EST_Use				UMETA(DisplayName="Use Item", Tooltip="Using an Item"),
+	EST_Drop			UMETA(DisplayName="Drop Item", Tooltip="Drop an Item"),
+	EST_Trade			UMETA(DisplayName="Trade",	Tooltip="Buy or Sell"),
+	EST_Loot			UMETA(DisplayName="Loot",	Tooltip = "Loot from other Inventory"),
+	
+	EST_Merge			UMETA(DisplayName="Merge",	Tooltip="Merge Item"),
+	EST_Split			UMETA(DisplayName="Split",	Tooltip="Split Item"),
+
+	EST_Invalid			UMETA(DisplayName="Invalid", Tooltip="Invalid value"),
+
+	Default				UMETA(Hidden)
+};
