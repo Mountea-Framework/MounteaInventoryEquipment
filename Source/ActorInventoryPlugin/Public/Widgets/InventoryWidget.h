@@ -57,6 +57,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
 	void OnItemInspected(class UInventoryItemSlot* InspectedItem);
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	TScriptInterface<IActorInventoryInterface>& GetOwningInventory () {return OwningInventory; };
 protected:
 
 	/**

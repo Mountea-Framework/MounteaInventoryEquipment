@@ -9,6 +9,8 @@
 class UInventoryItemSlot;
 class UInventoryWidget;
 class UInventoryTypeDefinition;
+class UInventoryTransaction;
+class IActorInventoryInterface;
 
 enum class EUseType : uint8;
 
@@ -45,6 +47,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	FString GetUseTypeText() const;
+
+	UFUNCTION(BlueprintCallable, Category="Invetory")
+	void SetTransactionClass(const TSubclassOf<UInventoryTransaction> NewTransactionClass);
 	
 protected:
 
@@ -65,6 +70,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
 	UInventoryItemSlot* TargetSlot = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	TSubclassOf<UInventoryTransaction> TransactionClass;
+
+private:
+
+	UPROPERTY()
+	TScriptInterface<IActorInventoryInterface> OriginSlotOwningInventory;
+
+	UPROPERTY()
+	TScriptInterface<IActorInventoryInterface> TargetSlotOwningInventory;
 };
 
 #undef LOCTEXT_NAMESPACE

@@ -33,15 +33,16 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Item Slot")
 	UInventoryWidget* GetOwningInventoryWidget() const {return OwningInventoryWidget; };
 	
-protected:
-
-	virtual bool Initialize() override;
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Item Slot")
 	FORCEINLINE bool DoesHaveItem() const
 	{
 		return ItemSlotData.Item != nullptr;
 	}
+	
+protected:
+
+	virtual bool Initialize() override;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory|Item Slot")
 	void ClearItem()
