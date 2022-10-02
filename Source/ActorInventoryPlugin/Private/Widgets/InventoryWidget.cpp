@@ -3,9 +3,6 @@
 
 #include "Widgets/InventoryWidget.h"
 
-#include "Helpers/ActorInventoryPluginLog.h"
-
-
 bool UInventoryWidget::Initialize()
 {
 	if (Super::Initialize())

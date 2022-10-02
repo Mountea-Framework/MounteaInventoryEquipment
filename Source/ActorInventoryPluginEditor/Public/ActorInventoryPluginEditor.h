@@ -18,6 +18,7 @@ public:
 
 	// Handle Blueprint Events
 	void HandleNewCustomKeyActionBlueprintCreated(UBlueprint* Blueprint);
+	void HandleNewInventoryTransactionBlueprintCreated(UBlueprint* Blueprint);
 
 private:
 
@@ -29,6 +30,7 @@ private:
 	TSharedPtr<FSlateStyleSet> InventoryItemSet;
 	TSharedPtr<FSlateStyleSet> InventoryItemComponentSet;
 	TSharedPtr<FSlateStyleSet> InventoryTypeDefinitionSet;
+	TSharedPtr<FSlateStyleSet> InventoryTransactionDefinitionSet;
 	
 	TSharedPtr<class FInventoryCategoryAssetActions> InventoryCategoryAssetActions;
 	TSharedPtr<class FInventoryRarityAssetActions> InventoryRarityAssetsActions;
@@ -37,4 +39,6 @@ private:
 	TSharedPtr<class FInventoryItemAssetActions> InventoryItemAssetActions;
 
 	TSharedPtr<class FInventoryTypeDefinitionAssetActions> InventoryTypeDefinitionAssetActions;
+
+	TSharedPtr<class FInventoryTransactionAssetActions> InventoryTransactionAssetActions;
 };

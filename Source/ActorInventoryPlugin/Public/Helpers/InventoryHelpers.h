@@ -579,3 +579,38 @@ enum class EUseType : uint8
 
 	Default				UMETA(Hidden)
 };
+
+#pragma region InventoryTransaction
+
+class UInventoryItemSlot;
+
+/**
+ * Abstract class which handles transactions between Inventory A and B.
+ */
+UCLASS(Abstract, Blueprintable, Category="Inventory")
+class ACTORINVENTORYPLUGIN_API UInventoryTransaction : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+	UInventoryTransaction()
+	{};
+
+	explicit UInventoryTransaction(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot = nullptr) :
+	SourceSlot(NewSourceSlot),
+	TargetSlot(NewTargetSlot)
+	{};
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	bool ProcessTransaction();
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* SourceSlot = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* TargetSlot = nullptr;
+};
+#pragma endregion
