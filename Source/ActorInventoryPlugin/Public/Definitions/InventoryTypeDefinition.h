@@ -28,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE FGuid GetInventoryTypeGuid() const {return InventoryTypeGuid; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE bool IsTransactional() const {return bIsTransactional; };
 	
 protected:
 
@@ -36,6 +39,10 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory", meta=(NoResetToDefault=true))
 	FText InventoryTypeName = LOCTEXT("InventoryType", "Player Inventory");
+
+	/** Defines whether a transaction action (like payment) must be processed when interacting with this Inventory Type. */
+	UPROPERTY(EditDefaultsOnly, Category="Inventory", meta=(NoResetToDefault=true))
+	uint8 bIsTransactional : 1;
 	
 	/**
 	 * Unique Guid

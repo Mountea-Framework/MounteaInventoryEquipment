@@ -575,7 +575,7 @@ enum class EUseType : uint8
 	EST_Merge			UMETA(DisplayName="Merge",	Tooltip="Merge Item"),
 	EST_Split			UMETA(DisplayName="Split",	Tooltip="Split Item"),
 
-	EST_Invalid			UMETA(DisplayName="Invalid", Tooltip="Invalid value"),
+	EST_Invalid			UMETA(DisplayName="Close", Tooltip="Closing the Split"),
 
 	Default				UMETA(Hidden)
 };
