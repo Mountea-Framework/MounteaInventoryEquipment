@@ -8,6 +8,8 @@
 #include "Definitions/InventoryKeyAction.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Widgets/InventoryItemSlot.h"
+#include "Widgets/InventoryWidget.h"
 
 UActorInventoryManagerComponent* UActorInventoryBPFLibrary::GetInventoryManager(const UObject* WorldContextObject)
 {

@@ -10,11 +10,12 @@
 
 class UInventoryCategory;
 class UInventoryKeyAction;
+class UInventoryTransaction;
 
 /**
  * Static class with useful Inventory utility functions that can be called from both Blueprint and C++
  */
-UCLASS()
+UCLASS(Blueprintable, Category="Inventory")
 class ACTORINVENTORYPLUGIN_API UActorInventoryBPFLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
@@ -41,4 +42,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(WorldContext="WorldContextObject", DefaultToSelf="WorldContextObject"))
 	static bool  IsValidKeyAction(const UObject* WorldContextObject, const FGuid& Guid);
+
 };

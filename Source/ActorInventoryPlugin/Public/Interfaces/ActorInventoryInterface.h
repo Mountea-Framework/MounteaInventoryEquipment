@@ -34,6 +34,7 @@ class UInventoryItem;
 class UInventoryWidget;
 class UInventoryItemSlot;
 class UInventoryTypeDefinition;
+class UInventoryTransaction;
 
 /**
  * Actor Inventory Interface.

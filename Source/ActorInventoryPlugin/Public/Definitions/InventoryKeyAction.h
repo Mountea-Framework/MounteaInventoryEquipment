@@ -43,6 +43,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
 	bool ExecuteAction(UInventoryItemSlot* ForItem);
 
+	virtual UWorld* GetWorld() const override;
 
 	/**
 	 * Gets Inventory Manager.

@@ -223,6 +223,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
 	UInventoryTypeDefinition* InventoryType = nullptr;
+
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Transactions", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly, AllowAbstract=false))
+	TSet<TSubclassOf<class UInventoryTransaction>> InventoryTransactions;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;

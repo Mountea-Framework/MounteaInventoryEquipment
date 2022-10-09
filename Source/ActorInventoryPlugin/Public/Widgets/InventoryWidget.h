@@ -17,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCategoryUpdated, const FGuid&, Ca
  * 
  */
 UCLASS(Abstract)
-class ACTORINVENTORYPLUGIN_API UInventoryWidget : public UUserWidget
+class ACTORINVENTORYPLUGIN_API UInventoryWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -59,6 +59,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	TScriptInterface<IActorInventoryInterface>& GetOwningInventory () {return OwningInventory; };
+
 protected:
 
 	/**

@@ -58,23 +58,6 @@ bool UInventoryItemSlotUse::IsValid_Implementation() const
 	{
 		return false;
 	}
-	
-	/*
-	switch (InventoryUseType)
-	{
-	case EUseType::EST_Use:
-	case EUseType::EST_Drop:
-	case EUseType::EST_Loot:
-		return OriginSlot != nullptr;
-	case EUseType::EST_Merge:
-	case EUseType::EST_Split:
-	case EUseType::EST_Trade:
-		return OriginSlot != nullptr && TargetSlot != nullptr;
-	case EUseType::Default:
-	default:
-		return false;
-	}
-	*/
 }
 
 void UInventoryItemSlotUse::SetUseType(const EUseType NewUseType)

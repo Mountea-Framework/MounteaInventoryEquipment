@@ -368,6 +368,21 @@ public:
 
 #pragma endregion 
 
+#pragma region Transactions
+
+	/**
+	 * Calculates Transaction Type for two given Item Slots.
+	 * Native C++ function returns null!
+	 * 
+	 * @param SourceItem Source Slot which was dragged and dropped
+	 * @param TargetItem Target Slot to which you want to drop the Source
+	 * @return Inventory Transaction if found, nullptr otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	TSubclassOf<UInventoryTransaction> CalculateTransactionType(UInventoryItemSlot* SourceItem, UInventoryItemSlot* TargetItem) const;
+
+#pragma endregion 
+	
 protected:
 
 #pragma region GeneralSettings
@@ -439,7 +454,7 @@ protected:
 	 */
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Rarities", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
 	TSet<UInventoryItemRarity*> AllowedRarities;
-
+	
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
 	TMap<EInventoryContext, FInventoryNotificationInfo> NotificationInfo;
 
