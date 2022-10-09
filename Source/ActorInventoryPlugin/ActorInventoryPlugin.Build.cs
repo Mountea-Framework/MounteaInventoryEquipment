@@ -42,7 +42,7 @@ public class ActorInventoryPlugin : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"UMG",
-				"InputCore"
+				"InputCore",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

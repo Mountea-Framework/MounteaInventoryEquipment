@@ -33,6 +33,8 @@ class UActorInventoryInterface : public UInterface
 class UInventoryItem;
 class UInventoryWidget;
 class UInventoryItemSlot;
+class UInventoryTypeDefinition;
+class UInventoryTransaction;
 
 /**
  * Actor Inventory Interface.
@@ -84,6 +86,7 @@ public:
 	virtual void LoadInventoryContent(const class UDataTable* SourceTable) = 0;
 	virtual void SaveToInventoryLayout(const FInventorySlotData& Slot) = 0;
 
+	virtual UInventoryTypeDefinition* GetInventoryType() const = 0;
 	
 	virtual void SetInventoryWidgetPtr(UInventoryWidget* NewInventoryWidget) = 0;
 	virtual UInventoryWidget* GetInventoryWidgetPtr() const = 0;
@@ -94,7 +97,9 @@ public:
 	virtual float GetInventoryMaxWeight() const = 0;
 
 	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) = 0;
-
+		
+	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction() const = 0;
+	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction() const = 0;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;
@@ -103,4 +108,6 @@ public:
 	virtual FOnInventoryOpenRequested& GetInventoryOpenRequestedHandle() = 0;
 
 	virtual void CloseInventory() = 0;
+
+	virtual bool TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory, TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item) = 0;
 };

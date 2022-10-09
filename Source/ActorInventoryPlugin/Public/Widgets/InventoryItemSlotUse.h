@@ -8,19 +8,13 @@
 
 class UInventoryItemSlot;
 class UInventoryWidget;
+class UInventoryTypeDefinition;
+class UInventoryTransaction;
+class IActorInventoryInterface;
 
-UENUM(BlueprintType)
-enum class EUseType : uint8
-{
-	EST_Use				UMETA(DispplayName="Use Item"),
-	EST_Drop			UMETA(DispplayName="Drop Item"),
-	EST_MERGE_SameInv	UMETA(DisplayName="MERGE - Same Inventory"),
-	EST_SPLIT_SameInv	UMETA(DisplayName="SPLIT - Same Inventory"),
-	EST_Merge_DiffInv	UMETA(DisplayName="MERGE - Different Inventories"),
-	EST_SPLIT_DiffInv	UMETA(DisplayName="SPLIT - Different Inventories"),
+enum class EUseType : uint8;
 
-	Default				UMETA(Hidden)
-};
+#define LOCTEXT_NAMESPACE "Inventory Use"
 
 /**
  * 
@@ -33,41 +27,34 @@ class ACTORINVENTORYPLUGIN_API UInventoryItemSlotUse : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, const EUseType& NewUseType);
+	void Init(UInventoryItemSlot* NewOriginSlot, UInventoryItemSlot* NewTargetSlot, EUseType NewUseType);
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	void DetermineUseType();
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetOwningInventoryWidget(UInventoryWidget* NewOwningWidget);
 
 	/**
-	 * @brief Validation function which returns whether the Slot is Valid or not. Validation is different for Split/Merge and Use/Drop.
+	 * Validation function which returns whether the Slot is Valid or not. Validation is different for Split/Merge and Use/Drop.
 	 * @return True if Use/Drop and OriginSlot is valid, True if Merge/Split and OriginSlot and TargetSlot are valid, default false.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	FORCEINLINE bool IsValid() const
-	{
-		switch (UseType)
-		{
-			case EUseType::EST_Use:
-			case EUseType::EST_Drop:
-				return OriginSlot != nullptr;
-			case EUseType::EST_MERGE_SameInv:
-			case EUseType::EST_SPLIT_SameInv: 
-			case EUseType::EST_Merge_DiffInv:
-			case EUseType::EST_SPLIT_DiffInv:
-				return OriginSlot != nullptr && TargetSlot != nullptr;
-			case EUseType::Default:
-			default:
-				return false;
-		}
-	}
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	bool IsValid() const;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void SetUseType(const EUseType& NewUseType);
+	void SetUseType(EUseType NewUseType);
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	FString GetUseTypeText() const;
+
+	UFUNCTION(BlueprintCallable, Category="Invetory")
+	void SetTransactionClass(const TSubclassOf<UInventoryTransaction> NewTransactionClass);
 	
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
-	EUseType UseType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
+	EUseType InventoryUseType;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory")
 	TArray<FKey> CancelKeys;
@@ -83,4 +70,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta=(ExposeOnSpawn=true, AllowAbstract=false))
 	UInventoryItemSlot* TargetSlot = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	TSubclassOf<UInventoryTransaction> TransactionClass;
+
+private:
+
+	UPROPERTY()
+	TScriptInterface<IActorInventoryInterface> OriginSlotOwningInventory;
+
+	UPROPERTY()
+	TScriptInterface<IActorInventoryInterface> TargetSlotOwningInventory;
 };
+
+#undef LOCTEXT_NAMESPACE

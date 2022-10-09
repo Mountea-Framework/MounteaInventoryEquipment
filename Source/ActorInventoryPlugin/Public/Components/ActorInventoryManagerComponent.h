@@ -363,8 +363,26 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Validation")
 	bool IsValidCategory(const FGuid& CategoryGUID) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|Settings")
+	FORCEINLINE FInventoryLayout GetInventoryLayout() const {return DefaultLayout; };
+
 #pragma endregion 
 
+#pragma region Transactions
+
+	/**
+	 * Calculates Transaction Type for two given Item Slots.
+	 * Native C++ function returns null!
+	 * 
+	 * @param SourceItem Source Slot which was dragged and dropped
+	 * @param TargetItem Target Slot to which you want to drop the Source
+	 * @return Inventory Transaction if found, nullptr otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	TSubclassOf<UInventoryTransaction> CalculateTransactionType(UInventoryItemSlot* SourceItem, UInventoryItemSlot* TargetItem) const;
+
+#pragma endregion 
+	
 protected:
 
 #pragma region GeneralSettings
@@ -416,7 +434,7 @@ protected:
 	 * Default Category which will be set when opening Inventory.
 	 * If left empty, first from Allowed Categories will be used instead.
 	 */
-	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	UInventoryCategory* DefaultCategory = nullptr;
 	
 	/**
@@ -425,7 +443,7 @@ protected:
 	 * Only valid Categories will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Categories", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSet<UInventoryCategory*> AllowedCategories;
 
 	/**
@@ -434,41 +452,44 @@ protected:
 	 * Only valid Rarities will be displayed.
 	 * Display order is equal order in Array.
 	 */
-	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Rarities", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly))
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Rarities", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSet<UInventoryItemRarity*> AllowedRarities;
+	
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
+	TMap<EInventoryContext, FInventoryNotificationInfo> NotificationInfo;
 
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Notifications", NoClear, meta=(NoResetToDefault))
-	TMap<EInventoryContext, FInventoryNotificationInfo> NotificationInfo;
+	FInventoryLayout DefaultLayout;
 	
 #pragma endregion
 
 #pragma region Subclasses
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|General", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|General", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryWidget> InventoryWidgetClass;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryWidget> InventoryCategoryClass;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Category", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryCategoryTooltip> InventoryCategoryTooltipClass;
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlot> InventorySlotClass;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlotTooltip> InventorySlotTooltipClass;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlotDrag> InventorySlotDragClass;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Item", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryItemSlotUse> InventorySlotUseClass;
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryNotificationContainer> NotificationContainerClass;
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly=true, AllowAbstract=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Inventory|UI|Notification", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TSubclassOf<UInventoryNotification> NotificationClass;
 
 #pragma endregion 

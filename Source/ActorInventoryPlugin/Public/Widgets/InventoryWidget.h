@@ -3,13 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Helpers/InventoryHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "InventoryWidget.generated.h"
 
-struct FInventorySlotData;
-
 class UInventoryItem;
-class UActorInventoryInterface;
 class IActorInventoryInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryWidgetUpdated);
@@ -19,7 +17,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCategoryUpdated, const FGuid&, Ca
  * 
  */
 UCLASS(Abstract)
-class ACTORINVENTORYPLUGIN_API UInventoryWidget : public UUserWidget
+class ACTORINVENTORYPLUGIN_API UInventoryWidget final : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -34,6 +32,9 @@ public:
 
 public:
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Inventory")
+	void InitializeInventoryWidget(TScriptInterface<IActorInventoryInterface>& SourceInventory);
+
 	/**
 	 * @brief Refreshes Inventory Widget. No C++ logic is implemented yet.
 	 */
@@ -45,7 +46,7 @@ public:
 	 * @param InventorySlot Slot to be Saved.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Inventory")
-	void SaveInventorySlot(const FInventorySlotData& InventorySlot);
+	void SaveInventorySlot(const struct FInventorySlotData& InventorySlot);
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	void SetSelectedCategory(const FGuid& CategoryGUID);
@@ -55,7 +56,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
 	void OnItemInspected(class UInventoryItemSlot* InspectedItem);
-	
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	TScriptInterface<IActorInventoryInterface>& GetOwningInventory () {return OwningInventory; };
+
 protected:
 
 	/**

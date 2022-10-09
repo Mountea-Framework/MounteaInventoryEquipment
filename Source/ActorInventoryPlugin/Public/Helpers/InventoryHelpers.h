@@ -21,11 +21,11 @@
  * @return FString of the Value (ECC_Visibility in our example, or invalid of name not specified nor UENUM does not exist)
  */
 template<typename TEnum>
-static FORCEINLINE FString GetEnumValueAsString(const FString& Name, TEnum Value)
+static FString GetEnumValueAsString(const FString& Name, TEnum Value)
 {
 	const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, *Name, true);
 	if (!enumPtr) return FString("invalid");
-	return enumPtr->GetNameByValue((int64)Value).ToString();
+	return enumPtr->GetDisplayNameTextByValue((int64)Value).ToString();
 }
 
 #pragma endregion TEMPLATES
@@ -562,3 +562,55 @@ enum class EInventoryContext : uint8
 
 	Default UMETA(Hidden)
 };
+
+
+UENUM(BlueprintType)
+enum class EUseType : uint8
+{
+	EST_Use				UMETA(DisplayName="Use Item", Tooltip="Using an Item"),
+	EST_Drop			UMETA(DisplayName="Drop Item", Tooltip="Drop an Item"),
+	EST_Trade			UMETA(DisplayName="Trade",	Tooltip="Buy or Sell"),
+	EST_Loot			UMETA(DisplayName="Loot",	Tooltip = "Loot from other Inventory"),
+	
+	EST_Merge			UMETA(DisplayName="Merge",	Tooltip="Merge Item"),
+	EST_Split			UMETA(DisplayName="Split",	Tooltip="Split Item"),
+
+	EST_Invalid			UMETA(DisplayName="Close", Tooltip="Closing the Split"),
+
+	Default				UMETA(Hidden)
+};
+
+#pragma region InventoryTransaction
+
+class UInventoryItemSlot;
+
+/**
+ * Abstract class which handles transactions between Inventory A and B.
+ */
+UCLASS(Abstract, Blueprintable, Category="Inventory")
+class ACTORINVENTORYPLUGIN_API UInventoryTransaction : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+	UInventoryTransaction()
+	{};
+
+	explicit UInventoryTransaction(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot = nullptr) :
+	SourceSlot(NewSourceSlot),
+	TargetSlot(NewTargetSlot)
+	{};
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	bool ProcessTransaction();
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* SourceSlot = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* TargetSlot = nullptr;
+};
+#pragma endregion

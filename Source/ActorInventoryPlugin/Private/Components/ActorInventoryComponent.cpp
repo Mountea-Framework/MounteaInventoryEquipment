@@ -2,9 +2,14 @@
 
 #include "Components/ActorInventoryComponent.h"
 
+#if WITH_EDITOR
+#include "EditorHelper.h"
+#endif
+
 #include "Definitions/InventoryCategory.h"
 #include "Definitions/InventoryItem.h"
 #include "Definitions/InventoryKeyAction.h"
+#include "Definitions/InventoryTypeDefinition.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
 #include "Helpers/ActorInventoryPluginLog.h"
 #include "Widgets/InventoryItemSlot.h"
@@ -24,12 +29,22 @@ void UActorInventoryComponent::BeginPlay()
 	{
 		AInvP_LOG(Error, TEXT("[UActorInventoryComponent] Cannot find Inventory Manager! Attach Inventory Manager Component to GameState class!"))
 
-		Deactivate();
+		UnregisterComponent();
+		MarkPendingKill();
+		return;
+	}
+	
+	if (InventoryType == nullptr)
+	{
+		AInvP_LOG(Error, TEXT("[UActorInventoryComponent] Inventory Type is not Valid!"))
+
+		UnregisterComponent();
+		MarkPendingKill();
+		return;
 	}
 
 	// Bind Virtual function and call BP Event
 	OnItemActionRequested.AddUniqueDynamic(this, &UActorInventoryComponent::ExecuteItemKeyAction);
-
 	OnInventoryOpenRequested.AddUniqueDynamic(this, &UActorInventoryComponent::UpdateInventory);
 }
 
@@ -41,6 +56,29 @@ void UActorInventoryComponent::UpdateInventory()
 void UActorInventoryComponent::SetInventoryLayout(const FInventoryLayout& InInventoryLayout)
 {
 	InventoryLayout = InInventoryLayout;
+}
+
+FInventoryLayout UActorInventoryComponent::GetInventoryLayout() const
+{
+	if (InventoryManager)
+	{
+		if (bOverrideDefaultLayout)
+		{
+			return InventoryLayout;
+		}
+		else
+		{
+			FInventoryLayout ReturnLayout;
+			ReturnLayout.InventoryLayout =  InventoryManager->GetInventoryLayout().InventoryLayout;
+			ReturnLayout.SavedInventoryLayout = InventoryLayout.SavedInventoryLayout;
+
+			return ReturnLayout;
+		}
+	}
+	else
+	{
+		return FInventoryLayout();
+	}
 }
 
 void UActorInventoryComponent::SaveToInventoryLayoutBP_Implementation(const FInventorySlotData& Slot)
@@ -514,6 +552,11 @@ void UActorInventoryComponent::CloseInventory()
 	SetOtherInventory(nullptr);
 }
 
+UInventoryTypeDefinition* UActorInventoryComponent::GetInventoryType() const
+{
+	return InventoryType;
+}
+
 void UActorInventoryComponent::LoadInventoryContent(const UDataTable* SourceTable)
 {
 	if (SourceTable && SourceTable->RowStruct)
@@ -581,6 +624,30 @@ float UActorInventoryComponent::GetInventoryMaxWeight() const
 	return MaximumInventoryWeight;
 }
 
+bool UActorInventoryComponent::TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory,
+	TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item)
+{
+	return true;
+}
+
+TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveFromTransaction() const
+{
+	if (InventoryType)
+	{
+		return InventoryType->GetTransactionFrom(InventoryType);
+	}
+	return nullptr;
+}
+
+TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveToTransaction() const
+{
+	if (InventoryType)
+	{
+		return InventoryType->GetTransactionTo(InventoryType);
+	}
+	return nullptr;
+}
+
 FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()
 {
 	return OnInventoryUpdated;
@@ -621,4 +688,36 @@ void UActorInventoryComponent::SetNotificationContainerPtr(UInventoryNotificatio
 	InventoryNotificationContainer = Widget;
 }
 
+#if WITH_EDITOR
 
+void UActorInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName PropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.GetPropertyName() : NAME_None;
+	
+	if (PropertyName == TEXT("InventoryType"))
+	{
+		if (InventoryType == nullptr)
+		{
+			const FString ErrorMessage = FString::Printf(TEXT("INVENTORY TYPE IS NOT VALID!"));
+			FEditorHelper::DisplayEditorNotification(FText::FromString(ErrorMessage), SNotificationItem::CS_Fail, 5.f, 2.f, TEXT("Icons.Error"));
+
+		}
+	}
+}
+
+
+EDataValidationResult UActorInventoryComponent::IsDataValid(TArray<FText>& ValidationErrors)
+{
+	if (InventoryType == nullptr)
+	{
+		const FText ErrorMessage = FText::FromString(TEXT("[ActorInventoryComponent] Validation failed: Inventory Type is empty!"));
+		ValidationErrors.Add(ErrorMessage);
+		
+		return EDataValidationResult::Invalid;
+	}
+	return Super::IsDataValid(ValidationErrors);
+}
+
+#endif

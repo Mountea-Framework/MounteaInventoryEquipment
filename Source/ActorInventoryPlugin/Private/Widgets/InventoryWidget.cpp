@@ -3,9 +3,6 @@
 
 #include "Widgets/InventoryWidget.h"
 
-#include "Helpers/ActorInventoryPluginLog.h"
-
-
 bool UInventoryWidget::Initialize()
 {
 	if (Super::Initialize())
@@ -32,6 +29,12 @@ bool UInventoryWidget::Initialize()
 	}
 	
 	return false;
+}
+
+void UInventoryWidget::InitializeInventoryWidget_Implementation(
+	TScriptInterface<IActorInventoryInterface>& SourceInventory)
+{
+	OwningInventory = SourceInventory;
 }
 
 void UInventoryWidget::SetSelectedCategory(const FGuid& CategoryGUID)

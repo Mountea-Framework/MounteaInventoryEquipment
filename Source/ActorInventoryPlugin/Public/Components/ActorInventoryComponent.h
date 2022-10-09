@@ -79,6 +79,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual void CloseInventory() override;
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual UInventoryTypeDefinition* GetInventoryType() const override;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual UInventoryItem* GetItemByData(const FInventoryItemData& ItemData) const override;
@@ -119,6 +122,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	virtual float GetInventoryMaxWeight() const override;
+	
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	virtual bool TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory, TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction() const override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction() const override;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
@@ -207,20 +219,19 @@ public:
 	void SetInventoryLayout(const FInventoryLayout& InInventoryLayout);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory|UI")
-	FORCEINLINE FInventoryLayout GetInventoryLayout() const
-	{
-		return InventoryLayout;
-	}
-	
+	FORCEINLINE FInventoryLayout GetInventoryLayout() const;
+
 protected:
 
 	virtual void BeginPlay() override;
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
+	UInventoryTypeDefinition* InventoryType = nullptr;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
-
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryNotificationContainer* InventoryNotificationContainer = nullptr;
@@ -231,7 +242,12 @@ protected:
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory")
 	TArray<UInventoryItem*> InventoryItems;
 
-	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true))
+	// Overrides default layout set in Inventory Manager
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Inventory|UI")
+	uint8 bOverrideDefaultLayout : 1;
+
+	// Custom Inventory Layout
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|UI", meta=(ShowOnlyInnerProperties=true, EditCondition="bOverrideDefaultLayout"))
 	FInventoryLayout InventoryLayout;
 
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
@@ -250,4 +266,7 @@ private:
 
 	UFUNCTION()
 	void UpdateInventory();
+
+	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 };
