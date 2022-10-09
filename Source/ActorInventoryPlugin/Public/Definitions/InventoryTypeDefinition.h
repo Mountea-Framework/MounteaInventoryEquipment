@@ -8,6 +8,8 @@
 #include "Widgets/InventoryItemSlotUse.h"
 #include "InventoryTypeDefinition.generated.h"
 
+class UInventoryTransaction;
+
 #define LOCTEXT_NAMESPACE "InventoryTypeDefinition"
 
 /**
@@ -31,6 +33,18 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
 	FORCEINLINE bool IsTransactional() const {return bIsTransactional; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE TSubclassOf<UInventoryTransaction> GetTransactionFrom(const UInventoryTypeDefinition* SourceType) const
+	{
+		return *TransactionsFrom.Find(SourceType);
+	};
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	FORCEINLINE TSubclassOf<UInventoryTransaction> GetTransactionTo(const UInventoryTypeDefinition* SourceType) const
+	{
+		return *TransactionsTo.Find(SourceType);
+	};
 	
 protected:
 
@@ -49,6 +63,12 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
 	FGuid InventoryTypeGuid = FGuid::NewGuid();
+
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Transaction Settings", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
+	TMap<UInventoryTypeDefinition*, TSubclassOf<UInventoryTransaction>> TransactionsFrom;
+
+	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Transaction Settings", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
+	TMap<UInventoryTypeDefinition*, TSubclassOf<UInventoryTransaction>> TransactionsTo;
 };
 
 #undef LOCTEXT_NAMESPACE

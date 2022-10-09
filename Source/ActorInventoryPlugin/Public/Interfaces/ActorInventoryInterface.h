@@ -97,7 +97,9 @@ public:
 	virtual float GetInventoryMaxWeight() const = 0;
 
 	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) = 0;
-
+		
+	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction() const = 0;
+	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction() const = 0;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;

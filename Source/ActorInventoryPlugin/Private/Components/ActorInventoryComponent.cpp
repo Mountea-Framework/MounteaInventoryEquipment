@@ -9,6 +9,7 @@
 #include "Definitions/InventoryCategory.h"
 #include "Definitions/InventoryItem.h"
 #include "Definitions/InventoryKeyAction.h"
+#include "Definitions/InventoryTypeDefinition.h"
 #include "Helpers/ActorInventoryBPFLibrary.h"
 #include "Helpers/ActorInventoryPluginLog.h"
 #include "Widgets/InventoryItemSlot.h"
@@ -627,6 +628,24 @@ bool UActorInventoryComponent::TransferItem(TScriptInterface<IActorInventoryInte
 	TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item)
 {
 	return true;
+}
+
+TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveFromTransaction() const
+{
+	if (InventoryType)
+	{
+		return InventoryType->GetTransactionFrom(InventoryType);
+	}
+	return nullptr;
+}
+
+TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveToTransaction() const
+{
+	if (InventoryType)
+	{
+		return InventoryType->GetTransactionTo(InventoryType);
+	}
+	return nullptr;
 }
 
 FOnInventoryUpdated& UActorInventoryComponent::GetUpdateEventHandle()

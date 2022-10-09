@@ -125,6 +125,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	virtual bool TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory, TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction() const override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
+	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction() const override;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;
@@ -223,9 +229,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory|Type", meta=(NoResetToDefault=true, BlueprintBaseOnly=true))
 	UInventoryTypeDefinition* InventoryType = nullptr;
-
-	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Transactions", NoClear, meta=(NoResetToDefault, BlueprintBaseOnly, AllowAbstract=false))
-	TSet<TSubclassOf<class UInventoryTransaction>> InventoryTransactions;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory|UI")
 	UInventoryWidget* InventoryWidget = nullptr;
