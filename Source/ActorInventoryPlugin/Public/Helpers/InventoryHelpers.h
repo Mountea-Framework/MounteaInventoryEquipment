@@ -602,8 +602,13 @@ public:
 	TargetSlot(NewTargetSlot)
 	{};
 
+	/**
+	 * Processes Transaction, like calculations and whether the Transaction is possible, returning possible outcomes in predefined object.
+	 * @param TransactionPayload Payload to be filled with data. 
+	 * @return TransactionPayload or nullptr
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
-	bool ProcessTransaction();
+	UObject* ProcessTransaction(UObject* TransactionPayload);
 
 public:
 
