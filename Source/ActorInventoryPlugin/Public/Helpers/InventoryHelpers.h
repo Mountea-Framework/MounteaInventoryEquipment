@@ -583,12 +583,13 @@ enum class EUseType : uint8
 #pragma region InventoryTransaction
 
 class UInventoryItemSlot;
+class UInventoryTransactionPayload;
 
 /**
  * Abstract class which handles transactions between Inventory A and B.
  */
 UCLASS(Abstract, Blueprintable, Category="Inventory")
-class ACTORINVENTORYPLUGIN_API UInventoryTransaction : public UObject
+class ACTORINVENTORYPLUGIN_API UInventoryTransaction final : public UObject
 {
 	GENERATED_BODY()
 
@@ -597,7 +598,8 @@ public:
 	UInventoryTransaction()
 	{};
 
-	explicit UInventoryTransaction(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot = nullptr) :
+	explicit UInventoryTransaction(const TSubclassOf<UObject> NewTransactionPayloadClass, UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot = nullptr) :
+	TransactionPayloadClass(NewTransactionPayloadClass),
 	SourceSlot(NewSourceSlot),
 	TargetSlot(NewTargetSlot)
 	{};
@@ -612,10 +614,40 @@ public:
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(AllowAbstract = false))
+	TSubclassOf<UObject> TransactionPayloadClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
 	UInventoryItemSlot* SourceSlot = nullptr;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* TargetSlot = nullptr;
+};
+#pragma endregion
+
+#pragma region InventoryTransactionPayload
+
+class UInventoryItemSlot;
+
+/**
+ * Abstract class which contains 
+ */
+UCLASS(Abstract, Blueprintable, Category="Inventory", HideCategories=("Inventory|Private"))
+class ACTORINVENTORYPLUGIN_API UInventoryTransactionPayload final : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+	UInventoryTransactionPayload()
+	{};
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* SourceSlot = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
 	UInventoryItemSlot* TargetSlot = nullptr;
 };
 #pragma endregion

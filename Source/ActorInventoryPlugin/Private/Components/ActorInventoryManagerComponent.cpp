@@ -267,6 +267,16 @@ bool UActorInventoryManagerComponent::IsValidCategory(const FGuid& CategoryGUID)
 	return false;
 }
 
+UObject* UActorInventoryManagerComponent::ProcessTransaction_Implementation(TSubclassOf<UInventoryTransaction> TransactionClass, UObject* TransactionPayload)
+{
+	if (TransactionClass.Get())
+	{
+		return TransactionClass.GetDefaultObject()->ProcessTransaction(TransactionPayload);	
+	}
+	
+	return nullptr;
+}
+
 
 TArray<UInventoryCategory*> UActorInventoryManagerComponent::GetAllowedCategories() const
 {

@@ -381,6 +381,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
 	TSubclassOf<UInventoryTransaction> CalculateTransactionType(UInventoryItemSlot* SourceItem, UInventoryItemSlot* TargetItem) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
+	UObject* ProcessTransaction(TSubclassOf<UInventoryTransaction> TransactionClass, UObject* TransactionPayload);
+
 #pragma endregion 
 	
 protected:
