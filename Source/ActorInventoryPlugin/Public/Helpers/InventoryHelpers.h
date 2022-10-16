@@ -580,15 +580,74 @@ enum class EUseType : uint8
 	Default				UMETA(Hidden)
 };
 
+#pragma region InventoryTransactionPayload
+
+class UInventoryItemSlot;
+class UActorInventoryManagerComponent;
+
+/**
+ * Abstract class which contains 
+ */
+UCLASS(Abstract, Blueprintable, Category="Inventory", HideCategories=("Inventory|Private"))
+class ACTORINVENTORYPLUGIN_API UInventoryTransactionPayload final : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+	UInventoryTransactionPayload() {};
+	
+	UInventoryTransactionPayload(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot, APlayerController* NewPlayerController, UActorInventoryManagerComponent* NewInventoryManager) :
+	SourceSlot(NewSourceSlot),
+	TargetSlot(NewTargetSlot),
+	PlayerController(NewPlayerController),
+	InventoryManagerComponent(NewInventoryManager)
+	{};
+
+	/**
+	 * Simple function to update the Payload to avoid dozens of setters.
+	 * Can be overriden in Blueprints to implement custom Payload entities.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	UInventoryTransactionPayload* UpdatePayload(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot, APlayerController* NewPlayerController, UActorInventoryManagerComponent* NewInventoryManager);
+
+	UInventoryTransactionPayload* UpdatePayload_Implementation(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot, APlayerController* NewPlayerController, UActorInventoryManagerComponent* NewInventoryManager)
+	{
+		SourceSlot = NewSourceSlot;
+		TargetSlot = NewTargetSlot;
+		PlayerController = NewPlayerController;
+		InventoryManagerComponent = NewInventoryManager;
+
+		return this;
+	};
+	
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* SourceSlot = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
+	UInventoryItemSlot* TargetSlot = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
+	APlayerController* PlayerController = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
+	UActorInventoryManagerComponent* InventoryManagerComponent = nullptr;
+};
+
+#pragma endregion
+
 #pragma region InventoryTransaction
 
 class UInventoryItemSlot;
+class UInventoryTransactionPayload;
 
 /**
  * Abstract class which handles transactions between Inventory A and B.
  */
 UCLASS(Abstract, Blueprintable, Category="Inventory")
-class ACTORINVENTORYPLUGIN_API UInventoryTransaction : public UObject
+class ACTORINVENTORYPLUGIN_API UInventoryTransaction final : public UObject
 {
 	GENERATED_BODY()
 
@@ -597,15 +656,47 @@ public:
 	UInventoryTransaction()
 	{};
 
-	explicit UInventoryTransaction(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot = nullptr) :
+	explicit UInventoryTransaction(const TSubclassOf<UObject> NewTransactionPayloadClass, UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot = nullptr) :
+	TransactionPayloadClass(NewTransactionPayloadClass),
 	SourceSlot(NewSourceSlot),
 	TargetSlot(NewTargetSlot)
 	{};
 
+	FORCEINLINE ULevel* GetLevel() const
+	{
+		return GetTypedOuter<ULevel>();
+	}
+
+	//UFUNCTION(BlueprintCallable, Category="Inventory Transaction")
+	virtual UWorld* GetWorld() const override
+	{
+		// CDO objects do not belong to a world
+		// If the actors outer is destroyed or unreachable we are shutting down and the world should be nullptr
+		if (
+			!HasAnyFlags(RF_ClassDefaultObject) && ensureMsgf(GetOuter(), TEXT("Actor: %s has a null OuterPrivate in AActor::GetWorld()"), *GetFullName())
+			&& !GetOuter()->HasAnyFlags(RF_BeginDestroyed) && !GetOuter()->IsUnreachable()
+			)
+		{
+			if (ULevel* Level = GetLevel())
+			{
+				return Level->OwningWorld;
+			}
+		}
+		return nullptr;
+	};
+		
+	/**
+	 * Processes Transaction, like calculations and whether the Transaction is possible, returning possible outcomes in predefined object.
+	 * @param TransactionPayload Payload to be filled with data. 
+	 * @return TransactionPayload or nullptr
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
-	bool ProcessTransaction();
+	UObject* ProcessTransaction(UInventoryTransactionPayload* TransactionPayload);
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(AllowAbstract = false))
+	TSubclassOf<UInventoryTransactionPayload> TransactionPayloadClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
 	UInventoryItemSlot* SourceSlot = nullptr;

@@ -64,9 +64,31 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
 	FGuid InventoryTypeGuid = FGuid::NewGuid();
 
+	/**
+	 * A list which defines what Transaction Type is used per what Inventory Type.
+	 * This list defines what Transaction is used when Item is coming From other Inventory Type to this.
+	 * If left empty, no Transaction will be processed when Item is coming From other inventory.
+	 *
+	 * Example:
+	 * Item from Shop is Dropped to Player Inventory. Player is Buying.
+	 * This Inventory Type is Player Inventory.
+	 * Other Inventory Type is Shop Inventory.
+	 * Here you would create mapping Shop - Buying.
+	 */
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Transaction Settings", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TMap<UInventoryTypeDefinition*, TSubclassOf<UInventoryTransaction>> TransactionsFrom;
 
+	/**
+	 * A list which defines what Transaction Type is used per what Inventory Type.
+	 * This list defines what Transaction is used when Item is coming From this Inventory Type to other.
+	 * If left empty, no Transaction will be processed when Item is coming To other inventory.
+	 *
+	 * Example:
+	 * Item from Player Inventory is Dropped to Shop. Player is Selling.
+	 * This Inventory Type is Player Inventory.
+	 * Other Inventory Type is Shop Inventory.
+	 * Here you would create mapping Shop - Selling.
+	 */
 	UPROPERTY(SaveGame, EditDefaultsOnly, Category="Inventory|Transaction Settings", NoClear, meta=(NoResetToDefault, AllowAbstract=false))
 	TMap<UInventoryTypeDefinition*, TSubclassOf<UInventoryTransaction>> TransactionsTo;
 };

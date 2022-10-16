@@ -127,10 +127,10 @@ public:
 	virtual bool TransferItem(TScriptInterface<IActorInventoryInterface> SourceInventory, TScriptInterface<IActorInventoryInterface> TargetInventory, UInventoryItem* Item) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction() const override;
+	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction(const TScriptInterface<IActorInventoryInterface> Context) const override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
-	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction() const override;
+	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction(const TScriptInterface<IActorInventoryInterface> Context) const override;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() override;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () override;

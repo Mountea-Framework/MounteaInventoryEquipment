@@ -630,20 +630,20 @@ bool UActorInventoryComponent::TransferItem(TScriptInterface<IActorInventoryInte
 	return true;
 }
 
-TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveFromTransaction() const
+TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveFromTransaction(const TScriptInterface<IActorInventoryInterface> Context) const
 {
-	if (InventoryType)
+	if (Context.GetObject() && Context->GetInventoryType())
 	{
-		return InventoryType->GetTransactionFrom(InventoryType);
+		return InventoryType->GetTransactionFrom(Context->GetInventoryType());
 	}
 	return nullptr;
 }
 
-TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveToTransaction() const
+TSubclassOf<UInventoryTransaction> UActorInventoryComponent::GetMoveToTransaction(const TScriptInterface<IActorInventoryInterface> Context) const
 {
-	if (InventoryType)
+	if (Context.GetObject() && Context->GetInventoryType())
 	{
-		return InventoryType->GetTransactionTo(InventoryType);
+		return InventoryType->GetTransactionTo(Context->GetInventoryType());
 	}
 	return nullptr;
 }

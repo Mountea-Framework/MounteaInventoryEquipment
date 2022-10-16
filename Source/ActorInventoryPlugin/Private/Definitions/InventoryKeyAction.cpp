@@ -16,13 +16,3 @@ UInventoryKeyAction::UInventoryKeyAction()
 	PlatformBasedMapping.Add(FInventoryKeyActionData(FText::FromString(TEXT("PS4")), FKey(TEXT("Gamepad Face Button Down")), nullptr));
 	PlatformBasedMapping.Add(FInventoryKeyActionData(FText::FromString(TEXT("XboxOne")), FKey(TEXT("Gamepad Face Button Down")), nullptr));
 }
-
-UWorld* UInventoryKeyAction::GetWorld() const
-{
-	return UObject::GetWorld();
-}
-
-UActorInventoryManagerComponent* UInventoryKeyAction::GetInventoryManager(const UObject* InventoryContext)
-{
-	return UActorInventoryBPFLibrary::GetInventoryManager(InventoryContext);
-}

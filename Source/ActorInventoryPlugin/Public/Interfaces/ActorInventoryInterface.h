@@ -98,8 +98,8 @@ public:
 
 	virtual void ExecuteItemKeyAction(UInventoryItemSlot* ForItem, const FGuid& ActionGuid) = 0;
 		
-	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction() const = 0;
-	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction() const = 0;
+	virtual TSubclassOf<UInventoryTransaction> GetMoveFromTransaction(const TScriptInterface<IActorInventoryInterface> Context) const = 0;
+	virtual TSubclassOf<UInventoryTransaction> GetMoveToTransaction(const TScriptInterface<IActorInventoryInterface> Context) const = 0;
 	
 	virtual FOnInventoryUpdated& GetUpdateEventHandle() = 0;
 	virtual FOnInventoryUpdateRequestProcessed& GetInventoryRequestProcessedHandle () = 0;

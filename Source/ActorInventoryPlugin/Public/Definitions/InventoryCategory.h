@@ -18,7 +18,7 @@ class UInventoryKeyAction;
  *
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Category
  */
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, meta=(UsesHierarchy=true))
 class ACTORINVENTORYPLUGIN_API UInventoryCategory : public UDataAsset
 {
 	GENERATED_BODY()

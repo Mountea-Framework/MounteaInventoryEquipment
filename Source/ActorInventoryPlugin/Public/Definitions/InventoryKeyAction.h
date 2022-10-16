@@ -43,15 +43,27 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
 	bool ExecuteAction(UInventoryItemSlot* ForItem);
 
-	virtual UWorld* GetWorld() const override;
-
-	/**
-	 * Gets Inventory Manager.
-	 * @param InventoryContext Must be Inventory Component of the Processed Item.
-	 * @return Inventory Manager or nullptr
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory", meta=(HideSelfPin=true, DefaultToSelf=true, CompactNodeTitle="Inventory Manager"))
-	static class UActorInventoryManagerComponent* GetInventoryManager(const UObject* InventoryContext);
+	FORCEINLINE ULevel* GetLevel() const
+	{
+		return GetTypedOuter<ULevel>();
+	}
+	
+	virtual UWorld* GetWorld() const override
+	{
+		// CDO objects do not belong to a world
+		// If the actors outer is destroyed or unreachable we are shutting down and the world should be nullptr
+		if (
+			!HasAnyFlags(RF_ClassDefaultObject) && ensureMsgf(GetOuter(), TEXT("Actor: %s has a null OuterPrivate in AActor::GetWorld()"), *GetFullName())
+			&& !GetOuter()->HasAnyFlags(RF_BeginDestroyed) && !GetOuter()->IsUnreachable()
+			)
+		{
+			if (ULevel* Level = GetLevel())
+			{
+				return Level->OwningWorld;
+			}
+		}
+		return nullptr;
+	};
 	
 	/** Returns Name of the Action, Use, for instance. */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Inventory")
