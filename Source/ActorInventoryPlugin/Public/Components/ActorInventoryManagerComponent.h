@@ -22,6 +22,7 @@ class UInventoryItemSlotDrag;
 class UInventoryCategoryWidget;
 class UInventoryItemSlotUse;
 class UInventoryCategoryTooltip;
+class UInventoryTransactionPayload;
 
 /**
  * Implement a GameState component for Inventory Manager.
@@ -382,7 +383,7 @@ public:
 	TSubclassOf<UInventoryTransaction> CalculateTransactionType(UInventoryItemSlot* SourceItem, UInventoryItemSlot* TargetItem) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Inventory")
-	UObject* ProcessTransaction(TSubclassOf<UInventoryTransaction> TransactionClass, UObject* TransactionPayload);
+	UObject* ProcessTransaction(TSubclassOf<UInventoryTransaction> TransactionClass, UInventoryTransactionPayload* TransactionPayload);
 
 #pragma endregion 
 	

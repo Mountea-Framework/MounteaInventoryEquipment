@@ -610,12 +610,12 @@ public:
 	 * @return TransactionPayload or nullptr
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
-	UObject* ProcessTransaction(UObject* TransactionPayload);
+	UObject* ProcessTransaction(UInventoryTransactionPayload* TransactionPayload);
 
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Inventory", meta=(AllowAbstract = false))
-	TSubclassOf<UObject> TransactionPayloadClass;
+	TSubclassOf<UInventoryTransactionPayload> TransactionPayloadClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory", meta = (ExposeOnSpawn = true))
 	UInventoryItemSlot* SourceSlot = nullptr;
@@ -639,9 +639,28 @@ class ACTORINVENTORYPLUGIN_API UInventoryTransactionPayload final : public UObje
 
 public:
 
-	UInventoryTransactionPayload()
+	UInventoryTransactionPayload() {};
+	
+	UInventoryTransactionPayload(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot) :
+	SourceSlot(NewSourceSlot),
+	TargetSlot(NewTargetSlot)
 	{};
 
+	/**
+	 * Simple function to update the Payload to avoid dozens of setters.
+	 * Can be overriden in Blueprints to implement custom Payload entities.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Inventory")
+	UInventoryTransactionPayload* UpdatePayload(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot);
+
+	UInventoryTransactionPayload* UpdatePayload_Implementation(UInventoryItemSlot* NewSourceSlot, UInventoryItemSlot* NewTargetSlot)
+	{
+		SourceSlot = NewSourceSlot;
+		TargetSlot = NewTargetSlot;
+
+		return this;
+	};
+	
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
@@ -650,4 +669,5 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory|Private", meta = (ExposeOnSpawn = true))
 	UInventoryItemSlot* TargetSlot = nullptr;
 };
+
 #pragma endregion
