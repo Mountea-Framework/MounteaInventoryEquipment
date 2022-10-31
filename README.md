@@ -3,7 +3,7 @@
 Component tool for smart and semi-modular data driven Actor Inventory.
 Developed with Designers in mind to allow you as easy as possible implementation while maintaining high scalability and diverse options to tweak everything to your liking.
 
-![UE](https://img.shields.io/badge/supported-4.25%2B-green)
+![UE](https://img.shields.io/badge/supported-4.26%2B-green)
 ![License](https://img.shields.io/github/license/Mountea-Framework/ActorInteractionPlugin)
 [![YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=flat&logo=youtube)](https://www.youtube.com/@mounteaframework)
 [![Discord](https://badgen.net/discord/online-members/2vXWEEN?label=Discord&logo=discord&logoColor=ffffff&color=7389D8)](https://discord.com/invite/2vXWEEN)
