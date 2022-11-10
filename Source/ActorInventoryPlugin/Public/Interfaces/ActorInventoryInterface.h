@@ -23,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemActionRequested, UInventoryI
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryOpenRequested);
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI, BlueprintType)
+UINTERFACE(BlueprintType, Blueprintable)
 class UActorInventoryInterface : public UInterface
 {
 	GENERATED_BODY()

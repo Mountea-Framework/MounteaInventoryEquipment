@@ -10,7 +10,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdateSpawnedActorItem, const FInventoryItemData, InventoryItem);
 
 // This class does not need to be modified.
-UINTERFACE()
+UINTERFACE(BlueprintType, BlueprintType)
 class UActorInventorySpawnableInterface : public UInterface
 {
 	GENERATED_BODY()
