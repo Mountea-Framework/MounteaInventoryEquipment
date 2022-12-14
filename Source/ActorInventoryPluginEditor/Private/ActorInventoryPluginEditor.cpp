@@ -261,8 +261,6 @@ void FActorInventoryPluginEditor::StartupModule()
 
 void FActorInventoryPluginEditor::ShutdownModule()
 {
-	UE_LOG(ActorInventoryPluginEditor, Warning, TEXT("ActorInventoryPluginEditor module has been unloaded"));
-
 	// Asset Types Cleanup
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
@@ -286,6 +284,8 @@ void FActorInventoryPluginEditor::ShutdownModule()
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryItemComponentSet->GetStyleSetName());
 		FSlateStyleRegistry::UnRegisterSlateStyle(InventoryTypeDefinitionSet->GetStyleSetName());
 	}
+
+	UE_LOG(ActorInventoryPluginEditor, Warning, TEXT("ActorInventoryPluginEditor module has been unloaded"));
 }
 
 void FActorInventoryPluginEditor::HandleNewCustomKeyActionBlueprintCreated(UBlueprint* Blueprint)

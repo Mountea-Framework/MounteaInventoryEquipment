@@ -12,7 +12,7 @@
 	"SupportURL": "https://bit.ly/DominikPavlicek_SupportServer",
 	"EngineVersion": "4.26.0",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
+	"IsBetaVersion": true,
 	"IsExperimentalVersion": false,
 	"Installed": true,
 	"Modules": [
