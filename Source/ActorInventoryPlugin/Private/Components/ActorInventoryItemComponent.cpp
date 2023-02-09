@@ -106,7 +106,6 @@ void UActorInventoryItemComponent::UpdateSpawnedActorItem(const FInventoryItemDa
 
 void UActorInventoryItemComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
 	const FName PropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.GetPropertyName() : NAME_None;

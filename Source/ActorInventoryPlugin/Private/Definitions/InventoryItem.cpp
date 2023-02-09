@@ -2,9 +2,9 @@
 
 #include "Definitions/InventoryItem.h"
 
+#if WITH_EDITOR
 void UInventoryItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-#if WITH_EDITOR
 	UObject::PostEditChangeProperty(PropertyChangedEvent);
 
 	const FName PropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.GetPropertyName() : NAME_None;
@@ -24,5 +24,5 @@ void UInventoryItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 			Item.ItemQuantityData.MaxQuantity = 1;
 		}
 	}
-#endif
 }
+#endif

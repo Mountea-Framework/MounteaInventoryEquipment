@@ -8,6 +8,7 @@ public class ActorInventoryPlugin : ModuleRules
 	public ActorInventoryPlugin(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		bEnforceIWYU = true;
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
@@ -30,7 +31,8 @@ public class ActorInventoryPlugin : ModuleRules
 			{
 				"Core",
 				"UMG",
-				"InventoryEditorNotifications"
+				"InputCore",
+				"Engine"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -39,10 +41,21 @@ public class ActorInventoryPlugin : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"Core",
 				"CoreUObject",
 				"Engine",
 				"UMG",
+				"Slate",
+				"SlateCore",
+				"Projects",
 				"InputCore",
+				
+				
+				"InventoryEditorNotifications",
+				
+#if UE_4_26_OR_LATER
+				"DeveloperSettings",
+#endif
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

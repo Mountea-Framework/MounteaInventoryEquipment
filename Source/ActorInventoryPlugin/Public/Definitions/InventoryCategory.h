@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataAsset.h"
 #include "Helpers/InventoryHelpers.h"
 #include "InventoryCategory.generated.h"
 
 class UInventoryKeyAction;
+struct FInventoryCategoryData;
 
 #define LOCTEXT_NAMESPACE "InventoryCategory"
 
@@ -78,7 +80,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowAbstract=false, NoElementDuplicate=true))
 	TArray<TSubclassOf<UInventoryKeyAction>> CategoryKeyActions;
 
+#if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 };
 
 #undef LOCTEXT_NAMESPACE

@@ -4,28 +4,57 @@ public class ActorInventoryPluginEditor : ModuleRules
 {
 	public ActorInventoryPluginEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        bEnforceIWYU = true;
-
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UnrealEd"});
- 
-		// PublicIncludePaths.AddRange(new string[] {"ActorInventoryPluginEditor/Public"});
-		// PrivateIncludePaths.AddRange(new string[] {"ActorInventoryPluginEditor/Private"});
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		bEnforceIWYU = true;
 		
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"ActorInventoryPlugin",
+		PrecompileForTargets = PrecompileTargetsType.None;
+		bPrecompile = false;
+		bUsePrecompiled = false;
+
+        PublicDependencyModuleNames.AddRange
+        (
+	        new string[]
+	        {
+		        "Core",
+		        "CoreUObject",
+					
+		        "BlueprintGraph",
+					
+		        "Engine",
+					
+		        "KismetCompiler",
+		        "PropertyEditor",
+		        "UnrealEd",
+		        "Kismet"
+	        }
+        );
+		
+        PrivateDependencyModuleNames.AddRange
+        (
+	        new string[]
+	        {
+		        "ActorInventoryPlugin",
+		        "UnrealEd",
+		        "Projects",
 				
-				"UnrealEd",
-				"Projects",
+		        "Slate",
+		        "SlateCore",
 				
-				"Slate",
-				"SlateCore",
+		        "AssetTools",
 				
-				"BlueprintGraph",
-				"Kismet"
-			}
-		);
+		        "BlueprintGraph",
+		        "Kismet", 
+				
+		        "WebBrowser",
+		        "EditorStyle",
+		        "DeveloperSettings",
+				
+		        "MainFrame",
+		        "ToolMenus",
+		        "InputCore",
+				
+		        "UMG"
+	        }
+        );
 	}
 }

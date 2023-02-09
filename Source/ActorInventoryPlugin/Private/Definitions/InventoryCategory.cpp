@@ -3,6 +3,8 @@
 
 #include "Definitions/InventoryCategory.h"
 
+
+#if WITH_EDITOR
 void UInventoryCategory::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -17,3 +19,5 @@ void UInventoryCategory::PostEditChangeProperty(FPropertyChangedEvent& PropertyC
 		}
 	}
 }
+
+#endif

@@ -1,8 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright Dominik Pavlicek 2022. All Rights Reserved.
 
 
 #include "Widgets/InventoryNotification.h"
-
+#include "TimerManager.h"
 
 void UInventoryNotification::NativeConstruct()
 {

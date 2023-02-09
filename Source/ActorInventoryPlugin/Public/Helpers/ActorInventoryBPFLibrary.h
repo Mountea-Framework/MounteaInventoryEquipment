@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "InventoryHelpers.h"
+#include "Definitions/InventoryCategory.h"
 #include "Components/ActorInventoryManagerComponent.h"
+
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ActorInventoryBPFLibrary.generated.h"
 

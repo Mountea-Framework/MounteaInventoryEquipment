@@ -4,8 +4,23 @@ public class InventoryEditorNotifications : ModuleRules
 {
 	public InventoryEditorNotifications(ReadOnlyTargetRules Target) : base(Target)
 	{
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		bEnforceIWYU = true;
+		
+		PrecompileForTargets = PrecompileTargetsType.None;
+		bPrecompile = false;
+		bUsePrecompiled = false;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "UnrealEd", "Slate", "SlateCore", "Projects"});
+		PublicDependencyModuleNames.AddRange
+		(new string[]
+			{
+				"Core", 
+				"CoreUObject", 
+				"Engine",
+				"Slate", 
+				"SlateCore", 
+				"Projects"
+			}
+		);	
 	}
 }

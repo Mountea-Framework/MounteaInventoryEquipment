@@ -4,13 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "InputCoreTypes.h"
+#include "Templates/SubclassOf.h"
+#include "Engine/Level.h"
 #include "InventoryHelpers.generated.h"
-
-#define INVENTORY_TAG_NAME			TEXT(Inventory)
-#define INVENTORY_ITEM_TAG_NAME		TEXT(InventoryItem)
-
-#define OUT
-#define IN
 
 #pragma region TEMPLATES
 
@@ -32,6 +29,15 @@ static FString GetEnumValueAsString(const FString& Name, TEnum Value)
 
 class UInventoryCategory;
 class UInventoryItemRarity;
+class UInventoryItemSlot;
+class UInventoryTransaction;
+class UInventoryTransactionPayload;
+
+class UTexture;
+class UTexture2D;
+class AActor;
+class ULevel;
+class UStreamableRenderAsset;
 
 #pragma region ItemQuantity
 
@@ -332,7 +338,7 @@ public:
 
 	// Actor to spawn from this Item.
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Item Data", meta=(ExposeOnSpawn=true, BlueprintBaseOnly=true, AllowAbstract=false, NoResetToDefault=true))
-	TSubclassOf<AActor> SpawnItemClass;;
+	TSubclassOf<AActor> SpawnItemClass;
 
 public:
 	

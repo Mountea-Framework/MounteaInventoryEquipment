@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Object.h"
 #include "Helpers/InventoryHelpers.h"
 
 #include "InventoryItem.generated.h"
@@ -74,8 +75,10 @@ protected:
 
 protected:
 
+#if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
+#endif
+	
 private:
 
 	/**

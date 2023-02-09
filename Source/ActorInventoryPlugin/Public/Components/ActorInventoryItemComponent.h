@@ -33,6 +33,10 @@ UCLASS(ClassGroup=(Inventory), Blueprintable, HideCategories=(Collision, AssetUs
 class ACTORINVENTORYPLUGIN_API UActorInventoryItemComponent : public UActorComponent, public IActorInventorySpawnableInterface
 {
 	GENERATED_BODY()
+	
+protected:
+
+	virtual void BeginPlay() override;
 
 public:
 
@@ -70,10 +74,11 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="Inventory")
 	UInventoryItem* SourceItem = nullptr;
-	
+
 protected:
 
-	virtual void BeginPlay() override;
+#if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+#endif
 };

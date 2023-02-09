@@ -5,12 +5,11 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "Definitions/InventoryCategory.h"
 #include "Helpers/InventoryHelpers.h"
+#include "Definitions/InventoryCategory.h"
 
 #include "ActorInventoryManagerComponent.generated.h"
 
-class UInventoryCategory;
 class UInventoryItemRarity;
 class UInventoryItem;
 class UInventoryNotification;
@@ -498,13 +497,15 @@ protected:
 
 #pragma endregion 
 	
-private:
+protected:
 
+#if WITH_EDITOR
 	bool ValidateCategories(const bool bShouldCheckForFlags = true);
 	
 	void UpdateCategories();
 	void AddParentCategory(UInventoryCategory* Category, int32& DepthIndex);
 	
-	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+#endif
 };

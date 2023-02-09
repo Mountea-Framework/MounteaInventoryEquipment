@@ -13,7 +13,7 @@
 	"EngineVersion": "4.26.0",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
-	"IsExperimentalVersion": false,
+	"IsExperimentalVersion": true,
 	"Installed": true,
 	"Modules": [
 		{
@@ -26,7 +26,8 @@
 				"Mac",
 				"Linux",
 				"PS4",
-				"XboxOne"
+				"XboxOne",
+				"Switch"
 			]
 		},
 		{

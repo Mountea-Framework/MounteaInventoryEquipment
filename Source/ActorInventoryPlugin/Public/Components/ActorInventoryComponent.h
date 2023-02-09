@@ -266,7 +266,12 @@ private:
 
 	UFUNCTION()
 	void UpdateInventory();
+	
+protected:
 
+#if WITH_EDITOR
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+	
 };
