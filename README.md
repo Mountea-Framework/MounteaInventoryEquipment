@@ -15,11 +15,21 @@ Developed with Designers in mind to allow you as easy as possible implementation
 
 Join support and community Discord!
 
-### Prerequisites
+### Compatible Engine Version
 
-The things you need before running this plugin.
+## Legend
+🟩 - Supported
+🟨 - WIP
+🟪 - Deprecated
+🟥 - Partially supported
 
-* Unreal Engine (supports from 4.26 to newest version)
+## Suport Table
+Engine Version | Plugin Version | Support
+-------------- | -------------- | ----
+UE 4.26 | 0.0.0.1 | 🟩
+UE 4.27 | - | 🟨
+UE 5.00 | - | 🟨
+UE 5.1 | - | 🟨
 
 ### Installation
 
