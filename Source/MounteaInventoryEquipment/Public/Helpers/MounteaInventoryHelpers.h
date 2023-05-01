@@ -91,6 +91,9 @@ struct FMounteaInventoryItemRequiredData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault))
 	TSubclassOf<class UMounteaInventoryItemRarity> ItemRarity;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="StaticMesh, SkeletalMesh"))
+	UStreamableRenderAsset* ItemMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
 	FMounteaItemQuantityData ItemQuantity;

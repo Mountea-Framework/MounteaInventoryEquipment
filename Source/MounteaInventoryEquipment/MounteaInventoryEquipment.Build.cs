@@ -26,6 +26,9 @@ public class MounteaInventoryEquipment : ModuleRules
 			new string[]
 			{
 				"Core",
+				"CoreUObject",
+				"Engine",
+				"UMG",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -34,10 +37,12 @@ public class MounteaInventoryEquipment : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"GameplayTags",
+				"DeveloperSettings",
+				"UMG",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

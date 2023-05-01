@@ -7,6 +7,7 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "MounteaInventoryItem.generated.h"
 
+class IMounteaInventoryPickupInterface;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, EventMessage);
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
@@ -33,6 +34,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(MustImplement="MounteaInventoryPickupInterface"))
+	TSubclassOf<AActor> SpawnActor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false))
 	UDataTable* SourceTable;
