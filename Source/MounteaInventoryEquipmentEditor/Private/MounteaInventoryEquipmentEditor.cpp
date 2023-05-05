@@ -1,5 +1,7 @@
 #include "MounteaInventoryEquipmentEditor.h"
 
+#include "Interfaces/IPluginManager.h"
+
 DEFINE_LOG_CATEGORY(MounteaInventoryEquipmentEditor);
 
 #define LOCTEXT_NAMESPACE "FMounteaInventoryEquipmentEditor"

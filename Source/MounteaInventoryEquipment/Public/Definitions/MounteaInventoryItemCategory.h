@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "MounteaInventoryItemCategory.generated.h"
 
@@ -23,6 +24,9 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemCategory : public UObje
 
 public:
 
+	UPROPERTY(EditDefaultsOnly, Category="1. Required")
+	FGameplayTagContainer CompatibleGameplayTags;
+	
 	UPROPERTY(EditDefaultsOnly, Category="1. Required")
 	FText CategoryName = LOCTEXT("MounteaInventoryItemCategory_Name", "Default");
 

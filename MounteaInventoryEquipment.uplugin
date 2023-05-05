@@ -19,7 +19,7 @@
 		{
 			"Name": "MounteaInventoryEquipment",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
+			"LoadingPhase": "PreDefault",
 			"WhitelistPlatforms": 
 			[
 				"Linux",

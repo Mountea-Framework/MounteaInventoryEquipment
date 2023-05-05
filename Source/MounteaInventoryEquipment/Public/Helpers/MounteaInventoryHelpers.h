@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataTable.h"
 #include "InputCoreTypes.h"
 #include "Templates/SubclassOf.h"
 #include "Engine/Level.h"
 #include "MounteaInventoryHelpers.generated.h"
 
+class UMounteaInventoryItem_Base;
 class UTexture;
 class UTexture2D;
 class AActor;
@@ -81,8 +83,11 @@ struct FMounteaInventoryItemRequiredData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
-	FText ItemName = LOCTEXT("MounteaInventoryItem_ItemName", "New Item");
+	FGameplayTagContainer CompatibleGameplayTags;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
+	FText ItemName = LOCTEXT("MounteaInventoryItem_ItemName", "New Item");
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, MultiLine))
 	FText ItemDescription = LOCTEXT("MounteaInventoryItem_ItemName", "This is a multiline description of a new Item.\nYou can use this to provide some lore data or any additional info about this Item.");
 	
@@ -100,6 +105,31 @@ struct FMounteaInventoryItemRequiredData
 
 	UPROPERTY(VisibleAnywhere)
 	FGuid ItemGuid = FGuid::NewGuid();
+
+public:
+
+	bool operator==(const FMounteaInventoryItemRequiredData& Other) const
+	{
+		return ItemGuid == Other.ItemGuid;
+	}
+
+	bool operator!=(const FMounteaInventoryItemRequiredData& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	FMounteaInventoryItemRequiredData& operator=(const FMounteaInventoryItemRequiredData& Other)
+	{
+		ItemGuid.Invalidate();
+		ItemGuid = FGuid::NewGuid();
+
+		return *this;
+	}
+
+	static friend uint32 GetTypeHash(const FMounteaInventoryItemRequiredData& Data)
+	{
+		return FCrc::MemCrc32(&Data.ItemGuid, sizeof(FGuid));
+	}
 };
 
 /**
@@ -113,22 +143,22 @@ struct FMounteaInventoryItemOptionalData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture* ItemIcon = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bHasWeight : 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=0.f, ClampMin=0.f, Units=kg))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=0.f, ClampMin=0.f, Units=kg, EditCondition="bHasWeight"))
 	float BaseWeight = 0.1f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bHasValue : 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasValue"))
 	float ItemBaseValue = 10.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bHasDurability : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
 	float ItemBaseDurability = 10.f;
 };
 
@@ -148,5 +178,35 @@ struct FMounteaInventoryItemData : public FTableRowBase
 };
 
 #undef LOCTEXT_NAMESPACE
+
+#pragma endregion
+
+#pragma region Filtration
+
+USTRUCT(BlueprintType)
+struct FItemRetrievalFilter
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByTag : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bSearchByTag"))
+	FGameplayTag Tag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByClass : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bSearchByClass"))
+	TSubclassOf<UMounteaInventoryItem_Base> Class;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByGUID : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bSearchByGUID"))
+	FGuid Guid;
+
+	bool IsValid() const
+	{
+		return bSearchByClass || bSearchByTag || bSearchByGUID;
+	}
+};
 
 #pragma endregion 

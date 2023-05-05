@@ -50,6 +50,13 @@ void UMounteaInventoryItem_Base::MarkDirtyForReplication()
 }
 
 #if WITH_EDITOR
+void UMounteaInventoryItem_Base::PostDuplicate(bool bDuplicateForPIE)
+{
+	UObject::PostDuplicate(bDuplicateForPIE);
+
+	ItemData.ItemGuid = FGuid::NewGuid();
+}
+
 void UMounteaInventoryItem_Base::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	// ...

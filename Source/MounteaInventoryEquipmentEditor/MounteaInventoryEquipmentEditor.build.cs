@@ -10,7 +10,19 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 		(
 			new string[]
 			{
-				"Core", "CoreUObject", "Engine", "UnrealEd"
+				"Core", 
+				"CoreUObject", 
+				"Engine", 
+				"UnrealEd",
+				"Projects"
+			}
+		);
+		
+		PrivateDependencyModuleNames.AddRange
+		(
+			new string[]
+			{
+				//...
 			}
 		);
  
@@ -18,7 +30,7 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 		(
 			new string[]
 			{
-				//
+				//...
 			}
 		);
 		
@@ -26,7 +38,7 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 		(
 			new string[]
 			{
-				//
+				//...
 			}
 		);
 	}

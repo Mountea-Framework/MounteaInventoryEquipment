@@ -8,7 +8,8 @@
 #include "MounteaInventoryItem.generated.h"
 
 class IMounteaInventoryPickupInterface;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, EventMessage);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, Message);
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
 
@@ -22,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, E
  * 
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Object
  */
-UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea")
+UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItem_Base : public UObject
 {
 	GENERATED_BODY()
@@ -65,10 +66,13 @@ private:
 
 public:
 
+	int GetRepKey() const
+	{ return RepKey; };
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
-	{ return OwningInventory; };
-
+	{ return OwningInventory; }
+	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory")
 	void Initialize(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData);
 
@@ -96,6 +100,7 @@ protected:
 	void MarkDirtyForReplication();
 
 #if WITH_EDITOR
+	virtual void PostDuplicate(bool bDuplicateForPIE) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 };

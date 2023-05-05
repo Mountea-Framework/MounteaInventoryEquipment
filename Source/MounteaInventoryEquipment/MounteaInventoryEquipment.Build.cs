@@ -29,6 +29,7 @@ public class MounteaInventoryEquipment : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"UMG",
+				"Projects"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

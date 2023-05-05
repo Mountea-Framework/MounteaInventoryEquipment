@@ -33,8 +33,11 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public 
 	UMounteaInventoryEquipmentSettings();
 
 public:
+
+	UPROPERTY(Config, EditAnywhere, Category="1. User Interface", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
+	TSoftClassPtr<UUserWidget> DefaultInventoryWidgetClass;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "UserInterface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TSet<FString> InventoryWidgetCommands;
 
 public:
