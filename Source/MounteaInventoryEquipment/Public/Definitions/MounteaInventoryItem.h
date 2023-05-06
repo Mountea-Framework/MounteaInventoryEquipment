@@ -48,7 +48,7 @@ public:
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault, TitleProperty="DisplayName"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
 	TArray<FMounteaItemConfig> ItemConfigs;
 
 	UPROPERTY(BlueprintAssignable, Category="4. Debug")

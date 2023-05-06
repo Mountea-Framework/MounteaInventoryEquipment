@@ -22,11 +22,6 @@ UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mount
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfig : public UObject
 {
 	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(EditAnywhere, Category="Mountea", meta=(MultiLine))
-	FText DisplayName = LOCTEXT("MounteaInventoryItemConfig_DispalyName", "Config Display Name");
 };
 
 USTRUCT(BlueprintType)
