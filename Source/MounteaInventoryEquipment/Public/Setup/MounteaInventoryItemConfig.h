@@ -23,8 +23,6 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfig : public UObject
 {
 	GENERATED_BODY()
 
-	UMounteaInventoryItemConfig();
-
 public:
 
 	UPROPERTY(EditAnywhere, Category="Mountea", meta=(MultiLine))
