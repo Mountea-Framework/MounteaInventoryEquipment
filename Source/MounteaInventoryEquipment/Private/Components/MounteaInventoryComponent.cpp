@@ -121,10 +121,21 @@ bool UMounteaInventoryComponent::AddItems_Implementation(TArray<UMounteaInventor
 
 bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItem_Base> ItemClass)
 {
+	return true;
 }
 
 bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItem_Base>>& NewItemsClasses)
 {
+	bool bSatisfied = true;
+	for (const auto Itr : NewItemsClasses)
+	{
+		if (!AddItemFromClass_Implementation(Itr))
+		{
+			bSatisfied = false;
+		}
+	}
+
+	return bSatisfied;
 }
 
 bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItem_Base* AffectedItem)
@@ -170,7 +181,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItem_Base* Item)
 
 bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItem_Base* Item)
 {
-	
+	return true;
 }
 
 void UMounteaInventoryComponent::PostInventoryUpdated()
