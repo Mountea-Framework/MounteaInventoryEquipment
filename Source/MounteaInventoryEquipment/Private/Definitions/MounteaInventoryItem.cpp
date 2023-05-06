@@ -12,6 +12,8 @@ void UMounteaInventoryItem_Base::Initialize(UWorld* NewWorld, TScriptInterface<I
 	ItemData = NewItemData;
 	ItemOptionalData = NewOptionalData;
 
+	MarkDirtyForReplication();
+
 	FString Message = ItemData.ItemName.ToString();
 	Message.Append(": Initialization completed.");
 	OnItemInitialized.Broadcast(Message);

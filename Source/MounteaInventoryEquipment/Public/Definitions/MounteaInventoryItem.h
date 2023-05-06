@@ -54,11 +54,11 @@ protected:
 	FItemGenericEvent OnItemModified;
 
 private:
-
+	
 	UPROPERTY(VisibleAnywhere, Category="4. Debug")
 	int32 RepKey = 0;
 
-   UPROPERTY(VisibleAnywhere, Category="4. Debug", meta=(DisplayThumbnail=false))
+    UPROPERTY(VisibleAnywhere, Category="4. Debug", meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
 	
 	UPROPERTY(Transient)

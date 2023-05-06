@@ -4,23 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
+#include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "MounteaInventoryEquipmentSettings.generated.h"
-
-namespace MounteaInventoryWidgetCommands
-{
-	namespace InventoryCommands
-	{
-		const FString InitializeInventoryWidget		(TEXT("InitializeInventoryWidget"));
-		const FString CreateInventoryWidget		(TEXT("CreateInventoryWidget"));
-		const FString HideInventoryWidget		(TEXT("HideInventoryWidget"));
-	}
-
-	namespace ItemCommands
-	{
-		const FString AddNewItem		(TEXT("AddNewItem"));
-	}
-	
-}
 
 /**
  * 
@@ -39,6 +24,9 @@ public:
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TSet<FString> InventoryWidgetCommands;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	TSet<FString> ItemsWidgetCommands;
 
 public:
 
@@ -62,17 +50,25 @@ public:
 	{
 		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryWidgetCommands))
 		{
-			if (!InventoryWidgetCommands.Contains(MounteaInventoryWidgetCommands::InventoryCommands::InitializeInventoryWidget))
+			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::InitializeInventoryWidget))
 			{
-				InventoryWidgetCommands.Add(MounteaInventoryWidgetCommands::InventoryCommands::InitializeInventoryWidget);
+				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::InitializeInventoryWidget);
 			}
-			if (!InventoryWidgetCommands.Contains(MounteaInventoryWidgetCommands::InventoryCommands::CreateInventoryWidget))
+			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::CreateInventoryWidget))
 			{
-				InventoryWidgetCommands.Add(MounteaInventoryWidgetCommands::InventoryCommands::CreateInventoryWidget);
+				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::CreateInventoryWidget);
 			}
-			if (!InventoryWidgetCommands.Contains(MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget))
+			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget))
 			{
-				InventoryWidgetCommands.Add(MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget);
+				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget);
+			}
+		}
+
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, ItemsWidgetCommands))
+		{
+			if (!ItemsWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::AddNewItem))
+			{
+				ItemsWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::AddNewItem);
 			}
 		}
 	}

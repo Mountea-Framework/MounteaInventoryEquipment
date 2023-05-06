@@ -10,9 +10,11 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	CategoryName = TEXT("Mountea Framework");
 	SectionName = TEXT("Mountea Inventory & Equipment");
 	
-	InventoryWidgetCommands.Add(MounteaInventoryWidgetCommands::InventoryCommands::InitializeInventoryWidget);
-	InventoryWidgetCommands.Add(MounteaInventoryWidgetCommands::InventoryCommands::CreateInventoryWidget);
-	InventoryWidgetCommands.Add(MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget);
+	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::InitializeInventoryWidget);
+	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::CreateInventoryWidget);
+	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget);
+	
+	ItemsWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::AddNewItem);
 }
 
 #undef LOCTEXT_NAMESPACE
