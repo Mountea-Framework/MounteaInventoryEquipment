@@ -79,7 +79,7 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 	return false;
 }
 
-UMounteaInventoryItem_Base* UMounteaInventoryComponent::FindItem_Implementation(const FItemRetrievalFilter& SearchFilter)
+UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(const FItemRetrievalFilter& SearchFilter)
 {
 	if (SearchFilter.IsValid())
 	{
@@ -89,7 +89,7 @@ UMounteaInventoryItem_Base* UMounteaInventoryComponent::FindItem_Implementation(
 	return nullptr;
 }
 
-TArray<UMounteaInventoryItem_Base*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter)
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter)
 {
 	if (OptionalFilter.IsValid())
 	{
@@ -100,12 +100,12 @@ TArray<UMounteaInventoryItem_Base*> UMounteaInventoryComponent::GetItems_Impleme
 	return Items;
 }
 
-bool UMounteaInventoryComponent::AddItem_Implementation(UMounteaInventoryItem_Base* NewItem)
+bool UMounteaInventoryComponent::AddItem_Implementation(UMounteaInventoryItemBase* NewItem)
 {
 	return TryAddItem(NewItem);
 }
 
-bool UMounteaInventoryComponent::AddItems_Implementation(TArray<UMounteaInventoryItem_Base*>& NewItems)
+bool UMounteaInventoryComponent::AddItems_Implementation(TArray<UMounteaInventoryItemBase*>& NewItems)
 {
 	bool bSatisfied = true;
 	for (const auto Itr : NewItems)
@@ -119,12 +119,12 @@ bool UMounteaInventoryComponent::AddItems_Implementation(TArray<UMounteaInventor
 	return bSatisfied;
 }
 
-bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItem_Base> ItemClass)
+bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass)
 {
 	return true;
 }
 
-bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItem_Base>>& NewItemsClasses)
+bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItemBase>>& NewItemsClasses)
 {
 	bool bSatisfied = true;
 	for (const auto Itr : NewItemsClasses)
@@ -138,12 +138,12 @@ bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TArray<TSubcla
 	return bSatisfied;
 }
 
-bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItem_Base* AffectedItem)
+bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem)
 {
 	return TryRemoveItem(AffectedItem);
 }
 
-bool UMounteaInventoryComponent::RemoveItems_Implementation(TArray<UMounteaInventoryItem_Base*>& AffectedItems)
+bool UMounteaInventoryComponent::RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems)
 {
 	bool bSatisfied = true;
 	for (const auto Itr : AffectedItems)
@@ -163,7 +163,7 @@ void UMounteaInventoryComponent::OnRep_Items()
 	// Broadcast changes
 }
 
-bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItem_Base* Item)
+bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item)
 {
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
@@ -179,7 +179,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItem_Base* Item)
 	return false;
 }
 
-bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItem_Base* Item)
+bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item)
 {
 	return true;
 }
@@ -188,15 +188,15 @@ void UMounteaInventoryComponent::PostInventoryUpdated()
 {
 }
 
-void UMounteaInventoryComponent::PostItemAdded(UMounteaInventoryItem_Base* Item, const FString& UpdateMessage)
+void UMounteaInventoryComponent::PostItemAdded(UMounteaInventoryItemBase* Item, const FString& UpdateMessage)
 {
 }
 
-void UMounteaInventoryComponent::PostItemRemoved(UMounteaInventoryItem_Base* Item, const FString& UpdateMessage)
+void UMounteaInventoryComponent::PostItemRemoved(UMounteaInventoryItemBase* Item, const FString& UpdateMessage)
 {
 }
 
-void UMounteaInventoryComponent::PostItemUpdated(UMounteaInventoryItem_Base* Item, const FString& UpdateMessage)
+void UMounteaInventoryComponent::PostItemUpdated(UMounteaInventoryItemBase* Item, const FString& UpdateMessage)
 {
 }
 

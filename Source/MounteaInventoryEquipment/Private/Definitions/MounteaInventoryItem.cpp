@@ -5,7 +5,7 @@
 #include "Net/UnrealNetwork.h"
 
 
-void UMounteaInventoryItem_Base::Initialize(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData)
+void UMounteaInventoryItemBase::Initialize(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData)
 {
 	World = NewWorld;
 	OwningInventory = NewOwningInventory;
@@ -19,7 +19,7 @@ void UMounteaInventoryItem_Base::Initialize(UWorld* NewWorld, TScriptInterface<I
 	OnItemInitialized.Broadcast(Message);
 }
 
-void UMounteaInventoryItem_Base::OnRep_Item()
+void UMounteaInventoryItemBase::OnRep_Item()
 {
 	FString Message = ItemData.ItemName.ToString();
 	Message.Append(" has been modified.");
@@ -27,24 +27,24 @@ void UMounteaInventoryItem_Base::OnRep_Item()
 	OnItemModified.Broadcast(Message);
 }
 
-void UMounteaInventoryItem_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UMounteaInventoryItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UMounteaInventoryItem_Base, ItemData);
+	DOREPLIFETIME(UMounteaInventoryItemBase, ItemData);
 }
 
-bool UMounteaInventoryItem_Base::IsSupportedForNetworking() const
+bool UMounteaInventoryItemBase::IsSupportedForNetworking() const
 {
 	return true;
 }
 
-UWorld* UMounteaInventoryItem_Base::GetWorld() const
+UWorld* UMounteaInventoryItemBase::GetWorld() const
 {
 	return World;
 }
 
-void UMounteaInventoryItem_Base::MarkDirtyForReplication()
+void UMounteaInventoryItemBase::MarkDirtyForReplication()
 {
 	++RepKey;
 
@@ -52,14 +52,14 @@ void UMounteaInventoryItem_Base::MarkDirtyForReplication()
 }
 
 #if WITH_EDITOR
-void UMounteaInventoryItem_Base::PostDuplicate(bool bDuplicateForPIE)
+void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 {
 	UObject::PostDuplicate(bDuplicateForPIE);
 
 	ItemData.ItemGuid = FGuid::NewGuid();
 }
 
-void UMounteaInventoryItem_Base::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	// ...
 }

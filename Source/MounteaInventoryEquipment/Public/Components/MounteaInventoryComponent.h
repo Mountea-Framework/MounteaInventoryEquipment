@@ -7,7 +7,7 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "MounteaInventoryComponent.generated.h"
 
-class UMounteaInventoryItem_Base;
+class UMounteaInventoryItemBase;
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryComponent"
 
@@ -50,16 +50,16 @@ public:
 	virtual void SaveInventory_Implementation() override;
 
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) override;
-	virtual UMounteaInventoryItem_Base* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) override;
-	virtual TArray<UMounteaInventoryItem_Base*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) override;
+	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) override;
+	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) override;
 	
-	virtual bool AddItem_Implementation(UMounteaInventoryItem_Base* NewItem) override;
-	virtual bool AddItems_Implementation(TArray<UMounteaInventoryItem_Base*>& NewItems) override;
-	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItem_Base> ItemClass) override;
-	virtual bool AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItem_Base>>& NewItemsClasses) override;
+	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem) override;
+	virtual bool AddItems_Implementation(TArray<UMounteaInventoryItemBase*>& NewItems) override;
+	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass) override;
+	virtual bool AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItemBase>>& NewItemsClasses) override;
 
-	virtual bool RemoveItem_Implementation(UMounteaInventoryItem_Base* AffectedItem) override;
-	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItem_Base*>& AffectedItems) override;
+	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) override;
+	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) override;
 
 public:
 
@@ -82,17 +82,17 @@ private:
 
 protected:
 
-	virtual bool TryAddItem(UMounteaInventoryItem_Base* Item);
-	virtual bool TryRemoveItem(UMounteaInventoryItem_Base* Item);
+	virtual bool TryAddItem(UMounteaInventoryItemBase* Item);
+	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item);
 
 	UFUNCTION()
 	void PostInventoryUpdated();
 	UFUNCTION()
-	void PostItemAdded(UMounteaInventoryItem_Base* Item, const FString& UpdateMessage);
+	void PostItemAdded(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
 	UFUNCTION()
-	void PostItemRemoved(UMounteaInventoryItem_Base* Item, const FString& UpdateMessage);
+	void PostItemRemoved(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
 	UFUNCTION()
-	void PostItemUpdated(UMounteaInventoryItem_Base* Item, const FString& UpdateMessage);
+	void PostItemUpdated(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
 
 #pragma endregion
 
@@ -118,10 +118,10 @@ protected:
 	UUserWidget* InventoryWBP = nullptr;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
-	TArray<UMounteaInventoryItem_Base*> Items;
+	TArray<UMounteaInventoryItemBase*> Items;
 
 	UPROPERTY()
-	TArray<UMounteaInventoryItem_Base*> ClientLastReceivedItems;
+	TArray<UMounteaInventoryItemBase*> ClientLastReceivedItems;
 
 private:
 

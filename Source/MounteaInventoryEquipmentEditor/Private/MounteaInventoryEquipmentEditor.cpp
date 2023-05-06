@@ -1,5 +1,7 @@
 #include "MounteaInventoryEquipmentEditor.h"
 
+#include "AssetToolsModule.h"
+#include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
 #include "Interfaces/IPluginManager.h"
 
 DEFINE_LOG_CATEGORY(MounteaInventoryEquipmentEditor);
@@ -8,6 +10,12 @@ DEFINE_LOG_CATEGORY(MounteaInventoryEquipmentEditor);
 
 void FMounteaInventoryEquipmentEditor::StartupModule()
 {
+	// Asset Actions
+	{
+		MounteaInventoryItemConfigAssetAction = MakeShared<FMounteaInventoryItemConfigAssetAction>();
+		FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(MounteaInventoryItemConfigAssetAction.ToSharedRef());
+	}
+	
 	UE_LOG(MounteaInventoryEquipmentEditor, Warning, TEXT("MounteaInventoryEquipmentEditor module has been loaded"));
 }
 

@@ -7,6 +7,7 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "MounteaInventoryItem.generated.h"
 
+struct FMounteaItemConfig;
 class IMounteaInventoryPickupInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, Message);
@@ -24,7 +25,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, M
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Object
  */
 UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItem_Base : public UObject
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UObject
 {
 	GENERATED_BODY()
 
@@ -46,6 +47,9 @@ public:
 	FName SourceRow;
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault, TitleProperty="DisplayName"))
+	TArray<FMounteaItemConfig> ItemConfigs;
 
 	UPROPERTY(BlueprintAssignable, Category="4. Debug")
 	FItemGenericEvent OnItemInitialized;

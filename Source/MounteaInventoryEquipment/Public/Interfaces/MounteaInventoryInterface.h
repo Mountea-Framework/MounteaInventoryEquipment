@@ -8,7 +8,7 @@
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryInterface.generated.h"
 
-class UMounteaInventoryItem_Base;
+class UMounteaInventoryItemBase;
 
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
@@ -18,7 +18,7 @@ class UMounteaInventoryInterface : public UInterface
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdated, class UMounteaInventoryItem_Base*, Item, const FString&, UpdateMessage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdated, class UMounteaInventoryItemBase*, Item, const FString&, UpdateMessage);
 
 /**
  * Mountea Inventory Interface.
@@ -55,40 +55,40 @@ public:
 	virtual void SaveInventory_Implementation() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	UMounteaInventoryItem_Base* FindItem(const FItemRetrievalFilter& SearchFilter);
-	virtual UMounteaInventoryItem_Base* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) = 0;
+	UMounteaInventoryItemBase* FindItem(const FItemRetrievalFilter& SearchFilter);
+	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool HasItem(const FItemRetrievalFilter& SearchFilter);
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TArray<UMounteaInventoryItem_Base*> GetItems(const FItemRetrievalFilter OptionalFilter);
-	virtual TArray<UMounteaInventoryItem_Base*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) = 0;
+	TArray<UMounteaInventoryItemBase*> GetItems(const FItemRetrievalFilter OptionalFilter);
+	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItem(UMounteaInventoryItem_Base* NewItem);
-	virtual bool AddItem_Implementation(UMounteaInventoryItem_Base* NewItem) = 0;
+	bool AddItem(UMounteaInventoryItemBase* NewItem);
+	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItemFromClass(TSubclassOf<UMounteaInventoryItem_Base> ItemClass);
-	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItem_Base> ItemClass) = 0;
+	bool AddItemFromClass(TSubclassOf<UMounteaInventoryItemBase> ItemClass);
+	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItems(TArray<UMounteaInventoryItem_Base*>& NewItems);
-	virtual bool AddItems_Implementation(TArray<UMounteaInventoryItem_Base*>& NewItems) = 0;
+	bool AddItems(TArray<UMounteaInventoryItemBase*>& NewItems);
+	virtual bool AddItems_Implementation(TArray<UMounteaInventoryItemBase*>& NewItems) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItemsFromClass(TArray<TSubclassOf<UMounteaInventoryItem_Base>>& NewItemsClasses);
-	virtual bool AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItem_Base>>& NewItemsClasses) = 0;
+	bool AddItemsFromClass(TArray<TSubclassOf<UMounteaInventoryItemBase>>& NewItemsClasses);
+	virtual bool AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItemBase>>& NewItemsClasses) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool RemoveItem(UMounteaInventoryItem_Base* AffectedItem);
-	virtual bool RemoveItem_Implementation(UMounteaInventoryItem_Base* AffectedItem) = 0;
+	bool RemoveItem(UMounteaInventoryItemBase* AffectedItem);
+	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool RemoveItems(TArray<UMounteaInventoryItem_Base*>& AffectedItems);
-	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItem_Base*>& AffectedItems) = 0;
+	bool RemoveItems(TArray<UMounteaInventoryItemBase*>& AffectedItems);
+	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) = 0;
 
 public:
 

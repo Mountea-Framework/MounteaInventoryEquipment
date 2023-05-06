@@ -22,6 +22,7 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 		(
 			new string[]
 			{
+				"MounteaInventoryEquipment",
 				//...
 			}
 		);

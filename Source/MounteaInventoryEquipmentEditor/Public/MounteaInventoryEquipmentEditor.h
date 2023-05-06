@@ -13,4 +13,8 @@ class FMounteaInventoryEquipmentEditor : public IModuleInterface
 
 	/* Called when the module is unloaded */
 	virtual void ShutdownModule() override;
+
+private:
+
+	TSharedPtr<class FMounteaInventoryItemConfigAssetAction> MounteaInventoryItemConfigAssetAction;
 };

@@ -10,7 +10,7 @@
 #include "Engine/Level.h"
 #include "MounteaInventoryHelpers.generated.h"
 
-class UMounteaInventoryItem_Base;
+class UMounteaInventoryItemBase;
 class UTexture;
 class UTexture2D;
 class AActor;
@@ -196,7 +196,7 @@ struct FItemRetrievalFilter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bSearchByClass : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bSearchByClass"))
-	TSubclassOf<UMounteaInventoryItem_Base> Class;
+	TSubclassOf<UMounteaInventoryItemBase> Class;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bSearchByGUID : 1;
