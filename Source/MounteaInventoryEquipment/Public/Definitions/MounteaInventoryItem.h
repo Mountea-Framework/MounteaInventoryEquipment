@@ -29,6 +29,12 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UObject
 {
 	GENERATED_BODY()
 
+	UMounteaInventoryItemBase();
+
+private:
+
+	virtual void PostInitProperties() override;
+
 public:
 
 	UPROPERTY(EditAnywhere, Category="1. Required", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
@@ -50,6 +56,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
 	TArray<FMounteaItemConfig> ItemConfigs;
+	
+	UPROPERTY(BlueprintAssignable, Category="4. Debug")
+	FItemGenericEvent OnItemAdded;
 
 	UPROPERTY(BlueprintAssignable, Category="4. Debug")
 	FItemGenericEvent OnItemInitialized;
@@ -70,20 +79,31 @@ private:
 
 public:
 
+	virtual FItemGenericEvent& GetItemAddedHandle()
+	{ return OnItemAdded; };
+
 	int GetRepKey() const
-	{ return RepKey; };
+	{ return RepKey; }
+
+	FGameplayTag GetFirstTag() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
 	{ return OwningInventory; }
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory")
-	void Initialize(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData);
+	virtual void SetWorld(UWorld* NewWorld);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory")
+	void InitializeNewItem(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData);
 
 protected:
 
 	UFUNCTION()
 	virtual void OnRep_Item();
+
+	UFUNCTION()
+	void ItemAdded(const FString& Message);
 	
 	UFUNCTION()
 	virtual TArray<FName> GetSourceTableRows() const

@@ -203,9 +203,14 @@ struct FItemRetrievalFilter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bSearchByGUID"))
 	FGuid Guid;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByItem : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bSearchByGUID"))
+	UMounteaInventoryItemBase* Item ;
+
 	bool IsValid() const
 	{
-		return bSearchByClass || bSearchByTag || bSearchByGUID;
+		return bSearchByClass || bSearchByTag || bSearchByGUID || bSearchByItem;
 	}
 };
 

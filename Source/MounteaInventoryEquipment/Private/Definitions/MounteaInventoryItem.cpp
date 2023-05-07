@@ -5,7 +5,29 @@
 #include "Net/UnrealNetwork.h"
 
 
-void UMounteaInventoryItemBase::Initialize(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData)
+UMounteaInventoryItemBase::UMounteaInventoryItemBase()
+{
+	RepKey = 0;
+}
+
+void UMounteaInventoryItemBase::PostInitProperties()
+{
+	UObject::PostInitProperties();
+
+	OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
+}
+
+FGameplayTag UMounteaInventoryItemBase::GetFirstTag() const
+{
+	return ItemData.CompatibleGameplayTags.First();
+}
+
+void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)
+{
+	World = NewWorld;
+}
+
+void UMounteaInventoryItemBase::InitializeNewItem(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData)
 {
 	World = NewWorld;
 	OwningInventory = NewOwningInventory;
@@ -27,6 +49,11 @@ void UMounteaInventoryItemBase::OnRep_Item()
 	OnItemModified.Broadcast(Message);
 }
 
+void UMounteaInventoryItemBase::ItemAdded(const FString& Message)
+{
+	RepKey++;
+}
+
 void UMounteaInventoryItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -41,7 +68,17 @@ bool UMounteaInventoryItemBase::IsSupportedForNetworking() const
 
 UWorld* UMounteaInventoryItemBase::GetWorld() const
 {
-	return World;
+	if (World)
+	{
+		return World;
+	}
+	
+	if (GetOuter())
+	{
+		return GetOuter()->GetWorld();
+	}
+	
+	return nullptr;
 }
 
 void UMounteaInventoryItemBase::MarkDirtyForReplication()
@@ -49,6 +86,10 @@ void UMounteaInventoryItemBase::MarkDirtyForReplication()
 	++RepKey;
 
 	// TODO: Request OwningInventory to increment ReplicatedItemsKeys
+	if (OwningInventory.GetInterface())
+	{
+		OwningInventory->Execute_RequestNetworkRefresh(OwningInventory.GetObject());
+	}
 }
 
 #if WITH_EDITOR

@@ -58,6 +58,13 @@ public:
 	UMounteaInventoryItemBase* FindItem(const FItemRetrievalFilter& SearchFilter);
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) = 0;
 
+	/***
+	 * ❗  Only checks for first Item that matches Search Filter.
+	 *
+	 * Takes a single argument of type FItemRetrievalFilter, which allows for searching the inventory for an item based on various parameters such as item ID, item class, tags, or GUID.
+	 * When called, HasItem will check the inventory for the existence of an item that matches the provided search filter. If such an item exists, the function will return true; otherwise, it will return false.
+	 * This function can be useful for quickly checking whether a particular item is present in the inventory before attempting to perform further operations with it, such as removing or using it.
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool HasItem(const FItemRetrievalFilter& SearchFilter);
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) = 0;
@@ -90,6 +97,10 @@ public:
 	bool RemoveItems(TArray<UMounteaInventoryItemBase*>& AffectedItems);
 	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) = 0;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void RequestNetworkRefresh();
+	virtual void RequestNetworkRefresh_Implementation() = 0;
+	
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() = 0;

@@ -33,10 +33,12 @@ public:
 	
 	UMounteaInventoryComponent();
 
-#pragma region FUNCTIONS
 protected:
 
 	virtual void BeginPlay() override;
+
+#pragma region FUNCTIONS
+protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
@@ -48,7 +50,7 @@ public:
 
 	virtual bool LoadInventoryFromDataTable_Implementation(const UDataTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
-
+	
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) override;
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) override;
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) override;
@@ -61,6 +63,8 @@ public:
 	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) override;
 	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) override;
 
+	virtual void RequestNetworkRefresh_Implementation() override;
+	
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() override
@@ -84,6 +88,10 @@ protected:
 
 	virtual bool TryAddItem(UMounteaInventoryItemBase* Item);
 	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item);
+	
+	virtual bool TryAddItem_Internal(UMounteaInventoryItemBase* Item);
+	virtual bool TryAddItem_InternalNewItem(UMounteaInventoryItemBase* Item);
+	virtual bool TryAddItem_InternalUpdateExisting(UMounteaInventoryItemBase* Item);
 
 	UFUNCTION()
 	void PostInventoryUpdated();
