@@ -97,7 +97,7 @@ void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 {
 	UObject::PostDuplicate(bDuplicateForPIE);
 
-	ItemData.ItemGuid = FGuid::NewGuid();
+	ItemGuid = FGuid::NewGuid();
 }
 
 void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

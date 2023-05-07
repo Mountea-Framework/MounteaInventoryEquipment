@@ -37,19 +37,19 @@ private:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category="1. Required", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
 	FMounteaInventoryItemRequiredData ItemData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(MustImplement="MounteaInventoryPickupInterface"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(MustImplement="MounteaInventoryPickupInterface"))
 	TSubclassOf<AActor> SpawnActor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false))
 	UDataTable* SourceTable;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr"))
 	FName SourceRow;
 
 protected:
@@ -67,6 +67,9 @@ protected:
 	FItemGenericEvent OnItemModified;
 
 private:
+
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="4. Debug")
+	FGuid ItemGuid = FGuid::NewGuid();
 	
 	UPROPERTY(VisibleAnywhere, Category="4. Debug")
 	int32 RepKey = 0;
@@ -78,6 +81,10 @@ private:
 	class UWorld* World;
 
 public:
+
+	UFUNCTION(BlueprintGetter, Category="Mountea|Inventory")
+	FGuid GetItemGuid() const
+	{ return ItemGuid; };
 
 	virtual FItemGenericEvent& GetItemAddedHandle()
 	{ return OnItemAdded; };

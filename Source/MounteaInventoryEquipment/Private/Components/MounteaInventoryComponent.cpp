@@ -73,7 +73,7 @@ void UMounteaInventoryComponent::SaveInventory_Implementation()
 	// TODO
 }
 
-bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilter& SearchFilter)
+bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
 {
 	if (SearchFilter.IsValid())
 	{
@@ -112,7 +112,7 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 		{
 			for (const auto Itr : Items)
 			{
-				if (Itr && Itr->ItemData.ItemGuid == SearchFilter.Guid)
+				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
 				{
 					return true;
 				}
@@ -123,7 +123,7 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 	return false;
 }
 
-UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(const FItemRetrievalFilter& SearchFilter)
+UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
 {
 	if (SearchFilter.IsValid())
 	{
@@ -165,7 +165,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 		{
 			for (const auto Itr : Items)
 			{
-				if (Itr && Itr->ItemData.ItemGuid == SearchFilter.Guid)
+				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
 				{
 					return Itr;
 				}
@@ -176,12 +176,57 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 	return nullptr;
 }
 
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter)
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const
 {
 	if (OptionalFilter.IsValid())
 	{
-		//TODO: Filtration
-		return Items;
+		TArray<UMounteaInventoryItemBase*> ReturnValues;
+
+		//Filter by Item
+		if (OptionalFilter.bSearchByItem)
+		{
+			if (Items.Contains(OptionalFilter.Item))
+			{
+				ReturnValues.Add(Items[Items.Find(OptionalFilter.Item)]);
+			}
+		}
+		
+		//Filter by Class
+		if (OptionalFilter.bSearchByClass)
+		{
+			for (auto Itr : Items)
+			{
+				if (Itr && Itr->IsA(OptionalFilter.Class))
+				{
+					ReturnValues.Add(Itr);
+				}
+			}
+		}
+
+		//Filter by Tag
+		if (OptionalFilter.bSearchByTag)
+		{
+			for (auto Itr : Items)
+			{
+				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasTag(OptionalFilter.Tag))
+				{
+					ReturnValues.Add(Itr);
+				}
+			}
+		}
+
+		//Filter by Guid
+		if (OptionalFilter.bSearchByGUID)
+		{
+			for (auto Itr : Items)
+			{
+				if (Itr && Itr->GetItemGuid() == OptionalFilter.Guid)
+				{
+					ReturnValues.Add(Itr);
+				}
+			}
+		}
+		return ReturnValues;
 	}
 	
 	return Items;
@@ -260,29 +305,6 @@ void UMounteaInventoryComponent::OnRep_Items()
 
 bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item)
 {
-	if (GetOwner() && GetOwner()->HasAuthority())
-	{
-		Items.Add(Item);
-
-		OnInventoryUpdated.Broadcast();
-		
-		OnItemAdded.Broadcast(Item, MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::NewItemAdded);
-
-		ReplicatedItemsKey++;
-		OnRep_Items();
-		return true;
-	}
-
-	return false;
-}
-
-bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item)
-{
-	return true;
-}
-
-bool UMounteaInventoryComponent::TryAddItem_Internal(UMounteaInventoryItemBase* Item)
-{
 	if (GetOwner() && GetOwner()->HasAuthority() && Item)
 	{
 		FItemRetrievalFilter Filter;
@@ -293,29 +315,53 @@ bool UMounteaInventoryComponent::TryAddItem_Internal(UMounteaInventoryItemBase* 
 		Filter.bSearchByTag = true;
 		Filter.Tag = Item->GetFirstTag();
 	
-		if (!HasItem(Filter))
+		if (!Execute_HasItem(this, Filter))
 		{
-			return TryAddItem_InternalNewItem(Item);
+			return TryAddItem_NewItem(Item);
 		}
 		else
 		{
-			return TryAddItem_InternalUpdateExisting(Item);
+			return TryAddItem_UpdateExisting(Item);
 		}
 	}
 
 	//TODO Broadcast fail with message
+	// Switch errors and broadcast only valid result
 	return false;
 }
 
-bool UMounteaInventoryComponent::TryAddItem_InternalNewItem(UMounteaInventoryItemBase* Item)
+bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item)
 {
-	
+	return true;
+}
+
+bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Item)
+{
+	if (GetOwner() && GetOwner()->HasAuthority())
+	{
+		Items.Add(Item);
+
+		OnInventoryUpdated.Broadcast();
+		
+		OnItemAdded.Broadcast(Item, MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::NewItemAdded);
+
+		ReplicatedItemsKey++;
+		OnRep_Items();
+
+		return true;
+	}
+
 	return false;
 }
 
-bool UMounteaInventoryComponent::TryAddItem_InternalUpdateExisting(UMounteaInventoryItemBase* Item)
+bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* Item)
 {
-	return false;
+	return AddItem_Internal(Item);
+}
+
+bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Item)
+{
+	return AddItem_Internal(Item);
 }
 
 void UMounteaInventoryComponent::PostInventoryUpdated()

@@ -103,14 +103,16 @@ struct FMounteaInventoryItemRequiredData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
 	FMounteaItemQuantityData ItemQuantity;
 
-	UPROPERTY(VisibleAnywhere)
-	FGuid ItemGuid = FGuid::NewGuid();
-
 public:
 
 	bool operator==(const FMounteaInventoryItemRequiredData& Other) const
 	{
-		return ItemGuid == Other.ItemGuid;
+		if (CompatibleGameplayTags.IsEmpty())
+		{
+			return ItemName.EqualTo(Other.ItemName);
+		}
+
+		return ItemName.EqualTo(Other.ItemName) && CompatibleGameplayTags == Other.CompatibleGameplayTags;
 	}
 
 	bool operator!=(const FMounteaInventoryItemRequiredData& Other) const
@@ -120,15 +122,15 @@ public:
 
 	FMounteaInventoryItemRequiredData& operator=(const FMounteaInventoryItemRequiredData& Other)
 	{
-		ItemGuid.Invalidate();
-		ItemGuid = FGuid::NewGuid();
-
 		return *this;
 	}
 
 	static friend uint32 GetTypeHash(const FMounteaInventoryItemRequiredData& Data)
 	{
-		return FCrc::MemCrc32(&Data.ItemGuid, sizeof(FGuid));
+		uint32 Hash = 0;
+		Hash = HashCombine(Hash, GetTypeHash(Data.ItemName.ToString()));
+				
+		return Hash;
 	}
 };
 
@@ -183,6 +185,20 @@ struct FMounteaInventoryItemData : public FTableRowBase
 
 #pragma region Filtration
 
+/**
+ * Helper structure that contains options to filter items in an inventory system by Item, Class, Tag, or Guid.
+ * It can be used to search for specific items in an inventory, or to retrieve all items that match a certain set of criteria.
+ *
+ * * Item: Specifies the exact item to search for in the inventory. If this member is set, the filter will only return single value that match the specified item.
+ * * Class: Specifies the class of items to search for in the inventory. If this member is set, the filter will return items that belong to the specified class.
+ * * Tag: Specifies the tag to search for in the inventory. If this  is set, the filter will only return items that have the specified tag.
+ * * Guid: Specifies the GUID to search for in the inventory. If this member is set, the filter will only return items that have the specified GUID.
+ *
+ * Each member of the structure can be used alone or in combination with other members to create more complex filters.
+ * For example, you could create a filter that searches for all items of a certain class and also items which have a specific tag.
+ * All functions use additive OR logic, meaning:
+ * * If you specify more than one filter, results will contain combined results for each selected criteria
+ */
 USTRUCT(BlueprintType)
 struct FItemRetrievalFilter
 {

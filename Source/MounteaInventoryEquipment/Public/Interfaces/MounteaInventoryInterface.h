@@ -55,8 +55,8 @@ public:
 	virtual void SaveInventory_Implementation() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	UMounteaInventoryItemBase* FindItem(const FItemRetrievalFilter& SearchFilter);
-	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) = 0;
+	UMounteaInventoryItemBase* FindItem(const FItemRetrievalFilter& SearchFilter) const;
+	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 
 	/***
 	 * ❗  Only checks for first Item that matches Search Filter.
@@ -66,12 +66,21 @@ public:
 	 * This function can be useful for quickly checking whether a particular item is present in the inventory before attempting to perform further operations with it, such as removing or using it.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool HasItem(const FItemRetrievalFilter& SearchFilter);
-	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) = 0;
+	bool HasItem(const FItemRetrievalFilter& SearchFilter) const;
+	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 
+	/**
+	 * Returns an array of pointers to UMounteaInventoryItemBase objects that match the specified filter criteria.
+	 * The filter options are defined in the FItemRetrievalFilter structure, which contains fields to search by item, class, tag, or GUID, or a additive combination of each.
+	 * By default, if no filter is specified, the function returns all items in the inventory.
+	 *
+	 * @param OptionalFilter An optional item retrieval filter specifying which items to retrieve.
+	 *
+	 * @return An array of inventory items that meet the specified filter criteria. If no filter is provided, returns all items.
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TArray<UMounteaInventoryItemBase*> GetItems(const FItemRetrievalFilter OptionalFilter);
-	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) = 0;
+	TArray<UMounteaInventoryItemBase*> GetItems(const FItemRetrievalFilter OptionalFilter) const;
+	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool AddItem(UMounteaInventoryItemBase* NewItem);

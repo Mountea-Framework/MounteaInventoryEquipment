@@ -32,13 +32,11 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryComponent : public UActorCo
 public:
 	
 	UMounteaInventoryComponent();
-
+	
+#pragma region FUNCTIONS
 protected:
 
 	virtual void BeginPlay() override;
-
-#pragma region FUNCTIONS
-protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
@@ -51,9 +49,9 @@ public:
 	virtual bool LoadInventoryFromDataTable_Implementation(const UDataTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
 	
-	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) override;
-	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) override;
-	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) override;
+	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
+	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
+	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const override;
 	
 	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem) override;
 	virtual bool AddItems_Implementation(TArray<UMounteaInventoryItemBase*>& NewItems) override;
@@ -89,9 +87,8 @@ protected:
 	virtual bool TryAddItem(UMounteaInventoryItemBase* Item);
 	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item);
 	
-	virtual bool TryAddItem_Internal(UMounteaInventoryItemBase* Item);
-	virtual bool TryAddItem_InternalNewItem(UMounteaInventoryItemBase* Item);
-	virtual bool TryAddItem_InternalUpdateExisting(UMounteaInventoryItemBase* Item);
+	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item);
+	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Item);
 
 	UFUNCTION()
 	void PostInventoryUpdated();
@@ -101,6 +98,16 @@ protected:
 	void PostItemRemoved(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
 	UFUNCTION()
 	void PostItemUpdated(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
+
+private:
+
+	/**
+	 * Do not call directly!
+	 * Use `AddItem` interface function instead.
+	 *
+	 * To use Interface call request `Execute_AddItem({interface}, {item})
+	 */
+	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item);
 
 #pragma endregion
 
