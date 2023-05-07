@@ -27,7 +27,8 @@ namespace MounteaInventoryEquipmentConsts
 			const FString NewItemAdded							(TEXT("NewItemAdded"));
 			const FString ItemUpdated								(TEXT("ItemUpdated"));
 			const FString ItemRemoved							(TEXT("ItemRemoved"));
-			
+
+			const FString ItemAddFailed_Invalid				(TEXT("ItemAddFailed_Invalid"));
 			const FString ItemAddFailed_Stacking			(TEXT("ItemAddFailed_Stacking"));
 			const FString ItemAddFailed_QuantityMax		(TEXT("ItemAddFailed_QuantityMax"));
 		}

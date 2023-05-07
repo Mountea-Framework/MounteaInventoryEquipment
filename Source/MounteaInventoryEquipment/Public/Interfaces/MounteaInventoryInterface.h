@@ -83,20 +83,20 @@ public:
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItem(UMounteaInventoryItemBase* NewItem);
-	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem) = 0;
+	bool AddItem(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0);
+	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItemFromClass(TSubclassOf<UMounteaInventoryItemBase> ItemClass);
-	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass) = 0;
+	bool AddItemFromClass(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32 OptionalQuantity = 0);
+	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32 OptionalQuantity = 0) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItems(TArray<UMounteaInventoryItemBase*>& NewItems);
-	virtual bool AddItems_Implementation(TArray<UMounteaInventoryItemBase*>& NewItems) = 0;
+	bool AddItems(TMap<UMounteaInventoryItemBase*,int32>& NewItems);
+	virtual bool AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItemsFromClass(TArray<TSubclassOf<UMounteaInventoryItemBase>>& NewItemsClasses);
-	virtual bool AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItemBase>>& NewItemsClasses) = 0;
+	bool AddItemsFromClass(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses);
+	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool RemoveItem(UMounteaInventoryItemBase* AffectedItem);

@@ -2,6 +2,8 @@
 
 
 #include "Definitions/MounteaInventoryItem.h"
+
+#include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Net/UnrealNetwork.h"
 
 
@@ -15,6 +17,15 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	UObject::PostInitProperties();
 
 	OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
+	OnItemInitialized.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemInitialized);
+	OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
+}
+
+void UMounteaInventoryItemBase::UpdateQuantity(const int32 NewQuantity)
+{
+	ItemData.ItemQuantity.CurrentQuantity = FMath::Min(ItemData.ItemQuantity.MaxQuantity, NewQuantity);
+
+	OnItemModified.Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::ItemUpdated);
 }
 
 FGameplayTag UMounteaInventoryItemBase::GetFirstTag() const
@@ -50,6 +61,16 @@ void UMounteaInventoryItemBase::OnRep_Item()
 }
 
 void UMounteaInventoryItemBase::ItemAdded(const FString& Message)
+{
+	RepKey++;
+}
+
+void UMounteaInventoryItemBase::ItemInitialized(const FString& Message)
+{
+	RepKey++;
+}
+
+void UMounteaInventoryItemBase::ItemModified(const FString& Message)
 {
 	RepKey++;
 }

@@ -32,7 +32,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UObject
 	UMounteaInventoryItemBase();
 
 private:
-
+	
 	virtual void PostInitProperties() override;
 
 public:
@@ -82,6 +82,8 @@ private:
 
 public:
 
+	void UpdateQuantity(const int32 NewQuantity);
+
 	UFUNCTION(BlueprintGetter, Category="Mountea|Inventory")
 	FGuid GetItemGuid() const
 	{ return ItemGuid; };
@@ -111,6 +113,10 @@ protected:
 
 	UFUNCTION()
 	void ItemAdded(const FString& Message);
+	UFUNCTION()
+	void ItemInitialized(const FString& Message);
+	UFUNCTION()
+	void ItemModified(const FString& Message);
 	
 	UFUNCTION()
 	virtual TArray<FName> GetSourceTableRows() const

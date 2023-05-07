@@ -53,10 +53,10 @@ public:
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const override;
 	
-	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem) override;
-	virtual bool AddItems_Implementation(TArray<UMounteaInventoryItemBase*>& NewItems) override;
-	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass) override;
-	virtual bool AddItemsFromClass_Implementation(TArray<TSubclassOf<UMounteaInventoryItemBase>>& NewItemsClasses) override;
+	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0) override;
+	virtual bool AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems) override;
+	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32 OptionalQuantity = 0) override;
+	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) override;
 
 	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) override;
 	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) override;
@@ -84,11 +84,11 @@ private:
 
 protected:
 
-	virtual bool TryAddItem(UMounteaInventoryItemBase* Item);
-	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item);
+	virtual bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
+	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	
-	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item);
-	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Item);
+	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
+	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0);
 
 	UFUNCTION()
 	void PostInventoryUpdated();
@@ -101,13 +101,15 @@ protected:
 
 private:
 
+	int32 GetSafeMaxQuantity(const UMounteaInventoryItemBase* Item, int32 OptionalQuantity) const;
+
 	/**
 	 * Do not call directly!
 	 * Use `AddItem` interface function instead.
 	 *
 	 * To use Interface call request `Execute_AddItem({interface}, {item})
 	 */
-	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item);
+	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 
 #pragma endregion
 
