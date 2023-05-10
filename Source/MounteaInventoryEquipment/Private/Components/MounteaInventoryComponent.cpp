@@ -80,7 +80,10 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 		// Search by Item
 		if (SearchFilter.bSearchByItem)
 		{
-			return Items.Contains(SearchFilter.Item);
+			if (Items.Contains(SearchFilter.Item))
+			{
+				return true;
+			}
 		}
 
 		// Search by Class
@@ -314,7 +317,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 			Filter.bSearchByItem = true;
 			Filter.Item = Item;
 			Filter.bSearchByClass = true;
-			Filter.Class = Item->StaticClass();
+			Filter.Class = Item->GetClass();
 			Filter.bSearchByTag = true;
 			Filter.Tag = Item->GetFirstTag();
 		}
@@ -370,7 +373,7 @@ bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* I
 	// Sanity check
 	if (!Item) return false;
 	
-	const int32 FinalQuantity = GetSafeMaxQuantity(Item, OptionalQuantity);
+	const int32 FinalQuantity = CalculateMaxPossibleQuantity(Item, nullptr, OptionalQuantity);
 	Item->UpdateQuantity(FinalQuantity);
 	
 	// In this case we actually can just add the item with no further checks
@@ -382,11 +385,13 @@ bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItem
 	// Sanity check
 	if (!NewItem) return false;
 	if (!Existing) return false;
-	
-	const int32 CurrentQuantity = Existing->ItemData.ItemQuantity.CurrentQuantity;
 
-	//TODO calculate and proceed
-	return AddItem_Internal(NewItem);
+	// If we didnt specify how much we adding all, if we did, never add more than possible
+	const int32 PassQuantity = CalculateMaxPossibleQuantity(Existing, NewItem, OptionalQuantity);
+
+	Existing->UpdateQuantity(PassQuantity);
+	
+	return AddItem_Internal(Existing);
 }
 
 void UMounteaInventoryComponent::PostInventoryUpdated()
@@ -412,19 +417,53 @@ void UMounteaInventoryComponent::PostItemUpdated(UMounteaInventoryItemBase* Item
 {
 }
 
-int32 UMounteaInventoryComponent::GetSafeMaxQuantity(const UMounteaInventoryItemBase* Item, const int32 OptionalQuantity) const
+int32 UMounteaInventoryComponent::CalculateMaxPossibleQuantity(const UMounteaInventoryItemBase* Item, const UMounteaInventoryItemBase* OtherItem, const int32 OptionalQuantity) const
 {
 	if (!Item)
 	{
 		return 0;
 	}
-
-	if (Item->ItemData.ItemQuantity.bIsStackable)
+	
+	if (OtherItem)
 	{
-		return FMath::Min(OptionalQuantity, Item->ItemData.ItemQuantity.MaxQuantity);
-	}
+		// Updating item that cannot stack mean always just and only 0
+		if (!Item->ItemData.ItemQuantity.bIsStackable)
+		{
+			return 0;
+		}
+		
+		const int32 UpdateQuantity = OptionalQuantity != 0 ? OptionalQuantity : OtherItem->ItemData.ItemQuantity.CurrentQuantity;
+	
+		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
+		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
 
-	return 1;
+		const int32 MaxPossible = MaxQuantity - CurrentQuantity;
+	
+		const int32 PassQuantity = FMath::Min(MaxPossible, CurrentQuantity + UpdateQuantity);
+
+		return PassQuantity;
+	}
+	else
+	{
+		// Adding new item that cannot stack mean always just and only 1
+		if (!Item->ItemData.ItemQuantity.bIsStackable)
+		{
+			return 1;
+		}
+
+		const int32 UpdateQuantity = OptionalQuantity != 0 ? OptionalQuantity : Item->ItemData.ItemQuantity.CurrentQuantity;
+	
+		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
+		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
+
+		const int32 MaxPossible = MaxQuantity - CurrentQuantity;
+	
+		const int32 PassQuantity = FMath::Min(MaxPossible, UpdateQuantity);
+
+		return PassQuantity;
+	}
+	
+	return 0;
 }
 
 void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()

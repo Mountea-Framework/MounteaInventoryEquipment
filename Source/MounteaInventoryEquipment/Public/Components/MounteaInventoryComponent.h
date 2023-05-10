@@ -101,7 +101,7 @@ protected:
 
 private:
 
-	int32 GetSafeMaxQuantity(const UMounteaInventoryItemBase* Item, int32 OptionalQuantity) const;
+	int32 CalculateMaxPossibleQuantity(const UMounteaInventoryItemBase* Item, const UMounteaInventoryItemBase* OtherItem = nullptr, int32 OptionalQuantity = 0) const;
 
 	/**
 	 * Do not call directly!

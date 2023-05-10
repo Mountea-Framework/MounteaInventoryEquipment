@@ -37,7 +37,7 @@ private:
 
 public:
 
-	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Required", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
 	FMounteaInventoryItemRequiredData ItemData;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties))
