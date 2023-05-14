@@ -235,7 +235,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implemen
 	return Items;
 }
 
-bool UMounteaInventoryComponent::AddItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity)
 {
 	return TryAddItem(NewItem, OptionalQuantity);
 }
@@ -245,7 +245,7 @@ bool UMounteaInventoryComponent::AddItems_Implementation(TMap<UMounteaInventoryI
 	bool bSatisfied = true;
 	for (const auto Itr : NewItems)
 	{
-		if (!Execute_AddItem(this, Itr.Key, Itr.Value))
+		if (!Execute_AddOrUpdateItem(this, Itr.Key, Itr.Value))
 		{
 			bSatisfied = false;
 		}
@@ -256,6 +256,9 @@ bool UMounteaInventoryComponent::AddItems_Implementation(TMap<UMounteaInventoryI
 
 bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32 OptionalQuantity)
 {
+	if (ItemClass == nullptr) return false;
+
+	
 	UMounteaInventoryItemBase* NewItem = NewObject<UMounteaInventoryItemBase>(GetWorld(), ItemClass);
 	NewItem->SetWorld(GetWorld());
 	
@@ -387,6 +390,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 		SearchFilter.Class = Item->StaticClass();
 			
 		UMounteaInventoryItemBase* ExistingItem = Execute_FindItem(this, SearchFilter);
+		
 		bSuccess = TryAddItem_UpdateExisting(ExistingItem, Item, OptionalQuantity);
 	}
 
@@ -394,14 +398,79 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	UpdateResult.InventoryUpdateResult = bSuccess ? EInventoryUpdateResult::EIC_Success : EInventoryUpdateResult::EIC_Failed;
 	UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
 
-	OnInventoryUpdated.Broadcast(UpdateResult);
+	//OnInventoryUpdated.Broadcast(UpdateResult);
 	
 	return bSuccess;
 }
 
 bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
 {
-	return true;
+	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+
+	if (!Settings)
+	{
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.UpdateMessage = LOCTEXT("MounteaInventoryComponent_FailedSettings", "Failed - No Inventory Settings");
+		OnInventoryUpdated.Broadcast(UpdateResult);
+		
+		return false;
+	}
+	
+	if (!Item)
+	{
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		const FText ReturnMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
+		const FText InvalidItem = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIC_Failed_InvalidItem);
+
+		UpdateResult.UpdateMessage = FText::Format(LOCTEXT("MounteaInventoryComponent_FailedItem", "{0}: {1}"), ReturnMessage, InvalidItem);
+	
+		OnInventoryUpdated.Broadcast(UpdateResult);
+		return false;
+	}
+	
+	if (!GetOwner())
+	{
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
+		OnInventoryUpdated.Broadcast(UpdateResult);
+		
+		return false;
+	}
+
+	if (!GetOwner()->HasAuthority())
+	{
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
+		OnInventoryUpdated.Broadcast(UpdateResult);
+		
+		return false;
+	}
+	
+	FItemRetrievalFilter Filter;
+	{
+		Filter.bSearchByItem = true;
+		Filter.Item = Item;
+		Filter.bSearchByClass = true;
+		Filter.Class = Item->GetClass();
+		Filter.bSearchByTag = true;
+		Filter.Tag = Item->GetFirstTag();
+	}
+	
+	if (!Execute_HasItem(this, Filter))
+	{
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
+		OnInventoryUpdated.Broadcast(UpdateResult);
+		
+		return false;
+	}
+
+	return RemoveItem_Internal(Item, OptionalQuantity);
 }
 
 bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
@@ -454,6 +523,71 @@ bool UMounteaInventoryComponent::UpdateItem_Internal(UMounteaInventoryItemBase* 
 	return false;
 }
 
+bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
+{
+	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+
+	// Sanity check
+	if (!Item)
+	{
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIC_Failed_InvalidItem);
+
+		OnInventoryUpdated.Broadcast(UpdateResult);
+		return false;
+	}
+	
+	if (GetOwner() && GetOwner()->HasAuthority())
+	{
+		FItemUpdateResult ItemUpdatedResult;
+		
+		int32 AmountToRemove = -1;
+		if (OptionalQuantity == 0)
+		{
+			AmountToRemove = Item->ItemData.ItemQuantity.CurrentQuantity;
+		}
+		else
+		{
+			AmountToRemove = OptionalQuantity;
+		}
+
+		AmountToRemove = FMath::Abs(AmountToRemove);
+		const int32 MaxToRemove = Item->ItemData.ItemQuantity.CurrentQuantity;
+		AmountToRemove =  FMath::Abs(FMath::Min(AmountToRemove, MaxToRemove));
+
+		AmountToRemove = -AmountToRemove;
+
+		Item->UpdateQuantity(AmountToRemove);
+		
+		
+		if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0)
+		{
+			ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIC_Success_RemovedItem;
+			ItemUpdatedResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(ItemUpdatedResult.ItemUpdateResult);
+			
+			OnItemRemoved.Broadcast(Item, ItemUpdatedResult);
+			Items.Remove(Item);
+
+			ReplicatedItemsKey++;
+			OnRep_Items();
+
+			return true;
+		}
+
+		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIC_Success_UpdateItem;
+		ItemUpdatedResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(ItemUpdatedResult.ItemUpdateResult);
+
+		OnItemUpdated.Broadcast(Item, ItemUpdatedResult);
+		ReplicatedItemsKey++;
+		OnRep_Items();
+		
+		return true;
+	}
+
+	return false;
+}
+
 bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
 {
 	// Sanity check
@@ -471,6 +605,11 @@ bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItem
 	// Sanity check
 	if (!NewItem) return false;
 	if (!Existing) return false;
+
+	if (OptionalQuantity < 0)
+	{
+		return TryRemoveItem(Existing, OptionalQuantity);
+	}
 
 	// If we didnt specify how much we adding all, if we did, never add more than possible
 	const int32 PassQuantity = CalculateMaxPossibleQuantity(Existing, NewItem, OptionalQuantity);

@@ -83,8 +83,8 @@ public:
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool AddItem(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0);
-	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0) = 0;
+	bool AddOrUpdateItem(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0);
+	virtual bool AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool AddItemFromClass(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32 OptionalQuantity = 0);

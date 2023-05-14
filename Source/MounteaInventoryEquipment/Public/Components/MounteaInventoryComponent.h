@@ -53,7 +53,7 @@ public:
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const override;
 	
-	virtual bool AddItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0) override;
+	virtual bool AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0) override;
 	virtual bool AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems) override;
 	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32 OptionalQuantity = 0) override;
 	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) override;
@@ -87,11 +87,12 @@ private:
 protected:
 
 	virtual bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
+	
 	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	
 	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0);
-
+	
 	UFUNCTION(Server, Unreliable)
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Client, Unreliable)
@@ -115,6 +116,7 @@ private:
 	 */
 	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
+	virtual bool  RemoveItem_Internal(UMounteaInventoryItemBase* Item, int32 OptionalQuantity = 0);
 
 	UFUNCTION()
 	void PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
