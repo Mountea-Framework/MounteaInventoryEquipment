@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryWBPInterface.generated.h"
 
+struct FInventoryNotificationData;
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
 class UMounteaInventoryWBPInterface : public UInterface
@@ -20,6 +21,13 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryWBPInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	void ProcessWBPCommand(const FString& Command);
+	virtual void ProcessWBPCommand_Implementation(const FString& Command) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	void CreateInventoryNotification(const FInventoryNotificationData& NotificationData);
+	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;
 };

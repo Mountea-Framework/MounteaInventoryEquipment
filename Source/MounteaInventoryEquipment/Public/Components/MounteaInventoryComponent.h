@@ -64,6 +64,9 @@ public:
 	virtual void RequestNetworkRefresh_Implementation() override;
 
 	virtual AActor* GetOwningActor_Implementation() const override;
+
+	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UUserWidget> NewInventoryWBPClass) override;
+	virtual void SetInventoryWBP_Implementation(UUserWidget* NewWBP) override;
 	
 public:
 
@@ -143,7 +146,7 @@ protected:
 	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
 	TSubclassOf<UUserWidget> InventoryWBPClass;
 
-	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	UUserWidget* InventoryWBP = nullptr;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))

@@ -3,9 +3,11 @@
 
 #include "Components/MounteaInventoryComponent.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
+#include "Interfaces/MounteaInventoryWBPInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
@@ -305,6 +307,16 @@ void UMounteaInventoryComponent::RequestNetworkRefresh_Implementation()
 AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 {
 	return GetOwner();
+}
+
+void UMounteaInventoryComponent::SetInventoryWBPClass_Implementation(TSubclassOf<UUserWidget> NewInventoryWBPClass)
+{
+	InventoryWBPClass = NewInventoryWBPClass;
+}
+
+void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UUserWidget* NewWBP)
+{
+	InventoryWBP = NewWBP;
 }
 
 void UMounteaInventoryComponent::OnRep_Items()
@@ -642,8 +654,18 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const
 	if (!GetWorld()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestSyncTimerHandle);
-
+	
 	OnInventoryUpdated_Client.Broadcast(UpdateContext);
+
+	if (InventoryWBP)
+	{
+		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
+		
+		const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+		const FInventoryNotificationData Data = *Settings->InventoryUpdateData.Find(UpdateContext.InventoryUpdateResult);
+
+		IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
+	}
 }
 
 void UMounteaInventoryComponent::PostItemAdded(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext)

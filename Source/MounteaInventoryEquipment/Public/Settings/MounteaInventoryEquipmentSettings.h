@@ -31,6 +31,9 @@ public:
 	TSet<FString> InventoryWidgetCommands;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
