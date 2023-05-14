@@ -17,8 +17,8 @@ class UMounteaInventoryInterface : public UInterface
 	GENERATED_BODY()
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdated, class UMounteaInventoryItemBase*, Item, const FString&, UpdateMessage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FInventoryUpdateResult&, UpdateContext);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdated, class UMounteaInventoryItemBase*, Item, const FItemUpdateResult&, UpdateContext);
 
 /**
  * Mountea Inventory Interface.
@@ -109,6 +109,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void RequestNetworkRefresh();
 	virtual void RequestNetworkRefresh_Implementation() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	AActor* GetOwningActor() const;
+	virtual AActor* GetOwningActor_Implementation() const = 0;
 	
 public:
 

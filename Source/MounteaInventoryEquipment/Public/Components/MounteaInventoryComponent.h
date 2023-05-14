@@ -62,6 +62,8 @@ public:
 	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) override;
 
 	virtual void RequestNetworkRefresh_Implementation() override;
+
+	virtual AActor* GetOwningActor_Implementation() const override;
 	
 public:
 
@@ -90,14 +92,14 @@ protected:
 	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0);
 
+	UFUNCTION(Client, Unreliable)
+	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
-	void PostInventoryUpdated();
+	void PostItemAdded(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 	UFUNCTION()
-	void PostItemAdded(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
+	void PostItemRemoved(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 	UFUNCTION()
-	void PostItemRemoved(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
-	UFUNCTION()
-	void PostItemUpdated(UMounteaInventoryItemBase* Item, const FString& UpdateMessage);
+	void PostItemUpdated(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 
 private:
 
@@ -110,15 +112,18 @@ private:
 	 * To use Interface call request `Execute_AddItem({interface}, {item})
 	 */
 	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
-
+	virtual bool UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
+	
 #pragma endregion
 
 #pragma region VARIABLES
 	
 protected:
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory" )
 	FOnInventoryUpdated OnInventoryUpdated;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory" )
+	FOnInventoryUpdated OnInventoryUpdated_Client;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FOnItemUpdated OnItemAdded;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")

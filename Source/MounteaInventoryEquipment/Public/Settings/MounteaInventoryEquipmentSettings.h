@@ -5,7 +5,12 @@
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
+#include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryEquipmentSettings.generated.h"
+
+#define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
+
+struct FItemUpdateResult;
 
 /**
  * 
@@ -26,7 +31,13 @@ public:
 	TSet<FString> InventoryWidgetCommands;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TSet<FString> ItemsWidgetCommands;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	TMap<EItemUpdateResult, FText> ItemUpdateMessages;
 
 public:
 
@@ -62,6 +73,10 @@ public:
 			{
 				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget);
 			}
+			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget))
+			{
+				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
+			}
 		}
 
 		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, ItemsWidgetCommands))
@@ -70,7 +85,57 @@ public:
 			{
 				ItemsWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::AddNewItem);
 			}
+			if (!ItemsWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::UpdateItem))
+			{
+				ItemsWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::UpdateItem);
+			}
+			if (!ItemsWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::RemoveItem))
+			{
+				ItemsWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::RemoveItem);
+			}
+		}
+
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryUpdateMessages))
+		{
+			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIC_Success))
+			{
+				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIC_Success, LOCTEXT("InventoryUpdateMessages_Success", "Inventory Updated"));
+			}
+			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIC_Failed))
+			{
+				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIC_Failed,  LOCTEXT("InventoryUpdateMessages_Failed", "Inventory Update Failed"));
+			}
+		}
+
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, ItemUpdateMessages))
+		{
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_AddItem))
+			{
+				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_AddItem, LOCTEXT("ItemUpdateMessages_SuccessAdd", "Success - Add Item"));
+			}
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_UpdateItem))
+			{
+				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_UpdateItem, LOCTEXT("ItemUpdateMessages_SuccessUpdate", "Success - Update Item"));
+			}
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_RemovedItem))
+			{
+				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_RemovedItem,  LOCTEXT("InventoryUpdateMessages_RemovedItem", "Success - Removed Item"));
+			}
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_SomeAdd))
+			{
+				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_SomeAdd,  LOCTEXT("InventoryUpdateMessages_SomeAddItem", "Success - Partially Added"));
+			}
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Failed_InvalidItem))
+			{
+				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Failed_InvalidItem,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Invalid Item"));
+			}
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Failed_LimitReached))
+			{
+				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Failed_LimitReached,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Max Quantity"));
+			}
 		}
 	}
 #endif
 };
+
+#undef LOCTEXT_NAMESPACE

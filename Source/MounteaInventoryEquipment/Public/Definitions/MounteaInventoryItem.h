@@ -90,6 +90,10 @@ public:
 
 	virtual FItemGenericEvent& GetItemAddedHandle()
 	{ return OnItemAdded; };
+	virtual FItemGenericEvent& GetItemUpdatedHandle()
+	{ return OnItemModified; };
+	virtual FItemGenericEvent& GetItemInitializedHandle()
+	{ return OnItemInitialized; };
 
 	int GetRepKey() const
 	{ return RepKey; }

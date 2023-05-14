@@ -50,6 +50,56 @@ struct FInventoryNotificationData
 
 #pragma endregion 
 
+#define LOCTEXT_NAMESPACE "MounteaInventoryResults"
+
+UENUM(BlueprintType)
+enum class EInventoryUpdateResult : uint8
+{
+	EIC_Success							UMETA(DisplayName="Success"),
+	EIC_Failed								UMETA(DisplayName="Failed"),
+
+	Default										UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EItemUpdateResult : uint8
+{
+	EIC_Success_UpdateItem			UMETA(DisplayName="Success - Update Item"),
+	EIC_Success_AddItem				UMETA(DisplayName="Success - Add Item"),
+	EIC_Success_SomeAdd			UMETA(DisplayName="Success - Partially Added"),
+	EIC_Success_RemovedItem		UMETA(DisplayName="Success - Removed Item"),
+	EIC_Failed_InvalidItem				UMETA(DisplayName="Failed - Invalid Item"),
+	EIC_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
+
+	Default										UMETA(Hidden)
+};
+
+USTRUCT(BlueprintType)
+struct FInventoryUpdateResult
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	EInventoryUpdateResult InventoryUpdateResult;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FText UpdateMessage;
+};
+
+USTRUCT(BlueprintType)
+struct FItemUpdateResult
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	EItemUpdateResult ItemUpdateResult;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FText UpdateMessage;
+};
+
+#undef LOCTEXT_NAMESPACE
+
 #pragma region ItemData
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"

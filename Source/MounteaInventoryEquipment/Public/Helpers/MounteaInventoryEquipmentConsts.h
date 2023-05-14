@@ -8,21 +8,29 @@ namespace MounteaInventoryEquipmentConsts
 	{
 		namespace InventoryCommands
 		{
-			const FString InitializeInventoryWidget		(TEXT("InitializeInventoryWidget"));
-			const FString CreateInventoryWidget		(TEXT("CreateInventoryWidget"));
-			const FString HideInventoryWidget			(TEXT("HideInventoryWidget"));
-			const FString RefreshInventoryWidget		(TEXT("RefreshInventoryWidget"));
+			const FString InitializeInventoryWidget				(TEXT("InitializeInventoryWidget"));
+			const FString CreateInventoryWidget				(TEXT("CreateInventoryWidget"));
+			const FString HideInventoryWidget					(TEXT("HideInventoryWidget"));
+			const FString RefreshInventoryWidget				(TEXT("RefreshInventoryWidget"));
 		}
 
 		namespace ItemCommands
 		{
-			const FString AddNewItem		(TEXT("AddNewItem"));
+			const FString AddNewItem								(TEXT("AddNewItem"));
+			const FString UpdateItem								(TEXT("UpdateItem"));
+			const FString RemoveItem								(TEXT("RemoveItem"));
 		}
 	}
 
 	namespace MounteaInventoryNotifications
 	{
 		namespace InventoryNotifications
+		{
+			const FString UpdateSuccessful						(TEXT("UpdateSuccessful"));
+			const FString UpdateFailed							(TEXT("UpdateFailed"));
+		}
+
+		namespace ItemNotifications
 		{
 			const FString NewItemAdded							(TEXT("NewItemAdded"));
 			const FString ItemUpdated								(TEXT("ItemUpdated"));

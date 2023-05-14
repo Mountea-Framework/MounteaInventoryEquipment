@@ -25,7 +25,7 @@ void UMounteaInventoryItemBase::UpdateQuantity(const int32 NewQuantity)
 {
 	ItemData.ItemQuantity.CurrentQuantity = FMath::Min(ItemData.ItemQuantity.MaxQuantity, NewQuantity);
 
-	OnItemModified.Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::ItemUpdated);
+	OnItemModified.Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::ItemNotifications::ItemUpdated);
 }
 
 FGameplayTag UMounteaInventoryItemBase::GetFirstTag() const
@@ -62,17 +62,17 @@ void UMounteaInventoryItemBase::OnRep_Item()
 
 void UMounteaInventoryItemBase::ItemAdded(const FString& Message)
 {
-	RepKey++;
+	MarkDirtyForReplication();
 }
 
 void UMounteaInventoryItemBase::ItemInitialized(const FString& Message)
 {
-	RepKey++;
+	MarkDirtyForReplication();
 }
 
 void UMounteaInventoryItemBase::ItemModified(const FString& Message)
 {
-	RepKey++;
+	MarkDirtyForReplication();
 }
 
 void UMounteaInventoryItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -104,9 +104,8 @@ UWorld* UMounteaInventoryItemBase::GetWorld() const
 
 void UMounteaInventoryItemBase::MarkDirtyForReplication()
 {
-	++RepKey;
-
-	// TODO: Request OwningInventory to increment ReplicatedItemsKeys
+	RepKey++;
+	
 	if (OwningInventory.GetInterface())
 	{
 		OwningInventory->Execute_RequestNetworkRefresh(OwningInventory.GetObject());
