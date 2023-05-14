@@ -258,7 +258,6 @@ bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMo
 {
 	if (ItemClass == nullptr) return false;
 
-	
 	UMounteaInventoryItemBase* NewItem = NewObject<UMounteaInventoryItemBase>(GetWorld(), ItemClass);
 	NewItem->SetWorld(GetWorld());
 	
@@ -393,12 +392,6 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 		
 		bSuccess = TryAddItem_UpdateExisting(ExistingItem, Item, OptionalQuantity);
 	}
-
-	FInventoryUpdateResult UpdateResult;
-	UpdateResult.InventoryUpdateResult = bSuccess ? EInventoryUpdateResult::EIC_Success : EInventoryUpdateResult::EIC_Failed;
-	UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
-
-	//OnInventoryUpdated.Broadcast(UpdateResult);
 	
 	return bSuccess;
 }
@@ -556,10 +549,9 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		const int32 MaxToRemove = Item->ItemData.ItemQuantity.CurrentQuantity;
 		AmountToRemove =  FMath::Abs(FMath::Min(AmountToRemove, MaxToRemove));
 
-		AmountToRemove = -AmountToRemove;
-
-		Item->UpdateQuantity(AmountToRemove);
+		AmountToRemove = MaxToRemove - AmountToRemove;
 		
+		Item->UpdateQuantity(AmountToRemove);
 		
 		if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0)
 		{
@@ -592,6 +584,11 @@ bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* I
 {
 	// Sanity check
 	if (!Item) return false;
+
+	if (OptionalQuantity < 0)
+	{
+		return TryRemoveItem(Item, OptionalQuantity);
+	}
 	
 	const int32 FinalQuantity = CalculateMaxPossibleQuantity(Item, nullptr, OptionalQuantity);
 	Item->UpdateQuantity(FinalQuantity);
