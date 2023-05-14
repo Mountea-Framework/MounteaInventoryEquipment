@@ -298,7 +298,6 @@ bool UMounteaInventoryComponent::RemoveItems_Implementation(TArray<UMounteaInven
 void UMounteaInventoryComponent::RequestNetworkRefresh_Implementation()
 {
 	ReplicatedItemsKey++;
-	OnRep_Items();
 }
 
 AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
@@ -483,6 +482,31 @@ bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItem
 
 void UMounteaInventoryComponent::PostInventoryUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
+	PostInventoryUpdated_Client(UpdateContext);
+}
+
+void UMounteaInventoryComponent::PostInventoryUpdated_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+
+	if (GetOwner()->HasAuthority()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestSyncTimerHandle);
+
+	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
+	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostInventoryUpdated_Client_RequestUpdate", UpdateContext);
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestSyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
+}
+
+void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestSyncTimerHandle);
+
 	OnInventoryUpdated_Client.Broadcast(UpdateContext);
 }
 
@@ -494,6 +518,10 @@ void UMounteaInventoryComponent::PostItemAdded(UMounteaInventoryItemBase* Item, 
 		{
 			Item->GetItemAddedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
 		}
+
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		OnInventoryUpdated.Broadcast(UpdateResult);
 	}
 }
 
@@ -501,7 +529,9 @@ void UMounteaInventoryComponent::PostItemRemoved(UMounteaInventoryItemBase* Item
 {
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
-		//...
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		OnInventoryUpdated.Broadcast(UpdateResult);
 	}
 }
 
@@ -513,6 +543,10 @@ void UMounteaInventoryComponent::PostItemUpdated(UMounteaInventoryItemBase* Item
 		{
 			Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
 		}
+		
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		OnInventoryUpdated.Broadcast(UpdateResult);
 	}
 }
 
@@ -568,6 +602,10 @@ int32 UMounteaInventoryComponent::CalculateMaxPossibleQuantity(const UMounteaInv
 void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
 {
 	ReplicatedItemsKey++;
+
+	FInventoryUpdateResult UpdateResult;
+	UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 
 #undef LOCTEXT_NAMESPACE

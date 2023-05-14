@@ -92,8 +92,10 @@ protected:
 	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity = 0);
 
-	UFUNCTION(Client, Unreliable)
+	UFUNCTION(Server, Unreliable)
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Client, Unreliable)
+	void PostInventoryUpdated_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
 	void PostItemAdded(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 	UFUNCTION()
@@ -113,6 +115,9 @@ private:
 	 */
 	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
+
+	UFUNCTION()
+	void PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	
 #pragma endregion
 
@@ -149,6 +154,11 @@ private:
 
 	UPROPERTY()
 	int32 ReplicatedItemsKey;
+	
+	UPROPERTY()
+	FTimerHandle TimerHandle_RequestSyncTimerHandle;
+	UPROPERTY(EditAnywhere, Category="2. Debug")
+	float Duration_RequestSyncTimerHandle = 0.2f;
 
 #pragma endregion
 	
