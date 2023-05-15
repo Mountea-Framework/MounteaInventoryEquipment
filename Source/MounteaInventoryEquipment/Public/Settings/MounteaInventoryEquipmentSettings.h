@@ -100,41 +100,61 @@ public:
 
 		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryUpdateMessages))
 		{
-			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIC_Success))
+			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIUR_Success))
 			{
-				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIC_Success, LOCTEXT("InventoryUpdateMessages_Success", "Inventory Updated"));
+				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Success, LOCTEXT("InventoryUpdateMessages_Success", "Inventory Updated"));
 			}
-			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIC_Failed))
+			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIUR_Failed))
 			{
-				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIC_Failed,  LOCTEXT("InventoryUpdateMessages_Failed", "Inventory Update Failed"));
+				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Failed,  LOCTEXT("InventoryUpdateMessages_Failed", "Inventory Update Failed"));
 			}
 		}
 
 		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, ItemUpdateMessages))
 		{
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_AddItem))
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_AddItem))
 			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_AddItem, LOCTEXT("ItemUpdateMessages_SuccessAdd", "Success - Add Item"));
+				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_AddItem, LOCTEXT("ItemUpdateMessages_SuccessAdd", "Success - Add Item"));
 			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_UpdateItem))
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_UpdateItem))
 			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_UpdateItem, LOCTEXT("ItemUpdateMessages_SuccessUpdate", "Success - Update Item"));
+				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_UpdateItem, LOCTEXT("ItemUpdateMessages_SuccessUpdate", "Success - Update Item"));
 			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_RemovedItem))
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_RemovedItem))
 			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_RemovedItem,  LOCTEXT("InventoryUpdateMessages_RemovedItem", "Success - Removed Item"));
+				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_RemovedItem,  LOCTEXT("InventoryUpdateMessages_RemovedItem", "Success - Removed Item"));
 			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Success_SomeAdd))
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_SomeAdd))
 			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Success_SomeAdd,  LOCTEXT("InventoryUpdateMessages_SomeAddItem", "Success - Partially Added"));
+				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_SomeAdd,  LOCTEXT("InventoryUpdateMessages_SomeAddItem", "Success - Partially Added"));
 			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Failed_InvalidItem))
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Failed_InvalidItem))
 			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Failed_InvalidItem,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Invalid Item"));
+				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Failed_InvalidItem,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Invalid Item"));
 			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIC_Failed_LimitReached))
+			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Failed_LimitReached))
 			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIC_Failed_LimitReached,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Max Quantity"));
+				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Failed_LimitReached,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Max Quantity"));
+			}
+		}
+
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryUpdateData))
+		{
+			if (!InventoryUpdateData.Contains(EInventoryUpdateResult::EIUR_Failed))
+			{
+				InventoryUpdateData.Add
+				(
+					EInventoryUpdateResult::EIUR_Failed,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Failed", "Inventory Update Failed"), 3.f, FLinearColor(FColor::Red))
+				);
+			}
+			if (!InventoryUpdateData.Contains(EInventoryUpdateResult::EIUR_Success))
+			{
+				InventoryUpdateData.Add
+				(
+					EInventoryUpdateResult::EIUR_Success,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Success", "Inventory Updated"), 1.5f, FLinearColor(FColor::White))
+				);
 			}
 		}
 	}

@@ -115,7 +115,7 @@ private:
 	 * Do not call directly!
 	 * Use `AddItem` interface function instead.
 	 *
-	 * To use Interface call request `Execute_AddItem({interface}, {item})
+	 * To use Interface call request `Execute_AddItem({interface}, {item})`
 	 */
 	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);

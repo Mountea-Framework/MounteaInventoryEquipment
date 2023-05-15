@@ -35,7 +35,7 @@ struct FInventoryNotificationData
 
 	// Notification text to be displayed.
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
-	FText NotificationText = LOCTEXT("InventoryNotificationData", "Item has been added successfully to Inventory");
+	FText NotificationText = LOCTEXT("InventoryNotificationData_Success", "Item has been added successfully to Inventory");
 
 	// Duration for how long the notification will be visible.
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
@@ -44,6 +44,11 @@ struct FInventoryNotificationData
 	// Notification icon Tint.
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	FLinearColor IconTint = FLinearColor::White;
+
+	FInventoryNotificationData(){};
+
+	FInventoryNotificationData(UTexture2D* Texture, const FText& Text, const float& Duration, const FLinearColor& Tint)
+		: NotificationTexture(Texture), NotificationText(Text), ShowDuration(Duration), IconTint(Tint){};
 };
 
 #undef LOCTEXT_NAMESPACE
@@ -55,8 +60,8 @@ struct FInventoryNotificationData
 UENUM(BlueprintType)
 enum class EInventoryUpdateResult : uint8
 {
-	EIC_Success							UMETA(DisplayName="Success"),
-	EIC_Failed								UMETA(DisplayName="Failed"),
+	EIUR_Success							UMETA(DisplayName="Success"),
+	EIUR_Failed								UMETA(DisplayName="Failed"),
 
 	Default										UMETA(Hidden)
 };
@@ -64,12 +69,12 @@ enum class EInventoryUpdateResult : uint8
 UENUM(BlueprintType)
 enum class EItemUpdateResult : uint8
 {
-	EIC_Success_UpdateItem			UMETA(DisplayName="Success - Update Item"),
-	EIC_Success_AddItem				UMETA(DisplayName="Success - Add Item"),
-	EIC_Success_SomeAdd			UMETA(DisplayName="Success - Partially Added"),
-	EIC_Success_RemovedItem		UMETA(DisplayName="Success - Removed Item"),
-	EIC_Failed_InvalidItem				UMETA(DisplayName="Failed - Invalid Item"),
-	EIC_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
+	EIUR_Success_UpdateItem			UMETA(DisplayName="Success - Update Item"),
+	EIUR_Success_AddItem				UMETA(DisplayName="Success - Add Item"),
+	EIUR_Success_SomeAdd			UMETA(DisplayName="Success - Partially Added"),
+	EIUR_Success_RemovedItem		UMETA(DisplayName="Success - Removed Item"),
+	EIUR_Failed_InvalidItem				UMETA(DisplayName="Failed - Invalid Item"),
+	EIUR_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
 
 	Default										UMETA(Hidden)
 };

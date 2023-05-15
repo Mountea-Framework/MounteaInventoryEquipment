@@ -325,7 +325,7 @@ void UMounteaInventoryComponent::OnRep_Items()
 	// Broadcast changes
 
 	FInventoryUpdateResult UpdateResult;
-	UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+	UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 	
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
@@ -337,7 +337,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	if (!Settings)
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		UpdateResult.UpdateMessage = LOCTEXT("MounteaInventoryComponent_FailedSettings", "Failed - No Inventory Settings");
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		
@@ -347,9 +347,9 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	if (!Item)
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		const FText ReturnMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
-		const FText InvalidItem = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIC_Failed_InvalidItem);
+		const FText InvalidItem = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIUR_Failed_InvalidItem);
 
 		UpdateResult.UpdateMessage = FText::Format(LOCTEXT("MounteaInventoryComponent_FailedItem", "{0}: {1}"), ReturnMessage, InvalidItem);
 	
@@ -360,7 +360,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	if (!GetOwner())
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		
@@ -370,7 +370,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	if (!GetOwner()->HasAuthority())
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		
@@ -415,7 +415,7 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 	if (!Settings)
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		UpdateResult.UpdateMessage = LOCTEXT("MounteaInventoryComponent_FailedSettings", "Failed - No Inventory Settings");
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		
@@ -425,9 +425,9 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 	if (!Item)
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		const FText ReturnMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
-		const FText InvalidItem = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIC_Failed_InvalidItem);
+		const FText InvalidItem = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIUR_Failed_InvalidItem);
 
 		UpdateResult.UpdateMessage = FText::Format(LOCTEXT("MounteaInventoryComponent_FailedItem", "{0}: {1}"), ReturnMessage, InvalidItem);
 	
@@ -438,7 +438,7 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 	if (!GetOwner())
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		
@@ -448,7 +448,7 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 	if (!GetOwner()->HasAuthority())
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
 		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		
@@ -468,8 +468,9 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 	if (!Execute_HasItem(this, Filter))
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
-		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
+
+		UpdateResult.UpdateMessage = LOCTEXT("MounteaInventoryComponent_UpdateItem_NoItem", "Failed - Cannot update Item outside Inventory!");
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		
 		return false;
@@ -487,11 +488,11 @@ bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Ite
 		const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 		
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
 
 		FItemUpdateResult ItemUpdatedResult;
-		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIC_Success_AddItem;
+		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_AddItem;
 		ItemUpdatedResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(ItemUpdatedResult.ItemUpdateResult);
 		
 		OnItemAdded.Broadcast(Item, ItemUpdatedResult);
@@ -511,11 +512,11 @@ bool UMounteaInventoryComponent::UpdateItem_Internal(UMounteaInventoryItemBase* 
 		const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 		
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
 
 		FItemUpdateResult ItemUpdatedResult;
-		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIC_Success_UpdateItem;
+		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_UpdateItem;
 		ItemUpdatedResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(ItemUpdatedResult.ItemUpdateResult);
 
 		OnItemUpdated.Broadcast(Item, ItemUpdatedResult);
@@ -536,8 +537,8 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 	if (!Item)
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Failed;
-		UpdateResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIC_Failed_InvalidItem);
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
+		UpdateResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(EItemUpdateResult::EIUR_Failed_InvalidItem);
 
 		OnInventoryUpdated.Broadcast(UpdateResult);
 		return false;
@@ -567,7 +568,7 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		
 		if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0)
 		{
-			ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIC_Success_RemovedItem;
+			ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_RemovedItem;
 			ItemUpdatedResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(ItemUpdatedResult.ItemUpdateResult);
 			
 			OnItemRemoved.Broadcast(Item, ItemUpdatedResult);
@@ -579,7 +580,7 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 			return true;
 		}
 
-		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIC_Success_UpdateItem;
+		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_UpdateItem;
 		ItemUpdatedResult.UpdateMessage = *Settings->ItemUpdateMessages.Find(ItemUpdatedResult.ItemUpdateResult);
 
 		OnItemUpdated.Broadcast(Item, ItemUpdatedResult);
@@ -662,7 +663,11 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const
 		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
 		
 		const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-		const FInventoryNotificationData Data = *Settings->InventoryUpdateData.Find(UpdateContext.InventoryUpdateResult);
+		FInventoryNotificationData Data = *Settings->InventoryUpdateData.Find(UpdateContext.InventoryUpdateResult);
+		if (!UpdateContext.UpdateMessage.IsEmpty())
+		{
+			Data.NotificationText = UpdateContext.UpdateMessage;
+		}
 
 		IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
 	}
@@ -678,7 +683,7 @@ void UMounteaInventoryComponent::PostItemAdded(UMounteaInventoryItemBase* Item, 
 		}
 
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 		OnInventoryUpdated.Broadcast(UpdateResult);
 	}
 }
@@ -688,7 +693,7 @@ void UMounteaInventoryComponent::PostItemRemoved(UMounteaInventoryItemBase* Item
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 		OnInventoryUpdated.Broadcast(UpdateResult);
 	}
 }
@@ -703,7 +708,7 @@ void UMounteaInventoryComponent::PostItemUpdated(UMounteaInventoryItemBase* Item
 		}
 		
 		FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 		OnInventoryUpdated.Broadcast(UpdateResult);
 	}
 }
@@ -762,7 +767,7 @@ void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
 	ReplicatedItemsKey++;
 
 	FInventoryUpdateResult UpdateResult;
-	UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIC_Success;
+	UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 
