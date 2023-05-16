@@ -29,19 +29,24 @@ public:
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TSet<FString> InventoryWidgetCommands;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
-	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
-
+	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TSet<FString> ItemsWidgetCommands;
-
+	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TMap<EItemUpdateResult, FText> ItemUpdateMessages;
 
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. Notifications")
+	int32 MinDisplayWeight = 1;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. Notifications")
+	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. Notifications")
+	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
+	
 public:
 
 #if WITH_EDITOR
@@ -79,6 +84,10 @@ public:
 			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget))
 			{
 				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
+			}
+			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets))
+			{
+				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
 			}
 		}
 

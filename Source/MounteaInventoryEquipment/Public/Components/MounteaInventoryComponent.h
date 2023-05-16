@@ -100,12 +100,18 @@ protected:
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Client, Unreliable)
 	void PostInventoryUpdated_Client(const FInventoryUpdateResult& UpdateContext);
-	UFUNCTION()
+	UFUNCTION(Server, Unreliable)
 	void PostItemAdded(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
-	UFUNCTION()
+	UFUNCTION(Client, Unreliable)
+	void PostItemAdded_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	UFUNCTION(Server, Unreliable)
 	void PostItemRemoved(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
-	UFUNCTION()
+	UFUNCTION(Client, Unreliable)
+	void PostItemRemoved_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	UFUNCTION(Server, Unreliable)
 	void PostItemUpdated(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	UFUNCTION(Client, Unreliable)
+	void PostItemUpdated_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 
 private:
 
@@ -120,9 +126,19 @@ private:
 	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity = 0);
 	virtual bool  RemoveItem_Internal(UMounteaInventoryItemBase* Item, int32 OptionalQuantity = 0);
-
+	
 	UFUNCTION()
 	void PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+	
+	UFUNCTION()
+	void PostItemAdded_Client_RequestUpdate(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	UFUNCTION()
+	void PostItemRemoved_Client_RequestUpdate(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	UFUNCTION()
+	void PostItemUpdated_Client_RequestUpdate(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	
+	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
+	void RequestItemNotification(const FItemUpdateResult& UpdateContext) const;
 	
 #pragma endregion
 
@@ -137,9 +153,15 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FOnItemUpdated OnItemAdded;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	FOnItemUpdated OnItemAdded_Client;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FOnItemUpdated OnItemRemoved;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	FOnItemUpdated OnItemRemoved_Client;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FOnItemUpdated OnItemUpdated;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	FOnItemUpdated OnItemUpdated_Client;
 
 protected:
 
@@ -161,7 +183,9 @@ private:
 	int32 ReplicatedItemsKey;
 	
 	UPROPERTY()
-	FTimerHandle TimerHandle_RequestSyncTimerHandle;
+	FTimerHandle TimerHandle_RequestInventorySyncTimerHandle;
+	UPROPERTY()
+	FTimerHandle TimerHandle_RequestItemSyncTimerHandle;
 	UPROPERTY(EditAnywhere, Category="2. Debug")
 	float Duration_RequestSyncTimerHandle = 0.2f;
 

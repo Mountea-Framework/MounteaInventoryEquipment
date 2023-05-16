@@ -30,25 +30,32 @@ struct FInventoryNotificationData
 	GENERATED_BODY()
 
 	// Icon Texture to be displayed.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	UTexture2D* NotificationTexture = nullptr;
 
 	// Notification text to be displayed.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	FText NotificationText = LOCTEXT("InventoryNotificationData_Success", "Item has been added successfully to Inventory");
 
 	// Duration for how long the notification will be visible.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	float ShowDuration = 3.f;
 
 	// Notification icon Tint.
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
 	FLinearColor IconTint = FLinearColor::White;
 
-	FInventoryNotificationData(){};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(NoResetToDefault=true))
+	int32 Weight = 0;
 
-	FInventoryNotificationData(UTexture2D* Texture, const FText& Text, const float& Duration, const FLinearColor& Tint)
-		: NotificationTexture(Texture), NotificationText(Text), ShowDuration(Duration), IconTint(Tint){};
+	FInventoryNotificationData()
+	{
+	};
+
+	FInventoryNotificationData(UTexture2D* Texture, const FText& Text, const float& Duration, const FLinearColor& Tint, const int32& NewWeight = 1)
+		: NotificationTexture(Texture), NotificationText(Text), ShowDuration(Duration), IconTint(Tint), Weight(NewWeight)
+	{
+	};
 };
 
 #undef LOCTEXT_NAMESPACE

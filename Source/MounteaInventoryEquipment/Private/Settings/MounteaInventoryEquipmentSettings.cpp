@@ -17,6 +17,7 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::HideInventoryWidget);
 	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
 	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
+	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
 
 	InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Success, LOCTEXT("InventoryUpdateMessages_Success", "Inventory Updated"));
 	InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Failed,  LOCTEXT("InventoryUpdateMessages_Failed", "Inventory Update Failed"));
@@ -35,12 +36,12 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	InventoryUpdateData.Add
 	(
 		EInventoryUpdateResult::EIUR_Failed,
-		FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Failed", "Inventory Update Failed"), 3.f, FLinearColor(FColor::Red))
+		FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Failed", "Inventory Update Failed"), 3.f, FLinearColor(FColor::Red), 1)
 	);
 	InventoryUpdateData.Add
 	(
 		EInventoryUpdateResult::EIUR_Success,
-		FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Success", "Inventory Updated"), 1.5f, FLinearColor(FColor::White))
+		FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Success", "Inventory Updated"), 1.5f, FLinearColor(FColor::White), 0)
 	);
 }
 
