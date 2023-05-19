@@ -8,6 +8,7 @@
 #include "Engine/ActorChannel.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Interfaces/MounteaInventoryWBPInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
@@ -16,6 +17,7 @@
 UMounteaInventoryComponent::UMounteaInventoryComponent()
 {	
 	SetIsReplicatedByDefault(true);
+	bAutoActivate = true;
 }
 
 void UMounteaInventoryComponent::BeginPlay()
@@ -321,12 +323,18 @@ void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UUserWidget* New
 
 void UMounteaInventoryComponent::OnRep_Items()
 {
-	// TODO: update items Context
-	// Broadcast changes
+	for (const auto& Itr : Items)
+	{
+		if (Itr)
+		{
+			Itr->SetWorld(GetWorld());
+		}
+	}
 
 	FInventoryUpdateResult UpdateResult;
 	UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 	UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Success_Replication", "Inventory Replicated.");
+	
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 
@@ -635,8 +643,8 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_Implementation(cons
 {
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
-
-	if (GetOwner()->HasAuthority()) return;
+	
+	if (!CanExecuteCosmetics()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
 
@@ -665,41 +673,50 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const
 
 void UMounteaInventoryComponent::PostItemAdded_Implementation(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext)
 {
-	if (GetOwner() && GetOwner()->HasAuthority())
+	if (!CanExecuteCosmetics()) return;
+	
+	if (Item)
 	{
-		if (Item)
-		{
-			Item->GetItemAddedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
+		Item->GetItemAddedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
 
-			PostItemAdded_Client(Item, UpdateContext);
-		}
+		PostItemAdded_Client(Item, UpdateContext);
 	}
 }
 
 void UMounteaInventoryComponent::PostItemRemoved_Implementation(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext)
 {
-	if (GetOwner() && GetOwner()->HasAuthority())
+	if (!CanExecuteCosmetics()) return;
+	
+	if (Item)
 	{
-		if (Item)
-		{
-			Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
+		Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
 
-			PostItemRemoved_Client(Item, UpdateContext);
-		}
+		PostItemAdded_Client(Item, UpdateContext);
 	}
 }
 
 void UMounteaInventoryComponent::PostItemUpdated_Implementation(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext)
 {
-	if (GetOwner() && GetOwner()->HasAuthority())
+	if (!CanExecuteCosmetics()) return;
+	
+	if (Item)
 	{
-		if (Item)
-		{
-			Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
+		Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
 
-			PostItemUpdated_Client(Item, UpdateContext);
-		}
+		PostItemAdded_Client(Item, UpdateContext);
 	}
+}
+
+bool UMounteaInventoryComponent::CanExecuteCosmetics() const
+{
+	if (!GetOwner()) return false;
+	
+	if (GetOwner()->HasAuthority() && !UKismetSystemLibrary::IsStandalone(GetOwner()))
+	{
+		return false;
+	}
+	
+	return true;
 }
 
 void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext)
@@ -707,7 +724,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(UMounteaInv
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
 
-	if (GetOwner()->HasAuthority()) return;
+	if (!CanExecuteCosmetics()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 
@@ -722,7 +739,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(UMounteaI
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
 
-	if (GetOwner()->HasAuthority()) return;
+	if (!CanExecuteCosmetics()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 
@@ -737,7 +754,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(UMounteaI
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
 
-	if (GetOwner()->HasAuthority()) return;
+	if (!CanExecuteCosmetics()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 

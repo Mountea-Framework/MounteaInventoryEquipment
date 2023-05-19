@@ -57,13 +57,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
 	TArray<FMounteaItemConfig> ItemConfigs;
 	
-	UPROPERTY(BlueprintAssignable, Category="4. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
 	FItemGenericEvent OnItemAdded;
 
-	UPROPERTY(BlueprintAssignable, Category="4. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
 	FItemGenericEvent OnItemInitialized;
 
-	UPROPERTY(BlueprintAssignable, Category="4. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
 	FItemGenericEvent OnItemModified;
 
 private:
@@ -77,17 +77,20 @@ private:
     UPROPERTY(VisibleAnywhere, Category="4. Debug", meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
 	
-	UPROPERTY(Transient)
+	UPROPERTY(VisibleAnywhere, Category="4. Debug", meta=(DisplayThumbnail=false))
 	class UWorld* World;
 
 public:
-
-	void UpdateQuantity(const int32 NewQuantity);
-
-	UFUNCTION(BlueprintGetter, Category="Mountea|Inventory")
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
+	bool IsValid(UObject* WorldContextObject) const;
+	
+	UFUNCTION(BlueprintGetter, Category="Mountea Inventory & Equipment|Item")
 	FGuid GetItemGuid() const
 	{ return ItemGuid; };
 
+	void UpdateQuantity(const int32 NewQuantity);
+	
 	virtual FItemGenericEvent& GetItemAddedHandle()
 	{ return OnItemAdded; };
 	virtual FItemGenericEvent& GetItemUpdatedHandle()
@@ -100,21 +103,24 @@ public:
 
 	FGameplayTag GetFirstTag() const;
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item")
 	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
 	{ return OwningInventory; }
 	
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
 	virtual void SetWorld(UWorld* NewWorld);
 	
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
 	void InitializeNewItem(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData);
 
 protected:
 
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea Inventory & Equipment|Item")
+	void OnItemBeginPlay(const FString& Message);
+
 	UFUNCTION()
 	virtual void OnRep_Item();
-
+	
 	UFUNCTION()
 	void ItemAdded(const FString& Message);
 	UFUNCTION()
@@ -135,7 +141,30 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty> & OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override;
-	virtual class UWorld* GetWorld() const override;
+	
+	FORCEINLINE ULevel* GetLevel() const
+	{
+		return GetTypedOuter<ULevel>();
+	}
+	
+	virtual UWorld* GetWorld() const override
+	{
+		if (World) return World;
+		
+		// CDO objects do not belong to a world
+		// If the actors outer is destroyed or unreachable we are shutting down and the world should be nullptr
+		if (
+			!HasAnyFlags(RF_ClassDefaultObject) && ensureMsgf(GetOuter(), TEXT("Actor: %s has a null OuterPrivate in AActor::GetWorld()"), *GetFullName())
+			&& !GetOuter()->HasAnyFlags(RF_BeginDestroyed) && !GetOuter()->IsUnreachable()
+			)
+		{
+			if (ULevel* Level = GetLevel())
+			{
+				return Level->OwningWorld;
+			}
+		}
+		return nullptr;
+	}
 
 	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
 	void MarkDirtyForReplication();

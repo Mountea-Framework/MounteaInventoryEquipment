@@ -19,6 +19,13 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
 	OnItemInitialized.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemInitialized);
 	OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
+
+	OnItemBeginPlay(TEXT("Item has been initialized"));
+}
+
+bool UMounteaInventoryItemBase::IsValid(UObject* WorldContextObject) const
+{
+	return GetWorld() ? true : false;
 }
 
 void UMounteaInventoryItemBase::UpdateQuantity(const int32 NewQuantity)
@@ -35,7 +42,15 @@ FGameplayTag UMounteaInventoryItemBase::GetFirstTag() const
 
 void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)
 {
-	World = NewWorld;
+	if (NewWorld != World)
+	{
+		World = NewWorld;
+
+		FString Message = TEXT("World updated for Item ");
+		Message.Append(GetName());
+		
+		OnItemModified.Broadcast(Message);
+	}
 }
 
 void UMounteaInventoryItemBase::InitializeNewItem(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData)
@@ -58,6 +73,11 @@ void UMounteaInventoryItemBase::OnRep_Item()
 	Message.Append(" has been modified.");
 	
 	OnItemModified.Broadcast(Message);
+}
+
+void UMounteaInventoryItemBase::OnItemBeginPlay_Implementation(const FString& Message)
+{
+	OnItemInitialized.Broadcast(Message);
 }
 
 void UMounteaInventoryItemBase::ItemAdded(const FString& Message)
@@ -85,21 +105,6 @@ void UMounteaInventoryItemBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 bool UMounteaInventoryItemBase::IsSupportedForNetworking() const
 {
 	return true;
-}
-
-UWorld* UMounteaInventoryItemBase::GetWorld() const
-{
-	if (World)
-	{
-		return World;
-	}
-	
-	if (GetOuter())
-	{
-		return GetOuter()->GetWorld();
-	}
-	
-	return nullptr;
 }
 
 void UMounteaInventoryItemBase::MarkDirtyForReplication()

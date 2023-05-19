@@ -129,7 +129,8 @@ private:
 	
 	UFUNCTION()
 	void PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
-	
+	bool CanExecuteCosmetics() const;
+
 	UFUNCTION()
 	void PostItemAdded_Client_RequestUpdate(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 	UFUNCTION()
