@@ -711,12 +711,17 @@ bool UMounteaInventoryComponent::CanExecuteCosmetics() const
 {
 	if (!GetOwner()) return false;
 	
-	if (GetOwner()->HasAuthority() && !UKismetSystemLibrary::IsStandalone(GetOwner()))
+	switch (GetOwnerRole())
 	{
-		return false;
+		case ROLE_MAX:
+		case ROLE_None:
+		case ROLE_Authority:
+		case ROLE_AutonomousProxy: return true;
+		case ROLE_SimulatedProxy: break;
+		default: break;
 	}
-	
-	return true;
+
+	return false;
 }
 
 void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext)
@@ -833,7 +838,7 @@ void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUp
 
 void UMounteaInventoryComponent::RequestItemNotification(const FItemUpdateResult& UpdateContext) const
 {
-	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+w	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 	FInventoryNotificationData Data = *Settings->ItemUpdateData.Find(UpdateContext.ItemUpdateResult);
 	if (!UpdateContext.UpdateMessage.IsEmpty())
 	{

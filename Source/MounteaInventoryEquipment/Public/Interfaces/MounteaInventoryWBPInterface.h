@@ -30,4 +30,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
 	void CreateInventoryNotification(const FInventoryNotificationData& NotificationData);
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	bool GetInventoryVisibility();
+	virtual bool GetInventoryVisibility_Implementation() = 0;
 };
