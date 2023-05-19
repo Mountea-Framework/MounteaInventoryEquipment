@@ -19,6 +19,7 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
 	OnItemInitialized.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemInitialized);
 	OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
+	OnItemRemoved.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemRemoved);
 
 	OnItemBeginPlay(TEXT("Item has been initialized"));
 }
@@ -91,6 +92,11 @@ void UMounteaInventoryItemBase::ItemInitialized(const FString& Message)
 }
 
 void UMounteaInventoryItemBase::ItemModified(const FString& Message)
+{
+	MarkDirtyForReplication();
+}
+
+void UMounteaInventoryItemBase::ItemRemoved(const FString& Message)
 {
 	MarkDirtyForReplication();
 }

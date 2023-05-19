@@ -10,6 +10,7 @@ namespace MounteaInventoryEquipmentConsts
 		{
 			const FString InitializeInventoryWidget				(TEXT("InitializeInventoryWidget"));
 			const FString CreateInventoryWidget				(TEXT("CreateInventoryWidget"));
+			const FString ShowInventoryWidget				(TEXT("ShowInventoryWidget"));
 			const FString HideInventoryWidget					(TEXT("HideInventoryWidget"));
 			const FString RefreshInventoryWidget				(TEXT("RefreshInventoryWidget"));
 			const FString RefreshItemsWidgets				(TEXT("RefreshItemsWidgets"));

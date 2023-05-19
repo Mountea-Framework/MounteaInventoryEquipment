@@ -45,13 +45,18 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 	//Check if the array of items needs to replicate
 	if (Channel->KeyNeedsToReplicate(0, ReplicatedItemsKey))
 	{
-		for (const auto& Item : Items)
+		TArray<UMounteaInventoryItemBase*> AllItems = Items;
+		AllItems.Append(RemovedItems);
+		
+		for (const auto& Item : AllItems)
 		{
 			if (Channel->KeyNeedsToReplicate(Item->GetUniqueID(), Item->GetRepKey()))
 			{
 				bUpdated |= Channel->ReplicateSubobject(Item, *Bunch, *RepFlags);
 			}
 		}
+
+		RemovedItems.Empty();
 	}
 
 	return bUpdated;
@@ -304,6 +309,8 @@ bool UMounteaInventoryComponent::RemoveItems_Implementation(TArray<UMounteaInven
 void UMounteaInventoryComponent::RequestNetworkRefresh_Implementation()
 {
 	ReplicatedItemsKey++;
+
+	OnRep_Items();
 }
 
 AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
@@ -569,19 +576,23 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0)
 		{
 			ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_RemovedItem;
+			OnItemUpdated.Broadcast(Item, ItemUpdatedResult);
 			
 			OnItemRemoved.Broadcast(Item, ItemUpdatedResult);
-
-			Items.Remove(Item);
 			
 			FInventoryUpdateResult UpdateResult;
 			UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
 			UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Success_RemovedItem", "Inventory Item Removed");
 
 			OnInventoryUpdated.Broadcast(UpdateResult);
-
+			
 			ReplicatedItemsKey++;
+			Item->NetFlush();
+			
 			OnRep_Items();
+
+			RemovedItems.Add(Item);
+			Items.Remove(Item);
 
 			return true;
 		}
@@ -691,7 +702,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Implementation(UMounteaInventor
 	{
 		Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
 
-		PostItemAdded_Client(Item, UpdateContext);
+		PostItemRemoved_Client(Item, UpdateContext);
 	}
 }
 
@@ -703,7 +714,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Implementation(UMounteaInventor
 	{
 		Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
 
-		PostItemAdded_Client(Item, UpdateContext);
+		PostItemUpdated_Client(Item, UpdateContext);
 	}
 }
 
@@ -773,16 +784,18 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(UMounteaInve
 {
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
+	if (!Item) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
 	
-	OnItemAdded_Client.Broadcast(Item, UpdateContext);
-
 	if (InventoryWBP)
 	{
 		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
 		
 		RequestItemNotification(UpdateContext);
+		
+		Item->GetItemAddedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
+		OnItemAdded_Client.Broadcast(Item, UpdateContext);
 	}
 }
 
@@ -790,16 +803,20 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(UMounteaIn
 {
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
+	if (!Item) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+
 	
-	OnItemRemoved_Client.Broadcast(Item, UpdateContext);
 
 	if (InventoryWBP)
 	{
 		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
 		
 		RequestItemNotification(UpdateContext);
+
+		Item->GetItemRemovedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
+		OnItemRemoved_Client.Broadcast(Item, UpdateContext);
 	}
 }
 
@@ -807,16 +824,18 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(UMounteaIn
 {
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
+	if (!Item) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
 	
-	OnItemUpdated_Client.Broadcast(Item, UpdateContext);
-
 	if (InventoryWBP)
 	{
 		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
 		
 		RequestItemNotification(UpdateContext);
+		
+		Item->GetItemUpdatedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
+		OnItemUpdated_Client.Broadcast(Item, UpdateContext);
 	}
 }
 
@@ -838,7 +857,7 @@ void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUp
 
 void UMounteaInventoryComponent::RequestItemNotification(const FItemUpdateResult& UpdateContext) const
 {
-w	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 	FInventoryNotificationData Data = *Settings->ItemUpdateData.Find(UpdateContext.ItemUpdateResult);
 	if (!UpdateContext.UpdateMessage.IsEmpty())
 	{

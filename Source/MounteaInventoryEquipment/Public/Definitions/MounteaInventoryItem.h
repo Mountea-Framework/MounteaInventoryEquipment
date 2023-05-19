@@ -61,6 +61,9 @@ protected:
 	FItemGenericEvent OnItemAdded;
 
 	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
+	FItemGenericEvent OnItemRemoved;
+
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
 	FItemGenericEvent OnItemInitialized;
 
 	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
@@ -97,6 +100,13 @@ public:
 	{ return OnItemModified; };
 	virtual FItemGenericEvent& GetItemInitializedHandle()
 	{ return OnItemInitialized; };
+	virtual FItemGenericEvent& GetItemRemovedHandle()
+	{ return OnItemRemoved; };
+
+	void NetFlush()
+	{
+		RepKey++;
+	}
 
 	int GetRepKey() const
 	{ return RepKey; }
@@ -127,6 +137,8 @@ protected:
 	void ItemInitialized(const FString& Message);
 	UFUNCTION()
 	void ItemModified(const FString& Message);
+	UFUNCTION()
+	void ItemRemoved(const FString& Message);
 	
 	UFUNCTION()
 	virtual TArray<FName> GetSourceTableRows() const

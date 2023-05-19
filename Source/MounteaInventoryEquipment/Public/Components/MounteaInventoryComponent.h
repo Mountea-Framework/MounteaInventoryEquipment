@@ -190,6 +190,8 @@ private:
 	UPROPERTY(EditAnywhere, Category="2. Debug")
 	float Duration_RequestSyncTimerHandle = 0.2f;
 
+	TArray<UMounteaInventoryItemBase*> RemovedItems;
+
 #pragma endregion
 	
 };
