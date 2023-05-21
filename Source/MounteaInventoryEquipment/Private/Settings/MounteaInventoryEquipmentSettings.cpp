@@ -44,6 +44,9 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 		EInventoryUpdateResult::EIUR_Success,
 		FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Success", "Inventory Updated"), 1.5f, FLinearColor(FColor::White), 0)
 	);
+
+	MinDisplayWeight = 1;
+	BaseInventoryDimensions = FIntPoint(10, 6);
 }
 
 #undef LOCTEXT_NAMESPACE
