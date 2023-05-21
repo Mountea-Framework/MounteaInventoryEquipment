@@ -26,8 +26,8 @@ Join support and community Discord!
 ## Suport Table
 Engine Version | Plugin Version | Support
 -------------- | -------------- | ----
-UE 4.26 | 0.0.0.1 | 🟩
-UE 4.27 | - | 🟨
+UE 4.26 | 0.0.0.1 | 🟪
+UE 4.27 | - | 🟪
 UE 5.00 | - | 🟨
 UE 5.1 | - | 🟨
 
