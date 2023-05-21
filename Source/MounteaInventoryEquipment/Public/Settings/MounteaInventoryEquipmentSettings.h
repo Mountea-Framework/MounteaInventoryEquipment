@@ -46,6 +46,9 @@ public:
 	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Notifications")
 	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	FIntPoint BaseInventoryDimensions;
 	
 public:
 

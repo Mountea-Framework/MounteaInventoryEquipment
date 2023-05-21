@@ -325,7 +325,23 @@ void UMounteaInventoryComponent::SetInventoryWBPClass_Implementation(TSubclassOf
 
 void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UUserWidget* NewWBP)
 {
+	if (InventoryWBP && InventoryWBP != NewWBP)
+	{
+		TScriptInterface<IMounteaInventoryWBPInterface> InventoryWBPInterface;
+		InventoryWBPInterface.SetInterface(Cast<IMounteaInventoryWBPInterface>(InventoryWBP));
+
+		const TScriptInterface<IMounteaInventoryInterface> OwningInventory;
+		InventoryWBPInterface->Execute_SetOwningInventory(InventoryWBP, OwningInventory);
+	}
+	
 	InventoryWBP = NewWBP;
+	if (InventoryWBP)
+	{
+		TScriptInterface<IMounteaInventoryWBPInterface> InventoryWBPInterface;
+		InventoryWBPInterface.SetInterface(Cast<IMounteaInventoryWBPInterface>(InventoryWBP));
+		
+		InventoryWBPInterface->Execute_SetOwningInventory(InventoryWBP, this);
+	}
 }
 
 void UMounteaInventoryComponent::OnRep_Items()

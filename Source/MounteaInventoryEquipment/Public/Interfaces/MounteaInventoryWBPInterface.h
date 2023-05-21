@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryWBPInterface.generated.h"
 
+class IMounteaInventoryInterface;
 struct FInventoryNotificationData;
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
@@ -34,4 +35,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool GetInventoryVisibility();
 	virtual bool GetInventoryVisibility_Implementation() = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory();
+	virtual TScriptInterface<IMounteaInventoryInterface> GetOwningInventory_Implementation() = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory);
+	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory) = 0;
 };
