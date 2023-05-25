@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MounteaInventoryHelpers.h"
+#include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
@@ -37,6 +38,17 @@ public:
 		return FIntPoint(6, 8);
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static FIntPoint GetInventorySlotSize()
+	{
+		if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
+		{
+			return Settings->BaseSlotSize;
+		}
+
+		return FIntPoint(32, 32);
+	}
+
 	/**
 	* Tries to retrieve the inventory interface of the specified Actor.
 	* If Actor doesn't implement interface, then first found interface in Components will be returned.
@@ -50,6 +62,9 @@ public:
 	{
 		return GetInterfaceFrom<UMounteaInventoryInterface, TScriptInterface<IMounteaInventoryInterface>>(FromActor);
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 
 	template<class Interface, class InterfaceClass>
 	static InterfaceClass GetInterfaceFrom(AActor* From)

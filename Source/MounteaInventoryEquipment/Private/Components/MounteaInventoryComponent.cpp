@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
+#include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Interfaces/MounteaInventoryWBPInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -244,9 +245,9 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implemen
 	return Items;
 }
 
-bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity)
 {
-	return TryAddItem(NewItem, OptionalQuantity);
+	return TryAddItem(NewItem, Quantity);
 }
 
 bool UMounteaInventoryComponent::AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems)
@@ -263,14 +264,14 @@ bool UMounteaInventoryComponent::AddItems_Implementation(TMap<UMounteaInventoryI
 	return bSatisfied;
 }
 
-bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32& Quantity)
 {
 	if (ItemClass == nullptr) return false;
 
 	UMounteaInventoryItemBase* NewItem = NewObject<UMounteaInventoryItemBase>(GetWorld(), ItemClass);
 	NewItem->SetWorld(GetWorld());
 	
-	return TryAddItem(NewItem, OptionalQuantity);
+	return TryAddItem(NewItem, Quantity);
 }
 
 bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses)
@@ -361,7 +362,7 @@ void UMounteaInventoryComponent::OnRep_Items()
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 
-bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
 	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 
@@ -411,14 +412,14 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 		Filter.Item = Item;
 		Filter.bSearchByClass = true;
 		Filter.Class = Item->GetClass();
-		Filter.bSearchByTag = true;
-		Filter.Tag = Item->GetFirstTag();
+		//Filter.bSearchByTag = false;
+		//Filter.Tag = Item->GetFirstTag();
 	}
 
 	bool bSuccess = false;
 	if (!Execute_HasItem(this, Filter))
 	{
-		bSuccess = TryAddItem_NewItem(Item, OptionalQuantity);
+		bSuccess = TryAddItem_NewItem(Item, Quantity);
 	}
 	else
 	{
@@ -430,13 +431,13 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 			
 		UMounteaInventoryItemBase* ExistingItem = Execute_FindItem(this, SearchFilter);
 		
-		bSuccess = TryAddItem_UpdateExisting(ExistingItem, Item, OptionalQuantity);
+		bSuccess = TryAddItem_UpdateExisting(ExistingItem, Item, Quantity);
 	}
 	
 	return bSuccess;
 }
 
-bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
 	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 
@@ -501,10 +502,10 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 		return false;
 	}
 
-	return RemoveItem_Internal(Item, OptionalQuantity);
+	return RemoveItem_Internal(Item, Quantity);
 }
 
-bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
@@ -529,7 +530,7 @@ bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Ite
 	return false;
 }
 
-bool UMounteaInventoryComponent::UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
@@ -552,7 +553,7 @@ bool UMounteaInventoryComponent::UpdateItem_Internal(UMounteaInventoryItemBase* 
 	return false;
 }
 
-bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
 	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 
@@ -572,13 +573,13 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		FItemUpdateResult ItemUpdatedResult;
 		
 		int32 AmountToRemove = -1;
-		if (OptionalQuantity == 0)
+		if (Quantity == 0) //TODO
 		{
 			AmountToRemove = Item->ItemData.ItemQuantity.CurrentQuantity;
 		}
 		else
 		{
-			AmountToRemove = OptionalQuantity;
+			AmountToRemove = Quantity;
 		}
 
 		AmountToRemove = FMath::Abs(AmountToRemove);
@@ -625,36 +626,36 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 	return false;
 }
 
-bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
 	// Sanity check
 	if (!Item) return false;
 
-	if (OptionalQuantity < 0)
+	if (Quantity < 0)
 	{
-		return TryRemoveItem(Item, OptionalQuantity);
+		return TryRemoveItem(Item, Quantity);
 	}
-	
-	const int32 FinalQuantity = CalculateMaxPossibleQuantity(Item, nullptr, OptionalQuantity);
+
+	const int32 FinalQuantity = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Item, nullptr, Quantity);
 	Item->UpdateQuantity(FinalQuantity);
 	
 	// In this case we actually can just add the item with no further checks
 	return AddItem_Internal(Item);
 }
 
-bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 OptionalQuantity)
+bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity)
 {
 	// Sanity check
 	if (!NewItem) return false;
 	if (!Existing) return false;
 
-	if (OptionalQuantity < 0)
+	if (Quantity < 0)
 	{
-		return TryRemoveItem(Existing, OptionalQuantity);
+		return TryRemoveItem(Existing, Quantity);
 	}
 
 	// If we didnt specify how much we adding all, if we did, never add more than possible
-	const int32 PassQuantity = CalculateMaxPossibleQuantity(Existing, NewItem, OptionalQuantity);
+	const int32 PassQuantity = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Existing, NewItem, Quantity);
 
 	Existing->UpdateQuantity(PassQuantity);
 	
@@ -881,55 +882,6 @@ void UMounteaInventoryComponent::RequestItemNotification(const FItemUpdateResult
 	}
 
 	IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
-}
-
-int32 UMounteaInventoryComponent::CalculateMaxPossibleQuantity(const UMounteaInventoryItemBase* Item, const UMounteaInventoryItemBase* OtherItem, const int32 OptionalQuantity) const
-{
-	if (!Item)
-	{
-		return 0;
-	}
-	
-	if (OtherItem)
-	{
-		// Updating item that cannot stack mean always just and only 0
-		if (!Item->ItemData.ItemQuantity.bIsStackable)
-		{
-			return 0;
-		}
-		
-		const int32 UpdateQuantity = OptionalQuantity != 0 ? OptionalQuantity : OtherItem->ItemData.ItemQuantity.CurrentQuantity;
-	
-		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
-		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
-
-		const int32 MaxPossible = MaxQuantity - CurrentQuantity;
-	
-		const int32 PassQuantity = FMath::Min(MaxPossible, CurrentQuantity + UpdateQuantity);
-
-		return PassQuantity;
-	}
-	else
-	{
-		// Adding new item that cannot stack mean always just and only 1
-		if (!Item->ItemData.ItemQuantity.bIsStackable)
-		{
-			return 1;
-		}
-
-		const int32 UpdateQuantity = OptionalQuantity != 0 ? OptionalQuantity : Item->ItemData.ItemQuantity.CurrentQuantity;
-	
-		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
-		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
-
-		const int32 MaxPossible = MaxQuantity - CurrentQuantity;
-	
-		const int32 PassQuantity = FMath::Min(MaxPossible, UpdateQuantity);
-
-		return PassQuantity;
-	}
-	
-	return 0;
 }
 
 void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()

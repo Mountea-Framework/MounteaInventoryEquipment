@@ -49,6 +49,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	FIntPoint BaseInventoryDimensions;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	FIntPoint BaseSlotSize;
 	
 public:
 

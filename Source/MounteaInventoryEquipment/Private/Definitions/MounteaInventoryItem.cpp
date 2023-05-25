@@ -6,6 +6,8 @@
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Net/UnrealNetwork.h"
 
+#define GET_MEMBERSTRUCT_NAME_CHECKED(ClassName, ClassStructMember, MemberName) \
+((void)sizeof(UEAsserts_Private::GetMemberNameCheckedJunk(((ClassName*)0)->ClassStructMember.MemberName)), FName(TEXT(#MemberName)))
 
 UMounteaInventoryItemBase::UMounteaInventoryItemBase()
 {
@@ -133,6 +135,12 @@ void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 
 void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	// ...
+	if (PropertyChangedEvent.GetPropertyName().ToString() == TEXT("bIsStackable"))
+	{
+		if (!ItemData.ItemQuantity.bIsStackable)
+		{
+			ItemData.ItemQuantity.MaxQuantity = 1;
+		}
+	}
 }
 #endif

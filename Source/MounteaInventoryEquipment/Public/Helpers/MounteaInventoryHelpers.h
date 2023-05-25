@@ -122,9 +122,9 @@ struct FMounteaItemQuantityData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=0, ClampMin=0))
-	int32 CurrentQuantity = 1;
+	int32 CurrentQuantity = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=1, ClampMin=1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
 	int32 MaxQuantity = 99;
 
 	UPROPERTY(EditAnywhere)

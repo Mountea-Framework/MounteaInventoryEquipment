@@ -22,6 +22,17 @@ UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mount
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfig : public UObject
 {
 	GENERATED_BODY()
+
+public:
+	/**
+	 * ItemSlotSize represents the size of an item slot in a grid-based inventory system.
+	 * The ItemSlotSize variable is typically used in the context of a grid-based inventory system, where items are organized and stored in slots.
+	 * It represents the size of each individual item slot in the grid.
+	 *
+	 * By accessing the ItemSlotSize variable, you can retrieve the dimensions of an item slot, which can be useful for various inventory-related operations such as positioning, layout calculations, and determining the size and placement of items within the inventory grid.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta=(ShowOnlyInnerProperties))
+	FIntPoint ItemSlotSize = FIntPoint(1,1);
 };
 
 USTRUCT(BlueprintType)
@@ -29,7 +40,7 @@ struct FMounteaItemConfig
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Mountea|Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
 	UMounteaInventoryItemConfig* ItemConfig = nullptr;
 };
 
