@@ -55,6 +55,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TSet<TSoftClassPtr<UMounteaInventoryItemCategory>> InventoryCategories;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	uint8 bUIDebug : 1;
 	
 public:
 

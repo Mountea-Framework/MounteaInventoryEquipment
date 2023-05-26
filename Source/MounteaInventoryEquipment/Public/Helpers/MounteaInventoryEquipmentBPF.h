@@ -49,6 +49,33 @@ public:
 		return FIntPoint(32, 32);
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool UIDebug()
+	{
+		if (IsShipping())
+		{
+			return false;
+		}
+		
+		if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
+		{
+			return Settings->bUIDebug;
+		}
+
+		return false;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsShipping()
+	{
+		
+#if UE_BUILD_SHIPPING
+		return true;
+#endif
+
+		return false;
+	}
+
 	/**
 	* Tries to retrieve the inventory interface of the specified Actor.
 	* If Actor doesn't implement interface, then first found interface in Components will be returned.
