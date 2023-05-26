@@ -52,6 +52,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	FIntPoint BaseSlotSize;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	TSet<TSoftClassPtr<UMounteaInventoryItemCategory>> InventoryCategories;
 	
 public:
 
