@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "MounteaInventoryItemRarity.generated.h"
 
@@ -21,10 +22,15 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemRarity : public UObject
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, Category="1. Required")
+public:
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required")
+	FGameplayTag RarityGameplayTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required")
 	FText RarityName = LOCTEXT("MounteaInventoryItemRarity_Name", "Default");
 
-	UPROPERTY(EditDefaultsOnly, Category="1. Required", meta=(HideAlphaChannel))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required", meta=(HideAlphaChannel))
 	FLinearColor RarityColor = FLinearColor::Gray;
 };
 

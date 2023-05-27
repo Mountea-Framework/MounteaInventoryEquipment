@@ -205,7 +205,7 @@ struct FMounteaInventoryItemOptionalData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture* ItemIcon = nullptr;
+	UTexture2D* ItemIcon = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bHasWeight : 1;
