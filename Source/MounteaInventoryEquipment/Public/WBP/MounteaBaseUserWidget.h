@@ -22,6 +22,6 @@ public:
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(CompactNodeTitle="Theme Config"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(CompactNodeTitle="Theme Config", HideSelfPin=true))
 	UMounteaInventoryThemeConfig* GetThemeConfig() const;
 };
