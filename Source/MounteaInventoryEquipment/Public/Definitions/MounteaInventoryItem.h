@@ -92,7 +92,8 @@ public:
 	FGuid GetItemGuid() const
 	{ return ItemGuid; };
 
-	void UpdateQuantity(const int32 NewQuantity);
+	void AddQuantity(const int32 Amount);
+	void SetQuantity(const int32 NewQuantity);
 	
 	virtual FItemGenericEvent& GetItemAddedHandle()
 	{ return OnItemAdded; };

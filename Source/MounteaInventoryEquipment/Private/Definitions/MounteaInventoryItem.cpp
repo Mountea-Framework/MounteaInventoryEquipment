@@ -31,8 +31,24 @@ bool UMounteaInventoryItemBase::IsValid(UObject* WorldContextObject) const
 	return GetWorld() ? true : false;
 }
 
-void UMounteaInventoryItemBase::UpdateQuantity(const int32 NewQuantity)
+void UMounteaInventoryItemBase::AddQuantity(const int32 Amount)
 {
+	const int32 Current = ItemData.ItemQuantity.CurrentQuantity;
+	const int32 Requested = Current + Amount;
+
+	if (Current == Requested) return;
+	
+	const int32 Max = ItemData.ItemQuantity.bIsStackable ? 1 : ItemData.ItemQuantity.MaxQuantity;
+	
+	ItemData.ItemQuantity.CurrentQuantity = FMath::Min(Requested, Max);
+
+	OnItemModified.Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::ItemNotifications::ItemUpdated);
+}
+
+void UMounteaInventoryItemBase::SetQuantity(const int32 NewQuantity)
+{
+	if (NewQuantity == ItemData.ItemQuantity.CurrentQuantity) return;
+	
 	ItemData.ItemQuantity.CurrentQuantity = FMath::Min(ItemData.ItemQuantity.MaxQuantity, NewQuantity);
 
 	OnItemModified.Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::ItemNotifications::ItemUpdated);

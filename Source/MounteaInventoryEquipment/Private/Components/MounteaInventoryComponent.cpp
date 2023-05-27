@@ -588,7 +588,7 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 
 		AmountToRemove = MaxToRemove - AmountToRemove;
 		
-		Item->UpdateQuantity(AmountToRemove);
+		Item->SetQuantity(AmountToRemove);
 		
 		if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0)
 		{
@@ -636,8 +636,8 @@ bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* I
 		return TryRemoveItem(Item, Quantity);
 	}
 
-	const int32 FinalQuantity = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Item, nullptr, Quantity);
-	Item->UpdateQuantity(FinalQuantity);
+	const int32 MaxToAdd = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Item, nullptr, Quantity);
+	Item->SetQuantity(MaxToAdd);
 	
 	// In this case we actually can just add the item with no further checks
 	return AddItem_Internal(Item);
@@ -654,10 +654,10 @@ bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItem
 		return TryRemoveItem(Existing, Quantity);
 	}
 
-	// If we didnt specify how much we adding all, if we did, never add more than possible
-	const int32 PassQuantity = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Existing, NewItem, Quantity);
-
-	Existing->UpdateQuantity(PassQuantity);
+	const int32 MaxAddQuantity = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Existing, NewItem, Quantity);
+	if (MaxAddQuantity == 0) return false;
+	
+	Existing->AddQuantity(MaxAddQuantity);
 	
 	return UpdateItem_Internal(Existing);
 }
