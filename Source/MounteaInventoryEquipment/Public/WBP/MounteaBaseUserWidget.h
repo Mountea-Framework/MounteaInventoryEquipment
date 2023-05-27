@@ -1,0 +1,27 @@
+// All rights reserved Dominik Pavlicek 2022.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "MounteaBaseUserWidget.generated.h"
+
+class UMounteaInventoryThemeConfig;
+/**
+ * 
+ */
+UCLASS()
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaBaseUserWidget : public UUserWidget
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, Category="1. Optional", meta=(AllowAbstract=false, DisplayThumbnail=false))
+	UMounteaInventoryThemeConfig* ThemeConfigOverride = nullptr;
+
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(CompactNodeTitle="Theme Config"))
+	UMounteaInventoryThemeConfig* GetThemeConfig() const;
+};

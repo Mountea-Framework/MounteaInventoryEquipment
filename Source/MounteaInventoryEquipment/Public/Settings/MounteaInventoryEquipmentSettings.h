@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventoryThemeConfig.h"
 #include "Engine/DeveloperSettings.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaInventoryHelpers.h"
@@ -48,16 +49,13 @@ public:
 	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
-	FIntPoint BaseInventoryDimensions;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
-	FIntPoint BaseSlotSize;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	TSet<TSoftClassPtr<UMounteaInventoryItemCategory>> InventoryCategories;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
 	uint8 bUIDebug : 1;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
 	
 public:
 

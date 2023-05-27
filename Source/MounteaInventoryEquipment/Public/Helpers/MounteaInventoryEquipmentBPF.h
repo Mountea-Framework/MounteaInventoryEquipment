@@ -30,23 +30,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static FIntPoint GetInventoryDimensions()
 	{
-		if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
-		{
-			return Settings->BaseInventoryDimensions;
-		}
-
-		return FIntPoint(6, 8);
+		return GetThemeConfig()->InventoryBaseSize;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static FIntPoint GetInventorySlotSize()
 	{
-		if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
-		{
-			return Settings->BaseSlotSize;
-		}
-
-		return FIntPoint(32, 32);
+		return GetThemeConfig()->SlotBaseSize;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
@@ -63,6 +53,23 @@ public:
 		}
 
 		return false;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static UMounteaInventoryThemeConfig* GetThemeConfig()
+	{
+		const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+		if (!Settings)
+		{
+			return NewObject<UMounteaInventoryThemeConfig>();
+		}
+
+		if (!Settings->ThemeConfig)
+		{
+			return NewObject<UMounteaInventoryThemeConfig>();
+		}
+		
+		return Settings->ThemeConfig.LoadSynchronous();
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))

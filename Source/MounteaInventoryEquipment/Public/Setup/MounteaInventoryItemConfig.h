@@ -24,6 +24,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfig : public UObject
 	GENERATED_BODY()
 
 public:
+	
 	/**
 	 * ItemSlotSize represents the size of an item slot in a grid-based inventory system.
 	 * The ItemSlotSize variable is typically used in the context of a grid-based inventory system, where items are organized and stored in slots.

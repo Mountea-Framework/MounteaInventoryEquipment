@@ -46,8 +46,6 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	);
 
 	MinDisplayWeight = 1;
-	BaseInventoryDimensions = FIntPoint(6, 10);
-	BaseSlotSize = FIntPoint(32,32);
 
 	bUIDebug = false;
 }
