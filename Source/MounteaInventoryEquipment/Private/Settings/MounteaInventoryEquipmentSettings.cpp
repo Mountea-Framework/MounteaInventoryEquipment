@@ -48,6 +48,7 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	MinDisplayWeight = 1;
 
 	bUIDebug = false;
+	bDragDropAllowed = true;
 }
 
 #undef LOCTEXT_NAMESPACE

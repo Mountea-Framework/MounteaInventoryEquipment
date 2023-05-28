@@ -39,6 +39,9 @@ public:
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
+	uint8 bDragDropAllowed : 1;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> InventoryWidgetCommands;
@@ -54,10 +57,13 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
 	int32 MinDisplayWeight = 1;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
+	TArray<FKey> DragKeys;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
 	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
 	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
 
 public:

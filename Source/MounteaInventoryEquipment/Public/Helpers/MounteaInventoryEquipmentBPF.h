@@ -56,6 +56,12 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsDragAllowed()
+	{
+		return GetSettings()->bDragDropAllowed;
+	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static UMounteaInventoryThemeConfig* GetThemeConfig()
 	{
 		const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
@@ -72,6 +78,18 @@ public:
 		return Settings->ThemeConfig.LoadSynchronous();
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static const UMounteaInventoryEquipmentSettings* GetSettings()
+	{
+		return GetDefault<UMounteaInventoryEquipmentSettings>();
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TArray<FKey> GetDragKeys()
+	{
+		return GetSettings()->DragKeys;
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static bool IsEditor()
 	{
