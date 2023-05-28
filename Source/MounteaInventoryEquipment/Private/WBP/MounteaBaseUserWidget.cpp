@@ -5,6 +5,7 @@
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 
+
 UMounteaInventoryThemeConfig* UMounteaBaseUserWidget::GetThemeConfig() const
 {
 	return ThemeConfigOverride != nullptr ? ThemeConfigOverride : UMounteaInventoryEquipmentBPF::GetThemeConfig();

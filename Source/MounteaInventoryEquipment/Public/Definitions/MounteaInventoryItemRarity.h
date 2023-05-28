@@ -17,8 +17,8 @@
  * Defines Rarity.
  * Is Assigned to Inventory Items to sort them to Rarities.
  */
-UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemRarity : public UObject
+UCLASS( BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea")
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemRarity : public UDataAsset
 {
 	GENERATED_BODY()
 

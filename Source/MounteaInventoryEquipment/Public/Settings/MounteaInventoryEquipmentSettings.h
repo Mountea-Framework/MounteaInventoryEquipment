@@ -25,38 +25,41 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public 
 
 public:
 
-	UPROPERTY(Config, EditAnywhere, Category="1. User Interface", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required")
+	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
+
+	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
 	TSoftClassPtr<UUserWidget> DefaultInventoryWidgetClass;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
+	uint8 bUIDebug : 1;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> InventoryWidgetCommands;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> ItemsWidgetCommands;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TMap<EItemUpdateResult, FText> ItemUpdateMessages;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
 	int32 MinDisplayWeight = 1;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
 	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
 	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
-	TSet<TSoftClassPtr<UMounteaInventoryItemCategory>> InventoryCategories;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
-	uint8 bUIDebug : 1;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. User Interface")
-	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
-	
 public:
 
 #if WITH_EDITOR

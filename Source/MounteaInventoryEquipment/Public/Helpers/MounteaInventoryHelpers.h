@@ -10,6 +10,8 @@
 #include "Engine/Level.h"
 #include "MounteaInventoryHelpers.generated.h"
 
+class UMounteaInventoryItemCategory;
+class UMounteaInventoryItemRarity;
 class UMounteaInventoryItemBase;
 class UTexture;
 class UTexture2D;
@@ -153,11 +155,11 @@ struct FMounteaInventoryItemRequiredData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, MultiLine))
 	FText ItemDescription = LOCTEXT("MounteaInventoryItem_ItemName", "This is a multiline description of a new Item.\nYou can use this to provide some lore data or any additional info about this Item.");
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault))
-	TSubclassOf<class UMounteaInventoryItemCategory> ItemCategory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UMounteaInventoryItemCategory* ItemCategory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault))
-	TSubclassOf<class UMounteaInventoryItemRarity> ItemRarity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UMounteaInventoryItemRarity* ItemRarity;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="StaticMesh, SkeletalMesh"))
 	UStreamableRenderAsset* ItemMesh = nullptr;

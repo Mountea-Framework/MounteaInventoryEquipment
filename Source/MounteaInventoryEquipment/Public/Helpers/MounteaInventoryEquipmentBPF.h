@@ -64,7 +64,7 @@ public:
 			return NewObject<UMounteaInventoryThemeConfig>();
 		}
 
-		if (!Settings->ThemeConfig)
+		if (Settings->ThemeConfig.IsNull())
 		{
 			return NewObject<UMounteaInventoryThemeConfig>();
 		}

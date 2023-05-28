@@ -17,8 +17,8 @@
  * Defines Category.
  * Is Assigned to Inventory Items to sort them to Categories.
  */
-UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemCategory : public UObject
+UCLASS( BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea")
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemCategory : public UDataAsset
 {
 	GENERATED_BODY()
 
