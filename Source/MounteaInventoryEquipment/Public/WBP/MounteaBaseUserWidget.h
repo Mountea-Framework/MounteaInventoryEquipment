@@ -15,11 +15,12 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaBaseUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+	UMounteaBaseUserWidget(const FObjectInitializer& ObjectInitializer);
+
 public:
 
 	UPROPERTY(EditAnywhere, Category="1. Optional", meta=(AllowAbstract=false, DisplayThumbnail=false))
 	UMounteaInventoryThemeConfig* ThemeConfigOverride = nullptr;
-	
 
 public:
 
