@@ -23,16 +23,15 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 			return 0;
 		}
 		
-		const int32 UpdateQuantity = RequestedQuantity != 0 ? RequestedQuantity : OtherItem->ItemData.ItemQuantity.CurrentQuantity;
+		const int32 UpdateQuantity = FMath::Min(RequestedQuantity, OtherItem->ItemData.ItemQuantity.CurrentQuantity);
 	
 		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
 		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
 
-		const int32 MaxPossible = MaxQuantity - CurrentQuantity;
-	
-		const int32 PassQuantity = FMath::Min(MaxPossible, CurrentQuantity + UpdateQuantity);
+		int32 MaxPossible = MaxQuantity - CurrentQuantity;
+		MaxPossible = FMath::Min(MaxPossible, UpdateQuantity);
 
-		return PassQuantity;
+		return MaxPossible;
 	}
 	else
 	{
@@ -47,11 +46,26 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 
 		int32 MaxPossible = MaxQuantity - CurrentQuantity;
 		MaxPossible = FMath::Min(MaxPossible, RequestedQuantity);
-	
-		//const int32 PassQuantity = FMath::Min(MaxPossible, RequestedQuantity);
 
 		return MaxPossible;
 	}
 	
 	return 0;
+}
+
+bool UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+{
+	if (!BaseItem) return false;
+	if (RequestedQuantity == 0) return false;
+
+	if (OtherItem)
+	{
+		
+	}
+	else
+	{
+		
+	}
+
+	return false;
 }

@@ -38,7 +38,7 @@ void UMounteaInventoryItemBase::AddQuantity(const int32 Amount)
 
 	if (Current == Requested) return;
 	
-	const int32 Max = ItemData.ItemQuantity.bIsStackable ? 1 : ItemData.ItemQuantity.MaxQuantity;
+	const int32 Max = ItemData.ItemQuantity.bIsStackable ? ItemData.ItemQuantity.MaxQuantity : 1;
 	
 	ItemData.ItemQuantity.CurrentQuantity = FMath::Min(Requested, Max);
 

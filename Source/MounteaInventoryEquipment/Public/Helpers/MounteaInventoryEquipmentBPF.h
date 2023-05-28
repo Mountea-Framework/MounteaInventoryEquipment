@@ -73,6 +73,17 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsEditor()
+	{
+		
+#if WITH_EDITOR
+		return true;
+#endif
+
+		return false;
+	}
+	 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static bool IsShipping()
 	{
 		
@@ -100,6 +111,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 
+	static bool AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
+	
 	template<class Interface, class InterfaceClass>
 	static InterfaceClass GetInterfaceFrom(AActor* From)
 	{
