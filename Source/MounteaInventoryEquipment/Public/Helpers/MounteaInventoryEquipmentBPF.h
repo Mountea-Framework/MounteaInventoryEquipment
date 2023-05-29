@@ -85,6 +85,30 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TSet<UMounteaInventoryItemCategory*> GetAllowedCategories()
+	{
+		TSet<UMounteaInventoryItemCategory*> ReturnValues;
+		for (auto Itr : GetSettings()->InventoryCategories)
+		{
+			ReturnValues.Add(Itr.LoadSynchronous());
+		}
+
+		return ReturnValues;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TSet<UMounteaInventoryItemRarity*> GetAllowedRarities()
+	{
+		TSet<UMounteaInventoryItemRarity*> ReturnValues;
+		for (auto Itr : GetSettings()->InventoryRarities)
+		{
+			ReturnValues.Add(Itr.LoadSynchronous());
+		}
+
+		return ReturnValues;
+	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FKey> GetDragKeys()
 	{
 		return GetSettings()->DragKeys;

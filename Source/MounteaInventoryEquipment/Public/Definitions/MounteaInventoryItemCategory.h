@@ -24,17 +24,17 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemCategory : public UData
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
 	FGameplayTagContainer CompatibleGameplayTags;
 	
-	UPROPERTY(EditDefaultsOnly, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
 	FText CategoryName = LOCTEXT("MounteaInventoryItemCategory_Name", "Default");
 
-	UPROPERTY(EditDefaultsOnly, Category="1. Required", meta=(MultiLine))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(MultiLine))
 	FText CategoryDescription = LOCTEXT("MounteaInventoryItemCategory_Name", "Default");
 	
-	UPROPERTY(EditDefaultsOnly, Category="2. Optional")
-	UTexture* CategoryIcon = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
+	UTexture2D* CategoryIcon = nullptr;
 };
 
 #undef LOCTEXT_NAMESPACE

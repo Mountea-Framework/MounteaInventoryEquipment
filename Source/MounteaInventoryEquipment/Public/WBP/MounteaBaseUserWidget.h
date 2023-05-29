@@ -17,12 +17,20 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaBaseUserWidget : public UUserWidget
 
 	UMounteaBaseUserWidget(const FObjectInitializer& ObjectInitializer);
 
+	virtual void NativeConstruct() override;
+
 public:
 
 	UPROPERTY(EditAnywhere, Category="1. Optional", meta=(AllowAbstract=false, DisplayThumbnail=false))
 	UMounteaInventoryThemeConfig* ThemeConfigOverride = nullptr;
 
 public:
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool BindEvents();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool UnBindEvents();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(CompactNodeTitle="Theme Config", HideSelfPin=true))
 	UMounteaInventoryThemeConfig* GetThemeConfig() const;

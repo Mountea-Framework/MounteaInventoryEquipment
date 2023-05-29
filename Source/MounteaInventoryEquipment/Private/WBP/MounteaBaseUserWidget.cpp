@@ -11,6 +11,13 @@ UMounteaBaseUserWidget::UMounteaBaseUserWidget(const FObjectInitializer& ObjectI
 	bIsFocusable = true;
 }
 
+void UMounteaBaseUserWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	LoadFromConfig();
+}
+
 UMounteaInventoryThemeConfig* UMounteaBaseUserWidget::GetThemeConfig() const
 {
 	return ThemeConfigOverride != nullptr ? ThemeConfigOverride : UMounteaInventoryEquipmentBPF::GetThemeConfig();
