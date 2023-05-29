@@ -112,7 +112,14 @@ public:
 	int GetRepKey() const
 	{ return RepKey; }
 
-	FGameplayTag GetFirstTag() const;
+	FGameplayTag GetFirstTag() const
+	{
+		return ItemData.CompatibleGameplayTags.First();
+	};
+	FGameplayTagContainer GetTags() const
+	{
+		return ItemData.CompatibleGameplayTags;
+	};
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item")
 	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const

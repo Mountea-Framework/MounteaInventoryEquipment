@@ -54,11 +54,6 @@ void UMounteaInventoryItemBase::SetQuantity(const int32 NewQuantity)
 	OnItemModified.Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::ItemNotifications::ItemUpdated);
 }
 
-FGameplayTag UMounteaInventoryItemBase::GetFirstTag() const
-{
-	return ItemData.CompatibleGameplayTags.First();
-}
-
 void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)
 {
 	if (NewWorld != World)

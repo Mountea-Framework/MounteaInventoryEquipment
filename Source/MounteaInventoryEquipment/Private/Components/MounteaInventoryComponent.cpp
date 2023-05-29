@@ -113,7 +113,7 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 		{
 			for (const auto Itr : Items)
 			{
-				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasTag(SearchFilter.Tag))
+				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
 				{
 					return true;
 				}
@@ -166,7 +166,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 		{
 			for (const auto Itr : Items)
 			{
-				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasTag(SearchFilter.Tag))
+				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
 				{
 					return Itr;
 				}
@@ -221,7 +221,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implemen
 		{
 			for (auto Itr : Items)
 			{
-				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasTag(OptionalFilter.Tag))
+				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(OptionalFilter.Tags))
 				{
 					ReturnValues.Add(Itr);
 				}
@@ -488,7 +488,7 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 		Filter.bSearchByClass = true;
 		Filter.Class = Item->GetClass();
 		Filter.bSearchByTag = true;
-		Filter.Tag = Item->GetFirstTag();
+		Filter.Tags = Item->GetTags();
 	}
 	
 	if (!Execute_HasItem(this, Filter))
