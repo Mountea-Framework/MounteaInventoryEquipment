@@ -189,7 +189,7 @@ public:
 		return *this;
 	}
 
-	static friend uint32 GetTypeHash(const FMounteaInventoryItemRequiredData& Data)
+	friend uint32 GetTypeHash(const FMounteaInventoryItemRequiredData& Data)
 	{
 		uint32 Hash = 0;
 		Hash = HashCombine(Hash, GetTypeHash(Data.ItemName.ToString()));
