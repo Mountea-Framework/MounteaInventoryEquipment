@@ -16,9 +16,6 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataA
 	
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Backgrounds", meta=(ShowOnlyInnerProperties))
-	UTexture2D* InventoryBackground = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint SlotBaseSize = FIntPoint(64,64);
 
@@ -27,6 +24,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint InventoryBaseSize = FIntPoint(6,10);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
+	TSubclassOf<UUserWidget> InventoryTitle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
+	TSubclassOf<UUserWidget> InventoryBackground;
 };
 
 USTRUCT(BlueprintType)
