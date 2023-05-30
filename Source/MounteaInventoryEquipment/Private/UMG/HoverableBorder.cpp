@@ -4,9 +4,6 @@
 
 #define LOCTEXT_NAMESPACE "MounteaUMG"
 
-/////////////////////////////////////////////////////
-// UHoverableBorder
-
 UHoverableBorder::UHoverableBorder(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {}
 
@@ -53,7 +50,5 @@ const FText UHoverableBorder::GetPaletteCategory()
 {
 	return LOCTEXT("Mountea", "Mountea");
 }
-
-/////////////////////////////////////////////////////
 
 #undef LOCTEXT_NAMESPACE

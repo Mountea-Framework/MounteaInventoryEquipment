@@ -4,15 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/Border.h"
-#include "UObject/ObjectMacros.h"
 #include "Input/Reply.h"
-#include "Widgets/SWidget.h"
 
 #include "HoverableBorder.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBorderClickedEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBorderPressedEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBorderReleasedEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBorderHoverEvent);
 
 /**
