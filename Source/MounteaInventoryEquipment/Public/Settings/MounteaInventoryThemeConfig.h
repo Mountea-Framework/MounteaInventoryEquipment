@@ -18,24 +18,24 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataA
 	
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Dimensions", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint SlotBaseSize = FIntPoint(64,64);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Dimensions", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint ItemBaseSize = FIntPoint(1,1);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Dimensions", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint InventoryBaseSize = FIntPoint(6,10);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryTitleClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryBackgroundClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties, MustImplement="MounteaInventoryItemWBPInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class", meta=(ShowOnlyInnerProperties, MustImplement="MounteaInventoryItemWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryCategoryClass;
 };

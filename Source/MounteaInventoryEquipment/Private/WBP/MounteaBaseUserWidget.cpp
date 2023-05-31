@@ -15,7 +15,16 @@ void UMounteaBaseUserWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	BindEvents();
+
 	LoadFromConfig();
+}
+
+void UMounteaBaseUserWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
+
+	UnBindEvents();
 }
 
 UMounteaInventoryThemeConfig* UMounteaBaseUserWidget::GetThemeConfig() const
