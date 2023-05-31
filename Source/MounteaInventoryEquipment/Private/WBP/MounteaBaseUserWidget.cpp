@@ -27,6 +27,11 @@ void UMounteaBaseUserWidget::NativeDestruct()
 	UnBindEvents();
 }
 
+void UMounteaBaseUserWidget::RenderPreview()
+{
+	OnWidgetRebuilt();
+}
+
 UMounteaInventoryThemeConfig* UMounteaBaseUserWidget::GetThemeConfig() const
 {
 	return ThemeConfigOverride != nullptr ? ThemeConfigOverride : UMounteaInventoryEquipmentBPF::GetThemeConfig();

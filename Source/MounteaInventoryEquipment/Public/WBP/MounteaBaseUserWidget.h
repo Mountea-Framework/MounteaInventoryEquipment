@@ -27,6 +27,9 @@ public:
 
 public:
 
+	UFUNCTION(CallInEditor, BlueprintCallable, Category="Mountea|Debug", meta=(DevelopmentOnly))
+	void RenderPreview();
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool BindEvents();
 
@@ -38,4 +41,5 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory", meta=(CompactNodeTitle="Defaults", HideSelfPin=true))
 	void LoadFromConfig();
+
 };
