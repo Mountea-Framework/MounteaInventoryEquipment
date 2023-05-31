@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "MounteaInventoryThemeConfig.generated.h"
 
+class UMounteaBaseUserWidget;
+
 /**
  * 
  */
@@ -26,17 +28,14 @@ public:
 	FIntPoint InventoryBaseSize = FIntPoint(6,10);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
-	TSubclassOf<UUserWidget> InventoryTitle;
+	TSubclassOf<UMounteaBaseUserWidget> InventoryTitleClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
-	TSubclassOf<UUserWidget> InventoryBackground;
-};
+	TSubclassOf<UMounteaBaseUserWidget> InventoryBackgroundClass;
 
-USTRUCT(BlueprintType)
-struct FInventoryThemeConfig
-{
-	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties, MustImplement="MounteaInventoryItemWBPInterface"))
+	TSubclassOf<UMounteaBaseUserWidget> InventoryItemClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Theme", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
-	UMounteaInventoryThemeConfig* ThemeConfig = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Base Class", meta=(ShowOnlyInnerProperties))
+	TSubclassOf<UMounteaBaseUserWidget> InventoryCategoryClass;
 };

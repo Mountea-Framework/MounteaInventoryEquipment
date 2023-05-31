@@ -28,8 +28,8 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required")
 	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
 
-	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
-	TSoftClassPtr<UUserWidget> DefaultInventoryWidgetClass;
+	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="MounteaInventoryWBPInterface"))
+	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryWidgetClass;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;

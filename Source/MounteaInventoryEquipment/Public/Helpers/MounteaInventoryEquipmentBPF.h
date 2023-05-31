@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputCore/Classes/InputCoreTypes.h"
 #include "MounteaInventoryHelpers.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/MounteaInventoryInterface.h"
