@@ -31,13 +31,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static FIntPoint GetInventoryDimensions()
 	{
-		return GetThemeConfig()->InventoryBaseSize;
+		return GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass())->InventoryBaseSize;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static FIntPoint GetInventorySlotSize()
 	{
-		return GetThemeConfig()->SlotBaseSize;
+		return GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass())->SlotBaseSize;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
@@ -62,9 +62,11 @@ public:
 		return GetSettings()->bDragDropAllowed;
 	}
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static UMounteaInventoryThemeConfig* GetThemeConfig()
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	static UMounteaInventoryThemeConfig* GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter)
 	{
+		if (ClassFilter == nullptr) return nullptr;
+		
 		const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 		if (!Settings)
 		{
@@ -73,10 +75,11 @@ public:
 
 		if (Settings->ThemeConfig.IsNull())
 		{
-			return NewObject<UMounteaInventoryThemeConfig>();
+			return NewObject<UMounteaInventoryThemeConfig>(nullptr, ClassFilter);
 		}
-		
-		return Settings->ThemeConfig.LoadSynchronous();
+
+		auto const FoundTheme = Settings->ThemeConfig.LoadSynchronous();
+		return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(nullptr, ClassFilter);
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
