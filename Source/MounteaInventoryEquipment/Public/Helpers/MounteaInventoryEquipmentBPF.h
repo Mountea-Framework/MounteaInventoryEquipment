@@ -82,6 +82,15 @@ public:
 		return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(nullptr, ClassFilter);
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	static UMounteaInventoryItemConfig* GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter)
+	{
+		if (ClassFilter == nullptr) return nullptr;
+		if (Target == nullptr) return nullptr;
+		
+		return Target->GetItemConfig(ClassFilter);
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static const UMounteaInventoryEquipmentSettings* GetSettings()
 	{

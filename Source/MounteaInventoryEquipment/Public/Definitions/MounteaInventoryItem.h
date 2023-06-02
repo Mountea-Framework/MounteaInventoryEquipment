@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "Interfaces/MounteaInventoryInterface.h"
+#include "Setup/MounteaInventoryItemConfig.h"
 #include "MounteaInventoryItem.generated.h"
 
 struct FMounteaItemConfig;
@@ -55,7 +56,7 @@ public:
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
-	TArray<FMounteaItemConfig> ItemConfigs;
+	FMounteaItemConfig ItemConfig;
 	
 	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
 	FItemGenericEvent OnItemAdded;
@@ -84,6 +85,19 @@ private:
 	class UWorld* World;
 
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter) const
+	{
+		if (ClassFilter == nullptr) return nullptr;
+
+		if (ItemConfig.ItemConfig == nullptr)
+		{
+			return NewObject<UMounteaInventoryItemConfig>(nullptr, ClassFilter);
+		}
+
+		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(nullptr, ClassFilter);
+	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
 	bool IsValid(UObject* WorldContextObject) const;
