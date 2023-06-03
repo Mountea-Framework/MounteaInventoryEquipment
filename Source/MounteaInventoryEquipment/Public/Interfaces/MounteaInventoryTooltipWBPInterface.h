@@ -8,7 +8,7 @@
 
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
-class UMounteaInventoryTooltipWBP : public UInterface
+class UMounteaTooltipWBPInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,7 +16,7 @@ class UMounteaInventoryTooltipWBP : public UInterface
 /**
  * 
  */
-class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryTooltipWBP
+class MOUNTEAINVENTORYEQUIPMENT_API IMounteaTooltipWBPInterface
 {
 	GENERATED_BODY()
 

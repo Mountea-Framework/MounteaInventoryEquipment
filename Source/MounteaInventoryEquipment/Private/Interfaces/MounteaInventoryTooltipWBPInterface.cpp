@@ -3,4 +3,4 @@
 
 #include "Interfaces\MounteaInventoryTooltipWBPInterface.h"
 
-// Add default functionality here for any IMounteaInventoryTooltipWBP functions that are not pure virtual.
+// Add default functionality here for any IMounteaTooltipWBPInterface functions that are not pure virtual.
