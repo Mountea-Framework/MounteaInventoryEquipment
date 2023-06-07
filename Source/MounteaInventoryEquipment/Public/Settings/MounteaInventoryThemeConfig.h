@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint InventoryBaseSize = FIntPoint(6,10);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Slot", meta=(ShowOnlyInnerProperties))
+	TSubclassOf<UMounteaBaseUserWidget> InventorySlotClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment", meta=(ShowOnlyInnerProperties, MustImplement="MounteaEquipmentWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> EquipmentBaseClass;;
 
@@ -41,6 +44,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="MounteaTooltipWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemTooltipClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties))
+	TSubclassOf<UMounteaBaseUserWidget> InventoryItemDragDropClass_DELME;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Category", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryCategoryClass;

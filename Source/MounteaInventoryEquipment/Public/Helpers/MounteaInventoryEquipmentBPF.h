@@ -9,6 +9,7 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+#include "WBP/MounteaTransactionPayload.h"
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
 class IMounteaInventoryInterface;
@@ -138,11 +139,32 @@ public:
 
 		return ReturnValues;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TSubclassOf<UMounteaTransactionPayload> GetTransactionPayloadClass()
+	{
+		const auto Settings = GetSettings();
+		return Settings->DefaultTransactionPayloadClass.IsNull() ? Settings->DefaultTransactionPayloadClass.LoadSynchronous() : UMounteaTransactionPayload::StaticClass();
+	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FKey> GetDragKeys()
 	{
 		return GetSettings()->DragKeys;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TArray<FIntPoint> GetSurroundingSlots(const FIntPoint& Area)
+	{
+		return TArray<FIntPoint>();
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsSafeSlot(const FIntPoint& Area)
+	{
+		GetSurroundingSlots(Area);
+
+		return false;
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
