@@ -31,13 +31,17 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static FIntPoint GetInventoryDimensions()
 	{
-		return GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass())->InventoryBaseSize;
+		bool bFound;
+		const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
+		return bFound ? Config->InventoryBaseSize : FIntPoint(6, 10);
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static FIntPoint GetInventorySlotSize()
 	{
-		return GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass())->SlotBaseSize;
+		bool bFound;
+		const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
+		return bFound ? Config->SlotBaseSize : FIntPoint(16, 16);
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
@@ -63,10 +67,15 @@ public:
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))
-	static UMounteaInventoryThemeConfig* GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter)
+	static UMounteaInventoryThemeConfig* GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter, bool& bResult)
 	{
-		if (ClassFilter == nullptr) return nullptr;
-		
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+
+		bResult = true;
 		const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 		if (!Settings)
 		{
@@ -83,12 +92,21 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
-	static UMounteaInventoryItemConfig* GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter)
+	static UMounteaInventoryItemConfig* GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult)
 	{
-		if (ClassFilter == nullptr) return nullptr;
-		if (Target == nullptr) return nullptr;
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
 		
-		return Target->GetItemConfig(ClassFilter);
+		if (Target == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+		
+		return Target->GetItemConfig(ClassFilter, bResult);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))

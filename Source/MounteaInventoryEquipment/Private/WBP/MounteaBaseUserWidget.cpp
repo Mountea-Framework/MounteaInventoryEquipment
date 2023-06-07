@@ -32,13 +32,18 @@ void UMounteaBaseUserWidget::RenderPreview()
 	OnWidgetRebuilt();
 }
 
-UMounteaInventoryThemeConfig* UMounteaBaseUserWidget::GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter) const
+UMounteaInventoryThemeConfig* UMounteaBaseUserWidget::GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter, bool& bResult) const
 {
-	if (ClassFilter == nullptr) return nullptr;
-	
-	const auto FoundTheme = ThemeConfigOverride != nullptr ? ThemeConfigOverride : UMounteaInventoryEquipmentBPF::GetThemeConfig(ClassFilter);
+	if (ClassFilter == nullptr)
+	{
+		bResult = false;
+		return nullptr;
+	}
 
-	if (!FoundTheme)
+	bResult = true;
+	const auto FoundTheme = ThemeConfigOverride != nullptr ? ThemeConfigOverride : UMounteaInventoryEquipmentBPF::GetThemeConfig(ClassFilter, bResult);
+
+	if (!bResult)
 	{
 		return NewObject<UMounteaInventoryThemeConfig>(nullptr, ClassFilter);
 	}

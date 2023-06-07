@@ -87,10 +87,15 @@ private:
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
-	UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter) const
+	UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const
 	{
-		if (ClassFilter == nullptr) return nullptr;
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
 
+		bResult = true;
 		if (ItemConfig.ItemConfig == nullptr)
 		{
 			return NewObject<UMounteaInventoryItemConfig>(nullptr, ClassFilter);
