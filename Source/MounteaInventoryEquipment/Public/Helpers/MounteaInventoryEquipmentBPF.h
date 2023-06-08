@@ -154,15 +154,51 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static TArray<FIntPoint> GetSurroundingSlots(const FIntPoint& Area)
+	static TArray<FIntPoint> CalculateItemShadow(const FIntPoint& StartCoords, const FIntPoint& Area)
 	{
-		return TArray<FIntPoint>();
+		TSet<FIntPoint> Results;
+
+		int32 X = StartCoords.X;
+		int32 Y = StartCoords.Y;
+
+		for (int i = 0; i < Area.X; i++)
+		{
+			for (int j = 0; j < Area.Y; j++)
+			{
+				Results.Add(FIntPoint(X, Y));
+
+				Y++;
+			}
+
+			X++;
+		}
+		
+		return Results.Array();
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsSafeSlot(const FIntPoint& Area)
+	static bool IsValidShadow(const TArray<FIntPoint>&  Canvas, const TArray<FIntPoint>& Shadow, const FIntPoint& Area)
 	{
-		GetSurroundingSlots(Area);
+		if (Shadow.Num() < FMath::Max(Area.X, Area.Y))
+		{
+			return false;
+		}
+
+		for (auto const Itr : Shadow)
+		{
+			if (!Canvas.Contains(Itr))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsSafeSlot(const FIntPoint& StartCoords, const FIntPoint& Area)
+	{
+		CalculateItemShadow(StartCoords, Area);
 
 		return false;
 	}
