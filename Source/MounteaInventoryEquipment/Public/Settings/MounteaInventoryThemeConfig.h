@@ -44,9 +44,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="MounteaTooltipWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemTooltipClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties))
-	TSubclassOf<UMounteaBaseUserWidget> InventoryItemDragDropClass_DELME;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Category", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryCategoryClass;

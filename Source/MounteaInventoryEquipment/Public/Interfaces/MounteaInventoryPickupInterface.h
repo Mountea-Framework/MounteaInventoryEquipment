@@ -34,8 +34,14 @@ public:
 	bool PickupItem(FString& ErrorMessage);
 	bool PickupItem_Implementation(FString& ErrorMessage)
 	{
-		return TryPickupItem(ErrorMessage);
+		return true;
 	};
 
-	virtual bool TryPickupItem(FString& ErrorMessage) = 0;
+	//TODO give it more context
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	bool DropItem(FString& ErrorMessage);
+	bool DropItem_Implementation(FString& ErrorMessage)
+	{
+		return true;
+	};
 };
