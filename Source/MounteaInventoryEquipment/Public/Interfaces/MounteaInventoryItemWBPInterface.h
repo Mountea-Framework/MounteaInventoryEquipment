@@ -21,7 +21,16 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryItemWBPInterface
 	GENERATED_BODY()
 
 public:
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	FIntPoint GetRootCoords();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	bool SaveRootCoords(const FIntPoint& NewCoords);
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	bool MoveToNewCoords(const FIntPoint& NewCoords);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	bool ReleaseOldCoords(const FIntPoint& OldCoords);
 };
