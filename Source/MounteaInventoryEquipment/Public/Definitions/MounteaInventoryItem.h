@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaItemAdditionalData.h"
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Setup/MounteaInventoryItemConfig.h"
 #include "MounteaInventoryItem.generated.h"
 
 struct FMounteaItemConfig;
+class UMounteaItemAdditionalData;
 class IMounteaInventoryPickupInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, Message);
@@ -57,6 +59,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
+	UMounteaItemAdditionalData* ItemAdditionalData;
 	
 	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
 	FItemGenericEvent OnItemAdded;
@@ -102,6 +107,24 @@ public:
 		}
 
 		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(nullptr, ClassFilter);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaItemAdditionalData"), meta=(DeterminesOutputType = "ClassFilter"))
+	UMounteaItemAdditionalData* GetItemAdditionalData(const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult) const
+	{
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+
+		bResult = true;
+		if (ItemAdditionalData == nullptr)
+		{
+			return NewObject<UMounteaItemAdditionalData>(nullptr, ClassFilter);
+		}
+
+		return ItemAdditionalData->IsA(ClassFilter) ? ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(nullptr, ClassFilter);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )

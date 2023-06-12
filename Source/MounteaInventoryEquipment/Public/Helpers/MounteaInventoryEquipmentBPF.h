@@ -6,6 +6,7 @@
 #include "InputCore/Classes/InputCoreTypes.h"
 #include "MounteaInventoryHelpers.h"
 #include "Definitions/MounteaInventoryItem.h"
+#include "Definitions/MounteaItemAdditionalData.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
@@ -108,6 +109,24 @@ public:
 		}
 		
 		return Target->GetItemConfig(ClassFilter, bResult);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaItemAdditionalData"), meta=(DeterminesOutputType = "ClassFilter"))
+	static UMounteaItemAdditionalData* GetItemAdditionalData(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult)
+	{
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+		
+		if (Target == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+		
+		return Target->GetItemAdditionalData(ClassFilter, bResult);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))

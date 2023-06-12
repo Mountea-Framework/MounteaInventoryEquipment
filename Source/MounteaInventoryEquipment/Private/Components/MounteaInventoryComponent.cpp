@@ -99,7 +99,7 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 		// Search by Class
 		if (SearchFilter.bSearchByClass)
 		{
-			for (const auto Itr : Items)
+			for (const auto& Itr : Items)
 			{
 				if (Itr && Itr->IsA(SearchFilter.Class))
 				{
@@ -111,7 +111,7 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 		// Search by Tag
 		if (SearchFilter.bSearchByTag)
 		{
-			for (const auto Itr : Items)
+			for (const auto& Itr : Items)
 			{
 				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
 				{
@@ -123,7 +123,7 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 		// Search by GUID
 		if (SearchFilter.bSearchByGUID)
 		{
-			for (const auto Itr : Items)
+			for (const auto& Itr : Items)
 			{
 				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
 				{
@@ -152,7 +152,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 		// Search by Class
 		if (SearchFilter.bSearchByClass)
 		{
-			for (const auto Itr : Items)
+			for (const auto& Itr : Items)
 			{
 				if (Itr && Itr->IsA(SearchFilter.Class))
 				{
@@ -164,7 +164,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 		// Search by Tag
 		if (SearchFilter.bSearchByTag)
 		{
-			for (const auto Itr : Items)
+			for (const auto& Itr : Items)
 			{
 				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
 				{
@@ -176,7 +176,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 		// Search by GUID
 		if (SearchFilter.bSearchByGUID)
 		{
-			for (const auto Itr : Items)
+			for (const auto& Itr : Items)
 			{
 				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
 				{
@@ -253,7 +253,7 @@ bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventor
 bool UMounteaInventoryComponent::AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems)
 {
 	bool bSatisfied = true;
-	for (const auto Itr : NewItems)
+	for (const auto& Itr : NewItems)
 	{
 		if (!Execute_AddOrUpdateItem(this, Itr.Key, Itr.Value))
 		{
@@ -277,7 +277,7 @@ bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMo
 bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses)
 {
 	bool bSatisfied = true;
-	for (const auto Itr : NewItemsClasses)
+	for (const auto& Itr : NewItemsClasses)
 	{
 		if (!Execute_AddItemFromClass(this, Itr.Key, Itr.Value))
 		{
@@ -296,7 +296,7 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItem
 bool UMounteaInventoryComponent::RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems)
 {
 	bool bSatisfied = true;
-	for (const auto Itr : AffectedItems)
+	for (const auto& Itr : AffectedItems)
 	{
 		if (!Execute_RemoveItem(this, Itr))
 		{

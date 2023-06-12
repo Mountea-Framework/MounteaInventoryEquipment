@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryTooltipWBPInterface.generated.h"
 
+class UMounteaItemAdditionalData;
+
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
 class UMounteaTooltipWBPInterface : public UInterface
@@ -20,6 +22,14 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaTooltipWBPInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	void UpdateTooltip(const UMounteaItemAdditionalData* Data);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	void ShowTooltip();
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	void RemoveTooltip();
 };
