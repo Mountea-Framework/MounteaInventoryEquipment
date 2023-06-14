@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryTooltipWBPInterface.generated.h"
 
-class UMounteaItemAdditionalData;
+class UMounteaInventoryItemBase;
 
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
@@ -25,11 +25,8 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaTooltipWBPInterface
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void UpdateTooltip(const UMounteaItemAdditionalData* Data);
+	void UpdateTooltip(const UMounteaInventoryItemBase* Item);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void ShowTooltip();
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void RemoveTooltip();
+	void ProcessCommand(const FString& Command);
 };

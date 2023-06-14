@@ -33,4 +33,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	bool ReleaseOldCoords(const FIntPoint& OldCoords);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	void OnItemSelected(const FString& Command);
+	
 };

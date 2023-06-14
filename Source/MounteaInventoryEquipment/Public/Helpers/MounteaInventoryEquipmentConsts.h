@@ -22,6 +22,13 @@ namespace MounteaInventoryEquipmentConsts
 			const FString UpdateItem								(TEXT("UpdateItem"));
 			const FString RemoveItem								(TEXT("RemoveItem"));
 		}
+
+		namespace ItemTooltipCommands
+		{
+			const FString CleanupTooltip							(TEXT("CleanupTooltip"));
+			const FString ShowTooltip								(TEXT("ShowTooltip"));
+			const FString HideTooltip								(TEXT("HideTooltip"));
+		}
 	}
 
 	namespace MounteaInventoryNotifications

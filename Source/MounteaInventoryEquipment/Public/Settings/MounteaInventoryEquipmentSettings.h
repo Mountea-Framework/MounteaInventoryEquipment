@@ -59,6 +59,9 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TMap<EItemUpdateResult, FText> ItemUpdateMessages;
 
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	TSet<FString> ItemTooltipWidgetCommands;
+
 	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
 	int32 MinDisplayWeight = 1;
 
@@ -191,6 +194,24 @@ public:
 					EInventoryUpdateResult::EIUR_Success,
 					FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Success", "Inventory Updated"), 1.5f, FLinearColor(FColor::White))
 				);
+			}
+		}
+
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, ItemTooltipWidgetCommands))
+		{
+			if (!ItemTooltipWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::CleanupTooltip))
+			{
+				ItemTooltipWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::CleanupTooltip);
+			}
+			
+			if (!ItemTooltipWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::ShowTooltip))
+			{
+				ItemTooltipWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::ShowTooltip);
+			}
+			
+			if (!ItemTooltipWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::HideTooltip))
+			{
+				ItemTooltipWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::HideTooltip);
 			}
 		}
 	}
