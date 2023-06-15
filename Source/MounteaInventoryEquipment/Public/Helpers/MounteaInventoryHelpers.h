@@ -151,10 +151,7 @@ struct FMounteaInventoryItemRequiredData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FText ItemName = LOCTEXT("MounteaInventoryItem_ItemName", "New Item");
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, MultiLine))
-	FText ItemDescription = LOCTEXT("MounteaInventoryItem_ItemName", "This is a multiline description of a new Item.\nYou can use this to provide some lore data or any additional info about this Item.");
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	UMounteaInventoryItemCategory* ItemCategory;
 

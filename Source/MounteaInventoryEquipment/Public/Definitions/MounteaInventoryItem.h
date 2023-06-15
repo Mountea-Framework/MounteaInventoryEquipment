@@ -15,6 +15,15 @@ class IMounteaInventoryPickupInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, Message);
 
+UENUM(BlueprintType)
+enum class EItemDataSource : uint8
+{
+	EIDS_SourceTable				UMETA(DisplayName="Source Table"),
+	EIDS_ManualInput				UMETA(DisplayName="Manual Input"),
+
+	Default								UMETA(hidden)
+};
+
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
 
 /**
@@ -41,12 +50,15 @@ private:
 public:
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Required", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
+	EItemDataSource ItemDataSource = EItemDataSource::EIDS_SourceTable;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Required", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"), ReplicatedUsing=OnRep_Item)
 	FMounteaInventoryItemRequiredData ItemData;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(MustImplement="MounteaInventoryPickupInterface"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(MustImplement="MounteaInventoryPickupInterface", EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	TSubclassOf<AActor> SpawnActor;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false))
@@ -56,37 +68,39 @@ public:
 	FName SourceRow;
 
 protected:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
-	FMounteaItemConfig ItemConfig;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault))
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	UMounteaItemAdditionalData* ItemAdditionalData;
 	
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FMounteaItemConfig ItemConfig;
+	
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
 	FItemGenericEvent OnItemAdded;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
 	FItemGenericEvent OnItemRemoved;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
 	FItemGenericEvent OnItemInitialized;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|4. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
 	FItemGenericEvent OnItemModified;
+
+	
 
 private:
 
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="4. Debug")
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug")
 	FGuid ItemGuid = FGuid::NewGuid();
 	
-	UPROPERTY(VisibleAnywhere, Category="4. Debug")
+	UPROPERTY(VisibleAnywhere, Category="5. Debug")
 	int32 RepKey = 0;
 
-    UPROPERTY(VisibleAnywhere, Category="4. Debug", meta=(DisplayThumbnail=false))
+    UPROPERTY(VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
 	
-	UPROPERTY(VisibleAnywhere, Category="4. Debug", meta=(DisplayThumbnail=false))
+	UPROPERTY(VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false))
 	class UWorld* World;
 
 public:

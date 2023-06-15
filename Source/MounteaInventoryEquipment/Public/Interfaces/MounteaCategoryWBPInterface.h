@@ -8,10 +8,6 @@
 
 class UMounteaInventoryItemCategory;
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FGenericCategoryEvent, const UMounteaInventoryItemCategory*, CategoryDefinition);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCategoryEvent, const UMounteaInventoryItemCategory*, CategoryDefinition);
-
-class UMounteaInventoryItemCategory;
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
 class UMounteaCategoryWBPInterface : public UInterface

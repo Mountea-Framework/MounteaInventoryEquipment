@@ -6,9 +6,6 @@
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Net/UnrealNetwork.h"
 
-#define GET_MEMBERSTRUCT_NAME_CHECKED(ClassName, ClassStructMember, MemberName) \
-((void)sizeof(UEAsserts_Private::GetMemberNameCheckedJunk(((ClassName*)0)->ClassStructMember.MemberName)), FName(TEXT(#MemberName)))
-
 UMounteaInventoryItemBase::UMounteaInventoryItemBase()
 {
 	RepKey = 0;
@@ -119,6 +116,7 @@ void UMounteaInventoryItemBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UMounteaInventoryItemBase, ItemData);
+	DOREPLIFETIME(UMounteaInventoryItemBase, ItemDataSource);
 }
 
 bool UMounteaInventoryItemBase::IsSupportedForNetworking() const
