@@ -6,6 +6,8 @@
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Net/UnrealNetwork.h"
 
+#include "Helpers/FMounteaTemplatesLibrary.h"
+
 UMounteaInventoryItemBase::UMounteaInventoryItemBase()
 {
 	RepKey = 0;
@@ -134,6 +136,17 @@ void UMounteaInventoryItemBase::MarkDirtyForReplication()
 	}
 }
 
+void UMounteaInventoryItemBase::ClearDataTable()
+{
+	SourceTable = nullptr;
+	SourceRow = FName();
+}
+
+void UMounteaInventoryItemBase::CopyFromTable()
+{
+	TArray<FName> Name = GetSourceRows<FName>(SourceTable);
+}
+
 #if WITH_EDITOR
 void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 {
@@ -149,6 +162,21 @@ void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& Pr
 		if (!ItemData.ItemQuantity.bIsStackable)
 		{
 			ItemData.ItemQuantity.MaxQuantity = 1;
+		}
+	}
+
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, ItemDataSource))
+	{
+		switch (ItemDataSource)
+		{
+			case EItemDataSource::EIDS_SourceTable:
+				CopyFromTable();
+				break;
+			case EItemDataSource::EIDS_ManualInput:
+				ClearDataTable();
+				break;
+			case EItemDataSource::Default:
+			default: break;
 		}
 	}
 }

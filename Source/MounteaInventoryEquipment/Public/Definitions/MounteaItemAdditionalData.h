@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+
 #include "Helpers/MounteaInventoryHelpers.h"
+#include "Helpers/FMounteaTemplatesLibrary.h"
+
 #include "MounteaItemAdditionalData.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaItemAdditionalData"
@@ -70,14 +73,6 @@ private:
 	TArray<FName> GetSourceTableRows_LongDescription() const
 	{
 		return GetSourceRows<FName>(SourceTable_LongDescription);
-	}
-
-	template<typename Name>
-	static TArray<Name> GetSourceRows(UDataTable* Table)
-	{
-		if (!Table) return TArray<Name>();
-
-		return Table->GetRowNames();
 	}
 
 #if WITH_EDITOR

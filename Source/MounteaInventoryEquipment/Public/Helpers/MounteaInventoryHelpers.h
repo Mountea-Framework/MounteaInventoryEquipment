@@ -223,6 +223,12 @@ struct FMounteaInventoryItemOptionalData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
 	float ItemBaseDurability = 10.f;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(MustImplement="MounteaInventoryPickupInterface"))
+	TSubclassOf<AActor> SpawnActor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, meta=(NoResetToDefault))
+	class UMounteaItemAdditionalData* ItemAdditionalData;
 };
 
 /**

@@ -61,10 +61,10 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(MustImplement="MounteaInventoryPickupInterface", EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	TSubclassOf<AActor> SpawnActor;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable"))
 	UDataTable* SourceTable;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable"))
 	FName SourceRow;
 
 protected:
@@ -72,7 +72,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	UMounteaItemAdditionalData* ItemAdditionalData;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
 	
 	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
@@ -244,6 +244,9 @@ protected:
 
 	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
 	void MarkDirtyForReplication();
+
+	void ClearDataTable();
+	void CopyFromTable();
 
 #if WITH_EDITOR
 	virtual void PostDuplicate(bool bDuplicateForPIE) override;

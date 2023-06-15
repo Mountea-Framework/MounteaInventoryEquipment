@@ -11,6 +11,9 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "WBP/MounteaTransactionPayload.h"
+
+#include "Helpers/FMounteaTemplatesLibrary.h"
+
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
 class IMounteaInventoryInterface;
@@ -262,25 +265,5 @@ public:
 	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 
 	static bool AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
-	
-	template<class Interface, class InterfaceClass>
-	static InterfaceClass GetInterfaceFrom(AActor* From)
-	{
-		if (From == nullptr) return nullptr;
-
-		if (From->Implements<Interface>()) return From;
-
-		TArray<UActorComponent*> Components;
-		From->GetComponents(Components);
-
-		for (auto Itr : Components)
-		{
-			if (Itr && Itr->Implements<Interface>())
-			{
-				return Itr;
-			}
-		}
-		return nullptr;
-	}
 };
 
