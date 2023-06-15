@@ -66,13 +66,13 @@ private:
 	UFUNCTION()
 	TArray<FName> GetSourceTableRows_ShortDescription() const
 	{
-		return GetSourceRows<FName>(SourceTable_ShortDescription);
+		return GetSourceRows<FName, UDataTable>(SourceTable_ShortDescription);
 	}
 
 	UFUNCTION()
 	TArray<FName> GetSourceTableRows_LongDescription() const
 	{
-		return GetSourceRows<FName>(SourceTable_LongDescription);
+		return GetSourceRows<FName, UDataTable>(SourceTable_LongDescription);
 	}
 
 #if WITH_EDITOR

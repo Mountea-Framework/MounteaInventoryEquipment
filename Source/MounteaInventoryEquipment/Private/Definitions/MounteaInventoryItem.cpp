@@ -22,6 +22,8 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
 	OnItemRemoved.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemRemoved);
 
+	RefreshData();
+
 	OnItemBeginPlay(TEXT("Item has been initialized"));
 }
 
@@ -144,10 +146,32 @@ void UMounteaInventoryItemBase::ClearDataTable()
 
 void UMounteaInventoryItemBase::CopyFromTable()
 {
-	TArray<FName> Name = GetSourceRows<FName>(SourceTable);
+	FString Context;
+	if (const FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(SourceRow, SourceTable))
+	{
+		ItemData = Row->RequiredData;
+		ItemOptionalData = Row->OptionalData;
+	}
+	
+	//TODO: Show error that no valid data found
+}
+
+void UMounteaInventoryItemBase::ClearMappedValues()
+{
+	ItemData = FMounteaInventoryItemRequiredData();
+	ItemOptionalData = FMounteaInventoryItemOptionalData();
 }
 
 #if WITH_EDITOR
+
+void UMounteaInventoryItemBase::RefreshData()
+{
+	if (SourceTable != nullptr)
+	{
+		CopyFromTable();
+	}
+}
+
 void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 {
 	UObject::PostDuplicate(bDuplicateForPIE);
@@ -170,7 +194,7 @@ void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& Pr
 		switch (ItemDataSource)
 		{
 			case EItemDataSource::EIDS_SourceTable:
-				CopyFromTable();
+				ClearMappedValues();
 				break;
 			case EItemDataSource::EIDS_ManualInput:
 				ClearDataTable();
@@ -178,6 +202,17 @@ void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& Pr
 			case EItemDataSource::Default:
 			default: break;
 		}
+	}
+
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, SourceTable))
+	{
+		SourceRow = FName();
+		ClearMappedValues();
+	}
+
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, SourceRow))
+	{
+		CopyFromTable();
 	}
 }
 #endif

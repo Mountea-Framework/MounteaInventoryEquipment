@@ -58,9 +58,6 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(MustImplement="MounteaInventoryPickupInterface", EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
-	TSubclassOf<AActor> SpawnActor;
-
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable"))
 	UDataTable* SourceTable;
 
@@ -68,9 +65,6 @@ public:
 	FName SourceRow;
 
 protected:
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "2. Optional", NoClear, meta=(NoResetToDefault, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
-	UMounteaItemAdditionalData* ItemAdditionalData;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
@@ -133,12 +127,12 @@ public:
 		}
 
 		bResult = true;
-		if (ItemAdditionalData == nullptr)
+		if (ItemOptionalData.ItemAdditionalData == nullptr)
 		{
 			return NewObject<UMounteaItemAdditionalData>(nullptr, ClassFilter);
 		}
 
-		return ItemAdditionalData->IsA(ClassFilter) ? ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(nullptr, ClassFilter);
+		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(nullptr, ClassFilter);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
@@ -247,10 +241,17 @@ protected:
 
 	void ClearDataTable();
 	void CopyFromTable();
+	void ClearMappedValues();
+
+	//TODO: Button to ribbon to update data
+	UFUNCTION(CallInEditor, BlueprintCallable, Category="3. Import")
+	void RefreshData();
 
 #if WITH_EDITOR
+	
 	virtual void PostDuplicate(bool bDuplicateForPIE) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
 #endif
 };
 

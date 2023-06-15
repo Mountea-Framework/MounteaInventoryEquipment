@@ -1,14 +1,22 @@
 ﻿// All rights reserved Dominik Pavlicek 2022.
 
 #pragma once
-#include "Engine/DataTable.h"
 
-template<typename Name>
-static TArray<Name> GetSourceRows(UDataTable* Table)
+template<typename Name, class TableClass>
+static TArray<Name> GetSourceRows(TableClass* Table)
 {
 	if (!Table) return TArray<Name>();
 
 	return Table->GetRowNames();
+}
+
+template<class RowStruct, class TableClass>
+static RowStruct* GetRow(FName RowName, TableClass* Table)
+{
+	if (!Table) return nullptr;
+
+	const FString Context;
+	return Table->template FindRow<RowStruct>(RowName, Context);
 }
 
 template<class Interface, class InterfaceClass>
@@ -30,3 +38,4 @@ static InterfaceClass GetInterfaceFrom(AActor* From)
 	}
 	return nullptr;
 }
+
