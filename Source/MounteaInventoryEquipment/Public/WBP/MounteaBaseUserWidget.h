@@ -3,10 +3,64 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "MounteaBaseUserWidget.generated.h"
 
 class UMounteaInventoryThemeConfig;
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaDynamicDelegate, const FString&, Command, UObject*, Payload) ;
+
+USTRUCT(BlueprintType)
+struct FMounteaDynamicDelegateContext
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FString Command;
+
+	UPROPERTY(BlueprintReadWrite)
+	UObject* Payload = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FMounteaEventBinding
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UObject* Listener;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString CallbackFunction;
+
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTag BindingTag;
+
+	UPROPERTY(BlueprintReadWrite)
+	FName BindingName;
+
+	UPROPERTY(VisibleAnywhere)
+	FMounteaDynamicDelegate Delegate;
+
+	bool operator==(const FMounteaEventBinding& Other) const
+	{
+		return
+		BindingName.IsValid() ?
+			
+		Listener == Other.Listener &&
+		CallbackFunction == Other.CallbackFunction &&
+		BindingTag == Other.BindingTag &&
+		BindingName == Other.BindingName
+		
+		:
+		
+		Listener == Other.Listener &&
+		CallbackFunction == Other.CallbackFunction &&
+		BindingTag == Other.BindingTag;
+	}
+};
+
 /**
  * 
  */
@@ -27,6 +81,17 @@ public:
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(CompactNodeTitle="ListenEvent"))
+	bool StartListeningToEvent(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(CompactNodeTitle="StopListenEvent"))
+	bool StopListeningToEvent(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(CompactNodeTitle="CallEvent"))
+	bool CallEvent(const FGameplayTag& EventTag, FName OptionalName, const FMounteaDynamicDelegateContext& Context);
+
+	
+	
 	UFUNCTION(CallInEditor, BlueprintCallable, Category="Mountea|Debug", meta=(DevelopmentOnly))
 	void RenderPreview();
 
@@ -42,4 +107,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")//, meta=(CompactNodeTitle="Defaults", HideSelfPin=true))
 	void LoadFromConfig();
 
+private:
+
+	UPROPERTY(VisibleAnywhere, Category="0. Debug")
+	TArray<FMounteaEventBinding> MounteaEventBindings;
 };

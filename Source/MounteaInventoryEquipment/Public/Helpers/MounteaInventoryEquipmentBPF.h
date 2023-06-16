@@ -5,8 +5,12 @@
 #include "CoreMinimal.h"
 #include "InputCore/Classes/InputCoreTypes.h"
 #include "MounteaInventoryHelpers.h"
+
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaItemAdditionalData.h"
+#include "Definitions/MounteaInventoryItemRarity.h"
+#include "Definitions/MounteaInventoryItemCategory.h"
+
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
@@ -69,6 +73,31 @@ public:
 	static bool IsDragAllowed()
 	{
 		return GetSettings()->bDragDropAllowed;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Object"), meta=(DeterminesOutputType = "ClassFilter"))
+	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult)
+	{
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+
+		if (Object == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+
+		if (Object->IsA(ClassFilter))
+		{
+			bResult = true;
+			return Object;
+		}
+
+		bResult = false;
+		return nullptr;
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))

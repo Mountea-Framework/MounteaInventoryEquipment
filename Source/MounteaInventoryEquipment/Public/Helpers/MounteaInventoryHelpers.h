@@ -227,7 +227,7 @@ struct FMounteaInventoryItemOptionalData
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(MustImplement="MounteaInventoryPickupInterface"))
 	TSubclassOf<AActor> SpawnActor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, meta=(NoResetToDefault, DisplayThumbnail=false))
 	class UMounteaItemAdditionalData* ItemAdditionalData;
 };
 
