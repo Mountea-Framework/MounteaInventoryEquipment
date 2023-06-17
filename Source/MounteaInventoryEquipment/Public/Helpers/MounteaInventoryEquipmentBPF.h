@@ -21,6 +21,7 @@
 
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/MounteaInventorySlotWBPInterface.h"
+#include "Interfaces/MounteaInventoryItemWBPInterface.h"
 
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
@@ -239,19 +240,7 @@ public:
 			return false;
 		}
 
-		/*
-		TArray<UUserWidget*> Slots;
-		CanvasSlots.GenerateValueArray(Slots);
-		
-		for (const UUserWidget* Itr : Slots)
-		{
-			if (!Itr) return false;
-
-			if (!Itr->Implements<UMounteaInventorySlotWBPInterface>()) return false;
-		}
-		*/
-		
-		for (auto const Itr : Shadow)
+		for (const auto& Itr : Shadow)
 		{
 			if (!SlotsCoords.Contains(Itr))
 			{
@@ -259,6 +248,28 @@ public:
 			}
 		}
 
+		TMap<FIntPoint, TScriptInterface<IMounteaInventorySlotWBPInterface>> Slots;
+		
+		for (int i = 0; i < SlotsCoords.Num(); i++)
+		{
+			TScriptInterface<IMounteaInventorySlotWBPInterface> Slot = SlotsRefs.IsValidIndex(i) ? SlotsRefs[i] : nullptr;
+			Slots.Add(SlotsCoords[i], Slot);
+		}
+
+		for (const auto& Itr : Shadow)
+		{
+			if (!Slots.Contains(Itr))
+			{
+				return false;
+			}
+
+			const TScriptInterface<IMounteaInventorySlotWBPInterface>* Slot = Slots.Find(Itr);
+			if (!Slot->GetInterface()->Execute_IsSlotEmpty(Slot->GetObject()) )
+			{
+				return false;
+			}
+ 		}
+		
 		return true;
 	}
 
