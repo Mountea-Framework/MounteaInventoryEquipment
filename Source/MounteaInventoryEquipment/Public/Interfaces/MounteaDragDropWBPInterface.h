@@ -27,6 +27,9 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaDragDropWBPInterface
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryItemWBPInterface> GetItemWBP() const;
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	void ProcessWidgetCommand(const FString& Command);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")

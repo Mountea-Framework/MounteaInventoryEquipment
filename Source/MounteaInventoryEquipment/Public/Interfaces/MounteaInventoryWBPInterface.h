@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+
+#include "Helpers/MounteaInventoryHelpers.h"
+
 #include "MounteaInventoryWBPInterface.generated.h"
 
 class IMounteaInventoryInterface;
 struct FInventoryNotificationData;
+
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
 class UMounteaInventoryWBPInterface : public UInterface

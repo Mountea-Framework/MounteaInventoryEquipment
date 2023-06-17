@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "InputCore/Classes/InputCoreTypes.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+
 #include "MounteaInventoryHelpers.h"
 
 #include "Definitions/MounteaInventoryItem.h"
@@ -11,12 +13,14 @@
 #include "Definitions/MounteaInventoryItemRarity.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 
-#include "Interfaces/MounteaInventoryInterface.h"
-#include "Kismet/BlueprintFunctionLibrary.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
-#include "WBP/MounteaTransactionPayload.h"
 
+#include "WBP/MounteaTransactionPayload.h"
+#include "WBP/MounteaBaseUserWidget.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
+
+#include "Interfaces/MounteaInventoryInterface.h"
+#include "Interfaces/MounteaInventorySlotWBPInterface.h"
 
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
@@ -228,16 +232,28 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsValidShadow(const TArray<FIntPoint>&  Canvas, const TArray<FIntPoint>& Shadow, const FIntPoint& Area)
+	static bool IsValidShadow(const TArray<FIntPoint>&  SlotsCoords, const TArray<TScriptInterface<IMounteaInventorySlotWBPInterface>>& SlotsRefs, const TArray<FIntPoint>& Shadow, const FIntPoint& Area)
 	{
 		if (Shadow.Num() < FMath::Max(Area.X, Area.Y))
 		{
 			return false;
 		}
 
+		/*
+		TArray<UUserWidget*> Slots;
+		CanvasSlots.GenerateValueArray(Slots);
+		
+		for (const UUserWidget* Itr : Slots)
+		{
+			if (!Itr) return false;
+
+			if (!Itr->Implements<UMounteaInventorySlotWBPInterface>()) return false;
+		}
+		*/
+		
 		for (auto const Itr : Shadow)
 		{
-			if (!Canvas.Contains(Itr))
+			if (!SlotsCoords.Contains(Itr))
 			{
 				return false;
 			}

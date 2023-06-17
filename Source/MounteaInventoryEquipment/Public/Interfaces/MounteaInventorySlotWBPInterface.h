@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "MounteaInventoryItemWBPInterface.generated.h"
+#include "MounteaInventorySlotWBPInterface.generated.h"
 
-class UMounteaInventoryItemBase;
+class IMounteaInventoryItemWBPInterface;
+class UDragDropOperation;
 // This class does not need to be modified.
 UINTERFACE(BlueprintType, Blueprintable)
-class UMounteaInventoryItemWBPInterface : public UInterface
+class UMounteaInventorySlotWBPInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,37 +18,37 @@ class UMounteaInventoryItemWBPInterface : public UInterface
 /**
  * 
  */
-class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryItemWBPInterface
+class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventorySlotWBPInterface
 {
 	GENERATED_BODY()
 
+	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	UMounteaInventoryItemBase* GetItem() const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	FIntPoint GetRootCoords();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void OnDropped();
+	void OccupySlot(const TScriptInterface<IMounteaInventoryItemWBPInterface>& Item);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void OnDagged();
+	void EmptySlot();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	FIntPoint GetItemSize() const;
+	bool IsSlotEmpty() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	FIntPoint GetSlotRoots() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	void SetSlotRoots(const FIntPoint& NewRoots);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryItemWBPInterface> GetOccupyingItem() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	bool SaveRootCoords(const FIntPoint& NewCoords);
+	void OnShadowCasted(const bool bIsValid);
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	bool MoveToNewCoords(const FIntPoint& NewCoords);
+	void OnShadowLifted();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	bool ReleaseOldCoords(const FIntPoint& OldCoords);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void OnItemSelected(const FString& Command);
-	
+	void OnDragSolutionFound(const UDragDropOperation* Operation, const bool bResult);
 };
