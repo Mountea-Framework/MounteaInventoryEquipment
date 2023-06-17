@@ -181,7 +181,7 @@ bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag& EventTag, const FName
 	return true;
 }
 
-bool UMounteaBaseUserWidget::RemoveAllBindings(const FGameplayTag& EventTag, const FName OptionalName)
+bool UMounteaBaseUserWidget::RemoveBindings(const FGameplayTag& EventTag, const FName OptionalName)
 {
 	TArray<FMounteaEventBinding> DirtyBindings;
 	for (const auto& Itr : MounteaEventBindings)
@@ -214,6 +214,11 @@ bool UMounteaBaseUserWidget::RemoveAllBindings(const FGameplayTag& EventTag, con
 	}
 
 	return true;
+}
+
+void UMounteaBaseUserWidget::RemoveAllBindings()
+{
+	MounteaEventBindings.Empty();
 }
 
 /*

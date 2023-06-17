@@ -102,8 +102,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Call Event", NativeMakeFunc))
 	bool CallEvent(const FGameplayTag& EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context);
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Remove Bindings (Filtered)", NativeMakeFunc))
+	bool RemoveBindings(const FGameplayTag& EventTag, const FName OptionalName);
+
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Remove All Bindings", NativeMakeFunc))
-	bool RemoveAllBindings(const FGameplayTag& EventTag, const FName OptionalName);
+	void RemoveAllBindings();
 
 	//UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Listen By Function", NativeMakeFunc))
 	//bool StartListeningByFunction(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName);
