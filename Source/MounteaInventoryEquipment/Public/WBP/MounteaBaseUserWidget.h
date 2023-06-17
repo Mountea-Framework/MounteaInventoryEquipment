@@ -28,25 +28,37 @@ struct FMounteaEventBinding
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UObject* Listener;
+	UPROPERTY(VisibleAnywhere)
+	const UObject* Listener;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere)
 	FString CallbackFunction;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere)
 	FGameplayTag BindingTag;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere)
 	FName BindingName;
 
 	UPROPERTY(VisibleAnywhere)
 	FMounteaDynamicDelegate Delegate;
 
+	bool operator==(const FMounteaDynamicDelegate& InDelegate) const
+	{
+		return Delegate == InDelegate;
+	}
+
 	bool operator==(const FMounteaEventBinding& Other) const
 	{
 		return
-		BindingName.IsValid() ?
+
+		Other.Delegate.IsBound() ?
+
+		Delegate == Other.Delegate
+
+		:
+		
+		Other.BindingName.IsValid() ?
 			
 		Listener == Other.Listener &&
 		CallbackFunction == Other.CallbackFunction &&
@@ -80,17 +92,23 @@ public:
 	UMounteaInventoryThemeConfig* ThemeConfigOverride = nullptr;
 
 public:
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(CompactNodeTitle="ListenEvent"))
-	bool StartListeningToEvent(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName);
 	
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(CompactNodeTitle="StopListenEvent"))
-	bool StopListeningToEvent(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Bind Delegate", NativeMakeFunc))
+	bool BindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag BindingTag, const FName OptionalName);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(CompactNodeTitle="CallEvent"))
-	bool CallEvent(const FGameplayTag& EventTag, FName OptionalName, const FMounteaDynamicDelegateContext& Context);
-
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Unbind Delegate", NativeMakeFunc))
+	bool UnbindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag& BindingTag, const FName OptionalName);
 	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Call Event", NativeMakeFunc))
+	bool CallEvent(const FGameplayTag& EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Remove All Bindings", NativeMakeFunc))
+	bool RemoveAllBindings(const FGameplayTag& EventTag, const FName OptionalName);
+
+	//UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Listen By Function", NativeMakeFunc))
+	//bool StartListeningByFunction(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName);
+	//UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Stop Listen By Function", NativeMakeFunc))
+	//bool StopListeningByFunction(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName);
 	
 	UFUNCTION(CallInEditor, BlueprintCallable, Category="Mountea|Debug", meta=(DevelopmentOnly))
 	void RenderPreview();

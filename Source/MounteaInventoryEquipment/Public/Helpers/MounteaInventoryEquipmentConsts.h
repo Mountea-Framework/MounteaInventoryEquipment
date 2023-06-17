@@ -50,4 +50,18 @@ namespace MounteaInventoryEquipmentConsts
 			const FString ItemAddFailed_QuantityMax		(TEXT("ItemAddFailed_QuantityMax"));
 		}
 	}
+
+	namespace NodeColours
+	{
+		const FLinearColor Call = FLinearColor::Yellow;
+		const FLinearColor Listen = FLinearColor::Green;
+		const FLinearColor Stop = FLinearColor::Red;
+	}
+
+	namespace NodeIcons
+	{
+		const FString Listen						(TEXT("Symbols.Check"));
+		const FString Call							(TEXT("Symbols.Contact"));
+		const FString Stop							(TEXT("Icons.Denied"));
+	}
 }

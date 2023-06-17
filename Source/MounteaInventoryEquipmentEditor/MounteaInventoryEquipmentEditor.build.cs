@@ -14,7 +14,11 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"CoreUObject", 
 				"Engine", 
 				"UnrealEd",
-				"Projects"
+				"Projects",
+				
+				"BlueprintGraph",
+				"SlateCore",
+				"KismetCompiler"
 			}
 		);
 		

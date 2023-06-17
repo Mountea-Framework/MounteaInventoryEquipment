@@ -29,7 +29,9 @@ public class MounteaInventoryEquipment : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"UMG",
-				"Projects"
+				"Projects",
+				
+				"GameplayTags"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -41,6 +43,7 @@ public class MounteaInventoryEquipment : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				
 				"GameplayTags",
 				"DeveloperSettings",
 				"UMG",

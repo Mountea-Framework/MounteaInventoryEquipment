@@ -27,11 +27,12 @@ void UMounteaBaseUserWidget::NativeDestruct()
 	UnBindEvents();
 }
 
-bool UMounteaBaseUserWidget::StartListeningToEvent(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName)
+/*
+bool UMounteaBaseUserWidget::StartListeningByFunction(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName)
 {
 	if (Listener == nullptr)
 	{
-		UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningToEvent requires Listener!"));
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningByFunction requires Listener!"));
 		return false;
 	}
 	
@@ -42,7 +43,7 @@ bool UMounteaBaseUserWidget::StartListeningToEvent(UObject* Listener, const FStr
 		const UFunction* const Func = Listener->FindFunction(FunctionFName);
 		if (Func == nullptr)
 		{
-			UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningToEvent requires valid Function in the Listener!"));
+			UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningByFunction requires valid Function in the Listener!"));
 			return false;
 		}
 		
@@ -51,7 +52,7 @@ bool UMounteaBaseUserWidget::StartListeningToEvent(UObject* Listener, const FStr
 			// User passed in a valid function, but one that takes parameters
 			// FMounteaDynamicDelegate expects 2 parameters and will choke on execution if it tries
 			// to execute a mismatched function
-			UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningToEvent passed a function (%s) that expects invalid parameters amount."), *CallbackFunction);
+			UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningByFunction passed a function (%s) that expects invalid parameters amount."), *CallbackFunction);
 			return false;
 		}
 	}
@@ -64,7 +65,7 @@ bool UMounteaBaseUserWidget::StartListeningToEvent(UObject* Listener, const FStr
 
 	if (MounteaEventBindings.Contains(NewBinding))
 	{
-		UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningToEvent tried to duplicate (%s) binding!"), *CallbackFunction);
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("StartListeningByFunction tried to duplicate (%s) binding!"), *CallbackFunction);
 		return false;
 	}
 
@@ -76,27 +77,72 @@ bool UMounteaBaseUserWidget::StartListeningToEvent(UObject* Listener, const FStr
 
 	return true;
 }
+*/
 
-bool UMounteaBaseUserWidget::StopListeningToEvent(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, FName OptionalName)
+bool UMounteaBaseUserWidget::BindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag BindingTag, const FName OptionalName)
 {
+	if (!BindingTag.IsValid() && !OptionalName.IsValid())
+	{
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("BindDelegate requires valid Gameplay Tag!"));
+		return false;
+	}
+	
 	FMounteaEventBinding PossibleBinding;
-	PossibleBinding.Listener = Listener;
-	PossibleBinding.CallbackFunction = CallbackFunction;
+	PossibleBinding.Delegate = Delegate;
 	PossibleBinding.BindingTag = BindingTag;
 	PossibleBinding.BindingName = OptionalName;
-	
-	if (!MounteaEventBindings.Contains(PossibleBinding))
+	PossibleBinding.CallbackFunction = Delegate.GetFunctionName().ToString();
+	PossibleBinding.Listener = Delegate.GetUObject();
+
+	if (MounteaEventBindings.Contains(PossibleBinding))
 	{
-		UE_LOG(LogBlueprintUserMessages, Error, TEXT("StopListeningToEvent didn't find any existing binding with specified paremeters!"));
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("BindDelegate tried to duplicate (%s) binding!"), *Delegate.GetFunctionName().ToString());
 		return false;
 	}
 
-	MounteaEventBindings.Remove(PossibleBinding);
-	
+	MounteaEventBindings.Add(PossibleBinding);
+
 	return true;
 }
 
-bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag& EventTag, FName EventName, const FMounteaDynamicDelegateContext& Context)
+bool UMounteaBaseUserWidget::UnbindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag& BindingTag, const FName OptionalName)
+{
+	FMounteaEventBinding DirtyBinding;
+	
+	for (const auto& Itr : MounteaEventBindings)
+	{
+		if (Itr.Delegate == Delegate)
+		{
+			if (Itr.BindingTag == BindingTag)
+			{
+				if (OptionalName.IsValid())
+				{
+					if (Itr.BindingName == OptionalName)
+					{
+						DirtyBinding = Itr;
+						break;
+					}
+
+					continue;
+				}
+				
+				DirtyBinding = Itr;
+				break;
+			}
+		}
+	}
+
+	if (DirtyBinding.Listener == nullptr)
+	{
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("UnbindDelegate found no binding for Event (%s) with Tag (%s)!"), *Delegate.GetFunctionName().ToString(), *BindingTag.ToString());
+		return false;
+	}
+
+	MounteaEventBindings.Remove(DirtyBinding);
+	return true;
+}
+
+bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag& EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context)
 {
 	bool bFound = false;
 	TArray<FMounteaEventBinding> FoundBindings;
@@ -105,25 +151,25 @@ bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag& EventTag, FName Event
 	{
 		if (EventTag == Itr.BindingTag)
 		{
-			if (EventName.IsValid())
+			if (OptionalName.IsValid())
 			{
-				if (Itr.BindingName == EventName)
+				if (Itr.BindingName == OptionalName)
 				{
 					bFound = true;
 					FoundBindings.Add(Itr);
 				}
+
+				continue;
 			}
-			else
-			{
-				bFound = true;
-				FoundBindings.Add(Itr);
-			}
+			
+			bFound = true;
+			FoundBindings.Add(Itr);
 		}
 	}
 
 	if (!bFound)
 	{
-		UE_LOG(LogBlueprintUserMessages, Error, TEXT("CallEvent didn't find any function by Tag (%s) and Name (%s)!"), *EventName.ToString(), *EventTag.ToString());
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("CallEvent didn't find any function by Tag (%s) and Name (%s)!"), *OptionalName.ToString(), *EventTag.ToString());
 		return false;
 	}
 
@@ -134,6 +180,62 @@ bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag& EventTag, FName Event
 
 	return true;
 }
+
+bool UMounteaBaseUserWidget::RemoveAllBindings(const FGameplayTag& EventTag, const FName OptionalName)
+{
+	TArray<FMounteaEventBinding> DirtyBindings;
+	for (const auto& Itr : MounteaEventBindings)
+	{
+		if (Itr.BindingTag == EventTag)
+		{
+			if (OptionalName.IsValid())
+			{
+				if (Itr.BindingName == OptionalName)
+				{
+					DirtyBindings.Add(Itr);
+				}
+
+				continue;
+			}
+
+			DirtyBindings.Add(Itr);
+		}
+	}
+
+	if (DirtyBindings.Num() == 0)
+	{
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("RemoveAllBindings didn't find any Bindings by Tag (%s) and Name (%s)!"), *OptionalName.ToString(), *EventTag.ToString());
+		return false;
+	}
+
+	for (const auto& Itr : DirtyBindings)
+	{
+		MounteaEventBindings.Remove(Itr);
+	}
+
+	return true;
+}
+
+/*
+bool UMounteaBaseUserWidget::StopListeningByFunction(UObject* Listener, const FString& CallbackFunction, const FGameplayTag& BindingTag, const FName OptionalName)
+{
+	FMounteaEventBinding PossibleBinding;
+	PossibleBinding.Listener = Listener;
+	PossibleBinding.CallbackFunction = CallbackFunction;
+	PossibleBinding.BindingTag = BindingTag;
+	PossibleBinding.BindingName = OptionalName;
+	
+	if (!MounteaEventBindings.Contains(PossibleBinding))
+	{
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("StopListeningByFunction didn't find any existing binding with specified paremeters!"));
+		return false;
+	}
+
+	MounteaEventBindings.Remove(PossibleBinding);
+	
+	return true;
+}
+*/
 
 void UMounteaBaseUserWidget::RenderPreview()
 {
