@@ -111,10 +111,10 @@ public:
 		bResult = true;
 		if (ItemConfig.ItemConfig == nullptr)
 		{
-			return NewObject<UMounteaInventoryItemConfig>(nullptr, ClassFilter);
+			return NewObject<UMounteaInventoryItemConfig>(GetTransientPackage(), ClassFilter);
 		}
 
-		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(nullptr, ClassFilter);
+		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetTransientPackage(), ClassFilter);
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaItemAdditionalData"), meta=(DeterminesOutputType = "ClassFilter"))
@@ -129,10 +129,10 @@ public:
 		bResult = true;
 		if (ItemOptionalData.ItemAdditionalData == nullptr)
 		{
-			return NewObject<UMounteaItemAdditionalData>(nullptr, ClassFilter);
+			return NewObject<UMounteaItemAdditionalData>(GetTransientPackage(), ClassFilter);
 		}
 
-		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(nullptr, ClassFilter);
+		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(GetTransientPackage(), ClassFilter);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )

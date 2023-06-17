@@ -118,11 +118,11 @@ public:
 
 		if (Settings->ThemeConfig.IsNull())
 		{
-			return NewObject<UMounteaInventoryThemeConfig>(nullptr, ClassFilter);
+			return NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
 		}
 
 		auto const FoundTheme = Settings->ThemeConfig.LoadSynchronous();
-		return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(nullptr, ClassFilter);
+		return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
