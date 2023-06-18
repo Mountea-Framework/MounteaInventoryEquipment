@@ -25,6 +25,8 @@ void UMounteaBaseUserWidget::NativeDestruct()
 	Super::NativeDestruct();
 
 	UnBindEvents();
+	
+	RemoveAllBindings();
 }
 
 /*
@@ -81,7 +83,7 @@ bool UMounteaBaseUserWidget::StartListeningByFunction(UObject* Listener, const F
 
 bool UMounteaBaseUserWidget::BindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag BindingTag, const FName OptionalName)
 {
-	if (!BindingTag.IsValid() && !OptionalName.IsValid())
+	if (!BindingTag.IsValid())
 	{
 		UE_LOG(LogBlueprintUserMessages, Error, TEXT("BindDelegate requires valid Gameplay Tag!"));
 		return false;
@@ -105,8 +107,14 @@ bool UMounteaBaseUserWidget::BindDelegate(const FMounteaDynamicDelegate& Delegat
 	return true;
 }
 
-bool UMounteaBaseUserWidget::UnbindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag& BindingTag, const FName OptionalName)
+bool UMounteaBaseUserWidget::UnbindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag BindingTag, const FName OptionalName)
 {
+	if (!BindingTag.IsValid())
+	{
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("UnbindDelegate requires valid BindingTag!"));
+		return false;
+	}
+	
 	FMounteaEventBinding DirtyBinding;
 	
 	for (const auto& Itr : MounteaEventBindings)
@@ -142,8 +150,14 @@ bool UMounteaBaseUserWidget::UnbindDelegate(const FMounteaDynamicDelegate& Deleg
 	return true;
 }
 
-bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag& EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context)
+bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context)
 {
+	if (!EventTag.IsValid())
+	{
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("CallEvent requires EventTag!"));
+		return false;
+	}
+	
 	bool bFound = false;
 	TArray<FMounteaEventBinding> FoundBindings;
 	

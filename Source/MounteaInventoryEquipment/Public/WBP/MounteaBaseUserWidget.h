@@ -97,10 +97,10 @@ public:
 	bool BindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag BindingTag, const FName OptionalName);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Unbind Delegate", NativeMakeFunc, Keywords="remove,clear,listen"))
-	bool UnbindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag& BindingTag, const FName OptionalName);
+	bool UnbindDelegate(const FMounteaDynamicDelegate& Delegate, const FGameplayTag BindingTag, const FName OptionalName);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Call Event", NativeMakeFunc, Keywords="call,broadcast,fire"))
-	bool CallEvent(const FGameplayTag& EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context);
+	bool CallEvent(const FGameplayTag EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory", meta=(DisplayName="Remove Bindings (Filtered)", NativeMakeFunc, Keywords="clean,unbind,restore"))
 	bool RemoveBindings(const FGameplayTag& EventTag, const FName OptionalName);
