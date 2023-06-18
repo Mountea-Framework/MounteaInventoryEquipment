@@ -233,10 +233,20 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsValidShadow(const TArray<FIntPoint>&  SlotsCoords, const TArray<TScriptInterface<IMounteaInventorySlotWBPInterface>>& SlotsRefs, const TArray<FIntPoint>& Shadow, const FIntPoint& Area)
+	static bool IsValidShadow(const TArray<FIntPoint>&  SlotsCoords, const TArray<TScriptInterface<IMounteaInventorySlotWBPInterface>>& SlotsRefs, const TArray<FIntPoint>& Shadow, const TScriptInterface<IMounteaInventoryItemWBPInterface>& MovedItem)
 	{
+		if (MovedItem.GetObject() == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[IsValidShadow - 00] Trying to move nothing!"))
+			return false;
+		}
+
+		const FIntPoint Area = MovedItem->Execute_GetItemSize(MovedItem.GetObject());
+
+		
 		if (Shadow.Num() < FMath::Max(Area.X, Area.Y))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("[IsValidShadow - 01] Trying to move outside Inventory grid!"))
 			return false;
 		}
 
@@ -244,29 +254,55 @@ public:
 		{
 			if (!SlotsCoords.Contains(Itr))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("[IsValidShadow - 02] Shadow coords outsied Inventoyr grid!!"))
 				return false;
 			}
 		}
 
 		TMap<FIntPoint, TScriptInterface<IMounteaInventorySlotWBPInterface>> Slots;
-		
-		for (int i = 0; i < SlotsCoords.Num(); i++)
+
+		//Collect slots under shadow
+		for (int i = 0; i < Shadow.Num(); i++)
 		{
-			TScriptInterface<IMounteaInventorySlotWBPInterface> Slot = SlotsRefs.IsValidIndex(i) ? SlotsRefs[i] : nullptr;
-			Slots.Add(SlotsCoords[i], Slot);
+			const FIntPoint Coords = Shadow[i];
+			
+			if (!SlotsCoords.Contains(Coords))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[IsValidShadow - 03] Shadow coords outsied Inventoyr grid!!"))
+				return false;
+			}
+
+			if (!SlotsCoords.IsValidIndex(SlotsCoords.Find(Coords)))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("[IsValidShadow - 04] Shadow coords outsied Inventoyr grid!!"))
+				return false;
+			}
+			
+			const int CoordsIndex = SlotsCoords.Find(Coords);
+			
+			TScriptInterface<IMounteaInventorySlotWBPInterface> Slot = SlotsRefs.IsValidIndex(CoordsIndex) ? SlotsRefs[CoordsIndex] : nullptr;
+
+			Slots.Add(Coords, Slot);
 		}
 
+		// Validate slot under shadow
 		for (const auto& Itr : Shadow)
 		{
-			if (!Slots.Contains(Itr))
+			if (!SlotsCoords.Contains(Itr))
 			{
+				UE_LOG(LogTemp, Warning, TEXT("[IsValidShadow - 05] Shadow coords outsied Inventoyr grid!!"))
 				return false;
 			}
 
 			const TScriptInterface<IMounteaInventorySlotWBPInterface>* Slot = Slots.Find(Itr);
 			if (!Slot->GetInterface()->Execute_IsSlotEmpty(Slot->GetObject()) )
 			{
-				return false;
+				const TScriptInterface<IMounteaInventoryItemWBPInterface> OccupyingItem = Slot->GetInterface()->Execute_GetOccupyingItem(Slot->GetObject());
+				if (OccupyingItem != MovedItem)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[IsValidShadow - 06] Shadow occupied by different Item!!"))
+					return false;
+				}
 			}
  		}
 		
