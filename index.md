@@ -16,20 +16,21 @@ Join support and community Discord!
 ## Compatible Engine Version
 
 ### Legend
-Colour | Explanation
--------------- | --------------
-🟩 | Supported
-🟨 | WIP
-🟪 | Deprecated (abaddoned)
-🟥 | Partially supported ([Epic Games Policies](https://www.unrealengine.com/en-US/marketplace-guidelines#263d)) 
+| Colour        | Explanation |
+|:-------------|:------|
+| 🟩          | Supported  |
+| 🟨          | WIP  |
+| 🟪          | Deprecated (abandoned)  |
+| 🟥          | Partially supported ([Epic Games Policies](https://www.unrealengine.com/en-US/marketplace-guidelines#263d))   |
 
-### Suport Table
-Engine Version | Plugin Version | Support
--------------- | -------------- | ----
-UE 4.26 | - | 🟪
-UE 4.27 | - | 🟪
-UE 5.00 | 0.0.0.1 | 🟨
-UE 5.1 | 0.0.0.1 | 🟨
+### Support Table
+| Engine Version        | Plugin Version         | Support |
+|:-------------|:------------------|:------|
+| UE 4.26           | - | 🟪  |
+| UE 4.27           | - | 🟪  |
+| UE 5.0          | - | 🟨  |
+| UE 5.1           | - | 🟨  |
+| UE 5.2           | - | 🟨  |
 
 ## Features
 TBA
