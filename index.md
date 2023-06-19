@@ -16,6 +16,7 @@ Join support and community Discord!
 ## Compatible Engine Version
 
 ### Legend
+
 | Colour        | Explanation |
 |:-------------|:------|
 | 🟩          | Supported  |
@@ -24,6 +25,7 @@ Join support and community Discord!
 | 🟥          | Partially supported ([Epic Games Policies](https://www.unrealengine.com/en-US/marketplace-guidelines#263d))   |
 
 ### Support Table
+
 | Engine Version        | Plugin Version         | Support |
 |:-------------|:------------------|:------|
 | UE 4.26           | - | 🟪  |
