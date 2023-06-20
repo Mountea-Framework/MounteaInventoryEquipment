@@ -296,7 +296,7 @@ struct FItemRetrievalFilter
 		return bSearchByClass || bSearchByTag || bSearchByGUID || bSearchByItem;
 	}
 
-	FItemRetrievalFilter(): bSearchByTag(0), bSearchByClass(0), bSearchByGUID(0), bSearchByItem(0), Item(nullptr)
+	FItemRetrievalFilter(): bSearchByTag(1), bSearchByClass(0), bSearchByGUID(0), bSearchByItem(0), Item(nullptr)
 	{};
 	
 	FItemRetrievalFilter(const bool ByTag, const FGameplayTagContainer& InTags, const bool ByClass, const TSubclassOf<UMounteaInventoryItemBase> InClass, const bool ByGUID, const FGuid InGUID, const bool ByItem, UMounteaInventoryItemBase* InItem)

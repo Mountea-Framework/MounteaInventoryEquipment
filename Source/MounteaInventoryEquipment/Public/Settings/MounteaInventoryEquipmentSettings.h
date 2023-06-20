@@ -31,9 +31,6 @@ public:
 
 	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="MounteaInventoryWBPInterface"))
 	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryWidgetClass;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required")
-	TSoftClassPtr<UMounteaTransactionPayload> DefaultTransactionPayloadClass;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;

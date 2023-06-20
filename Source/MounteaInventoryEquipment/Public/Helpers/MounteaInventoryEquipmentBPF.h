@@ -195,13 +195,6 @@ public:
 
 		return ReturnValues;
 	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static TSubclassOf<UMounteaTransactionPayload> GetTransactionPayloadClass()
-	{
-		const auto Settings = GetSettings();
-		return Settings->DefaultTransactionPayloadClass.IsNull() ? Settings->DefaultTransactionPayloadClass.LoadSynchronous() : UMounteaTransactionPayload::StaticClass();
-	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FKey> GetDragKeys()
@@ -227,6 +220,7 @@ public:
 			}
 
 			X++;
+			Y = StartCoords.Y;
 		}
 		
 		return Results.Array();
