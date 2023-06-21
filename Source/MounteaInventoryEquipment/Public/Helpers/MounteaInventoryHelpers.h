@@ -181,10 +181,12 @@ public:
 		return !(*this == Other);
 	}
 
+	/*
 	FMounteaInventoryItemRequiredData& operator=(const FMounteaInventoryItemRequiredData& Other)
 	{
 		return *this;
 	}
+	*/
 
 	friend uint32 GetTypeHash(const FMounteaInventoryItemRequiredData& Data)
 	{

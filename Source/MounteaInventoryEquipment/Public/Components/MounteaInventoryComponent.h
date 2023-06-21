@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2022.
+// All rights reserved Dominik Pavlicek 2023.
 
 #pragma once
 
@@ -89,6 +89,9 @@ private:
 
 protected:
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	
 	virtual bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	
 	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);

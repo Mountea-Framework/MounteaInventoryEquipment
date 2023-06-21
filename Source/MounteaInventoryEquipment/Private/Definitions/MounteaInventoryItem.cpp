@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2022.
+// All rights reserved Dominik Pavlicek 2023.
 
 
 #include "Definitions/MounteaInventoryItem.h"
@@ -22,7 +22,7 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
 	OnItemRemoved.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemRemoved);
 
-	RefreshData();
+	SetValidData();
 
 	OnItemBeginPlay(TEXT("Item has been initialized"));
 }
@@ -146,14 +146,41 @@ void UMounteaInventoryItemBase::ClearDataTable()
 
 void UMounteaInventoryItemBase::CopyFromTable()
 {
+	if (SourceTable == nullptr)
+	{
+		ClearDataTable();
+		return;
+	}
+	
 	FString Context;
 	if (const FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(SourceRow, SourceTable))
 	{
 		ItemData = Row->RequiredData;
 		ItemOptionalData = Row->OptionalData;
 	}
-	
-	//TODO: Show error that no valid data found
+	else
+	{
+		//TODO: Show error that no valid data found
+		
+		ItemData = FMounteaInventoryItemRequiredData();
+		ItemOptionalData = FMounteaInventoryItemOptionalData();
+	}
+}
+
+void UMounteaInventoryItemBase::SetValidData()
+{
+	switch (ItemDataSource)
+	{
+	case EItemDataSource::EIDS_SourceTable:
+		ClearMappedValues();
+		CopyFromTable();
+		break;
+	case EItemDataSource::EIDS_ManualInput:
+		ClearDataTable();
+		break;
+	case EItemDataSource::Default:
+	default: break;
+	}
 }
 
 void UMounteaInventoryItemBase::ClearMappedValues()
@@ -163,14 +190,6 @@ void UMounteaInventoryItemBase::ClearMappedValues()
 }
 
 #if WITH_EDITOR
-
-void UMounteaInventoryItemBase::RefreshData()
-{
-	if (SourceTable != nullptr)
-	{
-		CopyFromTable();
-	}
-}
 
 void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 {
@@ -191,28 +210,18 @@ void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& Pr
 
 	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, ItemDataSource))
 	{
-		switch (ItemDataSource)
-		{
-			case EItemDataSource::EIDS_SourceTable:
-				ClearMappedValues();
-				break;
-			case EItemDataSource::EIDS_ManualInput:
-				ClearDataTable();
-				break;
-			case EItemDataSource::Default:
-			default: break;
-		}
+		SetValidData();
 	}
 
 	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, SourceTable))
 	{
 		SourceRow = FName();
-		ClearMappedValues();
+		SetValidData();
 	}
 
 	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, SourceRow))
 	{
-		CopyFromTable();
+		SetValidData();
 	}
 }
 #endif

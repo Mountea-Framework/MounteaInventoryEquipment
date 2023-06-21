@@ -6,12 +6,12 @@
 #include "AssetTypeActions_Base.h"
 #include "Utils/MounteaInventoryEquipmentEditorUtilities.h"
 
-class FMounteaInventoryItemConfigAssetAction : public FAssetTypeActions_Base
+class FMounteaInventoryItemAssetAction : public FAssetTypeActions_Base
 {
 	
 public:
 
-	FMounteaInventoryItemConfigAssetAction();
+	FMounteaInventoryItemAssetAction();
 
 	virtual FText GetName() const override;
 	virtual FColor GetTypeColor() const override;

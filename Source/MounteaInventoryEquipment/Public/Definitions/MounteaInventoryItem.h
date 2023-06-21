@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2022.
+// All rights reserved Dominik Pavlicek 2023.
 
 #pragma once
 
@@ -242,10 +242,9 @@ protected:
 	void ClearDataTable();
 	void CopyFromTable();
 	void ClearMappedValues();
-
-	//TODO: Button to ribbon to update data
+	
 	UFUNCTION(CallInEditor, BlueprintCallable, Category="3. Import")
-	void RefreshData();
+	void SetValidData();
 
 #if WITH_EDITOR
 	

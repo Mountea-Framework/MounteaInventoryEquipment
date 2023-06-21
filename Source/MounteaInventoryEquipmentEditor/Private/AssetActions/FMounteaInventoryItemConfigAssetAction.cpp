@@ -1,4 +1,4 @@
-﻿// All rights reserved Dominik Pavlicek 2022.
+﻿// All rights reserved Dominik Pavlicek 2023.
 
 #include "FMounteaInventoryItemConfigAssetAction.h"
 
@@ -11,7 +11,7 @@ FMounteaInventoryItemConfigAssetAction::FMounteaInventoryItemConfigAssetAction()
 
 FText FMounteaInventoryItemConfigAssetAction::GetName() const
 {
-	return LOCTEXT("MounteaInventoryItemConfigAssetAction_Name", "?. Item Config");
+	return LOCTEXT("MounteaInventoryItemConfigAssetAction_Name", "2. Item Config");
 }
 
 FColor FMounteaInventoryItemConfigAssetAction::GetTypeColor() const

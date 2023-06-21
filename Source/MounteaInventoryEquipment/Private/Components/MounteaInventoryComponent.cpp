@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2022.
+// All rights reserved Dominik Pavlicek 2023.
 
 
 #include "Components/MounteaInventoryComponent.h"
@@ -362,8 +362,38 @@ void UMounteaInventoryComponent::OnRep_Items()
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 
+void UMounteaInventoryComponent::TryAddItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
+{
+	if (TryAddItem(Item, Quantity))
+	{
+		//TODO: Item Addeeeeeeeed
+		return;
+	}
+	else
+	{
+		//TODO: Something is wrong :(
+		return;
+	}
+}
+
+bool UMounteaInventoryComponent::TryAddItem_Server_Validate(UMounteaInventoryItemBase* Item, const int32 Quantity)
+{
+	// There is currently no protection,
+	// however, in the future some might be implemented.
+	// This function is here just for future proofing.
+	return true;
+}
+
 bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
+	if (!GetOwner()) return false;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		TryAddItem_Server(Item, Quantity);
+		return true;
+	}
+	
 	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 
 	if (!Settings)
