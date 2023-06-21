@@ -26,7 +26,28 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 		(
 			new string[]
 			{
-				"MounteaInventoryEquipment",
+				"MounteaInventoryEquipment", 
+				"AssetTools",
+				"Slate",
+				"SlateCore",
+				"GraphEditor",
+				"PropertyEditor",
+				"EditorStyle",
+				"Kismet",
+				"KismetWidgets",
+				"ApplicationCore",
+				"ToolMenus",
+				"DeveloperSettings",
+				"Projects", 
+				
+				"WebBrowser",
+				"HTTP", 
+				"Json", 
+				"JsonUtilities",
+
+				"InputCore", 
+				
+				"MainFrame"
 				//...
 			}
 		);

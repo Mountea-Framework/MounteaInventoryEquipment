@@ -1,8 +1,8 @@
 # Mountea Inventory & Equipment
 Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine tool for easy inventory management with flexible interactions. 
 
-[![UE](https://img.shields.io/badge/supported-4.26%2B-green)](https://github.com/Mountea-Framework/ActorInventoryPlugin/edit/master/README.md#compatible-engine-version)
-[![License](https://img.shields.io/github/license/Mountea-Framework/ActorInventoryPlugin)](https://github.com/Mountea-Framework/MounteaDialogueSystem/blob/master/LICENSE)
+[![UE](https://img.shields.io/badge/supported-4.26%2B-green)](https://github.com/Mountea-Framework/ActorInventoryPlugin/master/README.md#compatible-engine-version)
+[![License](https://img.shields.io/github/license/Mountea-Framework/ActorInventoryPlugin)](https://github.com/Mountea-Framework/MounteaInventoryEquipment/blob/master/LICENSE)
 [![YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=flat&logo=youtube)](https://www.youtube.com/@mounteaframework)
 [![Discord](https://badgen.net/discord/online-members/2vXWEEN?label=Discord&logo=discord&logoColor=ffffff&color=7389D8)](https://discord.com/invite/2vXWEEN)
 [![Discord](https://badgen.net/discord/members/2vXWEEN?label=Discord&logo=discord&logoColor=ffffff&color=7389D8)](https://discord.com/invite/2vXWEEN)
