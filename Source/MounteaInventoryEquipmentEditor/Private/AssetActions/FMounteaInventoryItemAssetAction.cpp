@@ -29,7 +29,7 @@ uint32 FMounteaInventoryItemAssetAction::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
-		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(FName("Mountea Inventory & Equipment"));
+		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(FName("MounteaInventoryEquipment"));
 	}
 	
 	return  EAssetTypeCategories::Misc;

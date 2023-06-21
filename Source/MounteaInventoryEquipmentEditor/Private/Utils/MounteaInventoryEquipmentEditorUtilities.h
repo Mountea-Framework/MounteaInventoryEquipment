@@ -3,7 +3,9 @@
 #pragma once
 
 #include "ClassViewerFilter.h"
+#include "ClassViewerModule.h"
 #include "K2Node_Event.h"
+#include "Kismet2/SClassPickerDialog.h"
 
 enum class EMounteaInventoryEquipmentBlueprintOpenType : uint8
 {
@@ -30,8 +32,7 @@ public:
 		return !InUnloadedClassData->HasAnyClassFlags(DisallowedClassFlags)
 			&& InFilterFuncs->IfInChildOfClassesSet(AllowedChildrenOfClasses, InUnloadedClassData) != EFilterReturn::Failed;
 	}
-
-private:
+	
 	// Disallowed class flags.
 	EClassFlags DisallowedClassFlags = CLASS_Deprecated;
 };
@@ -40,6 +41,8 @@ class FMounteaInventoryEquipmentEditorUtilities
 {
 	
 public:
+
+	static bool PickChildrenOfClass(const FText& TitleText, UClass*& OutChosenClass, UClass* Class);
 	
 	static bool IsABlueprintClass(const UClass* Class)
 	{
@@ -79,3 +82,26 @@ public:
 		return OutNativeClasses.Num() > 0 || OutBlueprintClasses.Num() > 0;
 	}
 };
+
+inline bool FMounteaInventoryEquipmentEditorUtilities::PickChildrenOfClass(const FText& TitleText, UClass*& OutChosenClass, UClass* Class)
+{
+	// Create filter
+	const TSharedPtr<FMounteaInventoryEquipmentViewerFilter> Filter = MakeShareable(new FMounteaInventoryEquipmentViewerFilter);
+	Filter->AllowedChildrenOfClasses.Add(Class);
+
+	// Fill in options
+	FClassViewerInitializationOptions Options;
+	Options.Mode = EClassViewerMode::ClassPicker;
+	Options.bShowUnloadedBlueprints = true;
+	Options.ClassFilters.Add(Filter.ToSharedRef());
+
+	Options.DisplayMode = EClassViewerDisplayMode::TreeView;
+	
+	Options.bShowNoneOption = false;
+	Options.InitiallySelectedClass = Class;
+
+	Options.bExpandRootNodes = true;
+	Options.NameTypeToDisplay = EClassViewerNameTypeToDisplay::DisplayName;
+	
+	return SClassPickerDialog::PickClass(TitleText, Options, OutChosenClass, Class);
+}

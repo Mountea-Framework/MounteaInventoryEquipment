@@ -37,13 +37,12 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 	// Register new Category
 	{
 		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(FName("MounteaInventoryEquipment"), FText::FromString("Mountea Inventory & Equipment"));
+		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(FName("MounteaInventoryEquipmentData"), FText::FromString("Mountea Inventory & Equipment (Data)"));
 	}
 	
 	// Asset Actions
 	{
-		MounteaInventoryItemConfigAssetAction = MakeShared<FMounteaInventoryItemConfigAssetAction>();
-		FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(MounteaInventoryItemConfigAssetAction.ToSharedRef());
-		
+		//RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemConfigBlueprintAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemConfigAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemAssetAction>());
 	}

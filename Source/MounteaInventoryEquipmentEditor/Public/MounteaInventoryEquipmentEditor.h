@@ -27,10 +27,9 @@ class FMounteaInventoryEquipmentEditor : public IModuleInterface
 	void RegisterMenus();
 
 private:
-
-	TSharedPtr<class FMounteaInventoryItemConfigAssetAction> MounteaInventoryItemConfigAssetAction;
 	
 	TSharedPtr<class FUICommandList> PluginCommands;
 	FHttpModule* Http = nullptr;
+	
 	TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
 };

@@ -11,7 +11,7 @@ FMounteaInventoryItemConfigAssetAction::FMounteaInventoryItemConfigAssetAction()
 
 FText FMounteaInventoryItemConfigAssetAction::GetName() const
 {
-	return LOCTEXT("MounteaInventoryItemConfigAssetAction_Name", "2. Item Config");
+	return LOCTEXT("MounteaInventoryItemConfigAssetAction_Name", "1. Item Config");
 }
 
 FColor FMounteaInventoryItemConfigAssetAction::GetTypeColor() const
@@ -28,7 +28,7 @@ uint32 FMounteaInventoryItemConfigAssetAction::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
-		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(FName("Mountea Inventory & Equipment"));
+		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(FName("MounteaInventoryEquipmentData"));
 	}
 	
 	return  EAssetTypeCategories::Misc;
