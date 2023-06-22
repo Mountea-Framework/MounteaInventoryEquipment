@@ -13,7 +13,4 @@ const FVector2D Icon200x70(200.f, 70.f);
 const FString ChangelogURL = FString("https://raw.githubusercontent.com/Mountea-Framework/MounteaInventoryEquipment/5.0/CHANGELOG.md");
 
 const FName AdvancedMenuCategoryName("MounteaInventoryEquipment");
-const FName AdvancedMenuCategoryNameData("MounteaInventoryEquipmentData");
-
 const FText AdvancedMenuCategoryNameText = FText::FromString("Mountea Inventory & Equipment");
-const FText AdvancedMenuCategoryNameDataText = FText::FromString("Mountea Inventory & Equipment (data)");

@@ -11,6 +11,7 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
+class UMounteaInventoryItemConfig;
 class UMounteaTransactionPayload;
 struct FItemUpdateResult;
 
@@ -37,6 +38,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;

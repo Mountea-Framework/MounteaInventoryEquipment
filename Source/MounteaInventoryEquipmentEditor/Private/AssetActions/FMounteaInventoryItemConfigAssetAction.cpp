@@ -13,7 +13,7 @@ FMounteaInventoryItemConfigAssetAction::FMounteaInventoryItemConfigAssetAction()
 
 FText FMounteaInventoryItemConfigAssetAction::GetName() const
 {
-	return LOCTEXT("MounteaInventoryItemConfigAssetAction_Name", "1. Item Config");
+	return LOCTEXT("MounteaInventoryItemConfigAssetAction_Name", "Item Config");
 }
 
 FColor FMounteaInventoryItemConfigAssetAction::GetTypeColor() const
@@ -30,10 +30,19 @@ uint32 FMounteaInventoryItemConfigAssetAction::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
-		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(AdvancedMenuCategoryNameData);
+		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(AdvancedMenuCategoryName);
 	}
 	
 	return  EAssetTypeCategories::Misc;
+}
+
+const TArray<FText>& FMounteaInventoryItemConfigAssetAction::GetSubMenus() const
+{
+	static const TArray<FText> AssetTypeActionSubMenu
+	{
+		LOCTEXT("MounteaInventoryEquipment_Sub02", "2. Configuration")
+	};
+	return AssetTypeActionSubMenu;
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -38,7 +38,6 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 	// Register new Category
 	{
 		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(AdvancedMenuCategoryName, AdvancedMenuCategoryNameText);
-		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(AdvancedMenuCategoryNameData, AdvancedMenuCategoryNameDataText);
 	}
 	
 	// Asset Actions
@@ -48,7 +47,7 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryThemeAssetAction>());
 	}
 
-	// Register Help Button
+	// Register Styles and Commands
 	{
 		FMIEHelpStyle::Initialize();
 		FMIEHelpStyle::ReloadTextures();

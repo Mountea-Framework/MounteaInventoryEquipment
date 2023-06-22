@@ -242,9 +242,6 @@ protected:
 	void ClearDataTable();
 	void CopyFromTable();
 	void ClearMappedValues();
-	
-	UFUNCTION(CallInEditor, BlueprintCallable, Category="3. Import")
-	void SetValidData();
 
 #if WITH_EDITOR
 	
@@ -252,6 +249,11 @@ protected:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	
 #endif
+
+public:
+
+	UFUNCTION(CallInEditor, BlueprintCallable, Category="3. Import")
+	void SetValidData();
 };
 
 #undef LOCTEXT_NAMESPACE

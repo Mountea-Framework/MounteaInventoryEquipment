@@ -18,7 +18,10 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				
 				"BlueprintGraph",
 				"SlateCore",
-				"KismetCompiler"
+				"KismetCompiler",
+
+				"UnrealEd",
+				"AssetTools"
 			}
 		);
 		
@@ -27,6 +30,7 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 			new string[]
 			{
 				"MounteaInventoryEquipment", 
+
 				"AssetTools",
 				"Slate",
 				"SlateCore",
@@ -44,11 +48,11 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"HTTP", 
 				"Json", 
 				"JsonUtilities",
-
+				
+				"BlueprintGraph",
 				"InputCore", 
 				
 				"MainFrame"
-				//...
 			}
 		);
  
