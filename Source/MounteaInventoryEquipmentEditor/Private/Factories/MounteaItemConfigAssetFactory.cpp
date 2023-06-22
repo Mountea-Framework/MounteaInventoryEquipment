@@ -25,7 +25,7 @@ UObject* UMounteaItemConfigAssetFactory::FactoryCreateNew(UClass* Class, UObject
 
 bool UMounteaItemConfigAssetFactory::ConfigureProperties()
 {
-	static const FText TitleText = FText::FromString(TEXT("Pick Parent  Class for new Mountea Inventory Item Config"));
+	static const FText TitleText = FText::FromString(TEXT("Pick Parent Class for new Mountea Inventory Item Config"));
 	
 	UClass* ChosenClass = nullptr;
 	const bool bPressedOk = FMounteaInventoryEquipmentEditorUtilities::PickChildrenOfClass(TitleText, ChosenClass, UMounteaInventoryItemConfig::StaticClass());

@@ -102,6 +102,12 @@ inline bool FMounteaInventoryEquipmentEditorUtilities::PickChildrenOfClass(const
 
 	Options.bExpandRootNodes = true;
 	Options.NameTypeToDisplay = EClassViewerNameTypeToDisplay::DisplayName;
+
+	Options.bShowDefaultClasses = false;
+	Options.bShowObjectRootClass = false;
+	Options.ExtraPickerCommonClasses.Add(Class);
+
+	Options.bShowBackgroundBorder = true;
 	
 	return SClassPickerDialog::PickClass(TitleText, Options, OutChosenClass, Class);
 }

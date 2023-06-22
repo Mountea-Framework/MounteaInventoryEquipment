@@ -7,13 +7,15 @@
 
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
+#include "AssetActions/FMounteaInventoryThemeAssetAction.h"
 
 #include "HelpButton/MIECommands.h"
 #include "HelpButton/MIEHelpStyle.h"
+#include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
 
 #include "Interfaces/IHttpResponse.h"
 #include "Interfaces/IMainFrameModule.h"
-#include "Interfaces/IPluginManager.h"
+
 #include "Popups/MIEPopup.h"
 #include "Popups/MIEPopupStyle.h"
 
@@ -22,7 +24,6 @@
 class IMainFrameModule;
 DEFINE_LOG_CATEGORY(MounteaInventoryEquipmentEditor);
 
-const FString ChangelogURL = FString("https://raw.githubusercontent.com/Mountea-Framework/MounteaInventoryEquipment/5.0/CHANGELOG.md");
 
 #define LOCTEXT_NAMESPACE "FMounteaInventoryEquipmentEditor"
 
@@ -36,15 +37,15 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 
 	// Register new Category
 	{
-		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(FName("MounteaInventoryEquipment"), FText::FromString("Mountea Inventory & Equipment"));
-		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(FName("MounteaInventoryEquipmentData"), FText::FromString("Mountea Inventory & Equipment (Data)"));
+		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(AdvancedMenuCategoryName, AdvancedMenuCategoryNameText);
+		FAssetToolsModule::GetModule().Get().RegisterAdvancedAssetCategory(AdvancedMenuCategoryNameData, AdvancedMenuCategoryNameDataText);
 	}
 	
 	// Asset Actions
 	{
-		//RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemConfigBlueprintAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemConfigAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryThemeAssetAction>());
 	}
 
 	// Register Help Button
@@ -98,6 +99,22 @@ void FMounteaInventoryEquipmentEditor::ShutdownModule()
 		FMIEHelpStyle::Shutdown();
 
 		FMIECommands::Unregister();
+	}
+
+	// Style Cleanup
+	{
+		FMIEPopupStyle::Shutdown();
+	}
+
+	// Asset Types Cleanup
+	{
+		if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
+		{
+			for (auto const& Itr : CreatedAssetTypeActions)
+			{
+				FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(Itr.ToSharedRef());
+			}
+		}
 	}
 	
 	UE_LOG(MounteaInventoryEquipmentEditor, Warning, TEXT("MounteaInventoryEquipmentEditor module has been unloaded"));

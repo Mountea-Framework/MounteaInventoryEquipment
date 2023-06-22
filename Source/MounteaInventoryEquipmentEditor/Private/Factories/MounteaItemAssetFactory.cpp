@@ -49,7 +49,7 @@ UObject* UMounteaItemAssetFactory::FactoryCreateNew(UClass* Class, UObject* InPa
 
 bool UMounteaItemAssetFactory::ConfigureProperties()
 {
-	static const FText TitleText = FText::FromString(TEXT("Pick Parent  Class for new Mountea Inventory Item"));
+	static const FText TitleText = FText::FromString(TEXT("Pick Parent Class for new Mountea Inventory Item"));
 	ParentClass = nullptr;
 
 	UClass* ChosenClass = nullptr;

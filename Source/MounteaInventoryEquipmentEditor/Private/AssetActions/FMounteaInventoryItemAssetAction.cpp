@@ -3,6 +3,7 @@
 #include "FMounteaInventoryItemAssetAction.h"
 
 #include "Definitions/MounteaInventoryItem.h"
+#include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
 
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemAssetAction"
@@ -29,7 +30,7 @@ uint32 FMounteaInventoryItemAssetAction::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
-		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(FName("MounteaInventoryEquipment"));
+		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(AdvancedMenuCategoryName);
 	}
 	
 	return  EAssetTypeCategories::Misc;
