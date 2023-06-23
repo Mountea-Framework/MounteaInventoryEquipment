@@ -4,19 +4,19 @@ description: Welcome to the product page of the Inventory & Equipment plugin, ma
 show_downloads: false
 
 # Build settings
-theme: jekyll-theme-minimal
+theme: pages-themes/cayman@v0.2.0
 
 # Navigation
 nav:
   - text: Home
     url: /
-
   - text: About
     url: /about/about.html
 
 # Plugins
 plugins:
   - jekyll-feed
+  - jekyll-remote-theme
 
 # Exclude files and folders from the build
 exclude:
