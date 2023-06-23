@@ -12,7 +12,7 @@ nav:
     url: /
 
   - text: About
-    url: /about
+    url: /about.html
 
 # Plugins
 plugins:
