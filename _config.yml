@@ -1,4 +1,24 @@
-theme: jekyll-theme-minimal
+# Site settings
 title: Mountea Framework - Inventory & Equipment
 description: Welcome to the product page of the Inventory & Equipment plugin, made by Mountea Framework.
 show_downloads: false
+
+# Build settings
+theme: jekyll-theme-minimal
+
+# Navigation
+nav:
+  - text: Home
+    url: /
+
+  - text: About
+    url: /about-us
+
+# Plugins
+plugins:
+  - jekyll-feed
+
+# Exclude files and folders from the build
+exclude:
+  - Gemfile
+  - Gemfile.lock
