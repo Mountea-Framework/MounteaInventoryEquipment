@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "MounteaItemAdditionalData.h"
 #include "Helpers/MounteaInventoryHelpers.h"
+#include "Interfaces/MounteaInventoryEquipmentItem.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Setup/MounteaInventoryItemConfig.h"
 #include "MounteaInventoryItem.generated.h"
@@ -37,7 +38,7 @@ enum class EItemDataSource : uint8
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Object
  */
 UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UObject
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UObject, public IMounteaInventoryEquipmentItem
 {
 	GENERATED_BODY()
 
@@ -253,7 +254,13 @@ protected:
 public:
 
 	UFUNCTION(CallInEditor, BlueprintCallable, Category="3. Import")
-	void SetValidData();
+	virtual void SetValidData() override;
+
+	
+#if WITH_EDITOR
+	virtual bool Modify(bool bAlwaysMarkDirty) override;
+#endif
+	
 };
 
 #undef LOCTEXT_NAMESPACE

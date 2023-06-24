@@ -21,7 +21,7 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"KismetCompiler",
 
 				"UnrealEd",
-				"AssetTools"
+				"AssetTools",
 			}
 		);
 		
@@ -52,7 +52,8 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"BlueprintGraph",
 				"InputCore", 
 				
-				"MainFrame"
+				"MainFrame",
+				"ContentBrowser"
 			}
 		);
  

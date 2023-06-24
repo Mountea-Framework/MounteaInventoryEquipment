@@ -171,16 +171,21 @@ void UMounteaInventoryItemBase::SetValidData()
 {
 	switch (ItemDataSource)
 	{
-	case EItemDataSource::EIDS_SourceTable:
-		ClearMappedValues();
-		CopyFromTable();
-		break;
-	case EItemDataSource::EIDS_ManualInput:
-		ClearDataTable();
-		break;
-	case EItemDataSource::Default:
-	default: break;
+		case EItemDataSource::EIDS_SourceTable:
+			ClearMappedValues();
+			CopyFromTable();
+			break;
+		case EItemDataSource::EIDS_ManualInput:
+			ClearDataTable();
+			break;
+		case EItemDataSource::Default:
+		default: break;
 	}
+}
+
+bool UMounteaInventoryItemBase::Modify(bool bAlwaysMarkDirty)
+{
+	return UObject::Modify(bAlwaysMarkDirty);
 }
 
 void UMounteaInventoryItemBase::ClearMappedValues()

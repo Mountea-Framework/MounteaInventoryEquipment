@@ -1,6 +1,7 @@
 #include "MounteaInventoryEquipmentEditor.h"
 
 #include "AssetToolsModule.h"
+#include "ContentBrowserMenuContexts.h"
 #include "HttpModule.h"
 #include "ToolMenuMisc.h"
 #include "ToolMenus.h"
@@ -212,6 +213,11 @@ void FMounteaInventoryEquipmentEditor::RegisterMenus()
 			}
 		}
 
+	}
+
+	// Item Menus
+	{
+		FAssetActionExtender_MounteaInventoryItem::RegisterMenus();
 	}
 }
 
