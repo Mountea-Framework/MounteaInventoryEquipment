@@ -37,8 +37,8 @@ enum class EItemDataSource : uint8
  * 
  * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Object
  */
-UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UObject, public IMounteaInventoryEquipmentItem
+UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UDataAsset, public IMounteaInventoryEquipmentItem
 {
 	GENERATED_BODY()
 
@@ -139,12 +139,18 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
 	bool IsValid(UObject* WorldContextObject) const;
 	
-	UFUNCTION(BlueprintGetter, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item")
 	FGuid GetItemGuid() const
 	{ return ItemGuid; };
 
+	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
 	void AddQuantity(const int32 Amount);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
 	void SetQuantity(const int32 NewQuantity);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item")
+	int32 GetQuantity() const;
 	
 	virtual FItemGenericEvent& GetItemAddedHandle()
 	{ return OnItemAdded; };

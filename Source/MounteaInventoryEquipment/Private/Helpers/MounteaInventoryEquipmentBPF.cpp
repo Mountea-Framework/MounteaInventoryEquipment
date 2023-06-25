@@ -40,7 +40,7 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 		{
 			return 1;
 		}
-	
+		
 		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
 		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
 

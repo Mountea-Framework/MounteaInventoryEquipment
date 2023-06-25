@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "Helpers/FMounteaTemplatesLibrary.h"
+#include "Helpers/MounteaInventoryEquipmentBPF.h"
 
 UMounteaInventoryItemBase::UMounteaInventoryItemBase()
 {
@@ -17,14 +18,29 @@ void UMounteaInventoryItemBase::PostInitProperties()
 {
 	UObject::PostInitProperties();
 
-	OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
-	OnItemInitialized.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemInitialized);
-	OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
-	OnItemRemoved.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemRemoved);
+	bool bIsEditorNoPlay = false;
+#if WITH_EDITOR
+	bIsEditorNoPlay = UMounteaInventoryEquipmentBPF::IsEditorNoPlay();
+#endif
+	
+	if (bIsEditorNoPlay)
+	{
+		if (ItemDataSource == EItemDataSource::EIDS_SourceTable && SourceTable == nullptr)
+		{
+			SourceTable = UMounteaInventoryEquipmentBPF::GetDefaultItemsTable();
+		}
+	}
+	else
+	{
+		OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
+		OnItemInitialized.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemInitialized);
+		OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
+		OnItemRemoved.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemRemoved);
+		
+		SetValidData();
 
-	SetValidData();
-
-	OnItemBeginPlay(TEXT("Item has been initialized"));
+		OnItemBeginPlay(TEXT("Item has been initialized"));
+	}
 }
 
 bool UMounteaInventoryItemBase::IsValid(UObject* WorldContextObject) const
@@ -53,6 +69,11 @@ void UMounteaInventoryItemBase::SetQuantity(const int32 NewQuantity)
 	ItemData.ItemQuantity.CurrentQuantity = FMath::Min(ItemData.ItemQuantity.MaxQuantity, NewQuantity);
 
 	OnItemModified.Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::ItemNotifications::ItemUpdated);
+}
+
+int32 UMounteaInventoryItemBase::GetQuantity() const
+{
+	return ItemData.ItemQuantity.CurrentQuantity;
 }
 
 void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)

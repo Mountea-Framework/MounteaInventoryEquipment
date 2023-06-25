@@ -25,6 +25,8 @@ UObject* UMounteaItemAssetFactory::FactoryCreateNew(UClass* Class, UObject* InPa
 		return nullptr;
 	}
 
+	return NewObject<UMounteaInventoryItemBase>(InParent, Class, Name, Flags, Context);
+	
 	// Create new Blueprint
 	auto CreatedBlueprint = FKismetEditorUtilities::CreateBlueprint(
 		ParentClass,
