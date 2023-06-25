@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Editor.h"
 #include "InputCore/Classes/InputCoreTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 
@@ -314,12 +315,32 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static bool IsEditor()
 	{
-		
 #if WITH_EDITOR
 		return true;
 #endif
 
 		return false;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsEditorNoPlay()
+	{
+		// This is to ensure we are not throwing InvalidWorld errors in Editor with no Gameplay.
+		bool bIsEditorCall = false;
+#if WITH_EDITOR
+		if (GEditor != nullptr)
+		{
+			bIsEditorCall = !GEditor->GetPlayInEditorSessionInfo().IsSet();
+		}
+#endif
+
+		return bIsEditorCall;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static UDataTable* GetDefaultItemsTable()
+	{
+		return GetSettings()->DefaultInventoryItemDefinitionsTable.LoadSynchronous();
 	}
 	 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))

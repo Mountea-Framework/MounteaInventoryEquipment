@@ -53,6 +53,10 @@ public class MounteaInventoryEquipment : ModuleRules
 			}
 			);
 		
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.Add("UnrealEd");
+		}
 		
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]

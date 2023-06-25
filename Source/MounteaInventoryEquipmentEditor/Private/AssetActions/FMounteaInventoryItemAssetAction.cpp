@@ -130,6 +130,7 @@ void FAssetActionExtender_MounteaInventoryItem::ExecuteRefreshItem(const FToolMe
 		return;
 	}
 
+	// TODO Find how to get from UBlueprint to execute its native functions
 	for (const TWeakObjectPtr<UObject>& Object : Context->SelectedObjects)
 	{
 		UMounteaInventoryItemBase* ItemBP = Cast<UMounteaInventoryItemBase>(Object);
