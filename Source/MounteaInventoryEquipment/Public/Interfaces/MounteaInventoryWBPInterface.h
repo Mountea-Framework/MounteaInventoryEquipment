@@ -13,7 +13,7 @@ class IMounteaInventoryInterface;
 struct FInventoryNotificationData;
 
 // This class does not need to be modified.
-UINTERFACE(BlueprintType, Blueprintable)
+UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventoryWBPInterface : public UInterface
 {
 	GENERATED_BODY()
