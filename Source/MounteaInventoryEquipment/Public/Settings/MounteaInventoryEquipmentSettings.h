@@ -77,6 +77,23 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
 	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
 
+	/**
+	 * The maximum number of threads used for parallel execution.
+	 * Increasing this value can improve performance in certain scenarios,
+	 * but using too many threads may introduce diminishing returns and
+	 * potential performance issues due to overhead and contention.
+	 *
+	 * ❗ Be cautious when adjusting this value. Setting it too high
+	 *     can lead to resource exhaustion and decreased performance.
+	 *
+	 * ❓ It is recommended to profile and experiment to find the optimal
+	 *     thread count for your specific workload and hardware setup.
+	 *
+	 * @see FPlatformMisc::NumberOfWorkerThreadsToSpawn
+	 */
+	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=1, ClampMin=1), AdvancedDisplay)
+	int32 ThreadsLimit = 4;
+	
 public:
 
 #if WITH_EDITOR

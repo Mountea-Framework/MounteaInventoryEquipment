@@ -89,7 +89,9 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 	{
 		FThreadSafeBool ItemFound(false);
 
-		const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), 4);
+		const int32 MinThreads = UMounteaInventoryEquipmentBPF::GetSettings()->ThreadsLimit;
+		const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), MinThreads);
+		
 		TArray<FRunnableThread*> Threads;
 
 		for (int32 ThreadIndex = 0; ThreadIndex < NumThreads; ++ThreadIndex)
@@ -120,7 +122,8 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 	{
 		TAtomic<UMounteaInventoryItemBase*> FoundItem(nullptr);
 
-		const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), 4);
+		const int32 MinThreads = UMounteaInventoryEquipmentBPF::GetSettings()->ThreadsLimit;
+		const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), MinThreads);
 		TArray<FRunnableThread*> Threads;
 
 		for (int32 ThreadIndex = 0; ThreadIndex < NumThreads; ++ThreadIndex)
