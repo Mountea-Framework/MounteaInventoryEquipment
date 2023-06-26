@@ -214,3 +214,23 @@ private:
 	const FItemRetrievalFilter& SearchFilter;
 	FThreadSafeBool& ItemFound;
 };
+
+class FItemGetRunnable : public FRunnable
+{
+public:
+	FItemGetRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TAtomic<UMounteaInventoryItemBase*>& InFoundItem)
+		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(false), FoundItem(InFoundItem)	{}
+
+	virtual bool Init() override { return true; }
+	virtual uint32 Run() override;
+	virtual void Stop() override {}
+
+	bool IsItemFound() const { return ItemFound; }
+	UMounteaInventoryItemBase* GetFoundItem() const { return FoundItem.Load(); }
+
+private:
+	const TArray<UMounteaInventoryItemBase*> Items;
+	const FItemRetrievalFilter& SearchFilter;
+	bool ItemFound;
+	TAtomic<UMounteaInventoryItemBase*>& FoundItem;
+};
