@@ -76,31 +76,42 @@ int32 UMounteaInventoryItemBase::GetQuantity() const
 	return ItemData.ItemQuantity.CurrentQuantity;
 }
 
-void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)
+void UMounteaInventoryItemBase::SetWorldFromLevel(ULevel* FromLevel)
 {
-	if (NewWorld != World)
+	if (FromLevel == nullptr)
 	{
-		World = NewWorld;
-
-		FString Message = TEXT("World updated for Item ");
-		Message.Append(GetName());
-		
-		OnItemModified.Broadcast(Message);
+		return;
+	}
+	
+	if (FromLevel->GetWorld() != World)
+	{
+		SetWorld(FromLevel->GetWorld());
 	}
 }
 
-void UMounteaInventoryItemBase::InitializeNewItem(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData)
+void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)
 {
 	World = NewWorld;
-	OwningInventory = NewOwningInventory;
-	ItemData = NewItemData;
-	ItemOptionalData = NewOptionalData;
+}
 
-	MarkDirtyForReplication();
+void UMounteaInventoryItemBase::InitializeNewItem(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory)
+{
+	if (NewOwningInventory.GetObject() == nullptr)
+	{
+		return;
+	}
 
-	FString Message = ItemData.ItemName.ToString();
-	Message.Append(": Initialization completed.");
-	OnItemInitialized.Broadcast(Message);
+	if (const AActor* InventoryOwner = NewOwningInventory->Execute_GetOwningActor(NewOwningInventory.GetObject()))
+	{
+		World = InventoryOwner->GetWorld();
+		OwningInventory = NewOwningInventory;
+	
+		MarkDirtyForReplication();
+
+		FString Message = ItemData.ItemName.ToString();
+		Message.Append(": Initialization completed.");
+		OnItemInitialized.Broadcast(Message);
+	}
 }
 
 void UMounteaInventoryItemBase::OnRep_Item()

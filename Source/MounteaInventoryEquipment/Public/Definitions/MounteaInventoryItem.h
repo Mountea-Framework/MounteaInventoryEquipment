@@ -183,10 +183,12 @@ public:
 	{ return OwningInventory; }
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
+	virtual void SetWorldFromLevel(ULevel* FromLevel);
+
 	virtual void SetWorld(UWorld* NewWorld);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
-	void InitializeNewItem(UWorld* NewWorld, TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory, const FMounteaInventoryItemRequiredData& NewItemData, const FMounteaInventoryItemOptionalData NewOptionalData);
+	void InitializeNewItem(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory);
 
 protected:
 

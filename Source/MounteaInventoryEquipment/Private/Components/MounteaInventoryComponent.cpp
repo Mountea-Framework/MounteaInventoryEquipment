@@ -87,52 +87,30 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 {
 	if (SearchFilter.IsValid())
 	{
-		// Search by Item
-		if (SearchFilter.bSearchByItem)
+		FThreadSafeBool ItemFound(false);
+
+		const int32 NumThreads = FPlatformMisc::NumberOfCoresIncludingHyperthreads();
+		TArray<FRunnableThread*> Threads;
+
+		for (int32 ThreadIndex = 0; ThreadIndex < NumThreads; ++ThreadIndex)
 		{
-			if (Items.Contains(SearchFilter.Item))
+			FItemSearchRunnable* SearchRunnable = new FItemSearchRunnable(Items, SearchFilter, ItemFound);
+			FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemSearchThread"));
+			Threads.Add(Thread);
+		}
+
+		for (FRunnableThread* Thread : Threads)
+		{
+			if (Thread)
 			{
-				return true;
+				Thread->WaitForCompletion();
+				delete Thread;
 			}
 		}
 
-		// Search by Class
-		if (SearchFilter.bSearchByClass)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->IsA(SearchFilter.Class))
-				{
-					return true;
-				}
-			}
-		}
-
-		// Search by Tag
-		if (SearchFilter.bSearchByTag)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
-				{
-					return true;
-				}
-			}
-		}
-
-		// Search by GUID
-		if (SearchFilter.bSearchByGUID)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
-				{
-					return true;
-				}
-			}
-		}
+		return ItemFound;
 	}
-	
+
 	return false;
 }
 
@@ -269,7 +247,7 @@ bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMo
 	if (ItemClass == nullptr) return false;
 
 	UMounteaInventoryItemBase* NewItem = NewObject<UMounteaInventoryItemBase>(GetWorld(), ItemClass);
-	NewItem->SetWorld(GetWorld());
+	//NewItem->SetWorld(GetWorld());
 	
 	return TryAddItem(NewItem, Quantity);
 }
@@ -553,6 +531,8 @@ bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Ite
 		OnItemAdded.Broadcast(Item, ItemUpdatedResult);
 		ReplicatedItemsKey++;
 		OnRep_Items();
+
+		Item->InitializeNewItem(this);
 		
 		return true;
 	}
@@ -920,3 +900,57 @@ void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
 }
 
 #undef LOCTEXT_NAMESPACE
+
+uint32 FItemSearchRunnable::Run()
+{
+	// Search by Item
+	if (SearchFilter.bSearchByItem)
+	{
+		if (Items.Contains(SearchFilter.Item))
+		{
+			ItemFound = true;
+			return 1;
+		}
+	}
+
+	// Search by Class
+	if (SearchFilter.bSearchByClass)
+	{
+		for (const auto& Itr : Items)
+		{
+			if (Itr && Itr->IsA(SearchFilter.Class))
+			{
+				ItemFound = true;
+				return 1;
+			}
+		}
+	}
+
+	// Search by Tag
+	if (SearchFilter.bSearchByTag)
+	{
+		for (const auto& Itr : Items)
+		{
+			if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+			{
+				ItemFound = true;
+				return 1;
+			}
+		}
+	}
+
+	// Search by GUID
+	if (SearchFilter.bSearchByGUID)
+	{
+		for (const auto& Itr : Items)
+		{
+			if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
+			{
+				ItemFound = true;
+				return 1;
+			}
+		}
+	}
+
+	return 0;
+}
