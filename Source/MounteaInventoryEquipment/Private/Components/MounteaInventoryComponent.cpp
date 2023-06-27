@@ -6,9 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
+
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Interfaces/MounteaInventoryWBPInterface.h"
+
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
@@ -85,20 +87,146 @@ void UMounteaInventoryComponent::SaveInventory_Implementation()
 
 bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
 {
+	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_HasItem );
+
 	if (SearchFilter.IsValid())
 	{
-		FThreadSafeBool ItemFound(false);
+		if (UMounteaInventoryEquipmentBPF::GetSettings()->MultithreadingThreshold < Items.Num())
+		{
+			return HasItem_Multithreading(SearchFilter);
+		}
+		else
+		{
+			return HasItem_Simple(SearchFilter);
+		}
+	}
 
+	return false;
+}
+
+bool UMounteaInventoryComponent::HasItem_Simple(const FItemRetrievalFilter& SearchFilter) const
+{
+	if (SearchFilter.IsValid())
+	{
+		// Search by Item
+		if (SearchFilter.bSearchByItem)
+		{
+			if (Items.Contains(SearchFilter.Item))
+			{
+				return true;
+			}
+		}
+
+		// Search by Class
+		if (SearchFilter.bSearchByClass)
+		{
+			for (const auto& Itr : Items)
+			{
+				if (Itr && Itr->IsA(SearchFilter.Class))
+				{
+					return true;
+				}
+			}
+		}
+
+		// Search by Tag
+		if (SearchFilter.bSearchByTag)
+		{
+			for (const auto& Itr : Items)
+			{
+				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+				{
+					return true;
+				}
+			}
+		}
+
+		// Search by GUID
+		if (SearchFilter.bSearchByGUID)
+		{
+			for (const auto& Itr : Items)
+			{
+				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	return false;
+}
+
+bool UMounteaInventoryComponent::HasItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const
+{
+	if (SearchFilter.IsValid())
+	{
+		int32 ThreadsPerFilter = UMounteaInventoryEquipmentBPF::GetValidFiltersCount(SearchFilter);
 		const int32 MinThreads = UMounteaInventoryEquipmentBPF::GetSettings()->ThreadsLimit;
 		const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), MinThreads);
-		
-		TArray<FRunnableThread*> Threads;
 
-		for (int32 ThreadIndex = 0; ThreadIndex < NumThreads; ++ThreadIndex)
+		ThreadsPerFilter = FMath::Max( NumThreads/ThreadsPerFilter, 1);
+			
+		TArray<FRunnableThread*> Threads;
+		TAtomic<bool> ItemFound(false);
+
+		if (SearchFilter.bSearchByClass)
 		{
-			FItemSearchRunnable* SearchRunnable = new FItemSearchRunnable(Items, SearchFilter, ItemFound);
-			FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemSearchThread"));
-			Threads.Add(Thread);
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByTag = false;
+			SpecificFilter.bSearchByGUID = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemSearchRunnable* SearchRunnable = new FItemSearchRunnable(Items, SpecificFilter, ItemFound);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("HasItemRunnable_ClassSearch"));
+				Threads.Add(Thread);
+			}
+		}
+		if (SearchFilter.bSearchByItem)
+		{
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByTag = false;
+			SpecificFilter.bSearchByGUID = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemSearchRunnable* SearchRunnable = new FItemSearchRunnable(Items, SpecificFilter, ItemFound);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("HasItemRunnable_ItemSearch"));
+				Threads.Add(Thread);
+			}
+		}
+		if (SearchFilter.bSearchByTag)
+		{
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByGUID = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemSearchRunnable* SearchRunnable = new FItemSearchRunnable(Items, SpecificFilter, ItemFound);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("HasItemRunnable_TagSearch"));
+				Threads.Add(Thread);
+			}
+		}
+		if (SearchFilter.bSearchByGUID)
+		{
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByTag = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemSearchRunnable* SearchRunnable = new FItemSearchRunnable(Items, SpecificFilter, ItemFound);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("HasItemRunnable_GUIDSearch"));
+				Threads.Add(Thread);
+			}
 		}
 
 		for (FRunnableThread* Thread : Threads)
@@ -110,27 +238,152 @@ bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilt
 			}
 		}
 
-		return ItemFound;
+		return ItemFound.Load();
 	}
-
+	
 	return false;
 }
 
 UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
 {
+	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_FindItem );
+	
 	if (SearchFilter.IsValid())
 	{
-		TAtomic<UMounteaInventoryItemBase*> FoundItem(nullptr);
+		if (UMounteaInventoryEquipmentBPF::GetSettings()->MultithreadingThreshold < Items.Num())
+		{
+			return FindItem_Multithreading(SearchFilter);
+		}
+		else
+		{
+			return FindItem_Simple(SearchFilter);
+		}
+	}
 
+	return nullptr;
+}
+
+UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Simple(const FItemRetrievalFilter& SearchFilter) const
+{
+	if (SearchFilter.IsValid())
+	{
+		// Search by Item
+		if (SearchFilter.bSearchByItem)
+		{
+			if (Items.Contains(SearchFilter.Item))
+			{
+				return SearchFilter.Item;
+			}
+		}
+
+		// Search by Class
+		if (SearchFilter.bSearchByClass)
+		{
+			for (const auto& Itr : Items)
+			{
+				if (Itr && Itr->IsA(SearchFilter.Class))
+				{
+					return Itr;
+				}
+			}
+		}
+
+		// Search by Tag
+		if (SearchFilter.bSearchByTag)
+		{
+			for (const auto& Itr : Items)
+			{
+				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+				{
+					return Itr;
+				}
+			}
+		}
+
+		// Search by GUID
+		if (SearchFilter.bSearchByGUID)
+		{
+			for (const auto& Itr : Items)
+			{
+				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
+				{
+					return Itr;
+				}
+			}
+		}		
+	}
+
+	return nullptr;
+}
+
+UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const
+{
+	if (SearchFilter.IsValid())
+	{
+		int32 ThreadsPerFilter = UMounteaInventoryEquipmentBPF::GetValidFiltersCount(SearchFilter);
 		const int32 MinThreads = UMounteaInventoryEquipmentBPF::GetSettings()->ThreadsLimit;
 		const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), MinThreads);
-		TArray<FRunnableThread*> Threads;
 
-		for (int32 ThreadIndex = 0; ThreadIndex < NumThreads; ++ThreadIndex)
+		ThreadsPerFilter = FMath::Max( NumThreads/ThreadsPerFilter, 1);
+			
+		TArray<FRunnableThread*> Threads;
+		TAtomic<UMounteaInventoryItemBase*> FoundItem(nullptr);
+
+		if (SearchFilter.bSearchByClass)
 		{
-			FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SearchFilter, FoundItem);
-			FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable"));
-			Threads.Add(Thread);
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByTag = false;
+			SpecificFilter.bSearchByGUID = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_ClassSearch"));
+				Threads.Add(Thread);
+			}
+		}
+		if (SearchFilter.bSearchByItem)
+		{
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByTag = false;
+			SpecificFilter.bSearchByGUID = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_ItemSearch"));
+				Threads.Add(Thread);
+			}
+		}
+		if (SearchFilter.bSearchByTag)
+		{
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByGUID = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_TagSearch"));
+				Threads.Add(Thread);
+			}
+		}
+		if (SearchFilter.bSearchByGUID)
+		{
+			FItemRetrievalFilter SpecificFilter = SearchFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByTag = false;
+
+			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			{
+				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
+				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_GUIDSearch"));
+				Threads.Add(Thread);
+			}
 		}
 
 		for (FRunnableThread* Thread : Threads)
@@ -148,59 +401,169 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(c
 	return nullptr;
 }
 
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Simple(const FItemRetrievalFilter OptionalFilter) const
 {
 	if (OptionalFilter.IsValid())
 	{
-		TArray<UMounteaInventoryItemBase*> ReturnValues;
-
-		//Filter by Item
+		TArray<UMounteaInventoryItemBase*> FoundItems;
+			
+		// Search by Item
 		if (OptionalFilter.bSearchByItem)
 		{
-			if (Items.Contains(OptionalFilter.Item))
+			for (const auto& Item : Items)
 			{
-				ReturnValues.Add(Items[Items.Find(OptionalFilter.Item)]);
+				if (Item == OptionalFilter.Item)
+				{
+					FoundItems.Add(Item);
+				}
 			}
 		}
-		
-		//Filter by Class
+
+		// Search by Class
 		if (OptionalFilter.bSearchByClass)
 		{
-			for (auto Itr : Items)
+			for (const auto& Item : Items)
 			{
-				if (Itr && Itr->IsA(OptionalFilter.Class))
+				if (Item && Item->IsA(OptionalFilter.Class))
 				{
-					ReturnValues.Add(Itr);
+					FoundItems.Add(Item);
 				}
 			}
 		}
 
-		//Filter by Tag
+		// Search by Tag
 		if (OptionalFilter.bSearchByTag)
 		{
-			for (auto Itr : Items)
+			for (const auto& Item : Items)
 			{
-				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(OptionalFilter.Tags))
+				if (Item && Item->ItemData.CompatibleGameplayTags.HasAny(OptionalFilter.Tags))
 				{
-					ReturnValues.Add(Itr);
+					FoundItems.Add(Item);
 				}
 			}
 		}
 
-		//Filter by Guid
+		// Search by GUID
 		if (OptionalFilter.bSearchByGUID)
 		{
-			for (auto Itr : Items)
+			for (const auto& Item : Items)
 			{
-				if (Itr && Itr->GetItemGuid() == OptionalFilter.Guid)
+				if (Item && Item->GetItemGuid() == OptionalFilter.Guid)
 				{
-					ReturnValues.Add(Itr);
+					FoundItems.Add(Item);
 				}
 			}
 		}
-		return ReturnValues;
+
+		return FoundItems;
 	}
+
+	return Items;
+}
+
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Multithreading(const FItemRetrievalFilter OptionalFilter) const
+{
+	int32 ThreadsPerFilter = UMounteaInventoryEquipmentBPF::GetValidFiltersCount(OptionalFilter);
+	const int32 MinThreads = UMounteaInventoryEquipmentBPF::GetSettings()->ThreadsLimit;
+	const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), MinThreads);
+
+	ThreadsPerFilter = FMath::Max( NumThreads/ThreadsPerFilter, 1);
+			
+	TArray<FRunnableThread*> Threads;
+	TArray<UMounteaInventoryItemBase*> ReturnValues;
+
+	// Make runnable for each filter task. Each thread will iterate over only 1 filter.
+	if (OptionalFilter.bSearchByClass)
+	{
+		// Create and run the search runnables on separate threads
+		for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+		{
+			FItemRetrievalFilter SpecificFilter = OptionalFilter;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByTag = false;
+			SpecificFilter.bSearchByGUID = false;
+					
+			FItemsGetRunnable* SearchRunnable = new FItemsGetRunnable(Items, SpecificFilter, ReturnValues);
+			FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemsGetRunnable_ClassSearch"), 0, TPri_BelowNormal);
+			Threads.Add(Thread);
+		}
+	}
+	if (OptionalFilter.bSearchByItem)
+	{
+		// Create and run the search runnables on separate threads
+		for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+		{
+			FItemRetrievalFilter SpecificFilter = OptionalFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByTag = false;
+			SpecificFilter.bSearchByGUID = false;
+					
+			FItemsGetRunnable* SearchRunnable = new FItemsGetRunnable(Items, SpecificFilter, ReturnValues);
+			FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemsGetRunnable_ItemSearch"), 0, TPri_BelowNormal);
+			Threads.Add(Thread);
+		}
+	}
+	if (OptionalFilter.bSearchByTag)
+	{
+		// Create and run the search runnables on separate threads
+		for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+		{
+			FItemRetrievalFilter SpecificFilter = OptionalFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByGUID = false;
+					
+			FItemsGetRunnable* SearchRunnable = new FItemsGetRunnable(Items, SpecificFilter, ReturnValues);
+			FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemsGetRunnable_TagSearch"), 0, TPri_BelowNormal);
+			Threads.Add(Thread);
+		}
+	}
+	if (OptionalFilter.bSearchByGUID)
+	{
+		// Create and run the search runnables on separate threads
+		for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+		{
+			FItemRetrievalFilter SpecificFilter = OptionalFilter;
+			SpecificFilter.bSearchByClass = false;
+			SpecificFilter.bSearchByItem = false;
+			SpecificFilter.bSearchByTag = false;
+					
+			FItemsGetRunnable* SearchRunnable = new FItemsGetRunnable(Items, SpecificFilter, ReturnValues);
+			FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemsGetRunnable_GUIDSearch"), 0, TPri_Lowest);
+			Threads.Add(Thread);
+		}
+	}
+
+	// Wait for the threads to complete
+	for (FRunnableThread* Thread : Threads)
+	{
+		if (Thread)
+		{
+			Thread->WaitForCompletion();
+			delete Thread;
+		}
+	}
+
+	// Collect the found items from the atomic variables
+	return ReturnValues;
+}
+
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const
+{
+	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_GetItems );
 	
+	if (OptionalFilter.IsValid())
+	{
+		if (UMounteaInventoryEquipmentBPF::GetSettings()->MultithreadingThreshold < Items.Num())
+		{
+			return GetItems_Multithreading(OptionalFilter);
+		}
+		else
+		{
+			return GetItems_Simple(OptionalFilter);
+		}
+	}
+
 	return Items;
 }
 
@@ -992,4 +1355,61 @@ uint32 FItemGetRunnable::Run()
 	}
 
 	return 0;
+}
+
+uint32 FItemsGetRunnable::Run()
+{
+	// Search by Item
+	if (SearchFilter.bSearchByItem)
+	{
+		for (const auto& Item : Items)
+		{
+			if (Item == SearchFilter.Item)
+			{
+				FoundItems.Add(Item);
+				ItemFound = true;
+			}
+		}
+	}
+
+	// Search by Class
+	if (SearchFilter.bSearchByClass)
+	{
+		for (const auto& Item : Items)
+		{
+			if (Item && Item->IsA(SearchFilter.Class))
+			{
+				FoundItems.Add(Item);
+				ItemFound = true;
+			}
+		}
+	}
+
+	// Search by Tag
+	if (SearchFilter.bSearchByTag)
+	{
+		for (const auto& Item : Items)
+		{
+			if (Item && Item->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+			{
+				FoundItems.Add(Item);
+				ItemFound = true;
+			}
+		}
+	}
+
+	// Search by GUID
+	if (SearchFilter.bSearchByGUID)
+	{
+		for (const auto& Item : Items)
+		{
+			if (Item && Item->GetItemGuid() == SearchFilter.Guid)
+			{
+				FoundItems.Add(Item);
+				ItemFound = true;
+			}
+		}
+	}
+
+	return ItemFound ? 1 : 0;
 }

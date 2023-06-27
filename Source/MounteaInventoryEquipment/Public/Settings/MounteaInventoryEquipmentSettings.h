@@ -66,11 +66,11 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> ItemTooltipWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. Notifications")
-	int32 MinDisplayWeight = 1;
-
 	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
 	TArray<FKey> DragKeys;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
+	int32 MinDisplayWeight = 1;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
 	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
@@ -92,7 +92,16 @@ public:
 	 * @see FPlatformMisc::NumberOfWorkerThreadsToSpawn
 	 */
 	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=1, ClampMin=1), AdvancedDisplay)
-	int32 ThreadsLimit = 4;
+	int32 ThreadsLimit = 2;
+	
+	/**
+	* The MultithreadingThreshold variable determines the minimum number of items required in the inventory to enable multithreading.
+	* When the number of items in the inventory is below this threshold, multithreading will be disabled.
+	* ❗ Warning: Modifying this value without proper knowledge may affect performance and stability.
+	* ❓ Note: The value should be set to a reasonable number based on the expected size of the inventory.
+	*/
+	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=100, ClampMin=100), AdvancedDisplay)
+	int32 MultithreadingThreshold = 1000;
 	
 public:
 

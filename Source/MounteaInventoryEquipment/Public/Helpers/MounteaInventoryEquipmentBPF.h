@@ -372,5 +372,17 @@ public:
 	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 
 	static bool AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
+
+	static int32 GetValidFiltersCount(const FItemRetrievalFilter& Filter)
+	{
+		int32 Result = 0;
+
+		if (Filter.bSearchByClass) Result++;
+		if (Filter.bSearchByItem) Result++;
+		if (Filter.bSearchByTag) Result++;
+		if (Filter.bSearchByGUID) Result++;
+
+		return Result;
+	}
 };
 

@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/MounteaInventoryInterface.h"
+
 #include "MounteaInventoryComponent.generated.h"
+
 
 class UMounteaInventoryItemBase;
 
@@ -141,6 +143,13 @@ private:
 	
 	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
 	void RequestItemNotification(const FItemUpdateResult& UpdateContext) const;
+
+	bool HasItem_Simple(const FItemRetrievalFilter& SearchFilter) const;
+	bool HasItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const; 
+	UMounteaInventoryItemBase* FindItem_Simple(const FItemRetrievalFilter& SearchFilter) const;
+	UMounteaInventoryItemBase* FindItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const;
+	TArray<UMounteaInventoryItemBase*> GetItems_Simple(const FItemRetrievalFilter OptionalFilter) const;
+	TArray<UMounteaInventoryItemBase*> GetItems_Multithreading(const FItemRetrievalFilter OptionalFilter) const;
 	
 #pragma endregion
 
@@ -202,7 +211,7 @@ private:
 class FItemSearchRunnable : public FRunnable
 {
 public:
-	FItemSearchRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, FThreadSafeBool& InItemFound)
+	FItemSearchRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TAtomic<bool>& InItemFound)
 		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(InItemFound) {}
 
 	virtual bool Init() override { return true; }
@@ -212,14 +221,14 @@ public:
 private:
 	const TArray<UMounteaInventoryItemBase*>& Items;
 	const FItemRetrievalFilter& SearchFilter;
-	FThreadSafeBool& ItemFound;
+	TAtomic<bool>& ItemFound;
 };
 
 class FItemGetRunnable : public FRunnable
 {
 public:
 	FItemGetRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TAtomic<UMounteaInventoryItemBase*>& InFoundItem)
-		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(false), FoundItem(InFoundItem)	{}
+		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(false), FoundItem(InFoundItem) {}
 
 	virtual bool Init() override { return true; }
 	virtual uint32 Run() override;
@@ -234,3 +243,25 @@ private:
 	bool ItemFound;
 	TAtomic<UMounteaInventoryItemBase*>& FoundItem;
 };
+
+class FItemsGetRunnable : public FRunnable
+{
+public:
+	FItemsGetRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TArray<UMounteaInventoryItemBase*>& InFoundItems)
+		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(false), FoundItems(InFoundItems) {}
+
+	virtual bool Init() override { return true; }
+	virtual uint32 Run() override;
+	virtual void Stop() override {}
+
+	bool IsItemFound() const { return ItemFound; }
+	TArray<UMounteaInventoryItemBase*>& GetFoundItems() const { return FoundItems; }
+
+private:
+	const TArray<UMounteaInventoryItemBase*>& Items;
+	const FItemRetrievalFilter& SearchFilter;
+	bool ItemFound;
+	TArray<UMounteaInventoryItemBase*>& FoundItems;
+};
+
+
