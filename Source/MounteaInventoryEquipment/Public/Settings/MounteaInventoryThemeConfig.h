@@ -37,7 +37,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Slot", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UMounteaBaseUserWidget> InventorySlotClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment", meta=(ShowOnlyInnerProperties, MustImplement="MounteaEquipmentWBPInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> EquipmentBaseClass;;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Title", meta=(ShowOnlyInnerProperties))
@@ -46,15 +46,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Background", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryBackgroundClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="MounteaInventoryItemWBPInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="MounteaTooltipWBPInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaTooltipWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemTooltipClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="MounteaDragDropWBPInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Item", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaDragDropWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryDragDropClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Category", meta=(ShowOnlyInnerProperties, MustImplement="MounteaCategoryWBPInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Category", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaCategoryWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryCategoryClass;
 };

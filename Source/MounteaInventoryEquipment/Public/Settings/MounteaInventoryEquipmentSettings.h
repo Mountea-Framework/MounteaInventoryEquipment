@@ -11,6 +11,7 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
+class UMounteaInventoryItemsTable;
 class UMounteaInventoryItemConfig;
 class UMounteaTransactionPayload;
 struct FItemUpdateResult;
@@ -27,14 +28,17 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public 
 
 public:
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required")
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
-
-	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="MounteaInventoryWBPInterface"))
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
+	
+	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface", AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryWidgetClass;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required")
-	TSoftObjectPtr<UDataTable> DefaultInventoryItemDefinitionsTable;
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSoftObjectPtr<UMounteaInventoryItemsTable> DefaultInventoryItemDefinitionsTable;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;
@@ -42,8 +46,7 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
+	
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;

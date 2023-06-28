@@ -40,7 +40,7 @@ const TArray<FText>& FMounteaInventoryItemConfigAssetAction::GetSubMenus() const
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		LOCTEXT("MounteaInventoryEquipment_Sub02", "2. Configuration")
+		AdvancedMenuSubCategoryName_01
 	};
 	return AssetTypeActionSubMenu;
 }

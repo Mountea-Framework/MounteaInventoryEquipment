@@ -16,7 +16,7 @@ UMounteaItemAdditionalData::UMounteaItemAdditionalData()
 	}
 }
 
-FMounteaItemDescription* UMounteaItemAdditionalData::GetRowData(const UDataTable* FromTable, const FName FromRow)
+FMounteaItemDescription* UMounteaItemAdditionalData::GetRowData(const UMounteaInventoryItemsDescriptionsTable* FromTable, const FName FromRow)
 {
 	if (!FromTable) return nullptr;
 	

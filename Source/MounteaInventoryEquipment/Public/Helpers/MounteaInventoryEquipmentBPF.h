@@ -338,7 +338,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static UDataTable* GetDefaultItemsTable()
+	static UMounteaInventoryItemsTable* GetDefaultItemsTable()
 	{
 		return GetSettings()->DefaultInventoryItemDefinitionsTable.LoadSynchronous();
 	}

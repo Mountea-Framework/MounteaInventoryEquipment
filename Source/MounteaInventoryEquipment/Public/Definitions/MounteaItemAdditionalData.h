@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventoryTableTypes.h"
 #include "Engine/DataAsset.h"
 
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
 
 #include "MounteaItemAdditionalData.generated.h"
+
 
 #define LOCTEXT_NAMESPACE "MounteaItemAdditionalData"
 
@@ -25,7 +27,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaItemAdditionalData : public UDataAss
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Long Description", meta=(DisplayThumbnail=false, DisplayName="Long Description (Source)"))
-	UDataTable* SourceTable_LongDescription = nullptr;
+	UMounteaInventoryItemsDescriptionsTable* SourceTable_LongDescription = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Long Description", meta=(GetOptions="GetSourceTableRows_LongDescription", EditCondition="SourceTable_LongDescription!=nullptr", DisplayName="Long Description (Row)"))
 	FName SourceRow_LongDescription;
@@ -35,7 +37,7 @@ public:
 
 		
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(DisplayThumbnail=false, DisplayName="Short Description (Source)"))
-	UDataTable* SourceTable_ShortDescription = nullptr;
+	UMounteaInventoryItemsDescriptionsTable* SourceTable_ShortDescription = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(GetOptions="GetSourceTableRows_ShortDescription", EditCondition="SourceTable_ShortDescription!=nullptr", DisplayName="Short Description (Row)"))
 	FName SourceRow_ShortDescription;
@@ -49,7 +51,7 @@ public:
 
 private:
 	
-	static FMounteaItemDescription* GetRowData(const UDataTable* FromTable, FName FromRow);
+	static FMounteaItemDescription* GetRowData(const UMounteaInventoryItemsDescriptionsTable* FromTable, FName FromRow);
 
 	UFUNCTION()
 	TArray<FName> GetSourceTableRows_ShortDescription() const

@@ -42,7 +42,7 @@ const TArray<FText>& FMounteaInventoryTableAssetAction_Base::GetSubMenus() const
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		LOCTEXT("MounteaInventoryEquipment_Sub03", "3. Data")
+		AdvancedMenuSubCategoryName_02
 	};
 	return AssetTypeActionSubMenu;
 }

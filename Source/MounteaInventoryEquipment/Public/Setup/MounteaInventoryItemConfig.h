@@ -11,8 +11,8 @@
 /**
  *	Mountea Inventory Item Config
  *
- * Defines the visual representation of an item in the user interface.
- * It contains properties that determine the appearance of the item, such as its slot size, Item Actions, and other logical defaults.
+ * Hold additional properties for Mountea Dialogue Item.
+ * It can contain properties that determine the appearance of the item, such as its slot size, Item Actions, and other logical defaults.
  * These properties can be customized by designers and artists to create a consistent and appealing look for the game's inventory system.
  *
  * This class allows creating of Child classes with specified defaults or introducing new attributes per project needs.

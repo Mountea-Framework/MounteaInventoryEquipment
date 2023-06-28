@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventoryTableTypes.h"
 #include "MounteaItemAdditionalData.h"
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "Interfaces/MounteaInventoryEquipmentItem.h"
@@ -28,14 +29,17 @@ enum class EItemDataSource : uint8
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
 
 /**
- * Inventory Item Object.
- *
- * Abstract Base Class.
- * Serves sole purpose of being a base class for individual Items.
- *
- * Inventory contains a list of those Items.
+ * Inventory Item Data Asset
  * 
- * @see https://github.com/Mountea-Framework/ActorInventoryPlugin/wiki/Inventory-Item-Object
+ * Base class for inventory items,
+ *
+ * This class represents an item in the inventory system.
+ * It serves as a data asset base class and provides functionality for holding item data.
+ * Inventory items are used within an inventory and can be replicated.
+ *
+ * @see UDataAsset
+ * @see IMounteaInventoryEquipmentItem
+ * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Object
  */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UDataAsset, public IMounteaInventoryEquipmentItem
@@ -49,21 +53,21 @@ private:
 	virtual void PostInitProperties() override;
 
 public:
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Required", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
 	EItemDataSource ItemDataSource = EItemDataSource::EIDS_SourceTable;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Required", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable"))
+	UMounteaInventoryItemsTable* SourceTable;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable"))
+	FName SourceRow;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Required", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"), ReplicatedUsing=OnRep_Item)
 	FMounteaInventoryItemRequiredData ItemData;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable"))
-	UDataTable* SourceTable;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable"))
-	FName SourceRow;
 
 protected:
 	
@@ -81,8 +85,6 @@ protected:
 
 	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
 	FItemGenericEvent OnItemModified;
-
-	
 
 private:
 
@@ -261,13 +263,8 @@ protected:
 
 public:
 
-	UFUNCTION(CallInEditor, BlueprintCallable, Category="3. Import")
+	UFUNCTION(CallInEditor, BlueprintCallable, Category="1. Import")
 	virtual void SetValidData() override;
-
-	
-#if WITH_EDITOR
-	virtual bool Modify(bool bAlwaysMarkDirty) override;
-#endif
 	
 };
 

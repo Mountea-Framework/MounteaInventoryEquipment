@@ -20,7 +20,7 @@ public:
 	virtual UClass* GetSupportedClass() const override;
 	virtual uint32 GetCategories() override;
 
-	virtual const TArray<FText>& GetSubMenus() const override;
+	//virtual const TArray<FText>& GetSubMenus() const override;
 	
 	virtual bool HasActions ( const TArray<UObject*>& InObjects ) const override { return true; }
 	virtual void GetActions(const TArray<UObject*>& InObjects, FToolMenuSection& Section) override;

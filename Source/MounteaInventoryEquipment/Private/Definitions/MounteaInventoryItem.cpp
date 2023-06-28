@@ -215,11 +215,6 @@ void UMounteaInventoryItemBase::SetValidData()
 	}
 }
 
-bool UMounteaInventoryItemBase::Modify(bool bAlwaysMarkDirty)
-{
-	return UObject::Modify(bAlwaysMarkDirty);
-}
-
 void UMounteaInventoryItemBase::ClearMappedValues()
 {
 	ItemData = FMounteaInventoryItemRequiredData();

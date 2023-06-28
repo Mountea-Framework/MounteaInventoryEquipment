@@ -25,6 +25,11 @@ class UMounteaInventoryItemBase;
  *
  * This system is designed to be modular and extensible, allowing developers to easily add new features or modify existing ones to suit their specific requirements.
  * If current implementation is not what you are looking for, the `IMounteaInventoryInterface` comes with all functions exposed, allowing recreating the whole system in Blueprints.
+ *
+ * @see UActorComponent
+ * @see IMounteaInventoryInterface
+ * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Interface
+ * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Component
 */
 UCLASS(ClassGroup=(Mountea), Blueprintable, hideCategories=(Collision, AssetUserData, Cooking, ComponentTick, Activation), meta=(BlueprintSpawnableComponent, DisplayName = "Mountea Inventory"))
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryComponent : public UActorComponent, public IMounteaInventoryInterface

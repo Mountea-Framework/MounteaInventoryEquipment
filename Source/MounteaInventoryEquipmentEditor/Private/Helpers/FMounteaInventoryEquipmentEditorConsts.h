@@ -13,4 +13,11 @@ const FVector2D Icon200x70(200.f, 70.f);
 const FString ChangelogURL = FString("https://raw.githubusercontent.com/Mountea-Framework/MounteaInventoryEquipment/5.0/CHANGELOG.md");
 
 const FName AdvancedMenuCategoryName("MounteaInventoryEquipment");
+
+#define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentEditorConsts"
+
 const FText AdvancedMenuCategoryNameText = FText::FromString("Mountea Inventory & Equipment");
+const FText AdvancedMenuSubCategoryName_01 = LOCTEXT("AdvancedMenuSubCategoryName_01", "1. Configuration");
+const FText AdvancedMenuSubCategoryName_02 = LOCTEXT("AdvancedMenuSubCategoryName_02", "2. Data");
+
+#undef LOCTEXT_NAMESPACE

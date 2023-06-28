@@ -79,14 +79,16 @@ void FMounteaInventoryItemAssetAction::GetActions(const TArray<UObject*>& InObje
 		);
 }
 
+/*
 const TArray<FText>& FMounteaInventoryItemAssetAction::GetSubMenus() const
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		LOCTEXT("MounteaInventoryEquipment_Sub01", "1. Class Definitions")
+		LOCTEXT("MounteaInventoryEquipment_Sub01", "1. Inventory Item")
 	};
 	return AssetTypeActionSubMenu;
 }
+*/
 
 void FAssetActionExtender_MounteaInventoryItem::RegisterMenus()
 {
