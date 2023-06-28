@@ -32,7 +32,7 @@ bool UMounteaItemConfigAssetFactory::ConfigureProperties()
 
 	if ( bPressedOk )
 	{
-		SupportedClass = ChosenClass;
+		ParentClass = ChosenClass;
 	}
 
 	return bPressedOk;

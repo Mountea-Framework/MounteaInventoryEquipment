@@ -53,7 +53,8 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"InputCore", 
 				
 				"MainFrame",
-				"ContentBrowser"
+				"ContentBrowser", 
+				"DataTableEditor"
 			}
 		);
  

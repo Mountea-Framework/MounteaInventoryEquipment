@@ -34,7 +34,7 @@ bool UMounteaThemeAssetFactory::ConfigureProperties()
 
 	if ( bPressedOk )
 	{
-		SupportedClass = ChosenClass;
+		ParentClass = ChosenClass;
 	}
 
 	return bPressedOk;
