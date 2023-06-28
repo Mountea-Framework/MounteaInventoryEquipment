@@ -19,7 +19,7 @@ UMounteaItemConfigAssetFactory::UMounteaItemConfigAssetFactory()
 
 UObject* UMounteaItemConfigAssetFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
-	return NewObject<UMounteaInventoryItemConfig>(InParent, Class, Name, Flags, Context);
+	return NewObject<UMounteaInventoryItemConfig>(InParent, ParentClass, Name, Flags, Context);
 }
 
 

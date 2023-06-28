@@ -25,28 +25,7 @@ UObject* UMounteaItemAssetFactory::FactoryCreateNew(UClass* Class, UObject* InPa
 		return nullptr;
 	}
 
-	return NewObject<UMounteaInventoryItemBase>(InParent, Class, Name, Flags, Context);
-	
-	// Create new Blueprint
-	auto CreatedBlueprint = FKismetEditorUtilities::CreateBlueprint(
-		ParentClass,
-		InParent,
-		Name,
-		BPTYPE_Normal,
-		UBlueprint::StaticClass(),
-		UBlueprintGeneratedClass::StaticClass(),
-		NAME_None
-	);
-
-	CreatedBlueprint->HideCategories.Add("Hidden");
-	CreatedBlueprint->HideCategories.Add("Private");
-	CreatedBlueprint->HideCategories.Add("Base");
-	CreatedBlueprint->HideCategories.Add("Hide");
-	CreatedBlueprint->HideCategories.Add("Editor");
-
-	CreatedBlueprint->BlueprintCategory = FString(TEXT("Mountea Inventory & Equipment"));
-
-	return CreatedBlueprint;
+	return NewObject<UMounteaInventoryItemBase>(InParent, ParentClass, Name, Flags, Context);
 }
 
 bool UMounteaItemAssetFactory::ConfigureProperties()

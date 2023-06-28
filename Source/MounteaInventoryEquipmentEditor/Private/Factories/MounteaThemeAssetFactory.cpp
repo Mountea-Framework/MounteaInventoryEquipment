@@ -21,7 +21,7 @@ UMounteaThemeAssetFactory::UMounteaThemeAssetFactory()
 
 UObject* UMounteaThemeAssetFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
-	return NewObject<UMounteaInventoryThemeConfig>(InParent, Class, Name, Flags, Context);
+	return NewObject<UMounteaInventoryThemeConfig>(InParent, ParentClass, Name, Flags, Context);
 }
 
 
