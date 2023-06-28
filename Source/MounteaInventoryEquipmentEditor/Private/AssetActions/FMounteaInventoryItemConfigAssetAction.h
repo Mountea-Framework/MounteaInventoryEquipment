@@ -20,9 +20,6 @@ public:
 
 	virtual const TArray<FText>& GetSubMenus() const override;
 
-	virtual bool CanFilter() override
-	{ return false; };
-	
 	virtual void BuildBackendFilter(FARFilter& InFilter) override
 	{
 		FilterAddNativeParentClassPath(InFilter, GetSupportedClass());
@@ -39,7 +36,6 @@ public:
 		InFilter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
 		InFilter.bRecursiveClasses = true;
 	};
-	
 	static void FilterAddNativeParentClassPath(FARFilter& InFilter, const UClass* Class)
 	{
 		if (Class == nullptr)

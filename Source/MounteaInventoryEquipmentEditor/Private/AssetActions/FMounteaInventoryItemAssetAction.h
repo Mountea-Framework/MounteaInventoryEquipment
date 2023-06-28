@@ -19,11 +19,11 @@ public:
 	virtual FColor GetTypeColor() const override;
 	virtual UClass* GetSupportedClass() const override;
 	virtual uint32 GetCategories() override;
+
+	virtual const TArray<FText>& GetSubMenus() const override;
+	
 	virtual bool HasActions ( const TArray<UObject*>& InObjects ) const override { return true; }
 	virtual void GetActions(const TArray<UObject*>& InObjects, FToolMenuSection& Section) override;
-	virtual bool CanFilter() override	{ return false; };
-	
-	virtual const TArray<FText>& GetSubMenus() const override;
 	
 	virtual void BuildBackendFilter(FARFilter& InFilter) override
 	{

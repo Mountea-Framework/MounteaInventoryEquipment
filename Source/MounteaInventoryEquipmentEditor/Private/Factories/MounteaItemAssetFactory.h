@@ -18,6 +18,7 @@ class MOUNTEAINVENTORYEQUIPMENTEDITOR_API UMounteaItemAssetFactory : public UFac
 public:
 
 	UMounteaItemAssetFactory();
+	
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 	virtual bool ConfigureProperties() override;
 

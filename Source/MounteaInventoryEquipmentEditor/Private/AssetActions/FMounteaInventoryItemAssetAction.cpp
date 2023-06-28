@@ -12,7 +12,9 @@
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemAssetAction"
 
 FMounteaInventoryItemAssetAction::FMounteaInventoryItemAssetAction()
-{}
+{
+	
+}
 
 FText FMounteaInventoryItemAssetAction::GetName() const
 {

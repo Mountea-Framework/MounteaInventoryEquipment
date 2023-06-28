@@ -3,10 +3,8 @@
 
 #include "Factories/MounteaItemConfigAssetFactory.h"
 
-#include "Kismet2/KismetEditorUtilities.h"
 #include "Setup/MounteaInventoryItemConfig.h"
 #include "Utils/MounteaInventoryEquipmentEditorUtilities.h"
-
 
 UMounteaItemConfigAssetFactory::UMounteaItemConfigAssetFactory()
 {

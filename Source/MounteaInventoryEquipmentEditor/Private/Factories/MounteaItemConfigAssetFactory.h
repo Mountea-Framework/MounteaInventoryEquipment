@@ -7,6 +7,7 @@
 #include "MounteaItemConfigAssetFactory.generated.h"
 
 class UMounteaInventoryItemConfig;
+
 /**
  * 
  */
