@@ -18,7 +18,7 @@ class FMounteaInventoryEquipmentEditor : public IModuleInterface
 	/* Called when the module is unloaded */
 	virtual void ShutdownModule() override;
 	
-	void RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action);
+	void RegisterAssetTypeAction(IAssetTools& AssetTools, const TSharedRef<IAssetTypeActions>& Action);
 	
 	void OnGetResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 	UFUNCTION() void SendHTTPGet();

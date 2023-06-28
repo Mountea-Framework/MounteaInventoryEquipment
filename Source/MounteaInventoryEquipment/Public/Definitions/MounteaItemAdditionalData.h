@@ -12,18 +12,6 @@
 
 #define LOCTEXT_NAMESPACE "MounteaItemAdditionalData"
 
-USTRUCT(BlueprintType)
-struct FMounteaItemDescription : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(MultiLine=true))
-	FText ItemShortDescription;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(MultiLine=true))
-	FText ItemLongDescription;
-};
-
 /**
  * 
  */

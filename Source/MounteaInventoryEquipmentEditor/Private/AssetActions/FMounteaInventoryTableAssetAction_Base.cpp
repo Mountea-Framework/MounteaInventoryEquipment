@@ -1,34 +1,34 @@
 ﻿// All rights reserved Dominik Pavlicek 2023.
 
-#include "FMounteaInventoryItemsTableAssetAction.h"
+#include "FMounteaInventoryTableAssetAction_Base.h"
 
 #include "ContentBrowserMenuContexts.h"
 #include "DataTableEditorModule.h"
-#include "Definitions/MounteaInventoryItemsTable.h"
+#include "Definitions/MounteaInventoryTableTypes.h"
 #include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
 
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemsTableAssetAction"
 
-FMounteaInventoryItemsTableAssetAction::FMounteaInventoryItemsTableAssetAction()
+FMounteaInventoryTableAssetAction_Base::FMounteaInventoryTableAssetAction_Base()
 {}
 
-FText FMounteaInventoryItemsTableAssetAction::GetName() const
+FText FMounteaInventoryTableAssetAction_Base::GetName() const
 {
 	return LOCTEXT("MounteaInventoryItemsTableAssetAction_Name", "Items Data Table");
 }
 
-FColor FMounteaInventoryItemsTableAssetAction::GetTypeColor() const
+FColor FMounteaInventoryTableAssetAction_Base::GetTypeColor() const
 {
 	return FColor::Green;
 }
 
-UClass* FMounteaInventoryItemsTableAssetAction::GetSupportedClass() const
+UClass* FMounteaInventoryTableAssetAction_Base::GetSupportedClass() const
 {
 	return UMounteaInventoryItemsTable::StaticClass();
 }
 
-uint32 FMounteaInventoryItemsTableAssetAction::GetCategories()
+uint32 FMounteaInventoryTableAssetAction_Base::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
@@ -38,7 +38,7 @@ uint32 FMounteaInventoryItemsTableAssetAction::GetCategories()
 	return  EAssetTypeCategories::Misc;
 }
 
-const TArray<FText>& FMounteaInventoryItemsTableAssetAction::GetSubMenus() const
+const TArray<FText>& FMounteaInventoryTableAssetAction_Base::GetSubMenus() const
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
@@ -47,7 +47,7 @@ const TArray<FText>& FMounteaInventoryItemsTableAssetAction::GetSubMenus() const
 	return AssetTypeActionSubMenu;
 }
 
-void FMounteaInventoryItemsTableAssetAction::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor)
+void FMounteaInventoryTableAssetAction_Base::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor)
 {
 	TArray<UDataTable*> DataTablesToOpen;
 	TArray<UDataTable*> InvalidDataTables;

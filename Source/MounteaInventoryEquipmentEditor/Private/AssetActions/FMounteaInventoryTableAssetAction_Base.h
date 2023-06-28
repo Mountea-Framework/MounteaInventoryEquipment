@@ -9,12 +9,12 @@
 class UMounteaInventoryItemBase;
 class UCommonGenericInputActionDataTable;
 
-class FMounteaInventoryItemsTableAssetAction : public FAssetTypeActions_Base
+class FMounteaInventoryTableAssetAction_Base : public FAssetTypeActions_Base
 {
 	
 public:
 
-	FMounteaInventoryItemsTableAssetAction();
+	FMounteaInventoryTableAssetAction_Base();
 
 	virtual FText GetName() const override;
 	virtual FColor GetTypeColor() const override;
@@ -26,9 +26,6 @@ public:
 	virtual void OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor = TSharedPtr<IToolkitHost>()) override;
 
 private:
-
-	/** Called via context menu to open data within the data table editor */
-	void OpenInDataTableEditor(TArray< TWeakObjectPtr<UCommonGenericInputActionDataTable> > Objects);
 	
 	virtual void BuildBackendFilter(FARFilter& InFilter) override
 	{

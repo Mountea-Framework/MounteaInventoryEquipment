@@ -8,7 +8,8 @@
 
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
-#include "AssetActions/FMounteaInventoryItemsTableAssetAction.h"
+#include "AssetActions/FMounteaInventoryItemDescriptionsTableAssetAction.h"
+#include "AssetActions/FMounteaInventoryTableAssetAction_Base.h"
 #include "AssetActions/FMounteaInventoryThemeAssetAction.h"
 
 #include "HelpButton/MIECommands.h"
@@ -47,7 +48,8 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemConfigAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryThemeAssetAction>());
-		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemsTableAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryTableAssetAction_Base>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryTableAssetAction_ItemDescriptions>());
 	}
 
 	// Register Styles and Commands
@@ -122,7 +124,7 @@ void FMounteaInventoryEquipmentEditor::ShutdownModule()
 	UE_LOG(MounteaInventoryEquipmentEditor, Warning, TEXT("MounteaInventoryEquipmentEditor module has been unloaded"));
 }
 
-void FMounteaInventoryEquipmentEditor::RegisterAssetTypeAction(IAssetTools& AssetTools, TSharedRef<IAssetTypeActions> Action)
+void FMounteaInventoryEquipmentEditor::RegisterAssetTypeAction(IAssetTools& AssetTools, const TSharedRef<IAssetTypeActions>& Action)
 {
 	AssetTools.RegisterAssetTypeActions(Action);
 	CreatedAssetTypeActions.Add(Action);
@@ -147,7 +149,7 @@ void FMounteaInventoryEquipmentEditor::OnGetResponse(FHttpRequestPtr Request, FH
 
 void FMounteaInventoryEquipmentEditor::SendHTTPGet()
 {
-	TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
+	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
 	
 	Request->OnProcessRequestComplete().BindRaw(this, &FMounteaInventoryEquipmentEditor::OnGetResponse);
 	Request->SetURL(ChangelogURL);
