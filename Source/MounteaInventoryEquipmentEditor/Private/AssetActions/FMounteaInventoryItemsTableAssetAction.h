@@ -9,12 +9,12 @@
 
 class UMounteaInventoryItemBase;
 
-class FMounteaInventoryTableAssetAction_Base : public FAssetTypeActions_CSVAssetBase
+class FMounteaInventoryItemsTableAssetAction : public FAssetTypeActions_CSVAssetBase
 {
 	
 public:
 
-	FMounteaInventoryTableAssetAction_Base();
+	FMounteaInventoryItemsTableAssetAction();
 
 	virtual FText GetName() const override;
 	virtual FColor GetTypeColor() const override;
@@ -31,6 +31,9 @@ protected:
 
 	/** Handler for when JSON is selected */
 	void ExecuteExportAsJSON(TArray< TWeakObjectPtr<UObject> > Objects);
+
+	/** Handler for when generate request is selected*/
+	void GenerateNewItems(TArray< TWeakObjectPtr<UObject> > Objects);
 
 private:
 	
@@ -66,11 +69,11 @@ private:
 	};
 
 	/** Handler for opening the source file for this asset */
-	void ExecuteFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions);
+	void ProcessFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions);
 
 	/** Determine whether the find source file in explorer editor command can execute or not */
-	bool CanExecuteFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions) const;
+	bool CanProcessFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions) const;
 
 	/** Verify the specified filename exists */
-	bool VerifyFileExists(const FString& InFileName) const;
+	bool CheckFileExists(const FString& InFileName) const;
 };

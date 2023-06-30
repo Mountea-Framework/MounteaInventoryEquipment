@@ -1,6 +1,6 @@
 ﻿// All rights reserved Dominik Pavlicek 2023.
 
-#include "FMounteaInventoryTableAssetAction_Base.h"
+#include "FMounteaInventoryItemsTableAssetAction.h"
 
 #include "ToolMenus.h"
 #include "Misc/FileHelper.h"
@@ -16,25 +16,25 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemsTableAssetAction"
 
-FMounteaInventoryTableAssetAction_Base::FMounteaInventoryTableAssetAction_Base()
+FMounteaInventoryItemsTableAssetAction::FMounteaInventoryItemsTableAssetAction()
 {}
 
-FText FMounteaInventoryTableAssetAction_Base::GetName() const
+FText FMounteaInventoryItemsTableAssetAction::GetName() const
 {
 	return LOCTEXT("MounteaInventoryItemsTableAssetAction_Name", "Items Data Table");
 }
 
-FColor FMounteaInventoryTableAssetAction_Base::GetTypeColor() const
+FColor FMounteaInventoryItemsTableAssetAction::GetTypeColor() const
 {
 	return FColor::Green;
 }
 
-UClass* FMounteaInventoryTableAssetAction_Base::GetSupportedClass() const
+UClass* FMounteaInventoryItemsTableAssetAction::GetSupportedClass() const
 {
 	return UMounteaInventoryItemsTable::StaticClass();
 }
 
-uint32 FMounteaInventoryTableAssetAction_Base::GetCategories()
+uint32 FMounteaInventoryItemsTableAssetAction::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
@@ -44,7 +44,7 @@ uint32 FMounteaInventoryTableAssetAction_Base::GetCategories()
 	return  EAssetTypeCategories::Misc;
 }
 
-const TArray<FText>& FMounteaInventoryTableAssetAction_Base::GetSubMenus() const
+const TArray<FText>& FMounteaInventoryItemsTableAssetAction::GetSubMenus() const
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
@@ -53,7 +53,7 @@ const TArray<FText>& FMounteaInventoryTableAssetAction_Base::GetSubMenus() const
 	return AssetTypeActionSubMenu;
 }
 
-void FMounteaInventoryTableAssetAction_Base::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor)
+void FMounteaInventoryItemsTableAssetAction::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor)
 {
 	TArray<UDataTable*> DataTablesToOpen;
 	TArray<UDataTable*> InvalidDataTables;
@@ -84,7 +84,7 @@ void FMounteaInventoryTableAssetAction_Base::OpenAssetEditor(const TArray<UObjec
 			DataTablesListText.AppendLineFormat(LOCTEXT("MounteaInventoryTable_MissingRowStructListEntry", "* {0} (Row Structure: {1})"), FText::FromString(Table->GetName()), FText::FromName(ResolvedRowStructName));
 		}
 
-		FText Title = LOCTEXT("DataTable_MissingRowStructTitle", "Continue?");
+		FText Title = LOCTEXT("MounteaInventoryTable_MissingRowStructTitle", "Continue?");
 		const EAppReturnType::Type DlgResult = FMessageDialog::Open(
 			EAppMsgType::YesNoCancel, 
 			FText::Format(LOCTEXT("MounteaInventoryTable_MissingRowStructMsg", "The following Data Tables are missing their row structure and will not be editable.\n\n{0}\n\nDo you want to open these data tables?"), DataTablesListText.ToText()), 
@@ -110,7 +110,7 @@ void FMounteaInventoryTableAssetAction_Base::OpenAssetEditor(const TArray<UObjec
 	}
 }
 
-void FMounteaInventoryTableAssetAction_Base::GetActions(const TArray<UObject*>& InObjects, FToolMenuSection& Section)
+void FMounteaInventoryItemsTableAssetAction::GetActions(const TArray<UObject*>& InObjects, FToolMenuSection& Section)
 {
 	auto Tables = GetTypedWeakObjectPtrs<UObject>(InObjects);
 	
@@ -131,7 +131,7 @@ void FMounteaInventoryTableAssetAction_Base::GetActions(const TArray<UObject*>& 
 		const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "AssetEditor.ReimportAsset.Small");
 		const FUIAction UIExecuteAction = FUIAction
 		(
-			FExecuteAction::CreateSP( this, &FMounteaInventoryTableAssetAction_Base::ExecuteExportAsJSON, Tables ),
+			FExecuteAction::CreateSP( this, &FMounteaInventoryItemsTableAssetAction::ExecuteExportAsJSON, Tables ),
 			FCanExecuteAction()
 		);
 
@@ -151,15 +151,27 @@ void FMounteaInventoryTableAssetAction_Base::GetActions(const TArray<UObject*>& 
 		const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Symbols.SearchGlass");
 		const FUIAction UIExecuteAction = FUIAction
 		(
-			FExecuteAction::CreateSP( this, &FMounteaInventoryTableAssetAction_Base::ExecuteFindSourceFileInExplorer, ImportPaths, PotentialFileExtensions ),
-				FCanExecuteAction::CreateSP(this, &FMounteaInventoryTableAssetAction_Base::CanExecuteFindSourceFileInExplorer, ImportPaths, PotentialFileExtensions)
+			FExecuteAction::CreateSP( this, &FMounteaInventoryItemsTableAssetAction::ProcessFindSourceFileInExplorer, ImportPaths, PotentialFileExtensions ),
+				FCanExecuteAction::CreateSP(this, &FMounteaInventoryItemsTableAssetAction::CanProcessFindSourceFileInExplorer, ImportPaths, PotentialFileExtensions)
 		);
 
 		Section.AddMenuEntry("MounteaInventoryTable_OpenSourceData", Label, ToolTip, Icon, UIExecuteAction);
 	}
+
+	// Generate new Items
+	const TAttribute<FText> Label =LOCTEXT("MounteaInventoryTable_GenerateNewItems", "Generate New Items");
+	const TAttribute<FText> ToolTip = LOCTEXT("MounteaInventoryTable_GenerateNewItemsTooltip", "For each row in selected Inventory Tables will make a new Item Asset, if such Item doesn't exist yet.");
+	const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Refresh");
+	const FUIAction UIExecuteAction = FUIAction
+		(
+			FExecuteAction::CreateSP( this, &FMounteaInventoryItemsTableAssetAction::GenerateNewItems, Tables ),
+			FCanExecuteAction()
+		);
+
+	Section.AddMenuEntry("MounteaInventoryTable_GenerateNewItems", Label, ToolTip, Icon, UIExecuteAction);
 }
 
-void FMounteaInventoryTableAssetAction_Base::ExecuteExportAsJSON(TArray<TWeakObjectPtr<UObject>> Objects)
+void FMounteaInventoryItemsTableAssetAction::ExecuteExportAsJSON(TArray<TWeakObjectPtr<UObject>> Objects)
 {
 	IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
 
@@ -170,7 +182,7 @@ void FMounteaInventoryTableAssetAction_Base::ExecuteExportAsJSON(TArray<TWeakObj
 		auto DataTable = Cast<UDataTable>((*ObjIt).Get());
 		if (DataTable)
 		{
-			const FText Title = FText::Format(LOCTEXT("DataTable_ExportJSONDialogTitle", "Export '{0}' as JSON..."), FText::FromString(*DataTable->GetName()));
+			const FText Title = FText::Format(LOCTEXT("MounteaInventoryTable_ExportJSONDialogTitle", "Export '{0}' as JSON..."), FText::FromString(*DataTable->GetName()));
 			const FString CurrentFilename = DataTable->AssetImportData->GetFirstFilename();
 			const FString FileTypes = TEXT("Data Table JSON (*.json)|*.json");
 
@@ -193,7 +205,11 @@ void FMounteaInventoryTableAssetAction_Base::ExecuteExportAsJSON(TArray<TWeakObj
 	}
 }
 
-void FMounteaInventoryTableAssetAction_Base::ExecuteFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions)
+void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObjectPtr<UObject>> Objects)
+{
+}
+
+void FMounteaInventoryItemsTableAssetAction::ProcessFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions)
 {
 	for (TArray<FString>::TConstIterator FilenameIter(Filenames); FilenameIter; ++FilenameIter)
 	{
@@ -204,7 +220,7 @@ void FMounteaInventoryTableAssetAction_Base::ExecuteFindSourceFileInExplorer(TAr
 		for (TArray<FString>::TConstIterator ExtensionItr(OverrideExtensions); ExtensionItr; ++ExtensionItr)
 		{
 			const FString FilenameWithExtension(FString::Printf(TEXT("%s/%s%s"), *RootPath, *BaseFilename, **ExtensionItr));
-			if (VerifyFileExists(FilenameWithExtension))
+			if (CheckFileExists(FilenameWithExtension))
 			{
 				FPlatformProcess::LaunchFileInDefaultExternalApplication(*FilenameWithExtension, NULL, ELaunchVerb::Edit);
 				break;
@@ -213,7 +229,7 @@ void FMounteaInventoryTableAssetAction_Base::ExecuteFindSourceFileInExplorer(TAr
 	}
 }
 
-bool FMounteaInventoryTableAssetAction_Base::CanExecuteFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions) const
+bool FMounteaInventoryItemsTableAssetAction::CanProcessFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions) const
 {
 	// Verify that extensions were provided
 	if (OverrideExtensions.Num() == 0)
@@ -231,7 +247,7 @@ bool FMounteaInventoryTableAssetAction_Base::CanExecuteFindSourceFileInExplorer(
 		for (TArray<FString>::TConstIterator ExtensionItr(OverrideExtensions); ExtensionItr; ++ExtensionItr)
 		{
 			const FString FilenameWithExtension(FString::Printf(TEXT("%s/%s%s"), *RootPath, *BaseFilename, **ExtensionItr));
-			if (VerifyFileExists(FilenameWithExtension))
+			if (CheckFileExists(FilenameWithExtension))
 			{
 				return true;
 			}
@@ -241,7 +257,7 @@ bool FMounteaInventoryTableAssetAction_Base::CanExecuteFindSourceFileInExplorer(
 	return false;
 }
 
-bool FMounteaInventoryTableAssetAction_Base::VerifyFileExists(const FString& InFileName) const
+bool FMounteaInventoryItemsTableAssetAction::CheckFileExists(const FString& InFileName) const
 {
 	return (!InFileName.IsEmpty() && IFileManager::Get().FileSize(*InFileName) != INDEX_NONE);
 }
