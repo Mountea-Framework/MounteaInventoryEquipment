@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaInventoryTableTypes.h"
+
 #include "Engine/DataAsset.h"
 
 #include "Helpers/MounteaInventoryHelpers.h"
@@ -11,6 +11,7 @@
 
 #include "MounteaItemAdditionalData.generated.h"
 
+class UMounteaInventoryItemsDescriptionsTable;
 
 #define LOCTEXT_NAMESPACE "MounteaItemAdditionalData"
 
@@ -56,13 +57,13 @@ private:
 	UFUNCTION()
 	TArray<FName> GetSourceTableRows_ShortDescription() const
 	{
-		return GetSourceRows<FName, UDataTable>(SourceTable_ShortDescription);
+		return GetSourceRows<FName, UMounteaInventoryItemsDescriptionsTable>(SourceTable_ShortDescription);
 	}
 
 	UFUNCTION()
 	TArray<FName> GetSourceTableRows_LongDescription() const
 	{
-		return GetSourceRows<FName, UDataTable>(SourceTable_LongDescription);
+		return GetSourceRows<FName, UMounteaInventoryItemsDescriptionsTable>(SourceTable_LongDescription);
 	}
 
 #if WITH_EDITOR

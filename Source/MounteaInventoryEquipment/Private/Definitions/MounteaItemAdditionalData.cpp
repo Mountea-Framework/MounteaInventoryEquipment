@@ -3,6 +3,8 @@
 
 #include "Definitions/MounteaItemAdditionalData.h"
 
+#include "Definitions/MounteaInventoryTableTypes.h"
+
 UMounteaItemAdditionalData::UMounteaItemAdditionalData()
 {
 	if (const FMounteaItemDescription* Row = GetRowData(SourceTable_ShortDescription, SourceRow_ShortDescription))
