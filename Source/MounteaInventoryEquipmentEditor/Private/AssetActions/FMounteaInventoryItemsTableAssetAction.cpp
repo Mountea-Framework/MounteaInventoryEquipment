@@ -11,6 +11,7 @@
 #include "AssetToolsModule.h"
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 
@@ -288,12 +289,47 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 				{
 					LocalPackageName.Append("/NoCategory/");
 				}
+				
 
+				// TODO:
+				// Look up if such asset exist in target destination already
+				// if it does, just straight up skip this round
+				FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(FName("AssetRegistry"));
+
+				TArray<FString> PathsToScan;
+				PathsToScan.Add(LocalPackageName);
+				
+				TArray<FAssetData> AssetList;
+				AssetRegistryModule.Get().GetAssetsByPath(FName(LocalPackageName), AssetList);
+
+				if (AssetList.Num() > 0)
+				{
+					bool bDuplicateFound = false;
+					for (const auto& AssetListItr : AssetList)
+					{
+						if (UMounteaInventoryItemBase* FoundItem = Cast<UMounteaInventoryItemBase>(AssetListItr.GetAsset()))
+						{
+							if (FoundItem->SourceTable == ItemsTable && FoundItem->SourceRow == Itr)
+							{
+								FoundItem->SetValidData();
+
+								bDuplicateFound = true;
+								break;
+							}
+						}
+					}
+
+					if (bDuplicateFound)
+					{
+						continue;
+					}
+				}
+				
 				// Hacking the suffix to fit the Name
 				CreateUniqueAssetName(LocalPackageName, Itr.ToString(), PackagePath, Name);
 
+				
 				FAssetToolsModule& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
-
 				if ( UObject* NewAsset = AssetToolsModule.Get().CreateAsset(Name, FPackageName::GetLongPackagePath(PackagePath), UMounteaInventoryItemBase::StaticClass(), Factory) )
 				{
 					ObjectsToSync.Add(NewAsset);
