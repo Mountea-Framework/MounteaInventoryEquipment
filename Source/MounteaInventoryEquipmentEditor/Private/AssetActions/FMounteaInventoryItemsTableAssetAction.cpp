@@ -12,9 +12,11 @@
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
 #include "Definitions/MounteaInventoryItem.h"
+#include "Definitions/MounteaInventoryItemCategory.h"
 
 #include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
 #include "Definitions/MounteaInventoryTableTypes.h"
+#include "Dialogs/DlgPickAssetPath.h"
 #include "Factories/MounteaItemAssetFactory.h"
 
 
@@ -211,6 +213,28 @@ void FMounteaInventoryItemsTableAssetAction::ExecuteExportAsJSON(TArray<TWeakObj
 
 void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObjectPtr<UObject>> Objects)
 {
+	// Build a package name to use
+	//FString MeshName;
+	FString PackageName;
+	if (PackageName.IsEmpty())
+	{
+		//FString NewNameSuggestion = FString(TEXT("StaticMesh"));
+		FString PackageNameSuggestion = FString(TEXT("/Game/MounteaInventory/Data/")); // + NewNameSuggestion;
+		FString Name;
+		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
+		AssetToolsModule.Get().CreateUniqueAssetName(PackageNameSuggestion, TEXT(""), PackageNameSuggestion, Name);
+
+		TSharedPtr<SDlgPickAssetPath> PickAssetPathWidget =
+			SNew(SDlgPickAssetPath)
+			.Title(LOCTEXT("GenerateNewItemsLocationPicker", "Choose New Items Location"))
+			.DefaultAssetPath(FText::FromString(PackageNameSuggestion));
+
+		if (PickAssetPathWidget->ShowModal() == EAppReturnType::Ok)
+		{
+			PackageName = PickAssetPathWidget->GetFullAssetPath().ToString();
+		}
+	}
+	
 	const FString DefaultSuffix = TEXT("_Imported");
 
 	for (auto ObjIt = Objects.CreateConstIterator(); ObjIt; ++ObjIt)
@@ -236,16 +260,27 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 
 			for (const auto& Itr : InventoryItemDataNames)
 			{
-				// Determine an appropriate name
-				FString Name;
-				FString PackagePath;
-				CreateUniqueAssetName(Object->GetOutermost()->GetName(), DefaultSuffix, PackagePath, Name);
-				
 				// Create the factory used to generate the asset
 				UMounteaItemAssetFactory* Factory = NewObject<UMounteaItemAssetFactory>();
 				Factory->SetParentClass(UMounteaInventoryItemBase::StaticClass());
 				Factory->SetSource(ItemsTable, Itr);
+
+				FString FindRowContext;
+				const FMounteaInventoryItemData* CurrentItemRow = ItemsTable->FindRow<FMounteaInventoryItemData>(Itr, FindRowContext);
 				
+				// Determine an appropriate name
+				FString Name;
+				FString PackagePath;
+				FString LocalPackageName = PackageName;
+
+				if (CurrentItemRow && CurrentItemRow->RequiredData.ItemCategory)
+				{
+					LocalPackageName.Append("/").Append(CurrentItemRow->RequiredData.ItemCategory->CategoryName.ToString()).Append("/");
+				}
+
+				// Hacking the suffix to fit the Name
+				CreateUniqueAssetName(LocalPackageName, Itr.ToString(), PackagePath, Name);
+
 				FAssetToolsModule& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
 				UObject* NewAsset = AssetToolsModule.Get().CreateAsset(Name, FPackageName::GetLongPackagePath(PackagePath), UMounteaInventoryItemBase::StaticClass(), Factory);
 
