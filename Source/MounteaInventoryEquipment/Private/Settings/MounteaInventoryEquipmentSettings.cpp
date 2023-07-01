@@ -3,6 +3,7 @@
 
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
+#include "Definitions/MounteaInventoryItem.h"
 #include "Helpers/MounteaInventoryHelpers.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
@@ -53,6 +54,9 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 
 	bUIDebug = false;
 	bDragDropAllowed = true;
+
+	DefaultItemClass = UMounteaInventoryItemBase::StaticClass();
+	DefaultItemConfigClass = UMounteaInventoryItemConfig::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

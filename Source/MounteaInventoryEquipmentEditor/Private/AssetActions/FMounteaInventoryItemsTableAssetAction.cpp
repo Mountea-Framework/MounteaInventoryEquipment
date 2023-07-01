@@ -9,9 +9,13 @@
 #include "Editor/DataTableEditor/Public/DataTableEditorModule.h"
 #include "DesktopPlatformModule.h"
 #include "AssetToolsModule.h"
+#include "ContentBrowserModule.h"
+#include "IContentBrowserSingleton.h"
+#include "Definitions/MounteaInventoryItem.h"
 
 #include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
 #include "Definitions/MounteaInventoryTableTypes.h"
+#include "Factories/MounteaItemAssetFactory.h"
 
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemsTableAssetAction"
@@ -207,6 +211,57 @@ void FMounteaInventoryItemsTableAssetAction::ExecuteExportAsJSON(TArray<TWeakObj
 
 void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObjectPtr<UObject>> Objects)
 {
+	const FString DefaultSuffix = TEXT("_Imported");
+
+	for (auto ObjIt = Objects.CreateConstIterator(); ObjIt; ++ObjIt)
+	{
+		const auto Object = (*ObjIt).Get();
+		
+		if (Object == nullptr)
+		{
+			return;
+		}
+
+		TArray<UObject*> ObjectsToSync;
+		
+		if ( UMounteaInventoryItemsTable* ItemsTable = Cast<UMounteaInventoryItemsTable>(Object) )
+		{
+			FString Context;
+			TArray<FName> InventoryItemDataNames = ItemsTable->GetRowNames();
+
+			if (InventoryItemDataNames.Num() == 0)
+			{
+				return;
+			}
+
+			for (const auto& Itr : InventoryItemDataNames)
+			{
+				// Determine an appropriate name
+				FString Name;
+				FString PackagePath;
+				CreateUniqueAssetName(Object->GetOutermost()->GetName(), DefaultSuffix, PackagePath, Name);
+				
+				// Create the factory used to generate the asset
+				UMounteaItemAssetFactory* Factory = NewObject<UMounteaItemAssetFactory>();
+				Factory->SetParentClass(UMounteaInventoryItemBase::StaticClass());
+				Factory->SetSource(ItemsTable, Itr);
+				
+				FAssetToolsModule& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
+				UObject* NewAsset = AssetToolsModule.Get().CreateAsset(Name, FPackageName::GetLongPackagePath(PackagePath), UMounteaInventoryItemBase::StaticClass(), Factory);
+
+				if ( NewAsset )
+				{
+					ObjectsToSync.Add(NewAsset);
+				}
+			}
+
+			if ( ObjectsToSync.Num() > 0 )
+			{
+				FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+				ContentBrowserModule.Get().SyncBrowserToAssets(ObjectsToSync);
+			}
+		}
+	}
 }
 
 void FMounteaInventoryItemsTableAssetAction::ProcessFindSourceFileInExplorer(TArray<FString> Filenames, TArray<FString> OverrideExtensions)
