@@ -17,6 +17,7 @@
 #include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
 #include "Definitions/MounteaInventoryTableTypes.h"
 #include "Dialogs/DlgPickAssetPath.h"
+#include "Dialogs/DlgPickPath.h"
 #include "Factories/MounteaItemAssetFactory.h"
 
 
@@ -224,14 +225,15 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
 		AssetToolsModule.Get().CreateUniqueAssetName(PackageNameSuggestion, TEXT(""), PackageNameSuggestion, Name);
 
-		TSharedPtr<SDlgPickAssetPath> PickAssetPathWidget =
-			SNew(SDlgPickAssetPath)
+		TSharedPtr<SDlgPickPath> PickAssetPathWidget =
+			SNew(SDlgPickPath)
 			.Title(LOCTEXT("GenerateNewItemsLocationPicker", "Choose New Items Location"))
-			.DefaultAssetPath(FText::FromString(PackageNameSuggestion));
+			.DefaultPath(FText::FromString(PackageNameSuggestion));
+			//.DefaultAssetPath(FText::FromString(PackageNameSuggestion));
 
 		if (PickAssetPathWidget->ShowModal() == EAppReturnType::Ok)
 		{
-			PackageName = PickAssetPathWidget->GetFullAssetPath().ToString();
+			PackageName = PickAssetPathWidget->GetPath().ToString();
 		}
 	}
 	
