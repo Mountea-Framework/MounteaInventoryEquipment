@@ -219,17 +219,15 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 	FString PackageName;
 	if (PackageName.IsEmpty())
 	{
-		//FString NewNameSuggestion = FString(TEXT("StaticMesh"));
-		FString PackageNameSuggestion = FString(TEXT("/Game/MounteaInventory/Data/")); // + NewNameSuggestion;
+		FString PackageNameSuggestion = FString(TEXT("/Game/MounteaInventory/Data/"));
 		FString Name;
-		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
+		const FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools");
 		AssetToolsModule.Get().CreateUniqueAssetName(PackageNameSuggestion, TEXT(""), PackageNameSuggestion, Name);
 
-		TSharedPtr<SDlgPickPath> PickAssetPathWidget =
+		const TSharedPtr<SDlgPickPath> PickAssetPathWidget =
 			SNew(SDlgPickPath)
-			.Title(LOCTEXT("GenerateNewItemsLocationPicker", "Choose New Items Location"))
+			.Title(LOCTEXT("GenerateNewItemsLocationPicker", "Choose Where to Create New Items"))
 			.DefaultPath(FText::FromString(PackageNameSuggestion));
-			//.DefaultAssetPath(FText::FromString(PackageNameSuggestion));
 
 		if (PickAssetPathWidget->ShowModal() == EAppReturnType::Ok)
 		{
@@ -248,10 +246,10 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 			return;
 		}
 
-		TArray<UObject*> ObjectsToSync;
-		
 		if ( UMounteaInventoryItemsTable* ItemsTable = Cast<UMounteaInventoryItemsTable>(Object) )
 		{
+			TArray<UObject*> ObjectsToSync;
+			
 			FString Context;
 			TArray<FName> InventoryItemDataNames = ItemsTable->GetRowNames();
 
@@ -269,24 +267,34 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 
 				FString FindRowContext;
 				const FMounteaInventoryItemData* CurrentItemRow = ItemsTable->FindRow<FMounteaInventoryItemData>(Itr, FindRowContext);
+
+				// TODO: Spawn warnings with list of what stuff cannot be created and why
+				if (!CurrentItemRow)
+				{
+					continue;
+				}
 				
 				// Determine an appropriate name
 				FString Name;
 				FString PackagePath;
 				FString LocalPackageName = PackageName;
-
-				if (CurrentItemRow && CurrentItemRow->RequiredData.ItemCategory)
+				
+				// Split items to Categories folders
+				if (CurrentItemRow->RequiredData.ItemCategory)
 				{
 					LocalPackageName.Append("/").Append(CurrentItemRow->RequiredData.ItemCategory->CategoryName.ToString()).Append("/");
+				}
+				else
+				{
+					LocalPackageName.Append("/NoCategory/");
 				}
 
 				// Hacking the suffix to fit the Name
 				CreateUniqueAssetName(LocalPackageName, Itr.ToString(), PackagePath, Name);
 
 				FAssetToolsModule& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
-				UObject* NewAsset = AssetToolsModule.Get().CreateAsset(Name, FPackageName::GetLongPackagePath(PackagePath), UMounteaInventoryItemBase::StaticClass(), Factory);
 
-				if ( NewAsset )
+				if ( UObject* NewAsset = AssetToolsModule.Get().CreateAsset(Name, FPackageName::GetLongPackagePath(PackagePath), UMounteaInventoryItemBase::StaticClass(), Factory) )
 				{
 					ObjectsToSync.Add(NewAsset);
 				}
@@ -314,7 +322,7 @@ void FMounteaInventoryItemsTableAssetAction::ProcessFindSourceFileInExplorer(TAr
 			const FString FilenameWithExtension(FString::Printf(TEXT("%s/%s%s"), *RootPath, *BaseFilename, **ExtensionItr));
 			if (CheckFileExists(FilenameWithExtension))
 			{
-				FPlatformProcess::LaunchFileInDefaultExternalApplication(*FilenameWithExtension, NULL, ELaunchVerb::Edit);
+				FPlatformProcess::LaunchFileInDefaultExternalApplication(*FilenameWithExtension, nullptr, ELaunchVerb::Edit);
 				break;
 			}
 		}
