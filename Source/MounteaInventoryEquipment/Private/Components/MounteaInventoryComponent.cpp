@@ -75,7 +75,7 @@ UUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation()
 	return InventoryWBP;
 }
 
-bool UMounteaInventoryComponent::LoadInventoryFromDataTable_Implementation(const UDataTable* SourceTable)
+bool UMounteaInventoryComponent::LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable)
 {
 	return true;
 }

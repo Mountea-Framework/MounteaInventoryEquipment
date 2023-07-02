@@ -5,8 +5,8 @@
 #include "HttpModule.h"
 #include "ToolMenuMisc.h"
 #include "ToolMenus.h"
-#include "AssetActions/FMounteaInventoryItemAdditionalDataAssetAction.h"
 
+#include "AssetActions/FMounteaInventoryItemAdditionalDataAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemDescriptionsTableAssetAction.h"
@@ -95,6 +95,7 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 				InventoryEquipmentClassStyleSet->SetContentRoot(ContentDir);
 
 				{
+					RegisterClassIcons(TEXT("Resources/InventoryComponentIcon"), TEXT("MounteaInventoryComponent"));
 					RegisterClassIcons(TEXT("Resources/ItemObjectIcon"), TEXT("MounteaInventoryItemBase"));
 					RegisterClassIcons(TEXT("Resources/ItemDataIcon"), TEXT("MounteaItemAdditionalData"));
 					RegisterClassIcons(TEXT("Resources/ItemConfigIcon"), TEXT("MounteaInventoryItemConfig"));

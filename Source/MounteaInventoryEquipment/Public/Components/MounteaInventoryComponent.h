@@ -53,7 +53,7 @@ public:
 	virtual TSubclassOf<UUserWidget> GetInventoryWBPClass_Implementation() override;
 	virtual UUserWidget* GetInventoryWBP_Implementation() override;
 
-	virtual bool LoadInventoryFromDataTable_Implementation(const UDataTable* SourceTable) override;
+	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
 	
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;

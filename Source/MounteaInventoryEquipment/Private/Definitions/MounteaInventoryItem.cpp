@@ -23,11 +23,18 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	bIsEditorNoPlay = UMounteaInventoryEquipmentBPF::IsEditorNoPlay();
 #endif
 	
-	if (bIsEditorNoPlay)
+	if (bIsEditorNoPlay) // This code gets executed only when opening new Asset in Editor
 	{
 		if (ItemDataSource == EItemDataSource::EIDS_SourceTable && SourceTable == nullptr)
 		{
 			SourceTable = UMounteaInventoryEquipmentBPF::GetDefaultItemsTable();
+		}
+
+		if (ItemConfig.ItemConfig == nullptr)
+		{
+			bool bFound = false;
+			const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
+			ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
 		}
 	}
 	else

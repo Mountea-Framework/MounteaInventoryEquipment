@@ -114,10 +114,10 @@ public:
 		bResult = true;
 		if (ItemConfig.ItemConfig == nullptr)
 		{
-			return NewObject<UMounteaInventoryItemConfig>(GetTransientPackage(), ClassFilter);
+			return NewObject<UMounteaInventoryItemConfig>(GetPackage(), ClassFilter);
 		}
 
-		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetTransientPackage(), ClassFilter);
+		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetPackage(), ClassFilter);
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaItemAdditionalData"), meta=(DeterminesOutputType = "ClassFilter"))
