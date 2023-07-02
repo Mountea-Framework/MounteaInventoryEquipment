@@ -5,6 +5,7 @@
 #include "HttpModule.h"
 #include "ToolMenuMisc.h"
 #include "ToolMenus.h"
+#include "AssetActions/FMounteaInventoryItemAdditionalDataAssetAction.h"
 
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
@@ -15,14 +16,17 @@
 #include "HelpButton/MIECommands.h"
 #include "HelpButton/MIEHelpStyle.h"
 #include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
+#include "Helpers/MIEClassStyle.h"
 
 #include "Interfaces/IHttpResponse.h"
 #include "Interfaces/IMainFrameModule.h"
+#include "Interfaces/IPluginManager.h"
 
 #include "Popups/MIEPopup.h"
 #include "Popups/MIEPopupStyle.h"
 
 #include "Serialization/JsonReader.h"
+#include "Styling/SlateStyleRegistry.h"
 
 class IMainFrameModule;
 DEFINE_LOG_CATEGORY(MounteaInventoryEquipmentEditor);
@@ -50,10 +54,14 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryThemeAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemsTableAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemDescsAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemAdditionalDataAssetAction>());
 	}
 
 	// Register Styles and Commands
 	{
+		FMIEClassStyle::Initialize();
+		FMIEClassStyle::ReloadTextures();
+		
 		FMIEHelpStyle::Initialize();
 		FMIEHelpStyle::ReloadTextures();
 
@@ -74,9 +82,50 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		mainFrame.GetMainFrameCommandBindings()->Append(PluginCommands.ToSharedRef());
 
 		UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FMounteaInventoryEquipmentEditor::RegisterMenus));
+
+		// Register Class Icons
+		{
+			InventoryEquipmentClassStyleSet = MakeShareable(new FSlateStyleSet("InventoryEquipmentClassStyleSet"));
+			const TSharedPtr<IPlugin> PluginPtr = IPluginManager::Get().FindPlugin("MounteaInventoryEquipment");
+
+			if (PluginPtr.IsValid())
+			{
+				const FString ContentDir = IPluginManager::Get().FindPlugin("MounteaInventoryEquipment")->GetBaseDir();
+
+				InventoryEquipmentClassStyleSet->SetContentRoot(ContentDir);
+
+				{
+					RegisterClassIcons(TEXT("Resources/ItemObjectIcon"), TEXT("MounteaInventoryItemBase"));
+					RegisterClassIcons(TEXT("Resources/ItemDataIcon"), TEXT("MounteaItemAdditionalData"));
+					RegisterClassIcons(TEXT("Resources/ItemConfigIcon"), TEXT("MounteaInventoryItemConfig"));
+				}
+
+				//Register the created style
+				FSlateStyleRegistry::RegisterSlateStyle(*InventoryEquipmentClassStyleSet.Get());
+			}
+		}
 	}
 	
 	UE_LOG(MounteaInventoryEquipmentEditor, Warning, TEXT("MounteaInventoryEquipmentEditor module has been loaded"));
+}
+
+void FMounteaInventoryEquipmentEditor::RegisterClassIcons(const FString& Path, const FString& ClassName)
+{
+	{
+		FSlateImageBrush* NewClassThumbBrush = new FSlateImageBrush(InventoryEquipmentClassStyleSet->RootToContentDir(Path, TEXT(".png")), FVector2D(512.f, 512.f));
+		FSlateImageBrush* NewClassIconBrush = new FSlateImageBrush(InventoryEquipmentClassStyleSet->RootToContentDir(Path, TEXT(".png")), FVector2D(16.f, 16.f));
+		if (NewClassThumbBrush && NewClassIconBrush)
+		{
+			FString ThumbnailName = FString("ClassThumbnail.");
+			ThumbnailName.Append(ClassName);
+
+			FString IconName = FString("ClassIcon.");
+			IconName.Append(ClassName);
+			
+			InventoryEquipmentClassStyleSet->Set(FName(ThumbnailName), NewClassThumbBrush);
+			InventoryEquipmentClassStyleSet->Set(FName(IconName), NewClassIconBrush);
+		}
+	}
 }
 
 void FMounteaInventoryEquipmentEditor::ShutdownModule()
@@ -119,6 +168,14 @@ void FMounteaInventoryEquipmentEditor::ShutdownModule()
 				FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(Itr.ToSharedRef());
 			}
 		}
+	}
+
+	// Unregister Class Styles
+	{
+		FMIEClassStyle::Shutdown();
+
+		//Register the created style
+		FSlateStyleRegistry::UnRegisterSlateStyle(*InventoryEquipmentClassStyleSet.Get());
 	}
 	
 	UE_LOG(MounteaInventoryEquipmentEditor, Warning, TEXT("MounteaInventoryEquipmentEditor module has been unloaded"));
@@ -224,6 +281,7 @@ void FMounteaInventoryEquipmentEditor::RegisterMenus()
 		FAssetActionExtender_MounteaInventoryItem::RegisterMenus();
 	}
 }
+
 
 #undef LOCTEXT_NAMESPACE
 

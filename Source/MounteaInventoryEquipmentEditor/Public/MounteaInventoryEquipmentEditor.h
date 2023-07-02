@@ -26,10 +26,14 @@ class FMounteaInventoryEquipmentEditor : public IModuleInterface
 	void PluginButtonClicked();
 	void RegisterMenus();
 
+	void RegisterClassIcons(const FString& Path, const FString& ClassName);
+
 private:
 	
 	TSharedPtr<class FUICommandList> PluginCommands;
 	FHttpModule* Http = nullptr;
 	
 	TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
+
+	TSharedPtr<FSlateStyleSet> InventoryEquipmentClassStyleSet;
 };
