@@ -98,15 +98,13 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 
 				InventoryEquipmentClassStyleSet->SetContentRoot(ContentDir);
 
-				{
-					RegisterClassIcons(TEXT("Resources/InventoryComponentIcon"), TEXT("MounteaInventoryComponent"));
-					RegisterClassIcons(TEXT("Resources/ItemObjectIcon"), TEXT("MounteaInventoryItemBase"));
-					RegisterClassIcons(TEXT("Resources/ItemDataIcon"), TEXT("MounteaItemAdditionalData"));
-					RegisterClassIcons(TEXT("Resources/ItemConfigIcon"), TEXT("MounteaInventoryItemConfig"));
-					RegisterClassIcons(TEXT("Resources/ThemeConfigIcon"), TEXT("MounteaInventoryThemeConfig"));
-					RegisterClassIcons(TEXT("Resources/InventoryRarityIcon"), TEXT("MounteaInventoryItemRarity"));
-					RegisterClassIcons(TEXT("Resources/InventoryCategoryIcon"), TEXT("MounteaInventoryItemCategory"));
-				}
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryComponentIcon"), TEXT("MounteaInventoryComponent"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemObjectIcon"), TEXT("MounteaInventoryItemBase"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemDataIcon"), TEXT("MounteaItemAdditionalData"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemConfigIcon"), TEXT("MounteaInventoryItemConfig"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ThemeConfigIcon"), TEXT("MounteaInventoryThemeConfig"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryRarityIcon"), TEXT("MounteaInventoryItemRarity"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryCategoryIcon"), TEXT("MounteaInventoryItemCategory"));
 
 				//Register the created style
 				FSlateStyleRegistry::RegisterSlateStyle(*InventoryEquipmentClassStyleSet.Get());
