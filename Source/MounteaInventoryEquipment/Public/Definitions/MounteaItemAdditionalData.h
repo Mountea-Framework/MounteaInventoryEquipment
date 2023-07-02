@@ -16,7 +16,16 @@ class UMounteaInventoryItemsDescriptionsTable;
 #define LOCTEXT_NAMESPACE "MounteaItemAdditionalData"
 
 /**
- * 
+ * Additional data for a Mountea inventory item.
+ *
+ * This class represents additional data associated with a Mountea inventory item. It serves as a data asset
+ * that can be assigned to an inventory item to provide extra information or functionality specific to that item.
+ * The additional data can be customized and configured in the editor, allowing designers to define unique
+ * properties or behaviors for each item.
+ *
+ * @see UDataAsset
+ * @see UMounteaInventoryItemBase
+ * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Additional-Data
  */
 UCLASS( Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea, Inventory"), DisplayName="Item Additional Data")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaItemAdditionalData : public UDataAsset

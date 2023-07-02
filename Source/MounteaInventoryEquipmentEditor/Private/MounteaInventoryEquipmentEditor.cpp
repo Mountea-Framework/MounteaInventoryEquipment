@@ -5,12 +5,14 @@
 #include "HttpModule.h"
 #include "ToolMenuMisc.h"
 #include "ToolMenus.h"
+#include "AssetActions/FMounteaInventoryCategoryAssetAction.h"
 
 #include "AssetActions/FMounteaInventoryItemAdditionalDataAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemDescriptionsTableAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemsTableAssetAction.h"
+#include "AssetActions/FMounteaInventoryRarityAssetAction.h"
 #include "AssetActions/FMounteaInventoryThemeAssetAction.h"
 
 #include "HelpButton/MIECommands.h"
@@ -55,6 +57,8 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemsTableAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemDescsAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemAdditionalDataAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryCategoryAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryRarityAssetAction>());
 	}
 
 	// Register Styles and Commands
@@ -99,6 +103,9 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 					RegisterClassIcons(TEXT("Resources/ItemObjectIcon"), TEXT("MounteaInventoryItemBase"));
 					RegisterClassIcons(TEXT("Resources/ItemDataIcon"), TEXT("MounteaItemAdditionalData"));
 					RegisterClassIcons(TEXT("Resources/ItemConfigIcon"), TEXT("MounteaInventoryItemConfig"));
+					RegisterClassIcons(TEXT("Resources/ThemeConfigIcon"), TEXT("MounteaInventoryThemeConfig"));
+					RegisterClassIcons(TEXT("Resources/InventoryRarityIcon"), TEXT("MounteaInventoryItemRarity"));
+					RegisterClassIcons(TEXT("Resources/InventoryCategoryIcon"), TEXT("MounteaInventoryItemCategory"));
 				}
 
 				//Register the created style
