@@ -38,12 +38,15 @@ UE 5.1 | 0.0.0.1 | 🟨
 ## Features
 ### Data-Driven Approach
 Import Data Tables, use Data Tables to define Items. Easy to manage system with extreme flexibility.
-![image](https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/ec6987b9-2c98-4836-a59a-e42f2a3806ba)
+<p align="center" width="100%">
+    <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/ec6987b9-2c98-4836-a59a-e42f2a3806ba">
+</p>
 
 ### Flexible Configuration
 In-line editable configuration with the ability to extend logic in Blueprints.
-![image](https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/6df25a2b-c885-42f5-a66b-e2820aeeffbb)
-
+<p align="center" width="100%">
+    <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/6df25a2b-c885-42f5-a66b-e2820aeeffbb">
+</p>
 
 ## Installation
 
