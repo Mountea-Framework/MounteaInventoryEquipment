@@ -37,50 +37,28 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentBPF : public UBlue
 
 public:
 
+	/**
+	* Tries to retrieve the inventory interface of the specified Actor.
+	* If Actor doesn't implement interface, then first found interface in Components will be returned.
+	* If nothing is found, then nullptr is returned.
+	* 
+	* @param FromActor The actor from which to retrieve the inventory interface.
+	* @return The inventory interface as a script interface of type IMounteaInventoryInterface.
+	*/
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TScriptInterface<IMounteaInventoryInterface> GetInventoryInterface(AActor* FromActor)
+	{
+		return GetInterfaceFrom<UMounteaInventoryInterface, TScriptInterface<IMounteaInventoryInterface>>(FromActor);
+	}
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(CompactNodeTitle="Is Valid", DisplayName="Is Valid", NativeBreakFunc))
 	static bool ItemRetrievalFilter_IsValid(const FItemRetrievalFilter& Filter)
 	{
 		return Filter.IsValid();
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static FIntPoint GetInventoryDimensions()
-	{
-		bool bFound;
-		const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
-		return bFound ? Config->InventoryBaseSize : FIntPoint(6, 10);
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static FIntPoint GetInventorySlotSize()
-	{
-		bool bFound;
-		const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
-		return bFound ? Config->SlotBaseSize : FIntPoint(16, 16);
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool UIDebug()
-	{
-		if (IsShipping())
-		{
-			return false;
-		}
-		
-		if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
-		{
-			return Settings->bUIDebug;
-		}
-
-		return false;
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsDragAllowed()
-	{
-		return GetSettings()->bDragDropAllowed;
-	}
-
+#pragma region HelpersFunctions
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Object"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult)
 	{
@@ -131,6 +109,14 @@ public:
 		return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TSubclassOf<UMounteaInventoryItemConfig> GetItemItemConfigClass(const UMounteaInventoryItemBase* Target)
+	{
+		if (!Target) return nullptr;
+
+		return Target->GetItemConfigClass();
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UMounteaInventoryItemConfig* GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult)
 	{
@@ -166,13 +152,63 @@ public:
 		
 		return Target->GetItemAdditionalData(ClassFilter, bResult);
 	}
+
+#pragma endregion 
 	
+#pragma region EditorFunctions
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsEditor()
+	{
+#if WITH_EDITOR
+		return true;
+#endif
+
+		return false;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsEditorNoPlay()
+	{
+		// This is to ensure we are not throwing InvalidWorld errors in Editor with no Gameplay.
+		bool bIsEditorCall = false;
+#if WITH_EDITOR
+		if (GEditor != nullptr)
+		{
+			bIsEditorCall = !GEditor->GetPlayInEditorSessionInfo().IsSet();
+		}
+#endif
+
+		return bIsEditorCall;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsShipping()
+	{
+		
+#if UE_BUILD_SHIPPING
+		return true;
+#endif
+
+		return false;
+	}
+	
+#pragma endregion 
+
+#pragma region SettingsFunctions
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static const UMounteaInventoryEquipmentSettings* GetSettings()
 	{
 		return GetDefault<UMounteaInventoryEquipmentSettings>();
 	}
-
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static UMounteaInventoryItemsTable* GetDefaultItemsTable()
+	{
+		return GetSettings()->DefaultInventoryItemDefinitionsTable.LoadSynchronous();
+	}
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TSet<UMounteaInventoryItemCategory*> GetAllowedCategories()
 	{
@@ -203,6 +239,79 @@ public:
 		return GetSettings()->DragKeys;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TSoftClassPtr<UMounteaInventoryItemConfig> GetDefaultItemConfigClass()
+	{
+		return GetSettings()->DefaultItemConfigClass;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool UIDebug()
+	{
+		if (IsShipping())
+		{
+			return false;
+		}
+		
+		if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
+		{
+			return Settings->bUIDebug;
+		}
+
+		return false;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool IsDragAllowed()
+	{
+		return GetSettings()->bDragDropAllowed;
+	}
+	
+#pragma endregion 
+
+#pragma region ThemeFunctions
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static FIntPoint GetInventoryDimensions()
+	{
+		bool bFound;
+		const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
+		return bFound ? Config->InventoryBaseSize : FIntPoint(6, 10);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static FIntPoint GetInventorySlotSize()
+	{
+		bool bFound;
+		const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
+		return bFound ? Config->SlotBaseSize : FIntPoint(16, 16);
+	}
+	
+#pragma endregion 
+	
+#pragma region QuantityFunctions
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
+
+	static bool AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
+
+	static int32 GetValidFiltersCount(const FItemRetrievalFilter& Filter)
+	{
+		int32 Result = 0;
+
+		if (Filter.bSearchByClass) Result++;
+		if (Filter.bSearchByItem) Result++;
+		if (Filter.bSearchByTag) Result++;
+		if (Filter.bSearchByGUID) Result++;
+
+		return Result;
+	}
+
+#pragma endregion 
+	
+#pragma region ItemFunctions
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FIntPoint> CalculateItemShadow(const FIntPoint& StartCoords, const FIntPoint& Area)
 	{
@@ -311,78 +420,7 @@ public:
 
 		return false;
 	}
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsEditor()
-	{
-#if WITH_EDITOR
-		return true;
-#endif
 
-		return false;
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsEditorNoPlay()
-	{
-		// This is to ensure we are not throwing InvalidWorld errors in Editor with no Gameplay.
-		bool bIsEditorCall = false;
-#if WITH_EDITOR
-		if (GEditor != nullptr)
-		{
-			bIsEditorCall = !GEditor->GetPlayInEditorSessionInfo().IsSet();
-		}
-#endif
-
-		return bIsEditorCall;
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static UMounteaInventoryItemsTable* GetDefaultItemsTable()
-	{
-		return GetSettings()->DefaultInventoryItemDefinitionsTable.LoadSynchronous();
-	}
-	 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsShipping()
-	{
-		
-#if UE_BUILD_SHIPPING
-		return true;
-#endif
-
-		return false;
-	}
-
-	/**
-	* Tries to retrieve the inventory interface of the specified Actor.
-	* If Actor doesn't implement interface, then first found interface in Components will be returned.
-	* If nothing is found, then nullptr is returned.
-	* 
-	* @param FromActor The actor from which to retrieve the inventory interface.
-	* @return The inventory interface as a script interface of type IMounteaInventoryInterface.
-	*/
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static TScriptInterface<IMounteaInventoryInterface> GetInventoryInterface(AActor* FromActor)
-	{
-		return GetInterfaceFrom<UMounteaInventoryInterface, TScriptInterface<IMounteaInventoryInterface>>(FromActor);
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
-
-	static bool AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
-
-	static int32 GetValidFiltersCount(const FItemRetrievalFilter& Filter)
-	{
-		int32 Result = 0;
-
-		if (Filter.bSearchByClass) Result++;
-		if (Filter.bSearchByItem) Result++;
-		if (Filter.bSearchByTag) Result++;
-		if (Filter.bSearchByGUID) Result++;
-
-		return Result;
-	}
+#pragma endregion 
 };
 

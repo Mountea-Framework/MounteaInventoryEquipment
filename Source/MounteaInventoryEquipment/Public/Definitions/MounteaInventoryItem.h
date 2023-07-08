@@ -102,6 +102,17 @@ private:
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const
+	{
+		if (ItemConfig.ItemConfig)
+		{
+			return ItemConfig.ItemConfig->StaticClass();
+		}
+		
+		return nullptr;
+	}
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
 	UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const
 	{
