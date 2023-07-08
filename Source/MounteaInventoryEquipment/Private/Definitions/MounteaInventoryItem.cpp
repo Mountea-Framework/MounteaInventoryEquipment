@@ -213,11 +213,11 @@ void UMounteaInventoryItemBase::SetValidData()
 		case EItemDataSource::EIDS_SourceTable:
 			ClearMappedValues();
 			CopyFromTable();
-			CopyTagsFromCategory();
+			CopyTagsFromTypes();
 			break;
 		case EItemDataSource::EIDS_ManualInput:
 			ClearDataTable();
-			CopyTagsFromCategory();
+			CopyTagsFromTypes();
 			break;
 		case EItemDataSource::Default:
 		default: break;
@@ -230,11 +230,16 @@ void UMounteaInventoryItemBase::ClearMappedValues()
 	ItemOptionalData = FMounteaInventoryItemOptionalData();
 }
 
-void UMounteaInventoryItemBase::CopyTagsFromCategory()
+void UMounteaInventoryItemBase::CopyTagsFromTypes()
 {
 	if (ItemData.ItemCategory)
 	{
 		ItemData.CompatibleGameplayTags.AppendTags(ItemData.ItemCategory->CompatibleGameplayTags);
+	}
+
+	if (ItemData.ItemRarity)
+	{
+		ItemData.CompatibleGameplayTags.AddTag(ItemData.ItemRarity->RarityGameplayTag);
 	}
 }
 

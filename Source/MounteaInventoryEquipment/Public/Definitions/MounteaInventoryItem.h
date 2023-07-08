@@ -253,7 +253,7 @@ protected:
 	void ClearDataTable();
 	void CopyFromTable();
 	void ClearMappedValues();
-	void CopyTagsFromCategory();
+	void CopyTagsFromTypes();
 
 #if WITH_EDITOR
 	
