@@ -253,6 +253,7 @@ protected:
 	void ClearDataTable();
 	void CopyFromTable();
 	void ClearMappedValues();
+	void CopyTagsFromCategory();
 
 #if WITH_EDITOR
 	
@@ -262,7 +263,7 @@ protected:
 #endif
 
 public:
-
+	
 	UFUNCTION(CallInEditor, BlueprintCallable, Category="1. Import")
 	virtual void SetValidData() override;
 	
