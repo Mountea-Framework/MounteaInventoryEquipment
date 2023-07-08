@@ -15,11 +15,15 @@
 #include "AssetActions/FMounteaInventoryItemsTableAssetAction.h"
 #include "AssetActions/FMounteaInventoryRarityAssetAction.h"
 #include "AssetActions/FMounteaInventoryThemeAssetAction.h"
+#include "Definitions/MounteaInventoryItem.h"
+#include "DetailsPanel/MounteaInventoryItemBase_Details.h"
+#include "DetailsPanel/MounteaItemConfig_Details.h"
+#include "DetailsPanel/MounteaItemConfig_DetailsPanel.h"
 
 #include "HelpButton/MIECommands.h"
 #include "HelpButton/MIEHelpStyle.h"
 #include "Helpers/FMounteaInventoryEquipmentEditorConsts.h"
-#include "Helpers/MIEClassStyle.h"
+#include "Helpers/MIEEditorStyle.h"
 
 #include "Interfaces/IHttpResponse.h"
 #include "Interfaces/IMainFrameModule.h"
@@ -29,6 +33,7 @@
 #include "Popups/MIEPopupStyle.h"
 
 #include "Serialization/JsonReader.h"
+#include "Setup/MounteaInventoryItemConfig.h"
 #include "Styling/SlateStyleRegistry.h"
 
 class IMainFrameModule;
@@ -65,8 +70,8 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 
 	// Register Styles and Commands
 	{
-		FMIEClassStyle::Initialize();
-		FMIEClassStyle::ReloadTextures();
+		FMIEEditorStyle::Initialize();
+		FMIEEditorStyle::ReloadTextures();
 		
 		FMIEHelpStyle::Initialize();
 		FMIEHelpStyle::ReloadTextures();
@@ -112,6 +117,44 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 				FSlateStyleRegistry::RegisterSlateStyle(*InventoryEquipmentClassStyleSet.Get());
 			}
 		}
+	}
+
+	//Register custom Buttons for Decorators
+	{
+		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		{
+			TArray<FOnGetDetailCustomizationInstance> CustomClassLayouts =
+			{
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaInventoryItem_Details::MakeInstance),
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemConfig_Details::MakeInstance),
+			};
+			RegisteredCustomClassLayouts =
+			{
+				UMounteaInventoryItemBase::StaticClass()->GetFName(),
+				UMounteaInventoryItemConfig::StaticClass()->GetFName(),
+			};
+			for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)
+			{
+				PropertyModule.RegisterCustomClassLayout(RegisteredCustomClassLayouts[i], CustomClassLayouts[i]);
+			}
+		}
+
+		{
+			TArray<FOnGetPropertyTypeCustomizationInstance> CustomPropertyTypeLayouts =
+		   {
+				FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaItemConfig_DetailsPanel::MakeInstance),
+			};
+			RegisteredCustomPropertyTypeLayout =
+			{
+				FMounteaItemConfig::StaticStruct()->GetFName(),
+			};
+			for (int32 i = 0; i < RegisteredCustomPropertyTypeLayout.Num(); i++)
+			{
+				PropertyModule.RegisterCustomPropertyTypeLayout(RegisteredCustomPropertyTypeLayout[i], CustomPropertyTypeLayouts[i]);
+			}
+		}
+
+		PropertyModule.NotifyCustomizationModuleChanged();
 	}
 	
 	UE_LOG(MounteaInventoryEquipmentEditor, Warning, TEXT("MounteaInventoryEquipmentEditor module has been loaded"));
@@ -180,7 +223,7 @@ void FMounteaInventoryEquipmentEditor::ShutdownModule()
 
 	// Unregister Class Styles
 	{
-		FMIEClassStyle::Shutdown();
+		FMIEEditorStyle::Shutdown();
 
 		//Register the created style
 		FSlateStyleRegistry::UnRegisterSlateStyle(*InventoryEquipmentClassStyleSet.Get());

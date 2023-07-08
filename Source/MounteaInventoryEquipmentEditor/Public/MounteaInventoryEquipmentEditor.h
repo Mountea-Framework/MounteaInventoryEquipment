@@ -36,4 +36,7 @@ private:
 	TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
 
 	TSharedPtr<FSlateStyleSet> InventoryEquipmentClassStyleSet;
+	
+	TArray<FName> RegisteredCustomClassLayouts;
+	TArray<FName> RegisteredCustomPropertyTypeLayout;
 };

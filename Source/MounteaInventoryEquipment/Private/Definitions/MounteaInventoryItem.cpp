@@ -30,12 +30,7 @@ void UMounteaInventoryItemBase::PostInitProperties()
 			SourceTable = UMounteaInventoryEquipmentBPF::GetDefaultItemsTable();
 		}
 
-		if (ItemConfig.ItemConfig == nullptr)
-		{
-			bool bFound = false;
-			const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
-			ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
-		}
+		EnsureValidConfig();
 	}
 	else
 	{
@@ -224,6 +219,12 @@ void UMounteaInventoryItemBase::SetValidData()
 	}
 }
 
+void UMounteaInventoryItemBase::SetValidDataEditor()
+{
+	SetValidData();
+	EnsureValidConfig();
+}
+
 void UMounteaInventoryItemBase::ClearMappedValues()
 {
 	ItemData = FMounteaInventoryItemRequiredData();
@@ -252,6 +253,16 @@ void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 	ItemGuid = FGuid::NewGuid();
 }
 
+void UMounteaInventoryItemBase::EnsureValidConfig()
+{
+	if (ItemConfig.ItemConfig == nullptr)
+	{
+		bool bFound = false;
+		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
+		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
+	}
+}
+
 void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	if (PropertyChangedEvent.GetPropertyName().ToString() == TEXT("bIsStackable"))
@@ -276,6 +287,11 @@ void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& Pr
 	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, SourceRow))
 	{
 		SetValidData();
+	}
+
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, ItemConfig))
+	{
+		EnsureValidConfig();
 	}
 }
 #endif

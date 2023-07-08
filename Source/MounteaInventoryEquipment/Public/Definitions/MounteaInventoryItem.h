@@ -54,13 +54,13 @@ private:
 
 public:
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties, EditFixedOrder), ReplicatedUsing=OnRep_Item)
 	EItemDataSource ItemDataSource = EItemDataSource::EIDS_SourceTable;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
 	UMounteaInventoryItemsTable* SourceTable;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable"))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
 	FName SourceRow;
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Required", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"), ReplicatedUsing=OnRep_Item)
@@ -265,18 +265,27 @@ protected:
 	void CopyFromTable();
 	void ClearMappedValues();
 	void CopyTagsFromTypes();
+	void EnsureValidConfig();
 
 #if WITH_EDITOR
 	
 	virtual void PostDuplicate(bool bDuplicateForPIE) override;
+	
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	
 #endif
 
 public:
 	
-	UFUNCTION(CallInEditor, BlueprintCallable, Category="1. Import")
+	UFUNCTION(BlueprintCallable, Category="1. Import")
 	virtual void SetValidData() override;
+
+#if WITH_EDITOR
+
+	UFUNCTION()
+	void SetValidDataEditor();
+	
+#endif
 	
 };
 

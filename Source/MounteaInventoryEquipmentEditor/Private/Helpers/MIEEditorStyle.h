@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Styling/SlateStyle.h"
 
-class FMIEClassStyle
+class FMIEEditorStyle
 {
 public:
 
@@ -20,6 +20,17 @@ public:
 	static const ISlateStyle& Get();
 
 	static FName GetStyleSetName();
+
+	static const FSlateBrush * GetBrush(FName PropertyName, const ANSICHAR* Specifier = NULL)
+	{
+		return StyleInstance->GetBrush(PropertyName, Specifier);
+	};
+
+	template< class T >            
+	static const T& GetWidgetStyle( FName PropertyName, const ANSICHAR* Specifier = NULL  ) 
+	{
+		return StyleInstance->GetWidgetStyle< T >( PropertyName, Specifier );
+	}
 
 private:
 
