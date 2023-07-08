@@ -20,5 +20,6 @@ const FText AdvancedMenuCategoryNameText = FText::FromString("Mountea Inventory 
 const FText AdvancedMenuSubCategoryName_01 = LOCTEXT("AdvancedMenuSubCategoryName_01", "1. Configuration");
 const FText AdvancedMenuSubCategoryName_02 = LOCTEXT("AdvancedMenuSubCategoryName_02", "2. Data");
 const FText AdvancedMenuSubCategoryName_03 = LOCTEXT("AdvancedMenuSubCategoryName_03", "3. Definitions");
+const FText AdvancedMenuSubCategoryName_04 = LOCTEXT("AdvancedMenuSubCategoryName_04", "4. Components");
 
 #undef LOCTEXT_NAMESPACE
