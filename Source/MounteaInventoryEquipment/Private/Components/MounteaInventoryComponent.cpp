@@ -75,7 +75,7 @@ UUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation()
 	return InventoryWBP;
 }
 
-bool UMounteaInventoryComponent::LoadInventoryFromDataTable_Implementation(const UDataTable* SourceTable)
+bool UMounteaInventoryComponent::LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable)
 {
 	return true;
 }
@@ -762,8 +762,8 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	{
 		Filter.bSearchByItem = true;
 		Filter.Item = Item;
-		Filter.bSearchByClass = true;
-		Filter.Class = Item->GetClass();
+		//Filter.bSearchByClass = true;
+		//Filter.Class = Item->StaticClass();
 		//Filter.bSearchByTag = false;
 		//Filter.Tag = Item->GetFirstTag();
 	}
@@ -778,8 +778,8 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 		FItemRetrievalFilter SearchFilter;
 		SearchFilter.bSearchByItem = true;
 		SearchFilter.Item = Item;
-		SearchFilter.bSearchByClass = true;
-		SearchFilter.Class = Item->StaticClass();
+		SearchFilter.bSearchByGUID = true;
+		SearchFilter.Guid = Item->GetItemGuid();
 			
 		UMounteaInventoryItemBase* ExistingItem = Execute_FindItem(this, SearchFilter);
 		
@@ -837,8 +837,8 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 	{
 		Filter.bSearchByItem = true;
 		Filter.Item = Item;
-		Filter.bSearchByClass = true;
-		Filter.Class = Item->GetClass();
+		Filter.bSearchByGUID = true;
+		Filter.Guid = Item->GetItemGuid();
 		Filter.bSearchByTag = true;
 		Filter.Tags = Item->GetTags();
 	}

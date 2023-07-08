@@ -16,6 +16,22 @@ UMounteaItemAssetFactory::UMounteaItemAssetFactory()
 
 UObject* UMounteaItemAssetFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
+	if (ParentClass == nullptr)
+	{
+		ParentClass = UMounteaInventoryItemBase::StaticClass();
+	}
+	
+	UMounteaInventoryItemBase* Item = NewObject<UMounteaInventoryItemBase>(InParent, ParentClass, Name, Flags, Context);
+	
+	if (SourceTable)
+	{
+		Item->SourceTable = SourceTable;
+		Item->SourceRow = SourceRow;
+
+		Item->SetValidData();
+	}
+
+	return Item;
 	return NewObject<UMounteaInventoryItemBase>(InParent, ParentClass, Name, Flags, Context);
 }
 
@@ -32,4 +48,15 @@ bool UMounteaItemAssetFactory::ConfigureProperties()
 	}
 
 	return bPressedOk;
+}
+
+void UMounteaItemAssetFactory::SetParentClass(const TSubclassOf<UMounteaInventoryItemsTable>& InParentClass)
+{
+	ParentClass = InParentClass;
+}
+
+void UMounteaItemAssetFactory::SetSource(UMounteaInventoryItemsTable* InSourceTable, const FName& InSourceRow)
+{
+	SourceTable = InSourceTable;
+	SourceRow = InSourceRow;
 }

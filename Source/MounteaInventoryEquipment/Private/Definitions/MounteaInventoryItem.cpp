@@ -23,12 +23,14 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	bIsEditorNoPlay = UMounteaInventoryEquipmentBPF::IsEditorNoPlay();
 #endif
 	
-	if (bIsEditorNoPlay)
+	if (bIsEditorNoPlay) // This code gets executed only when opening new Asset in Editor
 	{
 		if (ItemDataSource == EItemDataSource::EIDS_SourceTable && SourceTable == nullptr)
 		{
 			SourceTable = UMounteaInventoryEquipmentBPF::GetDefaultItemsTable();
 		}
+
+		EnsureValidConfig();
 	}
 	else
 	{
@@ -206,19 +208,40 @@ void UMounteaInventoryItemBase::SetValidData()
 		case EItemDataSource::EIDS_SourceTable:
 			ClearMappedValues();
 			CopyFromTable();
+			CopyTagsFromTypes();
 			break;
 		case EItemDataSource::EIDS_ManualInput:
 			ClearDataTable();
+			CopyTagsFromTypes();
 			break;
 		case EItemDataSource::Default:
 		default: break;
 	}
 }
 
+void UMounteaInventoryItemBase::SetValidDataEditor()
+{
+	SetValidData();
+	EnsureValidConfig();
+}
+
 void UMounteaInventoryItemBase::ClearMappedValues()
 {
 	ItemData = FMounteaInventoryItemRequiredData();
 	ItemOptionalData = FMounteaInventoryItemOptionalData();
+}
+
+void UMounteaInventoryItemBase::CopyTagsFromTypes()
+{
+	if (ItemData.ItemCategory)
+	{
+		ItemData.CompatibleGameplayTags.AppendTags(ItemData.ItemCategory->CompatibleGameplayTags);
+	}
+
+	if (ItemData.ItemRarity)
+	{
+		ItemData.CompatibleGameplayTags.AddTag(ItemData.ItemRarity->RarityGameplayTag);
+	}
 }
 
 #if WITH_EDITOR
@@ -228,6 +251,16 @@ void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 	UObject::PostDuplicate(bDuplicateForPIE);
 
 	ItemGuid = FGuid::NewGuid();
+}
+
+void UMounteaInventoryItemBase::EnsureValidConfig()
+{
+	if (ItemConfig.ItemConfig == nullptr)
+	{
+		bool bFound = false;
+		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
+		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
+	}
 }
 
 void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -254,6 +287,11 @@ void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& Pr
 	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, SourceRow))
 	{
 		SetValidData();
+	}
+
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemBase, ItemConfig))
+	{
+		EnsureValidConfig();
 	}
 }
 #endif

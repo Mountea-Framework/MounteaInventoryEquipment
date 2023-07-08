@@ -6,26 +6,22 @@
 #include "AssetTypeActions_Base.h"
 #include "Utils/MounteaInventoryEquipmentEditorUtilities.h"
 
-class UMounteaInventoryItemBase;
-class UCommonGenericInputActionDataTable;
-
-class FMounteaInventoryTableAssetAction_Base : public FAssetTypeActions_Base
+class FMounteaInventoryRarityAssetAction : public FAssetTypeActions_Base
 {
 	
 public:
 
-	FMounteaInventoryTableAssetAction_Base();
+	FMounteaInventoryRarityAssetAction();
 
 	virtual FText GetName() const override;
 	virtual FColor GetTypeColor() const override;
 	virtual UClass* GetSupportedClass() const override;
 	virtual uint32 GetCategories() override;
-	
-	virtual const TArray<FText>& GetSubMenus() const override;
-	
-	virtual void OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor = TSharedPtr<IToolkitHost>()) override;
 
-private:
+	virtual const TArray<FText>& GetSubMenus() const override;
+
+	virtual bool CanFilter() override
+	{ return false; };
 	
 	virtual void BuildBackendFilter(FARFilter& InFilter) override
 	{
@@ -43,6 +39,7 @@ private:
 		InFilter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
 		InFilter.bRecursiveClasses = true;
 	};
+	
 	static void FilterAddNativeParentClassPath(FARFilter& InFilter, const UClass* Class)
 	{
 		if (Class == nullptr)

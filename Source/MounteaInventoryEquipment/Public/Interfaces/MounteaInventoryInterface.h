@@ -55,8 +55,8 @@ public:
 	virtual UUserWidget* GetInventoryWBP_Implementation() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool LoadInventoryFromDataTable(const class UDataTable* SourceTable);
-	virtual bool LoadInventoryFromDataTable_Implementation(const class UDataTable* SourceTable) = 0;
+	bool LoadInventoryFromDataTable(const class UMounteaInventoryItemsTable* SourceTable);
+	virtual bool LoadInventoryFromDataTable_Implementation(const class UMounteaInventoryItemsTable* SourceTable) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void SaveInventory();

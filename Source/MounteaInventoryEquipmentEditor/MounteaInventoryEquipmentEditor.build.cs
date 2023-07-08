@@ -21,6 +21,7 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"KismetCompiler",
 
 				"UnrealEd",
+				
 				"AssetTools",
 			}
 		);
@@ -32,6 +33,7 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"MounteaInventoryEquipment", 
 
 				"AssetTools",
+				
 				"Slate",
 				"SlateCore",
 				"GraphEditor",
@@ -54,7 +56,8 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				
 				"MainFrame",
 				"ContentBrowser", 
-				"DataTableEditor"
+				"DataTableEditor",
+				"DesktopPlatform"
 			}
 		);
  

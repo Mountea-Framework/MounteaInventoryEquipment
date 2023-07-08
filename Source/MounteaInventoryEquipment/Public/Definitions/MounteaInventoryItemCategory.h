@@ -12,8 +12,6 @@
 /**
  * Mountea Inventory Category
  *
- * Abstract Base Class
- *
  * Defines Category.
  * Is Assigned to Inventory Items to sort them to Categories.
  */

@@ -11,6 +11,11 @@ const FVector2D Icon128x128(128.f, 128.f);
 const FVector2D Icon200x70(200.f, 70.f);
 
 const FString ChangelogURL = FString("https://raw.githubusercontent.com/Mountea-Framework/MounteaInventoryEquipment/5.0/CHANGELOG.md");
+const FString SupportDiscordURL = FString("https://discord.gg/2vXWEEN");
+
+const FString PluginWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki");
+const FString ItemsWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Object");
+const FString ItemConfigWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Config");
 
 const FName AdvancedMenuCategoryName("MounteaInventoryEquipment");
 
@@ -19,5 +24,7 @@ const FName AdvancedMenuCategoryName("MounteaInventoryEquipment");
 const FText AdvancedMenuCategoryNameText = FText::FromString("Mountea Inventory & Equipment");
 const FText AdvancedMenuSubCategoryName_01 = LOCTEXT("AdvancedMenuSubCategoryName_01", "1. Configuration");
 const FText AdvancedMenuSubCategoryName_02 = LOCTEXT("AdvancedMenuSubCategoryName_02", "2. Data");
+const FText AdvancedMenuSubCategoryName_03 = LOCTEXT("AdvancedMenuSubCategoryName_03", "3. Definitions");
+const FText AdvancedMenuSubCategoryName_04 = LOCTEXT("AdvancedMenuSubCategoryName_04", "4. Components");
 
 #undef LOCTEXT_NAMESPACE
