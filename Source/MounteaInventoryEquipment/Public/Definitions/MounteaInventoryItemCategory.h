@@ -36,6 +36,23 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
 	TSet<FMounteaItemAction> CategoryActions;
+
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE TArray<UMounteaInventoryItemAction*> GetCategoryActions() const
+	{
+		TArray<UMounteaInventoryItemAction*> ReturnValues;
+		for (const auto& Itr : CategoryActions)
+		{
+			if (Itr.ItemAction && !ReturnValues.Contains(Itr.ItemAction))
+			{
+				ReturnValues.Add(Itr.ItemAction);
+			}
+		}
+
+		return ReturnValues;
+	}
 };
 
 #undef LOCTEXT_NAMESPACE

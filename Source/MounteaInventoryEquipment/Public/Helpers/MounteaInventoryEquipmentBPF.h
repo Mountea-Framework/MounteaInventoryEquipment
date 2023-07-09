@@ -58,6 +58,25 @@ public:
 	}
 
 #pragma region HelpersFunctions
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target) const
+	{
+		if (!Target) return TArray<UMounteaInventoryItemAction*>();
+		if (!Target->GetItemData().ItemCategory) return Target->GetItemActions();
+
+		TArray<UMounteaInventoryItemAction*> ReturnValues = Target->GetItemData().ItemCategory->GetCategoryActions();
+
+		for (auto const& Itr : Target->GetItemActions())
+		{
+			if (Itr && !ReturnValues.Contains(Itr))
+			{
+				ReturnValues.Add(Itr);
+			}
+		}
+		
+		return ReturnValues;
+	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Object"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult)
@@ -84,24 +103,12 @@ public:
 		return nullptr;
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemAction"), meta=(DeterminesOutputType = "ClassFilter"), DisplayName="Get Item Actions (Item)")
-	static TArray<UMounteaInventoryItemAction*> GetItemActions_Item(const UMounteaItemAdditionalData* Item, const TSubclassOf<UMounteaInventoryItemAction> ClassFilter, bool& bResult)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	static TSubclassOf<UMounteaInventoryThemeConfig> GetThemeConfigClass()
 	{
-		if (!Item) return TArray<UMounteaInventoryItemAction*>();
+		if (GetSettings()->ThemeConfig) return GetSettings()->ThemeConfig->StaticClass();
 
-		//TODO
-
-		return TArray<UMounteaInventoryItemAction*>();
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemAction"), meta=(DeterminesOutputType = "ClassFilter"), DisplayName="Get Item Actions (Category)")
-	static TArray<UMounteaInventoryItemAction*> GetItemActions_Category(const UMounteaInventoryItemCategory* Category, const TSubclassOf<UMounteaInventoryItemAction> ClassFilter, bool& bResult)
-	{
-		if (!Category) return TArray<UMounteaInventoryItemAction*>();
-
-		//TODO
-
-		return TArray<UMounteaInventoryItemAction*>();
+		return nullptr;
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))

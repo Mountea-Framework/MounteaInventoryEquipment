@@ -9,8 +9,10 @@
 #include "Interfaces/MounteaInventoryEquipmentItem.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Setup/MounteaInventoryItemConfig.h"
+#include "Definitions/MounteaItemAction.h"
 #include "MounteaInventoryItem.generated.h"
 
+struct FMounteaItemAction;
 struct FMounteaItemConfig;
 class UMounteaItemAdditionalData;
 class IMounteaInventoryPickupInterface;
@@ -69,6 +71,9 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
+	TSet<FMounteaItemAction> ItemActions;
+	
 protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
@@ -101,6 +106,25 @@ private:
 	class UWorld* World;
 
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE FMounteaInventoryItemRequiredData GetItemData() const
+	{ return ItemData; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE TArray<UMounteaInventoryItemAction*> GetItemActions() const
+	{
+		TArray<UMounteaInventoryItemAction*> ReturnValues;
+		for (const auto& Itr : ItemActions)
+		{
+			if (Itr.ItemAction && !ReturnValues.Contains(Itr.ItemAction))
+			{
+				ReturnValues.Add(Itr.ItemAction);
+			}
+		}
+
+		return ReturnValues;
+	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const
@@ -143,10 +167,10 @@ public:
 		bResult = true;
 		if (ItemOptionalData.ItemAdditionalData == nullptr)
 		{
-			return NewObject<UMounteaItemAdditionalData>(GetTransientPackage(), ClassFilter);
+			return NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
 		}
 
-		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(GetTransientPackage(), ClassFilter);
+		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )

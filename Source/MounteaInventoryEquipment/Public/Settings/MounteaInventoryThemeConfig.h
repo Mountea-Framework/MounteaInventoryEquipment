@@ -57,4 +57,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Category", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaCategoryWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryCategoryClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Actions", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaItemActionWBPInterface"))
+	TSubclassOf<UMounteaBaseUserWidget> InventoryItemActionClass;
 };
