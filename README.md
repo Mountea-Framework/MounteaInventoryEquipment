@@ -10,12 +10,10 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 ## Discord Channel
 <a href="https://discord.gg/2vXWEEN"><img src="https://static.wikia.nocookie.net/siivagunner/images/9/9f/Discord_icon.svg/revision/latest?cb=20210814160101" alt="Discord LINK" width="100" height="100"></a>
 
-Join support and community Discord!
+Join the support and community Discord!
 
 ## Tutorial videos
 <a href="https://www.youtube.com/playlist?list=PLIU53wA8zZmg5eBKEcpZr7G8JBBZ4QPKq"><img src="https://img.talkandroid.com/uploads/2016/06/youtube-logo-450x450.png" alt="TUTORIAL playlist" width="100" height="100"></a>
-
-Join support and community Discord!
 
 ## Compatible Engine Version
 
@@ -46,6 +44,14 @@ Import Data Tables, use Data Tables to define Items. Easy to manage system with 
 In-line editable configuration with the ability to extend logic in Blueprints.
 <p align="center" width="100%">
     <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/6df25a2b-c885-42f5-a66b-e2820aeeffbb">
+</p>
+
+### Inventory/Equipment Actions
+In-line editable configuration with the ability to extend logic in Blueprints.</p>
+Each Action represents a logic that can be performed for each Item from the selected Category. For example, Apples can be Consumed, Keys can be Used etc.</p>
+Each Action can be shown from the in-game context menu and the visibility can be adjusted using the `DisplayAction` function, which can be overridden per Action type.
+<p align="center" width="100%">
+    <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/7129b964-70ac-4b01-99ea-058c8af607b8">
 </p>
 
 ## Installation
