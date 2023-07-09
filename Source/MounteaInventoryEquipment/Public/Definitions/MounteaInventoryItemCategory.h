@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "UObject/NoExportTypes.h"
+#include "MounteaItemAction.h"
 #include "MounteaInventoryItemCategory.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemCategory"
@@ -33,6 +33,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
 	UTexture2D* CategoryIcon = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
+	TSet<FMounteaItemAction> CategoryActions;
 };
 
 #undef LOCTEXT_NAMESPACE

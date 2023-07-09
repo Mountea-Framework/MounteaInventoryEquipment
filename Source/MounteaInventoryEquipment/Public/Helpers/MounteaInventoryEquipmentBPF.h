@@ -83,6 +83,26 @@ public:
 		bResult = false;
 		return nullptr;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemAction"), meta=(DeterminesOutputType = "ClassFilter"), DisplayName="Get Item Actions (Item)")
+	static TArray<UMounteaInventoryItemAction*> GetItemActions_Item(const UMounteaItemAdditionalData* Item, const TSubclassOf<UMounteaInventoryItemAction> ClassFilter, bool& bResult)
+	{
+		if (!Item) return TArray<UMounteaInventoryItemAction*>();
+
+		//TODO
+
+		return TArray<UMounteaInventoryItemAction*>();
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemAction"), meta=(DeterminesOutputType = "ClassFilter"), DisplayName="Get Item Actions (Category)")
+	static TArray<UMounteaInventoryItemAction*> GetItemActions_Category(const UMounteaInventoryItemCategory* Category, const TSubclassOf<UMounteaInventoryItemAction> ClassFilter, bool& bResult)
+	{
+		if (!Category) return TArray<UMounteaInventoryItemAction*>();
+
+		//TODO
+
+		return TArray<UMounteaInventoryItemAction*>();
+	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UMounteaInventoryThemeConfig* GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter, bool& bResult)

@@ -23,7 +23,7 @@ public:
 	void InitializeAction(UMounteaInventoryItemBase* ItemInFocus);
 	void InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus);
 	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction")
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Can Display Action")
 	bool DisplayAction(UMounteaInventoryItemBase* ItemInFocus) const;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction")
@@ -34,6 +34,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
 	FORCEINLINE FGameplayTag GetActionTag() const
 	{ return ActionTag; };
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
+	FORCEINLINE FName GetActionName() const
+	{ return ActionName; };
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
+	FORCEINLINE UTexture2D* GetActionIcon() const
+	{ return ActionIcon; };
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
@@ -66,15 +74,21 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required", meta=(NoResetToDefault))
 	FGameplayTag ActionTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required", meta=(NoResetToDefault))
+	FName ActionName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(NoResetToDefault, ExposeOnSpawn))
+	UTexture2D* ActionIcon = nullptr;
 	
 private:
 
-	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	UPROPERTY(VisibleAnywhere, Category="3. Debug", meta=(DisplayThumbnail=false), AdvancedDisplay)
 	class UWorld* World;
 
-	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	UPROPERTY(VisibleAnywhere, Category="3. Debug", meta=(DisplayThumbnail=false), AdvancedDisplay)
 	UMounteaInventoryItemBase* OwningItem = nullptr;
 };
 
@@ -83,6 +97,43 @@ struct FMounteaItemAction
 {
 	GENERATED_BODY()
 
+public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
 	UMounteaInventoryItemAction* ItemAction = nullptr;
+
+public:
+	
+	bool operator==(const FMounteaItemAction& Other) const
+	{
+		if (!ItemAction)
+		{
+			return true;
+		}
+
+		if (!Other.ItemAction)
+		{
+			return true;
+		}
+
+		return
+		ItemAction->GetActionTag() == Other.ItemAction->GetActionTag() &&
+		ItemAction->GetActionName() == Other.ItemAction->GetActionName();
+	}
+
+	bool operator!=(const FMounteaItemAction& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	friend uint32 GetTypeHash(const FMounteaItemAction& Src)
+	{
+		if (Src.ItemAction)
+		{
+			const uint32 Hash = GetTypeHash(Src.ItemAction->GetActionTag()) + GetTypeHash(Src.ItemAction->GetActionName());
+			return Hash;
+		}
+		return FCrc::MemCrc32(&Src, sizeof(FMounteaItemAction));
+	}
 };
+

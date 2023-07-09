@@ -18,8 +18,11 @@
 #include "AssetActions/FMounteaInventoryThemeAssetAction.h"
 
 #include "Definitions/MounteaInventoryItem.h"
+#include "Definitions/MounteaItemAction.h"
 
 #include "DetailsPanel/MounteaInventoryItemBase_Details.h"
+#include "DetailsPanel/MounteaItemAction_Details.h"
+#include "DetailsPanel/MounteaItemAction_DetailsPanel.h"
 #include "DetailsPanel/MounteaItemConfig_Details.h"
 #include "DetailsPanel/MounteaItemConfig_DetailsPanel.h"
 
@@ -132,11 +135,13 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 			{
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaInventoryItem_Details::MakeInstance),
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemConfig_Details::MakeInstance),
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemAction_Details::MakeInstance),
 			};
 			RegisteredCustomClassLayouts =
 			{
 				UMounteaInventoryItemBase::StaticClass()->GetFName(),
 				UMounteaInventoryItemConfig::StaticClass()->GetFName(),
+				UMounteaInventoryItemAction::StaticClass()->GetFName(),
 			};
 			for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)
 			{
@@ -148,10 +153,12 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 			TArray<FOnGetPropertyTypeCustomizationInstance> CustomPropertyTypeLayouts =
 		   {
 				FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaItemConfig_DetailsPanel::MakeInstance),
+				FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaItemAction_DetailsPanel::MakeInstance),
 			};
 			RegisteredCustomPropertyTypeLayout =
 			{
 				FMounteaItemConfig::StaticStruct()->GetFName(),
+				FMounteaItemAction::StaticStruct()->GetFName(),
 			};
 			for (int32 i = 0; i < RegisteredCustomPropertyTypeLayout.Num(); i++)
 			{
