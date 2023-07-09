@@ -267,6 +267,12 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TArray<FKey> GetActionRequestKeys()
+	{
+		return GetSettings()->ActionRequestKeys;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TSoftClassPtr<UMounteaInventoryItemConfig> GetDefaultItemConfigClass()
 	{
 		return GetSettings()->DefaultItemConfigClass;
