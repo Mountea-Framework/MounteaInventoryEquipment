@@ -15,6 +15,11 @@ void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInvent
 	}
 }
 
+bool UMounteaInventoryItemAction::DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const
+{
+	return GetWorld() != nullptr;
+}
+
 void UMounteaInventoryItemAction::SetWorldFromLevel(ULevel* FromLevel)
 {
 	if (FromLevel == nullptr)

@@ -23,8 +23,9 @@ public:
 	void InitializeAction(UMounteaInventoryItemBase* ItemInFocus);
 	void InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus);
 	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Can Display Action")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Can Display Action")
 	bool DisplayAction(UMounteaInventoryItemBase* ItemInFocus) const;
+	bool DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const;
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction")
 	void ProcessAction(UMounteaInventoryItemBase* ItemInFocus);
