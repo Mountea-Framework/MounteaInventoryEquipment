@@ -24,6 +24,7 @@
 #include "Interfaces/MounteaInventorySlotWBPInterface.h"
 #include "Interfaces/MounteaInventoryItemWBPInterface.h"
 
+
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
 class IMounteaInventoryInterface;
@@ -57,10 +58,20 @@ public:
 		return Filter.IsValid();
 	}
 
+#pragma region Converter
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, CompactNodeTitle="Array Valid"))
+	static bool IsArrayValid(const TArray<UObject*>& Array)
+	{
+		return Array.Num() > 0;
+	}
+
+#pragma endregion 
+	
 #pragma region HelpersFunctions
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target) const
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="find,all"))
+	static TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target)
 	{
 		if (!Target) return TArray<UMounteaInventoryItemAction*>();
 		if (!Target->GetItemData().ItemCategory) return Target->GetItemActions();

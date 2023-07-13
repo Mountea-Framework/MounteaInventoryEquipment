@@ -128,6 +128,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")//, meta=(CompactNodeTitle="Defaults", HideSelfPin=true))
 	void LoadFromConfig();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void ProcessMounteaWidgetCommand(const FString& Command, UObject* OptionalPayload);
+	
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="0. Debug")
