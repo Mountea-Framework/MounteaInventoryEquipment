@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryTooltipWBPInterface.generated.h"
 
-class UMounteaInventoryItemBase;
+class IMounteaInventoryItemWBPInterface;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -25,7 +25,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaTooltipWBPInterface
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void UpdateTooltip(const UMounteaInventoryItemBase* Item);
+	void UpdateTooltip(const TScriptInterface<IMounteaInventoryItemWBPInterface>& Item);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	void ProcessCommand(const FString& Command);

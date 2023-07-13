@@ -74,6 +74,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
 	TArray<FKey> DragKeys;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
+	TArray<FKey> ActionRequestKeys;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
 	int32 MinDisplayWeight = 1;

@@ -5,9 +5,10 @@
 #include "HttpModule.h"
 #include "ToolMenuMisc.h"
 #include "ToolMenus.h"
+
 #include "AssetActions/FMounteaInventoryCategoryAssetAction.h"
 #include "AssetActions/FMounteaInventoryComponentAssetAction.h"
-
+#include "AssetActions/FMounteaInventoryItemActionAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemAdditionalDataAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
@@ -15,8 +16,13 @@
 #include "AssetActions/FMounteaInventoryItemsTableAssetAction.h"
 #include "AssetActions/FMounteaInventoryRarityAssetAction.h"
 #include "AssetActions/FMounteaInventoryThemeAssetAction.h"
+
 #include "Definitions/MounteaInventoryItem.h"
+#include "Definitions/MounteaItemAction.h"
+
 #include "DetailsPanel/MounteaInventoryItemBase_Details.h"
+#include "DetailsPanel/MounteaItemAction_Details.h"
+#include "DetailsPanel/MounteaItemAction_DetailsPanel.h"
 #include "DetailsPanel/MounteaItemConfig_Details.h"
 #include "DetailsPanel/MounteaItemConfig_DetailsPanel.h"
 
@@ -37,8 +43,8 @@
 #include "Styling/SlateStyleRegistry.h"
 
 class IMainFrameModule;
-DEFINE_LOG_CATEGORY(MounteaInventoryEquipmentEditor);
 
+DEFINE_LOG_CATEGORY(MounteaInventoryEquipmentEditor);
 
 #define LOCTEXT_NAMESPACE "FMounteaInventoryEquipmentEditor"
 
@@ -66,6 +72,7 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryCategoryAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryRarityAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryComponentAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemActionAssetAction>());
 	}
 
 	// Register Styles and Commands
@@ -106,12 +113,13 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 				InventoryEquipmentClassStyleSet->SetContentRoot(ContentDir);
 
 				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryComponentIcon"), TEXT("MounteaInventoryComponent"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemObjectIcon"), TEXT("MounteaInventoryItemBase"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemDataIcon"), TEXT("MounteaItemAdditionalData"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemConfigIcon"), TEXT("MounteaInventoryItemConfig"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ThemeConfigIcon"), TEXT("MounteaInventoryThemeConfig"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryRarityIcon"), TEXT("MounteaInventoryItemRarity"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryCategoryIcon"), TEXT("MounteaInventoryItemCategory"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemObjectIcon"),				TEXT("MounteaInventoryItemBase"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemDataIcon"),					TEXT("MounteaItemAdditionalData"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemConfigIcon"),				TEXT("MounteaInventoryItemConfig"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ThemeConfigIcon"),			TEXT("MounteaInventoryThemeConfig"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryRarityIcon"),			TEXT("MounteaInventoryItemRarity"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryCategoryIcon"),		TEXT("MounteaInventoryItemCategory"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemActionIcon"),				TEXT("MounteaInventoryItemAction"));
 
 				//Register the created style
 				FSlateStyleRegistry::RegisterSlateStyle(*InventoryEquipmentClassStyleSet.Get());
@@ -127,11 +135,13 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 			{
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaInventoryItem_Details::MakeInstance),
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemConfig_Details::MakeInstance),
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemAction_Details::MakeInstance),
 			};
 			RegisteredCustomClassLayouts =
 			{
 				UMounteaInventoryItemBase::StaticClass()->GetFName(),
 				UMounteaInventoryItemConfig::StaticClass()->GetFName(),
+				UMounteaInventoryItemAction::StaticClass()->GetFName(),
 			};
 			for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)
 			{
@@ -143,10 +153,12 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 			TArray<FOnGetPropertyTypeCustomizationInstance> CustomPropertyTypeLayouts =
 		   {
 				FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaItemConfig_DetailsPanel::MakeInstance),
+				FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaItemAction_DetailsPanel::MakeInstance),
 			};
 			RegisteredCustomPropertyTypeLayout =
 			{
 				FMounteaItemConfig::StaticStruct()->GetFName(),
+				FMounteaItemAction::StaticStruct()->GetFName(),
 			};
 			for (int32 i = 0; i < RegisteredCustomPropertyTypeLayout.Num(); i++)
 			{
@@ -270,12 +282,7 @@ void FMounteaInventoryEquipmentEditor::SendHTTPGet()
 
 void FMounteaInventoryEquipmentEditor::PluginButtonClicked()
 {
-	const FString URL = "https://discord.gg/2vXWEEN";
-
-	if (!URL.IsEmpty())
-	{
-		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
-	}
+	FPlatformProcess::LaunchURL(*SupportDiscordURL, nullptr, nullptr);
 }
 
 void FMounteaInventoryEquipmentEditor::RegisterMenus()

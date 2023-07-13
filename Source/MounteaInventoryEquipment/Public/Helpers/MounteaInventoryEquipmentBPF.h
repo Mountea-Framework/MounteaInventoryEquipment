@@ -58,6 +58,25 @@ public:
 	}
 
 #pragma region HelpersFunctions
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target) const
+	{
+		if (!Target) return TArray<UMounteaInventoryItemAction*>();
+		if (!Target->GetItemData().ItemCategory) return Target->GetItemActions();
+
+		TArray<UMounteaInventoryItemAction*> ReturnValues = Target->GetItemData().ItemCategory->GetCategoryActions();
+
+		for (auto const& Itr : Target->GetItemActions())
+		{
+			if (Itr && !ReturnValues.Contains(Itr))
+			{
+				ReturnValues.Add(Itr);
+			}
+		}
+		
+		return ReturnValues;
+	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Object"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult)
@@ -81,6 +100,14 @@ public:
 		}
 
 		bResult = false;
+		return nullptr;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	static TSubclassOf<UMounteaInventoryThemeConfig> GetThemeConfigClass()
+	{
+		if (GetSettings()->ThemeConfig) return GetSettings()->ThemeConfig->StaticClass();
+
 		return nullptr;
 	}
 	
@@ -237,6 +264,12 @@ public:
 	static TArray<FKey> GetDragKeys()
 	{
 		return GetSettings()->DragKeys;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TArray<FKey> GetActionRequestKeys()
+	{
+		return GetSettings()->ActionRequestKeys;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))

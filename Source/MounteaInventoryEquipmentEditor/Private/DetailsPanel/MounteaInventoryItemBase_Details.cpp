@@ -168,37 +168,35 @@ void FMounteaInventoryItem_Details::CustomizeDetails(IDetailLayoutBuilder& Detai
 				.IsEnabled(this, &FMounteaInventoryItem_Details::IsSetValidDataEnabled)
 				.ButtonStyle(&ValidDataButtonStyle)
 				[
-				
-						SNew(SHorizontalBox)
-						
-						+ SHorizontalBox::Slot()
-						.FillWidth(0.1f)
-						.HAlign(HAlign_Fill)
-						.VAlign(VAlign_Center)
-						.Padding(FMargin(0.f, 0.f, 15.f, 0.f))
-						[
-							SNew(SScaleBox)
-							.HAlign(HAlign_Fill)
-							.Stretch(EStretch::ScaleToFit)
-							[
-								SAssignNew(ValidDataImage, SImage)
-								.Image(this, &FMounteaInventoryItem_Details::GetSetValidDataBrush)
-								.DesiredSizeOverride(FVector2d(20.f))
-							]
-						]
+					SNew(SHorizontalBox)
 					
-						+ SHorizontalBox::Slot()
-						.FillWidth(0.8f)
+					+ SHorizontalBox::Slot()
+					.FillWidth(0.1f)
+					.HAlign(HAlign_Fill)
+					.VAlign(VAlign_Center)
+					.Padding(FMargin(0.f, 0.f, 15.f, 0.f))
+					[
+						SNew(SScaleBox)
 						.HAlign(HAlign_Fill)
-						.VAlign(VAlign_Center)
-						.Padding(ContentPadding)
+						.Stretch(EStretch::ScaleToFit)
 						[
-							SNew(STextBlock)
-							.Text(LOCTEXT("MounteaInventoryItem_Details_SetValidData_Text", "Set Valid Data"))
-							.Justification(ETextJustify::Left)
-							
+							SAssignNew(ValidDataImage, SImage)
+							.Image(this, &FMounteaInventoryItem_Details::GetSetValidDataBrush)
+							.DesiredSizeOverride(FVector2d(20.f))
 						]
-
+					]
+				
+					+ SHorizontalBox::Slot()
+					.FillWidth(0.8f)
+					.HAlign(HAlign_Fill)
+					.VAlign(VAlign_Center)
+					.Padding(ContentPadding)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("MounteaInventoryItem_Details_SetValidData_Text", "Set Valid Data"))
+						.Justification(ETextJustify::Left)
+						
+					]
 				]
 			]
 		]

@@ -9,8 +9,10 @@
 #include "Interfaces/MounteaInventoryEquipmentItem.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Setup/MounteaInventoryItemConfig.h"
+#include "Definitions/MounteaItemAction.h"
 #include "MounteaInventoryItem.generated.h"
 
+struct FMounteaItemAction;
 struct FMounteaItemConfig;
 class UMounteaItemAdditionalData;
 class IMounteaInventoryPickupInterface;
@@ -69,21 +71,24 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
+	TSet<FMounteaItemAction> ItemActions;
+	
 protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
 	
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
 	FItemGenericEvent OnItemAdded;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
 	FItemGenericEvent OnItemRemoved;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
 	FItemGenericEvent OnItemInitialized;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea Inventory & Equipment|Item|5. Debug")
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
 	FItemGenericEvent OnItemModified;
 
 private:
@@ -101,6 +106,25 @@ private:
 	class UWorld* World;
 
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE FMounteaInventoryItemRequiredData GetItemData() const
+	{ return ItemData; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE TArray<UMounteaInventoryItemAction*> GetItemActions() const
+	{
+		TArray<UMounteaInventoryItemAction*> ReturnValues;
+		for (const auto& Itr : ItemActions)
+		{
+			if (Itr.ItemAction && !ReturnValues.Contains(Itr.ItemAction))
+			{
+				ReturnValues.Add(Itr.ItemAction);
+			}
+		}
+
+		return ReturnValues;
+	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const
@@ -143,26 +167,26 @@ public:
 		bResult = true;
 		if (ItemOptionalData.ItemAdditionalData == nullptr)
 		{
-			return NewObject<UMounteaItemAdditionalData>(GetTransientPackage(), ClassFilter);
+			return NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
 		}
 
-		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(GetTransientPackage(), ClassFilter);
+		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
 	}
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
 	bool IsValid(UObject* WorldContextObject) const;
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
 	FGuid GetItemGuid() const
 	{ return ItemGuid; };
 
-	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	void AddQuantity(const int32 Amount);
 	
-	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	void SetQuantity(const int32 NewQuantity);
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
 	int32 GetQuantity() const;
 	
 	virtual FItemGenericEvent& GetItemAddedHandle()
@@ -191,21 +215,21 @@ public:
 		return ItemData.CompatibleGameplayTags;
 	};
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
 	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
 	{ return OwningInventory; }
 	
-	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
 
 	virtual void SetWorld(UWorld* NewWorld);
 	
-	UFUNCTION(BlueprintCallable, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	void InitializeNewItem(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory);
 
 protected:
 
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea Inventory & Equipment|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Item")
 	void OnItemBeginPlay(const FString& Message);
 
 	UFUNCTION()
@@ -234,6 +258,26 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty> & OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override;
 	
+
+	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
+	void MarkDirtyForReplication();
+
+	void ClearDataTable();
+	void CopyFromTable();
+	void ClearMappedValues();
+	void CopyTagsFromTypes();
+	void EnsureValidConfig();
+	
+#if WITH_EDITOR
+	
+	virtual void PostDuplicate(bool bDuplicateForPIE) override;
+	
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
+
+public:
+	
 	FORCEINLINE ULevel* GetLevel() const
 	{
 		return GetTypedOuter<ULevel>();
@@ -258,28 +302,8 @@ protected:
 		return nullptr;
 	}
 
-	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
-	void MarkDirtyForReplication();
-
-	void ClearDataTable();
-	void CopyFromTable();
-	void ClearMappedValues();
-	void CopyTagsFromTypes();
-	void EnsureValidConfig();
-
-#if WITH_EDITOR
-	
-	virtual void PostDuplicate(bool bDuplicateForPIE) override;
-	
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	
-#endif
-
-public:
-	
-	UFUNCTION(BlueprintCallable, Category="1. Import")
 	virtual void SetValidData() override;
-
+	
 #if WITH_EDITOR
 
 	UFUNCTION()

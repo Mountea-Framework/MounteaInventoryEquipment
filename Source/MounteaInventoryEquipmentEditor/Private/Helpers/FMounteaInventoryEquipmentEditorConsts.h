@@ -16,6 +16,7 @@ const FString SupportDiscordURL = FString("https://discord.gg/2vXWEEN");
 const FString PluginWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki");
 const FString ItemsWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Object");
 const FString ItemConfigWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Config");
+const FString ItemActionWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Action");
 
 const FName AdvancedMenuCategoryName("MounteaInventoryEquipment");
 
