@@ -129,7 +129,7 @@ public:
 	void LoadFromConfig();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void ProcessMounteaWidgetCommand(const FString& Command, UObject* OptionalPayload);
+	void ProcessMounteaWidgetCommand(const FString& Command, UObject* OptionalPayload = nullptr);
 	
 private:
 

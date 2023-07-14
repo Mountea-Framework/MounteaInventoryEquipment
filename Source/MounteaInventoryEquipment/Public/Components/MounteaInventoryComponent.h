@@ -9,6 +9,7 @@
 #include "MounteaInventoryComponent.generated.h"
 
 
+class UMounteaBaseUserWidget;
 class UMounteaInventoryItemBase;
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryComponent"
@@ -50,8 +51,8 @@ protected:
 
 public:
 
-	virtual TSubclassOf<UUserWidget> GetInventoryWBPClass_Implementation() override;
-	virtual UUserWidget* GetInventoryWBP_Implementation() override;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() override;
+	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() override;
 
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
@@ -72,8 +73,8 @@ public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
 
-	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UUserWidget> NewInventoryWBPClass) override;
-	virtual void SetInventoryWBP_Implementation(UUserWidget* NewWBP) override;
+	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
+	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) override;
 	
 public:
 
@@ -182,10 +183,10 @@ protected:
 protected:
 
 	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
-	TSubclassOf<UUserWidget> InventoryWBPClass;
+	TSubclassOf<UMounteaBaseUserWidget> InventoryWBPClass;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
-	UUserWidget* InventoryWBP = nullptr;
+	UMounteaBaseUserWidget* InventoryWBP = nullptr;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<UMounteaInventoryItemBase*> Items;

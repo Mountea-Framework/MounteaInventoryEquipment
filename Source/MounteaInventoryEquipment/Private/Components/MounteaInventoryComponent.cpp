@@ -3,7 +3,6 @@
 
 #include "Components/MounteaInventoryComponent.h"
 
-#include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
 
@@ -11,7 +10,6 @@
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Interfaces/MounteaInventoryWBPInterface.h"
 
-#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
@@ -65,12 +63,12 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 	return bUpdated;
 }
 
-TSubclassOf<UUserWidget> UMounteaInventoryComponent::GetInventoryWBPClass_Implementation()
+TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryWBPClass_Implementation()
 {
 	return InventoryWBPClass;
 }
 
-UUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation()
+UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation()
 {
 	return InventoryWBP;
 }
@@ -641,12 +639,12 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
-void UMounteaInventoryComponent::SetInventoryWBPClass_Implementation(TSubclassOf<UUserWidget> NewInventoryWBPClass)
+void UMounteaInventoryComponent::SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass)
 {
 	InventoryWBPClass = NewInventoryWBPClass;
 }
 
-void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UUserWidget* NewWBP)
+void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP)
 {
 	if (InventoryWBP && InventoryWBP != NewWBP)
 	{
@@ -1047,8 +1045,8 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const
 
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
-		
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
+
 		RequestInventoryNotification(UpdateContext);
 	}
 }
@@ -1161,7 +1159,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(UMounteaInve
 	
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
 		
 		RequestItemNotification(UpdateContext);
 		
@@ -1182,8 +1180,8 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(UMounteaIn
 
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
-		
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+
 		RequestItemNotification(UpdateContext);
 
 		Item->GetItemRemovedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
@@ -1201,7 +1199,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(UMounteaIn
 	
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
 		
 		RequestItemNotification(UpdateContext);
 		
