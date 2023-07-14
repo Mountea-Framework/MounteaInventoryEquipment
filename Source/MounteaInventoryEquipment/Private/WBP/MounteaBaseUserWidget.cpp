@@ -95,6 +95,8 @@ bool UMounteaBaseUserWidget::BindDelegate(const FMounteaDynamicDelegate& Delegat
 	PossibleBinding.BindingName = OptionalName;
 	PossibleBinding.CallbackFunction = Delegate.GetFunctionName().ToString();
 	PossibleBinding.Listener = Delegate.GetUObject();
+	
+	PossibleBinding.UpdateUniqueID();
 
 	if (MounteaEventBindings.Contains(PossibleBinding))
 	{
@@ -116,30 +118,20 @@ bool UMounteaBaseUserWidget::UnbindDelegate(const FMounteaDynamicDelegate& Deleg
 	}
 	
 	FMounteaEventBinding DirtyBinding;
-	
-	for (const auto& Itr : MounteaEventBindings)
+	DirtyBinding.Delegate = Delegate;
+	DirtyBinding.BindingTag = BindingTag;
+	DirtyBinding.BindingName = OptionalName;
+	DirtyBinding.CallbackFunction = Delegate.GetFunctionName().ToString();
+	DirtyBinding.Listener = Delegate.GetUObject();
+
+	DirtyBinding.UpdateUniqueID();
+
+	if (!MounteaEventBindings.Contains(DirtyBinding))
 	{
-		if (Itr.Delegate == Delegate)
-		{
-			if (Itr.BindingTag == BindingTag)
-			{
-				if (OptionalName.IsValid())
-				{
-					if (Itr.BindingName == OptionalName)
-					{
-						DirtyBinding = Itr;
-						break;
-					}
-
-					continue;
-				}
-				
-				DirtyBinding = Itr;
-				break;
-			}
-		}
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("UnbindDelegate found no binding for Event (%s) with Tag (%s)!"), *Delegate.GetFunctionName().ToString(), *BindingTag.ToString());
+		return false;
 	}
-
+	
 	if (DirtyBinding.Listener == nullptr)
 	{
 		UE_LOG(LogBlueprintUserMessages, Error, TEXT("UnbindDelegate found no binding for Event (%s) with Tag (%s)!"), *Delegate.GetFunctionName().ToString(), *BindingTag.ToString());
@@ -183,13 +175,13 @@ bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag EventTag, const FName 
 
 	if (!bFound)
 	{
-		UE_LOG(LogBlueprintUserMessages, Error, TEXT("CallEvent didn't find any function by Tag (%s) and Name (%s)!"), *OptionalName.ToString(), *EventTag.ToString());
+		UE_LOG(LogBlueprintUserMessages, Error, TEXT("CallEvent didn't find any function by Name (%s) and Tag (%s)!"), *OptionalName.ToString(), *EventTag.ToString());
 		return false;
 	}
 
-	for (const auto& [Listener, CallbackFunction, BindingTag, BindingName, Delegate] : FoundBindings)
+	for (const auto& MounteaEventBinding : FoundBindings)
 	{
-		Delegate.ExecuteIfBound(Context.Command, Context.Payload);
+		MounteaEventBinding.Delegate.ExecuteIfBound(Context.Command, Context.Payload);
 	}
 
 	return true;

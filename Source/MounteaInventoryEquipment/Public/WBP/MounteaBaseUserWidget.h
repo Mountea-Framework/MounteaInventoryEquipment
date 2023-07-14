@@ -43,6 +43,15 @@ struct FMounteaEventBinding
 	UPROPERTY(VisibleAnywhere)
 	FMounteaDynamicDelegate Delegate;
 
+	UPROPERTY(VisibleAnywhere)
+	FString UniqueID;
+
+	void UpdateUniqueID()
+	{
+		UniqueID = BindingName.IsNone() ? CallbackFunction.Append(BindingTag.ToString()) : CallbackFunction.Append(BindingTag.ToString()).Append(BindingName.ToString());
+		UniqueID = Delegate.GetUObjectEvenIfUnreachable() ? UniqueID : UniqueID.Append(Delegate.GetUObjectEvenIfUnreachable()->GetName());
+	}
+
 	bool operator==(const FMounteaDynamicDelegate& InDelegate) const
 	{
 		return Delegate == InDelegate;
@@ -54,7 +63,8 @@ struct FMounteaEventBinding
 
 		Other.Delegate.IsBound() ?
 
-		Delegate == Other.Delegate
+		//Delegate == Other.Delegate
+		UniqueID == Other.UniqueID
 
 		:
 		
