@@ -9,6 +9,7 @@
 #include "MounteaInventoryInterface.generated.h"
 
 class UMounteaInventoryItemBase;
+class UMounteaInventoryItemAction;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -121,7 +122,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	AActor* GetOwningActor() const;
 	virtual AActor* GetOwningActor_Implementation() const = 0;
-	
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item);
+	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item) = 0;
+
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() = 0;

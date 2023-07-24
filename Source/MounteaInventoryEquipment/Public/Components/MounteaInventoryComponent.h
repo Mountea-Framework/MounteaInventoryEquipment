@@ -76,6 +76,8 @@ public:
 	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
 	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) override;
 	
+	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item) override;
+
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() override
@@ -106,6 +108,9 @@ protected:
 	
 	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity = 0);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void ProcessItemAction_Server(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item);
 	
 	UFUNCTION(Server, Unreliable)
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);

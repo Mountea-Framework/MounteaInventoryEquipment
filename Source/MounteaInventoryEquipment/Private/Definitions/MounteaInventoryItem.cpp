@@ -155,6 +155,8 @@ void UMounteaInventoryItemBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 
 	DOREPLIFETIME(UMounteaInventoryItemBase, ItemData);
 	DOREPLIFETIME(UMounteaInventoryItemBase, ItemDataSource);
+	DOREPLIFETIME(UMounteaInventoryItemBase, OwningInventory);
+	DOREPLIFETIME(UMounteaInventoryItemBase, World);
 }
 
 bool UMounteaInventoryItemBase::IsSupportedForNetworking() const

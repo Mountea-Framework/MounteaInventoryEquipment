@@ -26,10 +26,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Can Display Action")
 	bool DisplayAction(UMounteaInventoryItemBase* ItemInFocus) const;
 	bool DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const;
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction")
-	void ProcessAction(UMounteaInventoryItemBase* ItemInFocus);
-
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Process Action (Client)")
+	void ProcessAction_Client(UMounteaInventoryItemBase* ItemInFocus);
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Process Action (Server)")
+	void ProcessAction_Server(UMounteaInventoryItemBase* ItemInFocus);
 public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")

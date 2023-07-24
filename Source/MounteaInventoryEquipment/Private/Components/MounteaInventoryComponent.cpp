@@ -665,6 +665,39 @@ void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UMounteaBaseUser
 	}
 }
 
+void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item) 
+{
+	if (!Action)	return;
+
+	if (!Item) return;
+
+	if (!GetOwner()) return;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		ProcessItemAction_Server(Action, Item);
+
+		Action->ProcessAction_Client(Item);
+		
+		return;
+	}
+	else
+	{
+		Action->ProcessAction_Server(Item);
+		return;
+	}
+}
+
+void UMounteaInventoryComponent::ProcessItemAction_Server_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item)
+{
+	Execute_ProcessItemAction(this, Action, Item);
+}
+
+bool UMounteaInventoryComponent::ProcessItemAction_Server_Validate(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item)
+{
+	return true;
+}
+
 void UMounteaInventoryComponent::OnRep_Items()
 {
 	for (const auto& Itr : Items)
