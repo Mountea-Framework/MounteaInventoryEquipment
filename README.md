@@ -66,3 +66,8 @@ Download the plugin (either from Releases or from Marketplace). For a more detai
 * Master: A master branch, should always be relevant to the most current Engine version and stable.
 * Version Branch: A stable branch for specified Engine version.
 * Version Brach_Dev: A development branch for a specified Engine version.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Mountea-Framework/MounteaInventoryEquipment&type=Date)](https://star-history.com/#Mountea-Framework/MounteaInventoryEquipment&Date)
+
