@@ -9,6 +9,7 @@
 
 struct FGameplayTag;
 class UMounteaInventoryItemBase;
+
 /**
  * 
  */
@@ -27,11 +28,9 @@ public:
 	bool DisplayAction(UMounteaInventoryItemBase* ItemInFocus) const;
 	bool DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const;
 	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Process Action (Client)")
-	void ProcessAction_Client(UMounteaInventoryItemBase* ItemInFocus);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction")
+	void ProcessAction(UMounteaInventoryItemBase* ItemInFocus);
 	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Process Action (Server)")
-	void ProcessAction_Server(UMounteaInventoryItemBase* ItemInFocus);
 public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
@@ -75,6 +74,10 @@ public:
 		return nullptr;
 	}
 
+protected:
+
+	virtual bool IsSupportedForNetworking() const override {	return true; };
+	
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required", meta=(NoResetToDefault))

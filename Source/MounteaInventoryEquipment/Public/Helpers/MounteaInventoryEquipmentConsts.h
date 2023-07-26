@@ -14,6 +14,8 @@ namespace MounteaInventoryEquipmentConsts
 			const FString HideInventoryWidget					(TEXT("HideInventoryWidget"));
 			const FString RefreshInventoryWidget				(TEXT("RefreshInventoryWidget"));
 			const FString RefreshItemsWidgets				(TEXT("RefreshItemsWidgets"));
+
+			const FString RemoveItemWidget					(TEXT("RemoveItemWidget"));
 		}
 
 		namespace ItemCommands

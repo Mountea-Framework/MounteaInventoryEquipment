@@ -608,17 +608,17 @@ bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TMap<TSubclass
 	return bSatisfied;
 }
 
-bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem)
+bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Quantity)
 {
-	return TryRemoveItem(AffectedItem);
+	return TryRemoveItem(AffectedItem, Quantity);
 }
 
-bool UMounteaInventoryComponent::RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems)
+bool UMounteaInventoryComponent::RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems)
 {
 	bool bSatisfied = true;
 	for (const auto& Itr : AffectedItems)
 	{
-		if (!Execute_RemoveItem(this, Itr))
+		if (!Execute_RemoveItem(this, Itr.Key, Itr.Value))
 		{
 			bSatisfied = false;
 		}
@@ -673,30 +673,11 @@ void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInvent
 
 	if (!GetOwner()) return;
 
-	if (!GetOwner()->HasAuthority())
-	{
-		ProcessItemAction_Server(Action, Item);
-
-		Action->ProcessAction_Client(Item);
-		
-		return;
-	}
-	else
-	{
-		Action->ProcessAction_Server(Item);
-		return;
-	}
+	Action->InitializeAction(Item);
+	
+	Action->ProcessAction(Item);
 }
 
-void UMounteaInventoryComponent::ProcessItemAction_Server_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item)
-{
-	Execute_ProcessItemAction(this, Action, Item);
-}
-
-bool UMounteaInventoryComponent::ProcessItemAction_Server_Validate(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item)
-{
-	return true;
-}
 
 void UMounteaInventoryComponent::OnRep_Items()
 {
@@ -820,8 +801,38 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	return bSuccess;
 }
 
+void UMounteaInventoryComponent::TryRemoveItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
+{
+	if (TryRemoveItem(Item, Quantity))
+	{
+		//TODO: Item Addeeeeeeeed
+		return;
+	}
+	else
+	{
+		//TODO: Something is wrong :(
+		return;
+	}
+}
+
+bool UMounteaInventoryComponent::TryRemoveItem_Server_Validate(UMounteaInventoryItemBase* Item, const int32 Quantity)
+{
+	// There is currently no protection,
+	// however, in the future some might be implemented.
+	// This function is here just for future proofing.
+	return true;
+}
+
 bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
+	if (!GetOwner()) return false;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		TryRemoveItem_Server(Item, Quantity);
+		return true;
+	}
+	
 	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 
 	if (!Settings)
@@ -1192,7 +1203,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(UMounteaInve
 	
 	if (InventoryWBP)
 	{
-		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, Item);
 		
 		RequestItemNotification(UpdateContext);
 		
@@ -1208,12 +1219,10 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(UMounteaIn
 	if (!Item) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
-
 	
-
 	if (InventoryWBP)
 	{
-		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget, Item);
 
 		RequestItemNotification(UpdateContext);
 
@@ -1232,7 +1241,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(UMounteaIn
 	
 	if (InventoryWBP)
 	{
-		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, Item);
 		
 		RequestItemNotification(UpdateContext);
 		

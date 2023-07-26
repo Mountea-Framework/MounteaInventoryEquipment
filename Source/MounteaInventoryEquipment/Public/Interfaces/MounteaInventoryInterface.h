@@ -108,12 +108,12 @@ public:
 	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool RemoveItem(UMounteaInventoryItemBase* AffectedItem);
-	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) = 0;
+	bool RemoveItem(UMounteaInventoryItemBase* AffectedItem, const int32& Amount = 1);
+	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Amount = 1) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool RemoveItems(TArray<UMounteaInventoryItemBase*>& AffectedItems);
-	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) = 0;
+	bool RemoveItems(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems);
+	virtual bool RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void RequestNetworkRefresh();

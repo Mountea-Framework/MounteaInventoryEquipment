@@ -66,8 +66,8 @@ public:
 	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32& Quantity = 1) override;
 	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) override;
 
-	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) override;
-	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) override;
+	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Quantity = 1) override;
+	virtual bool RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems) override;
 
 	virtual void RequestNetworkRefresh_Implementation() override;
 
@@ -101,16 +101,14 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	
 	virtual bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void TryRemoveItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	
 	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity = 0);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	virtual void ProcessItemAction_Server(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item);
 	
 	UFUNCTION(Server, Unreliable)
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);

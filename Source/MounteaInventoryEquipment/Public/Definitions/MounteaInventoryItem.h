@@ -73,12 +73,12 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
-	TSet<FMounteaItemAction> ItemActions;
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
+	TArray<FMounteaItemAction> ItemActions;
 	
 protected:
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
 	
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
