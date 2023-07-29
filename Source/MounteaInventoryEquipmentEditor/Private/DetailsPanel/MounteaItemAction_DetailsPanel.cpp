@@ -41,6 +41,11 @@ void FMounteaItemAction_DetailsPanel::CustomizeChildren(TSharedRef<IPropertyHand
 		);
 
 		TSharedPtr<IPropertyHandle> ItemActionHandle = PropertyRow->GetPropertyHandle();
+		uint32 NumChildren = 0;
+		ItemActionHandle->GetNumChildren(NumChildren);
+
+		if (NumChildren == 0) return;
+		
 		TSharedPtr<IPropertyHandle> ChildHandle = ItemActionHandle->GetChildHandle(0);
 
 		uint32 ChildrenCount;

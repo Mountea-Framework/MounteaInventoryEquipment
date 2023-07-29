@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "UObject/NoExportTypes.h"
+#include "Helpers/MounteaInventoryHelpers.h"
+
 #include "MounteaItemAction.generated.h"
 
+
+struct FMounteaDynamicDelegateContext;
 struct FGameplayTag;
 class UMounteaInventoryItemBase;
 
@@ -21,8 +24,8 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemAction : public UObject
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|ItemAction")
-	void InitializeAction(UMounteaInventoryItemBase* ItemInFocus);
-	void InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus);
+	void InitializeAction(UMounteaInventoryItemBase* ItemInFocus, FMounteaDynamicDelegateContext Context);
+	void InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus, FMounteaDynamicDelegateContext Context);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Can Display Action")
 	bool DisplayAction(UMounteaInventoryItemBase* ItemInFocus) const;
@@ -33,15 +36,15 @@ public:
 	
 public:
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
 	FORCEINLINE FGameplayTag GetActionTag() const
 	{ return ActionTag; };
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
 	FORCEINLINE FName GetActionName() const
 	{ return ActionName; };
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
 	FORCEINLINE UTexture2D* GetActionIcon() const
 	{ return ActionIcon; };
 
@@ -74,6 +77,10 @@ public:
 		return nullptr;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
+	FORCEINLINE FMounteaDynamicDelegateContext GetActionContext() const
+	{ return ActionContext; }
+	
 protected:
 
 	virtual bool IsSupportedForNetworking() const override {	return true; };
@@ -88,8 +95,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(NoResetToDefault, ExposeOnSpawn))
 	UTexture2D* ActionIcon = nullptr;
-	
+
 private:
+
+	UPROPERTY(Transient, VisibleAnywhere, Category="3. Debug", meta=(DisplayThumbnail=false), AdvancedDisplay)
+	FMounteaDynamicDelegateContext ActionContext;;
 
 	UPROPERTY(VisibleAnywhere, Category="3. Debug", meta=(DisplayThumbnail=false), AdvancedDisplay)
 	class UWorld* World;

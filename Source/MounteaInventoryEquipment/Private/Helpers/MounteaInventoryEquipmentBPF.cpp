@@ -3,6 +3,21 @@
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 
+int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+{
+	if (RequestedQuantity == 0)
+	{
+		return 0;
+	}
+	
+	if (!Item)
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
 int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
 {
 	if (RequestedQuantity == 0)

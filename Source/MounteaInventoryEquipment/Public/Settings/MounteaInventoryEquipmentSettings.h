@@ -11,6 +11,7 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
+class UMounteaInventoryConfig;
 class UMounteaInventoryItemsTable;
 class UMounteaInventoryItemConfig;
 class UMounteaTransactionPayload;
@@ -33,6 +34,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
 	TSoftClassPtr<UMounteaInventoryItemBase> DefaultItemClass;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
+	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
 	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
@@ -111,7 +115,8 @@ public:
 	*/
 	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=100, ClampMin=100), AdvancedDisplay)
 	int32 MultithreadingThreshold = 1000;
-	
+
+
 public:
 
 #if WITH_EDITOR

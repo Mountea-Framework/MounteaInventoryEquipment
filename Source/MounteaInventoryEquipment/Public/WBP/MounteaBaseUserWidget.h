@@ -5,23 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
+#include "Helpers/MounteaInventoryHelpers.h"
+
 #include "MounteaBaseUserWidget.generated.h"
 
 class UMounteaInventoryThemeConfig;
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaDynamicDelegate, const FString&, Command, UObject*, Payload) ;
-
-USTRUCT(BlueprintType)
-struct FMounteaDynamicDelegateContext
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	FString Command;
-
-	UPROPERTY(BlueprintReadWrite)
-	UObject* Payload = nullptr;
-};
 
 USTRUCT(BlueprintType)
 struct FMounteaEventBinding

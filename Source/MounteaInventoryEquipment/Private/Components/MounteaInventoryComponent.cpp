@@ -37,6 +37,7 @@ void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UMounteaInventoryComponent, Items);
+	DOREPLIFETIME(UMounteaInventoryComponent, InventoryConfig);
 }
 
 bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
@@ -58,6 +59,11 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 		}
 
 		RemovedItems.Empty();
+
+		if (Channel->KeyNeedsToReplicate(InventoryConfig.MounteaInventoryConfig->GetUniqueID(), InventoryConfig.MounteaInventoryConfig->GetRepKey()))
+		{
+			bUpdated |= Channel->ReplicateSubobject(InventoryConfig.MounteaInventoryConfig, *Bunch, *RepFlags);
+		}
 	}
 
 	return bUpdated;
@@ -546,6 +552,26 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Multithr
 	return ReturnValues;
 }
 
+void UMounteaInventoryComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	bool bIsEditorNoPlay = false;
+#if WITH_EDITOR
+	bIsEditorNoPlay = UMounteaInventoryEquipmentBPF::IsEditorNoPlay();
+#endif
+	
+	if (bIsEditorNoPlay) // This code gets executed only when opening new Asset in Editor
+	{
+		if (InventoryConfig.MounteaInventoryConfig == nullptr)
+		{
+			bool bFound = false;
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(this, Class, bFound);
+		}
+	}
+}
+
 TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const
 {
 	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_GetItems );
@@ -665,7 +691,7 @@ void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UMounteaBaseUser
 	}
 }
 
-void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item) 
+void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) 
 {
 	if (!Action)	return;
 
@@ -673,7 +699,7 @@ void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInvent
 
 	if (!GetOwner()) return;
 
-	Action->InitializeAction(Item);
+	Action->InitializeAction(Item, Context);
 	
 	Action->ProcessAction(Item);
 }
@@ -694,6 +720,38 @@ void UMounteaInventoryComponent::OnRep_Items()
 	UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Success_Replication", "Inventory Replicated.");
 	
 	OnInventoryUpdated.Broadcast(UpdateResult);
+}
+
+UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfigImpl(const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
+{
+	if (ClassFilter == nullptr)
+	{
+		bResult = false;
+		return nullptr;
+	}
+
+	bResult = true;
+	if (InventoryConfig.MounteaInventoryConfig == nullptr)
+	{
+		return NewObject<UMounteaInventoryConfig>(GetPackage(), ClassFilter);
+	}
+
+	return InventoryConfig.MounteaInventoryConfig->IsA(ClassFilter) ? InventoryConfig.MounteaInventoryConfig : NewObject<UMounteaInventoryConfig>(GetPackage(), ClassFilter);
+}
+
+UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
+{
+	return GetInventoryConfigImpl(ClassFilter, bResult);
+}
+
+TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryComponent::GetInventoryConfigClass_Implementation() const
+{
+	if (InventoryConfig.MounteaInventoryConfig)
+	{
+		return InventoryConfig.MounteaInventoryConfig->StaticClass();
+	}
+
+	return nullptr;
 }
 
 void UMounteaInventoryComponent::TryAddItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)

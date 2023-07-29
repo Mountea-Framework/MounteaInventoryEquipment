@@ -319,3 +319,15 @@ struct FMounteaItemDescription : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(MultiLine=true))
 	FText ItemLongDescription;
 };
+
+USTRUCT(BlueprintType)
+struct FMounteaDynamicDelegateContext
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FString Command;
+
+	UPROPERTY(BlueprintReadWrite)
+	UObject* Payload = nullptr;
+};

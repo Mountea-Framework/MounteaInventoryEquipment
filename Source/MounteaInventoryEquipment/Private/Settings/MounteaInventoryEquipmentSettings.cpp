@@ -5,6 +5,7 @@
 
 #include "Definitions/MounteaInventoryItem.h"
 #include "Helpers/MounteaInventoryHelpers.h"
+#include "Setup/MounteaInventoryConfig.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
@@ -56,6 +57,7 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	bUIDebug = false;
 	bDragDropAllowed = true;
 
+	DefaultInventoryConfigClass = UMounteaInventoryConfig::StaticClass();
 	DefaultItemClass = UMounteaInventoryItemBase::StaticClass();
 	DefaultItemConfigClass = UMounteaInventoryItemConfig::StaticClass();
 }

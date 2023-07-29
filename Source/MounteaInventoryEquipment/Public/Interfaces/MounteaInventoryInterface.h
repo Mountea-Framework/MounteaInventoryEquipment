@@ -8,6 +8,8 @@
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryInterface.generated.h"
 
+class UMounteaInventoryConfig;
+class UMounteaTransactionPayload;
 class UMounteaInventoryItemBase;
 class UMounteaInventoryItemAction;
 
@@ -124,9 +126,17 @@ public:
 	virtual AActor* GetOwningActor_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item);
-	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item) = 0;
+	void ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context);
+	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) = 0;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	UMounteaInventoryConfig* GetInventoryConfig( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const;
+	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass() const;
+	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const = 0;
+	
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() = 0;

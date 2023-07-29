@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/MounteaInventoryInterface.h"
+#include "Setup/MounteaInventoryConfig.h"
 
 #include "MounteaInventoryComponent.generated.h"
 
 
+class UMounteaTransactionPayload;
 class UMounteaBaseUserWidget;
 class UMounteaInventoryItemBase;
 
@@ -76,8 +78,15 @@ public:
 	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
 	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) override;
 	
-	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item) override;
+	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
 
+	//UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	
+	UMounteaInventoryConfig* GetInventoryConfigImpl(const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const;
+	
+	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const override;
+	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const override;
+	
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() override
@@ -97,8 +106,9 @@ private:
 	UFUNCTION(Client, Reliable)
 	void ClientRefreshInventory();
 
+	
 protected:
-
+	
 	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	virtual bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
@@ -159,6 +169,8 @@ private:
 	UMounteaInventoryItemBase* FindItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const;
 	TArray<UMounteaInventoryItemBase*> GetItems_Simple(const FItemRetrievalFilter OptionalFilter) const;
 	TArray<UMounteaInventoryItemBase*> GetItems_Multithreading(const FItemRetrievalFilter OptionalFilter) const;
+
+	virtual void PostInitProperties() override;
 	
 #pragma endregion
 
@@ -196,6 +208,9 @@ protected:
 
 	UPROPERTY()
 	TArray<UMounteaInventoryItemBase*> ClientLastReceivedItems;
+	
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	FMounteaInventoryConfigBase InventoryConfig;
 
 private:
 

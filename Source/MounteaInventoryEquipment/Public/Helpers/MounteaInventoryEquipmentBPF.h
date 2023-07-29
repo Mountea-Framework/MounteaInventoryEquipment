@@ -8,6 +8,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "MounteaInventoryHelpers.h"
+#include "Components/MounteaInventoryComponent.h"
 
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaItemAdditionalData.h"
@@ -23,6 +24,7 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/MounteaInventorySlotWBPInterface.h"
 #include "Interfaces/MounteaInventoryItemWBPInterface.h"
+#include "Setup/MounteaInventoryConfig.h"
 
 
 #include "MounteaInventoryEquipmentBPF.generated.h"
@@ -148,11 +150,37 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TSubclassOf<UMounteaInventoryConfig> GetItemInventoryConfigClass(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
+	{
+		if (!Target) return nullptr;
+
+		return Target->Execute_GetInventoryConfigClass(Target.GetObject());
+	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TSubclassOf<UMounteaInventoryItemConfig> GetItemItemConfigClass(const UMounteaInventoryItemBase* Target)
 	{
 		if (!Target) return nullptr;
 
 		return Target->GetItemConfigClass();
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	static UMounteaInventoryConfig* GetInventoryConfig(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
+	{
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+		
+		if (Target == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+		
+		return Target->Execute_GetInventoryConfig(Target.GetObject(), ClassFilter, bResult);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
@@ -334,6 +362,9 @@ public:
 #pragma endregion 
 	
 #pragma region QuantityFunctions
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static int CalculateMaxSubtractQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
