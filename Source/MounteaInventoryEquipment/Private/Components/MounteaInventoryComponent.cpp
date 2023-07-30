@@ -722,7 +722,7 @@ void UMounteaInventoryComponent::OnRep_Items()
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 
-UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfigImpl(const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
+UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
 {
 	if (ClassFilter == nullptr)
 	{
@@ -739,11 +739,6 @@ UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfigImpl(cons
 	return InventoryConfig.MounteaInventoryConfig->IsA(ClassFilter) ? InventoryConfig.MounteaInventoryConfig : NewObject<UMounteaInventoryConfig>(GetPackage(), ClassFilter);
 }
 
-UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
-{
-	return GetInventoryConfigImpl(ClassFilter, bResult);
-}
-
 TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryComponent::GetInventoryConfigClass_Implementation() const
 {
 	if (InventoryConfig.MounteaInventoryConfig)
@@ -752,6 +747,40 @@ TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryComponent::GetInventoryCon
 	}
 
 	return nullptr;
+}
+
+TScriptInterface<IMounteaInventoryInterface> UMounteaInventoryComponent::GetOtherInventory_Implementation() const
+{
+	return OtherInventory;
+}
+
+void UMounteaInventoryComponent::SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)
+{
+	if (!GetOwner()) return;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		SetOtherInventory_Server(NewInventory);
+	}
+}
+
+void UMounteaInventoryComponent::SetOtherInventory_Server_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)
+{
+	if (NewInventory != OtherInventory)
+	{
+		OtherInventory = NewInventory;
+
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
+		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Success_OtherInventory", "Other Inventory Updated.");
+		
+		OnInventoryUpdated.Broadcast(UpdateResult);
+	}
+}
+
+bool UMounteaInventoryComponent::SetOtherInventory_Server_Validate(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)
+{
+	return true;
 }
 
 void UMounteaInventoryComponent::TryAddItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)

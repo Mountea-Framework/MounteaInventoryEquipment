@@ -10,18 +10,18 @@ UMounteaInventoryConfig::UMounteaInventoryConfig()
 	RepKey = 0;
 }
 
-void UMounteaInventoryConfig::RemoveFlag(const uint8 Flag)
+void UMounteaInventoryConfig::RemoveFlag(const FGameplayTag& Flag)
 {
 	RepKey++;
 	
-	InventoryFlags |= static_cast<uint8>(Flag);
+	InventoryFlags.RemoveTag(Flag);
 }
 
-void UMounteaInventoryConfig::AddFlag(const uint8 Flag)
+void UMounteaInventoryConfig::AddFlag(const FGameplayTag& Flag)
 {
 	RepKey++;
 	
-	InventoryFlags &= ~static_cast<uint8>(Flag);
+	InventoryFlags.AddTag(Flag);
 }
 
 void UMounteaInventoryConfig::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

@@ -136,6 +136,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass() const;
 	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryInterface> GetOtherInventory() const;
+	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void SetOtherInventory(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
+	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) = 0;
 	
 public:
 

@@ -79,13 +79,12 @@ public:
 	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) override;
 	
 	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
-
-	//UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
-	
-	UMounteaInventoryConfig* GetInventoryConfigImpl(const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const;
 	
 	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const override;
 	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const override;
+
+	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const override;
+	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) override;
 	
 public:
 
@@ -110,15 +109,15 @@ private:
 protected:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	virtual void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	virtual bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	virtual void TryRemoveItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	void TryRemoveItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	
-	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity = 0);
+	bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity = 0);
 	
 	UFUNCTION(Server, Unreliable)
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
@@ -137,6 +136,9 @@ protected:
 	UFUNCTION(Client, Unreliable)
 	void PostItemUpdated_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void SetOtherInventory_Server(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
+	
 private:
 
 	/**
@@ -213,6 +215,20 @@ protected:
 	FMounteaInventoryConfigBase InventoryConfig;
 
 private:
+	
+	/**
+	 * @brief This attribute represents another inventory in relation to the current instance. 
+	 * It could represent an inventory that the player is looting, or the inventory from which the player is looting.
+	 * It can also represent a store's inventory. The interface allows for interaction with various types of inventories.
+	 *
+	 * Use GetOtherInventory() to retrieve the inventory this attribute is pointing to.
+	 * Use SetOtherInventory() to change the inventory this attribute is pointing to.
+	 *
+	 * This attribute is transient.
+	 */
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	TScriptInterface<IMounteaInventoryInterface> OtherInventory;
+
 
 	UPROPERTY()
 	int32 ReplicatedItemsKey;
@@ -231,6 +247,8 @@ private:
 };
 
 #undef LOCTEXT_NAMESPACE
+
+#pragma region Runnables
 
 class FItemSearchRunnable : public FRunnable
 {
@@ -288,4 +306,4 @@ private:
 	TArray<UMounteaInventoryItemBase*>& FoundItems;
 };
 
-
+#pragma endregion 

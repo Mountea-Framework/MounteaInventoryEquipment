@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "MounteaInventoryConfig.generated.h"
 
+/*
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EMounteaInventoryConfig: uint8
 {
@@ -18,6 +20,7 @@ enum class EMounteaInventoryConfig: uint8
 };
 
 ENUM_CLASS_FLAGS(EMounteaInventoryConfig);
+*/
 
 /**
  * 
@@ -31,8 +34,8 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryConfig : public UObject
 	
 public:
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = EMounteaInventoryConfig), Category="1. Required")
-	uint8  InventoryFlags = 0;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="1. Required")
+	FGameplayTagContainer InventoryFlags;
 
 	UPROPERTY(VisibleAnywhere, Category="2. Debug")
 	int32 RepKey = 0;
@@ -40,22 +43,22 @@ public:
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|InventoryConfig")
-	FORCEINLINE bool HasFlag(UPARAM(meta = (Bitmask, BitmaskEnum = EMounteaInventoryConfig)) const uint8 Flag) const
+	FORCEINLINE bool HasFlag(const FGameplayTag Flag) const
 	{
-		return (Flag & InventoryFlags) == Flag;
+		return InventoryFlags.HasTag(Flag);
 	};
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|InventoryConfig")
-	FORCEINLINE bool IsMatch(UPARAM(meta = (Bitmask, BitmaskEnum = EMounteaInventoryConfig)) const uint8 Flag, const uint8 Flags) const
+	FORCEINLINE bool DoesNotHasFlag(const FGameplayTag Flag) const
 	{
-		return (Flag & Flags) == Flag;
+		return !InventoryFlags.HasTag(Flag);
 	};
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|InventoryConfig")
-	void RemoveFlag(UPARAM(meta = (Bitmask, BitmaskEnum = EMounteaInventoryConfig)) const uint8 Flag);
+	void RemoveFlag(const FGameplayTag& Flag);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|InventoryConfig")
-	void AddFlag(UPARAM(meta = (Bitmask, BitmaskEnum = EMounteaInventoryConfig)) const uint8 Flag);
+	void AddFlag(const FGameplayTag& Flag);
 
 public:
 
