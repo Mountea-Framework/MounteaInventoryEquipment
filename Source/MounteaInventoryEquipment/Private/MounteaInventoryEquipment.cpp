@@ -5,6 +5,7 @@
 #include "GameplayTagsManager.h"
 #include "Interfaces/IPluginManager.h"
 
+
 #define LOCTEXT_NAMESPACE "FMounteaInventoryEquipmentModule"
 
 void FMounteaInventoryEquipmentModule::StartupModule()

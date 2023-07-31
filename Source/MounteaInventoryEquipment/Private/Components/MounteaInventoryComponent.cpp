@@ -722,6 +722,12 @@ void UMounteaInventoryComponent::OnRep_Items()
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 
+void UMounteaInventoryComponent::OnRep_OtherInventory()
+{
+	// Call request to update Inventory Flags
+	Execute_SetInventoryFlags(this);
+}
+
 UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
 {
 	if (ClassFilter == nullptr)
@@ -758,10 +764,31 @@ void UMounteaInventoryComponent::SetOtherInventory_Implementation(const TScriptI
 {
 	if (!GetOwner()) return;
 
+
 	if (!GetOwner()->HasAuthority())
 	{
 		SetOtherInventory_Server(NewInventory);
 	}
+}
+
+bool UMounteaInventoryComponent::SetInventoryFlags_Implementation()
+{
+	if (!InventoryConfig.MounteaInventoryConfig) return false;
+	
+	if (OtherInventory.GetObject())
+	{
+		//TODO:
+		// Get all compatible tags of the Current Inventory
+		// Find if the Other has any of current one
+		// Find if Current one has any of the Other
+		// If match, update both
+		// If not, return false
+	}
+	else
+	{
+		InventoryConfig.MounteaInventoryConfig->ResetFlags();
+	}
+	return true;
 }
 
 void UMounteaInventoryComponent::SetOtherInventory_Server_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)

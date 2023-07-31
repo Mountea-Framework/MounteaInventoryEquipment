@@ -144,6 +144,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void SetOtherInventory(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
 	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool SetInventoryFlags();
+	virtual bool SetInventoryFlags_Implementation() = 0;
 	
 public:
 

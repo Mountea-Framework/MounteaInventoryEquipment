@@ -34,6 +34,9 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryConfig : public UObject
 	
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="1. Required")
+	FGameplayTagContainer DefaultInventoryFlags;
+
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="1. Required")
 	FGameplayTagContainer InventoryFlags;
 
@@ -41,6 +44,14 @@ public:
 	int32 RepKey = 0;
 
 public:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|InventoryConfig")
+	FORCEINLINE FGameplayTagContainer GetDefaultInventoryFlags() const
+	{ return DefaultInventoryFlags; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|InventoryConfig")
+	FORCEINLINE FGameplayTagContainer GetInventoryFlags() const
+	{ return InventoryFlags; };
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|InventoryConfig")
 	FORCEINLINE bool HasFlag(const FGameplayTag Flag) const
@@ -55,11 +66,20 @@ public:
 	};
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|InventoryConfig")
-	void RemoveFlag(const FGameplayTag& Flag);
+	void RemoveFlags(const FGameplayTagContainer& Flags);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|InventoryConfig")
-	void AddFlag(const FGameplayTag& Flag);
+	void AddFlags(const FGameplayTagContainer& Flags);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|InventoryConfig")
+	void RemoveFlag(const FGameplayTag& Flag, const bool bSkipNetUpdate = false);
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|InventoryConfig")
+	void AddFlag(const FGameplayTag& Flag, const bool bSkipNetUpdate = false);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|InventoryConfig")
+	void ResetFlags();
+	
 public:
 
 	inline int32 GetRepKey() const { return RepKey; };

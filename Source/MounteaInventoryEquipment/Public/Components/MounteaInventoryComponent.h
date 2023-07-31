@@ -85,6 +85,8 @@ public:
 
 	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const override;
 	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) override;
+
+	virtual bool SetInventoryFlags_Implementation() override;
 	
 public:
 
@@ -101,11 +103,13 @@ private:
 
 	UFUNCTION()
 	void OnRep_Items();
+	
+	UFUNCTION()
+	void OnRep_OtherInventory();
 
 	UFUNCTION(Client, Reliable)
 	void ClientRefreshInventory();
 
-	
 protected:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -207,9 +211,6 @@ protected:
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<UMounteaInventoryItemBase*> Items;
-
-	UPROPERTY()
-	TArray<UMounteaInventoryItemBase*> ClientLastReceivedItems;
 	
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaInventoryConfigBase InventoryConfig;
@@ -226,7 +227,7 @@ private:
 	 *
 	 * This attribute is transient.
 	 */
-	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_OtherInventory)
 	TScriptInterface<IMounteaInventoryInterface> OtherInventory;
 
 
