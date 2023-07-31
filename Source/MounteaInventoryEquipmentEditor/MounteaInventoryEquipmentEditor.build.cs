@@ -57,7 +57,9 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"MainFrame",
 				"ContentBrowser", 
 				"DataTableEditor",
-				"DesktopPlatform"
+				"DesktopPlatform",
+				
+				"GameplayTags"
 			}
 		);
  

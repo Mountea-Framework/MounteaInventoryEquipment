@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaInventoryThemeConfig.h"
 #include "Engine/DeveloperSettings.h"
+
+#include "MounteaInventoryThemeConfig.h"
+
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaInventoryHelpers.h"
+
 #include "MounteaInventoryEquipmentSettings.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
@@ -53,7 +56,8 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
 
-	
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;

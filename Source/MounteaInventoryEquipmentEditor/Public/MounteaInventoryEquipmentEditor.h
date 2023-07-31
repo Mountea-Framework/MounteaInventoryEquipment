@@ -20,13 +20,22 @@ class FMounteaInventoryEquipmentEditor : public IModuleInterface
 	
 	void RegisterAssetTypeAction(IAssetTools& AssetTools, const TSharedRef<IAssetTypeActions>& Action);
 	
-	void OnGetResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-	UFUNCTION() void SendHTTPGet();
+	void OnGetResponse_Changelog(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	UFUNCTION() void SendHTTPGet_Changelog();
+	void OnGetResponse_Tags(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	UFUNCTION() void SendHTTPGet_Tags();
 
 	void PluginButtonClicked();
 	void RegisterMenus();
 
 	void RegisterClassIcons(const FString& Path, const FString& ClassName);
+
+protected:
+	
+	bool DoesHaveValidTags() const;
+	void RefreshGameplayTags();
+	void UpdateTagsConfig(const FString& NewContent);
+	void CreateTagsConfig(const FString& NewContent);
 
 private:
 	

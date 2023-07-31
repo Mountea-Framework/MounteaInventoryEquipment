@@ -2,6 +2,7 @@
 
 #include "AssetToolsModule.h"
 #include "ContentBrowserMenuContexts.h"
+#include "GameplayTagsManager.h"
 #include "HttpModule.h"
 #include "ToolMenuMisc.h"
 #include "ToolMenus.h"
@@ -39,6 +40,7 @@
 #include "Popups/MIEPopupStyle.h"
 
 #include "Serialization/JsonReader.h"
+#include "Settings/MounteaInventoryEquipmentSettingsEditor.h"
 #include "Setup/MounteaInventoryItemConfig.h"
 #include "Styling/SlateStyleRegistry.h"
 
@@ -53,7 +55,8 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 	// Try to request Changelog from GitHub
 	{
 		Http = &FHttpModule::Get();
-		SendHTTPGet();
+		SendHTTPGet_Changelog();
+		SendHTTPGet_Tags();
 	}
 
 	// Register new Category
@@ -250,7 +253,7 @@ void FMounteaInventoryEquipmentEditor::RegisterAssetTypeAction(IAssetTools& Asse
 	CreatedAssetTypeActions.Add(Action);
 }
 
-void FMounteaInventoryEquipmentEditor::OnGetResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void FMounteaInventoryEquipmentEditor::OnGetResponse_Changelog(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
 	FString ResponseBody;
 	if (Response.Get() == nullptr) return;
@@ -267,17 +270,165 @@ void FMounteaInventoryEquipmentEditor::OnGetResponse(FHttpRequestPtr Request, FH
 	}
 }
 
-void FMounteaInventoryEquipmentEditor::SendHTTPGet()
+void FMounteaInventoryEquipmentEditor::OnGetResponse_Tags(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	FString ResponseBody;
+	if (Response.Get() == nullptr) return;
+	
+	if (Response.IsValid() && Response->GetResponseCode() == 200)
+	{
+		ResponseBody = Response->GetContentAsString();
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ResponseBody);
+	}
+	
+	if (!DoesHaveValidTags())
+	{
+		CreateTagsConfig(ResponseBody);
+	}
+	else
+	{
+		UpdateTagsConfig(ResponseBody);
+	}
+}
+
+void FMounteaInventoryEquipmentEditor::SendHTTPGet_Changelog()
 {
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
 	
-	Request->OnProcessRequestComplete().BindRaw(this, &FMounteaInventoryEquipmentEditor::OnGetResponse);
+	Request->OnProcessRequestComplete().BindRaw(this, &FMounteaInventoryEquipmentEditor::OnGetResponse_Changelog);
 	Request->SetURL(ChangelogURL);
 
 	Request->SetVerb("GET");
 	Request->SetHeader("User-Agent", "X-UnrealEngine-Agent");
 	Request->SetHeader("Content-Type", "text");
 	Request->ProcessRequest();
+}
+
+void FMounteaInventoryEquipmentEditor::SendHTTPGet_Tags()
+{
+	if (DoesHaveValidTags())
+	{
+		const UMounteaInventoryEquipmentSettingsEditor* Settings = GetDefault<UMounteaInventoryEquipmentSettingsEditor>();
+		if (!Settings->AllowCheckTagUpdate())
+		{
+			return;
+		}
+	}
+	
+	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = Http->CreateRequest();
+	
+	Request->OnProcessRequestComplete().BindRaw(this, &FMounteaInventoryEquipmentEditor::OnGetResponse_Tags);
+	Request->SetURL(GameplayTagsURL);
+
+	Request->SetVerb("GET");
+	Request->SetHeader("User-Agent", "X-UnrealEngine-Agent");
+	Request->SetHeader("Content-Type", "text");
+	Request->ProcessRequest();
+}
+
+bool FMounteaInventoryEquipmentEditor::DoesHaveValidTags() const
+{
+	if (!GConfig) return false;
+	
+	const FString PluginDirectory = IPluginManager::Get().FindPlugin(TEXT("MounteaInventoryEquipment"))->GetBaseDir();
+	const FString ConfigFilePath = PluginDirectory + "/Config/Tags/MounteaInventoryEquipmentTags.ini";
+
+	if (FPaths::FileExists(ConfigFilePath))
+	{
+		FString ConfigContent;
+		FConfigFile* ConfigFile = GConfig->Find(ConfigFilePath);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void FMounteaInventoryEquipmentEditor::RefreshGameplayTags()
+{
+	TSharedPtr<IPlugin> ThisPlugin = IPluginManager::Get().FindPlugin(TEXT("MounteaInventoryEquipment"));
+	check(ThisPlugin.IsValid());
+	
+	UGameplayTagsManager::Get().EditorRefreshGameplayTagTree();
+}
+
+void FMounteaInventoryEquipmentEditor::UpdateTagsConfig(const FString& NewContent)
+{
+	if (!GConfig) return;
+
+	const FString PluginDirectory = IPluginManager::Get().FindPlugin(TEXT("MounteaInventoryEquipment"))->GetBaseDir();
+	const FString ConfigFilePath = PluginDirectory + "/Config/Tags/MounteaInventoryEquipmentTags.ini";
+
+	FConfigFile* CurrentConfig = GConfig->Find(ConfigFilePath);
+
+	FString CurrentContent;
+	CurrentConfig->WriteToString(CurrentContent);
+
+	TArray<FString> Lines;
+	NewContent.ParseIntoArray(Lines, TEXT("\n"), true);
+
+	TArray<FString> CleanedLines;
+	for (FString& Itr : Lines)
+	{
+		if (Itr.Equals("[/Script/GameplayTags.GameplayTagsList]")) continue;
+
+		if (Itr.Contains("GameplayTagList="))
+		{
+			FString NewValue = Itr.Replace(TEXT("GameplayTagList="), TEXT(""));
+
+			CleanedLines.Add(NewValue);
+		}
+	}
+
+	if (!CurrentContent.Equals(NewContent))
+	{
+		TArray<FString> CurrentLines;
+		FConfigFile NewConfig;
+		NewConfig.SetArray(TEXT("/Script/GameplayTags.GameplayTagsList"), TEXT("GameplayTagList"), CleanedLines);
+		CurrentConfig->GetArray(TEXT("/Script/GameplayTags.GameplayTagsList"), TEXT("GameplayTagList"), CurrentLines);
+
+		for (const FString& Itr : CleanedLines)
+		{
+			if (CurrentLines.Contains(Itr)) continue;
+
+			CurrentLines.AddUnique(Itr);
+		}
+
+		CurrentConfig->SetArray(TEXT("/Script/GameplayTags.GameplayTagsList"), TEXT("GameplayTagList"), CurrentLines);
+		CurrentConfig->Write(ConfigFilePath);
+
+		RefreshGameplayTags();
+	}
+}
+
+void FMounteaInventoryEquipmentEditor::CreateTagsConfig(const FString& NewContent)
+{
+	if (!GConfig) return;
+
+	const FString PluginDirectory = IPluginManager::Get().FindPlugin(TEXT("MounteaInventoryEquipment"))->GetBaseDir();
+	const FString ConfigFilePath = PluginDirectory + "/Config/Tags/MounteaInventoryEquipmentTags.ini";
+
+	TArray<FString> Lines;
+	NewContent.ParseIntoArray(Lines, TEXT("\n"), true);
+
+	TArray<FString> CleanedLines;
+	for (FString& Itr : Lines)
+	{
+		if (Itr.Equals("[/Script/GameplayTags.GameplayTagsList]")) continue;
+
+		if (Itr.Contains("GameplayTagList="))
+		{
+			FString NewValue = Itr.Replace(TEXT("GameplayTagList="), TEXT(""));
+
+			CleanedLines.Add(NewValue);
+		}
+	}
+	
+	FConfigFile NewConfig;
+	NewConfig.SetArray(TEXT("/Script/GameplayTags.GameplayTagsList"), TEXT("GameplayTagList"), CleanedLines);
+	NewConfig.Write(ConfigFilePath);
 }
 
 void FMounteaInventoryEquipmentEditor::PluginButtonClicked()
