@@ -38,6 +38,7 @@ void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 
 	DOREPLIFETIME(UMounteaInventoryComponent, Items);
 	DOREPLIFETIME(UMounteaInventoryComponent, InventoryConfig);
+	DOREPLIFETIME(UMounteaInventoryComponent, OtherInventory);
 }
 
 bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
