@@ -26,6 +26,7 @@
 #include "DetailsPanel/MounteaItemAction_DetailsPanel.h"
 #include "DetailsPanel/MounteaItemConfig_Details.h"
 #include "DetailsPanel/MounteaItemConfig_DetailsPanel.h"
+#include "DetailsPanel/MounteaSettings_Details.h"
 
 #include "HelpButton/MIECommands.h"
 #include "HelpButton/MIEHelpStyle.h"
@@ -40,6 +41,7 @@
 #include "Popups/MIEPopupStyle.h"
 
 #include "Serialization/JsonReader.h"
+#include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "Settings/MounteaInventoryEquipmentSettingsEditor.h"
 #include "Setup/MounteaInventoryItemConfig.h"
 #include "Styling/SlateStyleRegistry.h"
@@ -130,7 +132,7 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		}
 	}
 
-	//Register custom Buttons for Decorators
+	//Register custom Details
 	{
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 		{
@@ -139,12 +141,14 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaInventoryItem_Details::MakeInstance),
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemConfig_Details::MakeInstance),
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemAction_Details::MakeInstance),
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaSettings_Details::MakeInstance)
 			};
 			RegisteredCustomClassLayouts =
 			{
 				UMounteaInventoryItemBase::StaticClass()->GetFName(),
 				UMounteaInventoryItemConfig::StaticClass()->GetFName(),
 				UMounteaInventoryItemAction::StaticClass()->GetFName(),
+				UMounteaInventoryEquipmentSettings::StaticClass()->GetFName()
 			};
 			for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)
 			{
@@ -490,7 +494,6 @@ void FMounteaInventoryEquipmentEditor::RegisterMenus()
 		FAssetActionExtender_MounteaInventoryItem::RegisterMenus();
 	}
 }
-
 
 #undef LOCTEXT_NAMESPACE
 

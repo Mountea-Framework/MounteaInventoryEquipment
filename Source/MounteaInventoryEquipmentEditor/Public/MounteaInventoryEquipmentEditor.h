@@ -38,10 +38,11 @@ protected:
 	void CreateTagsConfig(const FString& NewContent);
 
 private:
-	
-	TSharedPtr<class FUICommandList> PluginCommands;
+
 	FHttpModule* Http = nullptr;
 	
+	TSharedPtr<class FUICommandList> PluginCommands;
+		
 	TArray< TSharedPtr<IAssetTypeActions> > CreatedAssetTypeActions;
 
 	TSharedPtr<FSlateStyleSet> InventoryEquipmentClassStyleSet;
