@@ -84,3 +84,69 @@ bool UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* B
 
 	return false;
 }
+
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter)
+{
+	return ExcludeItems_Impl(Filter, ItemsToFilter, true);
+}
+
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems_Impl(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter, const bool& bIsFirstCall)
+{
+	if (!Filter.IsValid()) return TArray<UMounteaInventoryItemBase*>();
+
+	TArray<UMounteaInventoryItemBase*> TempResult;
+	if (Filter.bSearchByTag)
+	{
+		for (const auto& Itr : ItemsToFilter)
+		{
+			if (Itr && !Itr->GetTags().HasAny(Filter.Tags))
+			{
+				TempResult.Add(Itr);
+			}
+		}
+	}
+	
+	if (Filter.bSearchByItem)
+	{
+		for (const auto& Itr : ItemsToFilter)
+		{
+			if (Itr && Itr != Filter.Item)
+			{
+				TempResult.Add(Itr);
+			}
+		}
+	}
+
+	if (Filter.bSearchByClass)
+	{
+		for (const auto& Itr : ItemsToFilter)
+		{
+			if (Itr && !Itr->IsA(Filter.Class))
+			{
+				TempResult.Add(Itr);
+			}
+		}
+	}
+	
+	if (Filter.bSearchByGUID)
+	{
+		for (const auto& Itr : ItemsToFilter)
+		{
+			if (Itr && Itr->GetItemGuid() != Filter.Guid)
+			{
+				TempResult.Add(Itr);
+			}
+		}
+	}
+
+	// If this is the first call, make a recursive call with bIsFirstCall set to false
+	if (bIsFirstCall)
+	{
+		return ExcludeItems_Impl(Filter, TempResult, false);
+	}
+	else  // If this is not the first call, don't make a recursive call
+	{
+		return TempResult;
+	}
+}
+

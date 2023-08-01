@@ -496,6 +496,9 @@ public:
 		return false;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TArray<UMounteaInventoryItemBase*> ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter);
+	static TArray<UMounteaInventoryItemBase*> ExcludeItems_Impl(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter, const bool& bIsFirstCall);
 #pragma endregion 
 };
 
