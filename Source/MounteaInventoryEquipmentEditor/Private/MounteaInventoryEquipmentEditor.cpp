@@ -6,6 +6,7 @@
 #include "HttpModule.h"
 #include "ToolMenuMisc.h"
 #include "ToolMenus.h"
+#include "AssetActions/FMounteaEquipmentComponentAssetAction.h"
 
 #include "AssetActions/FMounteaInventoryCategoryAssetAction.h"
 #include "AssetActions/FMounteaInventoryComponentAssetAction.h"
@@ -78,6 +79,8 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryRarityAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryComponentAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemActionAssetAction>());
+
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaEquipmentComponentAssetAction>());
 	}
 
 	// Register Styles and Commands
@@ -117,14 +120,15 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 
 				InventoryEquipmentClassStyleSet->SetContentRoot(ContentDir);
 
-				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryComponentIcon"), TEXT("MounteaInventoryComponent"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemObjectIcon"),				TEXT("MounteaInventoryItemBase"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemDataIcon"),					TEXT("MounteaItemAdditionalData"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemConfigIcon"),				TEXT("MounteaInventoryItemConfig"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ThemeConfigIcon"),			TEXT("MounteaInventoryThemeConfig"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryRarityIcon"),			TEXT("MounteaInventoryItemRarity"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryCategoryIcon"),		TEXT("MounteaInventoryItemCategory"));
-				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemActionIcon"),				TEXT("MounteaInventoryItemAction"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryComponentIcon"),		TEXT("MounteaInventoryComponent"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemObjectIcon"),					TEXT("MounteaInventoryItemBase"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemDataIcon"),						TEXT("MounteaItemAdditionalData"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemConfigIcon"),					TEXT("MounteaInventoryItemConfig"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ThemeConfigIcon"),				TEXT("MounteaInventoryThemeConfig"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryRarityIcon"),				TEXT("MounteaInventoryItemRarity"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/InventoryCategoryIcon"),			TEXT("MounteaInventoryItemCategory"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/ItemActionIcon"),					TEXT("MounteaInventoryItemAction"));
+				RegisterClassIcons(TEXT("Resources/ClassIcons/EquipmentComponentIcon"),	TEXT("MounteaEquipmentComponent"));
 
 				//Register the created style
 				FSlateStyleRegistry::RegisterSlateStyle(*InventoryEquipmentClassStyleSet.Get());

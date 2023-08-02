@@ -72,6 +72,24 @@ public:
 	
 #pragma region HelpersFunctions
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Interface"), meta=(DeterminesOutputType = "InterfaceFilter"))
+	static UActorComponent* GetSingleComponentByInterface(const AActor* Target, TSubclassOf<UInterface> InterfaceFilter)
+	{
+		if (Target == nullptr) return nullptr;
+
+		TArray<UActorComponent*> TempComps = Target->GetComponentsByInterface(InterfaceFilter);
+
+		if (TempComps.IsEmpty()) return nullptr;
+
+		return TempComps[0];
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="valid,safe,null,check"), DisplayName="Is Valid (Inventory Ref)")
+	static bool IsInventoryValid(const TScriptInterface<IMounteaInventoryInterface>& InventoryInterface)
+	{
+		return InventoryInterface.GetObject() != nullptr;
+	}
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="find,all"))
 	static TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target)
 	{
@@ -386,6 +404,30 @@ public:
 #pragma endregion 
 	
 #pragma region ItemFunctions
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="has,have,contain"))
+	static bool DoesHaveTag(const UMounteaInventoryItemBase* Item, const FGameplayTag Tag)
+	{
+		if (Item == nullptr) return false;
+
+		return Item->GetTags().HasTag(Tag);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory",meta=(NativeBreakFunc, Keywords="has,have,contain"))
+	static bool DoesHaveAnyTag(const UMounteaInventoryItemBase* Item, const FGameplayTagContainer Tags)
+	{
+		if (Item == nullptr) return false;
+
+		return Item->GetTags().HasAny(Tags);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="has,have,contain"))
+	static bool DoesHaveAllTags(const UMounteaInventoryItemBase* Item, const FGameplayTagContainer Tags)
+	{
+		if (Item == nullptr) return false;
+
+		return Item->GetTags().HasAll(Tags);
+	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FIntPoint> CalculateItemShadow(const FIntPoint& StartCoords, const FIntPoint& Area)

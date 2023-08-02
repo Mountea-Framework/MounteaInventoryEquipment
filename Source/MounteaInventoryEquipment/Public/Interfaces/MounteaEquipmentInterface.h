@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaEquipmentInterface.generated.h"
 
+class UMounteaInventoryItemBase;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaEquipmentInterface : public UInterface
@@ -29,5 +30,18 @@ class UMounteaEquipmentInterface : public UInterface
 class MOUNTEAINVENTORYEQUIPMENT_API IMounteaEquipmentInterface
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool EquipItem(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex = 0);
+	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex = 0) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool UnEquipItem(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex = 0);
+	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex = 0) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool IsItemEquipped(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex = 0);
+	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex = 0) = 0;
 };

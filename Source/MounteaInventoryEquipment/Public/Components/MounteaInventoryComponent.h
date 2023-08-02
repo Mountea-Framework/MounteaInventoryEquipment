@@ -243,6 +243,15 @@ private:
 
 	TArray<UMounteaInventoryItemBase*> RemovedItems;
 
+	
+#if WITH_EDITOR
+private:
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+  
+#endif
+
+
 #pragma endregion
 	
 };

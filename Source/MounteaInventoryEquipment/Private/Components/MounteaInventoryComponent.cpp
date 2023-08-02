@@ -1398,6 +1398,25 @@ void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
 	ReplicatedItemsKey++;
 }
 
+#if WITH_EDITOR
+
+void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.Property->GetName() == TEXT("MounteaInventoryConfig"))
+	{
+		if (InventoryConfig.MounteaInventoryConfig == nullptr)
+		{
+			bool bFound = false;
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(this, Class, bFound);
+		}
+	}
+}
+
+#endif
+
 #undef LOCTEXT_NAMESPACE
 
 uint32 FItemSearchRunnable::Run()
