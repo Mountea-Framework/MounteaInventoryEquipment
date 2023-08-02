@@ -16,7 +16,7 @@ class UMounteaInventoryItemBase;
 /**
  * 
  */
-UCLASS( Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea, Inventory"), DisplayName="Item Action (Base)")
+UCLASS( Abstract, Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea, Inventory"), DisplayName="Item Action (Base)")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemAction : public UObject
 {
 	GENERATED_BODY()

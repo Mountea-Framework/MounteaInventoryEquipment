@@ -37,7 +37,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="1. Required")
 	FGameplayTagContainer DefaultInventoryFlags;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="2. Debug", meta=(NoResetToDefault))
 	FGameplayTagContainer InventoryFlags;
 
 	UPROPERTY(VisibleAnywhere, Category="2. Debug")
