@@ -1,17 +1,12 @@
-Current Version: 1.0.0.51
+Current Version: 0.0.0.0
 
 # Changelog
 
 All notable changes to this project will be documented in this file.
 
-**Version 1.0.0.51**
+**Version 0.0.0.0**
 ### Added
-> - Added: Mountea Dialogue Graph
-> - Added: Mountea Dialogue Node
-> - Added: Mountea Dialogue Graph Editor
-> - Added: Mountea Dialogue Graph Validator
-> - Added: Mountea Dialogue Graph Arranger Alpha
-> - Added: Mountea Dialogue Decorators
+> - Added: -
 
 ### Fixed
 > - Fixed: -
