@@ -46,6 +46,14 @@ In-line editable configuration with the ability to extend logic in Blueprints.
     <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/6df25a2b-c885-42f5-a66b-e2820aeeffbb">
 </p>
 
+### Editor Extensions
+Multiple tools aiming at as easy as possible management.
+<p align="center" width="100%">
+    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/7ebe7d13-64cd-4230-a367-d58d533ff7d2">
+    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/f1001730-503d-4642-967e-256ace54c16b">
+</p>
+
+
 ### Inventory/Equipment Actions
 In-line editable configuration with the ability to extend logic in Blueprints.</p>
 Each Action represents a logic that can be performed for each Item from the selected Category. For example, Apples can be Consumed, Keys can be Used etc.</p>
