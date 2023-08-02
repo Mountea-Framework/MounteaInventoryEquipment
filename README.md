@@ -47,10 +47,10 @@ In-line editable configuration with the ability to extend logic in Blueprints.
 </p>
 
 ### Editor Extensions
-Multiple tools aiming at as easy as possible management.
+Multiple tools aiming at as easy as possible management, simple management and data composition.
 <p align="center" width="100%">
-    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/7ebe7d13-64cd-4230-a367-d58d533ff7d2">
-    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/f1001730-503d-4642-967e-256ace54c16b">
+    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/a4ed137b-91e4-49b8-82c4-7f63164597ea">
+    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/df9763ce-8cbd-4aee-8768-9cc908af6a60">
 </p>
 
 
