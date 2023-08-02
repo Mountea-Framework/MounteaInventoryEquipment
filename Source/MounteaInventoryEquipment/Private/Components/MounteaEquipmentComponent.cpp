@@ -34,3 +34,8 @@ bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInv
 
 	return true;
 }
+
+TArray<FMounteaEquipmentSlots> UMounteaEquipmentComponent::GetAllSlots_Implementation() const
+{
+	return TArray<FMounteaEquipmentSlots>();
+}

@@ -44,6 +44,7 @@ protected:
 	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
 	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
 	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
+	virtual TArray<FMounteaEquipmentSlots> GetAllSlots_Implementation() const override;
 	
 #pragma endregion 
 	
