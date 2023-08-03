@@ -3,7 +3,6 @@
 
 #include "Components/MounteaInventoryComponent.h"
 
-#include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
 
@@ -11,7 +10,6 @@
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Interfaces/MounteaInventoryWBPInterface.h"
 
-#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
@@ -39,6 +37,8 @@ void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UMounteaInventoryComponent, Items);
+	DOREPLIFETIME(UMounteaInventoryComponent, InventoryConfig);
+	DOREPLIFETIME(UMounteaInventoryComponent, OtherInventory);
 }
 
 bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
@@ -53,24 +53,29 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 		
 		for (const auto& Item : AllItems)
 		{
-			if (Channel->KeyNeedsToReplicate(Item->GetUniqueID(), Item->GetRepKey()))
+			if (Item && Channel->KeyNeedsToReplicate(Item->GetUniqueID(), Item->GetRepKey()))
 			{
 				bUpdated |= Channel->ReplicateSubobject(Item, *Bunch, *RepFlags);
 			}
 		}
 
 		RemovedItems.Empty();
+
+		if (Channel->KeyNeedsToReplicate(InventoryConfig.MounteaInventoryConfig->GetUniqueID(), InventoryConfig.MounteaInventoryConfig->GetRepKey()))
+		{
+			bUpdated |= Channel->ReplicateSubobject(InventoryConfig.MounteaInventoryConfig, *Bunch, *RepFlags);
+		}
 	}
 
 	return bUpdated;
 }
 
-TSubclassOf<UUserWidget> UMounteaInventoryComponent::GetInventoryWBPClass_Implementation()
+TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryWBPClass_Implementation()
 {
 	return InventoryWBPClass;
 }
 
-UUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation()
+UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation()
 {
 	return InventoryWBP;
 }
@@ -548,6 +553,26 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Multithr
 	return ReturnValues;
 }
 
+void UMounteaInventoryComponent::PostInitProperties()
+{
+	Super::PostInitProperties();
+
+	bool bIsEditorNoPlay = false;
+#if WITH_EDITOR
+	bIsEditorNoPlay = UMounteaInventoryEquipmentBPF::IsEditorNoPlay();
+#endif
+	
+	if (bIsEditorNoPlay) // This code gets executed only when opening new Asset in Editor
+	{
+		if (InventoryConfig.MounteaInventoryConfig == nullptr)
+		{
+			bool bFound = false;
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(this, Class, bFound);
+		}
+	}
+}
+
 TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const
 {
 	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_GetItems );
@@ -610,17 +635,17 @@ bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TMap<TSubclass
 	return bSatisfied;
 }
 
-bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem)
+bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Quantity)
 {
-	return TryRemoveItem(AffectedItem);
+	return TryRemoveItem(AffectedItem, Quantity);
 }
 
-bool UMounteaInventoryComponent::RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems)
+bool UMounteaInventoryComponent::RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems)
 {
 	bool bSatisfied = true;
 	for (const auto& Itr : AffectedItems)
 	{
-		if (!Execute_RemoveItem(this, Itr))
+		if (!Execute_RemoveItem(this, Itr.Key, Itr.Value))
 		{
 			bSatisfied = false;
 		}
@@ -641,12 +666,12 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
-void UMounteaInventoryComponent::SetInventoryWBPClass_Implementation(TSubclassOf<UUserWidget> NewInventoryWBPClass)
+void UMounteaInventoryComponent::SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass)
 {
 	InventoryWBPClass = NewInventoryWBPClass;
 }
 
-void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UUserWidget* NewWBP)
+void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP)
 {
 	if (InventoryWBP && InventoryWBP != NewWBP)
 	{
@@ -667,6 +692,20 @@ void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UUserWidget* New
 	}
 }
 
+void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) 
+{
+	if (!Action)	return;
+
+	if (!Item) return;
+
+	if (!GetOwner()) return;
+
+	Action->InitializeAction(Item, Context);
+	
+	Action->ProcessAction(Item);
+}
+
+
 void UMounteaInventoryComponent::OnRep_Items()
 {
 	for (const auto& Itr : Items)
@@ -682,6 +721,94 @@ void UMounteaInventoryComponent::OnRep_Items()
 	UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Success_Replication", "Inventory Replicated.");
 	
 	OnInventoryUpdated.Broadcast(UpdateResult);
+}
+
+void UMounteaInventoryComponent::OnRep_OtherInventory()
+{
+	// Call request to update Inventory Flags
+	Execute_SetInventoryFlags(this);
+}
+
+UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
+{
+	if (ClassFilter == nullptr)
+	{
+		bResult = false;
+		return nullptr;
+	}
+
+	bResult = true;
+	if (InventoryConfig.MounteaInventoryConfig == nullptr)
+	{
+		return NewObject<UMounteaInventoryConfig>(GetPackage(), ClassFilter);
+	}
+
+	return InventoryConfig.MounteaInventoryConfig->IsA(ClassFilter) ? InventoryConfig.MounteaInventoryConfig : NewObject<UMounteaInventoryConfig>(GetPackage(), ClassFilter);
+}
+
+TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryComponent::GetInventoryConfigClass_Implementation() const
+{
+	if (InventoryConfig.MounteaInventoryConfig)
+	{
+		return InventoryConfig.MounteaInventoryConfig->StaticClass();
+	}
+
+	return nullptr;
+}
+
+TScriptInterface<IMounteaInventoryInterface> UMounteaInventoryComponent::GetOtherInventory_Implementation() const
+{
+	return OtherInventory;
+}
+
+void UMounteaInventoryComponent::SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)
+{
+	if (!GetOwner()) return;
+
+
+	if (!GetOwner()->HasAuthority())
+	{
+		SetOtherInventory_Server(NewInventory);
+	}
+}
+
+bool UMounteaInventoryComponent::SetInventoryFlags_Implementation()
+{
+	if (!InventoryConfig.MounteaInventoryConfig) return false;
+	
+	if (OtherInventory.GetObject())
+	{
+		//TODO:
+		// Get all compatible tags of the Current Inventory
+		// Find if the Other has any of current one
+		// Find if Current one has any of the Other
+		// If match, update both
+		// If not, return false
+	}
+	else
+	{
+		InventoryConfig.MounteaInventoryConfig->ResetFlags();
+	}
+	return true;
+}
+
+void UMounteaInventoryComponent::SetOtherInventory_Server_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)
+{
+	if (NewInventory != OtherInventory)
+	{
+		OtherInventory = NewInventory;
+
+		FInventoryUpdateResult UpdateResult;
+		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
+		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Success_OtherInventory", "Other Inventory Updated.");
+		
+		OnInventoryUpdated.Broadcast(UpdateResult);
+	}
+}
+
+bool UMounteaInventoryComponent::SetOtherInventory_Server_Validate(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)
+{
+	return true;
 }
 
 void UMounteaInventoryComponent::TryAddItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
@@ -789,8 +916,38 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 	return bSuccess;
 }
 
+void UMounteaInventoryComponent::TryRemoveItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
+{
+	if (TryRemoveItem(Item, Quantity))
+	{
+		//TODO: Item Addeeeeeeeed
+		return;
+	}
+	else
+	{
+		//TODO: Something is wrong :(
+		return;
+	}
+}
+
+bool UMounteaInventoryComponent::TryRemoveItem_Server_Validate(UMounteaInventoryItemBase* Item, const int32 Quantity)
+{
+	// There is currently no protection,
+	// however, in the future some might be implemented.
+	// This function is here just for future proofing.
+	return true;
+}
+
 bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
+	if (!GetOwner()) return false;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		TryRemoveItem_Server(Item, Quantity);
+		return true;
+	}
+	
 	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 
 	if (!Settings)
@@ -1047,8 +1204,8 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const
 
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
-		
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
+
 		RequestInventoryNotification(UpdateContext);
 	}
 }
@@ -1161,7 +1318,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(UMounteaInve
 	
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, Item);
 		
 		RequestItemNotification(UpdateContext);
 		
@@ -1177,13 +1334,11 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(UMounteaIn
 	if (!Item) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
-
 	
-
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
-		
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget, Item);
+
 		RequestItemNotification(UpdateContext);
 
 		Item->GetItemRemovedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
@@ -1201,7 +1356,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(UMounteaIn
 	
 	if (InventoryWBP)
 	{
-		IMounteaInventoryWBPInterface::Execute_ProcessWBPCommand(InventoryWBP, MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, Item);
 		
 		RequestItemNotification(UpdateContext);
 		
@@ -1242,6 +1397,25 @@ void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
 {
 	ReplicatedItemsKey++;
 }
+
+#if WITH_EDITOR
+
+void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.Property->GetName() == TEXT("MounteaInventoryConfig"))
+	{
+		if (InventoryConfig.MounteaInventoryConfig == nullptr)
+		{
+			bool bFound = false;
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(this, Class, bFound);
+		}
+	}
+}
+
+#endif
 
 #undef LOCTEXT_NAMESPACE
 

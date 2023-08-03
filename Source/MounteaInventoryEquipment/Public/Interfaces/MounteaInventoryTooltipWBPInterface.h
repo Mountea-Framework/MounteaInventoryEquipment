@@ -26,7 +26,4 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	void UpdateTooltip(const TScriptInterface<IMounteaInventoryItemWBPInterface>& Item);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void ProcessCommand(const FString& Command);
 };

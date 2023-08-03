@@ -23,10 +23,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaCategoryWBPInterface
 	GENERATED_BODY()
 
 public:
-			
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	void ProcessWidgetCommand(const FString& Command);
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	void RequestCreateCategory(const UMounteaInventoryItemCategory* CategoryDefinition);
 

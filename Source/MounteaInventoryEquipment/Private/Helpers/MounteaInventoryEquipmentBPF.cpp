@@ -3,7 +3,7 @@
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 
-int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
 {
 	if (RequestedQuantity == 0)
 	{
@@ -14,49 +14,66 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 	{
 		return 0;
 	}
-	
+
+	return 1;
+}
+
+int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+{
+	// Return 0 if RequestedQuantity is 0 or Item is null
+	if (RequestedQuantity == 0 || !Item)
+	{
+		return 0;
+	}
+    
+	// If the item is not stackable, return 0 if OtherItem is not null (updating case), or 1 if it is null (adding new item case)
+	if (!Item->ItemData.ItemQuantity.bIsStackable)
+	{
+		return OtherItem ? 0 : 1;
+	}
+    
+	// Calculate the maximum possible quantity to be added
+	const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
+	const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
+	int32 MaxPossible = MaxQuantity - CurrentQuantity;
+
+	// If OtherItem is not null, the requested quantity should be limited by OtherItem's current quantity
 	if (OtherItem)
 	{
-		// Updating item that cannot stack mean always just and only 0
-		if (!Item->ItemData.ItemQuantity.bIsStackable)
-		{
-			return 0;
-		}
-		
 		const int32 UpdateQuantity = FMath::Min(RequestedQuantity, OtherItem->ItemData.ItemQuantity.CurrentQuantity);
-	
-		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
-		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
-
-		int32 MaxPossible = MaxQuantity - CurrentQuantity;
 		MaxPossible = FMath::Min(MaxPossible, UpdateQuantity);
+	}
+	else // If OtherItem is null, the requested quantity should be limited by RequestedQuantity
+	{
+	MaxPossible = FMath::Min(MaxPossible, RequestedQuantity);
+	}
 
-		return MaxPossible;
+	return MaxPossible;
+}
+
+
+
+int32 UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+{
+	if (!BaseItem) return 0;
+	if (RequestedQuantity == 0) return 0;
+
+	if (OtherItem)
+	{
+		
 	}
 	else
 	{
-		// Adding new item that cannot stack mean always just and only 1
-		if (!Item->ItemData.ItemQuantity.bIsStackable)
-		{
-			return 1;
-		}
 		
-		const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
-		const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
-
-		int32 MaxPossible = MaxQuantity - CurrentQuantity;
-		MaxPossible = FMath::Min(MaxPossible, RequestedQuantity);
-
-		return MaxPossible;
 	}
-	
+
 	return 0;
 }
 
-bool UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+int32 UMounteaInventoryEquipmentBPF::RemoveItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
 {
-	if (!BaseItem) return false;
-	if (RequestedQuantity == 0) return false;
+	if (!BaseItem) return 0;
+	if (RequestedQuantity == 0) return 0;
 
 	if (OtherItem)
 	{
@@ -67,5 +84,43 @@ bool UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* B
 		
 	}
 
-	return false;
+	return 0;
+}
+
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter)
+{
+	if (!Filter.IsValid()) return TArray<UMounteaInventoryItemBase*>();
+
+	TArray<UMounteaInventoryItemBase*> TempResult;
+
+	for (const auto& Itr : ItemsToFilter)
+	{
+		if (!Itr) continue;
+
+		bool bExclude = false;
+
+		if (Filter.bSearchByTag && Itr->GetTags().HasAny(Filter.Tags))
+		{
+			bExclude = true;
+		}
+		else if (Filter.bSearchByItem && Itr == Filter.Item)
+		{
+			bExclude = true;
+		}
+		else if (Filter.bSearchByClass && Itr->IsA(Filter.Class))
+		{
+			bExclude = true;
+		}
+		else if (Filter.bSearchByGUID && Itr->GetItemGuid() == Filter.Guid)
+		{
+			bExclude = true;
+		}
+
+		if (!bExclude)
+		{
+			TempResult.Add(Itr);
+		}
+	}
+
+	return TempResult;
 }

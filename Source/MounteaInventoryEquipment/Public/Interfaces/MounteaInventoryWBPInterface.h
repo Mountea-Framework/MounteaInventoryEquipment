@@ -27,11 +27,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryWBPInterface
 	GENERATED_BODY()
 
 public:
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
-	void ProcessWBPCommand(const FString& Command);
-	virtual void ProcessWBPCommand_Implementation(const FString& Command) = 0;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
 	void CreateInventoryNotification(const FInventoryNotificationData& NotificationData);
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;

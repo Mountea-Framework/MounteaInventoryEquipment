@@ -43,6 +43,7 @@ public class MounteaInventoryEquipment : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
+				"CoreUObject",
 				
 				"GameplayTags",
 				"DeveloperSettings",

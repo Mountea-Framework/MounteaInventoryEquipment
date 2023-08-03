@@ -5,10 +5,13 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/MounteaInventoryInterface.h"
+#include "Setup/MounteaInventoryConfig.h"
 
 #include "MounteaInventoryComponent.generated.h"
 
 
+class UMounteaTransactionPayload;
+class UMounteaBaseUserWidget;
 class UMounteaInventoryItemBase;
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryComponent"
@@ -50,8 +53,8 @@ protected:
 
 public:
 
-	virtual TSubclassOf<UUserWidget> GetInventoryWBPClass_Implementation() override;
-	virtual UUserWidget* GetInventoryWBP_Implementation() override;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() override;
+	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() override;
 
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
@@ -65,15 +68,25 @@ public:
 	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32& Quantity = 1) override;
 	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) override;
 
-	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) override;
-	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) override;
+	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Quantity = 1) override;
+	virtual bool RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems) override;
 
 	virtual void RequestNetworkRefresh_Implementation() override;
 
 	virtual AActor* GetOwningActor_Implementation() const override;
 
-	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UUserWidget> NewInventoryWBPClass) override;
-	virtual void SetInventoryWBP_Implementation(UUserWidget* NewWBP) override;
+	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
+	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) override;
+	
+	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
+	
+	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const override;
+	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const override;
+
+	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const override;
+	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) override;
+
+	virtual bool SetInventoryFlags_Implementation() override;
 	
 public:
 
@@ -90,21 +103,25 @@ private:
 
 	UFUNCTION()
 	void OnRep_Items();
+	
+	UFUNCTION()
+	void OnRep_OtherInventory();
 
 	UFUNCTION(Client, Reliable)
 	void ClientRefreshInventory();
 
 protected:
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 
 	UFUNCTION(Server, Reliable, WithValidation)
-	virtual void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	void TryRemoveItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	
-	virtual bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	
-	virtual bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	
-	virtual bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	virtual bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity = 0);
+	bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
+	bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity = 0);
 	
 	UFUNCTION(Server, Unreliable)
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
@@ -123,6 +140,9 @@ protected:
 	UFUNCTION(Client, Unreliable)
 	void PostItemUpdated_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void SetOtherInventory_Server(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
+	
 private:
 
 	/**
@@ -155,6 +175,8 @@ private:
 	UMounteaInventoryItemBase* FindItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const;
 	TArray<UMounteaInventoryItemBase*> GetItems_Simple(const FItemRetrievalFilter OptionalFilter) const;
 	TArray<UMounteaInventoryItemBase*> GetItems_Multithreading(const FItemRetrievalFilter OptionalFilter) const;
+
+	virtual void PostInitProperties() override;
 	
 #pragma endregion
 
@@ -182,21 +204,35 @@ protected:
 protected:
 
 	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
-	TSubclassOf<UUserWidget> InventoryWBPClass;
+	TSubclassOf<UMounteaBaseUserWidget> InventoryWBPClass;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
-	UUserWidget* InventoryWBP = nullptr;
+	UMounteaBaseUserWidget* InventoryWBP = nullptr;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<UMounteaInventoryItemBase*> Items;
-
-	UPROPERTY()
-	TArray<UMounteaInventoryItemBase*> ClientLastReceivedItems;
+	
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	FMounteaInventoryConfigBase InventoryConfig;
 
 private:
+	
+	/**
+	 * @brief This attribute represents another inventory in relation to the current instance. 
+	 * It could represent an inventory that the player is looting, or the inventory from which the player is looting.
+	 * It can also represent a store's inventory. The interface allows for interaction with various types of inventories.
+	 *
+	 * Use GetOtherInventory() to retrieve the inventory this attribute is pointing to.
+	 * Use SetOtherInventory() to change the inventory this attribute is pointing to.
+	 *
+	 * This attribute is transient.
+	 */
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_OtherInventory)
+	TScriptInterface<IMounteaInventoryInterface> OtherInventory;
+
 
 	UPROPERTY()
-	int32 ReplicatedItemsKey;
+	int32 ReplicatedItemsKey = 0;
 	
 	UPROPERTY()
 	FTimerHandle TimerHandle_RequestInventorySyncTimerHandle;
@@ -207,11 +243,22 @@ private:
 
 	TArray<UMounteaInventoryItemBase*> RemovedItems;
 
+	
+#if WITH_EDITOR
+private:
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+  
+#endif
+
+
 #pragma endregion
 	
 };
 
 #undef LOCTEXT_NAMESPACE
+
+#pragma region Runnables
 
 class FItemSearchRunnable : public FRunnable
 {
@@ -269,4 +316,4 @@ private:
 	TArray<UMounteaInventoryItemBase*>& FoundItems;
 };
 
-
+#pragma endregion 

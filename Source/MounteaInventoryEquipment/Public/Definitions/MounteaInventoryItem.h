@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "MounteaInventoryTableTypes.h"
 #include "MounteaItemAdditionalData.h"
 #include "Helpers/MounteaInventoryHelpers.h"
@@ -10,6 +11,7 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Setup/MounteaInventoryItemConfig.h"
 #include "Definitions/MounteaItemAction.h"
+
 #include "MounteaInventoryItem.generated.h"
 
 struct FMounteaItemAction;
@@ -71,12 +73,12 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
-	TSet<FMounteaItemAction> ItemActions;
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
+	TArray<FMounteaItemAction> ItemActions;
 	
 protected:
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
 	
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
@@ -99,14 +101,18 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="5. Debug")
 	int32 RepKey = 0;
 
-    UPROPERTY(VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false))
+    UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Item)
 	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
 	
-	UPROPERTY(VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false))
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Item)
 	class UWorld* World;
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
+	{ return OwningInventory; };
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	FORCEINLINE FMounteaInventoryItemRequiredData GetItemData() const
 	{ return ItemData; }
@@ -214,10 +220,6 @@ public:
 	{
 		return ItemData.CompatibleGameplayTags;
 	};
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
-	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
-	{ return OwningInventory; }
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);

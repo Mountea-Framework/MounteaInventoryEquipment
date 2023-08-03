@@ -8,7 +8,11 @@
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryInterface.generated.h"
 
+class UMounteaBaseUserWidget;
+class UMounteaInventoryConfig;
+class UMounteaTransactionPayload;
 class UMounteaInventoryItemBase;
+class UMounteaInventoryItemAction;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -39,20 +43,20 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TSubclassOf<UUserWidget> GetInventoryWBPClass();
-	virtual TSubclassOf<UUserWidget> GetInventoryWBPClass_Implementation() = 0;
+	TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass();
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void SetInventoryWBPClass(TSubclassOf<UUserWidget> NewInventoryWBPClass);
-	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UUserWidget> NewInventoryWBPClass) = 0;
+	void SetInventoryWBPClass(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass);
+	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void SetInventoryWBP(UUserWidget* NewWBP);
-	virtual void SetInventoryWBP_Implementation(UUserWidget* NewWBP) = 0;
+	void SetInventoryWBP(UMounteaBaseUserWidget* NewWBP);
+	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	UUserWidget* GetInventoryWBP();
-	virtual UUserWidget* GetInventoryWBP_Implementation() = 0;
+	UMounteaBaseUserWidget* GetInventoryWBP();
+	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool LoadInventoryFromDataTable(const class UMounteaInventoryItemsTable* SourceTable);
@@ -107,12 +111,12 @@ public:
 	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool RemoveItem(UMounteaInventoryItemBase* AffectedItem);
-	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem) = 0;
+	bool RemoveItem(UMounteaInventoryItemBase* AffectedItem, const int32& Amount = 1);
+	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Amount = 1) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool RemoveItems(TArray<UMounteaInventoryItemBase*>& AffectedItems);
-	virtual bool RemoveItems_Implementation(TArray<UMounteaInventoryItemBase*>& AffectedItems) = 0;
+	bool RemoveItems(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems);
+	virtual bool RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void RequestNetworkRefresh();
@@ -121,6 +125,30 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	AActor* GetOwningActor() const;
 	virtual AActor* GetOwningActor_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context);
+	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	UMounteaInventoryConfig* GetInventoryConfig( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const;
+	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass() const;
+	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryInterface> GetOtherInventory() const;
+	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void SetOtherInventory(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
+	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool SetInventoryFlags();
+	virtual bool SetInventoryFlags_Implementation() = 0;
 	
 public:
 

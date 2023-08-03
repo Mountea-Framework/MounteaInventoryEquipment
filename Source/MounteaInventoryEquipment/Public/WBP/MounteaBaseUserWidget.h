@@ -5,23 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
+#include "Helpers/MounteaInventoryHelpers.h"
+
 #include "MounteaBaseUserWidget.generated.h"
 
 class UMounteaInventoryThemeConfig;
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaDynamicDelegate, const FString&, Command, UObject*, Payload) ;
-
-USTRUCT(BlueprintType)
-struct FMounteaDynamicDelegateContext
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	FString Command;
-
-	UPROPERTY(BlueprintReadWrite)
-	UObject* Payload = nullptr;
-};
 
 USTRUCT(BlueprintType)
 struct FMounteaEventBinding
@@ -43,6 +33,15 @@ struct FMounteaEventBinding
 	UPROPERTY(VisibleAnywhere)
 	FMounteaDynamicDelegate Delegate;
 
+	UPROPERTY(VisibleAnywhere)
+	FString UniqueID;
+
+	void UpdateUniqueID()
+	{
+		UniqueID = BindingName.IsNone() ? CallbackFunction.Append(BindingTag.ToString()) : CallbackFunction.Append(BindingTag.ToString()).Append(BindingName.ToString());
+		UniqueID = Delegate.GetUObjectEvenIfUnreachable() ? UniqueID : UniqueID.Append(Delegate.GetUObjectEvenIfUnreachable()->GetName());
+	}
+
 	bool operator==(const FMounteaDynamicDelegate& InDelegate) const
 	{
 		return Delegate == InDelegate;
@@ -54,7 +53,8 @@ struct FMounteaEventBinding
 
 		Other.Delegate.IsBound() ?
 
-		Delegate == Other.Delegate
+		//Delegate == Other.Delegate
+		UniqueID == Other.UniqueID
 
 		:
 		
@@ -128,6 +128,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")//, meta=(CompactNodeTitle="Defaults", HideSelfPin=true))
 	void LoadFromConfig();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void ProcessMounteaWidgetCommand(const FString& Command, UObject* OptionalPayload = nullptr);
+	
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="0. Debug")

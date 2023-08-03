@@ -8,6 +8,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "MounteaInventoryHelpers.h"
+#include "Components/MounteaInventoryComponent.h"
 
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaItemAdditionalData.h"
@@ -23,6 +24,8 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/MounteaInventorySlotWBPInterface.h"
 #include "Interfaces/MounteaInventoryItemWBPInterface.h"
+#include "Setup/MounteaInventoryConfig.h"
+
 
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
@@ -57,10 +60,38 @@ public:
 		return Filter.IsValid();
 	}
 
+#pragma region Converter
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, CompactNodeTitle="Array Valid"))
+	static bool IsArrayValid(const TArray<UObject*>& Array)
+	{
+		return Array.Num() > 0;
+	}
+
+#pragma endregion 
+	
 #pragma region HelpersFunctions
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target) const
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Interface"), meta=(DeterminesOutputType = "InterfaceFilter"))
+	static UActorComponent* GetSingleComponentByInterface(const AActor* Target, TSubclassOf<UInterface> InterfaceFilter)
+	{
+		if (Target == nullptr) return nullptr;
+
+		TArray<UActorComponent*> TempComps = Target->GetComponentsByInterface(InterfaceFilter);
+
+		if (TempComps.IsEmpty()) return nullptr;
+
+		return TempComps[0];
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="valid,safe,null,check"), DisplayName="Is Valid (Inventory Ref)")
+	static bool IsInventoryValid(const TScriptInterface<IMounteaInventoryInterface>& InventoryInterface)
+	{
+		return InventoryInterface.GetObject() != nullptr;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="find,all"))
+	static TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target)
 	{
 		if (!Target) return TArray<UMounteaInventoryItemAction*>();
 		if (!Target->GetItemData().ItemCategory) return Target->GetItemActions();
@@ -137,11 +168,37 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TSubclassOf<UMounteaInventoryConfig> GetItemInventoryConfigClass(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
+	{
+		if (!Target) return nullptr;
+
+		return Target->Execute_GetInventoryConfigClass(Target.GetObject());
+	}
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TSubclassOf<UMounteaInventoryItemConfig> GetItemItemConfigClass(const UMounteaInventoryItemBase* Target)
 	{
 		if (!Target) return nullptr;
 
 		return Target->GetItemConfigClass();
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	static UMounteaInventoryConfig* GetInventoryConfig(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
+	{
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+		
+		if (Target == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+		
+		return Target->Execute_GetInventoryConfig(Target.GetObject(), ClassFilter, bResult);
 	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
@@ -323,11 +380,15 @@ public:
 #pragma endregion 
 	
 #pragma region QuantityFunctions
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static int CalculateMaxSubtractQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static int CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 
-	static bool AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
+	static int32 AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
+	static int32 RemoveItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem = nullptr, const int32 RequestedQuantity = 1);
 
 	static int32 GetValidFiltersCount(const FItemRetrievalFilter& Filter)
 	{
@@ -344,6 +405,30 @@ public:
 #pragma endregion 
 	
 #pragma region ItemFunctions
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="has,have,contain"))
+	static bool DoesHaveTag(const UMounteaInventoryItemBase* Item, const FGameplayTag Tag)
+	{
+		if (Item == nullptr) return false;
+
+		return Item->GetTags().HasTag(Tag);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory",meta=(NativeBreakFunc, Keywords="has,have,contain"))
+	static bool DoesHaveAnyTag(const UMounteaInventoryItemBase* Item, const FGameplayTagContainer Tags)
+	{
+		if (Item == nullptr) return false;
+
+		return Item->GetTags().HasAny(Tags);
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="has,have,contain"))
+	static bool DoesHaveAllTags(const UMounteaInventoryItemBase* Item, const FGameplayTagContainer Tags)
+	{
+		if (Item == nullptr) return false;
+
+		return Item->GetTags().HasAll(Tags);
+	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FIntPoint> CalculateItemShadow(const FIntPoint& StartCoords, const FIntPoint& Area)
@@ -454,6 +539,8 @@ public:
 		return false;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static TArray<UMounteaInventoryItemBase*> ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter);
 #pragma endregion 
 };
 

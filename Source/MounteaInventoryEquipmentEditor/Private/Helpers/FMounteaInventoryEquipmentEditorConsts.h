@@ -12,6 +12,7 @@ const FVector2D Icon200x70(200.f, 70.f);
 
 const FString ChangelogURL = FString("https://raw.githubusercontent.com/Mountea-Framework/MounteaInventoryEquipment/5.0/CHANGELOG.md");
 const FString SupportDiscordURL = FString("https://discord.gg/2vXWEEN");
+const FString GameplayTagsURL = FString("https://raw.githubusercontent.com/Mountea-Framework/MounteaInventoryEquipment/main/Config/Tags/MounteaInventoryEquipmentTags.ini");
 
 const FString PluginWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki");
 const FString ItemsWikiPage = FString("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Object");

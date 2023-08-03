@@ -19,7 +19,7 @@ FText FMounteaInventoryItemActionAssetAction::GetName() const
 
 FColor FMounteaInventoryItemActionAssetAction::GetTypeColor() const
 {
-	return FColor::Green;
+	return FColor::Blue;
 }
 
 UClass* FMounteaInventoryItemActionAssetAction::GetSupportedClass() const

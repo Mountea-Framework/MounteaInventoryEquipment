@@ -5,7 +5,7 @@
 
 #include "Definitions/MounteaInventoryItem.h"
 
-void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus)
+void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus, FMounteaDynamicDelegateContext Context)
 {
 	OwningItem = ItemInFocus;
 
@@ -13,6 +13,8 @@ void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInvent
 	{
 		SetWorld(OwningItem->GetWorld());
 	}
+
+	ActionContext = Context;
 }
 
 bool UMounteaInventoryItemAction::DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const
@@ -37,3 +39,4 @@ void UMounteaInventoryItemAction::SetWorld(UWorld* NewWorld)
 {
 	World = NewWorld;
 }
+

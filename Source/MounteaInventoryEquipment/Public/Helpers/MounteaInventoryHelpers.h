@@ -80,12 +80,14 @@ enum class EItemUpdateResult : uint8
 {
 	EIUR_Success_UpdateItem			UMETA(DisplayName="Success - Update Item"),
 	EIUR_Success_AddItem				UMETA(DisplayName="Success - Add Item"),
-	EIUR_Success_SomeAdd			UMETA(DisplayName="Success - Partially Added"),
-	EIUR_Success_RemovedItem		UMETA(DisplayName="Success - Removed Item"),
-	EIUR_Failed_InvalidItem				UMETA(DisplayName="Failed - Invalid Item"),
+	EIUR_Success_SomeAdd				UMETA(DisplayName="Success - Partially Added"),
+	EIUR_Success_RemovedItem			UMETA(DisplayName="Success - Removed Item"),
+	EIUR_Success_EquipItem				UMETA(DisplayName="Success - Equip Item"),
+	EIUR_Success_UnEquipItem			UMETA(DisplayName="Success - Unequip Item"),
+	EIUR_Failed_InvalidItem					UMETA(DisplayName="Failed - Invalid Item"),
 	EIUR_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
 
-	Default										UMETA(Hidden)
+	Default											UMETA(Hidden)
 };
 
 USTRUCT(BlueprintType)
@@ -298,7 +300,7 @@ struct FItemRetrievalFilter
 		return bSearchByClass || bSearchByTag || bSearchByGUID || bSearchByItem;
 	}
 
-	FItemRetrievalFilter(): bSearchByTag(1), bSearchByClass(0), bSearchByGUID(0), bSearchByItem(0), Item(nullptr)
+	FItemRetrievalFilter(): bSearchByTag(0), bSearchByClass(0), bSearchByGUID(0), bSearchByItem(0), Item(nullptr)
 	{};
 	
 	FItemRetrievalFilter(const bool ByTag, const FGameplayTagContainer& InTags, const bool ByClass, const TSubclassOf<UMounteaInventoryItemBase> InClass, const bool ByGUID, const FGuid InGUID, const bool ByItem, UMounteaInventoryItemBase* InItem)
@@ -318,4 +320,16 @@ struct FMounteaItemDescription : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(MultiLine=true))
 	FText ItemLongDescription;
+};
+
+USTRUCT(BlueprintType)
+struct FMounteaDynamicDelegateContext
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FString Command;
+
+	UPROPERTY(BlueprintReadWrite)
+	UObject* Payload = nullptr;
 };

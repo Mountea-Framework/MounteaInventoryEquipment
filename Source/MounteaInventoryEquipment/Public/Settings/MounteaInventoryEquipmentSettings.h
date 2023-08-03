@@ -3,14 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaInventoryThemeConfig.h"
 #include "Engine/DeveloperSettings.h"
+
+#include "MounteaInventoryThemeConfig.h"
+
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaInventoryHelpers.h"
+
 #include "MounteaInventoryEquipmentSettings.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
+class UMounteaInventoryConfig;
 class UMounteaInventoryItemsTable;
 class UMounteaInventoryItemConfig;
 class UMounteaTransactionPayload;
@@ -33,6 +37,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
 	TSoftClassPtr<UMounteaInventoryItemBase> DefaultItemClass;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
+	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
 	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
@@ -49,7 +56,11 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
 
-	
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TMap<FString,FGameplayTag> EquipmentSlotIDs;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;
@@ -111,7 +122,8 @@ public:
 	*/
 	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=100, ClampMin=100), AdvancedDisplay)
 	int32 MultithreadingThreshold = 1000;
-	
+
+
 public:
 
 #if WITH_EDITOR
@@ -157,6 +169,10 @@ public:
 			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::ShowInventoryWidget))
 			{
 				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::ShowInventoryWidget);
+			}
+			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget))
+			{
+				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget);
 			}
 		}
 

@@ -5,6 +5,7 @@
 
 #include "Definitions/MounteaInventoryItem.h"
 #include "Helpers/MounteaInventoryHelpers.h"
+#include "Setup/MounteaInventoryConfig.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
@@ -20,6 +21,7 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
 	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
 	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets);
+	InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget);
 
 	InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Success, LOCTEXT("InventoryUpdateMessages_Success", "Inventory Updated"));
 	InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Failed,  LOCTEXT("InventoryUpdateMessages_Failed", "Inventory Update Failed"));
@@ -55,6 +57,7 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	bUIDebug = false;
 	bDragDropAllowed = true;
 
+	DefaultInventoryConfigClass = UMounteaInventoryConfig::StaticClass();
 	DefaultItemClass = UMounteaInventoryItemBase::StaticClass();
 	DefaultItemConfigClass = UMounteaInventoryItemConfig::StaticClass();
 }
