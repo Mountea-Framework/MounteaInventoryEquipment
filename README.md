@@ -59,9 +59,8 @@ In-line editable configuration with the ability to extend logic in Blueprints.</
 Each Action represents a logic that can be performed for each Item from the selected Category. For example, Apples can be Consumed, Keys can be Used etc.</p>
 Each Action can be shown from the in-game context menu and the visibility can be adjusted using the `DisplayAction` function, which can be overridden per Action type.
 <p align="center" width="100%">
-    <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/23708a31-3173-44ab-b2d3-d42f18fe8a2d">
+    <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/279c7c3e-8e01-4485-9288-b5ab51">
 </p>
-
 
 ## Installation
 
