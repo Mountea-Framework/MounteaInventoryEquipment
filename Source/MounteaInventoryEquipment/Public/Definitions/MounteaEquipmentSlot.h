@@ -7,6 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "MounteaEquipmentSlot.generated.h"
 
+class IMounteaEquipmentInterface;
 class UMounteaInventoryItemBase;
 
 /**
@@ -60,7 +61,9 @@ public:
 	 * It returns true if the slot is empty (i.e., there is no item equipped), and false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE bool IsEmpty() const { return ItemInSlot == nullptr; }
+	FORCEINLINE bool IsEmpty() const { return ItemInSlot == nullptr; };
+
+	FORCEINLINE int32 GetRepKey() const { return RepKey; };
 protected:
 
 	/**
@@ -68,28 +71,39 @@ protected:
 	 * This ID is used to distinguish this slot from others in an equipment system.
 	 * It can be customized in the editor.
 	 */
-	UPROPERTY(Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, meta=(GetOptions=GetSlotIDs))
+	UPROPERTY(SaveGame, Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, meta=(GetOptions=GetSlotIDs))
 	FString SlotID;
 
 	/**
 	 * The tag that determines which items can be equipped in this slot.
 	 * Only items that contain this tag can be equipped in this slot.
 	 */
-	UPROPERTY(Category="1. Required", VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(SaveGame, Category="1. Required", VisibleAnywhere, BlueprintReadOnly)
 	FGameplayTag SlotCompatibleTag;
 
 	/**
 	 * The item currently equipped in this slot.
 	 * This property is automatically updated when items are equipped or unequipped.
 	 */
-	UPROPERTY(Category="2. Debug", VisibleAnywhere, BlueprintReadOnly, meta=(DisplayThumbnail=false))
+	UPROPERTY(SaveGame, Category="2. Debug", VisibleAnywhere, BlueprintReadOnly, meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
 	UMounteaInventoryItemBase* ItemInSlot = nullptr;
 
 private:
 
-	UFUNCTION()
-	TArray<FString> GetSlotIDs() const;
+	UPROPERTY(VisibleAnywhere, Category="2. Debug")
+	int32 RepKey = 0;
 
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
+	TScriptInterface<IMounteaEquipmentInterface> OwningEquipment = nullptr;
+
+private:
+
+	UFUNCTION() void OnRep_Slot();
+	UFUNCTION() TArray<FString> GetSlotIDs() const;
+	
+	virtual bool IsSupportedForNetworking() const override;
+	void MarkDirtyForReplication();
+	
 #if WITH_EDITOR
 protected:
 	
@@ -97,6 +111,14 @@ protected:
 	
 #endif
 	
+};
+
+struct FMounteaEquipmentSlotDataCompare
+{
+	FMounteaEquipmentSlotDataCompare(const UMounteaInventoryItemBase* Item, const FString& ID) : SlotItem(Item), SlotID(ID) {};
+	
+	 const UMounteaInventoryItemBase* SlotItem;
+	 const FString SlotID;
 };
 
 USTRUCT(BlueprintType)
@@ -114,5 +136,42 @@ public:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=false))
 	UMounteaEquipmentSlot* Slot;
+
+public:
+
+	bool operator==(const FMounteaEquipmentSlotData& Other) const
+	{
+		return Slot == Other.Slot;
+	}
+	
+	bool operator==(const FMounteaEquipmentSlotDataCompare& Other) const
+	{
+		if (Slot)
+		{
+			return Slot->GetSlotID() == Other.SlotID && Slot->GetSlotItem() == Other.SlotItem;
+		}
+		return false;
+	}
+
+	bool operator!=(const FMounteaEquipmentSlotData& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	bool operator!=(const FMounteaEquipmentSlotDataCompare& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	friend uint32 GetTypeHash(const FMounteaEquipmentSlotData& Data)
+	{
+		uint32 Hash = 0;
+		if (Data.Slot)
+		{
+			Hash = HashCombine(Hash, GetTypeHash(Data.Slot->GetSlotID()));
+		}
+				
+		return Hash;
+	}
 
 };

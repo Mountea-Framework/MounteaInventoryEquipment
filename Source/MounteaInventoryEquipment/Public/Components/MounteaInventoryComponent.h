@@ -232,7 +232,7 @@ private:
 
 
 	UPROPERTY()
-	int32 ReplicatedItemsKey;
+	int32 ReplicatedItemsKey = 0;
 	
 	UPROPERTY()
 	FTimerHandle TimerHandle_RequestInventorySyncTimerHandle;

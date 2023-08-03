@@ -53,7 +53,7 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 		
 		for (const auto& Item : AllItems)
 		{
-			if (Channel->KeyNeedsToReplicate(Item->GetUniqueID(), Item->GetRepKey()))
+			if (Item && Channel->KeyNeedsToReplicate(Item->GetUniqueID(), Item->GetRepKey()))
 			{
 				bUpdated |= Channel->ReplicateSubobject(Item, *Bunch, *RepFlags);
 			}

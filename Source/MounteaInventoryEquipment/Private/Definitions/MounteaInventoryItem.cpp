@@ -156,7 +156,7 @@ void UMounteaInventoryItemBase::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	DOREPLIFETIME(UMounteaInventoryItemBase, ItemData);
 	DOREPLIFETIME(UMounteaInventoryItemBase, ItemDataSource);
 	DOREPLIFETIME(UMounteaInventoryItemBase, OwningInventory);
-	DOREPLIFETIME(UMounteaInventoryItemBase, World);
+	DOREPLIFETIME_CONDITION(UMounteaInventoryItemBase, World, COND_InitialOrOwner);
 	DOREPLIFETIME_CONDITION(UMounteaInventoryItemBase, ItemActions, COND_InitialOnly);
 	DOREPLIFETIME(UMounteaInventoryItemBase, ItemConfig);
 }

@@ -36,29 +36,75 @@ public:
 
 	UMounteaEquipmentComponent();
 
+#pragma region FUNCTIONS
 protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+
 public:
 	
-#pragma region FUNCTIONS
-
-	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
-	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
-	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
+	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const override;
 	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const override;
 	
-#pragma endregion
+	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	
+	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	
+	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip) const override;
+
+	virtual FOnEquipmentUpdated& GetEquipmentUpdatedHandle() override { return OnEquipmentUpdated; };
+	virtual FOnSlotUpdated& GetSlotEquippedHandle() override { return OnSlotEquipped; };
+	virtual FOnSlotUpdated& GetSlotUnEquippedHandle() override { return OnSlotUnequipped; };
 
 protected:
-	
-#pragma region VARIABLES
 
-	UPROPERTY(Category="1. Required", EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FMounteaEquipmentSlotData> EquipmentSlotData;
+	UFUNCTION(Server, Reliable, WithValidation) void EquipItem_Server(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	UFUNCTION(Server, Reliable, WithValidation) void UnEquipItem_Server(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	UFUNCTION(NetMulticast, Unreliable) void EquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	UFUNCTION(NetMulticast, Unreliable) void UnEquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	UFUNCTION() void OnRep_Equipment();
 	
 #pragma endregion
+	
+#pragma region VARIABLES
+protected:
+	
+	UPROPERTY(SaveGame, Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipment)
+	TArray<FMounteaEquipmentSlotData> EquipmentSlotData;
+
+private:
+	
+	UPROPERTY()
+	int32 ReplicatedItemsKey = 0;
+	
+#pragma endregion
+
+#pragma region EVENTS
+
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnEquipmentUpdated (Server)" )
+	FOnEquipmentUpdated OnEquipmentUpdated;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnEquipmentUpdated (Client)" )
+	FOnEquipmentUpdated OnEquipmentUpdated_Client;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnEquipmentUpdated (Multicast)")
+	FOnEquipmentUpdated OnEquipmentUpdated_Multicast;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotEquipped (Server)" )
+	FOnSlotUpdated OnSlotEquipped;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotEquipped (Client)" )
+	FOnSlotUpdated OnSlotEquipped_Client;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotEquipped (Multicast)")
+	FOnSlotUpdated OnSlotEquipped_Multicast;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotUnequipped (Server)" )
+	FOnSlotUpdated OnSlotUnequipped;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotUnequipped (Multicast)")
+	FOnSlotUpdated OnSlotUnequipped_Client;
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotUnequipped (Multicast)")
+	FOnSlotUpdated OnSlotUnequipped_Multicast;
+	
+#pragma endregion 
 
 #if WITH_EDITOR
 protected:

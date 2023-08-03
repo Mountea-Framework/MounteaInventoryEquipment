@@ -8,6 +8,7 @@
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryInterface.generated.h"
 
+class UMounteaBaseUserWidget;
 class UMounteaInventoryConfig;
 class UMounteaTransactionPayload;
 class UMounteaInventoryItemBase;

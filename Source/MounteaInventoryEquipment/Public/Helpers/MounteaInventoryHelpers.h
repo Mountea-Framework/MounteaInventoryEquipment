@@ -80,12 +80,14 @@ enum class EItemUpdateResult : uint8
 {
 	EIUR_Success_UpdateItem			UMETA(DisplayName="Success - Update Item"),
 	EIUR_Success_AddItem				UMETA(DisplayName="Success - Add Item"),
-	EIUR_Success_SomeAdd			UMETA(DisplayName="Success - Partially Added"),
-	EIUR_Success_RemovedItem		UMETA(DisplayName="Success - Removed Item"),
-	EIUR_Failed_InvalidItem				UMETA(DisplayName="Failed - Invalid Item"),
+	EIUR_Success_SomeAdd				UMETA(DisplayName="Success - Partially Added"),
+	EIUR_Success_RemovedItem			UMETA(DisplayName="Success - Removed Item"),
+	EIUR_Success_EquipItem				UMETA(DisplayName="Success - Equip Item"),
+	EIUR_Success_UnEquipItem			UMETA(DisplayName="Success - Unequip Item"),
+	EIUR_Failed_InvalidItem					UMETA(DisplayName="Failed - Invalid Item"),
 	EIUR_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
 
-	Default										UMETA(Hidden)
+	Default											UMETA(Hidden)
 };
 
 USTRUCT(BlueprintType)

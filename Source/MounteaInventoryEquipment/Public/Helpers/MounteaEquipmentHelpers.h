@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaEquipmentHelpers.generated.h"
+//#include "MounteaEquipmentHelpers.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaEquipmentSlots"
 

@@ -3,7 +3,13 @@
 
 #include "Definitions/MounteaEquipmentSlot.h"
 
+#include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+
+void UMounteaEquipmentSlot::OnRep_Slot()
+{
+	RepKey = 0;
+}
 
 TArray<FString> UMounteaEquipmentSlot::GetSlotIDs() const
 {
@@ -14,6 +20,24 @@ TArray<FString> UMounteaEquipmentSlot::GetSlotIDs() const
 	}
 
 	return ReturnValues;
+}
+
+void UMounteaEquipmentSlot::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UMounteaEquipmentSlot, ItemInSlot);
+	DOREPLIFETIME_CONDITION(UMounteaEquipmentSlot, OwningEquipment, COND_InitialOrOwner);
+}
+
+bool UMounteaEquipmentSlot::IsSupportedForNetworking() const
+{
+	return true;
+}
+
+void UMounteaEquipmentSlot::MarkDirtyForReplication()
+{
+	RepKey++;
 }
 
 #if WITH_EDITOR
