@@ -35,7 +35,27 @@ bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInv
 	return true;
 }
 
-TArray<FMounteaEquipmentSlots> UMounteaEquipmentComponent::GetAllSlots_Implementation() const
+TArray<FMounteaEquipmentSlotData> UMounteaEquipmentComponent::GetAllSlots_Implementation() const
 {
-	return TArray<FMounteaEquipmentSlots>();
+	return EquipmentSlotData;
 }
+
+#if WITH_EDITOR
+
+void UMounteaEquipmentComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.Property->GetName() == TEXT("EquipmentSlotData"))
+	{
+		for (FMounteaEquipmentSlotData& Itr : EquipmentSlotData)
+		{
+			if (Itr.Slot == nullptr)
+			{
+				Itr.Slot = NewObject<UMounteaEquipmentSlot>(GetPackage(), UMounteaEquipmentSlot::StaticClass());
+			}
+		}
+	}
+}
+
+#endif

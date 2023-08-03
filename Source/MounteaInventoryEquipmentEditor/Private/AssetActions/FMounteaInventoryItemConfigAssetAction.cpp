@@ -18,7 +18,7 @@ FText FMounteaInventoryItemConfigAssetAction::GetName() const
 
 FColor FMounteaInventoryItemConfigAssetAction::GetTypeColor() const
 {
-	return FColor::Green;
+	return FColor::Blue;
 }
 
 UClass* FMounteaInventoryItemConfigAssetAction::GetSupportedClass() const

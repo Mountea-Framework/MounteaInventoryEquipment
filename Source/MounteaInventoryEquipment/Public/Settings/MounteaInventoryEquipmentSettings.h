@@ -58,6 +58,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TMap<FString,FGameplayTag> EquipmentSlotIDs;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;

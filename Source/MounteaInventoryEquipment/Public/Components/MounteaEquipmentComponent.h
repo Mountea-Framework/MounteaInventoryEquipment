@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Definitions/MounteaEquipmentSlot.h"
 #include "Interfaces/MounteaEquipmentInterface.h"
 #include "MounteaEquipmentComponent.generated.h"
 
@@ -39,13 +40,31 @@ protected:
 
 	virtual void BeginPlay() override;
 
+public:
+	
 #pragma region FUNCTIONS
 
 	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
 	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
 	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex) override;
-	virtual TArray<FMounteaEquipmentSlots> GetAllSlots_Implementation() const override;
+	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const override;
 	
-#pragma endregion 
+#pragma endregion
+
+protected:
+	
+#pragma region VARIABLES
+
+	UPROPERTY(Category="1. Required", EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FMounteaEquipmentSlotData> EquipmentSlotData;
+	
+#pragma endregion
+
+#if WITH_EDITOR
+protected:
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
 	
 };

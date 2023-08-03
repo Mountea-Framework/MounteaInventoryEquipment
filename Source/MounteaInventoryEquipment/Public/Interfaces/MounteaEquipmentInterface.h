@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaEquipmentInterface.generated.h"
 
+struct FMounteaEquipmentSlotData;
 struct FMounteaEquipmentSlots;
 class UMounteaInventoryItemBase;
 
@@ -48,6 +49,6 @@ public:
 	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const int32 OptionalIndex = 0) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TArray<FMounteaEquipmentSlots> GetAllSlots() const;
-	virtual TArray<FMounteaEquipmentSlots> GetAllSlots_Implementation() const = 0;
+	TArray<FMounteaEquipmentSlotData> GetAllSlots() const;
+	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const = 0;
 };
