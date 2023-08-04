@@ -17,6 +17,11 @@ UMounteaInventoryItemBase::UMounteaInventoryItemBase()
 	FWorldDelegates::OnPostWorldCreation.AddUObject(this, &UMounteaInventoryItemBase::PostWorldCreated);
 }
 
+UMounteaInventoryItemBase::~UMounteaInventoryItemBase()
+{
+	FWorldDelegates::OnPostWorldCreation.RemoveAll(this);
+}
+
 void UMounteaInventoryItemBase::PostWorldCreated(UWorld* NewWorld)
 {
 	if (FApp::IsGame())

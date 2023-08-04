@@ -51,6 +51,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UDataAsse
 	GENERATED_BODY()
 	
 	UMounteaInventoryItemBase();
+	virtual ~UMounteaInventoryItemBase() override;
 
 private:
 	
