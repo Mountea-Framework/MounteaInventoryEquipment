@@ -148,8 +148,8 @@ struct FMounteaInventoryItemRequiredData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
-	FGameplayTagContainer CompatibleGameplayTags;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault), DisplayName="Item Flags (Gameplay Tags)")
+	FGameplayTagContainer ItemFlags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FText ItemName = LOCTEXT("MounteaInventoryItem_ItemName", "New Item");
@@ -170,12 +170,12 @@ public:
 
 	bool operator==(const FMounteaInventoryItemRequiredData& Other) const
 	{
-		if (CompatibleGameplayTags.IsEmpty())
+		if (ItemFlags.IsEmpty())
 		{
 			return ItemName.EqualTo(Other.ItemName);
 		}
 
-		return ItemName.EqualTo(Other.ItemName) && CompatibleGameplayTags == Other.CompatibleGameplayTags;
+		return ItemName.EqualTo(Other.ItemName) && ItemFlags == Other.ItemFlags;
 	}
 
 	bool operator!=(const FMounteaInventoryItemRequiredData& Other) const

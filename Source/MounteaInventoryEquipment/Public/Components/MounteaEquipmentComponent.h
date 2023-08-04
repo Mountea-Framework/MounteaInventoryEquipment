@@ -47,6 +47,7 @@ protected:
 public:
 	
 	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const override;
+	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const override;
 	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const override;
 	
 	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;

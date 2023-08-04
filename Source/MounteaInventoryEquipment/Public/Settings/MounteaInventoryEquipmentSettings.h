@@ -14,6 +14,7 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
+class UMounteaEquipmentConfigData;
 class UMounteaInventoryConfig;
 class UMounteaInventoryItemsTable;
 class UMounteaInventoryItemConfig;
@@ -55,12 +56,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
-
+	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TMap<FString,FGameplayTag> EquipmentSlotIDs;
+	TSoftObjectPtr<UMounteaEquipmentConfigData> EquipmentConfigData;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;

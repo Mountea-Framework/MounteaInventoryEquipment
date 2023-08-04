@@ -49,7 +49,7 @@ UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", Displa
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UDataAsset, public IMounteaInventoryEquipmentItem
 {
 	GENERATED_BODY()
-
+	
 	UMounteaInventoryItemBase();
 
 private:
@@ -214,11 +214,11 @@ public:
 
 	FGameplayTag GetFirstTag() const
 	{
-		return ItemData.CompatibleGameplayTags.First();
+		return ItemData.ItemFlags.First();
 	};
 	FGameplayTagContainer GetTags() const
 	{
-		return ItemData.CompatibleGameplayTags;
+		return ItemData.ItemFlags;
 	};
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
@@ -269,6 +269,8 @@ protected:
 	void ClearMappedValues();
 	void CopyTagsFromTypes();
 	void EnsureValidConfig();
+
+	void PostWorldCreated(UWorld* NewWorld);
 	
 #if WITH_EDITOR
 	

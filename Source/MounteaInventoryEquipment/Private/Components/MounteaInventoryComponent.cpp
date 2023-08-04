@@ -139,7 +139,7 @@ bool UMounteaInventoryComponent::HasItem_Simple(const FItemRetrievalFilter& Sear
 		{
 			for (const auto& Itr : Items)
 			{
-				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+				if (Itr && Itr->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
 				{
 					return true;
 				}
@@ -298,7 +298,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Simple(const FIt
 		{
 			for (const auto& Itr : Items)
 			{
-				if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+				if (Itr && Itr->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
 				{
 					return Itr;
 				}
@@ -441,7 +441,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Simple(c
 		{
 			for (const auto& Item : Items)
 			{
-				if (Item && Item->ItemData.CompatibleGameplayTags.HasAny(OptionalFilter.Tags))
+				if (Item && Item->ItemData.ItemFlags.HasAny(OptionalFilter.Tags))
 				{
 					FoundItems.Add(Item);
 				}
@@ -1037,7 +1037,8 @@ bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Ite
 		
 		return true;
 	}
-
+	
+	Item->InitializeNewItem(this);
 	return false;
 }
 
@@ -1265,10 +1266,13 @@ bool UMounteaInventoryComponent::CanExecuteCosmetics() const
 
 void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext)
 {
-	if (!GetOwner()) return;
+ 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
-
+	if (!Item) return;
+	
 	if (!CanExecuteCosmetics()) return;
+
+	//Item->InitializeNewItem(this);
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 
@@ -1449,7 +1453,7 @@ uint32 FItemSearchRunnable::Run()
 	{
 		for (const auto& Itr : Items)
 		{
-			if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+			if (Itr && Itr->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
 			{
 				ItemFound = true;
 				return 1;
@@ -1505,7 +1509,7 @@ uint32 FItemGetRunnable::Run()
 	{
 		for (const auto& Itr : Items)
 		{
-			if (Itr && Itr->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+			if (Itr && Itr->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
 			{
 				FoundItem = Itr;
 				ItemFound = true;
@@ -1564,7 +1568,7 @@ uint32 FItemsGetRunnable::Run()
 	{
 		for (const auto& Item : Items)
 		{
-			if (Item && Item->ItemData.CompatibleGameplayTags.HasAny(SearchFilter.Tags))
+			if (Item && Item->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
 			{
 				FoundItems.Add(Item);
 				ItemFound = true;

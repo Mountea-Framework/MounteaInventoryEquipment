@@ -7,7 +7,7 @@
 #include "Engine/DataAsset.h"
 
 #include "Helpers/MounteaInventoryHelpers.h"
-#include "Helpers/FMounteaTemplatesLibrary.h"
+
 
 #include "MounteaItemAdditionalData.generated.h"
 
@@ -64,16 +64,10 @@ private:
 	static FMounteaItemDescription* GetRowData(const UMounteaInventoryItemsDescriptionsTable* FromTable, FName FromRow);
 
 	UFUNCTION()
-	TArray<FName> GetSourceTableRows_ShortDescription() const
-	{
-		return GetSourceRows<FName, UMounteaInventoryItemsDescriptionsTable>(SourceTable_ShortDescription);
-	}
+	TArray<FName> GetSourceTableRows_ShortDescription() const;
 
 	UFUNCTION()
-	TArray<FName> GetSourceTableRows_LongDescription() const
-	{
-		return GetSourceRows<FName, UMounteaInventoryItemsDescriptionsTable>(SourceTable_LongDescription);
-	}
+	TArray<FName> GetSourceTableRows_LongDescription() const;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

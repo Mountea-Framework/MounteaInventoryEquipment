@@ -2,7 +2,7 @@
 
 
 #include "Definitions/MounteaItemAdditionalData.h"
-
+#include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Definitions/MounteaInventoryTableTypes.h"
 
 UMounteaItemAdditionalData::UMounteaItemAdditionalData()
@@ -24,6 +24,18 @@ FMounteaItemDescription* UMounteaItemAdditionalData::GetRowData(const UMounteaIn
 	
 	const FString Context;
 	return FromTable->FindRow<FMounteaItemDescription>(FromRow, Context);
+}
+
+TArray<FName> UMounteaItemAdditionalData::GetSourceTableRows_ShortDescription() const
+{
+	{
+		return GetSourceRows<FName, UMounteaInventoryItemsDescriptionsTable>(SourceTable_ShortDescription);
+	}
+}
+
+TArray<FName> UMounteaItemAdditionalData::GetSourceTableRows_LongDescription() const
+{
+		return GetSourceRows<FName, UMounteaInventoryItemsDescriptionsTable>(SourceTable_LongDescription);
 }
 
 #if WITH_EDITOR

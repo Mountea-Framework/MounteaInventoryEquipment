@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "MounteaEquipmentInterface.generated.h"
 
+class UMounteaEquipmentSlot;
 struct FMounteaEquipmentSlotData;
 struct FMounteaEquipmentSlots;
 class UMounteaInventoryItemBase;
@@ -44,6 +45,10 @@ public:
 	FString FindSlotForItem(const UMounteaInventoryItemBase* Item) const;
 	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const = 0;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UMounteaEquipmentSlot* FindSlotByID(const FString& SlotID) const;
+	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const = 0;
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool EquipItem(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip,const FString& SlotID) = 0;

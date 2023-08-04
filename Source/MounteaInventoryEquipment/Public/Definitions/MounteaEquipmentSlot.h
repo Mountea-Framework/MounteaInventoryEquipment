@@ -99,7 +99,8 @@ private:
 private:
 
 	UFUNCTION() void OnRep_Slot();
-	UFUNCTION() TArray<FString> GetSlotIDs() const;
+	UFUNCTION()
+	static TArray<FString> GetSlotIDs();
 	
 	virtual bool IsSupportedForNetworking() const override;
 	void MarkDirtyForReplication();

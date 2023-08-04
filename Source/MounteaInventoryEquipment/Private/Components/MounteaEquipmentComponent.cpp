@@ -4,6 +4,7 @@
 #include "Components/MounteaEquipmentComponent.h"
 
 #include "Engine/ActorChannel.h"
+#include "Settings/MounteaInventoryEquipmentSettings.h"
 
 UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 {
@@ -59,6 +60,16 @@ FString UMounteaEquipmentComponent::FindSlotForItem_Implementation(const UMounte
 	}
 
 	return SlotID;
+}
+
+UMounteaEquipmentSlot* UMounteaEquipmentComponent::FindSlotByID_Implementation(const FString& SlotID) const
+{
+	for (const FMounteaEquipmentSlotData& Itr : EquipmentSlotData)
+	{
+		if (Itr.Slot && Itr.Slot->GetSlotID().Equals(SlotID)) return Itr.Slot;
+	}
+
+	return nullptr;
 }
 
 #pragma region EQUIP
