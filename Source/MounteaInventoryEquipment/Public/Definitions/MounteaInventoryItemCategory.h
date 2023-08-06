@@ -53,6 +53,12 @@ public:
 
 		return ReturnValues;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE TArray<FMounteaItemAction> GetCategoryActionsDefinitions() const
+	{
+		return CategoryActions.Array();
+	}
 };
 
 #undef LOCTEXT_NAMESPACE

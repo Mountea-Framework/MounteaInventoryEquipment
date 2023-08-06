@@ -792,6 +792,12 @@ bool UMounteaInventoryComponent::SetInventoryFlags_Implementation()
 	return true;
 }
 
+bool UMounteaInventoryComponent::DoesHaveAuthority_Implementation() const
+{
+	if (GetOwner()==nullptr) return false;
+	return GetOwner()->HasAuthority();
+}
+
 void UMounteaInventoryComponent::SetOtherInventory_Server_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory)
 {
 	if (NewInventory != OtherInventory)
@@ -1038,7 +1044,6 @@ bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Ite
 		return true;
 	}
 	
-	Item->InitializeNewItem(this);
 	return false;
 }
 
@@ -1272,7 +1277,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(UMounteaInv
 	
 	if (!CanExecuteCosmetics()) return;
 
-	//Item->InitializeNewItem(this);
+	Item->InitializeNewItem(this);
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 
@@ -1319,6 +1324,8 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(UMounteaInve
 	if (!Item) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+
+	Item->InitializeNewItem(this);
 	
 	if (InventoryWBP)
 	{
@@ -1357,6 +1364,8 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(UMounteaIn
 	if (!Item) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+	
+	Item->InitializeNewItem(this);
 	
 	if (InventoryWBP)
 	{

@@ -35,6 +35,9 @@ void UMounteaInventoryItemBase::PostWorldCreated(UWorld* NewWorld)
 		
 		SetValidData();
 
+		EnsureValidConfig();
+		InitializeItemActions();
+
 		OnItemBeginPlay(TEXT("Item has been initialized"));
 	}
 }
@@ -57,6 +60,20 @@ void UMounteaInventoryItemBase::PostInitProperties()
 
 		EnsureValidConfig();
 	}
+}
+
+TArray<UMounteaInventoryItemAction*> UMounteaInventoryItemBase::GetItemActions() const
+{
+	TArray<UMounteaInventoryItemAction*> ReturnValues;
+	for (const auto& Itr : ItemActions)
+	{
+		if (Itr.ItemAction && !ReturnValues.Contains(Itr.ItemAction))
+		{
+			ReturnValues.Add(Itr.ItemAction);
+		}
+	}
+
+	return ReturnValues;
 }
 
 bool UMounteaInventoryItemBase::IsValid(UObject* WorldContextObject) const
@@ -92,6 +109,27 @@ int32 UMounteaInventoryItemBase::GetQuantity() const
 	return ItemData.ItemQuantity.CurrentQuantity;
 }
 
+bool UMounteaInventoryItemBase::OwnerHasAuthority() const
+{
+	if (!OwningInventory)
+	{
+		if (!GEngine) return false;
+		if (!World) return false;
+
+		const FString ModeName = GetEnumValueAsString(TEXT("ENetRole"), GEngine->GetNetMode(World));
+
+		UE_LOG(LogTemp, Error, TEXT("%s"), *ModeName)
+		if (GEngine->GetNetMode(World) == NM_Client)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	return OwningInventory->Execute_DoesHaveAuthority(OwningInventory.GetObject());
+}
+
 void UMounteaInventoryItemBase::SetWorldFromLevel(ULevel* FromLevel)
 {
 	if (FromLevel == nullptr)
@@ -105,9 +143,23 @@ void UMounteaInventoryItemBase::SetWorldFromLevel(ULevel* FromLevel)
 	}
 }
 
+void UMounteaInventoryItemBase::InitializeItemActions()
+{
+	TArray<UMounteaInventoryItemAction*> Actions = GetItemActions();
+	for (UMounteaInventoryItemAction* ItrAction : Actions)
+	{
+		FMounteaDynamicDelegateContext Context;
+		Context.Command = MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemActionCommands::InitializeAction;
+		Context.Payload = this;
+		ItrAction->InitializeAction(this, Context);
+	}
+}
+
 void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)
 {
 	World = NewWorld;
+
+	InitializeItemActions();
 }
 
 void UMounteaInventoryItemBase::InitializeNewItem(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory)
@@ -272,6 +324,44 @@ void UMounteaInventoryItemBase::CopyTagsFromTypes()
 	}
 }
 
+void UMounteaInventoryItemBase::EnsureValidConfig()
+{
+	if (ItemConfig.ItemConfig == nullptr)
+	{
+		bool bFound = false;
+		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
+		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
+	}
+	
+	// Copy Actions Categories
+	{
+		TArray<FMounteaItemAction> CurrentActions = GetItemActionsDefinitions();
+		ItemActions.Empty();
+
+		if (ItemData.ItemCategory)
+		{
+			TArray<FMounteaItemAction> CategoryActions = ItemData.ItemCategory->GetCategoryActionsDefinitions();
+			
+			for (const FMounteaItemAction ItrCategoryAction: CategoryActions)
+			{
+				if (!ItrCategoryAction.ItemAction) continue;
+				if (CurrentActions.Contains(ItrCategoryAction)) continue;
+
+				const UMounteaInventoryItemAction* SourceAction = ItrCategoryAction.ItemAction; 
+				UMounteaInventoryItemAction* NewAction = NewObject<UMounteaInventoryItemAction>(GetPackage(), SourceAction->GetClass());
+				NewAction->CopyFromOther(ItrCategoryAction.ItemAction);
+
+				FMounteaItemAction NewActionDefinition;
+				NewActionDefinition.ItemAction = NewAction;
+				
+				CurrentActions.Add(NewActionDefinition);
+			}
+		}
+
+		ItemActions = CurrentActions;
+	}
+}
+
 #if WITH_EDITOR
 
 void UMounteaInventoryItemBase::SetValidDataEditor()
@@ -288,16 +378,6 @@ void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
 	SetValidData();
 	
 	ItemGuid = FGuid::NewGuid();
-}
-
-void UMounteaInventoryItemBase::EnsureValidConfig()
-{
-	if (ItemConfig.ItemConfig == nullptr)
-	{
-		bool bFound = false;
-		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
-		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
-	}
 }
 
 void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

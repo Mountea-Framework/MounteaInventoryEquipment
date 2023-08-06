@@ -31,6 +31,11 @@ namespace MounteaInventoryEquipmentConsts
 			const FString ShowTooltip								(TEXT("ShowTooltip"));
 			const FString HideTooltip								(TEXT("HideTooltip"));
 		}
+
+		namespace ItemActionCommands
+		{
+			const FString InitializeAction							(TEXT("InitializeAction"));
+		}
 	}
 
 	namespace MounteaInventoryNotifications

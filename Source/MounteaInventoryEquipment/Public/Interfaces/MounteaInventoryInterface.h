@@ -149,6 +149,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool SetInventoryFlags();
 	virtual bool SetInventoryFlags_Implementation() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool DoesHaveAuthority() const;
+	virtual bool DoesHaveAuthority_Implementation() const = 0;
 	
 public:
 

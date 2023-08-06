@@ -119,18 +119,13 @@ public:
 	{ return ItemData; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	FORCEINLINE TArray<UMounteaInventoryItemAction*> GetItemActions() const
-	{
-		TArray<UMounteaInventoryItemAction*> ReturnValues;
-		for (const auto& Itr : ItemActions)
-		{
-			if (Itr.ItemAction && !ReturnValues.Contains(Itr.ItemAction))
-			{
-				ReturnValues.Add(Itr.ItemAction);
-			}
-		}
+	TArray<UMounteaInventoryItemAction*> GetItemActions() const;
+	
 
-		return ReturnValues;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE TArray<FMounteaItemAction> GetItemActionsDefinitions() const
+	{
+		return ItemActions;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
@@ -205,6 +200,8 @@ public:
 	virtual FItemGenericEvent& GetItemRemovedHandle()
 	{ return OnItemRemoved; };
 
+	bool OwnerHasAuthority() const;
+	
 	void NetFlush()
 	{
 		RepKey++;
@@ -225,6 +222,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	void InitializeItemActions();
+	
 	virtual void SetWorld(UWorld* NewWorld);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")

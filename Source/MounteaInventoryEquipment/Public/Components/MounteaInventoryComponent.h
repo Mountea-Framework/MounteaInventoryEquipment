@@ -87,6 +87,7 @@ public:
 	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) override;
 
 	virtual bool SetInventoryFlags_Implementation() override;
+	virtual bool DoesHaveAuthority_Implementation() const override;
 	
 public:
 
