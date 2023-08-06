@@ -36,6 +36,11 @@ void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	//FDoRepLifetimeParams Params;
+	//Params.bIsPushBased = true;
+	//Params.RepNotifyCondition = REPNOTIFY_OnChanged;
+	//DOREPLIFETIME_WITH_PARAMS(UMounteaInventoryComponent, Items, Params)
+	
 	DOREPLIFETIME(UMounteaInventoryComponent, Items);
 	DOREPLIFETIME(UMounteaInventoryComponent, InventoryConfig);
 	DOREPLIFETIME(UMounteaInventoryComponent, OtherInventory);

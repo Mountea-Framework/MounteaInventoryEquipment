@@ -4,6 +4,7 @@
 #include "Components/MounteaEquipmentComponent.h"
 
 #include "Engine/ActorChannel.h"
+#include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
 UMounteaEquipmentComponent::UMounteaEquipmentComponent()
@@ -20,6 +21,8 @@ void UMounteaEquipmentComponent::BeginPlay()
 void UMounteaEquipmentComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UMounteaEquipmentComponent, EquipmentSlotData);
 }
 
 bool UMounteaEquipmentComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
@@ -78,7 +81,7 @@ bool UMounteaEquipmentComponent::EquipItem_Implementation(const UMounteaInventor
 {
 	if (!ItemToEquip) return false;
 	
-	if (GetOwner() && GetOwner()->HasAuthority())
+	if (GetOwner() && !GetOwner()->HasAuthority())
 	{
 		EquipItem_Server(ItemToEquip, SlotID);
 	}
@@ -124,7 +127,7 @@ bool UMounteaEquipmentComponent::UnEquipItem_Implementation(const UMounteaInvent
 {
 	if (!ItemToEquip) return false;
 	
-	if (GetOwner() && GetOwner()->HasAuthority())
+	if (GetOwner() && !GetOwner()->HasAuthority())
 	{
 		UnEquipItem_Server(ItemToEquip, SlotID);
 	}
