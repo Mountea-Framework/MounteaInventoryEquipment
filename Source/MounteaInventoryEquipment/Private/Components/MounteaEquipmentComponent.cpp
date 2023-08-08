@@ -182,8 +182,6 @@ void UMounteaEquipmentComponent::UnEquipItem_Multicast_Implementation(const UMou
 bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const
 {
 	return EquipmentSlotData.Contains(FMounteaEquipmentSlotDataCompare(ItemToEquip, SlotID));
-
-	return true;
 }
 
 TArray<FMounteaEquipmentSlotData> UMounteaEquipmentComponent::GetAllSlots_Implementation() const

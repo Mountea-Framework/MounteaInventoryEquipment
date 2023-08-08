@@ -3,11 +3,14 @@
 
 #include "Definitions/MounteaInventoryItem.h"
 
+#include "Definitions/MounteaInventoryItemCategory.h"
+#include "Definitions/MounteaInventoryItemRarity.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Net/UnrealNetwork.h"
 
 #include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Settings/MounteaInventoryEquipmentSettings.h"
 
 
 UMounteaInventoryItemBase::UMounteaInventoryItemBase()
