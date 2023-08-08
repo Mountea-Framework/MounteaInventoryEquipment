@@ -50,16 +50,16 @@ public:
 	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool EquipItem(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip,const FString& SlotID) = 0;
+	bool EquipItem(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	virtual bool EquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip,const FString& SlotID) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool UnEquipItem(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) = 0;
+	bool UnEquipItem(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	virtual bool UnEquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool IsItemEquipped(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) = 0;
+	bool IsItemEquipped(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const;
+	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	TArray<FMounteaEquipmentSlotData> GetAllSlots() const;

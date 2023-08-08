@@ -3,6 +3,28 @@
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 
+#include "Definitions/MounteaEquipmentSlot.h"
+
+UMounteaEquipmentSlot* UMounteaInventoryEquipmentBPF::FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FMounteaEquipmentSlotDataCompare& Filter)
+{
+	for (const auto& Itr : SlotsData)
+	{
+		if (Itr == Filter) return Itr.Slot;
+	}
+
+	return nullptr;
+}
+
+UMounteaEquipmentSlot* UMounteaInventoryEquipmentBPF::FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FString& SlotID)
+{
+	for (const auto& Itr : SlotsData)
+	{
+		if (Itr.Slot && Itr.Slot->GetSlotID().Equals(SlotID)) return Itr.Slot;
+	}
+
+	return nullptr;
+}
+
 int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
 {
 	if (RequestedQuantity == 0)

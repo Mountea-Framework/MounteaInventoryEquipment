@@ -4,6 +4,7 @@
 #include "Components/MounteaEquipmentComponent.h"
 
 #include "Engine/ActorChannel.h"
+#include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
@@ -77,7 +78,7 @@ UMounteaEquipmentSlot* UMounteaEquipmentComponent::FindSlotByID_Implementation(c
 
 #pragma region EQUIP
 
-bool UMounteaEquipmentComponent::EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
+bool UMounteaEquipmentComponent::EquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
 {
 	if (!ItemToEquip) return false;
 	
@@ -96,19 +97,24 @@ bool UMounteaEquipmentComponent::EquipItem_Implementation(const UMounteaInventor
 	return false;
 }
 
-void UMounteaEquipmentComponent::EquipItem_Server_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
+void UMounteaEquipmentComponent::EquipItem_Server_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
 {
 	if (Execute_CanEquipItem(this, ItemToEquip))
 	{
-		OnSlotEquipped.Broadcast(ItemToEquip, SlotID);
+		if (UMounteaEquipmentSlot* Slot = UMounteaInventoryEquipmentBPF::FindEquipmentSlot(EquipmentSlotData, SlotID))
+		{
+			Slot->UpdateItem(ItemToEquip);
+			
+			OnSlotEquipped.Broadcast(ItemToEquip, SlotID);
 		
-		OnRep_Equipment();
+			OnRep_Equipment();
 
-		EquipItem_Multicast(ItemToEquip, SlotID);
+			EquipItem_Multicast(ItemToEquip, SlotID);
+		}
 	}
 }
 
-bool UMounteaEquipmentComponent::EquipItem_Server_Validate(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
+bool UMounteaEquipmentComponent::EquipItem_Server_Validate(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
 {
 	return true;
 }
@@ -123,7 +129,7 @@ void UMounteaEquipmentComponent::EquipItem_Multicast_Implementation(const UMount
 
 #pragma region UNEQUIP
 
-bool UMounteaEquipmentComponent::UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
+bool UMounteaEquipmentComponent::UnEquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
 {
 	if (!ItemToEquip) return false;
 	
@@ -142,19 +148,24 @@ bool UMounteaEquipmentComponent::UnEquipItem_Implementation(const UMounteaInvent
 	return false;
 }
 
-void UMounteaEquipmentComponent::UnEquipItem_Server_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
+void UMounteaEquipmentComponent::UnEquipItem_Server_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
 {
 	if (Execute_IsItemEquipped(this, ItemToEquip, SlotID))
 	{
-		OnSlotUnequipped.Broadcast(ItemToEquip, SlotID);
+		if (UMounteaEquipmentSlot* Slot = UMounteaInventoryEquipmentBPF::FindEquipmentSlot(EquipmentSlotData, SlotID))
+		{
+			Slot->UpdateItem(nullptr);
+			
+			OnSlotUnequipped.Broadcast(ItemToEquip, SlotID);
 		
-		OnRep_Equipment();
+			OnRep_Equipment();
 
-		UnEquipItem_Multicast(ItemToEquip, SlotID);
+			UnEquipItem_Multicast(ItemToEquip, SlotID);
+		}
 	}
 }
 
-bool UMounteaEquipmentComponent::UnEquipItem_Server_Validate(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
+bool UMounteaEquipmentComponent::UnEquipItem_Server_Validate(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
 {
 	return true;
 }
@@ -168,7 +179,7 @@ void UMounteaEquipmentComponent::UnEquipItem_Multicast_Implementation(const UMou
 #pragma endregion 
 
 
-bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID)
+bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const
 {
 	return EquipmentSlotData.Contains(FMounteaEquipmentSlotDataCompare(ItemToEquip, SlotID));
 
@@ -186,7 +197,9 @@ bool UMounteaEquipmentComponent::CanEquipItem_Implementation(const UMounteaInven
 
 	const FString SlotID = Execute_FindSlotForItem(this, ItemToEquip);
 
-	return !SlotID.IsEmpty();
+	if (SlotID.IsEmpty()) return false;
+
+	return !Execute_IsItemEquipped(this, ItemToEquip, SlotID);
 }
 
 void UMounteaEquipmentComponent::OnRep_Equipment()

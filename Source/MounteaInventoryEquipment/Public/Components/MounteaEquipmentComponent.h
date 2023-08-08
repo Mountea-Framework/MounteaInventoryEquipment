@@ -50,10 +50,10 @@ public:
 	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const override;
 	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const override;
 	
-	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
-	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	virtual bool EquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	virtual bool UnEquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
 	
-	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const override;
 	
 	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip) const override;
 
@@ -62,9 +62,9 @@ public:
 	virtual FOnSlotUpdated& GetSlotUnEquippedHandle() override { return OnSlotUnequipped; };
 
 protected:
-
-	UFUNCTION(Server, Reliable, WithValidation) void EquipItem_Server(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	UFUNCTION(Server, Reliable, WithValidation) void UnEquipItem_Server(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	
+	UFUNCTION(Server, Reliable, WithValidation) void EquipItem_Server(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	UFUNCTION(Server, Reliable, WithValidation) void UnEquipItem_Server(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	UFUNCTION(NetMulticast, Unreliable) void EquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	UFUNCTION(NetMulticast, Unreliable) void UnEquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	UFUNCTION() void OnRep_Equipment();

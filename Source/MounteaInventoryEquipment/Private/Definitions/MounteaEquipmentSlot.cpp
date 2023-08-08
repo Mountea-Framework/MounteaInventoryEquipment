@@ -7,9 +7,19 @@
 #include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
+void UMounteaEquipmentSlot::UpdateItem(UMounteaInventoryItemBase* NewItem)
+{
+	if (NewItem!=ItemInSlot)
+	{
+		ItemInSlot = NewItem;
+
+		OnRep_Slot();
+	}
+}
+
 void UMounteaEquipmentSlot::OnRep_Slot()
 {
-	RepKey = 0;
+	RepKey++;
 }
 
 TArray<FString> UMounteaEquipmentSlot::GetSlotIDs()

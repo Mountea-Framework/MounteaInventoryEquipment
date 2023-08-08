@@ -63,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
 	FORCEINLINE bool IsEmpty() const { return ItemInSlot == nullptr; };
 
+	UFUNCTION(Category="Mountea|EquipmentSlot")
+	void UpdateItem(UMounteaInventoryItemBase* NewItem);
+	
 	FORCEINLINE int32 GetRepKey() const { return RepKey; };
 protected:
 
@@ -139,7 +142,7 @@ public:
 	UMounteaEquipmentSlot* Slot;
 
 public:
-
+	
 	bool operator==(const FMounteaEquipmentSlotData& Other) const
 	{
 		return Slot == Other.Slot;

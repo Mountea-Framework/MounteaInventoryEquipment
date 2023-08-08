@@ -29,6 +29,9 @@
 
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
+struct FMounteaEquipmentSlotDataCompare;
+struct FMounteaEquipmentSlotData;
+class UMounteaEquipmentSlot;
 class IMounteaInventoryInterface;
 /**
  * 
@@ -237,6 +240,10 @@ public:
 		return Target->GetItemAdditionalData(ClassFilter, bResult);
 	}
 
+	static UMounteaEquipmentSlot* FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FMounteaEquipmentSlotDataCompare& Filter);
+
+	static UMounteaEquipmentSlot* FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FString& SlotID);
+	
 #pragma endregion 
 	
 #pragma region EditorFunctions
