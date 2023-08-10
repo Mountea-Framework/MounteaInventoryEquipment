@@ -81,8 +81,12 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaBaseUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	
 	UMounteaBaseUserWidget(const FObjectInitializer& ObjectInitializer);
-
+	
+protected:
+	
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 

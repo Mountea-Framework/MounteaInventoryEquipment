@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "MounteaInventoryThemeConfig.generated.h"
 
+class UMounteaBaseEquipmentSlotWidget;
 class UMounteaBaseUserWidget;
 
 /**
@@ -60,4 +61,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Actions", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaItemActionWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemActionClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface"))
+	TSubclassOf<UMounteaBaseEquipmentSlotWidget> EquipmentSlotClass;
+	
 };
