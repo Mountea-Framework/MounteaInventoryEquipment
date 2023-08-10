@@ -43,8 +43,10 @@ Import Data Tables, use Data Tables to define Items. Easy to manage system with 
 ### Flexible Configuration
 In-line editable configuration with the ability to extend logic in Blueprints.
 <p align="center" width="100%">
-    <img width="65%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/6df25a2b-c885-42f5-a66b-e2820aeeffbb">
+    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/6df25a2b-c885-42f5-a66b-e2820aeeffbb">
+    <img width="32.5%" src="https://github.com/Mountea-Framework/MounteaInventoryEquipment/assets/37410226/51cf3509-70ea-469e-a2b2-41d1ad9b790d">
 </p>
+
 
 ### Editor Extensions
 Multiple tools aiming at as easy as possible management, simple management and data composition.
