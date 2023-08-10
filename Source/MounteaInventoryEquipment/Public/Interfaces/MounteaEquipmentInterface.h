@@ -41,33 +41,46 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaEquipmentInterface
 
 public:
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
+	AActor* GetOwningActor() const;
+	virtual AActor* GetOwningActor_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	FString FindSlotForItem(const UMounteaInventoryItemBase* Item) const;
 	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	UMounteaEquipmentSlot* FindSlotByID(const FString& SlotID) const;
 	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const = 0;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	bool EquipItem(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	virtual bool EquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip,const FString& SlotID) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	bool UnEquipItem(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	virtual bool UnEquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	bool IsItemEquipped(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const;
 	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const = 0;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	TArray<FMounteaEquipmentSlotData> GetAllSlots() const;
 	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	bool CanEquipItem(const UMounteaInventoryItemBase* ItemToEquip) const;
 	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
+	UMounteaBaseUserWidget* GetEquipmentUI() const;
+	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
+	bool SetEquipmentUI(UMounteaBaseUserWidget* NewUI);
+	virtual bool SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI) = 0;
+	
 public:
 
 	virtual FOnEquipmentUpdated& GetEquipmentUpdatedHandle() = 0;

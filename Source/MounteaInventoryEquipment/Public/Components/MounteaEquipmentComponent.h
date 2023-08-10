@@ -45,6 +45,8 @@ protected:
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
+
+	virtual AActor* GetOwningActor_Implementation() const override;
 	
 	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const override;
 	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const override;
@@ -56,6 +58,9 @@ public:
 	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const override;
 	
 	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip) const override;
+
+	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const override;
+	virtual bool SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI) override;
 
 	virtual FOnEquipmentUpdated& GetEquipmentUpdatedHandle() override { return OnEquipmentUpdated; };
 	virtual FOnSlotUpdated& GetSlotEquippedHandle() override { return OnSlotEquipped; };
@@ -78,8 +83,11 @@ protected:
 	TArray<FMounteaEquipmentSlotData> EquipmentSlotData;
 
 private:
+
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	UMounteaBaseUserWidget* EquipmentUI;
 	
-	UPROPERTY()
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
 	int32 ReplicatedItemsKey = 0;
 	
 #pragma endregion

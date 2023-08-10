@@ -47,6 +47,11 @@ bool UMounteaEquipmentComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 	return bUpdated;
 }
 
+AActor* UMounteaEquipmentComponent::GetOwningActor_Implementation() const
+{
+	return GetOwner();
+}
+
 FString UMounteaEquipmentComponent::FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const
 {
 	FString SlotID;
@@ -198,6 +203,22 @@ bool UMounteaEquipmentComponent::CanEquipItem_Implementation(const UMounteaInven
 	if (SlotID.IsEmpty()) return false;
 
 	return !Execute_IsItemEquipped(this, ItemToEquip, SlotID);
+}
+
+UMounteaBaseUserWidget* UMounteaEquipmentComponent::GetEquipmentUI_Implementation() const
+{
+	return EquipmentUI;
+}
+
+bool UMounteaEquipmentComponent::SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI)
+{
+	if(NewUI != EquipmentUI)
+	{
+		EquipmentUI = NewUI;
+		return true;
+	}
+
+	return false;
 }
 
 void UMounteaEquipmentComponent::OnRep_Equipment()

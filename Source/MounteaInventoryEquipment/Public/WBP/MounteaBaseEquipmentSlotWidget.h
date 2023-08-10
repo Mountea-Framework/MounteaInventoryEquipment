@@ -17,6 +17,11 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaBaseEquipmentSlotWidget : public UMo
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
+	FORCEINLINE FString GetSlotID() const { return SlotID; };
+	
+protected:
+
 	UPROPERTY(Category="2. Required", EditInstanceOnly, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions", NoResetToDefault))
 	FString SlotID;
 
