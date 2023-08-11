@@ -20,8 +20,7 @@
 			"Name": "MounteaInventoryEquipment",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault",
-			"WhitelistPlatforms": 
-			[
+			"WhitelistPlatforms": [
 				"Linux",
 				"Mac",
 				"Win64"
@@ -31,8 +30,7 @@
 			"Name": "MounteaInventoryEquipmentEditor",
 			"Type": "Editor",
 			"LoadingPhase": "PostEngineInit",
-			"WhitelistPlatforms":
-			[
+			"WhitelistPlatforms": [
 				"Linux",
 				"Mac",
 				"Win64"
@@ -42,8 +40,17 @@
 			"Name": "MounteaInventoryEquipmentNotifications",
 			"Type": "Editor",
 			"LoadingPhase": "PostEngineInit",
-			"WhitelistPlatforms":
-			[
+			"WhitelistPlatforms": [
+				"Linux",
+				"Mac",
+				"Win64"
+			]
+		},
+		{
+			"Name": "MounteaInventoryEquipmentDeveloper",
+			"Type": "DeveloperTool",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
 				"Linux",
 				"Mac",
 				"Win64"

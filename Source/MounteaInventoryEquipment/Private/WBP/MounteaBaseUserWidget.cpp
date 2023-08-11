@@ -4,6 +4,7 @@
 #include "WBP/MounteaBaseUserWidget.h"
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Settings/MounteaInventoryThemeConfig.h"
 
 
 UMounteaBaseUserWidget::UMounteaBaseUserWidget(const FObjectInitializer& ObjectInitializer) : UUserWidget(ObjectInitializer)

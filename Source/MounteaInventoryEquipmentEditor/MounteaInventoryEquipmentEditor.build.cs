@@ -59,7 +59,8 @@ public class MounteaInventoryEquipmentEditor : ModuleRules
 				"DataTableEditor",
 				"DesktopPlatform",
 				
-				"GameplayTags"
+				"GameplayTags",
+				"KismetCompiler"
 			}
 		);
  
