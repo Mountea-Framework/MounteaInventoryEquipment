@@ -10,7 +10,11 @@
 #include "KismetCompiledFunctionContext.h"
 #include "KismetCompilerMisc.h"
 #include "ToolMenu.h"
+#include "Helpers/MounteaInventoryEquipmentDeveloperBPF.h"
+#include "Kismet/KismetArrayLibrary.h"
 #include "Kismet2/CompilerResultsLog.h"
+
+#define LOCTEXT_NAMESPACE "DistinctArray"
 
 class FKCHandler_DistinctArray : public FNodeHandlingFunctor
 {
@@ -21,7 +25,7 @@ protected:
 public:
 	FKCHandler_DistinctArray(FKismetCompilerContext& InCompilerContext) : FNodeHandlingFunctor(InCompilerContext)
 	{
-		CompiledStatementType = KCST_CreateArray;
+		CompiledStatementType = KCST_CallFunction ;
 	}
 
 	virtual void RegisterNets(FKismetFunctionContext& Context, UEdGraphNode* Node) override
@@ -40,50 +44,101 @@ public:
 	
 	virtual void Compile(FKismetFunctionContext& Context, UEdGraphNode* Node) override
 	{
-		TArray<FBPTerminal*> RHSTerms;
+	    // 1. Retrieve all TArray Inputs
+	    TArray<FBPTerminal*> InputArrays;
 
-		for (UEdGraphPin* Pin : Node->Pins)
-		{
-			if (Pin && Pin->Direction == EGPD_Input)
-			{
-				FBPTerminal** InputTerm = Context.NetMap.Find(FEdGraphUtilities::GetNetFromPin(Pin));
-				if (InputTerm)
-				{
-					FBPTerminal* RHSTerm = *InputTerm;
+	    for (UEdGraphPin* Pin : Node->Pins)
+	    {
+	        if (Pin && Pin->Direction == EGPD_Input)
+	        {
+	            FBPTerminal** InputTerm = Context.NetMap.Find(FEdGraphUtilities::GetNetFromPin(Pin));
+	            if (InputTerm)
+	            {
+	                InputArrays.Add(*InputTerm);
+	            }
+	        }
+	    }
 
-					{
-						using namespace UE::KismetCompiler;
+	    // 2. Get the empty TArray Output
+	    UK2Node_DistinctArray* DistinctArrayNode = CastChecked<UK2Node_DistinctArray>(Node);
+	    UEdGraphPin* OutputPin = DistinctArrayNode->GetOutputPin();
+	    FBPTerminal** OutputArrayTerm = Context.NetMap.Find(OutputPin);
+	    check(OutputArrayTerm);
+	    FScriptArrayHelper OutputArrayHelper(CastField<FArrayProperty>((*OutputArrayTerm)->AssociatedVarProperty), (*OutputArrayTerm)->AssociatedVarProperty);
+	    //OutputArrayHelper.EmptyValues(); // Make sure the output array is empty
 
-						TOptional<TPair<FBPTerminal*, EKismetCompiledStatementType>> ImplicitCastEntry =
-							CastingUtils::InsertImplicitCastStatement(Context, Pin, RHSTerm);
+	    // 3. Add All Intersecting Values from All Inputs to the Output
+	    for (FBPTerminal* ArrayTerm : InputArrays)
+	    {
+			FArrayProperty* Arr = CastField<FArrayProperty>(ArrayTerm->AssociatedVarProperty);
+			if (!Arr) continue;
+	    	
+	    	void* ArrVal = Arr->GetPropertyValuePtr_InContainer(ArrayTerm->Source);
+			if (!ArrVal) continue;
+	    	
+	        FScriptArrayHelper InputArrayHelper(Arr, ArrVal);
+	        FProperty* InnerProp = CastField<FArrayProperty>(ArrayTerm->AssociatedVarProperty)->Inner;
 
-						if (ImplicitCastEntry)
-						{
-							RHSTerm = ImplicitCastEntry->Get<0>();
-						}
-					}
-					RHSTerms.Add(RHSTerm);
-				}
-			}
-		}
+	        for (int32 SourceIndex = 0; SourceIndex < InputArrayHelper.Num(); ++SourceIndex)
+	        {
+	            void* SourceItem = InputArrayHelper.GetRawPtr(SourceIndex);
 
-		UK2Node_DistinctArray* ContainerNode = CastChecked<UK2Node_DistinctArray>(Node);
-		UEdGraphPin* OutputPin = ContainerNode->GetOutputPin();
+	            bool bItemExistsInAllArrays = true;
 
-		FBPTerminal** ContainerTerm = Context.NetMap.Find(OutputPin);
-		check(ContainerTerm);
+	            for (FBPTerminal* OtherArrayTerm : InputArrays)
+	            {
+	                if (OtherArrayTerm != ArrayTerm) // Don't compare with itself
+	                {
+	                    FScriptArrayHelper OtherArrayHelper(CastField<FArrayProperty>(OtherArrayTerm->AssociatedVarProperty), OtherArrayTerm->AssociatedVarProperty);
+	                    bool bItemFound = false;
 
-		FBlueprintCompiledStatement& CreateContainerStatement = Context.AppendStatementForNode(Node);
-		CreateContainerStatement.Type = CompiledStatementType;
-		CreateContainerStatement.LHS = *ContainerTerm;
-		CreateContainerStatement.RHS = MoveTemp(RHSTerms);
+	                    for (int32 OtherIndex = 0; OtherIndex < OtherArrayHelper.Num(); ++OtherIndex)
+	                    {
+	                        void* OtherItem = OtherArrayHelper.GetRawPtr(OtherIndex);
+	                        if (InnerProp->Identical(SourceItem, OtherItem))
+	                        {
+	                            bItemFound = true;
+	                            break;
+	                        }
+	                    }
+
+	                    if (!bItemFound)
+	                    {
+	                        bItemExistsInAllArrays = false;
+	                        break;
+	                    }
+	                }
+	            }
+
+	            if (bItemExistsInAllArrays)
+	            {
+	                bool bAlreadyInOutput = false;
+	                for (int32 OutIdx = 0; OutIdx < OutputArrayHelper.Num(); ++OutIdx)
+	                {
+	                    void* OutputItem = OutputArrayHelper.GetRawPtr(OutIdx);
+	                    if (InnerProp->Identical(SourceItem, OutputItem))
+	                    {
+	                        bAlreadyInOutput = true;
+	                        break;
+	                    }
+	                }
+
+	                if (!bAlreadyInOutput)
+	                {
+	                    int32 NewIdx = OutputArrayHelper.AddValue();
+	                    InnerProp->CopySingleValueToScriptVM(OutputArrayHelper.GetRawPtr(NewIdx), SourceItem);
+	                }
+	            }
+	        }
+	    }
 	}
-};
 
-#define LOCTEXT_NAMESPACE "DistinctArray"
+
+};
 
 UK2Node_DistinctArray::UK2Node_DistinctArray()
 {
+	MinNumInputs = 2;
 	NumInputs = 2;
 	ContainerType = EPinContainerType::Array;
 }

@@ -65,5 +65,9 @@ protected:
 	UPROPERTY()
 	int32 NumInputs;
 
+	/** The number of input pins which is required for the node to exist */
+	UPROPERTY()
+	int32 MinNumInputs;
+
 	EPinContainerType ContainerType;
 };
