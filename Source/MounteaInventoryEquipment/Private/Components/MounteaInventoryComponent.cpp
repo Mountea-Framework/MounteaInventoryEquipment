@@ -76,12 +76,12 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 	return bUpdated;
 }
 
-TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryWBPClass_Implementation()
+TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryWBPClass_Implementation() const
 {
 	return InventoryWBPClass;
 }
 
-UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation()
+UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation() const
 {
 	return InventoryWBP;
 }

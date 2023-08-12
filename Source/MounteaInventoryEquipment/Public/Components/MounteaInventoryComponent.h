@@ -53,8 +53,8 @@ protected:
 
 public:
 
-	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() override;
-	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() override;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() const override;
+	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() const override;
 
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;

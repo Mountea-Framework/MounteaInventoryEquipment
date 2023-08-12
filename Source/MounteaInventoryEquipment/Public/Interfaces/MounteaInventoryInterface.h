@@ -43,8 +43,8 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass();
-	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() = 0;
+	TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass() const;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void SetInventoryWBPClass(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass);
@@ -55,8 +55,8 @@ public:
 	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	UMounteaBaseUserWidget* GetInventoryWBP();
-	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() = 0;
+	UMounteaBaseUserWidget* GetInventoryWBP() const;
+	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool LoadInventoryFromDataTable(const class UMounteaInventoryItemsTable* SourceTable);
