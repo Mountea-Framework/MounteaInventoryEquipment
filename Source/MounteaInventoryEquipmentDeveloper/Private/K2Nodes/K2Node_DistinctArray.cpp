@@ -10,7 +10,6 @@
 #include "KismetCompiledFunctionContext.h"
 #include "KismetCompilerMisc.h"
 #include "ToolMenu.h"
-#include "Helpers/MounteaInventoryEquipmentDeveloperBPF.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "Kismet2/CompilerResultsLog.h"
 
@@ -62,11 +61,19 @@ public:
 	    // 2. Get the empty TArray Output
 	    UK2Node_DistinctArray* DistinctArrayNode = CastChecked<UK2Node_DistinctArray>(Node);
 	    UEdGraphPin* OutputPin = DistinctArrayNode->GetOutputPin();
-	    FBPTerminal** OutputArrayTerm = Context.NetMap.Find(OutputPin);
+	    FBPTerminal* OutputArrayTerm = *Context.NetMap.Find(OutputPin);
 	    check(OutputArrayTerm);
-	    FScriptArrayHelper OutputArrayHelper(CastField<FArrayProperty>((*OutputArrayTerm)->AssociatedVarProperty), (*OutputArrayTerm)->AssociatedVarProperty);
+
+		FArrayProperty* OuterArr = CastField<FArrayProperty>(OutputArrayTerm->AssociatedVarProperty);
+		if (!OuterArr) return;
+	    	
+		void* OuterArrVal = OuterArr->GetPropertyValuePtr_InContainer(OutputArrayTerm->Source);
+		if (!OuterArrVal) return;
+		
+	    FScriptArrayHelper OutputArrayHelper(OuterArr, OuterArrVal);
 	    //OutputArrayHelper.EmptyValues(); // Make sure the output array is empty
 
+		/*
 	    // 3. Add All Intersecting Values from All Inputs to the Output
 	    for (FBPTerminal* ArrayTerm : InputArrays)
 	    {
@@ -89,17 +96,30 @@ public:
 	            {
 	                if (OtherArrayTerm != ArrayTerm) // Don't compare with itself
 	                {
-	                    FScriptArrayHelper OtherArrayHelper(CastField<FArrayProperty>(OtherArrayTerm->AssociatedVarProperty), OtherArrayTerm->AssociatedVarProperty);
+	                	FArrayProperty* OtherArr = CastField<FArrayProperty>(OtherArrayTerm->AssociatedVarProperty);
+	                	if (!OtherArr) continue;
+	    	
+	                	void* OtherArrVal = Arr->GetPropertyValuePtr_InContainer(OtherArrayTerm->Source);
+	                	if (!OtherArrVal) continue;
+	    	
+	                	FScriptArrayHelper OtherArrayHelper(OtherArr, OtherArrVal);
+	                	
+	                    //FScriptArrayHelper OtherArrayHelper(CastField<FArrayProperty>(OtherArrayTerm->AssociatedVarProperty), OtherArrayTerm->AssociatedVarProperty);
 	                    bool bItemFound = false;
 
 	                    for (int32 OtherIndex = 0; OtherIndex < OtherArrayHelper.Num(); ++OtherIndex)
 	                    {
 	                        void* OtherItem = OtherArrayHelper.GetRawPtr(OtherIndex);
+	                    	if (!OtherItem) continue;
+
+	                    	bItemFound = true;
+	                    	/*
 	                        if (InnerProp->Identical(SourceItem, OtherItem))
 	                        {
 	                            bItemFound = true;
 	                            break;
 	                        }
+	                        
 	                    }
 
 	                    if (!bItemFound)
@@ -110,12 +130,14 @@ public:
 	                }
 	            }
 
+	        	UE_LOG(LogTemp, Error, TEXT("ItemExistsInAllArrays: %s"), *FString( bItemExistsInAllArrays ? "TRUE" : "FALSE"))
 	            if (bItemExistsInAllArrays)
 	            {
 	                bool bAlreadyInOutput = false;
 	                for (int32 OutIdx = 0; OutIdx < OutputArrayHelper.Num(); ++OutIdx)
 	                {
 	                    void* OutputItem = OutputArrayHelper.GetRawPtr(OutIdx);
+	                	/*
 	                    if (InnerProp->Identical(SourceItem, OutputItem))
 	                    {
 	                        bAlreadyInOutput = true;
@@ -125,12 +147,13 @@ public:
 
 	                if (!bAlreadyInOutput)
 	                {
-	                    int32 NewIdx = OutputArrayHelper.AddValue();
-	                    InnerProp->CopySingleValueToScriptVM(OutputArrayHelper.GetRawPtr(NewIdx), SourceItem);
+	                    //int32 NewIdx = OutputArrayHelper.AddValue();
+	                   // InnerProp->CopySingleValueToScriptVM(OutputArrayHelper.GetRawPtr(NewIdx), SourceItem);
 	                }
 	            }
 	        }
 	    }
+		*/
 	}
 
 
@@ -155,7 +178,7 @@ FText UK2Node_DistinctArray::GetTooltipText() const
 
 FLinearColor UK2Node_DistinctArray::GetNodeTitleColor() const
 {
-	return FLinearColor::Green;
+	return FLinearColor::Yellow;
 }
 
 FLinearColor UK2Node_DistinctArray::GetNodeBodyTintColor() const
