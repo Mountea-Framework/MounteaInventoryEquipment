@@ -76,12 +76,12 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 	return bUpdated;
 }
 
-TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryWBPClass_Implementation() const
+TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryUIClass_Implementation() const
 {
 	return InventoryWBPClass;
 }
 
-UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryWBP_Implementation() const
+UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryUI_Implementation() const
 {
 	return InventoryWBP;
 }
@@ -672,12 +672,12 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
-void UMounteaInventoryComponent::SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass)
+void UMounteaInventoryComponent::SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass)
 {
 	InventoryWBPClass = NewInventoryWBPClass;
 }
 
-void UMounteaInventoryComponent::SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP)
+void UMounteaInventoryComponent::SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewWBP)
 {
 	if (InventoryWBP && InventoryWBP != NewWBP)
 	{

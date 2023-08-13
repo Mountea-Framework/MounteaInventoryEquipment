@@ -53,8 +53,8 @@ protected:
 
 public:
 
-	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() const override;
-	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() const override;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass_Implementation() const override;
+	virtual UMounteaBaseUserWidget* GetInventoryUI_Implementation() const override;
 
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
@@ -75,8 +75,8 @@ public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
 
-	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
-	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) override;
+	virtual void SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
+	virtual void SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewWBP) override;
 	
 	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
 	
