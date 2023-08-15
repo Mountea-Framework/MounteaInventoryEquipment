@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaEquipmentWBPInterface.generated.h"
 
+class UMounteaEquipmentSlot;
 class IMounteaEquipmentInterface;
 
 // This class does not need to be modified.
@@ -25,7 +26,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaEquipmentWBPInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
 	TScriptInterface<IMounteaEquipmentInterface> GetOwningEquipment() const;
 	virtual TScriptInterface<IMounteaEquipmentInterface> GetOwningEquipment_Implementation() const = 0;
 

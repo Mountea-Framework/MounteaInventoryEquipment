@@ -30,7 +30,8 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshEquipmentWidget);
 	EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshEquipmentWidget);
 	EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshItemsWidgets);
-	EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RemoveItemWidget);
+	EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget);
+	EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget);
 
 	InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Success, LOCTEXT("InventoryUpdateMessages_Success", "Inventory Updated"));
 	InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Failed,  LOCTEXT("InventoryUpdateMessages_Failed", "Inventory Update Failed"));

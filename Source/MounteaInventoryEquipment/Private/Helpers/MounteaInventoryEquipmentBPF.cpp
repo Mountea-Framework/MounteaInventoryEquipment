@@ -39,33 +39,12 @@ UActorComponent* UMounteaInventoryEquipmentBPF::GetSingleComponentByInterface(co
 	return TempComps[0];
 }
 
-bool UMounteaInventoryEquipmentBPF::IsInventoryValid(
-	const TScriptInterface<IMounteaInventoryInterface>& InventoryInterface)
+bool UMounteaInventoryEquipmentBPF::IsInventoryValid(	const TScriptInterface<IMounteaInventoryInterface>& InventoryInterface)
 {
 	return InventoryInterface.GetObject() != nullptr;
 }
 
-TArray<UMounteaInventoryItemAction*> UMounteaInventoryEquipmentBPF::GetPurifiedItemActions(
-	const UMounteaInventoryItemBase* Target)
-{
-	if (!Target) return TArray<UMounteaInventoryItemAction*>();
-	if (!Target->GetItemData().ItemCategory) return Target->GetItemActions();
-
-	TArray<UMounteaInventoryItemAction*> ReturnValues = Target->GetItemData().ItemCategory->GetCategoryActions();
-
-	for (auto const& Itr : Target->GetItemActions())
-	{
-		if (Itr && !ReturnValues.Contains(Itr))
-		{
-			ReturnValues.Add(Itr);
-		}
-	}
-		
-	return ReturnValues;
-}
-
-UObject* UMounteaInventoryEquipmentBPF::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter,
-	bool& bResult)
+UObject* UMounteaInventoryEquipmentBPF::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter,	bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{

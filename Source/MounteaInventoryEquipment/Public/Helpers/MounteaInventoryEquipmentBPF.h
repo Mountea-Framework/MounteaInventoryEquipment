@@ -55,9 +55,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="valid,safe,null,check"), DisplayName="Is Valid (Inventory Ref)")
 	static bool IsInventoryValid(const TScriptInterface<IMounteaInventoryInterface>& InventoryInterface);
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc, Keywords="find,all"))
-	static TArray<UMounteaInventoryItemAction*> GetPurifiedItemActions(const UMounteaInventoryItemBase* Target);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Object"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 

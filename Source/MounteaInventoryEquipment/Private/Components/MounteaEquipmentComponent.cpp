@@ -5,8 +5,10 @@
 
 #include "Engine/ActorChannel.h"
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Interfaces/MounteaEquipmentWBPInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+#include "WBP/MounteaBaseUserWidget.h"
 
 UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 {
@@ -89,6 +91,19 @@ bool UMounteaEquipmentComponent::EquipItem_Implementation(UMounteaInventoryItemB
 	
 	if (GetOwner() && !GetOwner()->HasAuthority())
 	{
+		// Cleanup Slot before populating new, so populated slot can return to Inventory
+		// Local stuff should be fine, as it will get updates once server response is received
+		if (const auto TempEquipmentUI = Execute_GetEquipmentUI(this))
+		{
+			if (UMounteaEquipmentSlot* const FoundSlot = UMounteaInventoryEquipmentBPF::FindEquipmentSlot(EquipmentSlotData, SlotID))
+			{
+				FoundSlot->UpdateItem(ItemToEquip);
+			
+				TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget, FoundSlot);
+				TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget, FoundSlot);
+			}
+		}
+
 		EquipItem_Server(ItemToEquip, SlotID);
 	}
 	
@@ -140,6 +155,12 @@ bool UMounteaEquipmentComponent::UnEquipItem_Implementation(UMounteaInventoryIte
 	
 	if (GetOwner() && !GetOwner()->HasAuthority())
 	{
+		// Cleanup Slot and return possible slot back to Inventory
+		if (const auto TempEquipmentUI = Execute_GetEquipmentUI(this))
+		{
+			TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget, UMounteaInventoryEquipmentBPF::FindEquipmentSlot(EquipmentSlotData, SlotID));
+		}
+		
 		UnEquipItem_Server(ItemToEquip, SlotID);
 	}
 	
@@ -162,7 +183,7 @@ void UMounteaEquipmentComponent::UnEquipItem_Server_Implementation(UMounteaInven
 			Slot->UpdateItem(nullptr);
 			
 			OnSlotUnequipped.Broadcast(ItemToEquip, SlotID);
-		
+					
 			OnRep_Equipment();
 
 			UnEquipItem_Multicast(ItemToEquip, SlotID);

@@ -9,6 +9,7 @@
 
 #include "MounteaInventoryWBPInterface.generated.h"
 
+class IMounteaInventoryItemWBPInterface;
 class IMounteaInventoryInterface;
 struct FInventoryNotificationData;
 
@@ -43,4 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
 	void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory);
 	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI(const UMounteaInventoryItemBase* ForItem, bool& bFound) const;
+	virtual TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI_Implementation(const UMounteaInventoryItemBase* ForItem, bool& bFound) const = 0;
 };

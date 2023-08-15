@@ -15,7 +15,7 @@ namespace MounteaInventoryEquipmentConsts
 			const FString RefreshInventoryWidget				(TEXT("RefreshInventoryWidget"));
 			const FString RefreshItemsWidgets				(TEXT("RefreshItemsWidgets"));
 
-			const FString RemoveItemWidget					(TEXT("RemoveItemWidget"));
+			const FString RemoveItemWidget					(TEXT("UnequipItemWidget"));
 		}
 
 		namespace ItemCommands
@@ -45,13 +45,14 @@ namespace MounteaInventoryEquipmentConsts
 		namespace EquipmentCommands
 		{
 			const FString InitializeEquipmentWidget				(TEXT("InitializeEquipmentWidget"));
-			const FString CreateEquipmentWidget				(TEXT("CreateEquipmentWidget"));
-			const FString ShowEquipmentWidget				(TEXT("ShowEquipmentWidget"));
-			const FString HideEquipmentWidget					(TEXT("HideEquipmentWidget"));
+			const FString CreateEquipmentWidget					(TEXT("CreateEquipmentWidget"));
+			const FString ShowEquipmentWidget					(TEXT("ShowEquipmentWidget"));
+			const FString HideEquipmentWidget						(TEXT("HideEquipmentWidget"));
 			const FString RefreshEquipmentWidget				(TEXT("RefreshEquipmentWidget"));
-			const FString RefreshItemsWidgets				(TEXT("RefreshItemsWidgets"));
+			const FString RefreshItemsWidgets						(TEXT("RefreshItemsWidgets"));
 
-			const FString RemoveItemWidget					(TEXT("RemoveItemWidget"));
+			const FString UnequipItemWidget							(TEXT("UnequipItemWidget"));
+			const FString EquipItemWidget								(TEXT("EquipItemWidget"));
 		}
 	}
 	namespace MounteaInventoryNotifications

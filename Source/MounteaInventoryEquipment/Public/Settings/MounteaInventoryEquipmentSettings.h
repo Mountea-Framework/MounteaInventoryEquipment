@@ -203,9 +203,13 @@ public:
 			{
 				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshItemsWidgets);
 			}
-			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RemoveItemWidget))
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget))
 			{
-				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RemoveItemWidget);
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget);
 			}
 		}
 

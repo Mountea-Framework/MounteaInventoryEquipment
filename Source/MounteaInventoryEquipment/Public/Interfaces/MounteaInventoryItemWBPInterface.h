@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryItemWBPInterface.generated.h"
 
+class UMounteaBaseUserWidget;
 class UMounteaInventoryItemBase;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -25,6 +26,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	UMounteaInventoryItemBase* GetItem() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	UMounteaBaseUserWidget* GetItemUI() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	FIntPoint GetRootCoords();
