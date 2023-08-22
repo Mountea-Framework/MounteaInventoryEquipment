@@ -144,15 +144,15 @@ void MIEPopup::Open(const FString& Changelog)
 		[
 			SNew(SBorder)
 			.Padding(10)
-			.BorderImage(FEditorStyle::GetBrush("ToolPanel.DarkGroupBorder"))
+			.BorderImage(FAppStyle::GetBrush("ToolPanel.DarkGroupBorder"))
 			[
 				SNew(SScrollBox)
 				+ SScrollBox::Slot()
 				[
 					SNew(SRichTextBlock)
 					.Text(FText::FromString(DisplayText))
-					.TextStyle(FEditorStyle::Get(), "NormalText")
-					.DecoratorStyleSet(&FEditorStyle::Get())
+					.TextStyle(FAppStyle::Get(), "NormalText")
+					.DecoratorStyleSet(&FAppStyle::Get())
 					.AutoWrapText(true)
 					+ SRichTextBlock::HyperlinkDecorator(TEXT("browser"), FSlateHyperlinkRun::FOnClick::CreateStatic(&OnBrowserLinkClicked))
 				]
