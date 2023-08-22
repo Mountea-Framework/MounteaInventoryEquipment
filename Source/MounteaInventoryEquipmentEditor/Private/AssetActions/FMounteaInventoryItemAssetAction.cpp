@@ -72,7 +72,7 @@ void FMounteaInventoryItemAssetAction::GetActions(const TArray<UObject*>& InObje
 		"Item_RefreshItem",
 		LOCTEXT("Item_RefreshItem", "Refresh Item Data"),
 		LOCTEXT("Item_RefreshItemTooltip", "Updates data for selected Item(s)."),
-		FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Refresh"),
+		FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Refresh"),
 		FUIAction(
 			FExecuteAction::CreateSP( this, &FMounteaInventoryItemAssetAction::ExecuteRefreshItem, Items )
 			)
@@ -116,7 +116,7 @@ void FAssetActionExtender_MounteaInventoryItem::RegisterMenus()
 				{
 					const TAttribute<FText> Label = LOCTEXT("Item_RefreshItem", "Refresh Item Data");
 					const TAttribute<FText> ToolTip = LOCTEXT("Item_RefreshItemTooltip", "Updates data for selected Item(s).");
-					const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Refresh");
+					const FSlateIcon Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Refresh");
 					const FToolMenuExecuteAction UIExecuteAction = FToolMenuExecuteAction::CreateStatic(&FAssetActionExtender_MounteaInventoryItem::ExecuteRefreshItem);
 
 					InSection.AddMenuEntry("MounteaInventoryItemAsset_RefreshItem", Label, ToolTip, Icon, UIExecuteAction);
