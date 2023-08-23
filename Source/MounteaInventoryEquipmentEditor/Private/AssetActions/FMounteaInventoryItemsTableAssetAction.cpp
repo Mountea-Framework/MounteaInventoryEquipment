@@ -136,7 +136,7 @@ void FMounteaInventoryItemsTableAssetAction::GetActions(const TArray<UObject*>& 
 	{
 		const TAttribute<FText> Label = LOCTEXT("MounteaInventoryTable_ExportAsJSON", "Export as JSON");
 		const TAttribute<FText> ToolTip = LOCTEXT("MounteaInventoryTable_ExportAsJSONTooltip", "Export the Inventory Table as a file containing JSON data.");
-		const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "AssetEditor.ReimportAsset.Small");
+		const FSlateIcon Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "AssetEditor.ReimportAsset.Small");
 		const FUIAction UIExecuteAction = FUIAction
 		(
 			FExecuteAction::CreateSP( this, &FMounteaInventoryItemsTableAssetAction::ExecuteExportAsJSON, Tables ),
@@ -156,7 +156,7 @@ void FMounteaInventoryItemsTableAssetAction::GetActions(const TArray<UObject*>& 
 	{
 		const TAttribute<FText> Label =LOCTEXT("MounteaInventoryTable_OpenSourceData", "Open Source Data");
 		const TAttribute<FText> ToolTip = LOCTEXT("MounteaInventoryTable_OpenSourceDataTooltip", "Opens the data table's source data file in an external editor. It will search using the following extensions: .xls/.xlsm/.csv/.json");
-		const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Symbols.SearchGlass");
+		const FSlateIcon Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "Symbols.SearchGlass");
 		const FUIAction UIExecuteAction = FUIAction
 		(
 			FExecuteAction::CreateSP( this, &FMounteaInventoryItemsTableAssetAction::ProcessFindSourceFileInExplorer, ImportPaths, PotentialFileExtensions ),
@@ -169,7 +169,7 @@ void FMounteaInventoryItemsTableAssetAction::GetActions(const TArray<UObject*>& 
 	// Generate new Items
 	const TAttribute<FText> Label =LOCTEXT("MounteaInventoryTable_GenerateNewItems", "Generate New Items");
 	const TAttribute<FText> ToolTip = LOCTEXT("MounteaInventoryTable_GenerateNewItemsTooltip", "For each row in selected Inventory Tables will make a new Item Asset, if such Item doesn't exist yet.");
-	const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Icons.Refresh");
+	const FSlateIcon Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "Icons.Refresh");
 	const FUIAction UIExecuteAction = FUIAction
 		(
 			FExecuteAction::CreateSP( this, &FMounteaInventoryItemsTableAssetAction::GenerateNewItems, Tables ),

@@ -124,7 +124,7 @@ void FMounteaInventoryItemDescsAssetAction::GetActions(const TArray<UObject*>& I
 	{
 		const TAttribute<FText> Label = LOCTEXT("MounteaInventoryItemDescriptionsTable_ExportAsJSON", "Export as JSON");
 		const TAttribute<FText> ToolTip = LOCTEXT("MounteaInventoryItemDescriptionsTable_ExportAsJSONTooltip", "Export the Inventory Table as a file containing JSON data.");
-		const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "AssetEditor.ReimportAsset.Small");
+		const FSlateIcon Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "AssetEditor.ReimportAsset.Small");
 		const FUIAction UIExecuteAction = FUIAction
 		(
 			FExecuteAction::CreateSP( this, &FMounteaInventoryItemDescsAssetAction::ExecuteExportAsJSON, Tables ),
@@ -144,7 +144,7 @@ void FMounteaInventoryItemDescsAssetAction::GetActions(const TArray<UObject*>& I
 	{
 		const TAttribute<FText> Label =LOCTEXT("MounteaInventoryItemDescriptionsTable_OpenSourceData", "Open Source Data");
 		const TAttribute<FText> ToolTip = LOCTEXT("MounteaInventoryItemDescriptionsTable_OpenSourceDataTooltip", "Opens the data table's source data file in an external editor. It will search using the following extensions: .xls/.xlsm/.csv/.json");
-		const FSlateIcon Icon = FSlateIcon(FEditorStyle::GetStyleSetName(), "Symbols.SearchGlass");
+		const FSlateIcon Icon = FSlateIcon(FAppStyle::GetAppStyleSetName(), "Symbols.SearchGlass");
 		const FUIAction UIExecuteAction = FUIAction
 		(
 			FExecuteAction::CreateSP( this, &FMounteaInventoryItemDescsAssetAction::ProcessFindSourceFileInExplorer, ImportPaths, PotentialFileExtensions ),
