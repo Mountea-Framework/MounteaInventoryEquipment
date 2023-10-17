@@ -260,27 +260,3 @@ private:
 };
 
 #undef LOCTEXT_NAMESPACE
-
-#pragma region Runnables
-
-class FItemsGetRunnable : public FRunnable
-{
-public:
-	FItemsGetRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TArray<UMounteaInventoryItemBase*>& InFoundItems)
-		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(false), FoundItems(InFoundItems) {}
-
-	virtual bool Init() override { return true; }
-	virtual uint32 Run() override;
-	virtual void Stop() override {}
-
-	bool IsItemFound() const { return ItemFound; }
-	TArray<UMounteaInventoryItemBase*>& GetFoundItems() const { return FoundItems; }
-
-private:
-	const TArray<UMounteaInventoryItemBase*>& Items;
-	const FItemRetrievalFilter& SearchFilter;
-	bool ItemFound;
-	TArray<UMounteaInventoryItemBase*>& FoundItems;
-};
-
-#pragma endregion 
