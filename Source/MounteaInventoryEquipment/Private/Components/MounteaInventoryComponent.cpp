@@ -176,9 +176,7 @@ bool UMounteaInventoryComponent::HasItem_Multithreading(const FItemRetrievalFilt
 		return false;
 
 	TAtomic<bool> ItemFound(false);
-
-	//TODO: Settings?
-	const int32 ChunkSize = 100; 
+	
 	const int32 NumChunks = FMath::CeilToInt(static_cast<float>(Items.Num()) / ChunkSize);
 
 	auto SearchFunction = [&](const int32 ChunkIndex)
@@ -305,87 +303,61 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Simple(const FIt
 
 UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const
 {
-	if (SearchFilter.IsValid())
+	if (!SearchFilter.IsValid())
+		return nullptr;
+
+	TAtomic<UMounteaInventoryItemBase*> FoundItem(nullptr);
+	
+	const int32 NumChunks = FMath::CeilToInt(static_cast<float>(Items.Num()) / ChunkSize);
+
+	auto SearchFunction = [&](const int32 ChunkIndex)
 	{
-		int32 ThreadsPerFilter = UMounteaInventoryEquipmentBPF::GetValidFiltersCount(SearchFilter);
-		const int32 MinThreads = UMounteaInventoryEquipmentBPF::GetSettings()->ThreadsLimit;
-		const int32 NumThreads = FMath::Min( FPlatformMisc::NumberOfWorkerThreadsToSpawn(), MinThreads);
+		if (FoundItem.Load())  
+			return;
 
-		ThreadsPerFilter = FMath::Max( NumThreads/ThreadsPerFilter, 1);
-			
-		TArray<FRunnableThread*> Threads;
-		TAtomic<UMounteaInventoryItemBase*> FoundItem(nullptr);
+		const int32 StartIndex = ChunkIndex * ChunkSize;
+		const int32 EndIndex = FMath::Min(StartIndex + ChunkSize, Items.Num());
 
-		if (SearchFilter.bSearchByClass)
+		for (int32 i = StartIndex; i < EndIndex; i++)
 		{
-			FItemRetrievalFilter SpecificFilter = SearchFilter;
-			SpecificFilter.bSearchByItem = false;
-			SpecificFilter.bSearchByTag = false;
-			SpecificFilter.bSearchByGUID = false;
+			if (FoundItem.Load())  
+				return;
 
-			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
+			const auto& Item = Items[i];
+
+			// Search by Item
+			if (SearchFilter.bSearchByItem && Item == SearchFilter.Item)
 			{
-				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
-				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_ClassSearch"));
-				Threads.Add(Thread);
+				FoundItem = Item;
+				return;
+			}
+
+			// Search by Class
+			if (SearchFilter.bSearchByClass && Item && Item->IsA(SearchFilter.Class))
+			{
+				FoundItem = Item;
+				return;
+			}
+
+			// Search by Tag
+			if (SearchFilter.bSearchByTag && Item && Item->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
+			{
+				FoundItem = Item;
+				return;
+			}
+
+			// Search by GUID
+			if (SearchFilter.bSearchByGUID && Item && Item->GetItemGuid() == SearchFilter.Guid)
+			{
+				FoundItem = Item;
+				return;
 			}
 		}
-		if (SearchFilter.bSearchByItem)
-		{
-			FItemRetrievalFilter SpecificFilter = SearchFilter;
-			SpecificFilter.bSearchByClass = false;
-			SpecificFilter.bSearchByTag = false;
-			SpecificFilter.bSearchByGUID = false;
+	};
 
-			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
-			{
-				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
-				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_ItemSearch"));
-				Threads.Add(Thread);
-			}
-		}
-		if (SearchFilter.bSearchByTag)
-		{
-			FItemRetrievalFilter SpecificFilter = SearchFilter;
-			SpecificFilter.bSearchByClass = false;
-			SpecificFilter.bSearchByItem = false;
-			SpecificFilter.bSearchByGUID = false;
+	ParallelFor(NumChunks, SearchFunction);
 
-			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
-			{
-				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
-				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_TagSearch"));
-				Threads.Add(Thread);
-			}
-		}
-		if (SearchFilter.bSearchByGUID)
-		{
-			FItemRetrievalFilter SpecificFilter = SearchFilter;
-			SpecificFilter.bSearchByClass = false;
-			SpecificFilter.bSearchByItem = false;
-			SpecificFilter.bSearchByTag = false;
-
-			for (int32 ThreadIndex = 0; ThreadIndex < ThreadsPerFilter; ++ThreadIndex)
-			{
-				FItemGetRunnable* SearchRunnable = new FItemGetRunnable(Items, SpecificFilter, FoundItem);
-				FRunnableThread* Thread = FRunnableThread::Create(SearchRunnable, TEXT("ItemGetRunnable_GUIDSearch"));
-				Threads.Add(Thread);
-			}
-		}
-
-		for (FRunnableThread* Thread : Threads)
-		{
-			if (Thread)
-			{
-				Thread->WaitForCompletion();
-				delete Thread;
-			}
-		}
-
-		return FoundItem.Load();
-	}
-
-	return nullptr;
+	return FoundItem.Load();
 }
 
 TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Simple(const FItemRetrievalFilter OptionalFilter) const
@@ -1413,64 +1385,6 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 #endif
 
 #undef LOCTEXT_NAMESPACE
-
-uint32 FItemGetRunnable::Run()
-{
-	// Search by Item
-	if (SearchFilter.bSearchByItem)
-	{
-		if (Items.Contains(SearchFilter.Item))
-		{
-			FoundItem = SearchFilter.Item;
-			ItemFound = true;
-			return 1;
-		}
-	}
-
-	// Search by Class
-	if (SearchFilter.bSearchByClass)
-	{
-		for (const auto& Itr : Items)
-		{
-			if (Itr && Itr->IsA(SearchFilter.Class))
-			{
-				FoundItem = Itr;
-				ItemFound = true;
-				return 1;
-			}
-		}
-	}
-
-	// Search by Tag
-	if (SearchFilter.bSearchByTag)
-	{
-		for (const auto& Itr : Items)
-		{
-			if (Itr && Itr->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
-			{
-				FoundItem = Itr;
-				ItemFound = true;
-				return 1;
-			}
-		}
-	}
-
-	// Search by GUID
-	if (SearchFilter.bSearchByGUID)
-	{
-		for (const auto& Itr : Items)
-		{
-			if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
-			{
-				FoundItem = Itr;
-				ItemFound = true;
-				return 1;
-			}
-		}
-	}
-
-	return 0;
-}
 
 uint32 FItemsGetRunnable::Run()
 {
