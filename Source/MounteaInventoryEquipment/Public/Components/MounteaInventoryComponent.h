@@ -261,22 +261,6 @@ private:
 
 #pragma region Runnables
 
-class FItemSearchRunnable : public FRunnable
-{
-public:
-	FItemSearchRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TAtomic<bool>& InItemFound)
-		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(InItemFound) {}
-
-	virtual bool Init() override { return true; }
-	virtual uint32 Run() override;
-	virtual void Stop() override {}
-
-private:
-	const TArray<UMounteaInventoryItemBase*>& Items;
-	const FItemRetrievalFilter& SearchFilter;
-	TAtomic<bool>& ItemFound;
-};
-
 class FItemGetRunnable : public FRunnable
 {
 public:
