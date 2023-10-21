@@ -27,7 +27,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataA
 	GENERATED_BODY()
 	
 public:
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Category", meta=(ShowOnlyInnerProperties))
 	TSubclassOf<UCategoryTheme> DefaultCategoryTheme = UCategoryTheme::StaticClass();
 

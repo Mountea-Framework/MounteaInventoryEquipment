@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(MultiLine))
 	FText CategoryDescription = LOCTEXT("MounteaInventoryItemCategory_Name", "Default");
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(GetOptions="GetThemes"))
+	FString Theme;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
 	FContentThemeConfigData CategoryThemeConfig;
 	
@@ -65,6 +68,9 @@ public:
 	}
 
 	void EnsureValidConfig();
+
+	UFUNCTION()
+	TArray<FString> GetThemes() const;
 
 #if WITH_EDITOR
 

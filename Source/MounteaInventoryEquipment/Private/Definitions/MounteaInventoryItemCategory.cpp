@@ -3,7 +3,7 @@
 
 #include "Definitions/MounteaInventoryItemCategory.h"
 
-#if WITH_EDITOR
+#include "Helpers/MounteaInventoryEquipmentBPF.h"
 
 void UMounteaInventoryItemCategory::EnsureValidConfig()
 {
@@ -13,6 +13,13 @@ void UMounteaInventoryItemCategory::EnsureValidConfig()
 		CategoryThemeConfig.ContentThemeConfig = NewConfig;
 	}
 }
+
+TArray<FString> UMounteaInventoryItemCategory::GetThemes() const
+{
+	return UMounteaInventoryEquipmentBPF::GetThemeConfigsNames();
+}
+
+#if WITH_EDITOR
 
 void UMounteaInventoryItemCategory::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {

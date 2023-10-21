@@ -65,6 +65,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	static TArray<UMounteaInventoryThemeConfig*> GetThemeConfigs();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	static TArray<FString> GetThemeConfigsNames();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	static TSubclassOf<UMounteaInventoryThemeConfig> GetThemeConfigClass();
@@ -194,6 +197,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<UMounteaInventoryItemBase*> ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter);
+	
 #pragma endregion 
 };
 
