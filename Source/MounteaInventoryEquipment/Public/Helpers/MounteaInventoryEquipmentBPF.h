@@ -11,6 +11,11 @@
 
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
+class UMounteaInventoryItemsTable;
+class UMounteaInventoryEquipmentSettings;
+class UMounteaInventoryThemeConfig;
+class UMounteaInventoryConfig;
+class UMounteaInventoryItemConfig;
 struct FMounteaEquipmentSlotDataCompare;
 struct FMounteaEquipmentSlotData;
 class UMounteaEquipmentSlot;
@@ -58,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "Object"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	static TArray<UMounteaInventoryThemeConfig*> GetThemeConfigs();
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	static TSubclassOf<UMounteaInventoryThemeConfig> GetThemeConfigClass();
 

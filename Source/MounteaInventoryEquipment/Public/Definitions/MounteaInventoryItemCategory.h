@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "MounteaItemAction.h"
+#include "Settings/ContentTheme.h"
 #include "MounteaInventoryItemCategory.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemCategory"
@@ -30,6 +31,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(MultiLine))
 	FText CategoryDescription = LOCTEXT("MounteaInventoryItemCategory_Name", "Default");
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
+	FContentThemeConfigData CategoryThemeConfig;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
 	UTexture2D* CategoryIcon = nullptr;
@@ -59,6 +63,14 @@ public:
 	{
 		return CategoryActions.Array();
 	}
+
+	void EnsureValidConfig();
+
+#if WITH_EDITOR
+
+virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
 };
 
 #undef LOCTEXT_NAMESPACE

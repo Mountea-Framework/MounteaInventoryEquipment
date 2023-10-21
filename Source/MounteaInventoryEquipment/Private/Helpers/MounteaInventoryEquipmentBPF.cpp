@@ -68,6 +68,22 @@ UObject* UMounteaInventoryEquipmentBPF::GetObjectByClass(UObject* Object, const 
 	return nullptr;
 }
 
+TArray<UMounteaInventoryThemeConfig*> UMounteaInventoryEquipmentBPF::GetThemeConfigs()
+{
+	TArray<UMounteaInventoryThemeConfig*> Result;
+	if (const auto Settings = GetSettings())
+	{
+		for (auto& Itr : Settings->ThemeConfigs)
+		{
+			if (Itr.IsNull()) continue;
+			
+			Result.Add(Itr.LoadSynchronous());
+		}
+	}
+
+	return Result;
+}
+
 TSubclassOf<UMounteaInventoryThemeConfig> UMounteaInventoryEquipmentBPF::GetThemeConfigClass()
 {
 	if (GetSettings()->ThemeConfig) return GetSettings()->ThemeConfig->StaticClass();

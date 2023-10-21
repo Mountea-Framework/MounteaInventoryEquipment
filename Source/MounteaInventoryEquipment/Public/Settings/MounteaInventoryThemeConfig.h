@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ContentTheme.h"
 #include "UObject/NoExportTypes.h"
 #include "MounteaInventoryThemeConfig.generated.h"
 
+class UCategoryTheme;
 class UMounteaBaseEquipmentSlotWidget;
 class UMounteaBaseUserWidget;
 
@@ -25,6 +27,9 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataA
 	GENERATED_BODY()
 	
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Category", meta=(ShowOnlyInnerProperties))
+	TSubclassOf<UCategoryTheme> DefaultCategoryTheme = UCategoryTheme::StaticClass();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint SlotBaseSize = FIntPoint(64,64);
