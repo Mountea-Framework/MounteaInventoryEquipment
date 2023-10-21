@@ -68,6 +68,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	static TArray<FString> GetThemeConfigsNames();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	static UMounteaInventoryThemeConfig* GetThemeConfigByName(const FString& SearchName);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	static TSubclassOf<UMounteaInventoryThemeConfig> GetThemeConfigClass();

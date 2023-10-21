@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "MounteaItemAction.h"
-#include "Settings/ContentTheme.h"
 #include "MounteaInventoryItemCategory.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemCategory"
@@ -13,7 +12,7 @@
 /**
  * Mountea Inventory Category
  *
- * Defines Category.
+ * Defines Category
  * Is Assigned to Inventory Items to sort them to Categories.
  */
 UCLASS( BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea")
@@ -31,12 +30,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(MultiLine))
 	FText CategoryDescription = LOCTEXT("MounteaInventoryItemCategory_Name", "Default");
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(GetOptions="GetThemes"))
-	FString Theme;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
-	FContentThemeConfigData CategoryThemeConfig;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
 	UTexture2D* CategoryIcon = nullptr;
@@ -66,17 +59,6 @@ public:
 	{
 		return CategoryActions.Array();
 	}
-
-	void EnsureValidConfig();
-
-	UFUNCTION()
-	TArray<FString> GetThemes() const;
-
-#if WITH_EDITOR
-
-virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	
-#endif
 };
 
 #undef LOCTEXT_NAMESPACE

@@ -25,11 +25,13 @@ UCLASS( Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), Aut
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataAsset
 {
 	GENERATED_BODY()
+
+	UMounteaInventoryThemeConfig();
 	
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Category", meta=(ShowOnlyInnerProperties))
-	TSubclassOf<UCategoryTheme> DefaultCategoryTheme = UCategoryTheme::StaticClass();
+	TSet<FCategoryThemeData> CategoryThemes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint SlotBaseSize = FIntPoint(64,64);
@@ -69,5 +71,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface"))
 	TSubclassOf<UMounteaBaseEquipmentSlotWidget> EquipmentSlotClass;
+
+protected:
+
+	void GenerateMissingThemes();
+	
+#if WITH_EDITOR
+
+	
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
 	
 };

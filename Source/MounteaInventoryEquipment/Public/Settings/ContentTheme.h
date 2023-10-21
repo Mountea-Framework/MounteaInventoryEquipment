@@ -3,49 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryItemCategory.h"
 #include "Engine/DataAsset.h"
 #include "Helpers/MounteaThemeConfigHelpers.h"
 #include "ContentTheme.generated.h"
 
 USTRUCT(BlueprintType)
-struct FContentThemeConfigData : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
-	class UContentThemeConfig* ContentThemeConfig = nullptr;
-};
-
-UCLASS( Abstract, Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea, Inventory"), DisplayName="Content Theme Config")
-class MOUNTEAINVENTORYEQUIPMENT_API UContentThemeConfig : public UObject
-{
-	GENERATED_BODY()
-	
-};
-
-UCLASS()
-class MOUNTEAINVENTORYEQUIPMENT_API UCategoryThemeConfig : public UContentThemeConfig
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(EditAnywhere, Category="Settings")
-	FVector2D IconBrushCoordinates;
-};
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------//
-//--------------------------------------------------------------------------------------------------------------------------------------------------//
-//--------------------------------------------------------------------------------------------------------------------------------------------------//
-//--------------------------------------------------------------------------------------------------------------------------------------------------//
-
-USTRUCT(BlueprintType)
-struct FContentThemeData : public FTableRowBase
+struct FContentThemeData
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
 	class UContentTheme* ContentTheme = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FCategoryThemeData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
+	class UCategoryTheme* CategoryTheme = nullptr;
 };
 
 /**
@@ -81,12 +59,34 @@ class MOUNTEAINVENTORYEQUIPMENT_API UContentTheme : public UDataAsset
 	
 };
 
+/**
+ * UCategoryThemeConfig
+ * 
+ * A specialized theme configuration tailored for category-specific content presentation within the inventory system.
+ * This class extends the base UContentThemeConfig to provide further customization and theming options specific to inventory categories.
+ * It allows designers and developers to define the visual and interactive characteristics of category elements, ensuring consistent and theme-driven user experiences.
+ * 
+ * This configuration includes settings for:
+ * - Category Text: Defines the font, color, and other text-related settings for displaying category names or descriptions.
+ * - Category Style: Determines the visual appearance, including images and material effects, for category backgrounds, borders, or icons.
+ * 
+ * By being Blueprintable, users can create unique instances of this theme configuration through Blueprints, allowing easy and flexible customization without diving into C++.
+ * 
+ * Usage:
+ * Attach an instance of this configuration to the UInventoryThemeConfig or any relevant class to apply theme settings.
+ * 
+ * @see UContentThemeConfig
+ * @see UInventoryThemeConfig
+ */
 UCLASS( DisplayName="Category Theme Config")
 class MOUNTEAINVENTORYEQUIPMENT_API UCategoryTheme : public UContentTheme
 {
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditAnywhere, Category="Category")
+	UMounteaInventoryItemCategory* Category = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="Icon Brush")
 	FTextSettings CategoryTextSettings;

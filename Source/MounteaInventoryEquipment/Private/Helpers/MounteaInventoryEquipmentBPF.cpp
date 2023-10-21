@@ -96,6 +96,23 @@ TArray<FString> UMounteaInventoryEquipmentBPF::GetThemeConfigsNames()
 	return Result;
 }
 
+UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBPF::GetThemeConfigByName(const FString& SearchName)
+{
+	UMounteaInventoryThemeConfig* Result = nullptr;
+
+	for (const auto& Itr : GetThemeConfigs())
+	{
+		if (Itr && Itr->GetName().Equals(SearchName))
+		{
+			Result = Itr;
+
+			return Result;
+		}
+	}
+	
+	return Result;
+}
+
 TSubclassOf<UMounteaInventoryThemeConfig> UMounteaInventoryEquipmentBPF::GetThemeConfigClass()
 {
 	if (GetSettings()->ThemeConfig) return GetSettings()->ThemeConfig->StaticClass();
