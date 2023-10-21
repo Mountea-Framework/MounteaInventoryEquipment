@@ -24,7 +24,7 @@ struct FItemUpdateResult;
 /**
  * 
  */
-UCLASS(config = MounteaSettings, DisplayName="Mountea Inventory & Equipment Settings")
+UCLASS(config = MounteaSettings, DefaultConfig, DisplayName="Mountea Inventory & Equipment Settings")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
