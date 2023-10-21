@@ -36,6 +36,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 	for (const auto& Itr : MissingCategories)
 	{
 		UCategoryTheme* NewCategoryTheme = NewObject<UCategoryTheme>(GetPackage());
+		NewCategoryTheme->Category = Itr;
 
 		FCategoryThemeData NewCategoryThemeData;
 		NewCategoryThemeData.CategoryTheme = NewCategoryTheme;

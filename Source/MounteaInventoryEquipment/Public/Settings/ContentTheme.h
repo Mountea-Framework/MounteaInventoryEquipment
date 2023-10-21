@@ -112,9 +112,34 @@ public:
 	UPROPERTY(EditAnywhere, Category="Category")
 	UMounteaInventoryItemCategory* Category = nullptr;
 
-	UPROPERTY(EditAnywhere, Category="Icon Brush")
-	FTextSettings CategoryTextSettings;
-
 	UPROPERTY(EditAnywhere, Category="Text Brush")
-	FSlateBrush CategoryStyle;
+	class UTextTheme* TextTheme = nullptr;
+
+	UPROPERTY(EditAnywhere, Category="Icon Brush")
+	class UImageTheme* CategoryStyle;
+
+	UPROPERTY(EditAnywhere, Category="Icon Brush")
+	FVector2D CategoryIconOffset;
+};
+
+UCLASS( DisplayName="Text Theme Config")
+class MOUNTEAINVENTORYEQUIPMENT_API UTextTheme : public UContentTheme
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(EditAnywhere, Category="Icon Brush")
+	FTextSettings TextSettings;
+};
+
+UCLASS( DisplayName="Image Theme Config")
+class MOUNTEAINVENTORYEQUIPMENT_API UImageTheme : public UContentTheme
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(EditAnywhere, Category="Text Brush")
+	FSlateBrush ImageStyle;
 };
