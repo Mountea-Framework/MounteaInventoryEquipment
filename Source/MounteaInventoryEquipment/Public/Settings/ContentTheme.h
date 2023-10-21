@@ -15,6 +15,18 @@ struct FContentThemeData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
 	class UContentTheme* ContentTheme = nullptr;
+
+public:
+
+	bool operator==(const FContentThemeData& Other) const
+	{
+		return ContentTheme == Other.ContentTheme;
+	}
+	
+	friend uint32 GetTypeHash(const FContentThemeData& Data)
+	{				
+		return Data.ContentTheme ? GetTypeHash(Data.ContentTheme) : 0;
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -24,6 +36,18 @@ struct FCategoryThemeData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
 	class UCategoryTheme* CategoryTheme = nullptr;
+
+public:
+
+	bool operator==(const FCategoryThemeData& Other) const
+	{
+		return CategoryTheme == Other.CategoryTheme;
+	}
+
+	friend uint32 GetTypeHash(const FCategoryThemeData& Data)
+	{				
+		return Data.CategoryTheme ? GetTypeHash(Data.CategoryTheme) : 0;
+	}
 };
 
 /**
