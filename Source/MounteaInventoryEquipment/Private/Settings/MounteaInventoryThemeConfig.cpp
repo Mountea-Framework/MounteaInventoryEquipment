@@ -2,13 +2,7 @@
 
 
 #include "Settings/MounteaInventoryThemeConfig.h"
-
-#if WITH_EDITOR
-#include "AssetRegistry/AssetRegistryModule.h"
-#endif
-
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
-
 
 UMounteaInventoryThemeConfig::UMounteaInventoryThemeConfig()
 {
@@ -22,7 +16,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 		{
 			UImageTheme* NewImageTheme = NewObject<UImageTheme>(GetPackage());
 			
-			//CategoryImageTheme = NewImageTheme;
+			CategoryImageTheme = NewImageTheme;
 		}
 	}
 	
@@ -70,7 +64,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 		{
 			UTextTheme* NewTextTheme = NewObject<UTextTheme>(GetPackage());
 
-			//TextTheme = NewTextTheme;
+			TextTheme = NewTextTheme;
 		}
 	}
 
@@ -80,7 +74,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 		{
 			UColoursTheme* NewColoursTheme = NewObject<UColoursTheme>(GetPackage());
 
-			//ColoursTheme = NewColoursTheme;
+			ColoursTheme = NewColoursTheme;
 		}
 	}
 }
@@ -111,6 +105,7 @@ void UMounteaInventoryThemeConfig::PostEditChangeProperty(FPropertyChangedEvent&
 
 	const FString PropertyName = PropertyChangedEvent.Property->GetName();
 
+	// TODO: Rather than making them in-package, create a new ones in the same folder!
 	if (PropertyName.Equals("CategoryThemes"))
 	{
 		GenerateMissingThemes();
@@ -129,7 +124,7 @@ void UMounteaInventoryThemeConfig::PostEditChangeProperty(FPropertyChangedEvent&
 
 bool UMounteaInventoryThemeConfig::Rename(const TCHAR* NewName, UObject* NewOuter, ERenameFlags Flags)
 {
-	bool bSatisfied = Super::Rename(NewName, NewOuter, Flags);
+	const bool bSatisfied = Super::Rename(NewName, NewOuter, Flags);
 
 	if (bSatisfied)
 	{

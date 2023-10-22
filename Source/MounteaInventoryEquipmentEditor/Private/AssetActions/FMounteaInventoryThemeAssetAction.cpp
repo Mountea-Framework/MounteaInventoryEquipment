@@ -45,4 +45,9 @@ const TArray<FText>& FMounteaInventoryThemeAssetAction::GetSubMenus() const
 	return AssetTypeActionSubMenu;
 }
 
+void FMounteaInventoryThemeAssetAction::GenerateDefaultThemes(TArray<TWeakObjectPtr<UObject>> Objects)
+{
+	
+}
+
 #undef LOCTEXT_NAMESPACE

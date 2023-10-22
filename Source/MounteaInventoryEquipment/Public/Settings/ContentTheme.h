@@ -9,6 +9,8 @@
 #include "Helpers/MounteaThemeConfigHelpers.h"
 #include "ContentTheme.generated.h"
 
+#define LOCTEXT_NAMESPACE "ContentTheme"
+
 USTRUCT(BlueprintType)
 struct FContentThemeData
 {
@@ -158,7 +160,7 @@ public:
 
 	/** Defines the appearance settings for the category, such as backgrounds, borders, or icons. */
 	UPROPERTY(EditAnywhere, Category="Theme Config")
-	class UImageTheme* CategoryStyle;
+	class UImageTheme* CategoryStyle = nullptr;
 
 	/** Adjusts the position of the category's icon. Used only for specific UImageStyle with Texture Atlas. */
 	UPROPERTY(EditAnywhere, Category="Theme Config")
@@ -256,3 +258,5 @@ public:
 	UPROPERTY(EditAnywhere, Category="Button Brush")
 	FButtonStyle ButtonStyle;
 };
+
+#undef LOCTEXT_NAMESPACE

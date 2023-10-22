@@ -6,12 +6,12 @@
 #include "AssetTypeActions_Base.h"
 #include "Utils/MounteaInventoryEquipmentEditorUtilities.h"
 
-class FMounteaInventoryThemeAssetAction : public FAssetTypeActions_Base
+class FMounteaInventoryContentThemeAssetAction : public FAssetTypeActions_Base
 {
 	
 public:
 
-	FMounteaInventoryThemeAssetAction();
+	FMounteaInventoryContentThemeAssetAction();
 
 	virtual FText GetName() const override;
 	virtual FColor GetTypeColor() const override;
@@ -21,7 +21,7 @@ public:
 	virtual const TArray<FText>& GetSubMenus() const override;
 
 	virtual bool CanFilter() override
-	{ return false; };
+	{ return true; };
 	
 	virtual void BuildBackendFilter(FARFilter& InFilter) override
 	{
@@ -54,7 +54,20 @@ public:
 		);
 		InFilter.TagsAndValues.Add(FBlueprintTags::NativeParentClassPath, Value);
 	};
+};
+
+class FTextThemeAssetActions : public FMounteaInventoryContentThemeAssetAction
+{
+public:
 	
-	/** Handler for when generate request is selected*/
-	void GenerateDefaultThemes(TArray< TWeakObjectPtr<UObject> > Objects);
+	virtual FText GetName() const override;
+	virtual UClass* GetSupportedClass() const override;
+};
+
+class FCategoryThemeAssetActions : public FMounteaInventoryContentThemeAssetAction
+{
+public:
+	
+	virtual FText GetName() const override;
+	virtual UClass* GetSupportedClass() const override;
 };
