@@ -174,8 +174,22 @@ public:
 /**
  * UTextTheme
  *
- * Dedicated theme configuration for text elements. This class offers customization settings
- * to define the appearance and style of primary and secondary text elements.
+ * A theme configuration dedicated specifically for styling text elements within the application.
+ * UTextTheme provides detailed customization options for both primary and secondary text styles, 
+ * allowing developers and designers to ensure consistency and thematic coherence in text presentations.
+ *
+ * This configuration encapsulates:
+ * - Primary Text: Settings related to the font, color, and other visual attributes for main or headline text.
+ * - Secondary Text: Settings for text that might act as subtitles, descriptions, or any secondary information.
+ * 
+ * Given its Blueprintable nature, users can effortlessly spawn unique instances of this theme configuration directly from the Blueprint Editor.
+ * This promotes rapid iterations and experiments with text themes without the necessity of C++ involvement.
+ * 
+ * Usage:
+ * Integrate an instance of this theme configuration into the relevant classes, like UInventoryThemeConfig, to enforce the defined text styles.
+ * 
+ * @see UContentTheme
+ * @see UInventoryThemeConfig
  */
 UCLASS( DisplayName="Text Theme Config")
 class MOUNTEAINVENTORYEQUIPMENT_API UTextTheme : public UContentTheme
@@ -196,8 +210,22 @@ public:
 /**
  * UImageTheme
  *
- * This theme configuration is specialized for Slate Brush styling. It encapsulates settings that
- * define the appearance of various image elements within the system.
+ * A dedicated theme configuration focused on the visual styling of image elements within the application.
+ * UImageTheme provides a centralized setting to dictate the appearance and presentation of images, 
+ * ensuring consistent visual treatment and thematic alignment across various UI and content elements.
+ *
+ * The key configuration encapsulated within this class includes:
+ * - Image Style: Governs the visual attributes like texture, tint, and material effects for the images. 
+ *   This primary setting ensures that all images adhere to the established visual guidelines and thematic constraints.
+ * 
+ * With its Blueprintable attribute, users can create unique variations of this theme configuration directly from the Blueprint Editor,
+ * facilitating quick iterations and visual tweaks without delving into C++.
+ * 
+ * Usage:
+ * Integrate an instance of this theme configuration into the relevant classes to apply the defined image style consistently across the application.
+ * 
+ * @see UContentTheme
+ * @see UInventoryThemeConfig
  */
 UCLASS( DisplayName="Image Theme Config")
 class MOUNTEAINVENTORYEQUIPMENT_API UImageTheme : public UContentTheme
@@ -214,8 +242,25 @@ public:
 /**
  * UColoursTheme
  *
- * Tailored to provide color theming across the application. It offers a set of color configurations
- * to establish visual harmony and branding consistency.
+ * A specialized theme configuration centered on defining a color palette for the application. The UColoursTheme
+ * provides a comprehensive set of colors, from primary to quaternary, ensuring that designers and developers 
+ * have a consistent and harmonious color set to work with throughout the UI and content spaces.
+ *
+ * Each color within this configuration serves a distinct purpose:
+ * - Primary Color: The mainstay of the UI. It represents primary actions, elements in focus, and main highlights.
+ * - Secondary Color: A backdrop shade, typically used for background fills, secondary components, or elements in a passive state.
+ * - Tertiary Color: A supplementary hue for elements like hover states, accents, or any intermediate UI component that requires differentiation.
+ * - Quaternary Color: An auxiliary color that can be utilized for specific theming needs, such as borders, outlines, or unique accents.
+ * 
+ * Being Blueprintable, this configuration can be tweaked and iterated upon directly from the Blueprint Editor. This flexibility ensures 
+ * that UI/UX designers can experiment and finalize the color theme without the need to modify C++ code.
+ * 
+ * Usage:
+ * Integrate an instance of this theme configuration into the relevant classes to apply the defined color palette consistently 
+ * across various UI and content sections of the application.
+ * 
+ * @see UContentTheme
+ * @see UInventoryThemeConfig
  */
 UCLASS( DisplayName="Colours Theme Config")
 class MOUNTEAINVENTORYEQUIPMENT_API UColoursTheme : public UContentTheme
@@ -244,8 +289,25 @@ public:
 /**
  * UButtonTheme
  *
- * This theme configuration is specialized for Button Brush styling. It encapsulates settings that
- * define the appearance of Button types.
+ * A dedicated theme configuration tailored for button elements within the application. The UButtonTheme focuses on
+ * providing customization settings to define the appearance, behavior, and overall style of button elements, ensuring 
+ * a consistent and visually appealing user interaction across different areas of the application.
+ *
+ * The configuration encapsulates:
+ * - Button Style: This captures the visual representation of the button, including its default state, hovered state, 
+ *   pressed state, and more. It also can incorporate information like padding, font, and color settings, allowing 
+ *   for a comprehensive customization of button appearances.
+ * 
+ * As with other theme configurations, UButtonTheme is Blueprintable, enabling designers to adjust and set button styles 
+ * directly from the Blueprint Editor without the need to edit C++ code. This encourages rapid iterations and flexibility 
+ * in UI design, allowing for easy adaptability and refinements.
+ * 
+ * Usage:
+ * Integrate an instance of this theme configuration into the relevant classes or UI components where button styling 
+ * needs to be applied. This ensures uniformity in button appearances and interactions across the application.
+ * 
+ * @see UContentTheme
+ * @see UInventoryThemeConfig
  */
 UCLASS( DisplayName="Button Theme Config")
 class MOUNTEAINVENTORYEQUIPMENT_API UButtonTheme : public UContentTheme
