@@ -65,6 +65,8 @@ TSharedRef<FSlateStyleSet> FMIEEditorStyle::Create()
 	Style->Set("MIEStyleSet.Icon.Browse", new IMAGE_BRUSH(TEXT("BrowseIcon"), Icon12x12));
 	Style->Set("MIEStyleSet.Icon.Edit", new IMAGE_BRUSH(TEXT("EditIcon"), Icon12x12));
 
+	Style->Set("MIEStyleSet.Icon.DistinctArray", new IMAGE_BRUSH(TEXT("K2NodeIcons/DistinctIcon"), Icon12x12));
+
 	const FButtonStyle MounteaButtonStyle = FButtonStyle()
 		.SetNormal(BOX_BRUSH("RoundedSelection_16x", 4.0f / 16.0f, FLinearColor(1, 1, 1, 0.1f)))
 		.SetHovered(BOX_BRUSH("RoundedSelection_16x", 4.0f / 16.0f, FLinearColor(1, .55f, 0, 0.2f)))

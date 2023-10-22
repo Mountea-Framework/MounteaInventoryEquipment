@@ -201,6 +201,8 @@ void FMounteaInventoryItem_Details::CustomizeDetails(IDetailLayoutBuilder& Detai
 			]
 		]
 	];
+
+	if (EditingItem) EditingItem->SetValidDataEditor();
 }
 
 #undef LOCTEXT_NAMESPACE

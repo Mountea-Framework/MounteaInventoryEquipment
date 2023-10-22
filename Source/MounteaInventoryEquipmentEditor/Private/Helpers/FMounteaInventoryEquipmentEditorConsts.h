@@ -28,5 +28,6 @@ const FText AdvancedMenuSubCategoryName_01 = LOCTEXT("AdvancedMenuSubCategoryNam
 const FText AdvancedMenuSubCategoryName_02 = LOCTEXT("AdvancedMenuSubCategoryName_02", "2. Data");
 const FText AdvancedMenuSubCategoryName_03 = LOCTEXT("AdvancedMenuSubCategoryName_03", "3. Definitions");
 const FText AdvancedMenuSubCategoryName_04 = LOCTEXT("AdvancedMenuSubCategoryName_04", "4. Components");
+const FText AdvancedMenuSubCategoryName_05 = LOCTEXT("AdvancedMenuSubCategoryName_05", "5. Content Themes");
 
 #undef LOCTEXT_NAMESPACE

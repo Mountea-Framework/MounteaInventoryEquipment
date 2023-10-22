@@ -48,6 +48,12 @@ public:
 	FORCEINLINE UTexture2D* GetActionIcon() const
 	{ return ActionIcon; };
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
+	FORCEINLINE UMounteaInventoryItemBase* GetOwningItem() const
+	{
+		return OwningItem;
+	}
+	
 	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
 
@@ -80,6 +86,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
 	FORCEINLINE FMounteaDynamicDelegateContext GetActionContext() const
 	{ return ActionContext; }
+
+	void CopyFromOther(const UMounteaInventoryItemAction* OtherAction);
 	
 protected:
 

@@ -45,25 +45,31 @@ protected:
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 public:
+
+	virtual AActor* GetOwningActor_Implementation() const override;
 	
 	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const override;
+	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const override;
 	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const override;
 	
-	virtual bool EquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
-	virtual bool UnEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	virtual bool EquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	virtual bool UnEquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
 	
-	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
+	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const override;
 	
 	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip) const override;
+
+	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const override;
+	virtual bool SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI) override;
 
 	virtual FOnEquipmentUpdated& GetEquipmentUpdatedHandle() override { return OnEquipmentUpdated; };
 	virtual FOnSlotUpdated& GetSlotEquippedHandle() override { return OnSlotEquipped; };
 	virtual FOnSlotUpdated& GetSlotUnEquippedHandle() override { return OnSlotUnequipped; };
 
 protected:
-
-	UFUNCTION(Server, Reliable, WithValidation) void EquipItem_Server(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	UFUNCTION(Server, Reliable, WithValidation) void UnEquipItem_Server(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	
+	UFUNCTION(Server, Reliable, WithValidation) void EquipItem_Server(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
+	UFUNCTION(Server, Reliable, WithValidation) void UnEquipItem_Server(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	UFUNCTION(NetMulticast, Unreliable) void EquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	UFUNCTION(NetMulticast, Unreliable) void UnEquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
 	UFUNCTION() void OnRep_Equipment();
@@ -77,8 +83,11 @@ protected:
 	TArray<FMounteaEquipmentSlotData> EquipmentSlotData;
 
 private:
+
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	UMounteaBaseUserWidget* EquipmentUI;
 	
-	UPROPERTY()
+	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
 	int32 ReplicatedItemsKey = 0;
 	
 #pragma endregion

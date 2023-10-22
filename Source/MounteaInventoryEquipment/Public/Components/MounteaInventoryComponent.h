@@ -53,8 +53,8 @@ protected:
 
 public:
 
-	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() override;
-	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() override;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass_Implementation() const override;
+	virtual UMounteaBaseUserWidget* GetInventoryUI_Implementation() const override;
 
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
@@ -75,8 +75,8 @@ public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
 
-	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
-	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) override;
+	virtual void SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
+	virtual void SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewWBP) override;
 	
 	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
 	
@@ -87,6 +87,7 @@ public:
 	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) override;
 
 	virtual bool SetInventoryFlags_Implementation() override;
+	virtual bool DoesHaveAuthority_Implementation() const override;
 	
 public:
 
@@ -243,6 +244,8 @@ private:
 
 	TArray<UMounteaInventoryItemBase*> RemovedItems;
 
+	//TODO: Settings?
+	const int32 ChunkSize = 100;
 	
 #if WITH_EDITOR
 private:
@@ -257,63 +260,3 @@ private:
 };
 
 #undef LOCTEXT_NAMESPACE
-
-#pragma region Runnables
-
-class FItemSearchRunnable : public FRunnable
-{
-public:
-	FItemSearchRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TAtomic<bool>& InItemFound)
-		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(InItemFound) {}
-
-	virtual bool Init() override { return true; }
-	virtual uint32 Run() override;
-	virtual void Stop() override {}
-
-private:
-	const TArray<UMounteaInventoryItemBase*>& Items;
-	const FItemRetrievalFilter& SearchFilter;
-	TAtomic<bool>& ItemFound;
-};
-
-class FItemGetRunnable : public FRunnable
-{
-public:
-	FItemGetRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TAtomic<UMounteaInventoryItemBase*>& InFoundItem)
-		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(false), FoundItem(InFoundItem) {}
-
-	virtual bool Init() override { return true; }
-	virtual uint32 Run() override;
-	virtual void Stop() override {}
-
-	bool IsItemFound() const { return ItemFound; }
-	UMounteaInventoryItemBase* GetFoundItem() const { return FoundItem.Load(); }
-
-private:
-	const TArray<UMounteaInventoryItemBase*> Items;
-	const FItemRetrievalFilter& SearchFilter;
-	bool ItemFound;
-	TAtomic<UMounteaInventoryItemBase*>& FoundItem;
-};
-
-class FItemsGetRunnable : public FRunnable
-{
-public:
-	FItemsGetRunnable(const TArray<UMounteaInventoryItemBase*>& InItems, const FItemRetrievalFilter& InSearchFilter, TArray<UMounteaInventoryItemBase*>& InFoundItems)
-		: Items(InItems), SearchFilter(InSearchFilter), ItemFound(false), FoundItems(InFoundItems) {}
-
-	virtual bool Init() override { return true; }
-	virtual uint32 Run() override;
-	virtual void Stop() override {}
-
-	bool IsItemFound() const { return ItemFound; }
-	TArray<UMounteaInventoryItemBase*>& GetFoundItems() const { return FoundItems; }
-
-private:
-	const TArray<UMounteaInventoryItemBase*>& Items;
-	const FItemRetrievalFilter& SearchFilter;
-	bool ItemFound;
-	TArray<UMounteaInventoryItemBase*>& FoundItems;
-};
-
-#pragma endregion 

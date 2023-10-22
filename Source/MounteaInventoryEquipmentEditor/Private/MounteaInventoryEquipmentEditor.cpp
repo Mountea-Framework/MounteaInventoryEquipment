@@ -10,6 +10,7 @@
 
 #include "AssetActions/FMounteaInventoryCategoryAssetAction.h"
 #include "AssetActions/FMounteaInventoryComponentAssetAction.h"
+#include "AssetActions/FMounteaInventoryContentThemeAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemActionAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemAdditionalDataAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
@@ -79,8 +80,11 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryRarityAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryComponentAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemActionAssetAction>());
-
-		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaEquipmentComponentAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryContentThemeAssetAction>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryContentThemeAssetAction>());
+		
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FCategoryThemeAssetActions>());
+		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FTextThemeAssetActions>());
 	}
 
 	// Register Styles and Commands

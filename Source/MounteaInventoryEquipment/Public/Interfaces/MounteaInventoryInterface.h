@@ -43,20 +43,20 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass();
-	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryWBPClass_Implementation() = 0;
+	TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass() const;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass_Implementation() const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void SetInventoryWBPClass(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass);
-	virtual void SetInventoryWBPClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) = 0;
+	void SetInventoryUIClass(TSubclassOf<UMounteaBaseUserWidget> NewInventoryUIClass);
+	virtual void SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryUIClass) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void SetInventoryWBP(UMounteaBaseUserWidget* NewWBP);
-	virtual void SetInventoryWBP_Implementation(UMounteaBaseUserWidget* NewWBP) = 0;
+	void SetInventoryUI(UMounteaBaseUserWidget* NewUI);
+	virtual void SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewUI) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	UMounteaBaseUserWidget* GetInventoryWBP();
-	virtual UMounteaBaseUserWidget* GetInventoryWBP_Implementation() = 0;
+	UMounteaBaseUserWidget* GetInventoryUI() const;
+	virtual UMounteaBaseUserWidget* GetInventoryUI_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool LoadInventoryFromDataTable(const class UMounteaInventoryItemsTable* SourceTable);
@@ -149,6 +149,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool SetInventoryFlags();
 	virtual bool SetInventoryFlags_Implementation() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool DoesHaveAuthority() const;
+	virtual bool DoesHaveAuthority_Implementation() const = 0;
 	
 public:
 

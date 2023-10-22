@@ -4,19 +4,33 @@
 #include "Definitions/MounteaEquipmentSlot.h"
 
 #include "Net/UnrealNetwork.h"
+#include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+
+void UMounteaEquipmentSlot::UpdateItem(UMounteaInventoryItemBase* NewItem)
+{
+	if (NewItem!=ItemInSlot)
+	{
+		ItemInSlot = NewItem;
+
+		OnRep_Slot();
+	}
+}
 
 void UMounteaEquipmentSlot::OnRep_Slot()
 {
-	RepKey = 0;
+	RepKey++;
 }
 
-TArray<FString> UMounteaEquipmentSlot::GetSlotIDs() const
+TArray<FString> UMounteaEquipmentSlot::GetSlotIDs()
 {
 	TArray<FString> ReturnValues;
 	if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
 	{
-		Settings->EquipmentSlotIDs.GetKeys(ReturnValues);
+		if (const UMounteaEquipmentConfigData* EquipmentData = Settings->EquipmentConfigData.LoadSynchronous())
+		{
+			EquipmentData->EquipmentSlotIDs.GetKeys(ReturnValues);
+		} 
 	}
 
 	return ReturnValues;
@@ -49,7 +63,13 @@ void UMounteaEquipmentSlot::PostEditChangeProperty(FPropertyChangedEvent& Proper
 	{
 		if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
 		{
-			SlotCompatibleTag = *Settings->EquipmentSlotIDs.Find(SlotID);
+			if (const UMounteaEquipmentConfigData* EquipmentData = Settings->EquipmentConfigData.LoadSynchronous())
+			{
+				if (EquipmentData->EquipmentSlotIDs.Contains(SlotID))
+				{
+					SlotCompatibleTag = *EquipmentData->EquipmentSlotIDs.Find(SlotID);
+				}
+			} 
 		}
 	}
 }

@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ContentTheme.h"
 #include "UObject/NoExportTypes.h"
 #include "MounteaInventoryThemeConfig.generated.h"
 
+class UCategoryTheme;
+class UMounteaBaseEquipmentSlotWidget;
 class UMounteaBaseUserWidget;
 
 /**
@@ -22,9 +25,33 @@ UCLASS( Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), Aut
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataAsset
 {
 	GENERATED_BODY()
+
+	UMounteaInventoryThemeConfig();
 	
 public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme", meta=(ShowOnlyInnerProperties))
+	class UTextTheme* TextTheme = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme", meta=(ShowOnlyInnerProperties))
+	class UColoursTheme* ColoursTheme = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Categories", meta=(ShowOnlyInnerProperties))
+	class UImageTheme* CategoryImageTheme = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Categories", meta=(ShowOnlyInnerProperties))
+	TSet<FCategoryThemeData> CategoryThemes;
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Buttons", meta=(ShowOnlyInnerProperties))
+	TMap<TSubclassOf<UUserWidget>, UButtonTheme*> ButtonStyleThemes;
+
+	// ---------------------------------------------------------------------------- //
+	// ---------------------------------------------------------------------------- //
+	// BELOW CODE IS OUTDATED AND WILL BE REMOVED //
+	// ---------------------------------------------------------------------------- //
+	// ---------------------------------------------------------------------------- //
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint SlotBaseSize = FIntPoint(64,64);
 
@@ -60,4 +87,25 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Actions", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaItemActionWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemActionClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface"))
+	TSubclassOf<UMounteaBaseEquipmentSlotWidget> EquipmentSlotClass;
+
+protected:
+
+	void GenerateMissingThemes();
+
+#if WITH_EDITOR
+	
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual bool Rename(const TCHAR* NewName, UObject* NewOuter, ERenameFlags Flags) override;
+
+public:
+	virtual void GenerateMissingThemes_Editor();
+
+	UFUNCTION()
+	void Propagate_CategoryDefaultStyle();
+	
+#endif
+	
 };

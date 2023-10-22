@@ -3,20 +3,51 @@
 
 #include "Definitions/MounteaInventoryItem.h"
 
+#include "Definitions/MounteaInventoryItemCategory.h"
+#include "Definitions/MounteaInventoryItemRarity.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Net/UnrealNetwork.h"
 
 #include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Settings/MounteaInventoryEquipmentSettings.h"
+
 
 UMounteaInventoryItemBase::UMounteaInventoryItemBase()
 {
 	RepKey = 0;
+
+	FWorldDelegates::OnPostWorldCreation.AddUObject(this, &UMounteaInventoryItemBase::PostWorldCreated);
+}
+
+UMounteaInventoryItemBase::~UMounteaInventoryItemBase()
+{
+	FWorldDelegates::OnPostWorldCreation.RemoveAll(this);
+}
+
+void UMounteaInventoryItemBase::PostWorldCreated(UWorld* NewWorld)
+{
+	if (FApp::IsGame())
+	{
+		SetWorld(NewWorld);
+
+		OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
+		OnItemInitialized.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemInitialized);
+		OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
+		OnItemRemoved.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemRemoved);
+		
+		SetValidData();
+
+		EnsureValidConfig();
+		InitializeItemActions();
+
+		OnItemBeginPlay(TEXT("Item has been initialized"));
+	}
 }
 
 void UMounteaInventoryItemBase::PostInitProperties()
 {
-	UObject::PostInitProperties();
+	UDataAsset::PostInitProperties();
 
 	bool bIsEditorNoPlay = false;
 #if WITH_EDITOR
@@ -32,17 +63,20 @@ void UMounteaInventoryItemBase::PostInitProperties()
 
 		EnsureValidConfig();
 	}
-	else
-	{
-		OnItemAdded.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemAdded);
-		OnItemInitialized.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemInitialized);
-		OnItemModified.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemModified);
-		OnItemRemoved.AddUniqueDynamic(this, &UMounteaInventoryItemBase::ItemRemoved);
-		
-		SetValidData();
+}
 
-		OnItemBeginPlay(TEXT("Item has been initialized"));
+TArray<UMounteaInventoryItemAction*> UMounteaInventoryItemBase::GetItemActions() const
+{
+	TArray<UMounteaInventoryItemAction*> ReturnValues;
+	for (const auto& Itr : ItemActions)
+	{
+		if (Itr.ItemAction && !ReturnValues.Contains(Itr.ItemAction))
+		{
+			ReturnValues.Add(Itr.ItemAction);
+		}
 	}
+
+	return ReturnValues;
 }
 
 bool UMounteaInventoryItemBase::IsValid(UObject* WorldContextObject) const
@@ -78,6 +112,27 @@ int32 UMounteaInventoryItemBase::GetQuantity() const
 	return ItemData.ItemQuantity.CurrentQuantity;
 }
 
+bool UMounteaInventoryItemBase::OwnerHasAuthority() const
+{
+	if (!OwningInventory)
+	{
+		if (!GEngine) return false;
+		if (!World) return false;
+
+		const FString ModeName = GetEnumValueAsString(TEXT("ENetRole"), GEngine->GetNetMode(World));
+
+		UE_LOG(LogTemp, Error, TEXT("%s"), *ModeName)
+		if (GEngine->GetNetMode(World) == NM_Client)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	return OwningInventory->Execute_DoesHaveAuthority(OwningInventory.GetObject());
+}
+
 void UMounteaInventoryItemBase::SetWorldFromLevel(ULevel* FromLevel)
 {
 	if (FromLevel == nullptr)
@@ -91,9 +146,23 @@ void UMounteaInventoryItemBase::SetWorldFromLevel(ULevel* FromLevel)
 	}
 }
 
+void UMounteaInventoryItemBase::InitializeItemActions()
+{
+	TArray<UMounteaInventoryItemAction*> Actions = GetItemActions();
+	for (UMounteaInventoryItemAction* ItrAction : Actions)
+	{
+		FMounteaDynamicDelegateContext Context;
+		Context.Command = MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemActionCommands::InitializeAction;
+		Context.Payload = this;
+		ItrAction->InitializeAction(this, Context);
+	}
+}
+
 void UMounteaInventoryItemBase::SetWorld(UWorld* NewWorld)
 {
 	World = NewWorld;
+
+	InitializeItemActions();
 }
 
 void UMounteaInventoryItemBase::InitializeNewItem(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory)
@@ -106,20 +175,36 @@ void UMounteaInventoryItemBase::InitializeNewItem(const TScriptInterface<IMounte
 	if (const AActor* InventoryOwner = NewOwningInventory->Execute_GetOwningActor(NewOwningInventory.GetObject()))
 	{
 		World = InventoryOwner->GetWorld();
-		OwningInventory = NewOwningInventory;
-	
-		MarkDirtyForReplication();
-
-		FString Message = ItemData.ItemName.ToString();
-		Message.Append(": Initialization completed.");
-		OnItemInitialized.Broadcast(Message);
 	}
+	else
+	{
+		World = NewOwningInventory.GetObject()->GetWorld();
+	}
+	
+	OwningInventory = NewOwningInventory;
+	
+	MarkDirtyForReplication();
+
+	FString Message = ItemData.ItemName.ToString();
+	Message.Append(": Initialization completed.");
+	OnItemInitialized.Broadcast(Message);
 }
 
 void UMounteaInventoryItemBase::OnRep_Item()
 {
+	if (OwningInventory.GetObject() == nullptr) return;
+	
 	FString Message = ItemData.ItemName.ToString();
 	Message.Append(" has been modified.");
+		
+	if (const AActor* InventoryOwner = OwningInventory->Execute_GetOwningActor(OwningInventory.GetObject()))
+	{
+		World = InventoryOwner->GetWorld();
+	}
+	else
+	{
+		World = OwningInventory.GetObject()->GetWorld();
+	}
 	
 	OnItemModified.Broadcast(Message);
 }
@@ -223,12 +308,6 @@ void UMounteaInventoryItemBase::SetValidData()
 	}
 }
 
-void UMounteaInventoryItemBase::SetValidDataEditor()
-{
-	SetValidData();
-	EnsureValidConfig();
-}
-
 void UMounteaInventoryItemBase::ClearMappedValues()
 {
 	ItemData = FMounteaInventoryItemRequiredData();
@@ -239,22 +318,13 @@ void UMounteaInventoryItemBase::CopyTagsFromTypes()
 {
 	if (ItemData.ItemCategory)
 	{
-		ItemData.CompatibleGameplayTags.AppendTags(ItemData.ItemCategory->CompatibleGameplayTags);
+		ItemData.ItemFlags.AppendTags(ItemData.ItemCategory->CompatibleGameplayTags);
 	}
 
 	if (ItemData.ItemRarity)
 	{
-		ItemData.CompatibleGameplayTags.AddTag(ItemData.ItemRarity->RarityGameplayTag);
+		ItemData.ItemFlags.AddTag(ItemData.ItemRarity->RarityGameplayTag);
 	}
-}
-
-#if WITH_EDITOR
-
-void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
-{
-	UObject::PostDuplicate(bDuplicateForPIE);
-
-	ItemGuid = FGuid::NewGuid();
 }
 
 void UMounteaInventoryItemBase::EnsureValidConfig()
@@ -265,6 +335,52 @@ void UMounteaInventoryItemBase::EnsureValidConfig()
 		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
 		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
 	}
+	
+	// Copy Actions Categories
+	{
+		TArray<FMounteaItemAction> CurrentActions = GetItemActionsDefinitions();
+		ItemActions.Empty();
+
+		if (ItemData.ItemCategory)
+		{
+			TArray<FMounteaItemAction> CategoryActions = ItemData.ItemCategory->GetCategoryActionsDefinitions();
+			
+			for (const FMounteaItemAction ItrCategoryAction: CategoryActions)
+			{
+				if (!ItrCategoryAction.ItemAction) continue;
+				if (CurrentActions.Contains(ItrCategoryAction)) continue;
+
+				const UMounteaInventoryItemAction* SourceAction = ItrCategoryAction.ItemAction; 
+				UMounteaInventoryItemAction* NewAction = NewObject<UMounteaInventoryItemAction>(GetPackage(), SourceAction->GetClass());
+				NewAction->CopyFromOther(ItrCategoryAction.ItemAction);
+
+				FMounteaItemAction NewActionDefinition;
+				NewActionDefinition.ItemAction = NewAction;
+				
+				CurrentActions.Add(NewActionDefinition);
+			}
+		}
+
+		ItemActions = CurrentActions;
+	}
+}
+
+#if WITH_EDITOR
+
+void UMounteaInventoryItemBase::SetValidDataEditor()
+{
+	EnsureValidConfig();
+	SetValidData();
+}
+
+void UMounteaInventoryItemBase::PostDuplicate(bool bDuplicateForPIE)
+{
+	UObject::PostDuplicate(bDuplicateForPIE);
+
+	EnsureValidConfig();
+	SetValidData();
+	
+	ItemGuid = FGuid::NewGuid();
 }
 
 void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

@@ -40,3 +40,16 @@ void UMounteaInventoryItemAction::SetWorld(UWorld* NewWorld)
 	World = NewWorld;
 }
 
+void UMounteaInventoryItemAction::CopyFromOther(const UMounteaInventoryItemAction* OtherAction)
+{
+	if (!OtherAction) return;
+	
+	ActionIcon = OtherAction->ActionIcon;
+	ActionName = OtherAction->ActionName;
+	ActionTag = OtherAction->ActionTag;
+	ActionContext = OtherAction->ActionContext;
+
+	World = OtherAction->GetWorld();
+	OwningItem = OtherAction->GetOwningItem();
+}
+

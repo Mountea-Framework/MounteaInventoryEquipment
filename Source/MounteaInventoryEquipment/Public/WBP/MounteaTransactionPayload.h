@@ -13,5 +13,4 @@ UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mount
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaTransactionPayload : public UObject
 {
 	GENERATED_BODY()
-	
 };

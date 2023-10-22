@@ -14,6 +14,7 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryEquipmentSettings"
 
+class UMounteaEquipmentConfigData;
 class UMounteaInventoryConfig;
 class UMounteaInventoryItemsTable;
 class UMounteaInventoryItemConfig;
@@ -23,7 +24,7 @@ struct FItemUpdateResult;
 /**
  * 
  */
-UCLASS(config = MounteaSettings, DisplayName="Mountea Inventory & Equipment Settings")
+UCLASS(config = MounteaSettings, DefaultConfig, DisplayName="Mountea Inventory & Equipment Settings")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
@@ -31,6 +32,9 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public 
 	UMounteaInventoryEquipmentSettings();
 
 public:
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSet<TSoftObjectPtr<UMounteaInventoryThemeConfig>> ThemeConfigs;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
@@ -55,12 +59,9 @@ public:
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
-
+	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TMap<FString,FGameplayTag> EquipmentSlotIDs;
+	TSoftObjectPtr<UMounteaEquipmentConfigData> EquipmentConfigData;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;
@@ -70,6 +71,9 @@ public:
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> InventoryWidgetCommands;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	TSet<FString> EquipmentWidgetCommands;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
@@ -173,6 +177,42 @@ public:
 			if (!InventoryWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget))
 			{
 				InventoryWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget);
+			}
+		}
+
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, EquipmentWidgetCommands))
+		{
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::InitializeEquipmentWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::InitializeEquipmentWidget);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::CreateEquipmentWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::CreateEquipmentWidget);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::ShowEquipmentWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::ShowEquipmentWidget);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::HideEquipmentWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::HideEquipmentWidget);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshEquipmentWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshEquipmentWidget);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshItemsWidgets))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshItemsWidgets);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget);
+			}
+			if (!EquipmentWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget))
+			{
+				EquipmentWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget);
 			}
 		}
 

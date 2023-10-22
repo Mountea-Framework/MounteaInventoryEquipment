@@ -9,6 +9,7 @@
 
 #include "MounteaInventoryWBPInterface.generated.h"
 
+class IMounteaInventoryItemWBPInterface;
 class IMounteaInventoryInterface;
 struct FInventoryNotificationData;
 
@@ -33,14 +34,18 @@ public:
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
-	bool GetInventoryVisibility();
-	virtual bool GetInventoryVisibility_Implementation() = 0;
+	bool GetInventoryVisibility() const;
+	virtual bool GetInventoryVisibility_Implementation() const = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
-	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory();
-	virtual TScriptInterface<IMounteaInventoryInterface> GetOwningInventory_Implementation() = 0;
+	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const;
+	virtual TScriptInterface<IMounteaInventoryInterface> GetOwningInventory_Implementation() const = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
 	void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory);
 	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI(const UMounteaInventoryItemBase* ForItem, bool& bFound) const;
+	virtual TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI_Implementation(const UMounteaInventoryItemBase* ForItem, bool& bFound) const = 0;
 };

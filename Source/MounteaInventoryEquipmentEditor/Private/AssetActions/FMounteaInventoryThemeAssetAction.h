@@ -54,4 +54,7 @@ public:
 		);
 		InFilter.TagsAndValues.Add(FBlueprintTags::NativeParentClassPath, Value);
 	};
+	
+	/** Handler for when generate request is selected*/
+	void GenerateDefaultThemes(TArray< TWeakObjectPtr<UObject> > Objects);
 };

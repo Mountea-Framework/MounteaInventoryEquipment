@@ -12,7 +12,7 @@
 /**
  * Mountea Inventory Category
  *
- * Defines Category.
+ * Defines Category
  * Is Assigned to Inventory Items to sort them to Categories.
  */
 UCLASS( BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea")
@@ -52,6 +52,12 @@ public:
 		}
 
 		return ReturnValues;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FORCEINLINE TArray<FMounteaItemAction> GetCategoryActionsDefinitions() const
+	{
+		return CategoryActions.Array();
 	}
 };
 
