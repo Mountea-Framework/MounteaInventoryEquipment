@@ -98,3 +98,33 @@ bool UCategoryThemeAssetFactory::ConfigureProperties()
 
 	return bPressedOk;
 }
+
+USlotThemeAssetFactory::USlotThemeAssetFactory()
+{
+	bCreateNew = true;
+	bEditAfterNew = true;
+
+	SupportedClass = USlotTheme::StaticClass();
+}
+
+UObject* USlotThemeAssetFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+{
+	USlotTheme* NewTheme = NewObject<USlotTheme>(InParent, ParentClass, Name, Flags, Context);
+
+	return NewTheme;
+}
+
+bool USlotThemeAssetFactory::ConfigureProperties()
+{
+	static const FText TitleText = FText::FromString(TEXT("Pick Parent Class for new Mountea Inventory Slot Theme"));
+	
+	UClass* ChosenClass = nullptr;
+	const bool bPressedOk = FMounteaInventoryEquipmentEditorUtilities::PickChildrenOfClass(TitleText, ChosenClass, USlotTheme::StaticClass());
+
+	if ( bPressedOk )
+	{
+		ParentClass = ChosenClass;
+	}
+
+	return bPressedOk;
+}

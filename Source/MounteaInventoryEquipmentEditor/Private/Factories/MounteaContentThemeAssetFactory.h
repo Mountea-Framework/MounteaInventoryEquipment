@@ -54,3 +54,16 @@ public:
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 	virtual bool ConfigureProperties() override;
 };
+
+UCLASS()
+class MOUNTEAINVENTORYEQUIPMENTEDITOR_API USlotThemeAssetFactory : public UMounteaContentThemeAssetFactory
+{
+	GENERATED_BODY()
+
+public:
+	
+	USlotThemeAssetFactory();
+	
+	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+	virtual bool ConfigureProperties() override;
+};

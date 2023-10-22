@@ -321,4 +321,51 @@ public:
 	FButtonStyle ButtonStyle;
 };
 
+/**
+ * USlotTheme
+ *
+ * This theme configuration is specifically crafted for inventory slots, enabling customization of various layers 
+ * within each slot. A slot in inventory or UI systems often has multiple visual elements layered together to create 
+ * a rich and interactive appearance. The USlotTheme offers a structured way to theme these layers, ensuring visual 
+ * consistency across all slots in the application.
+ *
+ * The configuration covers the following layers:
+ * - Primary Slot Layer: This forms the base or background layer of the slot, often used for the main appearance.
+ * - Secondary Slot Layer: This sits atop the primary layer, possibly representing additional design elements or subtle details.
+ * - Tertiary Slot Layer: Another layer for decorative or functional purposes, such as hover effects or highlight states.
+ * - Quaternary Slot Layer: The top-most layer which can be used for special accents, borders, or additional overlays.
+ * 
+ * Given its Blueprintable nature, designers can easily customize the look and feel of slots directly within the 
+ * Blueprint Editor, facilitating quick iterations and real-time visual feedback. This level of customization ensures 
+ * that slots in the application can be themed to match any desired aesthetic or design language.
+ * 
+ * Usage:
+ * For any UI component or system that utilizes slots, apply an instance of this theme configuration to achieve the 
+ * desired slot appearance. Combining multiple layers provides depth and richness to the slot design, enhancing 
+ * user experience.
+ * 
+ * @see UContentTheme
+ * @see UInventoryThemeConfig
+ */
+UCLASS( DisplayName="Slot Theme Config")
+class MOUNTEAINVENTORYEQUIPMENT_API USlotTheme : public UContentTheme
+{
+	GENERATED_BODY()
+
+public:
+	
+	
+	UPROPERTY(EditAnywhere, Category="Slot Brush")
+	FSlateBrush PrimarySlotLayer;
+
+	UPROPERTY(EditAnywhere, Category="Slot Brush")
+	FSlateBrush SecondarySlotLayer;
+
+	UPROPERTY(EditAnywhere, Category="Slot Brush")
+	FSlateBrush TertiarySlotLayer;
+
+	UPROPERTY(EditAnywhere, Category="Slot Brush")
+	FSlateBrush QuaternarySlotLayer;
+};
+
 #undef LOCTEXT_NAMESPACE
