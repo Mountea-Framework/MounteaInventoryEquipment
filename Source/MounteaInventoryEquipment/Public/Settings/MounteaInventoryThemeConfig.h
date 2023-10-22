@@ -30,9 +30,18 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataA
 	
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Category", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme", meta=(ShowOnlyInnerProperties))
+	class UTextTheme* TextTheme = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme", meta=(ShowOnlyInnerProperties))
+	class UColoursTheme* ColoursTheme = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Categories", meta=(ShowOnlyInnerProperties))
 	TSet<FCategoryThemeData> CategoryThemes;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Categories", meta=(ShowOnlyInnerProperties))
+	class UImageTheme* CategoryImageTheme = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint SlotBaseSize = FIntPoint(64,64);
 
@@ -77,9 +86,14 @@ protected:
 	void GenerateMissingThemes();
 	
 #if WITH_EDITOR
-
 	
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+public:
+	virtual void GenerateMissingThemes_Editor();
+
+	UFUNCTION()
+	void Propagate_CategoryDefaultStyle();
 	
 #endif
 	

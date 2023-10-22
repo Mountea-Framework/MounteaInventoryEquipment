@@ -21,7 +21,14 @@ UMounteaThemeAssetFactory::UMounteaThemeAssetFactory()
 
 UObject* UMounteaThemeAssetFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
-	return NewObject<UMounteaInventoryThemeConfig>(InParent, ParentClass, Name, Flags, Context);
+	UMounteaInventoryThemeConfig* NewTheme = NewObject<UMounteaInventoryThemeConfig>(InParent, ParentClass, Name, Flags, Context);
+
+	if (NewTheme)
+	{
+		NewTheme->GenerateMissingThemes_Editor();
+	}
+
+	return NewTheme;
 }
 
 

@@ -50,6 +50,48 @@ public:
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FTextThemeData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
+	class UTextTheme* TextTheme = nullptr;
+
+public:
+
+	bool operator==(const FTextThemeData& Other) const
+	{
+		return TextTheme == Other.TextTheme;
+	}
+
+	friend uint32 GetTypeHash(const FTextThemeData& Data)
+	{				
+		return Data.TextTheme ? GetTypeHash(Data.TextTheme) : 0;
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FColoursThemeData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=true))
+	class UColoursTheme* ColoursTheme = nullptr;
+
+public:
+
+	bool operator==(const FColoursThemeData& Other) const
+	{
+		return ColoursTheme == Other.ColoursTheme;
+	}
+
+	friend uint32 GetTypeHash(const FColoursThemeData& Data)
+	{				
+		return Data.ColoursTheme ? GetTypeHash(Data.ColoursTheme) : 0;
+	}
+};
+
 /**
  * UContentTheme
  *
@@ -109,30 +151,51 @@ class MOUNTEAINVENTORYEQUIPMENT_API UCategoryTheme : public UContentTheme
 
 public:
 
-	UPROPERTY(EditAnywhere, Category="Category")
+	/** The specific inventory item category this theme config pertains to. */
+	UPROPERTY(EditAnywhere, Category="Theme Config")
 	UMounteaInventoryItemCategory* Category = nullptr;
 
-	UPROPERTY(EditAnywhere, Category="Text Brush")
-	class UTextTheme* TextTheme = nullptr;
-
-	UPROPERTY(EditAnywhere, Category="Icon Brush")
+	/** Defines the appearance settings for the category, such as backgrounds, borders, or icons. */
+	UPROPERTY(EditAnywhere, Category="Theme Config")
 	class UImageTheme* CategoryStyle;
 
-	UPROPERTY(EditAnywhere, Category="Icon Brush")
+	/** Adjusts the position of the category's icon. Used only for specific UImageStyle with Texture Atlas. */
+	UPROPERTY(EditAnywhere, Category="Theme Config")
 	FVector2D CategoryIconOffset;
+
+	/** Allows for overriding the default text theme for this specific category. */
+	UPROPERTY(EditAnywhere, Category="Theme Config|Override")
+	FTextThemeData TextThemeOverride;
 };
 
+/**
+ * UTextTheme
+ *
+ * Dedicated theme configuration for text elements. This class offers customization settings
+ * to define the appearance and style of primary and secondary text elements.
+ */
 UCLASS( DisplayName="Text Theme Config")
 class MOUNTEAINVENTORYEQUIPMENT_API UTextTheme : public UContentTheme
 {
 	GENERATED_BODY()
 
 public:
-	
-	UPROPERTY(EditAnywhere, Category="Icon Brush")
-	FTextSettings TextSettings;
+
+	/** Styling settings for primary text elements. */
+	UPROPERTY(EditAnywhere, Category="Text Theme")
+	FTextSettings PrimaryTextTheme;
+
+	/** Styling settings for secondary or less emphasized text elements. */
+	UPROPERTY(EditAnywhere, Category="Text Theme")
+	FTextSettings SecondaryTextTheme;
 };
 
+/**
+ * UImageTheme
+ *
+ * This theme configuration is specialized for Slate Brush styling. It encapsulates settings that
+ * define the appearance of various image elements within the system.
+ */
 UCLASS( DisplayName="Image Theme Config")
 class MOUNTEAINVENTORYEQUIPMENT_API UImageTheme : public UContentTheme
 {
@@ -140,6 +203,37 @@ class MOUNTEAINVENTORYEQUIPMENT_API UImageTheme : public UContentTheme
 
 public:
 	
+	/** The primary appearance settings for images. */
 	UPROPERTY(EditAnywhere, Category="Text Brush")
 	FSlateBrush ImageStyle;
+};
+
+/**
+ * UColoursTheme
+ *
+ * Tailored to provide color theming across the application. It offers a set of color configurations
+ * to establish visual harmony and branding consistency.
+ */
+UCLASS( DisplayName="Colours Theme Config")
+class MOUNTEAINVENTORYEQUIPMENT_API UColoursTheme : public UContentTheme
+{
+	GENERATED_BODY()
+
+public:
+	
+	/** The primary color typically used for primary UI elements and highlights. */
+	UPROPERTY(EditAnywhere, Category="Colours", meta=(DisplayPriority=-100))
+	FLinearColor PrimaryColor = FLinearColor(1,0.863157,0.502886);
+
+	/** A secondary color used for background fills, secondary UI elements, or passive elements. */
+	UPROPERTY(EditAnywhere, Category="Colours", meta=(DisplayPriority=-50))
+	FLinearColor SecondaryColor = FLinearColor(0.230740,0.187821,0.122139);
+
+	/** Used for tertiary purposes, such as hover states, accents, or other intermediate UI elements. */
+	UPROPERTY(EditAnywhere, Category="Colours", meta=(DisplayPriority=-10))
+	FLinearColor TertiaryColor = FLinearColor(1,1,1);
+
+	/** A fourth-tier color that can be used for additional UI theming, like borders, outlines, or specific accents. */
+	UPROPERTY(EditAnywhere, Category="Colours", meta=(DisplayPriority=-1))
+	FLinearColor QuaternaryColor = FLinearColor(0.693872,0.351533,0.008568);
 };
