@@ -237,3 +237,21 @@ public:
 	UPROPERTY(EditAnywhere, Category="Colours", meta=(DisplayPriority=-1))
 	FLinearColor QuaternaryColor = FLinearColor(0.693872,0.351533,0.008568);
 };
+
+/**
+ * UButtonTheme
+ *
+ * This theme configuration is specialized for Button Brush styling. It encapsulates settings that
+ * define the appearance of Button types.
+ */
+UCLASS( DisplayName="Button Theme Config")
+class MOUNTEAINVENTORYEQUIPMENT_API UButtonTheme : public UContentTheme
+{
+	GENERATED_BODY()
+
+public:
+	
+	/** The primary appearance settings for images. */
+	UPROPERTY(EditAnywhere, Category="Button Brush")
+	FButtonStyle ButtonStyle;
+};
