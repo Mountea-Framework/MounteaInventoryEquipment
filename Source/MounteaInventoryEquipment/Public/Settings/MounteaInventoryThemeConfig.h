@@ -37,10 +37,20 @@ public:
 	class UColoursTheme* ColoursTheme = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Categories", meta=(ShowOnlyInnerProperties))
+	class UImageTheme* CategoryImageTheme = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Categories", meta=(ShowOnlyInnerProperties))
 	TSet<FCategoryThemeData> CategoryThemes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Categories", meta=(ShowOnlyInnerProperties))
-	class UImageTheme* CategoryImageTheme = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme|Buttons", meta=(ShowOnlyInnerProperties))
+	TMap<TSubclassOf<UUserWidget>, UButtonTheme*> ButtonStyleThemes;
+
+	// ---------------------------------------------------------------------------- //
+	// ---------------------------------------------------------------------------- //
+	// BELOW CODE IS OUTDATED AND WILL BE REMOVED //
+	// ---------------------------------------------------------------------------- //
+	// ---------------------------------------------------------------------------- //
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dimensions", meta=(ShowOnlyInnerProperties))
 	FIntPoint SlotBaseSize = FIntPoint(64,64);
@@ -84,10 +94,11 @@ public:
 protected:
 
 	void GenerateMissingThemes();
-	
+
 #if WITH_EDITOR
 	
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual bool Rename(const TCHAR* NewName, UObject* NewOuter, ERenameFlags Flags) override;
 
 public:
 	virtual void GenerateMissingThemes_Editor();

@@ -3,6 +3,10 @@
 
 #include "Settings/MounteaInventoryThemeConfig.h"
 
+#if WITH_EDITOR
+#include "AssetRegistry/AssetRegistryModule.h"
+#endif
+
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 
 
@@ -18,7 +22,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 		{
 			UImageTheme* NewImageTheme = NewObject<UImageTheme>(GetPackage());
 			
-			CategoryImageTheme = NewImageTheme;
+			//CategoryImageTheme = NewImageTheme;
 		}
 	}
 	
@@ -66,7 +70,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 		{
 			UTextTheme* NewTextTheme = NewObject<UTextTheme>(GetPackage());
 
-			TextTheme = NewTextTheme;
+			//TextTheme = NewTextTheme;
 		}
 	}
 
@@ -76,7 +80,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 		{
 			UColoursTheme* NewColoursTheme = NewObject<UColoursTheme>(GetPackage());
 
-			ColoursTheme = NewColoursTheme;
+			//ColoursTheme = NewColoursTheme;
 		}
 	}
 }
@@ -121,6 +125,27 @@ void UMounteaInventoryThemeConfig::PostEditChangeProperty(FPropertyChangedEvent&
 	{
 		GenerateMissingThemes();
 	}
+}
+
+bool UMounteaInventoryThemeConfig::Rename(const TCHAR* NewName, UObject* NewOuter, ERenameFlags Flags)
+{
+	bool bSatisfied = Super::Rename(NewName, NewOuter, Flags);
+
+	if (bSatisfied)
+	{
+		if (TextTheme) TextTheme->Rename(nullptr, NewOuter, Flags);
+
+		if (ColoursTheme) ColoursTheme->Rename(nullptr, NewOuter, Flags);
+
+		if (CategoryImageTheme) CategoryImageTheme->Rename(nullptr, NewOuter, Flags);
+
+		for (auto& Itr : CategoryThemes)
+		{
+			if (Itr.CategoryTheme) Itr.CategoryTheme->Rename(nullptr, NewOuter, Flags);
+		}
+	}
+	
+	return bSatisfied;
 }
 
 #endif

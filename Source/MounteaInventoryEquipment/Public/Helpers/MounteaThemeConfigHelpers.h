@@ -19,7 +19,7 @@ struct FTextSettings
 	 * Default:
 	 * * Color: White
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Subtitles", meta=(DisplayName="Color and Oppacity"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Text Settings", meta=(DisplayName="Color and Oppacity"))
 	FSlateColor FontColor;
 	/**
 	 * Slate Font Info settings.
@@ -29,20 +29,20 @@ struct FTextSettings
 	 * * Typeface: 'Regular'
 	 * * Outline: 1
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Subtitles", meta=(ForceShowEngineContent))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Text Settings", meta=(ForceShowEngineContent))
 	FSlateFontInfo SubtitlesFont;
 	/**
 	 * Shadow Offset Settings.
 	 * Defines shadow offset on X and Y axis.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Subtitles")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Text Settings")
 	FVector2D ShadowOffset;
 	/**
 	 * Shadow Color Settings.
 	 * Default:
 	 * * Color: Black
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Subtitles")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Text Settings")
 	FLinearColor ShadowColor;
 
 	/**
@@ -53,7 +53,7 @@ struct FTextSettings
 	 * 
 	 * Invalid settings are ignored!
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Subtitles")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Text Settings")
 	FGuid SettingsGUID;
 
 public:

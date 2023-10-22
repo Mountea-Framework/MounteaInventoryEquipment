@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Engine/DataAsset.h"
 #include "Helpers/MounteaThemeConfigHelpers.h"
@@ -180,13 +181,13 @@ class MOUNTEAINVENTORYEQUIPMENT_API UTextTheme : public UContentTheme
 	GENERATED_BODY()
 
 public:
-
+	
 	/** Styling settings for primary text elements. */
-	UPROPERTY(EditAnywhere, Category="Text Theme")
+	UPROPERTY(EditAnywhere, Category="Primary Text Theme")
 	FTextSettings PrimaryTextTheme;
 
 	/** Styling settings for secondary or less emphasized text elements. */
-	UPROPERTY(EditAnywhere, Category="Text Theme")
+	UPROPERTY(EditAnywhere, Category="Secondary Text Theme")
 	FTextSettings SecondaryTextTheme;
 };
 
