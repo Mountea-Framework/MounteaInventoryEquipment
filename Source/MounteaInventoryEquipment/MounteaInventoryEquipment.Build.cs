@@ -31,7 +31,8 @@ public class MounteaInventoryEquipment : ModuleRules
 				"UMG",
 				"Projects",
 				
-				"GameplayTags"
+				"GameplayTags", 
+				"CommonUI"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
