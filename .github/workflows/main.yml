@@ -4,15 +4,15 @@ on:
   issues:
     types: [opened]
 
-jobs:
-  assign-to-user:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Assign to user
-        uses: peter-evans/assignee@v2.1.0
-        with:
-          assignee: dominikpavlicek
-      - name: Set status to Backlog
-        uses: peter-evans/create-issue-comment@v1.5.2
-        with:
-          body: 'status: Backlog'
+# jobs:
+#   assign-to-user:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Assign to user
+#         uses: peter-evans/assignee@v2.1.0
+#         with:
+#           assignee: dominikpavlicek
+#       - name: Set status to Backlog
+#         uses: peter-evans/create-issue-comment@v1.5.2
+#         with:
+#           body: 'status: Backlog'
