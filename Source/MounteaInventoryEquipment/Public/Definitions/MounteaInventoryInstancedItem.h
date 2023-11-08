@@ -203,6 +203,9 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
 
 	virtual void SetWorld(UWorld* NewWorld);

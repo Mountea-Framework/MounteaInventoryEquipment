@@ -49,7 +49,7 @@ bool UMounteaInstancedItem::InitializeNewItem_Implementation(const FItemInitPara
 	}
 	else if (InitParams.SourceTable && InitParams.SourceRow.IsValid())
 	{
-		FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(InitParams.SourceRow, InitParams.SourceTable);
+		const FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(InitParams.SourceRow, InitParams.SourceTable);
 		
 		if (Row == nullptr)
 		{
@@ -74,6 +74,8 @@ void UMounteaInstancedItem::SetValidData()
 	if (ConstructItem())
 	{
 		OnItemBeginPlay("[UMounteaInstancedItem::SetValidData] Begin Play Called Successfully");
+
+		OnItemInitialized.Broadcast("Item Initialized");
 
 		TRACE_OBJECT_LIFETIME_BEGIN(this);
 	}
@@ -177,6 +179,8 @@ void UMounteaInstancedItem::UpdateQuantity(const int32& NewValue)
 	{
 		DestroyItem();
 	}
+
+	MarkDirtyForReplication();
 }
 
 void UMounteaInstancedItem::DestroyItem()
@@ -185,16 +189,26 @@ void UMounteaInstancedItem::DestroyItem()
 	// Destroy Stacks
 	// Call to UI to remove them all
 	// Mark garbage
+
+	MarkDirtyForReplication();
 }
 
 void UMounteaInstancedItem::AddItemFlag(const FGameplayTag& NewFlag)
 {
 	ItemFlags.AddTag(NewFlag);
+
+	OnItemModified.Broadcast("Added new Item Flag");
+	
+	MarkDirtyForReplication();	
 }
 
 void UMounteaInstancedItem::SetItemFlags(const FGameplayTagContainer& NewFlags)
 {
 	ItemFlags = NewFlags;
+
+	OnItemModified.Broadcast("Item Flags bulk updated");
+	
+	MarkDirtyForReplication();	
 }
 
 void UMounteaInstancedItem::RemoveItemFlag(const FGameplayTag& RemoveFlag)
@@ -202,6 +216,10 @@ void UMounteaInstancedItem::RemoveItemFlag(const FGameplayTag& RemoveFlag)
 	if (ItemFlags.HasTag(RemoveFlag))
 	{
 		ItemFlags.RemoveTag(RemoveFlag);
+
+		OnItemModified.Broadcast("Removed Item Flag");
+	
+		MarkDirtyForReplication();	
 	}
 }
 
@@ -226,6 +244,15 @@ bool UMounteaInstancedItem::AreFlagsSet(const FGameplayTagContainer& QueryFlags,
 	return bAreFlagsSet;
 }
 
+void UMounteaInstancedItem::SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory)
+{
+	OwningInventory = NewOwningInventory;
+
+	OnItemModified.Broadcast("Inventory Updated");
+	
+	MarkDirtyForReplication();	
+}
+
 void UMounteaInstancedItem::SetWorldFromLevel(ULevel* FromLevel)
 {
 	if (FromLevel == nullptr)
@@ -244,6 +271,10 @@ void UMounteaInstancedItem::SetWorld(UWorld* NewWorld)
 	if (!NewWorld) return;
 	
 	World = NewWorld;
+
+	OnItemModified.Broadcast("World Updated");
+	
+	MarkDirtyForReplication();	
 }
 
 bool UMounteaInstancedItem::OwnerHasAuthority() const
@@ -296,6 +327,7 @@ void UMounteaInstancedItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 void UMounteaInstancedItem::OnRep_Item()
 {
 	// TODO
+	OnItemModified.Broadcast("Item Modified");
 }
 
 void UMounteaInstancedItem::OnRep_Quantity()
@@ -303,4 +335,6 @@ void UMounteaInstancedItem::OnRep_Quantity()
 	// TODO:
 	// Calculate if there is 0
 	// If so, DestroyItem
+
+	OnItemModified.Broadcast("Quantity Has Changed");
 }
