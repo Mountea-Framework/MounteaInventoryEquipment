@@ -11,6 +11,8 @@
 
 #define LOCTEXT_NAMESPACE "ContentTheme"
 
+#pragma region Structures
+
 USTRUCT(BlueprintType)
 struct FContentThemeData
 {
@@ -95,6 +97,8 @@ public:
 	}
 };
 
+#pragma endregion 
+
 /**
  * UContentTheme
  *
@@ -128,48 +132,6 @@ class MOUNTEAINVENTORYEQUIPMENT_API UContentTheme : public UDataAsset
 	
 };
 
-/**
- * UCategoryThemeConfig
- * 
- * A specialized theme configuration tailored for category-specific content presentation within the inventory system.
- * This class extends the base UContentThemeConfig to provide further customization and theming options specific to inventory categories.
- * It allows designers and developers to define the visual and interactive characteristics of category elements, ensuring consistent and theme-driven user experiences.
- * 
- * This configuration includes settings for:
- * - Category Text: Defines the font, color, and other text-related settings for displaying category names or descriptions.
- * - Category Style: Determines the visual appearance, including images and material effects, for category backgrounds, borders, or icons.
- * 
- * By being Blueprintable, users can create unique instances of this theme configuration through Blueprints, allowing easy and flexible customization without diving into C++.
- * 
- * Usage:
- * Attach an instance of this configuration to the UInventoryThemeConfig or any relevant class to apply theme settings.
- * 
- * @see UContentThemeConfig
- * @see UInventoryThemeConfig
- */
-UCLASS( DisplayName="Category Theme Config")
-class MOUNTEAINVENTORYEQUIPMENT_API UCategoryTheme : public UContentTheme
-{
-	GENERATED_BODY()
-
-public:
-
-	/** The specific inventory item category this theme config pertains to. */
-	UPROPERTY(EditAnywhere, Category="Theme Config")
-	UMounteaInventoryItemCategory* Category = nullptr;
-
-	/** Defines the appearance settings for the category, such as backgrounds, borders, or icons. */
-	UPROPERTY(EditAnywhere, Category="Theme Config")
-	class UImageTheme* CategoryStyle = nullptr;
-
-	/** Adjusts the position of the category's icon. Used only for specific UImageStyle with Texture Atlas. */
-	UPROPERTY(EditAnywhere, Category="Theme Config")
-	FVector2D CategoryIconOffset;
-
-	/** Allows for overriding the default text theme for this specific category. */
-	UPROPERTY(EditAnywhere, Category="Theme Config|Override")
-	FTextThemeData TextThemeOverride;
-};
 
 /**
  * UTextTheme
@@ -366,6 +328,54 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Slot Brush")
 	FSlateBrush QuaternarySlotLayer;
+};
+
+
+/**
+ * UCategoryThemeConfig
+ * 
+ * A specialized theme configuration tailored for category-specific content presentation within the inventory system.
+ * This class extends the base UContentThemeConfig to provide further customization and theming options specific to inventory categories.
+ * It allows designers and developers to define the visual and interactive characteristics of category elements, ensuring consistent and theme-driven user experiences.
+ * 
+ * This configuration includes settings for:
+ * - Category Text: Defines the font, color, and other text-related settings for displaying category names or descriptions.
+ * - Category Style: Determines the visual appearance, including images and material effects, for category backgrounds, borders, or icons.
+ * 
+ * By being Blueprintable, users can create unique instances of this theme configuration through Blueprints, allowing easy and flexible customization without diving into C++.
+ * 
+ * Usage:
+ * Attach an instance of this configuration to the UInventoryThemeConfig or any relevant class to apply theme settings.
+ * 
+ * @see UContentThemeConfig
+ * @see UInventoryThemeConfig
+ */
+UCLASS( DisplayName="Category Theme Config")
+class MOUNTEAINVENTORYEQUIPMENT_API UCategoryTheme : public UButtonTheme
+{
+	GENERATED_BODY()
+
+public:
+
+	/** The specific inventory item category this theme config pertains to. */
+	UPROPERTY(EditAnywhere, Category="Theme Config")
+	UMounteaInventoryItemCategory* Category = nullptr;
+
+	/** Defines the appearance settings for the category, such as backgrounds, borders, or icons. */
+	UPROPERTY(EditAnywhere, Category="Theme Config")
+	class UImageTheme* CategoryStyle = nullptr;
+
+	/** Adjusts the position of the category's icon. Used only for specific UImageStyle with Texture Atlas. */
+	// UPROPERTY(EditAnywhere, Category="Theme Config")
+	// FIntPoint CategoryIconCoords;
+
+	/** Defines whether Category should Show the Title or not. */
+	UPROPERTY(EditAnywhere, Category="Theme Config")
+	uint8 bShowCategoryTitle : 1;
+	
+	/** Allows for overriding the default text theme for this specific category. */
+	UPROPERTY(EditAnywhere, Category="Theme Config|Override")
+	FTextThemeData TextThemeOverride;
 };
 
 #undef LOCTEXT_NAMESPACE
