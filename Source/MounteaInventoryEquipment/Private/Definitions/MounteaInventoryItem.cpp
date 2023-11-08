@@ -299,7 +299,7 @@ void UMounteaInventoryItemBase::SetValidData()
 			CopyFromTable();
 			CopyTagsFromTypes();
 			break;
-		case EItemDataSource::EIDS_ManualInput:
+		case EItemDataSource::EIDS_SourceItem:
 			ClearDataTable();
 			CopyTagsFromTypes();
 			break;

@@ -25,9 +25,9 @@ UENUM(BlueprintType)
 enum class EItemDataSource : uint8
 {
 	EIDS_SourceTable				UMETA(DisplayName="Source Table"),
-	EIDS_ManualInput				UMETA(DisplayName="Manual Input"),
+	EIDS_SourceItem				UMETA(DisplayName="Source Item"),
 
-	Default								UMETA(hidden)
+	Default									UMETA(hidden)
 };
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
@@ -46,7 +46,7 @@ enum class EItemDataSource : uint8
  * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Object
  */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UDataAsset, public IMounteaInventoryEquipmentItem
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UPrimaryDataAsset, public IMounteaInventoryEquipmentItem
 {
 	GENERATED_BODY()
 	
@@ -59,7 +59,7 @@ private:
 
 public:
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties, EditFixedOrder), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties, EditFixedOrder))
 	EItemDataSource ItemDataSource = EItemDataSource::EIDS_SourceTable;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
@@ -68,18 +68,18 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
 	FName SourceRow;
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Required", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Required", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemRequiredData ItemData;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
 	FMounteaInventoryItemOptionalData ItemOptionalData;
-
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
 	TArray<FMounteaItemAction> ItemActions;
 	
 protected:
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
 	
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
@@ -102,10 +102,10 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="5. Debug")
 	int32 RepKey = 0;
 
-    UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Item)
+    UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
 	
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false))
 	class UWorld* World;
 
 public:
@@ -121,7 +121,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	TArray<UMounteaInventoryItemAction*> GetItemActions() const;
 	
-
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	FORCEINLINE TArray<FMounteaItemAction> GetItemActionsDefinitions() const
 	{

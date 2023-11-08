@@ -16,6 +16,30 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInstancedItem"
 
+USTRUCT(BlueprintType)
+struct FItemInitParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UObject* Outer = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TScriptInterface<IMounteaInventoryInterface> OwningInventory;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMounteaInventoryItemBase* SourceItem = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMounteaInventoryItemsTable* SourceTable = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FName SourceRow;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 Quantity;
+};
+
 UCLASS(BlueprintType, Blueprintable,  ClassGroup="Mountea", DisplayName="Instanced Inventory Item")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInstancedItem : public UObject, public IMounteaInventoryEquipmentItem
 {
@@ -34,26 +58,26 @@ public:
 	EItemDataSource ItemDataSource = EItemDataSource::EIDS_SourceTable;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable", EditFixedOrder))
-	UMounteaInventoryItemBase* SourceItem;
+	UMounteaInventoryItemBase* SourceItem = nullptr;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
-	UMounteaInventoryItemsTable* SourceTable;
+	UMounteaInventoryItemsTable* SourceTable = nullptr;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
 	FName SourceRow;
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item")
 	FGuid InstanceID = FGuid::NewGuid();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item", ReplicatedUsing=OnRep_Quantity)
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item", ReplicatedUsing=OnRep_Quantity)
 	int32 Quantity = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item")
 	FGameplayTagContainer ItemFlags;
 
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
 
 private:
@@ -104,29 +128,26 @@ protected:
 	
 public:
 
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Item")
+	UFUNCTION(BlueprintImplementableEvent, Category="Mountea|Item")
 	void OnItemBeginPlay(const FString& Message);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mountea|Item")
+	bool InitializeNewItem(const FItemInitParams& InitParams);
+	virtual bool InitializeNewItem_Implementation(const FItemInitParams& InitParams);
+	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void SetSourceItem(UMounteaInventoryItemBase* NewSourceItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void SetSourceTable(UMounteaInventoryItemsTable* Table, const FString& RowName);
 	
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	bool ConstructItem();
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void UpdateQuantity(const int32& NewValue);
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void DestroyItem();
-
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	void SplitItem(const int32& SplitAmount);
-
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	bool MergeWith(UMounteaInstancedItem* OtherInstance);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
 	FGameplayTagContainer GetItemFlags() const
@@ -195,8 +216,6 @@ protected:
 	bool CopyFromBaseItem();
 	bool CopyFromDataTable();
 	void CleanupData();
-
-	void PostWorldCreated(UWorld* NewWorld);
 
 	bool OwnerHasAuthority() const;
 

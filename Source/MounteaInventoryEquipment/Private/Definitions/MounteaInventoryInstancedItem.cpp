@@ -3,31 +3,85 @@
 
 #include "Definitions/MounteaInventoryInstancedItem.h"
 
+#include "ObjectTrace.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Net/UnrealNetwork.h"
-
 
 UMounteaInstancedItem::UMounteaInstancedItem()
 {
 	RepKey = 0;
-
-	FWorldDelegates::OnPostWorldCreation.AddUObject(this, &UMounteaInstancedItem::PostWorldCreated);
 }
 
 UMounteaInstancedItem::~UMounteaInstancedItem()
 {
-	FWorldDelegates::OnPostWorldCreation.RemoveAll(this);
+	TRACE_OBJECT_LIFETIME_END(this);
 }
 
-void UMounteaInstancedItem::OnItemBeginPlay_Implementation(const FString& Message)
+bool UMounteaInstancedItem::InitializeNewItem_Implementation(const FItemInitParams& InitParams)
 {
-	ItemDataSource = SourceTable ? EItemDataSource::EIDS_SourceTable : EItemDataSource::EIDS_SourceItem;
-	
-	if (!ConstructItem())
+	if (!InitParams.Outer)
 	{
-		MarkAsGarbage();
+		return false;
+	}
+
+	if (InitParams.OwningInventory.GetObject() == nullptr)
+	{
+		return false;
+	}
+
+	if (!InitParams.Outer->GetWorld())
+	{
+		return false;
+	}
+
+	if (InitParams.Quantity <= 0)
+	{
+		return false;
+	}
+
+	SetWorld(InitParams.Outer->GetWorld());
+	OwningInventory = InitParams.OwningInventory;
+
+	if (InitParams.SourceItem)
+	{
+		ItemDataSource = EItemDataSource::EIDS_SourceItem;
+		SetSourceItem(InitParams.SourceItem);
+	}
+	else if (InitParams.SourceTable && InitParams.SourceRow.IsValid())
+	{
+		FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(InitParams.SourceRow, InitParams.SourceTable);
 		
-		UE_LOG(LogTemp, Error, TEXT("%s"), *Message)
+		if (Row == nullptr)
+		{
+			return false;
+		}
+
+		ItemDataSource = EItemDataSource::EIDS_SourceTable;
+		SetSourceTable(InitParams.SourceTable, InitParams.SourceRow.ToString());
+	}
+	else
+	{
+		return false;
+	}
+
+	SetValidData();
+
+	return true;
+}
+
+void UMounteaInstancedItem::SetValidData()
+{
+	if (ConstructItem())
+	{
+		OnItemBeginPlay("[UMounteaInstancedItem::SetValidData] Begin Play Called Successfully");
+
+		TRACE_OBJECT_LIFETIME_BEGIN(this);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[UMounteaInstancedItem::SetValidData] Cannot initialize Item, will be deleted"))
+		
+		DestroyItem();
 	}
 }
 
@@ -123,10 +177,6 @@ void UMounteaInstancedItem::UpdateQuantity(const int32& NewValue)
 	{
 		DestroyItem();
 	}
-
-	// TODO
-	// SplitItem if needed
-	// Or remove Stacks if needed
 }
 
 void UMounteaInstancedItem::DestroyItem()
@@ -135,20 +185,6 @@ void UMounteaInstancedItem::DestroyItem()
 	// Destroy Stacks
 	// Call to UI to remove them all
 	// Mark garbage
-}
-
-void UMounteaInstancedItem::SplitItem(const int32& SplitAmount)
-{
-	// TODO...
-}
-
-bool UMounteaInstancedItem::MergeWith(UMounteaInstancedItem* OtherInstance)
-{
-	if (!OtherInstance) return false;
-
-	// TODO: Actually calculate stuff
-	
-	return true;
 }
 
 void UMounteaInstancedItem::AddItemFlag(const FGameplayTag& NewFlag)
@@ -210,20 +246,6 @@ void UMounteaInstancedItem::SetWorld(UWorld* NewWorld)
 	World = NewWorld;
 }
 
-void UMounteaInstancedItem::PostWorldCreated(UWorld* NewWorld)
-{
-	if (FApp::IsGame())
-	{
-		SetWorld(NewWorld);
-		
-		SetValidData();
-
-		ConstructItem();
-
-		OnItemBeginPlay(TEXT("Item has been initialized"));
-	}
-}
-
 bool UMounteaInstancedItem::OwnerHasAuthority() const
 {
 	if (!OwningInventory)
@@ -269,11 +291,6 @@ void UMounteaInstancedItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(UMounteaInstancedItem, ItemConfig);
 	DOREPLIFETIME(UMounteaInstancedItem, Quantity);
 	DOREPLIFETIME(UMounteaInstancedItem, ItemFlags);
-}
-
-void UMounteaInstancedItem::SetValidData()
-{
-	ConstructItem();
 }
 
 void UMounteaInstancedItem::OnRep_Item()
