@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// Copyright Dominik Morse 2023. All Rights Reserved.
 
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
@@ -142,6 +142,25 @@ UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBPF::GetThemeConfig(cons
 
 	auto const FoundTheme = Settings->ThemeConfig.LoadSynchronous();
 	return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
+}
+
+UContentTheme* UMounteaInventoryEquipmentBPF::GetContentThemeConfig(const TSubclassOf<UContentTheme> ClassFilter, bool& bResult)
+{
+	if (ClassFilter == nullptr)
+	{
+		bResult = false;
+		return nullptr;
+	}
+
+	bResult = true;
+	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+	if (!Settings)
+	{
+		return NewObject<UContentTheme>(GetTransientPackage(), ClassFilter);
+	}
+		
+	bResult = false;
+	return nullptr;
 }
 
 TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryEquipmentBPF::GetItemInventoryConfigClass(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
@@ -432,7 +451,8 @@ bool UMounteaInventoryEquipmentBPF::DoesHaveTag(const UMounteaInventoryItemBase*
 {
 	if (Item == nullptr) return false;
 
-	return Item->GetTags().HasTag(Tag);
+	// return Item->GetTags().HasTag(Tag); BREAKING
+	return false;
 }
 
 bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItemBase* Item,
@@ -440,7 +460,8 @@ bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItemBa
 {
 	if (Item == nullptr) return false;
 
-	return Item->GetTags().HasAny(Tags);
+	// return Item->GetTags().HasAny(Tags); BREAKING
+	return false;
 }
 
 bool UMounteaInventoryEquipmentBPF::DoesHaveAllTags(const UMounteaInventoryItemBase* Item,
@@ -448,7 +469,9 @@ bool UMounteaInventoryEquipmentBPF::DoesHaveAllTags(const UMounteaInventoryItemB
 {
 	if (Item == nullptr) return false;
 
-	return Item->GetTags().HasAll(Tags);
+	// return Item->GetTags().HasAll(Tags); BREAKING
+
+	return false;
 }
 
 TArray<FIntPoint> UMounteaInventoryEquipmentBPF::CalculateItemShadow(const FIntPoint& StartCoords,
@@ -572,6 +595,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems(c
 
 		bool bExclude = false;
 
+		/* BREAKING
 		if (Filter.bSearchByTag && Itr->GetTags().HasAny(Filter.Tags))
 		{
 			bExclude = true;
@@ -588,6 +612,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems(c
 		{
 			bExclude = true;
 		}
+		*/
 
 		if (!bExclude)
 		{

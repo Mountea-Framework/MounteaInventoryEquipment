@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// Copyright Dominik Morse 2023. All Rights Reserved.
 
 
 #include "Setup/MounteaInventoryConfig.h"

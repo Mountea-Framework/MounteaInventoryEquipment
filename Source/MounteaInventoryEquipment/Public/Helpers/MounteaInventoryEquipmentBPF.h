@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// Copyright Dominik Morse 2023. All Rights Reserved.
 
 #pragma once
 
@@ -8,6 +8,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "MounteaInventoryHelpers.h"
+#include "Settings/ContentTheme.h"
 
 #include "MounteaInventoryEquipmentBPF.generated.h"
 
@@ -77,6 +78,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UMounteaInventoryThemeConfig* GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter, bool& bResult);
+
+	// This needs a bit more throughout approach 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "ContentTheme"), meta=(DeterminesOutputType = "ClassFilter"))
+	static UContentTheme* GetContentThemeConfig(TSubclassOf<class UContentTheme> ClassFilter, bool& bResult);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TSubclassOf<UMounteaInventoryConfig> GetItemInventoryConfigClass(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult);
