@@ -18,8 +18,6 @@ class UMounteaInventoryEquipmentItem : public UInterface
 class UMounteaInventoryItemConfig;
 class IMounteaInventoryInterface;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, Message);
-
 /**
  * 
  */
@@ -32,11 +30,8 @@ public:
 
 	virtual void SetValidData() = 0;
 
-	virtual void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) = 0;
-	virtual TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const = 0;
-
-	virtual FGameplayTagContainer GetItemFlags() const = 0;
-
+	virtual FGuid GetGuid() const = 0;
+	
 	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const = 0;
 	virtual UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const = 0;
 };

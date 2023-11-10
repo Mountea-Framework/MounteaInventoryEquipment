@@ -38,7 +38,7 @@ class IMounteaInventoryPickupInterface;
  * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Object
  */
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UPrimaryDataAsset
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UPrimaryDataAsset, public IMounteaInventoryEquipmentItem
 {
 	GENERATED_BODY()
 
@@ -70,18 +70,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaItemConfig ItemConfig;
-	
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
-	FItemGenericEvent OnItemAdded;
-
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
-	FItemGenericEvent OnItemRemoved;
-
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
-	FItemGenericEvent OnItemInitialized;
-
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
-	FItemGenericEvent OnItemModified;
 
 private:
 
@@ -104,7 +92,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const
+	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const override
 	{
 		if (ItemConfig.ItemConfig)
 		{
@@ -115,7 +103,7 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
-	UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const
+	virtual UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const override
 	{
 		if (ClassFilter == nullptr)
 		{
@@ -154,13 +142,13 @@ public:
 	bool IsValid(UObject* WorldContextObject) const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
-	FGuid GetItemGuid() const
+	virtual FGuid GetGuid() const override
 	{ return ItemGuid; };
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	void InitializeItemActions();
 	
-	void SetValidData();
+	virtual void SetValidData() override;
 	
 protected:
 	
@@ -180,8 +168,7 @@ protected:
 	void ClearMappedValues();
 	void CopyTagsFromTypes();
 	void EnsureValidConfig();
-	
-	
+
 #if WITH_EDITOR
 
 protected:

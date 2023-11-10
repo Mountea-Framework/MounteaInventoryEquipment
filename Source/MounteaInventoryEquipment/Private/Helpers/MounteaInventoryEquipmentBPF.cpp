@@ -608,7 +608,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems(c
 		{
 			bExclude = true;
 		}
-		else if (Filter.bSearchByGUID && Itr->GetItemGuid() == Filter.Guid)
+		else if (Filter.bSearchByGUID && Itr->GetGuid() == Filter.Guid)
 		{
 			bExclude = true;
 		}

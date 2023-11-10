@@ -112,13 +112,16 @@ private:
 
 public:
 	
-	FItemGenericEvent& GetEventHandle_OnItemAdded()
+	virtual FItemGenericEvent& GetEventHandle_OnItemAdded() override
 	{ return OnItemAdded; };
-	FItemGenericEvent& GetEventHandle_OnItemRemoved()
+
+	virtual FItemGenericEvent& GetEventHandle_OnItemRemoved() override
 	{ return OnItemRemoved; };
-	FItemGenericEvent& GetEventHandle_OnItemInitialized()
+
+	virtual FItemGenericEvent& GetEventHandle_OnItemInitialized() override
 	{ return OnItemInitialized; };
-	FItemGenericEvent& GetEventHandle_OnItemModified()
+
+	virtual FItemGenericEvent& GetEventHandle_OnItemModified() override
 	{ return OnItemModified; };
 
 protected:
@@ -206,7 +209,7 @@ public:
 	FMounteaInventoryItemData GetItemData() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	FGuid GetGuid() const
+	virtual FGuid GetGuid() const override
 	{ return InstanceID; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")

@@ -159,7 +159,7 @@ bool UMounteaInventoryComponent::HasItem_Simple(const FItemRetrievalFilter& Sear
 		{
 			for (const auto& Itr : Items)
 			{
-				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
+				if (Itr && Itr->GetGuid() == SearchFilter.Guid)
 				{
 					return true;
 				}
@@ -218,7 +218,7 @@ bool UMounteaInventoryComponent::HasItem_Multithreading(const FItemRetrievalFilt
 			}
 
 			// Search by GUID
-			if (SearchFilter.bSearchByGUID && Item && Item->GetItemGuid() == SearchFilter.Guid)
+			if (SearchFilter.bSearchByGUID && Item && Item->GetGuid() == SearchFilter.Guid)
 			{
 				ItemFound = true;
 				return;
@@ -292,7 +292,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Simple(const FIt
 		{
 			for (const auto& Itr : Items)
 			{
-				if (Itr && Itr->GetItemGuid() == SearchFilter.Guid)
+				if (Itr && Itr->GetGuid() == SearchFilter.Guid)
 				{
 					return Itr;
 				}
@@ -349,7 +349,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Multithreading(c
 			}
 
 			// Search by GUID
-			if (SearchFilter.bSearchByGUID && Item && Item->GetItemGuid() == SearchFilter.Guid)
+			if (SearchFilter.bSearchByGUID && Item && Item->GetGuid() == SearchFilter.Guid)
 			{
 				FoundItem = Item;
 				return;
@@ -409,7 +409,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Simple(c
 		{
 			for (const auto& Item : Items)
 			{
-				if (Item && Item->GetItemGuid() == OptionalFilter.Guid)
+				if (Item && Item->GetGuid() == OptionalFilter.Guid)
 				{
 					FoundItems.Add(Item);
 				}
@@ -462,7 +462,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Multithr
 			}
 
 			// Search by GUID
-			else if (OptionalFilter.bSearchByGUID && Item && Item->GetItemGuid() == OptionalFilter.Guid)
+			else if (OptionalFilter.bSearchByGUID && Item && Item->GetGuid() == OptionalFilter.Guid)
 			{
 				TempList.Add(Item);
 			}
@@ -838,7 +838,7 @@ bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, con
 		SearchFilter.bSearchByItem = true;
 		SearchFilter.Item = Item;
 		SearchFilter.bSearchByGUID = true;
-		SearchFilter.Guid = Item->GetItemGuid();
+		SearchFilter.Guid = Item->GetGuid();
 			
 		UMounteaInventoryItemBase* ExistingItem = Execute_FindItem(this, SearchFilter);
 		
@@ -927,7 +927,7 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 		Filter.bSearchByItem = true;
 		Filter.Item = Item;
 		Filter.bSearchByGUID = true;
-		Filter.Guid = Item->GetItemGuid();
+		Filter.Guid = Item->GetGuid();
 		Filter.bSearchByTag = true;
 		// Filter.Tags = Item->GetTags(); BREAKING
 	}
