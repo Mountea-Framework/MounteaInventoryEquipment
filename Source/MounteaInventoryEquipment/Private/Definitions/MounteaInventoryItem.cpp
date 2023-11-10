@@ -6,7 +6,6 @@
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Definitions/MounteaInventoryItemRarity.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
-#include "Net/UnrealNetwork.h"
 
 #include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
@@ -80,34 +79,32 @@ void UMounteaInventoryItemBase::CopyFromTable()
 	FString Context;
 	if (const FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(SourceRow, SourceTable))
 	{
-		ItemData = Row->RequiredData;
-		ItemOptionalData = Row->OptionalData;
+		ItemData.RequiredData = Row->RequiredData;
+		ItemData.OptionalData = Row->OptionalData;
 	}
 	else
 	{
 		//TODO: Show error that no valid data found
 		
-		ItemData = FMounteaInventoryItemRequiredData();
-		ItemOptionalData = FMounteaInventoryItemOptionalData();
+		ItemData = FMounteaInventoryItemData();
 	}
 }
 
 void UMounteaInventoryItemBase::ClearMappedValues()
 {
-	ItemData = FMounteaInventoryItemRequiredData();
-	ItemOptionalData = FMounteaInventoryItemOptionalData();
+	ItemData = FMounteaInventoryItemData();
 }
 
 void UMounteaInventoryItemBase::CopyTagsFromTypes()
 {
-	if (ItemData.ItemCategory)
+	if (ItemData.RequiredData.ItemCategory)
 	{
-		ItemData.ItemFlags.AppendTags(ItemData.ItemCategory->CompatibleGameplayTags);
+		ItemData.RequiredData.ItemFlags.AppendTags(ItemData.RequiredData.ItemCategory->CompatibleGameplayTags);
 	}
 
-	if (ItemData.ItemRarity)
+	if (ItemData.RequiredData.ItemRarity)
 	{
-		ItemData.ItemFlags.AddTag(ItemData.ItemRarity->RarityGameplayTag);
+		ItemData.RequiredData.ItemFlags.AddTag(ItemData.RequiredData.ItemRarity->RarityGameplayTag);
 	}
 }
 
@@ -125,9 +122,9 @@ void UMounteaInventoryItemBase::EnsureValidConfig()
 		TArray<FMounteaItemAction> CurrentActions = GetItemActionsDefinitions();
 		ItemActions.Empty();
 
-		if (ItemData.ItemCategory)
+		if (ItemData.RequiredData.ItemCategory)
 		{
-			TArray<FMounteaItemAction> CategoryActions = ItemData.ItemCategory->GetCategoryActionsDefinitions();
+			TArray<FMounteaItemAction> CategoryActions = ItemData.RequiredData.ItemCategory->GetCategoryActionsDefinitions();
 			
 			for (const FMounteaItemAction ItrCategoryAction: CategoryActions)
 			{
@@ -187,9 +184,9 @@ void UMounteaInventoryItemBase::PostEditChangeProperty(FPropertyChangedEvent& Pr
 {
 	if (PropertyChangedEvent.GetPropertyName().ToString() == TEXT("bIsStackable"))
 	{
-		if (!ItemData.ItemQuantity.bIsStackable)
+		if (!ItemData.RequiredData.ItemQuantity.bIsStackable)
 		{
-			ItemData.ItemQuantity.MaxQuantity = 1;
+			ItemData.RequiredData.ItemQuantity.MaxQuantity = 1;
 		}
 	}
 

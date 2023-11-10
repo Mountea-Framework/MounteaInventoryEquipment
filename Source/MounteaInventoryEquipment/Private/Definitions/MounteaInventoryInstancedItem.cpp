@@ -5,6 +5,7 @@
 
 #include "ObjectTrace.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
+#include "Interfaces/MounteaInventoryInterface.h"
 #include "Net/UnrealNetwork.h"
 
 UMounteaInstancedItem::UMounteaInstancedItem()
@@ -145,7 +146,7 @@ bool UMounteaInstancedItem::CopyFromBaseItem()
 	bool bItemConfigFound = false;
 	ItemConfig.ItemConfig = SourceItem->GetItemConfig(SourceItem->GetItemConfigClass(), bItemConfigFound);
 
-	ItemFlags = SourceItem->GetItemData().ItemFlags;
+	ItemFlags = SourceItem->GetItemData().RequiredData.ItemFlags;
 	
 	return true;
 }
@@ -220,7 +221,7 @@ FMounteaInventoryItemData UMounteaInstancedItem::GetItemData() const
 			if (SourceItem)
 			{
 				bool bResult = false;
-				return FMounteaInventoryItemData(SourceItem->ItemData, SourceItem->ItemOptionalData, SourceItem->GetItemConfig(SourceItem->GetItemConfigClass(), bResult));
+				return SourceItem->ItemData;
 			}
 			break;
 		case EItemDataSource::Default:

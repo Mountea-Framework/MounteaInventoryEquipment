@@ -147,7 +147,7 @@ bool UMounteaInventoryComponent::HasItem_Simple(const FItemRetrievalFilter& Sear
 		{
 			for (const auto& Itr : Items)
 			{
-				if (Itr && Itr->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
+				if (Itr && Itr->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
 				{
 					return true;
 				}
@@ -211,7 +211,7 @@ bool UMounteaInventoryComponent::HasItem_Multithreading(const FItemRetrievalFilt
 			}
 
 			// Search by Tag
-			if (SearchFilter.bSearchByTag && Item && Item->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
+			if (SearchFilter.bSearchByTag && Item && Item->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
 			{
 				ItemFound = true;
 				return;
@@ -280,7 +280,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Simple(const FIt
 		{
 			for (const auto& Itr : Items)
 			{
-				if (Itr && Itr->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
+				if (Itr && Itr->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
 				{
 					return Itr;
 				}
@@ -342,7 +342,7 @@ UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Multithreading(c
 			}
 
 			// Search by Tag
-			if (SearchFilter.bSearchByTag && Item && Item->ItemData.ItemFlags.HasAny(SearchFilter.Tags))
+			if (SearchFilter.bSearchByTag && Item && Item->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
 			{
 				FoundItem = Item;
 				return;
@@ -397,7 +397,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Simple(c
 		{
 			for (const auto& Item : Items)
 			{
-				if (Item && Item->ItemData.ItemFlags.HasAny(OptionalFilter.Tags))
+				if (Item && Item->ItemData.RequiredData.ItemFlags.HasAny(OptionalFilter.Tags))
 				{
 					FoundItems.Add(Item);
 				}
@@ -456,7 +456,7 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Multithr
 			}
 
 			// Search by Tag
-			else if (OptionalFilter.bSearchByTag && Item && Item->ItemData.ItemFlags.HasAny(OptionalFilter.Tags))
+			else if (OptionalFilter.bSearchByTag && Item && Item->ItemData.RequiredData.ItemFlags.HasAny(OptionalFilter.Tags))
 			{
 				TempList.Add(Item);
 			}
@@ -1018,7 +1018,7 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		int32 AmountToRemove = -1;
 		if (Quantity == 0) //TODO
 		{
-			// AmountToRemove = Item->ItemData.ItemQuantity.CurrentQuantity; BREAKING
+			// AmountToRemove = Item->ItemData.RequiredData.ItemQuantity.CurrentQuantity; BREAKING
 		}
 		else
 		{
@@ -1026,15 +1026,15 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		}
 
 		AmountToRemove = FMath::Abs(AmountToRemove);
-		const int32 MaxToRemove = 0; // Item->ItemData.ItemQuantity.CurrentQuantity; BREAKING
+		const int32 MaxToRemove = 0; // Item->ItemData.RequiredData.ItemQuantity.CurrentQuantity; BREAKING
 		AmountToRemove =  FMath::Abs(FMath::Min(AmountToRemove, MaxToRemove));
 
 		AmountToRemove = MaxToRemove - AmountToRemove;
 		
 		// Item->SetQuantity(AmountToRemove); BREAKING
 		
-		// if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0) BREAKING
-		if (Item->ItemData.ItemQuantity.MaxQuantity > 0)
+		// if (Item->ItemData.RequiredData.ItemQuantity.CurrentQuantity <= 0) BREAKING
+		if (Item->ItemData.RequiredData.ItemQuantity.MaxQuantity > 0)
 		{
 			ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_RemovedItem;
 			OnItemUpdated.Broadcast(Item, ItemUpdatedResult);

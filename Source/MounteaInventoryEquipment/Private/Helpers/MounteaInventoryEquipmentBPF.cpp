@@ -387,14 +387,14 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 	}
     
 	// If the item is not stackable, return 0 if OtherItem is not null (updating case), or 1 if it is null (adding new item case)
-	if (!Item->ItemData.ItemQuantity.bIsStackable)
+	if (!Item->ItemData.RequiredData.ItemQuantity.bIsStackable)
 	{
 		return OtherItem ? 0 : 1;
 	}
     
 	// Calculate the maximum possible quantity to be added
 	const int32 CurrentQuantity = 0; // Item->ItemData.ItemQuantity.CurrentQuantity; BREAKING
-	const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
+	const int32 MaxQuantity = Item->ItemData.RequiredData.ItemQuantity.MaxQuantity;
 	int32 MaxPossible = MaxQuantity - CurrentQuantity;
 
 	// If OtherItem is not null, the requested quantity should be limited by OtherItem's current quantity
