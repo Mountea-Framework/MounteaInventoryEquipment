@@ -53,7 +53,7 @@ struct FItemInitParams
  * @see IMounteaInventoryEquipmentItem
  * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Instanced-Inventory-Item
  */
-UCLASS(BlueprintType, Blueprintable,  ClassGroup="Mountea", DisplayName="Instanced Inventory Item")
+UCLASS(BlueprintType, Blueprintable,  ClassGroup="Mountea", DisplayName="Inventory Item Instance")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInstancedItem : public UObject, public IMounteaInventoryEquipmentItem
 {
 	GENERATED_BODY()
@@ -140,7 +140,7 @@ protected:
 #pragma region Public
 	
 public:
-
+	
 	UFUNCTION(BlueprintImplementableEvent, Category="Mountea|Item")
 	void OnItemBeginPlay(const FString& Message);
 
@@ -162,6 +162,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void DestroyItem();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FGuid GetGuid() const
+	{ return InstanceID; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	int32 GetQuantity() const;
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
 	FGameplayTagContainer GetItemFlags() const
 	{ return ItemFlags; };

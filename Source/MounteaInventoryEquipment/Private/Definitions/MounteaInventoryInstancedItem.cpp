@@ -204,6 +204,11 @@ void UMounteaInstancedItem::DestroyItem()
 	MarkDirtyForReplication();
 }
 
+int32 UMounteaInstancedItem::GetQuantity() const
+{
+	return Quantity;
+}
+
 void UMounteaInstancedItem::AddItemFlag(const FGameplayTag& NewFlag)
 {
 	ItemFlags.AddTag(NewFlag);
