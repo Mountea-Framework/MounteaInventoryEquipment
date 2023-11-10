@@ -65,6 +65,10 @@ public:
 	{
 		return IsValidStackSize() && HasValidGuids();
 	};
+
+	friend FArchive& operator<<(FArchive& Ar, FItemSlotStack& Element);
+	
+	bool Serialize(class FArchive& Ar);
 	
 	bool operator==(const FItemSlotStack& Other) const;
 };
@@ -114,6 +118,33 @@ public:
 	bool operator==(const FGuid& Other) const;
 
 	bool operator==(const UMounteaInstancedItem* Other) const;
+
+	friend FArchive& operator<<(FArchive& Ar, FItemSlot& Element);
+	
+	bool Serialize(class FArchive& Ar);
+	
+};
+
+template<>
+struct TStructOpsTypeTraits< FItemSlotStack > : public TStructOpsTypeTraitsBase2< FItemSlotStack >
+{
+	enum
+	{
+		WithSerializer = true,
+		WithAtomic = true,
+		WithIdenticalViaEquality = true
+	};
+};
+
+template<>
+struct TStructOpsTypeTraits< FItemSlot > : public TStructOpsTypeTraitsBase2< FItemSlot >
+{
+	enum
+	{
+		WithSerializer = true,
+		WithAtomic = true,
+		WithIdenticalViaEquality = true
+	};
 };
 
 FORCEINLINE  uint32 GetTypeHash(const FItemSlotStack& Data)

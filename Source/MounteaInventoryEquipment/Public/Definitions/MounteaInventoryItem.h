@@ -22,8 +22,6 @@ struct FMounteaItemConfig;
 class UMounteaItemAdditionalData;
 class IMounteaInventoryPickupInterface;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, Message);
-
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
 

@@ -6,6 +6,18 @@
 
 #include "Definitions/MounteaInventoryInstancedItem.h"
 
+bool FItemSlotStack::Serialize(FArchive& Ar)
+{
+	// Call the appropriate serialization function for the 'int32' type.
+	Ar << StackSize;
+
+	// Serialize the 'FGuid' types.
+	Ar << StackGuid;
+	Ar << SlotGuid;
+
+	return true;
+}
+
 bool FItemSlotStack::operator==(const FItemSlotStack& Other) const
 {
 	return Other.StackGuid == StackGuid;
@@ -55,4 +67,36 @@ bool FItemSlot::operator==(const FGuid& Other) const
 bool FItemSlot::operator==(const UMounteaInstancedItem* Other) const
 {
 	return Item == Other;
+}
+
+bool FItemSlot::Serialize(FArchive& Ar)
+{
+	// Serialize the Item.
+	Ar << Item;
+        
+	// Serialize the Stacks set.
+	Ar << Stacks;
+
+	return true;
+}
+
+FArchive& operator<<(FArchive& Ar, FItemSlotStack& Element)
+{
+	// Serialize each member of the struct
+	Ar << Element.StackSize;
+	Ar << Element.StackGuid;
+	Ar << Element.SlotGuid;
+
+	// Return the FArchive reference to allow for chaining << calls.
+	return Ar;
+}
+
+FArchive& operator<<(FArchive& Ar, FItemSlot& Element)
+{
+	// Serialize each member of the struct
+	Ar << Element.Item;
+	Ar << Element.Stacks;
+
+	// Return the FArchive reference to allow for chaining << calls.
+	return Ar;
 }

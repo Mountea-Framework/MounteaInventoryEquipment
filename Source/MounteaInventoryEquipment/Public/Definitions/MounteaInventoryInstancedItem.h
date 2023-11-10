@@ -3,16 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
+
 #include "MounteaInventoryItem.h"
 
 #include "MounteaInventoryTableTypes.h"
 
+#include "Interfaces/Item/MounteaInventoryInstancedItemInterface.h"
 #include "Interfaces/MounteaInventoryEquipmentItem.h"
+
 #include "Setup/MounteaInventoryItemConfig.h"
 
 #include "Helpers/MounteaItemHelpers.h"
-
 #include "MounteaInventoryInstancedItem.generated.h"
 
 
@@ -53,8 +54,8 @@ struct FItemInitParams
  * @see IMounteaInventoryEquipmentItem
  * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Instanced-Inventory-Item
  */
-UCLASS(BlueprintType, Blueprintable,  ClassGroup="Mountea", DisplayName="Inventory Item Instance")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInstancedItem : public UObject, public IMounteaInventoryEquipmentItem
+UCLASS(BlueprintType, NotBlueprintable,  ClassGroup="Mountea", DisplayName="Inventory Item Instance")
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInstancedItem : public UObject, public IMounteaInventoryEquipmentItem, public IMounteaInventoryInstancedItemInterface
 {
 	GENERATED_BODY()
 
@@ -148,6 +149,44 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mountea|Item")
 	bool InitializeNewItem(const FItemInitParams& InitParams);
 	virtual bool InitializeNewItem_Implementation(const FItemInitParams& InitParams);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	virtual  TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const override
+	{ return OwningInventory; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const override
+	{
+		if (ItemConfig.ItemConfig)
+		{
+			return ItemConfig.ItemConfig->StaticClass();
+		}
+		
+		return nullptr;
+	}
+
+	/** Returns instanced Item Config, which can include applied runes, specific properties, durability, etc. */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	virtual UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const override
+	{
+		if (ClassFilter == nullptr)
+		{
+			bResult = false;
+			return nullptr;
+		}
+
+		bResult = true;
+		if (ItemConfig.ItemConfig == nullptr)
+		{
+			return NewObject<UMounteaInventoryItemConfig>(GetPackage()->GetOuter(), ClassFilter);
+		}
+
+		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetPackage()->GetOuter(), ClassFilter);
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	virtual void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) override;
+
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void SetSourceItem(UMounteaInventoryItemBase* NewSourceItem);
@@ -174,7 +213,7 @@ public:
 	int32 GetQuantity() const;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
-	FGameplayTagContainer GetItemFlags() const
+	virtual FGameplayTagContainer GetItemFlags() const override
 	{ return ItemFlags; };
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
@@ -191,43 +230,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	bool AreFlagsSet(const FGameplayTagContainer& QueryFlags, const bool bSimpleSearch = true) const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	FORCEINLINE TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
-	{ return OwningInventory; };
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const
-	{
-		if (ItemConfig.ItemConfig)
-		{
-			return ItemConfig.ItemConfig->StaticClass();
-		}
-		
-		return nullptr;
-	}
-
-	/** Returns instanced Item Config, which can include applied runes, specific properties, durability, etc. */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
-	UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const
-	{
-		if (ClassFilter == nullptr)
-		{
-			bResult = false;
-			return nullptr;
-		}
-
-		bResult = true;
-		if (ItemConfig.ItemConfig == nullptr)
-		{
-			return NewObject<UMounteaInventoryItemConfig>(GetPackage(), ClassFilter);
-		}
-
-		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetPackage(), ClassFilter);
-	}
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);

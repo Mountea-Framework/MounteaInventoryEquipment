@@ -343,7 +343,7 @@ bool UMounteaInstancedItem::OwnerHasAuthority() const
 
 void UMounteaInstancedItem::MarkDirtyForReplication()
 {
-	RepKey++;
+	NetFlush();
 	
 	if (OwningInventory.GetInterface())
 	{
