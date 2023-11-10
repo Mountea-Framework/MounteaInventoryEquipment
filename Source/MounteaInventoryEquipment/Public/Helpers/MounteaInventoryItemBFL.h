@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MounteaItemHelpers.h"
+#include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryItemBFL.generated.h"
 
@@ -25,7 +26,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 		}
 
 		// Assuming GetMaxStackSize() is a function that exists on UMounteaInstancedItem
-		return Item->GetMaxStackSize();
+		return Item->GetItemData().RequiredData.ItemQuantity.MaxStackSize;
 	}
 
 	// Function to calculate the amount that can be added to the stack
@@ -37,7 +38,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 			return 0;
 		}
 
-		const int32 MaxStackSize = Item->GetMaxStackSize();
+		const int32 MaxStackSize =Item->GetItemData().RequiredData.ItemQuantity.MaxStackSize;
 		// Logic to determine how much can be added, considering the max stack size
 		// This could be as simple as min(QuantityToAdd, MaxStackSize) or more complex if needed
 		return FMath::Min(QuantityToAdd, MaxStackSize);
@@ -65,7 +66,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 			return;
 		}
 
-		// Assuming there's a function or property on UMounteaInstancedItem that tracks quantity
-		Item->ModifyQuantity(QuantityToAdd);
+		// TODO: Calculate this value etc.
+		//Item->ModifyQuantity(QuantityToAdd);
 	}
 };

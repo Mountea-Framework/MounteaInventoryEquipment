@@ -62,6 +62,7 @@ public:
 
 	UMounteaInstancedItem();
 	virtual ~UMounteaInstancedItem() override;
+	
 
 #pragma region Variables
 	
@@ -162,6 +163,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void DestroyItem();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	FMounteaInventoryItemData GetItemData() const;
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	FGuid GetGuid() const
 	{ return InstanceID; };

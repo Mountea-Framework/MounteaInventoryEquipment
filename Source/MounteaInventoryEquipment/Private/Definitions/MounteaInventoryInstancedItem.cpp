@@ -204,6 +204,33 @@ void UMounteaInstancedItem::DestroyItem()
 	MarkDirtyForReplication();
 }
 
+FMounteaInventoryItemData UMounteaInstancedItem::GetItemData() const
+{
+	switch (ItemDataSource)
+	{
+		case EItemDataSource::EIDS_SourceTable:
+			{
+				if (FMounteaInventoryItemData* const Row = GetRow<FMounteaInventoryItemData>(SourceRow, SourceTable))
+				{
+					return *Row;
+				}
+			}
+			break;
+		case EItemDataSource::EIDS_SourceItem:
+			if (SourceItem)
+			{
+				bool bResult = false;
+				return FMounteaInventoryItemData(SourceItem->ItemData, SourceItem->ItemOptionalData, SourceItem->GetItemConfig(SourceItem->GetItemConfigClass(), bResult));
+			}
+			break;
+		case EItemDataSource::Default:
+		default:
+			break;
+	}
+
+	return FMounteaInventoryItemData();
+}
+
 int32 UMounteaInstancedItem::GetQuantity() const
 {
 	return Quantity;

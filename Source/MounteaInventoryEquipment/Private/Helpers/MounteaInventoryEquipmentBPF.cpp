@@ -393,14 +393,14 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 	}
     
 	// Calculate the maximum possible quantity to be added
-	const int32 CurrentQuantity = Item->ItemData.ItemQuantity.CurrentQuantity;
+	const int32 CurrentQuantity = 0; // Item->ItemData.ItemQuantity.CurrentQuantity; BREAKING
 	const int32 MaxQuantity = Item->ItemData.ItemQuantity.MaxQuantity;
 	int32 MaxPossible = MaxQuantity - CurrentQuantity;
 
 	// If OtherItem is not null, the requested quantity should be limited by OtherItem's current quantity
 	if (OtherItem)
 	{
-		const int32 UpdateQuantity = FMath::Min(RequestedQuantity, OtherItem->ItemData.ItemQuantity.CurrentQuantity);
+		const int32 UpdateQuantity = 0; // FMath::Min(RequestedQuantity, OtherItem->ItemData.ItemQuantity.CurrentQuantity); BREAKING
 		MaxPossible = FMath::Min(MaxPossible, UpdateQuantity);
 	}
 	else // If OtherItem is null, the requested quantity should be limited by RequestedQuantity

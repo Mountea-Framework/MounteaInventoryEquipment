@@ -19,6 +19,8 @@ class AActor;
 class ULevel;
 class UStreamableRenderAsset;
 
+class UMounteaInventoryItemConfig;
+
 #pragma region NotificationData
 
 #define LOCTEXT_NAMESPACE "InventoryNotificationData"
@@ -125,11 +127,11 @@ struct FMounteaItemQuantityData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=0, ClampMin=0))
-	int32 CurrentQuantity = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
+	int32 MaxStackSize = 99;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
-	int32 MaxQuantity = 99;
+	int32 MaxQuantity = 999;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 bIsStackable : 1;
@@ -242,6 +244,13 @@ USTRUCT(BlueprintType)
 struct FMounteaInventoryItemData : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	FMounteaInventoryItemData(): RequiredData(), OptionalData(), ItemConfig(nullptr)
+	{};
+
+	explicit FMounteaInventoryItemData(const FMounteaInventoryItemRequiredData& InRequiredData, const FMounteaInventoryItemOptionalData InOptionalData, UMounteaInventoryItemConfig* InItemConfig = nullptr)
+		: RequiredData(InRequiredData), OptionalData(InOptionalData), ItemConfig(InItemConfig)
+	{};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FMounteaInventoryItemRequiredData RequiredData;

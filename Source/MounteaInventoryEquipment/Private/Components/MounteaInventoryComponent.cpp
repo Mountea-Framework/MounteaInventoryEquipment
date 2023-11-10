@@ -1018,7 +1018,7 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		int32 AmountToRemove = -1;
 		if (Quantity == 0) //TODO
 		{
-			AmountToRemove = Item->ItemData.ItemQuantity.CurrentQuantity;
+			// AmountToRemove = Item->ItemData.ItemQuantity.CurrentQuantity; BREAKING
 		}
 		else
 		{
@@ -1026,14 +1026,15 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 		}
 
 		AmountToRemove = FMath::Abs(AmountToRemove);
-		const int32 MaxToRemove = Item->ItemData.ItemQuantity.CurrentQuantity;
+		const int32 MaxToRemove = 0; // Item->ItemData.ItemQuantity.CurrentQuantity; BREAKING
 		AmountToRemove =  FMath::Abs(FMath::Min(AmountToRemove, MaxToRemove));
 
 		AmountToRemove = MaxToRemove - AmountToRemove;
 		
 		// Item->SetQuantity(AmountToRemove); BREAKING
 		
-		if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0)
+		// if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0) BREAKING
+		if (Item->ItemData.ItemQuantity.MaxQuantity > 0)
 		{
 			ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_RemovedItem;
 			OnItemUpdated.Broadcast(Item, ItemUpdatedResult);
