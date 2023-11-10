@@ -69,8 +69,8 @@ struct FInventoryNotificationData
 UENUM(BlueprintType)
 enum class EInventoryUpdateResult : uint8
 {
-	EIUR_Success							UMETA(DisplayName="Success"),
-	EIUR_Failed								UMETA(DisplayName="Failed"),
+	EIUR_Success  UMETA(DisplayName="Success"),
+	EIUR_Failed	      UMETA(DisplayName="Failed"),
 
 	Default										UMETA(Hidden)
 };

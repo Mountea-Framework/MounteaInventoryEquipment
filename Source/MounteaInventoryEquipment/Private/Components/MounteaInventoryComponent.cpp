@@ -56,7 +56,8 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 	{
 		TArray<UMounteaInventoryItemBase*> AllItems = Items;
 		AllItems.Append(RemovedItems);
-		
+
+		/* BREAKING
 		for (const auto& Item : AllItems)
 		{
 			if (Item && Channel->KeyNeedsToReplicate(Item->GetUniqueID(), Item->GetRepKey()))
@@ -64,6 +65,7 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 				bUpdated |= Channel->ReplicateSubobject(Item, *Bunch, *RepFlags);
 			}
 		}
+		*/
 
 		RemovedItems.Empty();
 
@@ -636,7 +638,7 @@ void UMounteaInventoryComponent::OnRep_Items()
 	{
 		if (Itr)
 		{
-			Itr->SetWorld(GetWorld());
+			//Itr->SetWorld(GetWorld()); BREAKING
 		}
 	}
 
@@ -927,7 +929,7 @@ bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, 
 		Filter.bSearchByGUID = true;
 		Filter.Guid = Item->GetItemGuid();
 		Filter.bSearchByTag = true;
-		Filter.Tags = Item->GetTags();
+		// Filter.Tags = Item->GetTags(); BREAKING
 	}
 	
 	if (!Execute_HasItem(this, Filter))
@@ -963,7 +965,7 @@ bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Ite
 		ReplicatedItemsKey++;
 		OnRep_Items();
 
-		Item->InitializeNewItem(this);
+		// Item->InitializeNewItem(this); BREAKING
 		
 		return true;
 	}
@@ -1029,7 +1031,7 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 
 		AmountToRemove = MaxToRemove - AmountToRemove;
 		
-		Item->SetQuantity(AmountToRemove);
+		// Item->SetQuantity(AmountToRemove); BREAKING
 		
 		if (Item->ItemData.ItemQuantity.CurrentQuantity <= 0)
 		{
@@ -1045,7 +1047,7 @@ bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* 
 			OnInventoryUpdated.Broadcast(UpdateResult);
 			
 			ReplicatedItemsKey++;
-			Item->NetFlush();
+			// Item->NetFlush(); BREAKING
 			
 			OnRep_Items();
 
@@ -1078,7 +1080,7 @@ bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* I
 	}
 
 	const int32 MaxToAdd = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Item, nullptr, Quantity);
-	Item->SetQuantity(MaxToAdd);
+	// Item->SetQuantity(MaxToAdd); BREAKING
 	
 	// In this case we actually can just add the item with no further checks
 	return AddItem_Internal(Item);
@@ -1098,7 +1100,7 @@ bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItem
 	const int32 MaxAddQuantity = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Existing, NewItem, Quantity);
 	if (MaxAddQuantity == 0) return false;
 	
-	Existing->AddQuantity(MaxAddQuantity);
+	// Existing->AddQuantity(MaxAddQuantity); BREAKING
 	
 	return UpdateItem_Internal(Existing);
 }
@@ -1146,7 +1148,7 @@ void UMounteaInventoryComponent::PostItemAdded_Implementation(UMounteaInventoryI
 	
 	if (Item)
 	{
-		Item->GetItemAddedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
+		// Item->GetItemAddedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
 
 		PostItemAdded_Client(Item, UpdateContext);
 	}
@@ -1158,7 +1160,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Implementation(UMounteaInventor
 	
 	if (Item)
 	{
-		Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
+		// Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
 
 		PostItemRemoved_Client(Item, UpdateContext);
 	}
@@ -1170,7 +1172,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Implementation(UMounteaInventor
 	
 	if (Item)
 	{
-		Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful);
+		// Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
 
 		PostItemUpdated_Client(Item, UpdateContext);
 	}
@@ -1201,7 +1203,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(UMounteaInv
 	
 	if (!CanExecuteCosmetics()) return;
 
-	Item->InitializeNewItem(this);
+	// Item->InitializeNewItem(this); BREAKING
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 
@@ -1249,7 +1251,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(UMounteaInve
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
 
-	Item->InitializeNewItem(this);
+	// Item->InitializeNewItem(this); BREAKING
 	
 	if (InventoryWBP)
 	{
@@ -1257,7 +1259,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(UMounteaInve
 		
 		RequestItemNotification(UpdateContext);
 		
-		Item->GetItemAddedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
+		// Item->GetItemAddedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
 		OnItemAdded_Client.Broadcast(Item, UpdateContext);
 	}
 }
@@ -1276,7 +1278,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(UMounteaIn
 
 		RequestItemNotification(UpdateContext);
 
-		Item->GetItemRemovedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
+		// Item->GetItemRemovedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
 		OnItemRemoved_Client.Broadcast(Item, UpdateContext);
 	}
 }
@@ -1289,7 +1291,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(UMounteaIn
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
 	
-	Item->InitializeNewItem(this);
+	// Item->InitializeNewItem(this); BREAKING
 	
 	if (InventoryWBP)
 	{
@@ -1297,7 +1299,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(UMounteaIn
 		
 		RequestItemNotification(UpdateContext);
 		
-		Item->GetItemUpdatedHandle().Broadcast(UpdateContext.UpdateMessage.ToString());
+		// Item->GetItemUpdatedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
 		OnItemUpdated_Client.Broadcast(Item, UpdateContext);
 	}
 }

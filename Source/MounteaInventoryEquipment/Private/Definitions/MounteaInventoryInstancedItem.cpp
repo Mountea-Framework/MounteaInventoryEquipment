@@ -17,19 +17,24 @@ UMounteaInstancedItem::~UMounteaInstancedItem()
 	TRACE_OBJECT_LIFETIME_END(this);
 }
 
+void UMounteaInstancedItem::PostInitProperties()
+{
+	UObject::PostInitProperties();
+
+	if (FApp::IsGame())
+	{
+		//...
+	}
+}
+
 bool UMounteaInstancedItem::InitializeNewItem_Implementation(const FItemInitParams& InitParams)
 {
-	if (!InitParams.Outer)
-	{
-		return false;
-	}
-
 	if (InitParams.OwningInventory.GetObject() == nullptr)
 	{
 		return false;
 	}
 
-	if (!InitParams.Outer->GetWorld())
+	if (!InitParams.OwningInventory->Execute_GetOwningActor(OwningInventory.GetObject()))
 	{
 		return false;
 	}
@@ -39,7 +44,13 @@ bool UMounteaInstancedItem::InitializeNewItem_Implementation(const FItemInitPara
 		return false;
 	}
 
-	SetWorld(InitParams.Outer->GetWorld());
+	UWorld* NewWorld =
+		InitParams.OwningInventory.GetObject()->GetWorld() ?
+			InitParams.OwningInventory.GetObject()->GetWorld() :
+			InitParams.OwningInventory->Execute_GetOwningActor(OwningInventory.GetObject())->GetWorld();
+	
+	// Validate nullptr!
+	SetWorld(NewWorld);
 	OwningInventory = InitParams.OwningInventory;
 
 	if (InitParams.SourceItem)

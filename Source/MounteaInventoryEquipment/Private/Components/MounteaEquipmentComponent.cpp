@@ -63,11 +63,13 @@ FString UMounteaEquipmentComponent::FindSlotForItem_Implementation(const UMounte
 
 	for (const auto& Itr : EquipmentSlotData)
 	{
+		/* BREAKING
 		if (Itr.Slot && Itr.Slot->GetSlotTag().IsValid() && Item->GetTags().HasTagExact(Itr.Slot->GetSlotTag()))
 		{
 			SlotID = Itr.Slot->GetSlotID();
 			break;
 		}
+		*/
 	}
 
 	return SlotID;

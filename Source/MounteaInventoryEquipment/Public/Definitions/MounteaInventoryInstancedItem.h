@@ -11,6 +11,8 @@
 #include "Interfaces/MounteaInventoryEquipmentItem.h"
 #include "Setup/MounteaInventoryItemConfig.h"
 
+#include "Helpers/MounteaItemHelpers.h"
+
 #include "MounteaInventoryInstancedItem.generated.h"
 
 
@@ -20,9 +22,6 @@ USTRUCT(BlueprintType)
 struct FItemInitParams
 {
 	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UObject* Outer = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TScriptInterface<IMounteaInventoryInterface> OwningInventory;
@@ -40,6 +39,20 @@ struct FItemInitParams
 	int32 Quantity;
 };
 
+/**
+ * Inventory Item Instance
+ * 
+ * Base class for inventory items.
+ *
+ * This class represents an item in the inventory system.
+ * It serves as representation of the item, it knows its source base item/source table where defaults are stored.
+ * This instance can be updated in runtime, quantity can be changed, flags can be adjusted etc.
+ * Inventory items are used within an inventory and can be replicated.
+ *
+ * @see UObject
+ * @see IMounteaInventoryEquipmentItem
+ * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Instanced-Inventory-Item
+ */
 UCLASS(BlueprintType, Blueprintable,  ClassGroup="Mountea", DisplayName="Instanced Inventory Item")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInstancedItem : public UObject, public IMounteaInventoryEquipmentItem
 {
@@ -215,6 +228,8 @@ public:
 #pragma region Protected
 	
 protected:
+	
+	virtual void PostInitProperties() override;
 
 	bool CopyFromBaseItem();
 	bool CopyFromDataTable();
@@ -264,7 +279,9 @@ protected:
 private:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual bool IsSupportedForNetworking() const override
+	{ return true; };
+	
 	virtual void SetValidData() override;
 
 	UFUNCTION()
@@ -273,7 +290,7 @@ private:
 	UFUNCTION()
 	virtual void OnRep_Quantity();
 
-#pragma endregion 
+#pragma endregion
 
 #pragma endregion 
 };
