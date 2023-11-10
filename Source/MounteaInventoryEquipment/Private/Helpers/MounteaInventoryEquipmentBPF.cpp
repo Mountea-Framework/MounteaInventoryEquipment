@@ -7,6 +7,7 @@
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
+#include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/MounteaInventoryItemWBPInterface.h"
 #include "Interfaces/MounteaInventorySlotWBPInterface.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"

@@ -19,27 +19,6 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInstancedItem"
 
-USTRUCT(BlueprintType)
-struct FItemInitParams
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TScriptInterface<IMounteaInventoryInterface> OwningInventory;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UMounteaInventoryItemBase* SourceItem = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UMounteaInventoryItemsTable* SourceTable = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName SourceRow;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 Quantity;
-};
-
 /**
  * Inventory Item Instance
  * 
@@ -146,12 +125,8 @@ protected:
 	
 public:
 	
-	UFUNCTION(BlueprintImplementableEvent, Category="Mountea|Item")
-	void OnItemBeginPlay(const FString& Message);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Mountea|Item")
-	bool InitializeNewItem(const FItemInitParams& InitParams);
-	virtual bool InitializeNewItem_Implementation(const FItemInitParams& InitParams);
+	
+	virtual bool InitializeNewItem_Implementation(const FItemInitParams& InitParams) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual  TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const override
@@ -189,7 +164,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) override;
-
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void SetSourceItem(UMounteaInventoryItemBase* NewSourceItem);
@@ -200,25 +174,26 @@ public:
 	bool ConstructItem();
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	void UpdateQuantity(const int32& NewValue);
+	virtual void SetQuantity(const int32& NewValue) override;
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void DestroyItem();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	FMounteaInventoryItemData GetItemData() const;
+	virtual FMounteaInventoryItemData GetItemData() const override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual FGuid GetGuid() const override
 	{ return InstanceID; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	int32 GetQuantity() const;
+	virtual int32 GetQuantity() const override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
 	virtual FGameplayTagContainer GetItemFlags() const override
 	{ return ItemFlags; };
 
+	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void AddItemFlag(const FGameplayTag& NewFlag);
 
@@ -233,6 +208,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	bool AreFlagsSet(const FGameplayTagContainer& QueryFlags, const bool bSimpleSearch = true) const;
+
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);

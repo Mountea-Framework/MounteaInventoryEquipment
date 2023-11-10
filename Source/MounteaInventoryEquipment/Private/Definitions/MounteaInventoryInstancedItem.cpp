@@ -85,7 +85,7 @@ void UMounteaInstancedItem::SetValidData()
 {
 	if (ConstructItem())
 	{
-		OnItemBeginPlay("[UMounteaInstancedItem::SetValidData] Begin Play Called Successfully");
+		Execute_OnItemBeginPlay(this, "[UMounteaInstancedItem::SetValidData] Begin Play Called Successfully");
 
 		OnItemInitialized.Broadcast("Item Initialized");
 
@@ -183,7 +183,7 @@ void UMounteaInstancedItem::CleanupData()
 	ItemFlags.Reset();
 }
 
-void UMounteaInstancedItem::UpdateQuantity(const int32& NewValue)
+void UMounteaInstancedItem::SetQuantity(const int32& NewValue)
 {
 	Quantity = FMath::Max(0, NewValue);
 
