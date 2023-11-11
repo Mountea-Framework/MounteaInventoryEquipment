@@ -16,6 +16,8 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 {
 	GENERATED_BODY()
 
+public:
+
 	// Function to determine the max stack size of the item
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	static int32 DetermineMaxStackSize(UMounteaInstancedItem* Item)
@@ -31,7 +33,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 
 	// Function to calculate the amount that can be added to the stack
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	static int32 CalculateAddAmount(UMounteaInstancedItem* Item, int32 QuantityToAdd)
+	static int32 CalculateAddAmount(const UMounteaInstancedItem* Item, const int32 QuantityToAdd)
 	{
 		if (!Item)
 		{
@@ -68,5 +70,15 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 
 		// TODO: Calculate this value etc.
 		//Item->ModifyQuantity(QuantityToAdd);
+	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	static bool IsItemValid(const UMounteaInstancedItem* Item)
+	{
+		if (!Item) return false;
+
+		if (!Item->GetItemData().IsValid()) return false;
+		
+		return true;
 	}
 };

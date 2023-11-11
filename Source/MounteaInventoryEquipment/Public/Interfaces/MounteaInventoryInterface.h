@@ -8,6 +8,8 @@
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryInterface.generated.h"
 
+class IMounteaInventoryInstancedItemInterface;
+class UMounteaInstancedItem;
 class UMounteaBaseUserWidget;
 class UMounteaInventoryConfig;
 class UMounteaTransactionPayload;
@@ -94,6 +96,29 @@ public:
 	TArray<UMounteaInventoryItemBase*> GetItems(const FItemRetrievalFilter OptionalFilter) const;
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const = 0;
 
+
+
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	FInventoryUpdateResult AddItemToInventory(UMounteaInstancedItem* Item, const int32& Quantity = 1);
+	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool CanAddItem(UMounteaInstancedItem* Item, const int32& Quantity) const;
+	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UMounteaInstancedItem* SearchSingleItem(const FItemRetrievalFilter& SearchFilter) const;
+	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
+
+
+
+
+
+
+
+
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool AddOrUpdateItem(UMounteaInventoryItemBase* NewItem, const int32& Quantity = 1);
 	virtual bool AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity = 1) = 0;

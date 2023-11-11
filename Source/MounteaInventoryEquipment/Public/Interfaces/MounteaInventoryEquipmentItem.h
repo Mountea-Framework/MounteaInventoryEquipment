@@ -19,6 +19,8 @@ class UMounteaInventoryEquipmentItem : public UInterface
 class UMounteaInventoryItemConfig;
 class IMounteaInventoryInterface;
 
+enum class EItemDataSource : uint8;
+
 /**
  * 
  */
@@ -35,6 +37,7 @@ public:
 	virtual FGuid GetGuid() const = 0;
 
 	virtual FMounteaInventoryItemData GetItemData() const = 0;
+	virtual EItemDataSource GetItemDataSource() const = 0;
 	
 	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const = 0;
 	virtual UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const = 0;

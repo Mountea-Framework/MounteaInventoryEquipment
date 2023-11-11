@@ -3,11 +3,13 @@
 
 #include "Components/MounteaInventoryComponent.h"
 
+#include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
+#include "Helpers/MounteaInventoryItemBFL.h"
 #include "Interfaces/MounteaInventoryWBPInterface.h"
 
 #include "Net/UnrealNetwork.h"
@@ -518,6 +520,234 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implemen
 	return Items;
 }
 
+FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity)
+{
+	// Create an empty result struct.
+    FInventoryUpdateResult Result;
+
+    // Check if Quantity is larger than 0
+    if (Quantity <= 0)
+    {
+        Result.OptionalPayload = Item;
+        Result.ResultID = 400; // Corresponds to "Bad Request"
+        Result.ResultText = FText::FromString("Quantity less than 1 is forbidden.");
+        return Result;
+    }
+
+    // Check if the item can be added at all
+    if (!Execute_CanAddItem(this, Item, Quantity))
+    {
+        Result.OptionalPayload = Item;
+        Result.ResultID = 403; // Corresponds to "Forbidden"
+        Result.ResultText = FText::FromString("Cannot add the item to inventory.");
+        return Result;
+    }
+
+    // Check if a similar item already exists in the inventory
+	FItemRetrievalFilter Filter;
+	{
+		Filter.bSearchByGUID = true;
+    	Filter.Guid = Item->GetGuid();
+    	Filter.bSearchByItem = true;
+    	Filter.Item = Item;
+	}
+	
+    UMounteaInstancedItem* ExistingItem = Execute_SearchSingleItem(this, Filter);
+
+    // Calculate the max addable amount
+    int32 MaxAddAmount = UMounteaInventoryItemBFL::CalculateAddAmount(Item, Quantity);
+
+    // If the similar item already exists in the inventory
+    if (ExistingItem != nullptr)
+    {
+        // If entire quantity of Item can be added to existing item
+        if (Quantity <= MaxAddAmount)
+        {
+            ExistingItem->SetQuantity(Quantity); // Increment the quantity of the existing item
+            Item->SetQuantity(0); // Set the source item's quantity to 0, effectively marking it for destruction
+
+            Result.OptionalPayload = ExistingItem;
+            Result.ResultID = 200; // Corresponds to "OK"
+            Result.ResultText = FText::FromString("Added all of the item to the existing stack.");
+        }
+        else
+        {
+            // If only part of the Item can be added
+            ExistingItem->SetQuantity(MaxAddAmount); // Add the maximum possible quantity to the existing item
+            Item->ModifyQuantity(-MaxAddAmount); // Decrease the source item's quantity
+
+            Result.OptionalPayload = ExistingItem;
+            Result.ResultID = 206; // Analogous to "Partial Content"
+            Result.ResultText = FText::FromString("Added part of the item to the existing stack. Some quantity remains in the source item.");
+        }
+    }
+    else
+    {
+        // If the item doesn't exist in the inventory
+        if (Quantity <= MaxAddAmount)
+        {
+            // Directly add the entire source item to the inventory
+        	// TODO: implement logic to automatically split items to stacks
+        	const FItemSlot NewSlot = FItemSlot(Item);
+
+            Result.OptionalPayload = Item;
+            Result.ResultID = 201; // Corresponds to "Created"
+            Result.ResultText = FText::FromString("Added the entire item to the inventory.");
+        }
+        else
+        {
+            // If only part of the Item can be added
+            UMounteaInstancedItem* NewItemInstance = NewObject<UMounteaInstancedItem>();
+        	
+        	FItemInitParams ItemInitParams;
+        	ItemInitParams.Quantity = MaxAddAmount;
+        	ItemInitParams.OwningInventory = this;
+            switch (Item->GetItemDataSource())
+            {
+	            case EItemDataSource::EIDS_SourceTable:
+	            	ItemInitParams.SourceTable = Item->SourceTable;
+            		ItemInitParams.SourceRow = Item->SourceRow;
+		            break;
+	            case EItemDataSource::EIDS_SourceItem:
+	            	ItemInitParams.SourceItem = Item->SourceItem;
+		            break;
+	            case EItemDataSource::Default:
+				default:
+            		break;;
+            }
+        	
+        	const bool bNewItemSuccess = NewItemInstance->Execute_InitializeNewItem(NewItemInstance, ItemInitParams);
+
+        	if (bNewItemSuccess)
+        	{
+        		// TODO: implement logic to automatically split items to stacks
+		        const FItemSlot NewSlot = FItemSlot(NewItemInstance);
+        		
+        		
+        		InventorySlots.Add(NewSlot); // Add the new instance to the inventory
+        		Item->ModifyQuantity(-MaxAddAmount); // Decrease the source item's quantity
+
+        		Result.OptionalPayload = NewItemInstance;
+        		Result.ResultID = 206; // Analogous to "Partial Content"
+        		Result.ResultText = FText::FromString("Added part of the item to the inventory. Some quantity remains in the source item.");
+        	}
+	        else
+	        {
+	        	Result.OptionalPayload = Item;
+	        	Result.ResultID = 500; // Analogous to "Unknown issue"
+	        	Result.ResultText = FText::FromString("Unhandled Exception.");
+	        }
+        }
+    }
+
+    return Result;
+}
+
+bool UMounteaInventoryComponent::CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const
+{
+	// Check if the Item is valid.
+	if (!UMounteaInventoryItemBFL::IsItemValid(Item))
+	{
+		return false;
+	}
+
+	// Check if we have this type of item in the inventory already
+	FItemRetrievalFilter Filter;
+	{
+		Filter.bSearchByGUID = true;
+		Filter.Guid = Item->GetGuid();
+		Filter.bSearchByItem = true;
+		Filter.Item = Item;
+	}
+
+	const bool bHasItem = HasItem(Filter);
+
+	// Calculate the maxAddAmount value
+	const int32 MaxAddAmount = UMounteaInventoryItemBFL::CalculateAddAmount(Item, Quantity);
+
+	// This means there is already no space
+	if (MaxAddAmount == 0)
+	{
+		return false;
+	}
+
+	// If the item is stackable
+	if (Item->GetItemData().RequiredData.ItemQuantity.bIsStackable)
+	{
+		// If the current item amount we want to add is less than or equal to the max 
+		// amount we can add to the stack, return true.
+		if (Quantity <= MaxAddAmount)
+		{
+			return true;
+		}
+		// If not, but there's partial space, return true as well, since partial addition is allowed. Valid MaxAddAmount has already been validated before.
+		else
+		{
+			return true;
+		}
+	}
+	// If the item is not stackable
+	else
+	{
+		// If we already have this item in inventory, return false as we can't add another non-stacking item of the same type.
+		if (bHasItem)
+		{
+			return false;
+		}
+		// If we don't have the item, it's the creation process. Valid MaxAddAmount has already been validated before.
+		else
+		{
+			return true;
+		}
+	}
+}
+
+UMounteaInstancedItem* UMounteaInventoryComponent::SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
+{
+	// If we are searching specifically by a UMounteaInstancedItem
+	if (SearchFilter.bSearchByItem && SearchFilter.Item != nullptr)
+	{
+		const FItemSlot Slot = InventorySlots.Find(SearchFilter.Item);
+		if (Slot.IsValid())
+		{
+			return Slot.Item;
+		}
+	}
+
+	// If we are searching specifically by FGuid
+	if (SearchFilter.bSearchByGUID)
+	{
+		FItemSlot SearchSlot;
+		SearchSlot.SlotGuid = SearchFilter.Guid;
+		
+		const FItemSlot* Slot = InventorySlots.Find(SearchSlot);
+		if (Slot && Slot->IsValid())
+		{
+			return Slot->Item;
+		}
+	}
+
+	// Search by other conditions
+	for (const FItemSlot& Slot : InventorySlots)
+	{
+		UMounteaInstancedItem* Item = Slot.Item;
+		if (!Item) continue;
+
+		if (SearchFilter.bSearchByClass && Item->GetSourceItem() && Item->GetSourceItem()->IsA(SearchFilter.Class))
+		{
+			return Item;
+		}
+
+		if (SearchFilter.bSearchByTag && Item->GetItemFlags().HasAny(SearchFilter.Tags))
+		{
+			return Item;
+		}
+	}
+
+	// No matching item found in this case
+	return nullptr;
+}
+
 bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity)
 {
 	return TryAddItem(NewItem, Quantity);
@@ -654,6 +884,14 @@ void UMounteaInventoryComponent::OnRep_OtherInventory()
 	// Call request to update Inventory Flags
 	Execute_SetInventoryFlags(this);
 }
+
+void UMounteaInventoryComponent::AddItemToInventory_Server_Implementation(UMounteaInstancedItem* Item, const int32& Quantity)
+{
+	Execute_AddItemToInventory(this, Item, Quantity);
+}
+
+bool UMounteaInventoryComponent::AddItemToInventory_Server_Validate(UMounteaInstancedItem* Item, const int32& Quantity)
+{ return true; }
 
 UMounteaInventoryConfig* UMounteaInventoryComponent::GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const
 {

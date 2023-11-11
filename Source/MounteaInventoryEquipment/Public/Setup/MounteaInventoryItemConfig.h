@@ -32,7 +32,7 @@ public:
 	 *
 	 * By accessing the ItemSlotSize variable, you can retrieve the dimensions of an item slot, which can be useful for various inventory-related operations such as positioning, layout calculations, and determining the size and placement of items within the inventory grid.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory", meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta=(ShowOnlyInnerProperties))
 	FIntPoint ItemSlotSize = FIntPoint(1,1);
 };
 

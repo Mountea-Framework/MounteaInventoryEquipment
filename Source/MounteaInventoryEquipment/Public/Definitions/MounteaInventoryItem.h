@@ -103,6 +103,10 @@ public:
 	virtual FMounteaInventoryItemData GetItemData() const override
 	{ return ItemData; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	virtual EItemDataSource GetItemDataSource() const override
+	{	return ItemDataSource; };
+	
 	/**
 	 * Obtains the action objects associated with the item, which can be used to perform various interactions with the item.
 	 * @return An array of UMounteaInventoryItemAction objects.

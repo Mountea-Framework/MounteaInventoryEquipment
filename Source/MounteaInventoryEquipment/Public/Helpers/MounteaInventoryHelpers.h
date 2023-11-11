@@ -92,30 +92,81 @@ enum class EItemUpdateResult : uint8
 	Default											UMETA(Hidden)
 };
 
+/*
+	ResultID Values:
+	200 OK: The operation was successful. All items were added/removed as expected.
+	201 Created: A new item was successfully created and added to the inventory.
+	204 No Content: The operation was successful, but there was nothing to add/remove (e.g., the quantity was 0).
+	206 Partial Content: Only a part of the requested operation was completed. For example, some but not all of the items were added to a stack because it reached its maximum capacity.
+	400 Bad Request: The request to update the inventory was invalid. This could be due to bad input parameters or an illegal state (e.g., trying to add a negative quantity).
+	404 Not Found: The specified item was not found in the inventory.
+	409 Conflict: The operation could not be completed due to a conflict. For example, trying to add an item to a full inventory.
+	413 Payload Too Large: The quantity of the item being added exceeds the maximum allowed stack size or inventory capacity.
+	422 Unprocessable Entity: The operation is understood but cannot be processed. For example, the item type cannot be stacked.
+	500 Internal Server Error: A generic error code indicating that something went wrong with the inventory system that was not due to user input.
+ */
 
+/**
+ * FInventoryUpdateResult
+ * 
+ * Encapsulates the outcome of inventory operations such as add, remove, or move items.
+ * This structure is intended to provide standardized feedback after an inventory transaction,
+ * allowing the system to handle the results accordingly.
+ * 
+ * Fields:
+ * - OptionalPayload: A pointer to any UObject that might provide additional context or data
+ *   related to the inventory operation. This could be used to pass along objects that were
+ *   involved in or affected by the transaction, such as the actor who picked up the item.
+ * 
+ * - ResultID: An integer that represents the outcome of the inventory operation. It adheres to
+ *   HTTP-like status codes for ease of understanding and handling. For instance, a value of 200
+ *   indicates a successful operation, while 404 indicates that the requested item was not found.
+ * 
+ * - ResultText: A localized text that gives a human-readable description of the result. This can
+ *   be displayed in logs, UI elements, or debugging tools to inform the user or developer about
+ *   the specifics of the inventory operation's outcome.
+ * 
+ * Usage:
+ * - Initialize the structure with default values or with specific result information.
+ * - Use the structure to communicate the outcome of an inventory operation, attaching any additional
+ *   context as needed via the OptionalPayload.
+ * - Check the ResultID and handle the operation's outcome in the game's logic, UI updates, or error handling.
+ */
 USTRUCT(BlueprintType)
 struct FInventoryUpdateResult
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	EInventoryUpdateResult InventoryUpdateResult;
+	// Default constructor.
+	FInventoryUpdateResult() :
+		OptionalPayload(nullptr), ResultID(500), ResultText(LOCTEXT("MounteaInventoryResults_InventoryUpdateResult", "Empty Message"))
+	{};
 
+	// Constructor for initializing with a specific result ID and descriptive text.
+	FInventoryUpdateResult(const int32 InResultID, const FText& InResultText) :
+		OptionalPayload(nullptr), ResultID(InResultID), ResultText(InResultText)
+	{};
+
+	// Constructor for initializing with a specific result ID, descriptive text, and an optional payload.
+	FInventoryUpdateResult(const int32 InResultID, const FText& InResultText, UObject* InOptionalPayload = nullptr) :
+		OptionalPayload(InOptionalPayload), ResultID(InResultID), ResultText(InResultText)
+	{};
+	
+public:
+
+	// An optional payload that may carry additional information related to the inventory operation.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FText UpdateMessage;
+	UObject* OptionalPayload = nullptr;
+
+	// A numeric identifier that represents the result of the inventory operation, akin to HTTP status codes.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 ResultID;
+
+	// Descriptive text providing details about the outcome of the inventory operation.
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FText ResultText;
 };
 
-USTRUCT(BlueprintType)
-struct FItemUpdateResult
-{
-	GENERATED_BODY()
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	EItemUpdateResult ItemUpdateResult;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FText UpdateMessage;
-};
 
 #undef LOCTEXT_NAMESPACE
 
@@ -325,7 +376,7 @@ struct FItemRetrievalFilter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bSearchByItem : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) //, meta=(EditCondition="bSearchByGUID"))
-	UMounteaInventoryItemBase* Item ;
+	UMounteaInstancedItem* Item ;
 
 	bool IsValid() const
 	{
@@ -335,7 +386,7 @@ struct FItemRetrievalFilter
 	FItemRetrievalFilter(): bSearchByTag(0), bSearchByClass(0), bSearchByGUID(0), bSearchByItem(0), Item(nullptr)
 	{};
 	
-	FItemRetrievalFilter(const bool ByTag, const FGameplayTagContainer& InTags, const bool ByClass, const TSubclassOf<UMounteaInventoryItemBase> InClass, const bool ByGUID, const FGuid InGUID, const bool ByItem, UMounteaInventoryItemBase* InItem)
+	FItemRetrievalFilter(const bool ByTag, const FGameplayTagContainer& InTags, const bool ByClass, const TSubclassOf<UMounteaInventoryItemBase> InClass, const bool ByGUID, const FGuid InGUID, const bool ByItem, UMounteaInstancedItem* InItem)
 		: bSearchByTag(ByTag), Tags(InTags), bSearchByClass(ByClass), Class(InClass), bSearchByGUID(ByGUID), Guid(InGUID), bSearchByItem(ByItem), Item(InItem)
 	{};
 };

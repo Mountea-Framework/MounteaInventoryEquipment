@@ -146,7 +146,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual  TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const override
 	{ return OwningInventory; };
-
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	virtual void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) override;
+	
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const override
 	{
@@ -177,14 +180,24 @@ public:
 		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetPackage()->GetOuter(), ClassFilter);
 	}
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	virtual void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) override;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	virtual EItemDataSource GetItemDataSource() const override
+	{	return ItemDataSource; };
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void SetSourceItem(UMounteaInventoryItemBase* NewSourceItem);
-
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Item")
+	virtual UMounteaInventoryItemBase* GetSourceItem() const override
+	{ return SourceItem; };
+	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	void SetSourceTable(UMounteaInventoryItemsTable* Table, const FString& RowName);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Item")
+	virtual UMounteaInventoryItemsTable*  GetSourceTable(FName& RowName) const override
+	{
+		RowName = SourceRow;
+		return SourceTable;
+	};
 	
 	bool ConstructItem();
 	
@@ -193,6 +206,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual FMounteaInventoryItemData GetItemData() const override;
+
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual FGuid GetGuid() const override
@@ -202,6 +216,7 @@ public:
 	virtual void SetGuid(const FGuid& NewGuid) override
 	{ InstanceID = NewGuid; };
 
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual int32 GetQuantity() const override;
 

@@ -173,7 +173,9 @@ public:
 	virtual void RemoveItemFlag(const FGameplayTag& RemoveFlag) = 0;
 	virtual bool IsFlagSet(const FGameplayTag& QueryFlag) const = 0;
 	virtual bool AreFlagsSet(const FGameplayTagContainer& QueryFlags, const bool bSimpleSearch = true) const = 0;
-	
+
+	virtual UMounteaInventoryItemBase* GetSourceItem() const = 0;
+	virtual UMounteaInventoryItemsTable*  GetSourceTable(FName& RowName) const = 0;
 public:
 
 	virtual FItemGenericEvent& GetEventHandle_OnItemAdded() = 0;

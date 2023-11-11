@@ -170,13 +170,15 @@ struct FItemSlot
 	FItemSlot() : Item(nullptr)
 	{};
 	
-	FItemSlot(UMounteaInstancedItem* NewItem, const TSet<FItemSlotStack>& NewStacks)
-		: Item(NewItem), Stacks(NewStacks)
+	FItemSlot(const FItemSlot& Other) :
+		Item(Other.Item), SlotGuid(Other.SlotGuid)
+	{};
+	
+	FItemSlot(UMounteaInstancedItem* NewItem, const TSet<FItemSlotStack>& NewStacks): #
+		Item(NewItem), Stacks(NewStacks)
 	{};
 
-	explicit FItemSlot(UMounteaInstancedItem* NewItem)
-		: Item(NewItem)
-	{};
+	explicit FItemSlot(UMounteaInstancedItem* NewItem);
 
 public:
 
@@ -187,6 +189,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(DisplayThumbnail=false))
 	UMounteaInstancedItem* Item = nullptr;
 
+	/**
+	 * The identifier for the slot. 
+	 * Slot Guid represents the Item's Guid which resides in the Slot. Item Guid and Slot Guid are always the same.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FGuid SlotGuid;
+	
 	/**
 	 * A set of item stacks, each representing a group of item quantities within this slot. It allows for the management of 
 	 * multiple quantities of an item, such as stacking identical items to save space and organize the inventory.
@@ -208,10 +217,7 @@ public:
 	/** Validates the total stack size, ensuring it does not exceed the item's maximum stack size. */
 	bool IsStackSizeValid() const;
 
-
 	bool operator==(const FItemSlot& Other) const;
-
-	bool operator==(const FGuid& Other) const;
 
 	bool operator==(const UMounteaInstancedItem* Other) const;
 

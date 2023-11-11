@@ -10,6 +10,7 @@
 #include "MounteaInventoryComponent.generated.h"
 
 
+struct FItemSlot;
 class UMounteaTransactionPayload;
 class UMounteaBaseUserWidget;
 class UMounteaInventoryItemBase;
@@ -60,6 +61,18 @@ public:
 	virtual void SaveInventory_Implementation() override;
 	
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
+	
+	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) override;
+
+	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const override;
+
+	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
+	
+
+
+
+
+
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const override;
 	
@@ -112,6 +125,9 @@ private:
 	void ClientRefreshInventory();
 
 protected:
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void AddItemToInventory_Server(UMounteaInstancedItem* Item, const int32& Quantity = 1);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
@@ -209,6 +225,9 @@ protected:
 
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	UMounteaBaseUserWidget* InventoryWBP = nullptr;
+
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
+	TSet<FItemSlot> InventorySlots;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<UMounteaInventoryItemBase*> Items;
