@@ -47,7 +47,7 @@ TArray<UMounteaInventoryItemAction*> UMounteaInventoryItemBase::GetItemActions()
 
 bool UMounteaInventoryItemBase::IsValid(UObject* WorldContextObject) const
 {
-	return true;
+	return ItemGuid.IsValid() && ItemData.IsValid();
 }
 
 void UMounteaInventoryItemBase::InitializeItemActions()

@@ -151,6 +151,8 @@ struct FMounteaInventoryItemRequiredData
 {
 	GENERATED_BODY()
 
+public:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault), DisplayName="Item Flags (Gameplay Tags)")
 	FGameplayTagContainer ItemFlags;
 
@@ -168,6 +170,17 @@ struct FMounteaInventoryItemRequiredData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
 	FMounteaItemQuantityData ItemQuantity;
+
+public:
+
+	bool IsValid() const
+	{
+		return
+		ItemName.IsEmpty() != true &&
+		ItemCategory != nullptr &&
+		ItemRarity != nullptr &&
+		ItemQuantity.MaxQuantity > 0;
+	}
 
 public:
 
@@ -250,6 +263,8 @@ struct FMounteaInventoryItemData : public FTableRowBase
 		: RequiredData(InRequiredData), OptionalData(InOptionalData), ItemConfig(InItemConfig)
 	{};
 
+public:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FMounteaInventoryItemRequiredData RequiredData;
 	
@@ -258,6 +273,13 @@ struct FMounteaInventoryItemData : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UMounteaInventoryItemConfig* ItemConfig;
+
+public:
+
+	bool IsValid() const
+	{
+		return RequiredData.IsValid();
+	}
 };
 
 #undef LOCTEXT_NAMESPACE

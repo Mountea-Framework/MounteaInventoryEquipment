@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Helpers/MounteaInventoryHelpers.h"
 #include "UObject/Interface.h"
 #include "MounteaInventoryEquipmentItem.generated.h"
 
@@ -32,6 +33,8 @@ public:
 
 	virtual void SetGuid(const FGuid& NewGuid) = 0;
 	virtual FGuid GetGuid() const = 0;
+
+	virtual FMounteaInventoryItemData GetItemData() const = 0;
 	
 	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const = 0;
 	virtual UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const = 0;
