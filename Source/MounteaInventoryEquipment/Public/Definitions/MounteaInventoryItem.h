@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 
 #include "MounteaInventoryTableTypes.h"
-#include "MounteaItemAdditionalData.h"
 
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "Interfaces/MounteaInventoryEquipmentItem.h"
@@ -19,7 +18,6 @@
 
 struct FMounteaItemAction;
 struct FMounteaItemConfig;
-class UMounteaItemAdditionalData;
 class IMounteaInventoryPickupInterface;
 
 
@@ -116,24 +114,6 @@ public:
 
 		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetPackage(), ClassFilter);
 	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaItemAdditionalData"), meta=(DeterminesOutputType = "ClassFilter"))
-	UMounteaItemAdditionalData* GetItemAdditionalData(const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult) const
-	{
-		if (ClassFilter == nullptr)
-		{
-			bResult = false;
-			return nullptr;
-		}
-
-		bResult = true;
-		if (ItemData.OptionalData.ItemAdditionalData == nullptr)
-		{
-			return NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
-		}
-
-		return ItemData.OptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemData.OptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
-	}
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
 	bool IsValid(UObject* WorldContextObject) const;
@@ -142,6 +122,10 @@ public:
 	virtual FGuid GetGuid() const override
 	{ return ItemGuid; };
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	virtual void SetGuid(const FGuid& NewGuid) override
+	{ ItemGuid = NewGuid; };
+	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	void InitializeItemActions();
 	

@@ -94,10 +94,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UMounteaInventoryItemConfig* GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaItemAdditionalData"), meta=(DeterminesOutputType = "ClassFilter"))
-	static UMounteaItemAdditionalData* GetItemAdditionalData(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult);
-
+	
 	static UMounteaEquipmentSlot* FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FMounteaEquipmentSlotDataCompare& Filter);
 
 	static UMounteaEquipmentSlot* FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FString& SlotID);

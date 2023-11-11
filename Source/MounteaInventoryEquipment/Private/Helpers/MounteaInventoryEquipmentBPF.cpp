@@ -213,23 +213,6 @@ UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const 
 	return Target->GetItemConfig(ClassFilter, bResult);
 }
 
-UMounteaItemAdditionalData* UMounteaInventoryEquipmentBPF::GetItemAdditionalData(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult)
-{
-	if (ClassFilter == nullptr)
-	{
-		bResult = false;
-		return nullptr;
-	}
-		
-	if (Target == nullptr)
-	{
-		bResult = false;
-		return nullptr;
-	}
-		
-	return Target->GetItemAdditionalData(ClassFilter, bResult);
-}
-
 UMounteaEquipmentSlot* UMounteaInventoryEquipmentBPF::FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FMounteaEquipmentSlotDataCompare& Filter)
 {
 	for (const auto& Itr : SlotsData)

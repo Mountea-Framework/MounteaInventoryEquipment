@@ -6,6 +6,7 @@
 #include "ObjectTrace.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Interfaces/MounteaInventoryInterface.h"
+
 #include "Net/UnrealNetwork.h"
 
 UMounteaInstancedItem::UMounteaInstancedItem()
@@ -95,7 +96,7 @@ void UMounteaInstancedItem::SetValidData()
 	{
 		UE_LOG(LogTemp, Error, TEXT("[UMounteaInstancedItem::SetValidData] Cannot initialize Item, will be deleted"))
 		
-		DestroyItem();
+		EmptyItem();
 	}
 }
 
@@ -143,9 +144,18 @@ bool UMounteaInstancedItem::CopyFromBaseItem()
 		return false;
 	}
 
+	// Construct new Config
 	bool bItemConfigFound = false;
-	ItemConfig.ItemConfig = SourceItem->GetItemConfig(SourceItem->GetItemConfigClass(), bItemConfigFound);
+	ItemConfig.ItemConfig = NewObject<UMounteaInventoryItemConfig>
+	(
+		GetPackage()->GetOuter(),
+		SourceItem->GetItemConfigClass(),
+		NAME_None,
+		RF_NoFlags,
+		SourceItem->GetItemConfig(SourceItem->GetItemConfigClass(), bItemConfigFound)
+	);
 
+	// Copy Flags (including those from Category and Rarity
 	ItemFlags = SourceItem->GetItemData().RequiredData.ItemFlags;
 	
 	return true;
@@ -169,9 +179,22 @@ bool UMounteaInstancedItem::CopyFromDataTable()
 		return false;
 	}
 
-	ItemConfig.ItemConfig = ItemData->ItemConfig;
-	
+	// Construct new Config
+	if (ItemData->ItemConfig)
+	{
+		ItemConfig.ItemConfig = NewObject<UMounteaInventoryItemConfig>
+		(
+			GetPackage()->GetOuter(),
+			ItemData->ItemConfig->StaticClass(),
+			NAME_None,
+			RF_NoFlags,
+			ItemData->ItemConfig
+		);
+	}
+
+	// Copy Flags (including those from Category and Rarity
 	ItemFlags = ItemData->RequiredData.ItemFlags;
+	
 	return true;
 }
 
@@ -179,6 +202,11 @@ void UMounteaInstancedItem::CleanupData()
 {
 	Quantity = 0;
 
+	if (ItemConfig.ItemConfig)
+	{
+		ItemConfig.ItemConfig->MarkAsGarbage();
+	}
+	
 	ItemConfig.ItemConfig = nullptr;
 	ItemFlags.Reset();
 }
@@ -189,13 +217,39 @@ void UMounteaInstancedItem::SetQuantity(const int32& NewValue)
 
 	if (NewValue <= 0)
 	{
-		DestroyItem();
+		EmptyItem();
 	}
 
 	MarkDirtyForReplication();
 }
 
-void UMounteaInstancedItem::DestroyItem()
+int32 UMounteaInstancedItem::ModifyQuantity(const int32& ValueToAdd)
+{
+	const int32 MaxQuantity = GetItemData().RequiredData.ItemQuantity.MaxQuantity;
+
+	// Trying to subtract to null or negative
+	if (Quantity + ValueToAdd <= 0)
+	{
+		EmptyItem();
+		
+		return 0;
+	}
+	
+	// Trying to add over
+	if (Quantity + ValueToAdd > MaxQuantity)
+	{
+		const int32 Remainder = (Quantity + ValueToAdd) - MaxQuantity;
+		const int32 NewQuantity = MaxQuantity;
+
+		SetQuantity(MaxQuantity);
+
+		return Remainder;
+	}
+	
+	return 0;
+}
+
+void UMounteaInstancedItem::EmptyItem()
 {
 	//TODO
 	// Destroy Stacks

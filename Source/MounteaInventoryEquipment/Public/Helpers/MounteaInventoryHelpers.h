@@ -92,6 +92,7 @@ enum class EItemUpdateResult : uint8
 	Default											UMETA(Hidden)
 };
 
+
 USTRUCT(BlueprintType)
 struct FInventoryUpdateResult
 {
@@ -232,9 +233,6 @@ struct FMounteaInventoryItemOptionalData
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly)
 	TSubclassOf<AActor> SpawnActor;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, meta=(NoResetToDefault, DisplayThumbnail=false))
-	class UMounteaItemAdditionalData* ItemAdditionalData;
 };
 
 /**

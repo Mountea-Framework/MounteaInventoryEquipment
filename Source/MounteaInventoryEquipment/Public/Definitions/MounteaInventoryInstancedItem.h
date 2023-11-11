@@ -16,7 +16,6 @@
 #include "Helpers/MounteaItemHelpers.h"
 #include "MounteaInventoryInstancedItem.generated.h"
 
-
 #define LOCTEXT_NAMESPACE "MounteaInstancedItem"
 
 /**
@@ -43,7 +42,12 @@ public:
 	UMounteaInstancedItem();
 	virtual ~UMounteaInstancedItem() override;
 	
-
+/*===============================================================================
+	Variables
+	
+	Contains the variables that hold the item's data, such as its source, quantity, flags, and configuration.
+	These variables define the state and the properties of the inventory item instance.
+===============================================================================*/
 #pragma region Variables
 	
 public:
@@ -87,6 +91,12 @@ private:
 
 #pragma endregion
 
+/*===============================================================================
+	Events
+	
+	BlueprintAssignable events for responding to item-related actions, such as adding, removing, 
+	initializing, or modifying the item. These events provide hooks for game logic and UI updates.
+===============================================================================*/
 #pragma region Events
 
 public:
@@ -119,12 +129,17 @@ protected:
 	
 #pragma endregion 
 
-#pragma region Functions
+/*===============================================================================
+	Interface Functions
+	
+	Interface functions that provide access to item functionality and are implementing Interface functions.
+	These include initialization, getter and setter methods, and other item manipulations.
+===============================================================================*/
+#pragma region InterfaceFunctions
 
 #pragma region Public
 	
 public:
-	
 	
 	virtual bool InitializeNewItem_Implementation(const FItemInitParams& InitParams) override;
 
@@ -174,10 +189,7 @@ public:
 	bool ConstructItem();
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	virtual void SetQuantity(const int32& NewValue) override;
-	
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	void DestroyItem();
+	virtual void EmptyItem() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual FMounteaInventoryItemData GetItemData() const override;
@@ -186,28 +198,37 @@ public:
 	virtual FGuid GetGuid() const override
 	{ return InstanceID; };
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	virtual void SetGuid(const FGuid& NewGuid) override
+	{ InstanceID = NewGuid; };
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
 	virtual int32 GetQuantity() const override;
+
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
+	virtual void SetQuantity(const int32& NewValue) override;
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory")
+	virtual int32 ModifyQuantity(const int32& ValueToAdd) override;
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
 	virtual FGameplayTagContainer GetItemFlags() const override
 	{ return ItemFlags; };
-
 	
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	void AddItemFlag(const FGameplayTag& NewFlag);
+	virtual void AddItemFlag(const FGameplayTag& NewFlag) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	void SetItemFlags(const FGameplayTagContainer& NewFlags);
+	virtual void SetItemFlags(const FGameplayTagContainer& NewFlags) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	void RemoveItemFlag(const FGameplayTag& RemoveFlag);
+	virtual void RemoveItemFlag(const FGameplayTag& RemoveFlag) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	bool IsFlagSet(const FGameplayTag& QueryFlag) const;
+	virtual bool IsFlagSet(const FGameplayTag& QueryFlag) const override;
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
-	bool AreFlagsSet(const FGameplayTagContainer& QueryFlags, const bool bSimpleSearch = true) const;
+	virtual bool AreFlagsSet(const FGameplayTagContainer& QueryFlags, const bool bSimpleSearch = true) const override;
 
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
@@ -216,6 +237,16 @@ public:
 	virtual void SetWorld(UWorld* NewWorld);
 	
 #pragma endregion
+
+#pragma endregion
+
+/*===============================================================================
+	Class Functions
+		
+	Functions that are specific for the class are not inherited from any of its Interface parents.
+	This section also includes the lifetime properties for replication.
+===============================================================================*/
+#pragma region ClassFunctions
 
 #pragma region Protected
 	

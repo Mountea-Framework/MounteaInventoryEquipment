@@ -30,6 +30,7 @@ public:
 
 	virtual void SetValidData() = 0;
 
+	virtual void SetGuid(const FGuid& NewGuid) = 0;
 	virtual FGuid GetGuid() const = 0;
 	
 	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const = 0;

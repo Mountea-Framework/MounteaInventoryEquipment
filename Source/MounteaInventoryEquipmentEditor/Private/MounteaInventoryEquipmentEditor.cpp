@@ -12,7 +12,6 @@
 #include "AssetActions/FMounteaInventoryComponentAssetAction.h"
 #include "AssetActions/FMounteaInventoryContentThemeAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemActionAssetAction.h"
-#include "AssetActions/FMounteaInventoryItemAdditionalDataAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemConfigAssetAction.h"
 #include "AssetActions/FMounteaInventoryItemDescriptionsTableAssetAction.h"
@@ -75,7 +74,6 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryThemeAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemsTableAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemDescsAssetAction>());
-		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryItemAdditionalDataAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryCategoryAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryRarityAssetAction>());
 		RegisterAssetTypeAction(FAssetToolsModule::GetModule().Get(), MakeShared<FMounteaInventoryComponentAssetAction>());
