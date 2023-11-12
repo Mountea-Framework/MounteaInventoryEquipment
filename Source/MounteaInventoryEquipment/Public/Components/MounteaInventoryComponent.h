@@ -56,6 +56,9 @@ public:
 	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass_Implementation() const override;
 	virtual UMounteaBaseUserWidget* GetInventoryUI_Implementation() const override;
 
+	virtual void SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
+	virtual void SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewWBP) override;
+
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
 	
@@ -66,9 +69,15 @@ public:
 	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const override;
 
 	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
+	virtual TArray<UMounteaInstancedItem*> SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	
+	virtual FGameplayTagContainer GetInventoryFlags_Implementation() const override;
+	virtual bool HasFlag_Implementation(const FGameplayTag& SearchedFlag, const bool bSearchExact = true) override;
+	virtual bool HasFlags_Implementation(const FGameplayTagContainer& SearchedFlags, const bool bSearchExact = true, const bool bSearchFast = true) override;
+	virtual bool SetInventoryFlags_Implementation(const FGameplayTagContainer& NewFlags) override;
+	virtual bool SetInventoryFlag_Implementation(const FGameplayTag& NewFlag) override;
 
-
+	virtual bool DoesHaveAuthority_Implementation() const override;
 
 
 
@@ -87,16 +96,14 @@ public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
 
-	virtual void SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
-	virtual void SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewWBP) override;
+	
 	
 	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
 	
 	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const override;
 	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const override;
 	
-	virtual bool SetInventoryFlags_Implementation() override;
-	virtual bool DoesHaveAuthority_Implementation() const override;
+	
 	
 public:
 
@@ -219,11 +226,17 @@ protected:
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, DisallowCreateNew, NoElementDuplicate))
 	TArray<FItemSlot> InventorySlots;
 
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, DisallowCreateNew, NoElementDuplicate))
+	FGameplayTagContainer InventoryFlags;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	FMounteaInventoryConfigBase InventoryConfig;
+
+
+
+	
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<UMounteaInventoryItemBase*> Items;
-	
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
-	FMounteaInventoryConfigBase InventoryConfig;
 
 private:
 	

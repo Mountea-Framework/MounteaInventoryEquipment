@@ -68,6 +68,44 @@ public:
 	virtual void SaveInventory_Implementation() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	FInventoryUpdateResult AddItemToInventory(UMounteaInstancedItem* Item, const int32& Quantity = 1);
+	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool CanAddItem(UMounteaInstancedItem* Item, const int32& Quantity) const;
+	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UMounteaInstancedItem* SearchSingleItem(const FItemRetrievalFilter& SearchFilter) const;
+	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TArray<UMounteaInstancedItem*> SearchMultipleItems(const FItemRetrievalFilter& SearchFilter) const;
+	virtual TArray<UMounteaInstancedItem*> SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool SetInventoryFlags(const FGameplayTagContainer& NewFlags);
+	virtual bool SetInventoryFlags_Implementation(const FGameplayTagContainer& NewFlags) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool SetInventoryFlag(const FGameplayTag& NewFlag);
+	virtual bool SetInventoryFlag_Implementation(const FGameplayTag& NewFlag) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	FGameplayTagContainer GetInventoryFlags() const;
+	virtual FGameplayTagContainer GetInventoryFlags_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool HasFlag(const FGameplayTag& SearchedFlag, const bool bSearchExact = true);
+	virtual bool HasFlag_Implementation(const FGameplayTag& SearchedFlag, const bool bSearchExact = true) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool HasFlags(const FGameplayTagContainer& SearchedFlags, const bool bSearchExact = true);
+	virtual bool HasFlags_Implementation(const FGameplayTagContainer& SearchedFlags, const bool bSearchExact = true, const bool bSearchFast = true) = 0;
+
+	
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	UMounteaInventoryItemBase* FindItem(const FItemRetrievalFilter& SearchFilter) const;
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 
@@ -95,29 +133,6 @@ public:
 	TArray<UMounteaInventoryItemBase*> GetItems(const FItemRetrievalFilter OptionalFilter) const;
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const = 0;
 
-
-
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	FInventoryUpdateResult AddItemToInventory(UMounteaInstancedItem* Item, const int32& Quantity = 1);
-	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool CanAddItem(UMounteaInstancedItem* Item, const int32& Quantity) const;
-	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const = 0;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	UMounteaInstancedItem* SearchSingleItem(const FItemRetrievalFilter& SearchFilter) const;
-	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
-
-
-
-
-
-
-
-
-	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool AddOrUpdateItem(UMounteaInventoryItemBase* NewItem, const int32& Quantity = 1);
 	virtual bool AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity = 1) = 0;
@@ -162,9 +177,7 @@ public:
 	TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass() const;
 	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const = 0;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool SetInventoryFlags();
-	virtual bool SetInventoryFlags_Implementation() = 0;
+	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool DoesHaveAuthority() const;

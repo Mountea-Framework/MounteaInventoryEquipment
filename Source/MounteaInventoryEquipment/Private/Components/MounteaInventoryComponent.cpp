@@ -45,7 +45,7 @@ void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	//DOREPLIFETIME_WITH_PARAMS(UMounteaInventoryComponent, Items, Params)
 	
 	DOREPLIFETIME(UMounteaInventoryComponent, InventorySlots);
-	DOREPLIFETIME(UMounteaInventoryComponent, InventoryConfig);
+	DOREPLIFETIME(UMounteaInventoryComponent, InventoryFlags);
 }
 
 bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
@@ -78,11 +78,6 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 
 		// Cleanup all Nullified Slots
 		NullifiedSlots.Empty();
-
-		if (Channel->KeyNeedsToReplicate(InventoryConfig.MounteaInventoryConfig->GetUniqueID(), InventoryConfig.MounteaInventoryConfig->GetRepKey()))
-		{
-			bUpdated |= Channel->ReplicateSubobject(InventoryConfig.MounteaInventoryConfig, *Bunch, *RepFlags);
-		}
 	}
 
 	return bUpdated;
@@ -726,9 +721,6 @@ UMounteaInstancedItem* UMounteaInventoryComponent::SearchSingleItem_Implementati
 	// If we are searching specifically by FGuid
 	if (SearchFilter.bSearchByGUID)
 	{
-		FItemSlot SearchSlot;
-		SearchSlot.SlotGuid = SearchFilter.Guid;
-		
 		const FItemSlot* Slot =  InventorySlots.FindByKey(SearchFilter.Guid);
 		if (Slot && Slot->IsValid())
 		{
@@ -756,6 +748,79 @@ UMounteaInstancedItem* UMounteaInventoryComponent::SearchSingleItem_Implementati
 	// No matching item found in this case
 	return nullptr;
 }
+
+TArray<UMounteaInstancedItem*> UMounteaInventoryComponent::SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const
+{
+	TArray<UMounteaInstancedItem*> ResultArray;
+
+	// If we are searching specifically by a UMounteaInstancedItem
+	if (SearchFilter.bSearchByItem && SearchFilter.Item != nullptr)
+	{
+		const FItemSlot* Slot = InventorySlots.FindByKey(SearchFilter.Item);
+		if (Slot && Slot->IsValid())
+		{
+			ResultArray.AddUnique(Slot->Item);
+		}
+	}
+
+	// If we are searching specifically by FGuid
+	if (SearchFilter.bSearchByGUID)
+	{
+		const FItemSlot* Slot =  InventorySlots.FindByKey(SearchFilter.Guid);
+		if (Slot && Slot->IsValid())
+		{
+			ResultArray.AddUnique(Slot->Item);
+		}
+	}
+	
+	// Search by other conditions
+	for (const FItemSlot& Slot : InventorySlots)
+	{
+		UMounteaInstancedItem* Item = Slot.Item;
+		if (!Item) continue;
+
+		if (SearchFilter.bSearchByClass && Item->GetSourceItem() && Item->GetSourceItem()->IsA(SearchFilter.Class))
+		{
+			ResultArray.AddUnique(Item);
+		}
+
+		if (SearchFilter.bSearchByTag && Item->GetItemFlags().HasAny(SearchFilter.Tags))
+		{
+			ResultArray.AddUnique(Item);
+		}
+	}
+
+	// Add other search conditions here as necessary
+
+	return ResultArray;
+}
+
+FGameplayTagContainer UMounteaInventoryComponent::GetInventoryFlags_Implementation() const
+{
+	return InventoryFlags;
+}
+
+bool UMounteaInventoryComponent::HasFlag_Implementation(const FGameplayTag& SearchedFlag, const bool bSearchExact)
+{
+	return bSearchExact ? InventoryFlags.HasTagExact(SearchedFlag) : InventoryFlags.HasTag(SearchedFlag);
+}
+
+bool UMounteaInventoryComponent::HasFlags_Implementation(const FGameplayTagContainer& SearchedFlags, const bool bSearchExact, const bool bSearchFast)
+{
+	if (bSearchExact)
+	{
+		return bSearchFast ? InventoryFlags.HasAnyExact(SearchedFlags) : InventoryFlags.HasAllExact(SearchedFlags);
+	}
+	else
+	{
+		return bSearchFast ? InventoryFlags.HasAny(SearchedFlags) : InventoryFlags.HasAll(SearchedFlags);
+	}
+}
+
+
+
+
+
 
 bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity)
 {
@@ -878,6 +943,9 @@ void UMounteaInventoryComponent::OnRep_Items()
 		if (Itr.Item)
 		{
 			Itr.Item->SetWorld(GetWorld());
+
+			TScriptInterface<IMounteaInventoryInterface> OwningInterface = this;
+			Itr.Item->SetOwningInventory(OwningInterface);
 		}
 	}
 
@@ -923,10 +991,28 @@ TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryComponent::GetInventoryCon
 	return nullptr;
 }
 
-bool UMounteaInventoryComponent::SetInventoryFlags_Implementation()
+bool UMounteaInventoryComponent::SetInventoryFlags_Implementation(const FGameplayTagContainer& NewFlags)
 {
-	// TODO: Implement flags updates
-	// then replicate changes
+	// TODO: replicate
+	
+	InventoryFlags.Reset();
+
+	InventoryFlags.AppendTags(NewFlags);
+	
+	return true;
+}
+
+bool UMounteaInventoryComponent::SetInventoryFlag_Implementation(const FGameplayTag& NewFlag)
+{
+	// TODO: replicate
+
+	if (InventoryFlags.HasTag(NewFlag))
+	{
+		return false;
+	}
+
+	InventoryFlags.AddTag(NewFlag);
+
 	return true;
 }
 
@@ -935,6 +1021,10 @@ bool UMounteaInventoryComponent::DoesHaveAuthority_Implementation() const
 	if (GetOwner()==nullptr) return false;
 	return GetOwner()->HasAuthority();
 }
+
+
+
+
 
 void UMounteaInventoryComponent::TryAddItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
