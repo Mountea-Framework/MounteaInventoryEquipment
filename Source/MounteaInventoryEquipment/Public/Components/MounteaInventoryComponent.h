@@ -4,13 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Helpers/MounteaItemHelpers.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Setup/MounteaInventoryConfig.h"
 
 #include "MounteaInventoryComponent.generated.h"
 
-
-struct FItemSlot;
 class UMounteaTransactionPayload;
 class UMounteaBaseUserWidget;
 class UMounteaInventoryItemBase;
@@ -95,10 +94,7 @@ public:
 	
 	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const override;
 	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const override;
-
-	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const override;
-	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) override;
-
+	
 	virtual bool SetInventoryFlags_Implementation() override;
 	virtual bool DoesHaveAuthority_Implementation() const override;
 	
@@ -106,11 +102,11 @@ public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() override
 	{ return OnInventoryUpdated; };
-	virtual FOnItemUpdated& GetItemAddedHandle() override
+	virtual FOnInventoryUpdated& GetItemAddedHandle() override
 	{ return OnItemAdded; };
-	virtual FOnItemUpdated& GetItemRemovedHandle() override
+	virtual FOnInventoryUpdated& GetItemRemovedHandle() override
 	{ return OnItemRemoved; };
-	virtual FOnItemUpdated& GetItemUpdatedHandle() override
+	virtual FOnInventoryUpdated& GetItemUpdatedHandle() override
 	{ return OnItemUpdated; };
 
 private:
@@ -118,9 +114,6 @@ private:
 	UFUNCTION()
 	void OnRep_Items();
 	
-	UFUNCTION()
-	void OnRep_OtherInventory();
-
 	UFUNCTION(Client, Reliable)
 	void ClientRefreshInventory();
 
@@ -145,21 +138,18 @@ protected:
 	UFUNCTION(Client, Unreliable)
 	void PostInventoryUpdated_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Server, Unreliable)
-	void PostItemAdded(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemAdded(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Client, Unreliable)
-	void PostItemAdded_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemAdded_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Server, Unreliable)
-	void PostItemRemoved(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemRemoved(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Client, Unreliable)
-	void PostItemRemoved_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemRemoved_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Server, Unreliable)
-	void PostItemUpdated(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemUpdated(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Client, Unreliable)
-	void PostItemUpdated_Client(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemUpdated_Client(const FInventoryUpdateResult& UpdateContext);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void SetOtherInventory_Server(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
-	
 private:
 
 	/**
@@ -177,14 +167,14 @@ private:
 	bool CanExecuteCosmetics() const;
 
 	UFUNCTION()
-	void PostItemAdded_Client_RequestUpdate(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemAdded_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
-	void PostItemRemoved_Client_RequestUpdate(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemRemoved_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
-	void PostItemUpdated_Client_RequestUpdate(UMounteaInventoryItemBase* Item, const FItemUpdateResult& UpdateContext);
+	void PostItemUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	
 	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
-	void RequestItemNotification(const FItemUpdateResult& UpdateContext) const;
+	void RequestItemNotification(const FInventoryUpdateResult& UpdateContext) const;
 
 	bool HasItem_Simple(const FItemRetrievalFilter& SearchFilter) const;
 	bool HasItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const; 
@@ -206,17 +196,17 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory" )
 	FOnInventoryUpdated OnInventoryUpdated_Client;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FOnItemUpdated OnItemAdded;
+	FOnInventoryUpdated OnItemAdded;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FOnItemUpdated OnItemAdded_Client;
+	FOnInventoryUpdated OnItemAdded_Client;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FOnItemUpdated OnItemRemoved;
+	FOnInventoryUpdated OnItemRemoved;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FOnItemUpdated OnItemRemoved_Client;
+	FOnInventoryUpdated OnItemRemoved_Client;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FOnItemUpdated OnItemUpdated;
+	FOnInventoryUpdated OnItemUpdated;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FOnItemUpdated OnItemUpdated_Client;
+	FOnInventoryUpdated OnItemUpdated_Client;
 
 protected:
 
@@ -226,8 +216,8 @@ protected:
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	UMounteaBaseUserWidget* InventoryWBP = nullptr;
 
-	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
-	TSet<FItemSlot> InventorySlots;
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, DisallowCreateNew, NoElementDuplicate))
+	TArray<FItemSlot> InventorySlots;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<UMounteaInventoryItemBase*> Items;
@@ -237,20 +227,6 @@ protected:
 
 private:
 	
-	/**
-	 * @brief This attribute represents another inventory in relation to the current instance. 
-	 * It could represent an inventory that the player is looting, or the inventory from which the player is looting.
-	 * It can also represent a store's inventory. The interface allows for interaction with various types of inventories.
-	 *
-	 * Use GetOtherInventory() to retrieve the inventory this attribute is pointing to.
-	 * Use SetOtherInventory() to change the inventory this attribute is pointing to.
-	 *
-	 * This attribute is transient.
-	 */
-	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_OtherInventory)
-	TScriptInterface<IMounteaInventoryInterface> OtherInventory;
-
-
 	UPROPERTY()
 	int32 ReplicatedItemsKey = 0;
 	
@@ -261,6 +237,10 @@ private:
 	UPROPERTY(EditAnywhere, Category="2. Debug")
 	float Duration_RequestSyncTimerHandle = 0.2f;
 
+	// Filled from RemoveFromItem to keep track of Items that were removed
+	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
+	TArray<FItemSlot> NullifiedSlots;
+	
 	TArray<UMounteaInventoryItemBase*> RemovedItems;
 
 	//TODO: Settings?

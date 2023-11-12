@@ -20,7 +20,7 @@ bool FItemSlotStack::Serialize(FArchive& Ar)
 
 bool FItemSlotStack::operator==(const FItemSlotStack& Other) const
 {
-	return Other.StackGuid == StackGuid;
+	return Other.StackGuid == this->StackGuid;
 }
 
 FItemSlot::FItemSlot(UMounteaInstancedItem* NewItem)
@@ -60,12 +60,21 @@ bool FItemSlot::IsStackSizeValid() const
 
 bool FItemSlot::operator==(const FItemSlot& Other) const
 {
-	return Other.Item == Item;
+	return Other.Item == this->Item;
+}
+
+bool FItemSlot::operator==(const FGuid& Other) const
+{
+	if (Item)
+	{
+		return this->Item->GetGuid() == Other;
+	}
+	return false;
 }
 
 bool FItemSlot::operator==(const UMounteaInstancedItem* Other) const
 {
-	return Item == Other;
+	return this->Item == Other;
 }
 
 bool FItemSlot::Serialize(FArchive& Ar)

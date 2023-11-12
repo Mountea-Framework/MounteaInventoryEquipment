@@ -263,6 +263,14 @@ public:
 ===============================================================================*/
 #pragma region ClassFunctions
 
+#pragma region Public
+public:
+
+	int GetRepKey() const
+	{ return RepKey; }
+	
+#pragma endregion 
+	
 #pragma region Protected
 	
 protected:
@@ -282,10 +290,7 @@ protected:
 	{
 		RepKey++;
 	}
-
-	int GetRepKey() const
-	{ return RepKey; }
-
+	
 	FORCEINLINE ULevel* GetLevel() const
 	{
 		return GetTypedOuter<ULevel>();

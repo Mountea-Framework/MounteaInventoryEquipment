@@ -24,7 +24,6 @@ class UMounteaInventoryInterface : public UInterface
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FInventoryUpdateResult&, UpdateContext);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdated, class UMounteaInventoryItemBase*, Item, const FItemUpdateResult&, UpdateContext);
 
 /**
  * Mountea Inventory Interface.
@@ -162,15 +161,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass() const;
 	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const = 0;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TScriptInterface<IMounteaInventoryInterface> GetOtherInventory() const;
-	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const = 0;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void SetOtherInventory(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
-	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) = 0;
-
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool SetInventoryFlags();
 	virtual bool SetInventoryFlags_Implementation() = 0;
@@ -182,7 +173,7 @@ public:
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() = 0;
-	virtual FOnItemUpdated& GetItemAddedHandle() = 0;
-	virtual FOnItemUpdated& GetItemRemovedHandle() = 0;
-	virtual FOnItemUpdated& GetItemUpdatedHandle() = 0;
+	virtual FOnInventoryUpdated& GetItemAddedHandle() = 0;
+	virtual FOnInventoryUpdated& GetItemRemovedHandle() = 0;
+	virtual FOnInventoryUpdated& GetItemUpdatedHandle() = 0;
 };

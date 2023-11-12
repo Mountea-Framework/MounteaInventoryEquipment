@@ -18,6 +18,7 @@ class UTexture2D;
 class AActor;
 class ULevel;
 class UStreamableRenderAsset;
+class UMounteaInstancedItem;
 
 class UMounteaInventoryItemConfig;
 
@@ -358,37 +359,43 @@ struct FItemRetrievalFilter
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
-	uint8 bSearchByTag : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) //, meta=(EditCondition="bSearchByTag"))
-	FGameplayTagContainer Tags;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
-	uint8 bSearchByClass : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) //, meta=(EditCondition="bSearchByClass"))
-	TSubclassOf<UMounteaInventoryItemBase> Class;
+public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
-	uint8 bSearchByGUID : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) //, meta=(EditCondition="bSearchByGUID"))
-	FGuid Guid;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
-	uint8 bSearchByItem : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite) //, meta=(EditCondition="bSearchByGUID"))
-	UMounteaInstancedItem* Item ;
-
-	bool IsValid() const
-	{
-		return bSearchByClass || bSearchByTag || bSearchByGUID || bSearchByItem;
-	}
-
 	FItemRetrievalFilter(): bSearchByTag(0), bSearchByClass(0), bSearchByGUID(0), bSearchByItem(0), Item(nullptr)
 	{};
 	
 	FItemRetrievalFilter(const bool ByTag, const FGameplayTagContainer& InTags, const bool ByClass, const TSubclassOf<UMounteaInventoryItemBase> InClass, const bool ByGUID, const FGuid InGUID, const bool ByItem, UMounteaInstancedItem* InItem)
 		: bSearchByTag(ByTag), Tags(InTags), bSearchByClass(ByClass), Class(InClass), bSearchByGUID(ByGUID), Guid(InGUID), bSearchByItem(ByItem), Item(InItem)
 	{};
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByTag : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTagContainer Tags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByClass : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UMounteaInventoryItemBase> Class;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByGUID : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGuid Guid;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bSearchByItem : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMounteaInstancedItem* Item;
+
+public:
+
+	bool IsValid() const
+	{
+		return bSearchByClass || bSearchByTag || bSearchByGUID || bSearchByItem;
+	};
 };
 
 #pragma endregion
