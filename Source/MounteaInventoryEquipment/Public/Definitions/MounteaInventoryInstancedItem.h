@@ -147,7 +147,7 @@ public:
 	virtual  TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const override
 	{ return OwningInventory; };
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	virtual void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) override;
+	virtual void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) override;
 	
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")

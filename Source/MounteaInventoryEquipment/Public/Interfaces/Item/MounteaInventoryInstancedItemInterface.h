@@ -158,7 +158,7 @@ public:
 	
 public:
 
-	virtual void SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) = 0;
+	virtual void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) = 0;
 	virtual TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const = 0;
 	
 	virtual int32 GetQuantity() const = 0;

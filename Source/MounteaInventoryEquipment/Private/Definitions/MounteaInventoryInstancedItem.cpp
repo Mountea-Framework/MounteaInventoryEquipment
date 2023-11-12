@@ -342,7 +342,7 @@ bool UMounteaInstancedItem::AreFlagsSet(const FGameplayTagContainer& QueryFlags,
 	return bAreFlagsSet;
 }
 
-void UMounteaInstancedItem::SetOwningInventory(TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory)
+void UMounteaInstancedItem::SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory)
 {
 	OwningInventory = NewOwningInventory;
 

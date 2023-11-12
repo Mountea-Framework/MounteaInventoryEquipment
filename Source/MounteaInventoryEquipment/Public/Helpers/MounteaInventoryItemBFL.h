@@ -46,32 +46,84 @@ public:
 		return FMath::Min(QuantityToAdd, MaxStackSize);
 	}
 
-	// Function to add a new stack to the inventory
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	static FItemSlotStack AddNewStack(UMounteaInstancedItem* Item, int32 Quantity)
+	static FItemSlot MakeNewSlot(UMounteaInstancedItem* NewItemInstance, const int32& Quantity)
 	{
-		FItemSlotStack NewStack;
-		NewStack.StackSize = Quantity;
-		NewStack.StackGuid = FGuid::NewGuid();
-		// Link to the parent slot or item if needed
-		// NewStack.SlotGuid = ...
+		// Create a new slot for the item instance
+		FItemSlot NewSlot = FItemSlot(NewItemInstance);
 
-		return NewStack;
+		// Add to existing stacks or create new ones as necessary, and update the remaining quantity
+		UpdateStacksInSlot(NewSlot, Quantity);
+
+		// Return the new slot with updated stacks
+		return NewSlot;
 	}
-
-	// Function to update the total quantity of items
-	UFUNCTION(BlueprintCallable, Category="Inventory")
-	static void UpdateTotalQuantity(UMounteaInstancedItem* Item, int32 QuantityToAdd)
+	
+	static void UpdateStacksInSlot(FItemSlot& Slot, const int32 Quantity)
 	{
-		if (!Item)
+		// Assuming DetermineMaxStackSize() is a function that determines the maximum stack size for the item
+		const int32 MaxStackSize = DetermineMaxStackSize(Slot.Item); 
+		int32 RemainingQuantity = Quantity;
+
+		// Update existing non-full stacks
+		for (FItemSlotStack& Stack : Slot.Stacks)
 		{
-			return;
+			if (Stack.StackSize < MaxStackSize)
+			{
+				const int32 AvailableSpace = MaxStackSize - Stack.StackSize;
+				const int32 AmountToAdd = FMath::Min(AvailableSpace, RemainingQuantity);
+
+				Stack.StackSize += AmountToAdd;
+				RemainingQuantity -= AmountToAdd;
+
+				if (RemainingQuantity <= 0)
+				{
+					return; // All the quantity has been successfully added to existing stacks.
+				}
+			}
 		}
 
-		// TODO: Calculate this value etc.
-		//Item->ModifyQuantity(QuantityToAdd);
-	}
+		// Create new stacks if any quantity is left
+		while (RemainingQuantity > 0)
+		{
+			const int32 AmountToAdd = FMath::Min(MaxStackSize, RemainingQuantity);
+			FItemSlotStack NewStack(AmountToAdd, Slot.SlotGuid); // Assuming constructor takes stack size and slot GUID
+			Slot.Stacks.Add(NewStack);
 
+			RemainingQuantity -= AmountToAdd;
+		}
+	}
+		
+	// Function to add a new stack to the inventory
+	static int32 UpdateStack(FItemSlot& Slot, FGuid& StackGuid, const int32 Quantity)
+	{
+		// If no valid stack is found, add a new one
+		if (FItemSlotStack* ExistingStack = Slot.Stacks.FindByKey(StackGuid))
+		{
+			// Logic to update the existing stack's quantity
+			const int32 AvailableSpace = DetermineMaxStackSize(Slot.Item) - ExistingStack->StackSize;
+			const int32 AmountToAdd = FMath::Min(AvailableSpace, Quantity);
+        
+			ExistingStack->StackSize += AmountToAdd;
+        
+			// If the stack size drops to 0 or below, remove the stack
+			if (ExistingStack->StackSize <= 0)
+			{
+				Slot.Stacks.RemoveSingle(*ExistingStack);
+			}
+        
+			return Quantity - AmountToAdd;
+		}
+		else
+		{
+			// Add a new stack with the specified quantity
+			const int32 AmountToAdd = FMath::Min(DetermineMaxStackSize(Slot.Item), Quantity);
+			const FItemSlotStack NewStack(AmountToAdd, Slot.SlotGuid);
+			Slot.Stacks.Add(NewStack);
+
+			return Quantity - AmountToAdd;
+		}
+	}
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	static bool IsItemValid(const UMounteaInstancedItem* Item)
 	{

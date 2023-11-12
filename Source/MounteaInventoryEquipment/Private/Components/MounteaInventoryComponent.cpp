@@ -137,6 +137,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
 	{
 		Result.ResultID = 400; // Bad Request
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item.");
+		
 		return Result;
 	}
 
@@ -148,6 +149,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
 		Result.OptionalPayload = Item;
 		Result.ResultID = 102; // Corresponds to "Processing"
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
+		
 		return Result;
 	}
 	
@@ -157,6 +159,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         Result.OptionalPayload = Item;
         Result.ResultID = 400; // Corresponds to "Bad Request"
         Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidIQuantity", "Quantity less than 1 is forbidden.");
+    	
         return Result;
     }
 
@@ -166,6 +169,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         Result.OptionalPayload = Item;
         Result.ResultID = 403; // Corresponds to "Forbidden"
         Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
+    	
         return Result;
     }
 
@@ -195,6 +199,9 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
             Result.OptionalPayload = ExistingItem;
             Result.ResultID = 200; // Corresponds to "OK"
             Result.ResultText =  LOCTEXT("InventoryUpdateResult_ItemUpdated", "Added all of the item to the existing stack.");
+
+        	FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem);
+        	UMounteaInventoryItemBFL::UpdateStacksInSlot(*Slot, Quantity);
         }
         else
         {
@@ -205,7 +212,12 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
             Result.OptionalPayload = ExistingItem;
             Result.ResultID = 206; // Analogous to "Partial Content"
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemUpdatedPartly", "Added part of the item to the existing stack. Some quantity remains in the source item.");
+
+        	FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem);
+        	UMounteaInventoryItemBFL::UpdateStacksInSlot(*Slot, MaxAddAmount);
         }
+
+    	OnItemUpdated.Broadcast(Result);
     }
     else
     {
@@ -213,12 +225,16 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         if (Quantity <= MaxAddAmount)
         {
             // Directly add the entire source item to the inventory
-        	// TODO: implement logic to automatically split items to stacks
-        	const FItemSlot NewSlot = FItemSlot(Item);
+        	const FItemSlot NewSlot = UMounteaInventoryItemBFL::MakeNewSlot(Item, Quantity);
 
             Result.OptionalPayload = Item;
             Result.ResultID = 201; // Corresponds to "Created"
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemCreated", "Added the entire item to the inventory.");
+        	
+        	Item->SetWorld(GetWorld());
+        	Item->SetOwningInventory(this);
+
+        	OnItemAdded.Broadcast(Result);
         }
         else
         {
@@ -226,29 +242,28 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
             UMounteaInstancedItem* NewItemInstance = NewObject<UMounteaInstancedItem>(GetWorld());
         	
         	FItemInitParams ItemInitParams;
-        	ItemInitParams.Quantity = MaxAddAmount;
-        	ItemInitParams.OwningInventory = this;
-            switch (Item->GetItemDataSource())
-            {
-	            case EItemDataSource::EIDS_SourceTable:
-	            	ItemInitParams.SourceTable = Item->SourceTable;
+	        {
+		        ItemInitParams.Quantity = MaxAddAmount;
+            	ItemInitParams.OwningInventory = this;
+            	switch (Item->GetItemDataSource())
+            	{
+            	case EItemDataSource::EIDS_SourceTable:
+            		ItemInitParams.SourceTable = Item->SourceTable;
             		ItemInitParams.SourceRow = Item->SourceRow;
-		            break;
-	            case EItemDataSource::EIDS_SourceItem:
-	            	ItemInitParams.SourceItem = Item->SourceItem;
-		            break;
-	            case EItemDataSource::Default:
-				default:
-            		break;;
-            }
+            		break;
+            	case EItemDataSource::EIDS_SourceItem:
+            		ItemInitParams.SourceItem = Item->SourceItem;
+            		break;
+            	case EItemDataSource::Default:
+            	default:
+					break;
+            	}
+	        }
         	
-        	const bool bNewItemSuccess = NewItemInstance->Execute_InitializeNewItem(NewItemInstance, ItemInitParams);
-
-        	if (bNewItemSuccess)
+			// Try make a new item
+        	if (NewItemInstance->Execute_InitializeNewItem(NewItemInstance, ItemInitParams))
         	{
-        		// TODO: implement logic to automatically split items to stacks
-		        const FItemSlot NewSlot = FItemSlot(NewItemInstance);
-        		
+        		const FItemSlot NewSlot = UMounteaInventoryItemBFL::MakeNewSlot(NewItemInstance, MaxAddAmount);
         		
         		InventorySlots.Add(NewSlot); // Add the new instance to the inventory
         		Item->ModifyQuantity(-MaxAddAmount); // Decrease the source item's quantity
@@ -259,13 +274,21 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         	}
 	        else
 	        {
-	        	Result.OptionalPayload = Item;
+	        	Result.OptionalPayload = nullptr;
 	        	Result.ResultID = 500; // Analogous to "Unknown issue"
 	        	Result.ResultText =  LOCTEXT("InventoryUpdateResult_ItemUnknownIssue", "Unhandled Exception.");
+
+	        	return Result;
 	        }
+
+        	OnItemAdded.Broadcast(Result);
         }
     }
-		
+
+	// Remove OptionalPayload so UI does not need to refresh - UI is refreshing only if OptionalPayload is not null
+	Result.OptionalPayload = nullptr;
+	OnInventoryUpdated.Broadcast(Result);
+	
     return Result;
 }
 
@@ -280,6 +303,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 	{
 		Result.ResultID = 400; // Bad Request
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item.");
+		
 		return Result;
 	}
 
@@ -291,6 +315,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 		Result.OptionalPayload = Item;
 		Result.ResultID = 102; // Corresponds to "Processing"
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
+		
 		return Result;
 	}
 	
@@ -316,18 +341,23 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 		// Keep track of this slot being nullified to it gets updated once before it's removed - useful for UI
 		NullifiedSlots.AddUnique(*ExistingItemSlot);
 		
+		Result.ResultID = 200;
+		Result.OptionalPayload = ExistingItemSlot->Item;
+		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemRemoved", "The item has been successfully removed from the inventory.");
+
 		// Assuming InventorySlots is a TArray or TSet of FItemSlot
 		InventorySlots.Remove(*ExistingItemSlot);
-
-		Result.ResultID = 200;
-		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemRemoved", "The item has been successfully removed from the inventory.");
 	}
 	else
 	{
 		Result.ResultID = 404;
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemNotFound", "The item was not found in the inventory.");
+
+		return Result;
 	}
 
+	OnInventoryUpdated.Broadcast(Result);
+	
 	return Result;
 }
 
@@ -1239,9 +1269,8 @@ void UMounteaInventoryComponent::OnRep_Items()
 		if (Itr.Item)
 		{
 			Itr.Item->SetWorld(GetWorld());
-
-			TScriptInterface<IMounteaInventoryInterface> OwningInterface = this;
-			Itr.Item->SetOwningInventory(OwningInterface);
+			
+			Itr.Item->SetOwningInventory(this);
 		}
 	}
 
