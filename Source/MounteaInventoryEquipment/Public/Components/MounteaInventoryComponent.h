@@ -65,9 +65,12 @@ public:
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	
 	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) override;
-
+	virtual FInventoryUpdateResult RemoveItemFromInventory_Implementation(UMounteaInstancedItem* Item) override;
+	virtual FInventoryUpdateResult ReduceItemInInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) override;
+	
 	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const override;
-
+	virtual bool CanRemoveItem_Implementation(UMounteaInstancedItem* Item) const override;
+	
 	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	virtual TArray<UMounteaInstancedItem*> SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	
@@ -77,9 +80,17 @@ public:
 	virtual bool SetInventoryFlags_Implementation(const FGameplayTagContainer& NewFlags) override;
 	virtual bool SetInventoryFlag_Implementation(const FGameplayTag& NewFlag) override;
 
+	virtual AActor* GetOwningActor_Implementation() const override;
 	virtual bool DoesHaveAuthority_Implementation() const override;
 
+	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const override;
+	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const override;
 
+
+
+	
+	
+	
 
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const override;
@@ -93,18 +104,9 @@ public:
 	virtual bool RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems) override;
 
 	virtual void RequestNetworkRefresh_Implementation() override;
-
-	virtual AActor* GetOwningActor_Implementation() const override;
-
-	
 	
 	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
-	
-	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const override;
-	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const override;
-	
-	
-	
+
 public:
 
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() override
@@ -128,6 +130,10 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void AddItemToInventory_Server(UMounteaInstancedItem* Item, const int32& Quantity = 1);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void RemoveItemFromInventory_Server(UMounteaInstancedItem* Item);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ReduceItemInInventory_Server(UMounteaInstancedItem* Item, const int32& Quantity = 1);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);

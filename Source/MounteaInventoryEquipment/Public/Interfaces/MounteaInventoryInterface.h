@@ -72,9 +72,21 @@ public:
 	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	FInventoryUpdateResult RemoveItemFromInventory(UMounteaInstancedItem* Item);
+	virtual FInventoryUpdateResult RemoveItemFromInventory_Implementation(UMounteaInstancedItem* Item) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	FInventoryUpdateResult ReduceItemInInventory(UMounteaInstancedItem* Item, const int32& Quantity = 1);
+	virtual FInventoryUpdateResult ReduceItemInInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool CanAddItem(UMounteaInstancedItem* Item, const int32& Quantity) const;
 	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const = 0;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool CanRemoveItem(UMounteaInstancedItem* Item) const;
+	virtual bool CanRemoveItem_Implementation(UMounteaInstancedItem* Item) const = 0;
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	UMounteaInstancedItem* SearchSingleItem(const FItemRetrievalFilter& SearchFilter) const;
 	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
@@ -82,7 +94,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	TArray<UMounteaInstancedItem*> SearchMultipleItems(const FItemRetrievalFilter& SearchFilter) const;
 	virtual TArray<UMounteaInstancedItem*> SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
-
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool HasItem(const FItemRetrievalFilter& SearchFilter) const;
+	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool SetInventoryFlags(const FGameplayTagContainer& NewFlags);
 	virtual bool SetInventoryFlags_Implementation(const FGameplayTagContainer& NewFlags) = 0;
@@ -109,16 +125,7 @@ public:
 	UMounteaInventoryItemBase* FindItem(const FItemRetrievalFilter& SearchFilter) const;
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 
-	/***
-	 * ❗  Only checks for first Item that matches Search Filter.
-	 *
-	 * Takes a single argument of type FItemRetrievalFilter, which allows for searching the inventory for an item based on various parameters such as item ID, item class, tags, or GUID.
-	 * When called, HasItem will check the inventory for the existence of an item that matches the provided search filter. If such an item exists, the function will return true; otherwise, it will return false.
-	 * This function can be useful for quickly checking whether a particular item is present in the inventory before attempting to perform further operations with it, such as removing or using it.
-	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool HasItem(const FItemRetrievalFilter& SearchFilter) const;
-	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
+	
 
 	/**
 	 * Returns an array of pointers to UMounteaInventoryItemBase objects that match the specified filter criteria.

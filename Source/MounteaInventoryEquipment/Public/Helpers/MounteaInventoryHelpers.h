@@ -95,6 +95,7 @@ enum class EItemUpdateResult : uint8
 
 /*
 	ResultID Values:
+	102 Processing: Operation cannot proceed on Client side and is moved to Server side to process.
 	200 OK: The operation was successful. All items were added/removed as expected.
 	201 Created: A new item was successfully created and added to the inventory.
 	204 No Content: The operation was successful, but there was nothing to add/remove (e.g., the quantity was 0).
