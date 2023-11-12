@@ -377,24 +377,26 @@ void UMounteaInstancedItem::SetWorld(UWorld* NewWorld)
 
 bool UMounteaInstancedItem::OwnerHasAuthority() const
 {
-	if (!OwningInventory)
+	if (OwningInventory)
 	{
-		if (!GEngine) return false;
-		if (!World) return false;
-
-		const FString ModeName = GetEnumValueAsString(TEXT("ENetRole"), GEngine->GetNetMode(World));
-
-		UE_LOG(LogTemp, Error, TEXT("%s"), *ModeName)
-		if (GEngine->GetNetMode(World) == NM_Client)
-		{
-			return false;
-		}
-
-		return true;
+		// If OwningInventory is valid, delegate the authority check to it.
+		return OwningInventory->Execute_DoesHaveAuthority(OwningInventory.GetObject());
 	}
-
-	return OwningInventory->Execute_DoesHaveAuthority(OwningInventory.GetObject());
+	else
+	{
+		// If OwningInventory is null, use global checks.
+		if (GEngine && World)
+		{
+			const ENetMode NetMode = GEngine->GetNetMode(World);
+			UE_LOG(LogTemp, Log, TEXT("NetMode is %s"), *GetEnumValueAsString(TEXT("ENetRole"), NetMode));
+			return NetMode != NM_Client;
+		}
+	}
+    
+	// If we reach this point, we don't have enough information to determine authority.
+	return false;
 }
+
 
 void UMounteaInstancedItem::MarkDirtyForReplication()
 {
@@ -409,17 +411,18 @@ void UMounteaInstancedItem::MarkDirtyForReplication()
 void UMounteaInstancedItem::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UMounteaInstancedItem, ItemDataSource);
-	DOREPLIFETIME(UMounteaInstancedItem, SourceItem);
-	DOREPLIFETIME(UMounteaInstancedItem, SourceTable);
-	DOREPLIFETIME(UMounteaInstancedItem, SourceRow);
+	
 	DOREPLIFETIME(UMounteaInstancedItem, OwningInventory);
-	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, World, COND_InitialOrOwner);
-	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, InstanceID, COND_InitialOnly);
-	DOREPLIFETIME(UMounteaInstancedItem, ItemConfig);
 	DOREPLIFETIME(UMounteaInstancedItem, Quantity);
 	DOREPLIFETIME(UMounteaInstancedItem, ItemFlags);
+	
+	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, ItemDataSource, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, SourceItem, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, SourceTable, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, SourceRow, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, World, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, InstanceID, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(UMounteaInstancedItem, ItemConfig, COND_InitialOrOwner);
 }
 
 void UMounteaInstancedItem::OnRep_Item()
