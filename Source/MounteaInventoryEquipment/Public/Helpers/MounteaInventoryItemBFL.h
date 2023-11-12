@@ -92,7 +92,40 @@ public:
 			RemainingQuantity -= AmountToAdd;
 		}
 	}
+
+	// Function to reduce quantity in stacks and remove empty stacks
+	static void ReduceQuantityInStacks(FItemSlot& Slot, int32 QuantityToReduce)
+	{
+		// Sort stacks by their quantity from lowest to highest
+		Slot.Stacks.Sort([](const FItemSlotStack& A, const FItemSlotStack& B) {
+			return A.StackSize < B.StackSize;
+		});
+
+		TArray<FItemSlotStack> FinalStacks = Slot.Stacks;
 		
+		// Reduce quantity stack by stack
+		for (FItemSlotStack& Stack : Slot.Stacks)
+		{
+			if (QuantityToReduce <= 0) break; // No more quantity to reduce
+
+			const int32 QuantityReduced = FMath::Min(QuantityToReduce, Stack.StackSize);
+			Stack.StackSize -= QuantityReduced;
+			QuantityToReduce -= QuantityReduced;
+
+			
+			// If a stack is empty, mark it for removal
+			if (Stack.StackSize <= 0)
+			{
+				Stack.StackSize = 0; // Ensure the stack size is not negative
+			}
+		}
+
+		// Remove all empty stacks
+		Slot.Stacks.RemoveAll([](const FItemSlotStack& Stack) {
+			return Stack.StackSize <= 0;
+		});
+	}
+	
 	// Function to add a new stack to the inventory
 	static int32 UpdateStack(FItemSlot& Slot, FGuid& StackGuid, const int32 Quantity)
 	{

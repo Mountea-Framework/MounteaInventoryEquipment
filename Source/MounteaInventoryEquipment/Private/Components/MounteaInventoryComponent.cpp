@@ -394,11 +394,11 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
 	}
 
     // Search for the item in the inventory
-    const FItemSlot* FoundSlot = InventorySlots.FindByKey(Item);
+    FItemSlot* FoundSlot = InventorySlots.FindByKey(Item);
 	
     if (!FoundSlot)
     {
-        Result.OptionalPayload = Item;
+        Result.OptionalPayload = nullptr;
         Result.ResultID = 404; // Not Found
         Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemNotFound", "Item not found in the inventory.");
     	
@@ -421,8 +421,15 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
         }
         else
         {
+        	Result.OptionalPayload = FoundSlot->Item;
             Result.ResultID = 200; // OK
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemQuantityReduced", "The item quantity has been reduced in the inventory.");
+
+        	// Update Stacks in the Slot
+        	UMounteaInventoryItemBFL::ReduceQuantityInStacks(*FoundSlot, Quantity);
+        	
+        	// Broadcast that an item has been updated
+        	OnItemUpdated.Broadcast(Result);
         }
     }
 	// Remove the item slot if the quantity is zero or below
@@ -434,6 +441,9 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
     	Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemQuantityReducedRemoved", "The item has been reduced and removed from the inventory.");
     }
 
+	Result.OptionalPayload = nullptr;
+	OnInventoryUpdated.Broadcast(Result);
+	
     return Result;
 }
 
