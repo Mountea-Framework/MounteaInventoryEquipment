@@ -347,6 +347,9 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 
 		// Assuming InventorySlots is a TArray or TSet of FItemSlot
 		InventorySlots.Remove(*ExistingItemSlot);
+		
+		// Broadcast that an item has been removed. This should be done before broadcasting the general inventory update.
+		OnItemRemoved.Broadcast(Result);
 	}
 	else
 	{
@@ -355,7 +358,9 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 
 		return Result;
 	}
-
+	
+	// Remove OptionalPayload so UI does not need to refresh - UI is refreshing only if OptionalPayload is not null
+	Result.OptionalPayload = nullptr;
 	OnInventoryUpdated.Broadcast(Result);
 	
 	return Result;
