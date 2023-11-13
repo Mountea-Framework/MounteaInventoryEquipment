@@ -23,6 +23,11 @@ bool FItemSlotStack::operator==(const FItemSlotStack& Other) const
 	return Other.StackGuid == this->StackGuid;
 }
 
+bool FItemSlotStack::operator==(const FGuid& Other) const
+{
+	return this->StackGuid == Other;
+}
+
 FItemSlot::FItemSlot(UMounteaInstancedItem* NewItem)
 {
 	Item = NewItem;
@@ -61,6 +66,15 @@ bool FItemSlot::IsStackSizeValid() const
 bool FItemSlot::operator==(const FItemSlot& Other) const
 {
 	return Other.Item == this->Item;
+}
+
+bool FItemSlot::operator==(const FItemSlot* Other) const
+{
+	if (Other)
+	{
+		return this == Other;
+	}
+	return false;
 }
 
 bool FItemSlot::operator==(const FGuid& Other) const

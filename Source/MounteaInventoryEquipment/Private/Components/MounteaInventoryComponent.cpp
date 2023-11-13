@@ -57,12 +57,9 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 	//Check if the array of items needs to replicate
 	if (Channel->KeyNeedsToReplicate(0, ReplicatedItemsKey))
 	{
-		TSet<UMounteaInstancedItem*> AllItems;
-		TArray<FItemSlot> AllSlots = InventorySlots;
-		AllSlots.Append(NullifiedSlots);
-
 		// Setup all Items, even from Slots that should be empty at this point
-		for (auto const& Itr : AllSlots)
+		TSet<UMounteaInstancedItem*> AllItems;
+		for (auto const& Itr : ModifiedSlots)
 		{
 			if (Itr.Item)
 			{
@@ -79,7 +76,7 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 		}
 
 		// Cleanup all Nullified Slots
-		NullifiedSlots.Empty();
+		ModifiedSlots.Empty();
 	}
 
 	return bUpdated;
@@ -196,12 +193,44 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
             ExistingItem->SetQuantity(Quantity); // Increment the quantity of the existing item
             Item->SetQuantity(0); // Set the source item's quantity to 0, effectively marking it for destruction
 
+        	// Check if we have this Item in Inventory, and if so then remove it
+			if (Execute_CanRemoveItem(this, Item))
+			{
+				RemoveItemFromInventory(Item);
+			}
+        	
             Result.OptionalPayload = ExistingItem;
             Result.ResultID = 200; // Corresponds to "OK"
             Result.ResultText =  LOCTEXT("InventoryUpdateResult_ItemUpdated", "Added all of the item to the existing stack.");
+        	
+        	if (FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem))
+        	{
+        		UMounteaInventoryItemBFL::UpdateStacksInSlot(*Slot, Quantity);
 
-        	FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem);
-        	UMounteaInventoryItemBFL::UpdateStacksInSlot(*Slot, Quantity);
+        		ModifiedSlots.AddUnique(*Slot);
+        	}
+	        else
+	        {
+	        	// Find an empty slot or create a new one if none exist
+	        	const int32 EmptyIndex = UMounteaInventoryItemBFL::FindEmptySlot(InventorySlots, ExistingItem);
+	        	if (EmptyIndex != INDEX_NONE)
+	        	{
+	        		FItemSlot& EmptySlot = InventorySlots[EmptyIndex];
+	        		
+	        		UMounteaInventoryItemBFL::UpdateStacksInSlot(EmptySlot, Quantity);
+
+	        		ModifiedSlots.AddUnique(EmptySlot);
+	        	}
+		        else
+		        {
+		        	FItemSlot NewSlot = UMounteaInventoryItemBFL::MakeNewSlot(ExistingItem, Quantity);
+		        	
+		        	UMounteaInventoryItemBFL::UpdateStacksInSlot(NewSlot, Quantity);
+		        	
+		        	InventorySlots.AddUnique(NewSlot);
+		        	ModifiedSlots.AddUnique(NewSlot);
+		        }
+	        }
         }
         else
         {
@@ -209,12 +238,44 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
             ExistingItem->SetQuantity(MaxAddAmount); // Add the maximum possible quantity to the existing item
             Item->ModifyQuantity(-MaxAddAmount); // Decrease the source item's quantity
 
+        	// Check if we have this Item in Inventory, and if so then remove it
+        	if (Item->GetQuantity() <= 0 && Execute_CanRemoveItem(this, Item))
+        	{
+        		RemoveItemFromInventory(Item);
+        	}
+        	
             Result.OptionalPayload = ExistingItem;
             Result.ResultID = 206; // Analogous to "Partial Content"
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemUpdatedPartly", "Added part of the item to the existing stack. Some quantity remains in the source item.");
 
-        	FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem);
-        	UMounteaInventoryItemBFL::UpdateStacksInSlot(*Slot, MaxAddAmount);
+        	if (FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem))
+        	{
+        		UMounteaInventoryItemBFL::UpdateStacksInSlot(*Slot, MaxAddAmount);
+
+        		ModifiedSlots.AddUnique(*Slot);
+        	}
+        	else
+        	{
+        		// Find an empty slot or create a new one if none exist
+        		const int32 EmptyIndex = UMounteaInventoryItemBFL::FindEmptySlot(InventorySlots, ExistingItem);
+        		if (EmptyIndex != INDEX_NONE)
+        		{
+        			FItemSlot& EmptySlot = InventorySlots[EmptyIndex];
+	        		
+        			UMounteaInventoryItemBFL::UpdateStacksInSlot(EmptySlot, MaxAddAmount);
+
+        			ModifiedSlots.AddUnique(EmptySlot);
+        		}
+        		else
+        		{
+        			FItemSlot NewSlot = UMounteaInventoryItemBFL::MakeNewSlot(ExistingItem, MaxAddAmount);
+		        	
+        			UMounteaInventoryItemBFL::UpdateStacksInSlot(NewSlot, MaxAddAmount);
+		        	
+        			InventorySlots.AddUnique(NewSlot);
+        			ModifiedSlots.AddUnique(NewSlot);
+        		}
+        	}
         }
 
     	OnItemUpdated.Broadcast(Result);
@@ -224,9 +285,26 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         // If the item doesn't exist in the inventory
         if (Quantity <= MaxAddAmount)
         {
-            // Directly add the entire source item to the inventory
-        	const FItemSlot NewSlot = UMounteaInventoryItemBFL::MakeNewSlot(Item, Quantity);
+        	// Directly add the entire source item to the inventory
+        	FItemSlot* NewSlot = nullptr;
 
+        	// Find an empty slot or create a new one if none exist
+        	const int32 EmptyIndex = UMounteaInventoryItemBFL::FindEmptySlot(InventorySlots, Item);
+        	if (EmptyIndex != INDEX_NONE)
+        	{
+        		NewSlot = &InventorySlots[EmptyIndex];        		
+        	}
+	        else
+	        {
+	        	InventorySlots.AddUnique(UMounteaInventoryItemBFL::MakeNewSlot(Item, Quantity));
+	        	
+	        	// Use the new slot
+	        	NewSlot = &InventorySlots.Last();
+	        }
+        	
+        	// Assuming NewSlot is now pointing to the correct slot, either found or newly created
+        	UMounteaInventoryItemBFL::UpdateStacksInSlot(*NewSlot, Quantity);        	
+        	
             Result.OptionalPayload = Item;
             Result.ResultID = 201; // Corresponds to "Created"
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemCreated", "Added the entire item to the inventory.");
@@ -234,6 +312,8 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         	Item->SetWorld(GetWorld());
         	Item->SetOwningInventory(this);
 
+        	ModifiedSlots.AddUnique(*NewSlot);
+        	
         	OnItemAdded.Broadcast(Result);
         }
         else
@@ -247,26 +327,41 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
             	ItemInitParams.OwningInventory = this;
             	switch (Item->GetItemDataSource())
             	{
-            	case EItemDataSource::EIDS_SourceTable:
-            		ItemInitParams.SourceTable = Item->SourceTable;
-            		ItemInitParams.SourceRow = Item->SourceRow;
-            		break;
-            	case EItemDataSource::EIDS_SourceItem:
-            		ItemInitParams.SourceItem = Item->SourceItem;
-            		break;
-            	case EItemDataSource::Default:
-            	default:
-					break;
+            		case EItemDataSource::EIDS_SourceTable:
+            			ItemInitParams.SourceTable = Item->SourceTable;
+            			ItemInitParams.SourceRow = Item->SourceRow;
+            			break;
+            		case EItemDataSource::EIDS_SourceItem:
+            			ItemInitParams.SourceItem = Item->SourceItem;
+            			break;
+            		case EItemDataSource::Default:
+            		default:
+						break;
             	}
 	        }
         	
 			// Try make a new item
         	if (NewItemInstance->Execute_InitializeNewItem(NewItemInstance, ItemInitParams))
         	{
-        		const FItemSlot NewSlot = UMounteaInventoryItemBFL::MakeNewSlot(NewItemInstance, MaxAddAmount);
-        		
-        		InventorySlots.Add(NewSlot); // Add the new instance to the inventory
-        		Item->ModifyQuantity(-MaxAddAmount); // Decrease the source item's quantity
+        		FItemSlot* NewSlot;
+
+        		// Find an empty slot or create a new one if none exist
+        		int32 EmptyIndex = UMounteaInventoryItemBFL::FindEmptySlot(InventorySlots, NewItemInstance);
+        		if (EmptyIndex != INDEX_NONE)
+        		{
+        			NewSlot = &InventorySlots[EmptyIndex];
+        		}
+        		else
+        		{
+        			InventorySlots.AddUnique(UMounteaInventoryItemBFL::MakeNewSlot(NewItemInstance, MaxAddAmount));
+        			NewSlot = &InventorySlots.Last();
+        		}
+
+        		// Update the stacks in the slot with the new item instance
+        		UMounteaInventoryItemBFL::UpdateStacksInSlot(*NewSlot, MaxAddAmount);
+        
+        		// Adjust the quantity of the original item
+        		Item->ModifyQuantity(-MaxAddAmount);
 
         		Result.OptionalPayload = NewItemInstance;
         		Result.ResultID = 206; // Analogous to "Partial Content"
@@ -335,18 +430,19 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 		return Result;
 	}
 	
-	// If the item exists in the inventory, remove it.
+	// If the item exists in the inventory, remove it. Here we don't care about Quantities, we just straight up remove the item from inventory
 	if (const FItemSlot* ExistingItemSlot = InventorySlots.FindByKey(Item))
 	{
 		// Keep track of this slot being nullified to it gets updated once before it's removed - useful for UI
-		NullifiedSlots.AddUnique(*ExistingItemSlot);
+		ModifiedSlots.AddUnique(*ExistingItemSlot);
 		
 		Result.ResultID = 200;
 		Result.OptionalPayload = ExistingItemSlot->Item;
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemRemoved", "The item has been successfully removed from the inventory.");
 
-		// Assuming InventorySlots is a TArray or TSet of FItemSlot
-		InventorySlots.Remove(*ExistingItemSlot);
+		// Cleanup the slot in InventorySlots so it can be used again
+		const int32 ExistingSlotIndex = InventorySlots.IndexOfByKey(ExistingItemSlot);
+		InventorySlots[ExistingSlotIndex] = FItemSlot();
 		
 		// Broadcast that an item has been removed. This should be done before broadcasting the general inventory update.
 		OnItemRemoved.Broadcast(Result);
@@ -787,6 +883,66 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 }
 
 #endif
+
+/*===============================================================================
+	IN PROGRESS
+	
+	Following functions are already being updated.
+===============================================================================*/
+
+void UMounteaInventoryComponent::PostItemAdded_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!CanExecuteCosmetics()) return;
+
+	// TODO: Execute Interface call
+	if (UMounteaInstancedItem* Item = Cast<UMounteaInstancedItem>(UpdateContext.OptionalPayload))
+	{
+		Item->NetFlush();
+	}
+	
+	if (UpdateContext.OptionalPayload)
+	{
+		// Item->GetItemAddedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
+
+		PostItemAdded_Client(UpdateContext);
+	}
+}
+
+void UMounteaInventoryComponent::PostItemRemoved_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!CanExecuteCosmetics()) return;
+
+	// TODO: Execute Interface call
+	if (UMounteaInstancedItem* Item = Cast<UMounteaInstancedItem>(UpdateContext.OptionalPayload))
+	{
+		Item->NetFlush();
+	}
+	
+	if (UpdateContext.OptionalPayload)
+	{
+		// Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
+
+		PostItemRemoved_Client(UpdateContext);
+	}
+}
+
+void UMounteaInventoryComponent::PostItemUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!CanExecuteCosmetics()) return;
+
+	// TODO: Execute Interface call
+	if (UMounteaInstancedItem* Item = Cast<UMounteaInstancedItem>(UpdateContext.OptionalPayload))
+	{
+		Item->NetFlush();
+	}
+	
+	if (UpdateContext.OptionalPayload)
+	{
+		// Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
+
+		PostItemUpdated_Client(UpdateContext);
+	}
+}
 
 /*===============================================================================
 	SUBJECT OF CHANGE
@@ -1701,42 +1857,6 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const
 		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
 
 		RequestInventoryNotification(UpdateContext);
-	}
-}
-
-void UMounteaInventoryComponent::PostItemAdded_Implementation(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!CanExecuteCosmetics()) return;
-	
-	if (UpdateContext.OptionalPayload)
-	{
-		// Item->GetItemAddedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
-
-		PostItemAdded_Client(UpdateContext);
-	}
-}
-
-void UMounteaInventoryComponent::PostItemRemoved_Implementation(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!CanExecuteCosmetics()) return;
-	
-	if (UpdateContext.OptionalPayload)
-	{
-		// Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
-
-		PostItemRemoved_Client(UpdateContext);
-	}
-}
-
-void UMounteaInventoryComponent::PostItemUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!CanExecuteCosmetics()) return;
-	
-	if (UpdateContext.OptionalPayload)
-	{
-		// Item->GetItemUpdatedHandle().Broadcast(MounteaInventoryEquipmentConsts::MounteaInventoryNotifications::InventoryNotifications::UpdateSuccessful); BREAKING
-
-		PostItemUpdated_Client(UpdateContext);
 	}
 }
 

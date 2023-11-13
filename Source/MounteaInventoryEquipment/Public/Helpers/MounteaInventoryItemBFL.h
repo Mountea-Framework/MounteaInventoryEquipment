@@ -46,6 +46,21 @@ public:
 		return FMath::Min(QuantityToAdd, MaxStackSize);
 	}
 
+	static int32 FindEmptySlot(const TArray<FItemSlot>& Slots, UMounteaInstancedItem* ItemInstance)
+	{
+		if (const FItemSlot* EmptySlot = Slots.FindByPredicate(
+			[](const FItemSlot& Slot)
+			{
+				return Slot.IsEmpty();
+			}))
+		{
+			return Slots.Find(*EmptySlot); // Return index of to the found empty slot.
+		}
+
+		// No empty slot found, return invalid index	
+		return INDEX_NONE;
+	}
+	
 	static FItemSlot MakeNewSlot(UMounteaInstancedItem* NewItemInstance, const int32& Quantity)
 	{
 		// Create a new slot for the item instance
@@ -127,7 +142,7 @@ public:
 	}
 	
 	// Function to add a new stack to the inventory
-	static int32 UpdateStack(FItemSlot& Slot, FGuid& StackGuid, const int32 Quantity)
+	static int32 UpdateStack(FItemSlot& Slot, const FGuid& StackGuid, const int32 Quantity)
 	{
 		// If no valid stack is found, add a new one
 		if (FItemSlotStack* ExistingStack = Slot.Stacks.FindByKey(StackGuid))

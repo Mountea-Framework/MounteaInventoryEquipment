@@ -258,7 +258,7 @@ private:
 
 	// Filled from RemoveFromItem to keep track of Items that were removed
 	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
-	TArray<FItemSlot> NullifiedSlots;
+	TArray<FItemSlot> ModifiedSlots;
 	
 	TArray<UMounteaInventoryItemBase*> RemovedItems;
 

@@ -250,6 +250,11 @@ public:
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
 
 	virtual void SetWorld(UWorld* NewWorld);
+
+	void NetFlush()
+	{
+		RepKey++;
+	}
 	
 #pragma endregion
 
@@ -285,12 +290,7 @@ protected:
 
 	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
 	void MarkDirtyForReplication();
-	
-	void NetFlush()
-	{
-		RepKey++;
-	}
-	
+		
 	FORCEINLINE ULevel* GetLevel() const
 	{
 		return GetTypedOuter<ULevel>();

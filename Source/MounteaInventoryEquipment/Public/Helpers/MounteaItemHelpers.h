@@ -124,6 +124,8 @@ public:
 	bool Serialize(class FArchive& Ar);
 	
 	bool operator==(const FItemSlotStack& Other) const;
+
+	bool operator==(const FGuid& Other) const;
 };
 
 /**
@@ -171,7 +173,7 @@ struct FItemSlot
 	{};
 	
 	FItemSlot(const FItemSlot& Other) :
-		Item(Other.Item), SlotGuid(Other.SlotGuid)
+		Item(Other.Item), SlotGuid(Other.SlotGuid), Stacks(Other.Stacks)
 	{};
 	
 	FItemSlot(UMounteaInstancedItem* NewItem, const TArray<FItemSlotStack>& NewStacks) :
@@ -205,10 +207,14 @@ public:
 
 public:
 
+	/** Check if the slot is empty, meaning it has no Item. */
+	bool IsEmpty() const
+	{ return Item == nullptr; };
+
 	/** Checks if the slot is valid, meaning it has an item and at least one stack. */
 	bool IsValid() const
 	{
-		return Item != nullptr && Stacks.Num() > 0;
+		return IsEmpty() == false && SlotGuid.IsValid() && Stacks.Num() > 0;
 	}
 
 	/** Validates the consistency of stack GUIDs, ensuring they match with the item's GUID. */
@@ -219,6 +225,8 @@ public:
 
 	bool operator==(const FItemSlot& Other) const;
 
+	bool operator==(const FItemSlot* Other) const;
+
 	bool operator==(const FGuid& Other) const;
 
 	bool operator==(const UMounteaInstancedItem* Other) const;
@@ -226,7 +234,6 @@ public:
 	friend FArchive& operator<<(FArchive& Ar, FItemSlot& Element);
 	
 	bool Serialize(class FArchive& Ar);
-	
 };
 
 template<>
