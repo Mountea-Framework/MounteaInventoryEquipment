@@ -1006,6 +1006,56 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(const FIn
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestItemSyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
 }
 
+
+void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const
+{
+	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+		
+	FInventoryNotificationData Data; // = *Settings->InventoryUpdateData.Find(UpdateContext.InventoryUpdateResult); BREAKING
+	if (Data.Weight >= Settings->MinDisplayWeight)
+	{
+		if (!UpdateContext.ResultText.IsEmpty())
+		{
+			// Data.NotificationText = UpdateContext.UpdateMessage;
+		}
+
+		IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
+	}
+}
+
+void UMounteaInventoryComponent::RequestItemNotification(const FInventoryUpdateResult& UpdateContext) const
+{
+	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+	FInventoryNotificationData Data; // = *Settings->ItemUpdateData.Find(UpdateContext.ItemUpdateResult); BREAKING
+	if (!UpdateContext.ResultText.IsEmpty())
+	{
+		// Data.NotificationText = UpdateContext.UpdateMessage;
+	}
+
+	IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
+}
+
+
+void UMounteaInventoryComponent::OnRep_Items()
+{
+	for (const auto& Itr : InventorySlots)
+	{
+		if (Itr.Item)
+		{
+			Itr.Item->SetWorld(GetWorld());
+			
+			Itr.Item->SetOwningInventory(this);
+		}
+	}
+
+	FInventoryUpdateResult UpdateResult;
+	UpdateResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK; // Corresponds to "OK"
+	UpdateResult.ResultText = LOCTEXT("InventoryNotificationData_Success_Replication", "Inventory Replicated.");
+
+	UpdateResult.OptionalPayload = this;
+	OnInventoryUpdated.Broadcast(UpdateResult);
+}
+
 /*===============================================================================
 	SUBJECT OF CHANGE
 	
@@ -1495,26 +1545,6 @@ void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInvent
 	Action->ProcessAction(Item);
 }
 
-void UMounteaInventoryComponent::OnRep_Items()
-{
-	for (const auto& Itr : InventorySlots)
-	{
-		if (Itr.Item)
-		{
-			Itr.Item->SetWorld(GetWorld());
-			
-			Itr.Item->SetOwningInventory(this);
-		}
-	}
-
-	FInventoryUpdateResult UpdateResult;
-	UpdateResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK; // Corresponds to "OK"
-	UpdateResult.ResultText = LOCTEXT("InventoryNotificationData_Success_Replication", "Inventory Replicated.");
-
-	UpdateResult.OptionalPayload = this;
-	OnInventoryUpdated.Broadcast(UpdateResult);
-}
-
 void UMounteaInventoryComponent::TryAddItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
 {
 	if (TryAddItem(Item, Quantity))
@@ -1886,8 +1916,6 @@ bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItem
 	return UpdateItem_Internal(Existing);
 }
 
-
-
 void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
 {
 	if (!GetOwner()) return;
@@ -1964,34 +1992,6 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(const FInv
 		// Item->GetItemUpdatedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
 		OnItemUpdated_Client.Broadcast(UpdateContext);
 	}
-}
-
-void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const
-{
-	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-		
-	FInventoryNotificationData Data; // = *Settings->InventoryUpdateData.Find(UpdateContext.InventoryUpdateResult); BREAKING
-	if (Data.Weight >= Settings->MinDisplayWeight)
-	{
-		if (!UpdateContext.ResultText.IsEmpty())
-		{
-			// Data.NotificationText = UpdateContext.UpdateMessage;
-		}
-
-		IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
-	}
-}
-
-void UMounteaInventoryComponent::RequestItemNotification(const FInventoryUpdateResult& UpdateContext) const
-{
-	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-	FInventoryNotificationData Data; // = *Settings->ItemUpdateData.Find(UpdateContext.ItemUpdateResult); BREAKING
-	if (!UpdateContext.ResultText.IsEmpty())
-	{
-		// Data.NotificationText = UpdateContext.UpdateMessage;
-	}
-
-	IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
 }
 
 void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
