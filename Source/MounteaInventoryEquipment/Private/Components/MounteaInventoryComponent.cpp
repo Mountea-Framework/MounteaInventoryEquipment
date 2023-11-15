@@ -887,11 +887,7 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 
 #endif
 
-/*===============================================================================
-	IN PROGRESS
-	
-	Following functions are already being updated.
-===============================================================================*/
+
 
 void UMounteaInventoryComponent::PostInventoryUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
 {

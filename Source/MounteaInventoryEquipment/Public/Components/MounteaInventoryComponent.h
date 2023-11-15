@@ -63,6 +63,11 @@ public:
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
 	
+	/**
+	 * Checks if the inventory contains an item that matches the given search filter.
+	 * @param SearchFilter A given filter based on which the search engine will try to find the item. It is required to fill!
+	 * @return True if item based on `SearchFilter` is found, false otherwise.
+	 */
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	
 	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) override;
