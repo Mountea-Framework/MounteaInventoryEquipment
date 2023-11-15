@@ -132,7 +132,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
 	// Validate the request
 	if (!Item)
 	{
-		Result.ResultID = 400; // Bad Request
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item.");
 		
 		return Result;
@@ -144,7 +144,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
 		AddItemToInventory_Server(Item, Quantity);
 		
 		Result.OptionalPayload = Item;
-		Result.ResultID = 102; // Corresponds to "Processing"
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing; // Corresponds to "Processing"
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
 		
 		return Result;
@@ -154,7 +154,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
     if (Quantity <= 0)
     {
         Result.OptionalPayload = Item;
-        Result.ResultID = 400; // Corresponds to "Bad Request"
+        Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Corresponds to "Bad Request"
         Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidIQuantity", "Quantity less than 1 is forbidden.");
     	
         return Result;
@@ -164,7 +164,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
     if (!Execute_CanAddItem(this, Item, Quantity))
     {
         Result.OptionalPayload = Item;
-        Result.ResultID = 403; // Corresponds to "Forbidden"
+        Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
         Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
     	
         return Result;
@@ -200,7 +200,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
 			}
         	
             Result.OptionalPayload = ExistingItem;
-            Result.ResultID = 200; // Corresponds to "OK"
+            Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK; // Corresponds to "OK"
             Result.ResultText =  LOCTEXT("InventoryUpdateResult_ItemUpdated", "Added all of the item to the existing stack.");
         	
         	if (FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem))
@@ -245,7 +245,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         	}
         	
             Result.OptionalPayload = ExistingItem;
-            Result.ResultID = 206; // Analogous to "Partial Content"
+            Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_CreatedPart; // Analogous to "Partial Content"
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemUpdatedPartly", "Added part of the item to the existing stack. Some quantity remains in the source item.");
 
         	if (FItemSlot* Slot = InventorySlots.FindByKey(ExistingItem))
@@ -306,7 +306,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         	UMounteaInventoryItemBFL::UpdateStacksInSlot(*NewSlot, Quantity);        	
         	
             Result.OptionalPayload = Item;
-            Result.ResultID = 201; // Corresponds to "Created"
+            Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Created; // Corresponds to "Created"
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemCreated", "Added the entire item to the inventory.");
         	
         	Item->SetWorld(GetWorld());
@@ -364,13 +364,13 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
         		Item->ModifyQuantity(-MaxAddAmount);
 
         		Result.OptionalPayload = NewItemInstance;
-        		Result.ResultID = 206; // Analogous to "Partial Content"
+        		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_CreatedPart; // Analogous to "Partial Content"
         		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemUpdatedPartly", "Added part of the item to the existing stack. Some quantity remains in the source item.");
         	}
 	        else
 	        {
 	        	Result.OptionalPayload = nullptr;
-	        	Result.ResultID = 500; // Analogous to "Unknown issue"
+	        	Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_GenericIssue; // Analogous to "Unknown issue"
 	        	Result.ResultText =  LOCTEXT("InventoryUpdateResult_ItemUnknownIssue", "Unhandled Exception.");
 
 	        	return Result;
@@ -396,7 +396,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 	// Validate the request
 	if (!Item)
 	{
-		Result.ResultID = 400; // Bad Request
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item.");
 		
 		return Result;
@@ -408,7 +408,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 		RemoveItemFromInventory_Server(Item);
 		
 		Result.OptionalPayload = Item;
-		Result.ResultID = 102; // Corresponds to "Processing"
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing; // Corresponds to "Processing"
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
 		
 		return Result;
@@ -424,7 +424,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 	// Validate whether the item exists
 	if (!Execute_HasItem(this, Filter))
 	{
-		Result.ResultID = 404;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound; // Not Found
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemNotFound", "The item was not found in the inventory.");
 
 		return Result;
@@ -436,7 +436,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 		// Keep track of this slot being nullified to it gets updated once before it's removed - useful for UI
 		ModifiedSlots.AddUnique(*ExistingItemSlot);
 		
-		Result.ResultID = 200;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK; // Corresponds to "OK"
 		Result.OptionalPayload = ExistingItemSlot->Item;
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemRemoved", "The item has been successfully removed from the inventory.");
 
@@ -449,7 +449,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 	}
 	else
 	{
-		Result.ResultID = 404;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound; // Not Found
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemNotFound", "The item was not found in the inventory.");
 
 		return Result;
@@ -471,7 +471,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
     // Validate the request
     if (!Item)
     {
-        Result.ResultID = 400; // Bad Request
+    	Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
         Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item or quantity.");
     	
         return Result;
@@ -483,7 +483,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
 		ReduceItemInInventory_Server(Item, Quantity);
 		
 		Result.OptionalPayload = Item;
-		Result.ResultID = 102; // Corresponds to "Processing"
+		Result.ResultID = Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing;; // Corresponds to "Processing"
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
 		
 		return Result;
@@ -495,7 +495,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
     if (!FoundSlot)
     {
         Result.OptionalPayload = nullptr;
-        Result.ResultID = 404; // Not Found
+    	Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound; // Not Found
         Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemNotFound", "Item not found in the inventory.");
     	
         return Result;
@@ -512,13 +512,13 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
         {
             Execute_RemoveItemFromInventory(this, FoundSlot->Item);
         	
-        	Result.ResultID = 207; // Corresponds to "Multi-Status
+        	Result.ResultID = Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_MutliStatus; // Corresponds to "Multi-Status
         	Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemQuantityReducedRemoved", "The item has been reduced and removed from the inventory.");
         }
         else
         {
         	Result.OptionalPayload = FoundSlot->Item;
-            Result.ResultID = 200; // OK
+        	Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK; // Corresponds to "OK"
             Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemQuantityReduced", "The item quantity has been reduced in the inventory.");
 
         	// Update Stacks in the Slot
@@ -536,7 +536,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::ReduceItemInInventory_Impleme
     {
     	Execute_RemoveItemFromInventory(this, FoundSlot->Item);
         	
-    	Result.ResultID = 207; // Corresponds to "Multi-Status
+    	Result.ResultID = Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_MutliStatus; // Corresponds to "Multi-Status
     	Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemQuantityReducedRemoved", "The item has been reduced and removed from the inventory.");
     }
 
@@ -896,12 +896,9 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 void UMounteaInventoryComponent::PostInventoryUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
 	if (!CanExecuteCosmetics()) return;
-
+	
 	if (UpdateContext.OptionalPayload)
 	{
-		const TScriptInterface<IMounteaInventoryInstancedItemInterface> ItemInterfacePayload = UpdateContext.OptionalPayload;
-		ItemInterfacePayload->NetFlush();
-
 		PostInventoryUpdated_Client(UpdateContext);
 	}
 }
@@ -1511,9 +1508,10 @@ void UMounteaInventoryComponent::OnRep_Items()
 	}
 
 	FInventoryUpdateResult UpdateResult;
-	UpdateResult.ResultID = 200;
+	UpdateResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK; // Corresponds to "OK"
 	UpdateResult.ResultText = LOCTEXT("InventoryNotificationData_Success_Replication", "Inventory Replicated.");
-	
+
+	UpdateResult.OptionalPayload = this;
 	OnInventoryUpdated.Broadcast(UpdateResult);
 }
 

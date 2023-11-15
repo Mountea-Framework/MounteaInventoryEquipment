@@ -59,27 +59,27 @@ namespace MounteaInventoryEquipmentConsts
 	{
 		namespace InventoryNotifications
 		{
-			const FString UpdateSuccessful						(TEXT("UpdateSuccessful"));
-			const FString UpdateFailed							(TEXT("UpdateFailed"));
+			const FString UpdateSuccessful                        (TEXT("UpdateSuccessful"));
+			const FString UpdateFailed                                 (TEXT("UpdateFailed"));
 		}
 
 		namespace ItemNotifications
 		{
-			const FString NewItemAdded							(TEXT("NewItemAdded"));
-			const FString ItemUpdated								(TEXT("ItemUpdated"));
-			const FString ItemRemoved							(TEXT("ItemRemoved"));
+			const FString NewItemAdded                              (TEXT("NewItemAdded"));
+			const FString ItemUpdated                                  (TEXT("ItemUpdated"));
+			const FString ItemRemoved                                (TEXT("ItemRemoved"));
 
-			const FString ItemAddFailed_Invalid				(TEXT("ItemAddFailed_Invalid"));
-			const FString ItemAddFailed_Stacking			(TEXT("ItemAddFailed_Stacking"));
-			const FString ItemAddFailed_QuantityMax		(TEXT("ItemAddFailed_QuantityMax"));
+			const FString ItemAddFailed_Invalid                  (TEXT("ItemAddFailed_Invalid"));
+			const FString ItemAddFailed_Stacking              (TEXT("ItemAddFailed_Stacking"));
+			const FString ItemAddFailed_QuantityMax        (TEXT("ItemAddFailed_QuantityMax"));
 		}
 	}
 
 	namespace NodeColours
 	{
-		const FLinearColor Call = FLinearColor::Yellow;
+		const FLinearColor Call     = FLinearColor::Yellow;
 		const FLinearColor Listen = FLinearColor::Green;
-		const FLinearColor Stop = FLinearColor::Red;
+		const FLinearColor Stop    = FLinearColor::Red;
 	}
 
 	namespace NodeIcons
@@ -87,5 +87,18 @@ namespace MounteaInventoryEquipmentConsts
 		const FString Listen						(TEXT("Symbols.Check"));
 		const FString Call							(TEXT("Symbols.Contact"));
 		const FString Stop							(TEXT("Icons.Denied"));
+	}
+
+	namespace InventoryUpdatedCodes
+	{
+		constexpr int32 Status_Processing     = 102;
+		constexpr int32 Status_OK                    = 200;
+		constexpr int32 Status_Created           = 201;
+		constexpr int32 Status_CreatedPart    = 206;
+		constexpr int32 Status_MutliStatus      = 207;
+		constexpr int32 Status_BadRequest   = 400;
+		constexpr int32 Status_Forbidden       = 403;
+		constexpr int32 Status_NotFound        = 404;
+		constexpr int32 Status_GenericIssue = 500;
 	}
 }
