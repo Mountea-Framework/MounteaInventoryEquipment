@@ -251,7 +251,7 @@ public:
 
 	virtual void SetWorld(UWorld* NewWorld);
 
-	void NetFlush()
+	virtual void NetFlush() override
 	{
 		RepKey++;
 	}

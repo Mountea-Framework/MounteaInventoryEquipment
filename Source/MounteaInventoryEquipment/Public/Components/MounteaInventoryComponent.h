@@ -148,18 +148,19 @@ protected:
 	
 	UFUNCTION(Server, Unreliable)
 	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
-	UFUNCTION(Client, Unreliable)
-	void PostInventoryUpdated_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Server, Unreliable)
 	void PostItemAdded(const FInventoryUpdateResult& UpdateContext);
-	UFUNCTION(Client, Unreliable)
-	void PostItemAdded_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Server, Unreliable)
 	void PostItemRemoved(const FInventoryUpdateResult& UpdateContext);
-	UFUNCTION(Client, Unreliable)
-	void PostItemRemoved_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Server, Unreliable)
 	void PostItemUpdated(const FInventoryUpdateResult& UpdateContext);
+	
+	UFUNCTION(Client, Unreliable)
+	void PostInventoryUpdated_Client(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Client, Unreliable)
+	void PostItemAdded_Client(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Client, Unreliable)
+	void PostItemRemoved_Client(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Client, Unreliable)
 	void PostItemUpdated_Client(const FInventoryUpdateResult& UpdateContext);
 

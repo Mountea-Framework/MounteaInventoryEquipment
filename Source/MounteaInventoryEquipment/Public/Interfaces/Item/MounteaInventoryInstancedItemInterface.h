@@ -176,6 +176,9 @@ public:
 
 	virtual UMounteaInventoryItemBase* GetSourceItem() const = 0;
 	virtual UMounteaInventoryItemsTable*  GetSourceTable(FName& RowName) const = 0;
+
+	virtual void NetFlush() = 0;
+	
 public:
 
 	virtual FItemGenericEvent& GetEventHandle_OnItemAdded() = 0;
