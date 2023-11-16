@@ -79,6 +79,7 @@ public:
 	
 	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	virtual TArray<UMounteaInstancedItem*> SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
+	virtual TArray<UMounteaInstancedItem*> GetItems_Implementation() const override;
 	
 	virtual FGameplayTagContainer GetInventoryFlags_Implementation() const override;
 	virtual bool HasFlag_Implementation(const FGameplayTag& SearchedFlag, const bool bSearchExact = true) override;
@@ -113,8 +114,15 @@ protected:
 	void ReduceItemInInventory_Server(UMounteaInstancedItem* Item, const int32& Quantity = 1);
 
 protected:
-	
-	bool CanExecuteCosmetics() const;
+
+	/**
+	 * Checks if the owning actor has a network role of either Authority or Autonomous Proxy.
+	 * The function is used to determine if the actor is in a suitable state to perform certain operations,
+	 * particularly those that are visual or UI-related and may not be relevant or appropriate for actors in other network roles.
+	 * 
+	 * @return True if the owning actor is either Authority or Autonomous Proxy, false otherwise.
+	 */
+	bool IsAuthorityOrAutonomousProxy() const;
 	
 /*===============================================================================
 		IN PROGRESS
@@ -166,8 +174,7 @@ private:
 ===============================================================================*/
 	
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
-	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const override;
-	
+		
 	virtual bool AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity = 1) override;
 	virtual bool AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems) override;
 	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32& Quantity = 1) override;

@@ -440,6 +440,9 @@ FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Imple
 		Result.OptionalPayload = ExistingItemSlot->Item;
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_ItemRemoved", "The item has been successfully removed from the inventory.");
 
+		// Break the connection between the item and the inventory
+		ExistingItemSlot->Item->SetOwningInventory(nullptr);
+		
 		// Cleanup the slot in InventorySlots so it can be used again
 		const int32 ExistingSlotIndex = InventorySlots.IndexOfByKey(ExistingItemSlot);
 		InventorySlots[ExistingSlotIndex] = FItemSlot();
@@ -740,6 +743,23 @@ TArray<UMounteaInstancedItem*> UMounteaInventoryComponent::SearchMultipleItems_I
 	return ResultArray;
 }
 
+TArray<UMounteaInstancedItem*> UMounteaInventoryComponent::GetItems_Implementation() const
+{
+	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_GetItems );
+	
+	TArray<UMounteaInstancedItem*> AllItems;
+	if (const FItemSlot* ValidSlot = InventorySlots.FindByPredicate(
+			[](const FItemSlot& Slot)
+			{
+				return Slot.IsValid();
+			}))
+	{
+		AllItems.Add(ValidSlot->Item);
+	}
+
+	return AllItems;
+}
+
 FGameplayTagContainer UMounteaInventoryComponent::GetInventoryFlags_Implementation() const
 {
 	return InventoryFlags;
@@ -851,18 +871,18 @@ bool UMounteaInventoryComponent::DoesHaveAuthority_Implementation() const
 	return GetOwner()->HasAuthority();
 }
 
-bool UMounteaInventoryComponent::CanExecuteCosmetics() const
+bool UMounteaInventoryComponent::IsAuthorityOrAutonomousProxy() const
 {
 	if (!GetOwner()) return false;
 	
 	switch (GetOwnerRole())
 	{
-	case ROLE_MAX:
-	case ROLE_None:
-	case ROLE_Authority:
-	case ROLE_AutonomousProxy: return true;
-	case ROLE_SimulatedProxy: break;
-	default: break;
+		case ROLE_MAX:
+		case ROLE_None:
+		case ROLE_Authority:
+		case ROLE_AutonomousProxy: return true;
+		case ROLE_SimulatedProxy: break;
+		default: break;
 	}
 
 	return false;
@@ -891,7 +911,7 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 
 void UMounteaInventoryComponent::PostInventoryUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 	
 	if (UpdateContext.OptionalPayload)
 	{
@@ -901,7 +921,7 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Implementation(const FInve
 
 void UMounteaInventoryComponent::PostItemAdded_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 
 	if (UpdateContext.OptionalPayload)
 	{
@@ -914,7 +934,7 @@ void UMounteaInventoryComponent::PostItemAdded_Implementation(const FInventoryUp
 
 void UMounteaInventoryComponent::PostItemRemoved_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 
 	if (UpdateContext.OptionalPayload)
 	{
@@ -927,7 +947,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Implementation(const FInventory
 
 void UMounteaInventoryComponent::PostItemUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 
 	if (UpdateContext.OptionalPayload)
 	{
@@ -944,7 +964,7 @@ void UMounteaInventoryComponent::PostInventoryUpdated_Client_Implementation(cons
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
 	
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
 
@@ -960,7 +980,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInve
 	if (!GetWorld()) return;
 	if (!UpdateContext.OptionalPayload) return;
 	
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 
 	// Item->InitializeNewItem(this); BREAKING
 	
@@ -977,7 +997,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FIn
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
 
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 
@@ -992,7 +1012,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(const FIn
 	if (!GetOwner()) return;
 	if (!GetWorld()) return;
 
-	if (!CanExecuteCosmetics()) return;
+	if (!IsAuthorityOrAutonomousProxy()) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
 
@@ -1438,25 +1458,6 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Multithr
 	ParallelFor(NumChunks, SearchFunction);
 
 	return ReturnValues;
-}
-
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const
-{
-	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_GetItems );
-	
-	if (OptionalFilter.IsValid())
-	{
-		if (UMounteaInventoryEquipmentBPF::GetSettings()->MultithreadingThreshold < Items.Num())
-		{
-			return GetItems_Multithreading(OptionalFilter);
-		}
-		else
-		{
-			return GetItems_Simple(OptionalFilter);
-		}
-	}
-
-	return Items;
 }
 
 bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity)

@@ -76,29 +76,37 @@ public:
 	virtual UMounteaBaseUserWidget* GetInventoryUI_Implementation() const = 0;
 
 	/**
-	 * Attempts to add an item to the inventory with the specified quantity.
-	 * @param Item The item to add.
-	 * @param Quantity The quantity of the item to add.
-	 * @return A structured result of the inventory update operation.
+	 * Adds an item to the inventory, handling different scenarios such as adding a new item,
+	 * stacking with existing ones, or creating a new item when only a part of it can be added.
+	 * It manages the item quantity, updates inventory slots, and broadcasts relevant events.
+	 * 
+	 * @param Item The item to add to the inventory.
+	 * @param Quantity The quantity of the item to be added.
+	 * @return A structure containing details about the outcome of the addition process.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	FInventoryUpdateResult AddItemToInventory(UMounteaInstancedItem* Item, const int32& Quantity = 1);
 	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
 
 	/**
-	 * Attempts to remove an item from the inventory.
-	 * @param Item The item to remove.
-	 * @return A structured result of the inventory update operation.
+	 * Removes a specific item from the inventory, handling the cleanup and updating of inventory slots.
+	 * It ensures that all relevant data structures are updated and broadcasts the item removal event.
+	 * 
+	 * @param Item The item to be removed from the inventory.
+	 * @return A structure containing details about the outcome of the removal process.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	FInventoryUpdateResult RemoveItemFromInventory(UMounteaInstancedItem* Item);
 	virtual FInventoryUpdateResult RemoveItemFromInventory_Implementation(UMounteaInstancedItem* Item) = 0;
 
 	/**
-	 * Attempts to reduce the quantity of an item in the inventory.
-	 * @param Item The item to reduce in quantity.
+	 * Reduces the quantity of a specific item in the inventory. If the item's quantity
+	 * falls to zero or below, it triggers the item's removal from the inventory.
+	 * It updates the relevant inventory slots and broadcasts update or removal events.
+	 * 
+	 * @param Item The item for which the quantity should be reduced.
 	 * @param Quantity The amount by which to reduce the item's quantity.
-	 * @return A structured result of the inventory update operation.
+	 * @return A structure containing details about the outcome of the reduction process.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	FInventoryUpdateResult ReduceItemInInventory(UMounteaInstancedItem* Item, const int32& Quantity = 1);
@@ -141,6 +149,17 @@ public:
 	TArray<UMounteaInstancedItem*> SearchMultipleItems(const FItemRetrievalFilter& SearchFilter) const;
 	virtual TArray<UMounteaInstancedItem*> SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 
+	/**
+	 * Returns an array of Instanced Item objects.
+	 * This function returns all items in the inventory.
+	 * For detailed search use `SearchMultipleItems`.
+	 *
+	 * @return An array of all inventory items.
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TArray<UMounteaInstancedItem*> GetItems() const;
+	virtual TArray<UMounteaInstancedItem*> GetItems_Implementation() const = 0;
+	
 	/**
 	 * Checks if the inventory contains any items that match the given search filter.
 	 * @param SearchFilter The criteria used to search for items.
@@ -233,9 +252,33 @@ public:
 
 public:
 
+	/**
+	 * Retrieves a reference to the inventory updated event handle.
+	 * This event is broadcasted when any change occurs in the inventory, 
+	 * such as adding, removing, or updating items.
+	 * 
+	 * @return Reference to the inventory updated event delegate.
+	 */
 	virtual FOnInventoryUpdated& GetInventoryUpdatedHandle() = 0;
+	/**
+	 * Retrieves a reference to the item added event handle.
+	 * This event is broadcasted specifically when a new item is successfully added to the inventory.
+	 * @return Reference to the item added event delegate.
+	 */
 	virtual FOnInventoryUpdated& GetItemAddedHandle() = 0;
+	/**
+	 * Retrieves a reference to the item removed event handle.
+	 * This event is broadcasted when an item is successfully removed from the inventory.
+	 * @return Reference to the item removed event delegate.
+	 */
 	virtual FOnInventoryUpdated& GetItemRemovedHandle() = 0;
+	/**
+	 * Retrieves a reference to the item updated event handle.
+	 * This event is broadcasted when an existing item in the inventory is modified, 
+	 * such as a change in quantity or properties.
+	 * 
+	 * @return Reference to the item updated event delegate.
+	 */
 	virtual FOnInventoryUpdated& GetItemUpdatedHandle() = 0;
 	
 /*===============================================================================
@@ -262,18 +305,8 @@ public:
 	UMounteaInventoryItemBase* FindItem(const FItemRetrievalFilter& SearchFilter) const;
 	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 	
-	/**
-	 * Returns an array of pointers to UMounteaInventoryItemBase objects that match the specified filter criteria.
-	 * The filter options are defined in the FItemRetrievalFilter structure, which contains fields to search by item, class, tag, or GUID, or a additive combination of each.
-	 * By default, if no filter is specified, the function returns all items in the inventory.
-	 *
-	 * @param OptionalFilter An optional item retrieval filter specifying which items to retrieve.
-	 *
-	 * @return An array of inventory items that meet the specified filter criteria. If no filter is provided, returns all items.
-	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	TArray<UMounteaInventoryItemBase*> GetItems(const FItemRetrievalFilter OptionalFilter) const;
-	virtual TArray<UMounteaInventoryItemBase*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const = 0;
+	
+	
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	bool AddOrUpdateItem(UMounteaInventoryItemBase* NewItem, const int32& Quantity = 1);
