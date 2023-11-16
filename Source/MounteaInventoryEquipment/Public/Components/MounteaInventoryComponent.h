@@ -63,11 +63,6 @@ public:
 	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
 	virtual void SaveInventory_Implementation() override;
 	
-	/**
-	 * Checks if the inventory contains an item that matches the given search filter.
-	 * @param SearchFilter A given filter based on which the search engine will try to find the item. It is required to fill!
-	 * @return True if item based on `SearchFilter` is found, false otherwise.
-	 */
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	
 	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) override;
@@ -113,6 +108,15 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ReduceItemInInventory_Server(UMounteaInstancedItem* Item, const int32& Quantity = 1);
 
+	UFUNCTION(Server, Unreliable)
+	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Server, Unreliable)
+	void PostItemAdded(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Server, Unreliable)
+	void PostItemRemoved(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Server, Unreliable)
+	void PostItemUpdated(const FInventoryUpdateResult& UpdateContext);
+
 protected:
 
 	/**
@@ -123,6 +127,19 @@ protected:
 	 * @return True if the owning actor is either Authority or Autonomous Proxy, false otherwise.
 	 */
 	bool IsAuthorityOrAutonomousProxy() const;
+
+	
+#if WITH_EDITOR
+private:
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+  
+#endif
+
+private:
+
+	UFUNCTION()
+	void OnRep_Items();
 	
 /*===============================================================================
 		IN PROGRESS
@@ -131,15 +148,6 @@ protected:
 ===============================================================================*/
 
 protected:
-
-	UFUNCTION(Server, Unreliable)
-	void PostInventoryUpdated(const FInventoryUpdateResult& UpdateContext);
-	UFUNCTION(Server, Unreliable)
-	void PostItemAdded(const FInventoryUpdateResult& UpdateContext);
-	UFUNCTION(Server, Unreliable)
-	void PostItemRemoved(const FInventoryUpdateResult& UpdateContext);
-	UFUNCTION(Server, Unreliable)
-	void PostItemUpdated(const FInventoryUpdateResult& UpdateContext);
 	
 	UFUNCTION(Client, Unreliable)
 	void PostInventoryUpdated_Client(const FInventoryUpdateResult& UpdateContext);
@@ -153,35 +161,13 @@ protected:
 	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
 	void RequestItemNotification(const FInventoryUpdateResult& UpdateContext) const;
 
-private:
-
-	UFUNCTION()
-	void OnRep_Items();
-
 protected:
-
-#if WITH_EDITOR
-private:
-
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-  
-#endif
 	
 /*===============================================================================
 		SUBJECT OF CHANGE
 		
 		Following functions are using outdated, wrong class definitions and functions.
 ===============================================================================*/
-	
-	virtual UMounteaInventoryItemBase* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
-		
-	virtual bool AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity = 1) override;
-	virtual bool AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems) override;
-	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32& Quantity = 1) override;
-	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses) override;
-
-	virtual bool RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Quantity = 1) override;
-	virtual bool RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems) override;
 
 	virtual void RequestNetworkRefresh_Implementation() override;
 	
@@ -192,28 +178,7 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientRefreshInventory();
 	
-	UFUNCTION(Server, Reliable, WithValidation)
-	void TryAddItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	bool TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void TryRemoveItem_Server(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	bool TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	
-	bool TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	bool TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity = 0);
-
 private:
-
-	/**
-	 * Do not call directly!
-	 * Use `AddItem` interface function instead.
-	 *
-	 * To use Interface call request `Execute_AddItem({interface}, {item})`
-	 */
-	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	virtual bool UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
-	virtual bool  RemoveItem_Internal(UMounteaInventoryItemBase* Item, int32 Quantity = 0);
 	
 	UFUNCTION()
 	void PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
@@ -224,14 +189,6 @@ private:
 	void PostItemRemoved_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
 	void PostItemUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
-	
-	bool HasItem_Simple(const FItemRetrievalFilter& SearchFilter) const;
-	bool HasItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const; 
-	UMounteaInventoryItemBase* FindItem_Simple(const FItemRetrievalFilter& SearchFilter) const;
-	UMounteaInventoryItemBase* FindItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const;
-	TArray<UMounteaInventoryItemBase*> GetItems_Simple(const FItemRetrievalFilter OptionalFilter) const;
-	TArray<UMounteaInventoryItemBase*> GetItems_Multithreading(const FItemRetrievalFilter OptionalFilter) const;
-
 
 #pragma endregion
 
@@ -288,11 +245,6 @@ private:
 			Following variable are using outdated, wrong class definitions and functions.
 ===============================================================================*/
 
-protected:
-	
-	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
-	TArray<UMounteaInventoryItemBase*> Items;
-
 private:
 	
 	UPROPERTY()
@@ -301,11 +253,6 @@ private:
 	FTimerHandle TimerHandle_RequestItemSyncTimerHandle;
 	UPROPERTY(EditAnywhere, Category="2. Debug")
 	float Duration_RequestSyncTimerHandle = 0.2f;
-		
-	TArray<UMounteaInventoryItemBase*> RemovedItems;
-
-	//TODO: Settings?
-	const int32 ChunkSize = 100;
 
 #pragma endregion
 	

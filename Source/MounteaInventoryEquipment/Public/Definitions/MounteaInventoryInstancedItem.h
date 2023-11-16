@@ -52,30 +52,30 @@ public:
 	
 public:
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties, EditFixedOrder), ReplicatedUsing=OnRep_Item)
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties, EditFixedOrder), Replicated)
 	EItemDataSource ItemDataSource = EItemDataSource::EIDS_SourceTable;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable", EditFixedOrder))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable", EditFixedOrder), Replicated)
 	UMounteaInventoryItemBase* SourceItem = nullptr;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder), Replicated)
 	UMounteaInventoryItemsTable* SourceTable = nullptr;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder), Replicated)
 	FName SourceRow;
 
 protected:
 
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item", Replicated)
 	FGuid InstanceID = FGuid::NewGuid();
 
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item", ReplicatedUsing=OnRep_Quantity)
 	int32 Quantity = 0;
 
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item", ReplicatedUsing=OnRep_Item)
 	FGameplayTagContainer ItemFlags;
 
-	UPROPERTY(SaveGame, Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault), Replicated)
 	FMounteaItemConfig ItemConfig;
 
 private:
@@ -273,24 +273,9 @@ public:
 
 	int GetRepKey() const
 	{ return RepKey; }
-	
-#pragma endregion 
-	
-#pragma region Protected
-	
-protected:
-	
-	virtual void PostInitProperties() override;
-
-	bool CopyFromBaseItem();
-	bool CopyFromDataTable();
-	void CleanupData();
 
 	bool OwnerHasAuthority() const;
 
-	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
-	void MarkDirtyForReplication();
-		
 	FORCEINLINE ULevel* GetLevel() const
 	{
 		return GetTypedOuter<ULevel>();
@@ -314,6 +299,21 @@ protected:
 		}
 		return nullptr;
 	}
+	
+#pragma endregion 
+	
+#pragma region Protected
+	
+protected:
+	
+	virtual void PostInitProperties() override;
+
+	bool CopyFromBaseItem();
+	bool CopyFromDataTable();
+	void CleanupData();
+	
+	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
+	void MarkDirtyForReplication();
 
 #pragma endregion
 

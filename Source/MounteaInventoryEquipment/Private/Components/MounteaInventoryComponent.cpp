@@ -565,6 +565,14 @@ void UMounteaInventoryComponent::RemoveItemFromInventory_Server_Implementation(U
 bool UMounteaInventoryComponent::RemoveItemFromInventory_Server_Validate(UMounteaInstancedItem* Item)
 { return true; }
 
+void UMounteaInventoryComponent::ReduceItemInInventory_Server_Implementation(UMounteaInstancedItem* Item, const int32& Quantity)
+{
+	Execute_ReduceItemInInventory(this, Item, Quantity);
+}
+
+bool UMounteaInventoryComponent::ReduceItemInInventory_Server_Validate(UMounteaInstancedItem* Item, const int32& Quantity)
+{ return true; }
+
 bool UMounteaInventoryComponent::CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const
 {
 	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_CanAddItem );
@@ -648,6 +656,18 @@ bool UMounteaInventoryComponent::CanRemoveItem_Implementation(UMounteaInstancedI
 
 	// Return true as the item exists in the inventory and can potentially be removed.
 	return true;
+}
+
+bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
+{
+	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_HasItem );
+
+	if (SearchFilter.IsValid())
+	{
+		return Execute_SearchSingleItem(this, SearchFilter) != nullptr;
+	}
+
+	return false;
 }
 
 UMounteaInstancedItem* UMounteaInventoryComponent::SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
@@ -888,27 +908,6 @@ bool UMounteaInventoryComponent::IsAuthorityOrAutonomousProxy() const
 	return false;
 }
 
-#if WITH_EDITOR
-
-void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	if (PropertyChangedEvent.Property->GetName() == TEXT("MounteaInventoryConfig"))
-	{
-		if (InventoryConfig.MounteaInventoryConfig == nullptr)
-		{
-			bool bFound = false;
-			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
-			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(GetPackage()->GetOuter(), Class, bFound);
-		}
-	}
-}
-
-#endif
-
-
-
 void UMounteaInventoryComponent::PostInventoryUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
 	if (!IsAuthorityOrAutonomousProxy()) return;
@@ -958,6 +957,54 @@ void UMounteaInventoryComponent::PostItemUpdated_Implementation(const FInventory
 	}
 }
 
+void UMounteaInventoryComponent::OnRep_Items()
+{
+	if (const FItemSlot* DirtySlot  = InventorySlots.FindByPredicate(
+			[this](const FItemSlot& Slot)
+			{
+				if (!this)
+				{
+					return false;
+				}
+				
+				return
+				Slot.IsValid() &&
+				Slot.Item->GetWorld() == nullptr;
+			}))
+	{
+		// If the slot contains an item, perform necessary updates
+		if (DirtySlot && DirtySlot->Item)
+		{
+			// Set the world context for the item, ensuring it is properly located in the game world.
+			DirtySlot->Item->SetWorld(GetWorld());
+		}
+	}
+}
+
+#if WITH_EDITOR
+
+void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.Property->GetName() == TEXT("MounteaInventoryConfig"))
+	{
+		if (InventoryConfig.MounteaInventoryConfig == nullptr)
+		{
+			bool bFound = false;
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(GetPackage()->GetOuter(), Class, bFound);
+		}
+	}
+}
+
+#endif
+
+/*===============================================================================
+		IN PROGRESS
+		
+		Following functions are already being updated.
+===============================================================================*/
 
 void UMounteaInventoryComponent::PostInventoryUpdated_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
 {
@@ -1022,7 +1069,6 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(const FIn
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestItemSyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
 }
 
-
 void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const
 {
 	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
@@ -1052,475 +1098,12 @@ void UMounteaInventoryComponent::RequestItemNotification(const FInventoryUpdateR
 }
 
 
-void UMounteaInventoryComponent::OnRep_Items()
-{
-	for (const auto& Itr : InventorySlots)
-	{
-		if (Itr.Item)
-		{
-			Itr.Item->SetWorld(GetWorld());
-			
-			Itr.Item->SetOwningInventory(this);
-		}
-	}
-
-	FInventoryUpdateResult UpdateResult;
-	UpdateResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK; // Corresponds to "OK"
-	UpdateResult.ResultText = LOCTEXT("InventoryNotificationData_Success_Replication", "Inventory Replicated.");
-
-	UpdateResult.OptionalPayload = this;
-	OnInventoryUpdated.Broadcast(UpdateResult);
-}
 
 /*===============================================================================
 	SUBJECT OF CHANGE
 	
 	Following functions are using outdated, wrong class definitions and functions.
 ===============================================================================*/
-
-bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
-{
-	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_HasItem );
-
-	if (SearchFilter.IsValid())
-	{
-		if (UMounteaInventoryEquipmentBPF::GetSettings()->MultithreadingThreshold < Items.Num())
-		{
-			return HasItem_Multithreading(SearchFilter);
-		}
-		else
-		{
-			return HasItem_Simple(SearchFilter);
-		}
-	}
-
-	return false;
-}
-
-bool UMounteaInventoryComponent::HasItem_Simple(const FItemRetrievalFilter& SearchFilter) const
-{
-	// BREAKING
-	/*if (SearchFilter.IsValid())
-	{
-		// Search by Item
-		if (SearchFilter.bSearchByItem)
-		{
-			if (Items.Contains(SearchFilter.Item))
-			{
-				return true;
-			}
-		}
-
-		// Search by Class
-		if (SearchFilter.bSearchByClass)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->IsA(SearchFilter.Class))
-				{
-					return true;
-				}
-			}
-		}
-
-		// Search by Tag
-		if (SearchFilter.bSearchByTag)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
-				{
-					return true;
-				}
-			}
-		}
-
-		// Search by GUID
-		if (SearchFilter.bSearchByGUID)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->GetGuid() == SearchFilter.Guid)
-				{
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}*/
-	
-	return false;
-}
-
-bool UMounteaInventoryComponent::HasItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const
-{
-	if (!SearchFilter.IsValid())
-		return false;
-
-	TAtomic<bool> ItemFound(false);
-	
-	const int32 NumChunks = FMath::CeilToInt(static_cast<float>(Items.Num()) / ChunkSize);
-
-	auto SearchFunction = [&](const int32 ChunkIndex)
-	{
-		if (ItemFound.Load())  
-			return;
-
-		const int32 StartIndex = ChunkIndex * ChunkSize;
-		const int32 EndIndex = FMath::Min(StartIndex + ChunkSize, Items.Num());
-
-		for (int32 i = StartIndex; i < EndIndex; i++)
-		{
-			if (ItemFound.Load())  
-				return;
-
-			const auto& Item = Items[i];
-
-			// Search by Item
-			/*if (SearchFilter.bSearchByItem && Item == SearchFilter.Item)
-			{
-				ItemFound = true;
-				return;
-			}*/
-
-			// Search by Class
-			if (SearchFilter.bSearchByClass && Item && Item->IsA(SearchFilter.Class))
-			{
-				ItemFound = true;
-				return;
-			}
-
-			// Search by Tag
-			if (SearchFilter.bSearchByTag && Item && Item->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
-			{
-				ItemFound = true;
-				return;
-			}
-
-			// Search by GUID
-			if (SearchFilter.bSearchByGUID && Item && Item->GetGuid() == SearchFilter.Guid)
-			{
-				ItemFound = true;
-				return;
-			}
-		}
-	};
-
-	ParallelFor(NumChunks, SearchFunction);
-
-	return ItemFound.Load();
-}
-
-UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const
-{
-	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_FindItem );
-	
-	if (SearchFilter.IsValid())
-	{
-		if (UMounteaInventoryEquipmentBPF::GetSettings()->MultithreadingThreshold < Items.Num())
-		{
-			return FindItem_Multithreading(SearchFilter);
-		}
-		else
-		{
-			return FindItem_Simple(SearchFilter);
-		}
-	}
-
-	return nullptr;
-}
-
-UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Simple(const FItemRetrievalFilter& SearchFilter) const
-{
-	if (SearchFilter.IsValid())
-	{
-		// Search by Item
-		if (SearchFilter.bSearchByItem)
-		{
-			/*if (Items.Contains(SearchFilter.Item))
-			{
-				return SearchFilter.Item;
-			}*/
-		}
-
-		// Search by Class
-		if (SearchFilter.bSearchByClass)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->IsA(SearchFilter.Class))
-				{
-					return Itr;
-				}
-			}
-		}
-
-		// Search by Tag
-		if (SearchFilter.bSearchByTag)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
-				{
-					return Itr;
-				}
-			}
-		}
-
-		// Search by GUID
-		if (SearchFilter.bSearchByGUID)
-		{
-			for (const auto& Itr : Items)
-			{
-				if (Itr && Itr->GetGuid() == SearchFilter.Guid)
-				{
-					return Itr;
-				}
-			}
-		}		
-	}
-
-	return nullptr;
-}
-
-UMounteaInventoryItemBase* UMounteaInventoryComponent::FindItem_Multithreading(const FItemRetrievalFilter& SearchFilter) const
-{
-	if (!SearchFilter.IsValid())
-		return nullptr;
-
-	TAtomic<UMounteaInventoryItemBase*> FoundItem(nullptr);
-	
-	const int32 NumChunks = FMath::CeilToInt(static_cast<float>(Items.Num()) / ChunkSize);
-
-	auto SearchFunction = [&](const int32 ChunkIndex)
-	{
-		if (FoundItem.Load())  
-			return;
-
-		const int32 StartIndex = ChunkIndex * ChunkSize;
-		const int32 EndIndex = FMath::Min(StartIndex + ChunkSize, Items.Num());
-
-		for (int32 i = StartIndex; i < EndIndex; i++)
-		{
-			if (FoundItem.Load())  
-				return;
-
-			const auto& Item = Items[i];
-
-			// Search by Item
-			/*if (SearchFilter.bSearchByItem && Item == SearchFilter.Item)
-			{
-				FoundItem = Item;
-				return;
-			}*/
-
-			// Search by Class
-			if (SearchFilter.bSearchByClass && Item && Item->IsA(SearchFilter.Class))
-			{
-				FoundItem = Item;
-				return;
-			}
-
-			// Search by Tag
-			if (SearchFilter.bSearchByTag && Item && Item->ItemData.RequiredData.ItemFlags.HasAny(SearchFilter.Tags))
-			{
-				FoundItem = Item;
-				return;
-			}
-
-			// Search by GUID
-			if (SearchFilter.bSearchByGUID && Item && Item->GetGuid() == SearchFilter.Guid)
-			{
-				FoundItem = Item;
-				return;
-			}
-		}
-	};
-
-	ParallelFor(NumChunks, SearchFunction);
-
-	return FoundItem.Load();
-}
-
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Simple(const FItemRetrievalFilter OptionalFilter) const
-{
-	if (OptionalFilter.IsValid())
-	{
-		TArray<UMounteaInventoryItemBase*> FoundItems;
-			
-		// Search by Item
-		if (OptionalFilter.bSearchByItem)
-		{
-			for (const auto& Item : Items)
-			{
-				/*if (Item == OptionalFilter.Item)
-				{
-					FoundItems.Add(Item);
-				}*/
-			}
-		}
-
-		// Search by Class
-		if (OptionalFilter.bSearchByClass)
-		{
-			for (const auto& Item : Items)
-			{
-				if (Item && Item->IsA(OptionalFilter.Class))
-				{
-					FoundItems.Add(Item);
-				}
-			}
-		}
-
-		// Search by Tag
-		if (OptionalFilter.bSearchByTag)
-		{
-			for (const auto& Item : Items)
-			{
-				if (Item && Item->ItemData.RequiredData.ItemFlags.HasAny(OptionalFilter.Tags))
-				{
-					FoundItems.Add(Item);
-				}
-			}
-		}
-
-		// Search by GUID
-		if (OptionalFilter.bSearchByGUID)
-		{
-			for (const auto& Item : Items)
-			{
-				if (Item && Item->GetGuid() == OptionalFilter.Guid)
-				{
-					FoundItems.Add(Item);
-				}
-			}
-		}
-
-		return FoundItems;
-	}
-
-	return Items;
-}
-
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryComponent::GetItems_Multithreading(const FItemRetrievalFilter OptionalFilter) const
-{
-	if (!OptionalFilter.IsValid())
-		return TArray<UMounteaInventoryItemBase*>();
-	
-	const int32 NumChunks = FMath::CeilToInt(static_cast<float>(Items.Num()) / ChunkSize);
-
-	// Thread-safe container to collect items from each thread/chunk
-	FCriticalSection CriticalSection;
-	TArray<UMounteaInventoryItemBase*> ReturnValues;
-
-	auto SearchFunction = [&](const int32 ChunkIndex)
-	{
-		const int32 StartIndex = ChunkIndex * ChunkSize;
-		const int32 EndIndex = FMath::Min(StartIndex + ChunkSize, Items.Num());
-		TArray<UMounteaInventoryItemBase*> TempList;
-
-		for (int32 i = StartIndex; i < EndIndex; i++)
-		{
-			auto& Item = Items[i];
-
-			// Search by Class
-			if (OptionalFilter.bSearchByClass && Item && Item->IsA(OptionalFilter.Class))
-			{
-				TempList.Add(Item);
-			}
-
-			// Search by Item
-			/*else if (OptionalFilter.bSearchByItem && Item == OptionalFilter.Item)
-			{
-				TempList.Add(Item);
-			}*/
-
-			// Search by Tag
-			else if (OptionalFilter.bSearchByTag && Item && Item->ItemData.RequiredData.ItemFlags.HasAny(OptionalFilter.Tags))
-			{
-				TempList.Add(Item);
-			}
-
-			// Search by GUID
-			else if (OptionalFilter.bSearchByGUID && Item && Item->GetGuid() == OptionalFilter.Guid)
-			{
-				TempList.Add(Item);
-			}
-		}
-
-		// Add items found in this chunk to the main list
-		CriticalSection.Lock();
-		ReturnValues.Append(TempList);
-		CriticalSection.Unlock();
-	};
-
-	ParallelFor(NumChunks, SearchFunction);
-
-	return ReturnValues;
-}
-
-bool UMounteaInventoryComponent::AddOrUpdateItem_Implementation(UMounteaInventoryItemBase* NewItem, const int32& Quantity)
-{
-	return TryAddItem(NewItem, Quantity);
-}
-
-bool UMounteaInventoryComponent::AddItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& NewItems)
-{
-	bool bSatisfied = true;
-	for (const auto& Itr : NewItems)
-	{
-		if (!Execute_AddOrUpdateItem(this, Itr.Key, Itr.Value))
-		{
-			bSatisfied = false;
-		}
-	}
-	
-	return bSatisfied;
-}
-
-bool UMounteaInventoryComponent::AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItemBase> ItemClass, const int32& Quantity)
-{
-	if (ItemClass == nullptr) return false;
-
-	UMounteaInventoryItemBase* NewItem = NewObject<UMounteaInventoryItemBase>(GetWorld(), ItemClass);
-	//NewItem->SetWorld(GetWorld());
-	
-	return TryAddItem(NewItem, Quantity);
-}
-
-bool UMounteaInventoryComponent::AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItemBase>, int32>& NewItemsClasses)
-{
-	bool bSatisfied = true;
-	for (const auto& Itr : NewItemsClasses)
-	{
-		if (!Execute_AddItemFromClass(this, Itr.Key, Itr.Value))
-		{
-			bSatisfied = false;
-		}
-	}
-
-	return bSatisfied;
-}
-
-bool UMounteaInventoryComponent::RemoveItem_Implementation(UMounteaInventoryItemBase* AffectedItem, const int32& Quantity)
-{
-	return TryRemoveItem(AffectedItem, Quantity);
-}
-
-bool UMounteaInventoryComponent::RemoveItems_Implementation(TMap<UMounteaInventoryItemBase*,int32>& AffectedItems)
-{
-	bool bSatisfied = true;
-	for (const auto& Itr : AffectedItems)
-	{
-		if (!Execute_RemoveItem(this, Itr.Key, Itr.Value))
-		{
-			bSatisfied = false;
-		}
-	}
-	
-	return bSatisfied;
-}
 
 void UMounteaInventoryComponent::RequestNetworkRefresh_Implementation()
 {
@@ -1542,376 +1125,6 @@ void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInvent
 	Action->ProcessAction(Item);
 }
 
-void UMounteaInventoryComponent::TryAddItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	if (TryAddItem(Item, Quantity))
-	{
-		//TODO: Item Addeeeeeeeed
-		return;
-	}
-	else
-	{
-		//TODO: Something is wrong :(
-		return;
-	}
-}
-
-bool UMounteaInventoryComponent::TryAddItem_Server_Validate(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	// There is currently no protection,
-	// however, in the future some might be implemented.
-	// This function is here just for future proofing.
-	return true;
-}
-
-void UMounteaInventoryComponent::ReduceItemInInventory_Server_Implementation(UMounteaInstancedItem* Item, const int32& Quantity)
-{
-	Execute_ReduceItemInInventory(this, Item, Quantity);
-}
-
-bool UMounteaInventoryComponent::ReduceItemInInventory_Server_Validate(UMounteaInstancedItem* Item, const int32& Quantity)
-{ return true; }
-
-bool UMounteaInventoryComponent::TryAddItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	if (!GetOwner()) return false;
-
-	if (!GetOwner()->HasAuthority())
-	{
-		TryAddItem_Server(Item, Quantity);
-		return true;
-	}
-	
-	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-
-	if (!Settings)
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoSettings", "Failed - No Inventory Settings");
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		
-		return false;
-	}
-	
-	if (!Item)
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoItem", "Failed - Invalid Item!");
-	
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		return false;
-	}
-	
-	if (!GetOwner())
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoOwner", "Failed - Inventory failed to initialize!");
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		
-		return false;
-	}
-
-	if (!GetOwner()->HasAuthority())
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoAuth", "Failed - Client requests are disabled!");
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		
-		return false;
-	}
-	
-	FItemRetrievalFilter Filter;
-	{
-		//Filter.bSearchByItem = true;
-		//Filter.Item = Item;
-		//Filter.bSearchByClass = true;
-		//Filter.Class = Item->StaticClass();
-		//Filter.bSearchByTag = false;
-		//Filter.Tag = Item->GetFirstTag();
-	}
-
-	bool bSuccess = false;
-	if (!Execute_HasItem(this, Filter))
-	{
-		bSuccess = TryAddItem_NewItem(Item, Quantity);
-	}
-	else
-	{
-		FItemRetrievalFilter SearchFilter;
-		//SearchFilter.bSearchByItem = true;
-		//SearchFilter.Item = Item;
-		SearchFilter.bSearchByGUID = true;
-		SearchFilter.Guid = Item->GetGuid();
-			
-		UMounteaInventoryItemBase* ExistingItem = Execute_FindItem(this, SearchFilter);
-		
-		bSuccess = TryAddItem_UpdateExisting(ExistingItem, Item, Quantity);
-	}
-	
-	return bSuccess;
-}
-
-void UMounteaInventoryComponent::TryRemoveItem_Server_Implementation(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	if (TryRemoveItem(Item, Quantity))
-	{
-		//TODO: Item Addeeeeeeeed
-		return;
-	}
-	else
-	{
-		//TODO: Something is wrong :(
-		return;
-	}
-}
-
-bool UMounteaInventoryComponent::TryRemoveItem_Server_Validate(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	// There is currently no protection,
-	// however, in the future some might be implemented.
-	// This function is here just for future proofing.
-	return true;
-}
-
-bool UMounteaInventoryComponent::TryRemoveItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	if (!GetOwner()) return false;
-
-	if (!GetOwner()->HasAuthority())
-	{
-		TryRemoveItem_Server(Item, Quantity);
-		return true;
-	}
-	
-	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-
-	if (!Settings)
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("MounteaInventoryComponent_FailedSettings", "Failed - No Inventory Settings");
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		
-		return false;
-	}
-	
-	if (!Item)
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoItem", "Failed - Invalid Item!");
-	
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		return false;
-	}
-	
-	if (!GetOwner())
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoOwner", "Failed - Inventory failed to initialize!");
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		
-		return false;
-	}
-
-	if (!GetOwner()->HasAuthority())
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoAuth", "Failed - Client requests are disabled!");
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		
-		return false;
-	}
-	
-	FItemRetrievalFilter Filter;
-	{
-		//Filter.bSearchByItem = true;
-		//Filter.Item = Item;
-		Filter.bSearchByGUID = true;
-		Filter.Guid = Item->GetGuid();
-		Filter.bSearchByTag = true;
-		// Filter.Tags = Item->GetTags(); BREAKING
-	}
-	
-	if (!Execute_HasItem(this, Filter))
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-
-		UpdateResult.UpdateMessage = LOCTEXT("MounteaInventoryComponent_UpdateItem_NoItem", "Failed - Cannot update Item outside Inventory!");
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		
-		return false;
-	}
-
-	return RemoveItem_Internal(Item, Quantity);
-}
-
-bool UMounteaInventoryComponent::AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	if (GetOwner() && GetOwner()->HasAuthority())
-	{
-		Items.Add(Item);
-		
-		const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-		
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
-		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
-
-		FOnInventoryUpdated ItemUpdatedResult;
-		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_AddItem;
-		
-		OnItemAdded.Broadcast(Item, ItemUpdatedResult);*/
-		ReplicatedItemsKey++;
-		OnRep_Items();
-
-		// Item->InitializeNewItem(this); BREAKING
-		
-		return true;
-	}
-	
-	return false;
-}
-
-bool UMounteaInventoryComponent::UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	if (GetOwner() && GetOwner()->HasAuthority())
-	{
-		const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-		
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
-		UpdateResult.UpdateMessage = *Settings->InventoryUpdateMessages.Find(UpdateResult.InventoryUpdateResult);
-
-		FOnInventoryUpdated ItemUpdatedResult;
-		ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_UpdateItem;
-		
-		OnItemUpdated.Broadcast(Item, ItemUpdatedResult);*/
-		ReplicatedItemsKey++;
-		OnRep_Items();
-		
-		return true;
-	}
-
-	return false;
-}
-
-bool UMounteaInventoryComponent::RemoveItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	const UMounteaInventoryEquipmentSettings* const Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-
-	// Sanity check
-	if (!Item)
-	{
-		/*FInventoryUpdateResult UpdateResult;
-		UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Failed;
-		UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Failed_NoItem", "Failed - Invalid Item input!");
-
-		OnInventoryUpdated.Broadcast(UpdateResult);*/
-		return false;
-	}
-	
-	if (GetOwner() && GetOwner()->HasAuthority())
-	{
-		FOnInventoryUpdated ItemUpdatedResult;
-		
-		int32 AmountToRemove = -1;
-		if (Quantity == 0) //TODO
-		{
-			// AmountToRemove = Item->ItemData.RequiredData.ItemQuantity.CurrentQuantity; BREAKING
-		}
-		else
-		{
-			AmountToRemove = Quantity;
-		}
-
-		AmountToRemove = FMath::Abs(AmountToRemove);
-		const int32 MaxToRemove = 0; // Item->ItemData.RequiredData.ItemQuantity.CurrentQuantity; BREAKING
-		AmountToRemove =  FMath::Abs(FMath::Min(AmountToRemove, MaxToRemove));
-
-		AmountToRemove = MaxToRemove - AmountToRemove;
-		
-		// Item->SetQuantity(AmountToRemove); BREAKING
-		
-		// if (Item->ItemData.RequiredData.ItemQuantity.CurrentQuantity <= 0) BREAKING
-		if (Item->ItemData.RequiredData.ItemQuantity.MaxQuantity > 0)
-		{
-			/*ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_RemovedItem;
-			OnItemUpdated.Broadcast(Item, ItemUpdatedResult);
-			
-			OnItemRemoved.Broadcast(ItemUpdatedResult);
-			
-			FInventoryUpdateResult UpdateResult;
-			UpdateResult.InventoryUpdateResult = EInventoryUpdateResult::EIUR_Success;
-			UpdateResult.UpdateMessage = LOCTEXT("InventoryNotificationData_Success_RemovedItem", "Inventory Item Removed");
-
-			OnInventoryUpdated.Broadcast(UpdateResult);*/
-			
-			ReplicatedItemsKey++;
-			// Item->NetFlush(); BREAKING
-			
-			OnRep_Items();
-
-			RemovedItems.Add(Item);
-			Items.Remove(Item);
-
-			return true;
-		}
-
-		/*ItemUpdatedResult.ItemUpdateResult = EItemUpdateResult::EIUR_Success_UpdateItem;
-
-		OnItemUpdated.Broadcast(Item, ItemUpdatedResult);*/
-		ReplicatedItemsKey++;
-		OnRep_Items();
-		
-		return true;
-	}
-
-	return false;
-}
-
-bool UMounteaInventoryComponent::TryAddItem_NewItem(UMounteaInventoryItemBase* Item, const int32 Quantity)
-{
-	// Sanity check
-	if (!Item) return false;
-
-	if (Quantity < 0)
-	{
-		return TryRemoveItem(Item, Quantity);
-	}
-
-	const int32 MaxToAdd = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Item, nullptr, Quantity);
-	// Item->SetQuantity(MaxToAdd); BREAKING
-	
-	// In this case we actually can just add the item with no further checks
-	return AddItem_Internal(Item);
-}
-
-bool UMounteaInventoryComponent::TryAddItem_UpdateExisting(UMounteaInventoryItemBase* Existing, UMounteaInventoryItemBase* NewItem, const int32 Quantity)
-{
-	// Sanity check
-	if (!NewItem) return false;
-	if (!Existing) return false;
-
-	if (Quantity < 0)
-	{
-		return TryRemoveItem(Existing, Quantity);
-	}
-
-	const int32 MaxAddQuantity = UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(Existing, NewItem, Quantity);
-	if (MaxAddQuantity == 0) return false;
-	
-	// Existing->AddQuantity(MaxAddQuantity); BREAKING
-	
-	return UpdateItem_Internal(Existing);
-}
 
 void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
 {
@@ -1995,6 +1208,5 @@ void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
 {
 	ReplicatedItemsKey++;
 }
-
 
 #undef LOCTEXT_NAMESPACE
