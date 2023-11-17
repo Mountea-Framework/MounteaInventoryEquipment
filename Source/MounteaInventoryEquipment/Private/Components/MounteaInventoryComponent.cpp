@@ -973,6 +973,170 @@ void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUp
 	}
 }
 
+void UMounteaInventoryComponent::PostInventoryUpdated_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	
+	if (!IsAuthorityOrAutonomousProxy()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+
+	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
+	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostInventoryUpdated_Client_RequestUpdate", UpdateContext);
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestInventorySyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
+}
+
+void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	if (!UpdateContext.OptionalPayload) return;
+	
+	if (!IsAuthorityOrAutonomousProxy()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+
+	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
+	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostItemAdded_Client_RequestUpdate", UpdateContext);
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestInventorySyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
+}
+
+void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+
+	if (!IsAuthorityOrAutonomousProxy()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+
+	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
+	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostItemRemoved_Client_RequestUpdate", UpdateContext);
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestInventorySyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
+}
+
+void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+
+	if (!IsAuthorityOrAutonomousProxy()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+
+	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
+	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostItemUpdated_Client_RequestUpdate", UpdateContext);
+	
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestInventorySyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
+}
+
+void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+	
+	OnInventoryUpdated_Client.Broadcast(UpdateContext);
+
+	if (InventoryWBP)
+	{
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
+
+		RequestInventoryNotification(UpdateContext);
+	}
+}
+
+void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	if (!UpdateContext.OptionalPayload) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+	
+	if (InventoryWBP)
+	{
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, UpdateContext.OptionalPayload);
+		
+		RequestInventoryNotification(UpdateContext);
+		
+		const TScriptInterface<IMounteaInventoryInstancedItemInterface> ItemInterface = UpdateContext.OptionalPayload;
+		if (ItemInterface.GetObject())
+		{
+			ItemInterface->GetEventHandle_OnItemAdded().Broadcast(UpdateContext.ResultText.ToString());
+		}
+		OnItemAdded_Client.Broadcast(UpdateContext);
+	}
+}
+
+void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	if (!UpdateContext.OptionalPayload) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+	
+	if (InventoryWBP)
+	{
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget, UpdateContext.OptionalPayload);
+
+		RequestInventoryNotification(UpdateContext);
+
+		const TScriptInterface<IMounteaInventoryInstancedItemInterface> ItemInterface = UpdateContext.OptionalPayload;
+		if (ItemInterface.GetObject())
+		{
+			ItemInterface->GetEventHandle_OnItemRemoved().Broadcast(UpdateContext.ResultText.ToString());
+		}
+		OnItemRemoved_Client.Broadcast(UpdateContext);
+	}
+}
+
+void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	if (!UpdateContext.OptionalPayload) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
+	
+	if (InventoryWBP)
+	{
+		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, UpdateContext.OptionalPayload);
+		
+		RequestInventoryNotification(UpdateContext);
+
+		const TScriptInterface<IMounteaInventoryInstancedItemInterface> ItemInterface = UpdateContext.OptionalPayload;
+		if (ItemInterface.GetObject())
+		{
+			ItemInterface->GetEventHandle_OnItemModified().Broadcast(UpdateContext.ResultText.ToString());
+		}
+
+		OnItemUpdated_Client.Broadcast(UpdateContext);
+	}
+}
+
+void UMounteaInventoryComponent::RequestNetworkRefresh_Implementation()
+{
+	if (!Execute_DoesHaveAuthority(this))
+	{
+		RequestNetworkRefresh_Server();
+		return;
+	}
+
+	ReplicatedItemsKey++;
+}
+
+void UMounteaInventoryComponent::RequestNetworkRefresh_Server_Implementation()
+{
+	RequestNetworkRefresh();
+}
+
 void UMounteaInventoryComponent::OnRep_Items()
 {
 	if (const FItemSlot* DirtySlot  = InventorySlots.FindByPredicate(
@@ -1022,69 +1186,6 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 		Following functions are already being updated.
 ===============================================================================*/
 
-void UMounteaInventoryComponent::PostInventoryUpdated_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-	
-	if (!IsAuthorityOrAutonomousProxy()) return;
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
-
-	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
-	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostInventoryUpdated_Client_RequestUpdate", UpdateContext);
-	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestInventorySyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
-}
-
-void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-	if (!UpdateContext.OptionalPayload) return;
-	
-	if (!IsAuthorityOrAutonomousProxy()) return;
-
-	// Item->InitializeNewItem(this); BREAKING
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
-
-	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
-	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostItemAdded_Client_RequestUpdate", UpdateContext);
-	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestItemSyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
-}
-
-void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-
-	if (!IsAuthorityOrAutonomousProxy()) return;
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
-
-	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
-	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostItemRemoved_Client_RequestUpdate", UpdateContext);
-	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestItemSyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
-}
-
-void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-
-	if (!IsAuthorityOrAutonomousProxy()) return;
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestItemSyncTimerHandle);
-
-	FTimerDelegate TimerDelegate_RequestSyncTimerHandle;
-	TimerDelegate_RequestSyncTimerHandle.BindUFunction(this, "PostItemUpdated_Client_RequestUpdate", UpdateContext);
-	
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestItemSyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
-}
-
 
 
 /*===============================================================================
@@ -1092,13 +1193,6 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(const FIn
 	
 	Following functions are using outdated, wrong class definitions and functions.
 ===============================================================================*/
-
-void UMounteaInventoryComponent::RequestNetworkRefresh_Implementation()
-{
-	ReplicatedItemsKey++;
-
-	OnRep_Items();
-}
 
 void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) 
 {
@@ -1111,89 +1205,6 @@ void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInvent
 	Action->InitializeAction(Item, Context);
 	
 	Action->ProcessAction(Item);
-}
-
-void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
-	
-	OnInventoryUpdated_Client.Broadcast(UpdateContext);
-
-	if (InventoryWBP)
-	{
-		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshInventoryWidget);
-
-		RequestInventoryNotification(UpdateContext);
-	}
-}
-
-void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-	if (!UpdateContext.OptionalPayload) return;
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
-
-	// Item->InitializeNewItem(this); BREAKING
-	
-	if (InventoryWBP)
-	{
-		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, UpdateContext.OptionalPayload);
-		
-		RequestInventoryNotification(UpdateContext);
-		
-		// Item->GetItemAddedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
-		OnItemAdded_Client.Broadcast(UpdateContext);
-	}
-}
-
-void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-	if (!UpdateContext.OptionalPayload) return;
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
-	
-	if (InventoryWBP)
-	{
-		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget, UpdateContext.OptionalPayload);
-
-		RequestInventoryNotification(UpdateContext);
-
-		// Item->GetItemRemovedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
-		OnItemRemoved_Client.Broadcast(UpdateContext);
-	}
-}
-
-void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
-{
-	if (!GetOwner()) return;
-	if (!GetWorld()) return;
-	if (!UpdateContext.OptionalPayload) return;
-	
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestInventorySyncTimerHandle);
-	
-	// Item->InitializeNewItem(this); BREAKING
-	
-	if (InventoryWBP)
-	{
-		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, UpdateContext.OptionalPayload);
-		
-		RequestInventoryNotification(UpdateContext);
-		
-		// Item->GetItemUpdatedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
-		OnItemUpdated_Client.Broadcast(UpdateContext);
-	}
-}
-
-void UMounteaInventoryComponent::ClientRefreshInventory_Implementation()
-{
-	ReplicatedItemsKey++;
 }
 
 #undef LOCTEXT_NAMESPACE

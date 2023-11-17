@@ -117,6 +117,8 @@ protected:
 	UFUNCTION(Server, Unreliable)
 	void PostItemUpdated(const FInventoryUpdateResult& UpdateContext);
 
+	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
+	
 protected:
 
 	/**
@@ -127,7 +129,6 @@ protected:
 	 * @return True if the owning actor is either Authority or Autonomous Proxy, false otherwise.
 	 */
 	bool IsAuthorityOrAutonomousProxy() const;
-
 	
 #if WITH_EDITOR
 private:
@@ -140,12 +141,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_Items();
-	
-/*===============================================================================
-		IN PROGRESS
-		
-		Following functions are already being updated.
-===============================================================================*/
 
 protected:
 	
@@ -158,24 +153,7 @@ protected:
 	UFUNCTION(Client, Unreliable)
 	void PostItemUpdated_Client(const FInventoryUpdateResult& UpdateContext);
 
-	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
-
-protected:
-	
-/*===============================================================================
-		SUBJECT OF CHANGE
-		
-		Following functions are using outdated, wrong class definitions and functions.
-===============================================================================*/
-
 	virtual void RequestNetworkRefresh_Implementation() override;
-	
-	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
-
-protected:
-	
-	UFUNCTION(Client, Reliable)
-	void ClientRefreshInventory();
 	
 private:
 	
@@ -188,6 +166,29 @@ private:
 	void PostItemRemoved_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
 	void PostItemUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+	
+	UFUNCTION(Server, Unreliable)
+	void RequestNetworkRefresh_Server();
+	
+/*===============================================================================
+		IN PROGRESS
+		
+		Following functions are already being updated.
+===============================================================================*/
+
+
+	
+protected:
+	
+/*===============================================================================
+		SUBJECT OF CHANGE
+		
+		Following functions are using outdated, wrong class definitions and functions.
+===============================================================================*/
+	
+	
+	
+	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
 
 #pragma endregion
 
@@ -231,27 +232,18 @@ protected:
 
 private:
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category="2. Debug")
 	int32 ReplicatedItemsKey = 0;
 	
 	// Filled from RemoveFromItem to keep track of Items that were removed
 	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<FItemSlot> ModifiedSlots;
-	
-/*===============================================================================
-			SUBJECT OF CHANGE
-			
-			Following variable are using outdated, wrong class definitions and functions.
-===============================================================================*/
 
-private:
-	
 	UPROPERTY()
 	FTimerHandle TimerHandle_RequestInventorySyncTimerHandle;
-	UPROPERTY()
-	FTimerHandle TimerHandle_RequestItemSyncTimerHandle;
+	
 	UPROPERTY(EditAnywhere, Category="2. Debug")
-	float Duration_RequestSyncTimerHandle = 0.2f;
+	float Duration_RequestSyncTimerHandle = 0.1f;
 
 #pragma endregion
 	
