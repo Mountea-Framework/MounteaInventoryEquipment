@@ -957,6 +957,22 @@ void UMounteaInventoryComponent::PostItemUpdated_Implementation(const FInventory
 	}
 }
 
+void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const
+{
+	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
+	FInventoryNotificationData Data = *Settings->InventoryUpdateData.Find(UpdateContext.ResultID);
+
+	if (Data.Weight >= Settings->MinDisplayWeight)
+	{
+		if (!UpdateContext.ResultText.IsEmpty())
+		{
+			Data.NotificationText = UpdateContext.ResultText;
+		}
+
+		IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
+	}
+}
+
 void UMounteaInventoryComponent::OnRep_Items()
 {
 	if (const FItemSlot* DirtySlot  = InventorySlots.FindByPredicate(
@@ -1069,34 +1085,6 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_Implementation(const FIn
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle_RequestItemSyncTimerHandle, TimerDelegate_RequestSyncTimerHandle, Duration_RequestSyncTimerHandle, false);
 }
 
-void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const
-{
-	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-		
-	FInventoryNotificationData Data; // = *Settings->InventoryUpdateData.Find(UpdateContext.InventoryUpdateResult); BREAKING
-	if (Data.Weight >= Settings->MinDisplayWeight)
-	{
-		if (!UpdateContext.ResultText.IsEmpty())
-		{
-			// Data.NotificationText = UpdateContext.UpdateMessage;
-		}
-
-		IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
-	}
-}
-
-void UMounteaInventoryComponent::RequestItemNotification(const FInventoryUpdateResult& UpdateContext) const
-{
-	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-	FInventoryNotificationData Data; // = *Settings->ItemUpdateData.Find(UpdateContext.ItemUpdateResult); BREAKING
-	if (!UpdateContext.ResultText.IsEmpty())
-	{
-		// Data.NotificationText = UpdateContext.UpdateMessage;
-	}
-
-	IMounteaInventoryWBPInterface::Execute_CreateInventoryNotification(InventoryWBP, Data);
-}
-
 
 
 /*===============================================================================
@@ -1124,7 +1112,6 @@ void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInvent
 	
 	Action->ProcessAction(Item);
 }
-
 
 void UMounteaInventoryComponent::PostInventoryUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
 {
@@ -1157,7 +1144,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_RequestUpdate(const FInven
 	{
 		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, UpdateContext.OptionalPayload);
 		
-		RequestItemNotification(UpdateContext);
+		RequestInventoryNotification(UpdateContext);
 		
 		// Item->GetItemAddedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
 		OnItemAdded_Client.Broadcast(UpdateContext);
@@ -1176,7 +1163,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_RequestUpdate(const FInv
 	{
 		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RemoveItemWidget, UpdateContext.OptionalPayload);
 
-		RequestItemNotification(UpdateContext);
+		RequestInventoryNotification(UpdateContext);
 
 		// Item->GetItemRemovedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
 		OnItemRemoved_Client.Broadcast(UpdateContext);
@@ -1197,7 +1184,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Client_RequestUpdate(const FInv
 	{
 		InventoryWBP->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::InventoryCommands::RefreshItemsWidgets, UpdateContext.OptionalPayload);
 		
-		RequestItemNotification(UpdateContext);
+		RequestInventoryNotification(UpdateContext);
 		
 		// Item->GetItemUpdatedHandle().Broadcast(UpdateContext.UpdateMessage.ToString()); BREAKING
 		OnItemUpdated_Client.Broadcast(UpdateContext);

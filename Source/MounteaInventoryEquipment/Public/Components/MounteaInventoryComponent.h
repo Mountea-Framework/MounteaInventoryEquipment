@@ -159,7 +159,6 @@ protected:
 	void PostItemUpdated_Client(const FInventoryUpdateResult& UpdateContext);
 
 	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
-	void RequestItemNotification(const FInventoryUpdateResult& UpdateContext) const;
 
 protected:
 	

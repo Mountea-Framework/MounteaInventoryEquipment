@@ -36,24 +36,9 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryThemeConfig>> ThemeConfigs;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
-	TSoftClassPtr<UMounteaInventoryItemBase> DefaultItemClass;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
-	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;
-	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
-	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
-	
 	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface", AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryWidgetClass;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TSoftObjectPtr<UMounteaInventoryItemsTable> DefaultInventoryItemDefinitionsTable;
-	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;
 
@@ -62,75 +47,33 @@ public:
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaEquipmentConfigData> EquipmentConfigData;
-	
+
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bUIDebug : 1;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
-	uint8 bDragDropAllowed : 1;
+#pragma region COMMANDS
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> InventoryWidgetCommands;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> EquipmentWidgetCommands;
-	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
-	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> ItemsWidgetCommands;
-	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
-	TMap<EItemUpdateResult, FText> ItemUpdateMessages;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> ItemTooltipWidgetCommands;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
-	TArray<FKey> DragKeys;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
-	TArray<FKey> ActionRequestKeys;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
-	int32 MinDisplayWeight = 1;
-	
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
-	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
-	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
+#pragma endregion
 
-	/**
-	 * The maximum number of threads used for parallel execution.
-	 * Increasing this value can improve performance in certain scenarios,
-	 * but using too many threads may introduce diminishing returns and
-	 * potential performance issues due to overhead and contention.
-	 *
-	 * ❗ Be cautious when adjusting this value. Setting it too high
-	 *     can lead to resource exhaustion and decreased performance.
-	 *
-	 * ❓ It is recommended to profile and experiment to find the optimal
-	 *     thread count for your specific workload and hardware setup.
-	 *
-	 * @see FPlatformMisc::NumberOfWorkerThreadsToSpawn
-	 */
-	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=1, ClampMin=1), AdvancedDisplay)
-	int32 ThreadsLimit = 2;
-	
-	/**
-	* The MultithreadingThreshold variable determines the minimum number of items required in the inventory to enable multithreading.
-	* When the number of items in the inventory is below this threshold, multithreading will be disabled.
-	* ❗ Warning: Modifying this value without proper knowledge may affect performance and stability.
-	* ❓ Note: The value should be set to a reasonable number based on the expected size of the inventory.
-	*/
-	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=100, ClampMin=100), AdvancedDisplay)
-	int32 MultithreadingThreshold = 1000;
-
-
-public:
+	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
+	TMap<int32, FInventoryNotificationData> InventoryUpdateData;
 
 #if WITH_EDITOR
+
+public:
+	
 	virtual FText GetSectionText() const override
 	{
 		return NSLOCTEXT("MounteaInventoryEquipment", "MounteaInventoryEquipmentSettingsSection", "Mountea Inventory & Equipment Settings");
@@ -146,6 +89,8 @@ public:
 		return "Project";
 	}
 
+protected:
+	
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override
 	{
 		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryWidgetCommands))
@@ -231,67 +176,7 @@ public:
 				ItemsWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemCommands::RemoveItem);
 			}
 		}
-
-		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryUpdateMessages))
-		{
-			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIUR_Success))
-			{
-				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Success, LOCTEXT("InventoryUpdateMessages_Success", "Inventory Updated"));
-			}
-			if (!InventoryUpdateMessages.Contains(EInventoryUpdateResult::EIUR_Failed))
-			{
-				InventoryUpdateMessages.Add(EInventoryUpdateResult::EIUR_Failed,  LOCTEXT("InventoryUpdateMessages_Failed", "Inventory Update Failed"));
-			}
-		}
-
-		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, ItemUpdateMessages))
-		{
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_AddItem))
-			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_AddItem, LOCTEXT("ItemUpdateMessages_SuccessAdd", "Success - Add Item"));
-			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_UpdateItem))
-			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_UpdateItem, LOCTEXT("ItemUpdateMessages_SuccessUpdate", "Success - Update Item"));
-			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_RemovedItem))
-			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_RemovedItem,  LOCTEXT("InventoryUpdateMessages_RemovedItem", "Success - Removed Item"));
-			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Success_SomeAdd))
-			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Success_SomeAdd,  LOCTEXT("InventoryUpdateMessages_SomeAddItem", "Success - Partially Added"));
-			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Failed_InvalidItem))
-			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Failed_InvalidItem,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Invalid Item"));
-			}
-			if (!ItemUpdateMessages.Contains(EItemUpdateResult::EIUR_Failed_LimitReached))
-			{
-				ItemUpdateMessages.Add(EItemUpdateResult::EIUR_Failed_LimitReached,  LOCTEXT("InventoryUpdateMessages_InvalidItem", "Failed - Max Quantity"));
-			}
-		}
-
-		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryUpdateData))
-		{
-			if (!InventoryUpdateData.Contains(EInventoryUpdateResult::EIUR_Failed))
-			{
-				InventoryUpdateData.Add
-				(
-					EInventoryUpdateResult::EIUR_Failed,
-					FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Failed", "Inventory Update Failed"), 3.f, FLinearColor(FColor::Red))
-				);
-			}
-			if (!InventoryUpdateData.Contains(EInventoryUpdateResult::EIUR_Success))
-			{
-				InventoryUpdateData.Add
-				(
-					EInventoryUpdateResult::EIUR_Success,
-					FInventoryNotificationData(nullptr, LOCTEXT("InventoryNotificationData_Success", "Inventory Updated"), 1.5f, FLinearColor(FColor::White))
-				);
-			}
-		}
-
+		
 		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, ItemTooltipWidgetCommands))
 		{
 			if (!ItemTooltipWidgetCommands.Contains(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::CleanupTooltip))
@@ -309,8 +194,158 @@ public:
 				ItemTooltipWidgetCommands.Add(MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemTooltipCommands::HideTooltip);
 			}
 		}
+
+		if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryEquipmentSettings, InventoryUpdateData))
+		{
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request."), 3.f, FLinearColor(FColor::White), 0)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemUpdated", "Added all of the item to the existing stack."), 3.f, FLinearColor(FColor::White), 2)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Created))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Created,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemCreated", "New item created in Inventory."), 3.f, FLinearColor(FColor::White), 2)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_CreatedPart))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_CreatedPart,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemUpdatedPartly", "Added part of the item to the existing stack. Some quantity remains in the source item."), 3.f, FLinearColor(FColor::White), 2)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_MutliStatus))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_MutliStatus,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemQuantityReducedRemoved", "The item has been reduced and removed from the inventory."), 3.f, FLinearColor(FColor::White), 2)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid Request. Item does not exist."), 3.f, FLinearColor(FColor::Red), 10)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_InvalidRequest", "Action is forbidden. Action cannot be processed."), 3.f, FLinearColor(FColor::Red), 10)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemNotFound", "The item was not found in the inventory."), 3.f, FLinearColor(FColor::Red), 10)
+				);
+			}
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound))
+			{
+				InventoryUpdateData.Add
+				(
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound,
+					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemUnknownIssue", "Unhandled Exception."), 3.f, FLinearColor(FColor::Red), 10)
+				);
+			}
+		}
 	}
+	
 #endif
+	
+/*===============================================================================
+		IN PROGRESS
+		
+		Following properties are already being updated.
+===============================================================================*/
+
+public:
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
+	TSoftClassPtr<UMounteaInventoryItemBase> DefaultItemClass;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
+	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
+	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
+	
+/*===============================================================================
+		SUBJECT OF CHANGE
+		
+		Following functions are using outdated, wrong class definitions and functions.
+===============================================================================*/
+
+public:
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSoftObjectPtr<UMounteaInventoryItemsTable> DefaultInventoryItemDefinitionsTable;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
+	uint8 bDragDropAllowed : 1;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
+	TArray<FKey> DragKeys;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
+	TArray<FKey> ActionRequestKeys;
+	
+	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
+	int32 MinDisplayWeight = 1;
+		
+	/**
+	 * The maximum number of threads used for parallel execution.
+	 * Increasing this value can improve performance in certain scenarios,
+	 * but using too many threads may introduce diminishing returns and
+	 * potential performance issues due to overhead and contention.
+	 *
+	 * ❗ Be cautious when adjusting this value. Setting it too high
+	 *     can lead to resource exhaustion and decreased performance.
+	 *
+	 * ❓ It is recommended to profile and experiment to find the optimal
+	 *     thread count for your specific workload and hardware setup.
+	 *
+	 * @see FPlatformMisc::NumberOfWorkerThreadsToSpawn
+	 */
+	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=1, ClampMin=1), AdvancedDisplay)
+	int32 ThreadsLimit = 2;
+	
+	/**
+	* The MultithreadingThreshold variable determines the minimum number of items required in the inventory to enable multithreading.
+	* When the number of items in the inventory is below this threshold, multithreading will be disabled.
+	* ❗ Warning: Modifying this value without proper knowledge may affect performance and stability.
+	* ❓ Note: The value should be set to a reasonable number based on the expected size of the inventory.
+	*/
+	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=100, ClampMin=100), AdvancedDisplay)
+	int32 MultithreadingThreshold = 1000;
+	
 };
 
 #undef LOCTEXT_NAMESPACE
