@@ -308,9 +308,6 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
 	uint8 bDragDropAllowed : 1;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
-	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
-	
 	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
 	TArray<FKey> DragKeys;
 
