@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "MounteaInventoryItemConfig.generated.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemConfig"
@@ -21,10 +20,16 @@
 UCLASS( Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea, Inventory"), DisplayName="Item Config (Base)")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfig : public UDataAsset
 {
+	GENERATED_BODY()	
+};
+
+UCLASS(DisplayName="Item Config (Grid Inventory)")
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfigGrid : public UMounteaInventoryItemConfig
+{
 	GENERATED_BODY()
 
 public:
-	
+
 	/**
 	 * ItemSlotSize represents the size of an item slot in a grid-based inventory system.
 	 * The ItemSlotSize variable is typically used in the context of a grid-based inventory system, where items are organized and stored in slots.

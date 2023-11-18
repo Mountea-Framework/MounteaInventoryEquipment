@@ -6,7 +6,6 @@
 
 #include "MounteaInventoryTableTypes.h"
 
-#include "Helpers/MounteaInventoryHelpers.h"
 #include "Interfaces/MounteaInventoryEquipmentItem.h"
 
 #include "Helpers/MounteaItemHelpers.h"
