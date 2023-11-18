@@ -418,8 +418,8 @@ struct FMounteaInventoryItemData : public FTableRowBase
 	FMounteaInventoryItemData(): RequiredData(), OptionalData(), ItemConfig(nullptr)
 	{};
 
-	explicit FMounteaInventoryItemData(const FMounteaInventoryItemRequiredData& InRequiredData, const FMounteaInventoryItemOptionalData InOptionalData, UMounteaInventoryItemConfig* InItemConfig = nullptr)
-		: RequiredData(InRequiredData), OptionalData(InOptionalData), ItemConfig(InItemConfig)
+	explicit FMounteaInventoryItemData(const FMounteaInventoryItemRequiredData& InRequiredData, const FMounteaInventoryItemOptionalData InOptionalData, const TSet<TSubclassOf<UMounteaInventoryItemAction>> InItemActions, const TSubclassOf<UMounteaInventoryItemConfig> InItemConfig = nullptr)
+		: RequiredData(InRequiredData), OptionalData(InOptionalData), ItemActions(InItemActions), ItemConfig(InItemConfig)
 	{};
 
 public:
@@ -431,10 +431,10 @@ public:
 	FMounteaInventoryItemOptionalData OptionalData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UMounteaInventoryItemConfig* ItemConfig;
+	TSet<TSubclassOf<UMounteaInventoryItemAction>> ItemActions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSet<TSubclassOf<UMounteaInventoryItemAction>> ItemActions;
+	TSubclassOf<UMounteaInventoryItemConfig> ItemConfig;
 
 public:
 

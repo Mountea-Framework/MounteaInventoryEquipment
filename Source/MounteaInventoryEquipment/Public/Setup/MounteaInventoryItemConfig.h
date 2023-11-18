@@ -19,7 +19,7 @@
  * By using `UMounteaInventoryItemConfig`, game developers can easily create and manage the visual aspects of the inventory system, while keeping the underlying logic separate and modular.
  */
 UCLASS( Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea, Inventory"), DisplayName="Item Config (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfig : public UObject
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemConfig : public UDataAsset
 {
 	GENERATED_BODY()
 
