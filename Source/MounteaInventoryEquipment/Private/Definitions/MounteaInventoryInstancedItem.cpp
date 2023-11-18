@@ -88,7 +88,7 @@ void UMounteaInstancedItem::SetValidData()
 	if (ConstructItem())
 	{
 		Execute_OnItemBeginPlay(this, "[UMounteaInstancedItem::SetValidData] Begin Play Called Successfully");
-
+		
 		OnItemInitialized.Broadcast("Item Initialized");
 
 		TRACE_OBJECT_LIFETIME_BEGIN(this);
@@ -138,6 +138,10 @@ bool UMounteaInstancedItem::ConstructItem()
 			default:
 				break;	
 	}
+
+	// Setup Actions
+	ItemActions = GetItemActions();
+	InitializeItemActions();
 
 	return bSuccess;
 }
@@ -214,6 +218,8 @@ void UMounteaInstancedItem::CleanupData()
 	
 	ItemConfig.ItemConfig = nullptr;
 	ItemFlags.Reset();
+
+	ItemActions.Reset();
 }
 
 void UMounteaInstancedItem::SetQuantity(const int32& NewValue)
@@ -356,13 +362,10 @@ TArray<UMounteaInventoryItemAction*> UMounteaInstancedItem::GetItemActions() con
 			{
 				if (FMounteaInventoryItemData* const Row = GetRow<FMounteaInventoryItemData>(SourceRow, SourceTable))
 				{
-					if (const FMounteaItemAction* ActionContainer = Row->ItemActions.FindByPredicate(
-					[](const FMounteaItemAction& Container)
+					for (const auto& Itr : Row->ItemActions)
 					{
-						return Container.ItemAction != nullptr;
-					}))
-					{
-						Result.Add(ActionContainer->ItemAction);
+						
+						Result.Add(NewObject<UMounteaInventoryItemAction>(GetWorld(), Itr));
 					}
 				}
 			}
@@ -385,8 +388,7 @@ TArray<UMounteaInventoryItemAction*> UMounteaInstancedItem::GetItemActions() con
 
 void UMounteaInstancedItem::InitializeItemActions()
 {
-	TArray<UMounteaInventoryItemAction*> Actions = GetItemActions();
-	for (UMounteaInventoryItemAction* ItrAction : Actions)
+	for (UMounteaInventoryItemAction* ItrAction : ItemActions)
 	{
 		FMounteaDynamicDelegateContext Context;
 		Context.Command = MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemActionCommands::InitializeAction;
@@ -449,7 +451,6 @@ bool UMounteaInstancedItem::OwnerHasAuthority() const
 	// If we reach this point, we don't have enough information to determine authority.
 	return false;
 }
-
 
 void UMounteaInstancedItem::MarkDirtyForReplication()
 {

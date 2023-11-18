@@ -97,7 +97,7 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 					);
 		InventoryUpdateData.Add
 					(
-						MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound,
+						MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_GenericIssue,
 						FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemUnknownIssue", "Unhandled Exception."), 3.f, FLinearColor(FColor::Red), 10)
 					);
 	}

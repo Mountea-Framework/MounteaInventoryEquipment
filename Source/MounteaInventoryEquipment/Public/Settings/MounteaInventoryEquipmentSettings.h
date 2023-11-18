@@ -261,11 +261,11 @@ protected:
 					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemNotFound", "The item was not found in the inventory."), 3.f, FLinearColor(FColor::Red), 10)
 				);
 			}
-			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound))
+			if (!InventoryUpdateData.Contains(MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_GenericIssue))
 			{
 				InventoryUpdateData.Add
 				(
-					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_NotFound,
+					MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_GenericIssue,
 					FInventoryNotificationData(nullptr, LOCTEXT("InventoryUpdateResult_ItemUnknownIssue", "Unhandled Exception."), 3.f, FLinearColor(FColor::Red), 10)
 				);
 			}

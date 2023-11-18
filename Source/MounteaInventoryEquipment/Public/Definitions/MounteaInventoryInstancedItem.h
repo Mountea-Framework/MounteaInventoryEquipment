@@ -78,6 +78,9 @@ protected:
 	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault), Replicated)
 	FMounteaItemConfig ItemConfig;
 
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Item", Replicated)
+	TArray<UMounteaInventoryItemAction*> ItemActions;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, Category="5. Debug")

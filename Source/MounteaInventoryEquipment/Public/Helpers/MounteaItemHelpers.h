@@ -5,6 +5,7 @@
 
 #include "MounteaItemHelpers.generated.h"
 
+class UMounteaInventoryItemAction;
 class UMounteaInventoryItemConfig;
 class UMounteaInventoryItemCategory;
 class UMounteaInventoryItemRarity;
@@ -243,7 +244,39 @@ public:
 	bool Serialize(class FArchive& Ar);
 };
 
-#pragma endregion 
+template<>
+struct TStructOpsTypeTraits< FItemSlotStack > : public TStructOpsTypeTraitsBase2< FItemSlotStack >
+{
+	enum
+	{
+		WithSerializer = true,
+		WithAtomic = true,
+		WithIdenticalViaEquality = true
+	};
+};
+
+template<>
+struct TStructOpsTypeTraits< FItemSlot > : public TStructOpsTypeTraitsBase2< FItemSlot >
+{
+	enum
+	{
+		WithSerializer = true,
+		WithAtomic = true,
+		WithIdenticalViaEquality = true
+	};
+};
+
+FORCEINLINE  uint32 GetTypeHash(const FItemSlotStack& Data)
+{
+	return GetTypeHash(Data.StackGuid);
+};
+
+FORCEINLINE  uint32 GetTypeHash(const FItemSlot& Data)
+{
+	return PointerHash(Data.Item);
+};
+
+#pragma endregion
 
 #pragma region ItemData
 
@@ -401,7 +434,7 @@ public:
 	class UMounteaInventoryItemConfig* ItemConfig;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FMounteaItemAction> ItemActions;
+	TSet<TSubclassOf<UMounteaInventoryItemAction>> ItemActions;
 
 public:
 
@@ -413,34 +446,4 @@ public:
 
 #undef LOCTEXT_NAMESPACE
 
-template<>
-struct TStructOpsTypeTraits< FItemSlotStack > : public TStructOpsTypeTraitsBase2< FItemSlotStack >
-{
-	enum
-	{
-		WithSerializer = true,
-		WithAtomic = true,
-		WithIdenticalViaEquality = true
-	};
-};
-
-template<>
-struct TStructOpsTypeTraits< FItemSlot > : public TStructOpsTypeTraitsBase2< FItemSlot >
-{
-	enum
-	{
-		WithSerializer = true,
-		WithAtomic = true,
-		WithIdenticalViaEquality = true
-	};
-};
-
-FORCEINLINE  uint32 GetTypeHash(const FItemSlotStack& Data)
-{
-	return GetTypeHash(Data.StackGuid);
-};
-
-FORCEINLINE  uint32 GetTypeHash(const FItemSlot& Data)
-{
-	return PointerHash(Data.Item);
-};
+#pragma endregion 

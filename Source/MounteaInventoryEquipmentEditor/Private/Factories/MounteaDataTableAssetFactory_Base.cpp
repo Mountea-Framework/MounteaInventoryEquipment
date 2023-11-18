@@ -4,6 +4,7 @@
 #include "MounteaDataTableAssetFactory_Base.h"
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "Definitions/MounteaInventoryTableTypes.h"
+#include "Helpers/MounteaItemHelpers.h"
 
 UMounteaDataTableAssetFactory_Base::UMounteaDataTableAssetFactory_Base()
 {
