@@ -3,6 +3,7 @@
 
 #include "Components/MounteaInventoryComponent.h"
 
+#include "Async/Async.h"
 #include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
@@ -375,6 +376,168 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
 	OnInventoryUpdated.Broadcast(Result);
 	
     return Result;
+}
+
+TArray<FInventoryUpdateResult> UMounteaInventoryComponent::AddItemsToInventory_Implementation(const TMap<UMounteaInstancedItem*, int32>& Items, int32 TransactionTypeFlags)
+{
+	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_AddItemsToInventory );
+
+	TArray<FInventoryUpdateResult> Results;
+
+	// If no transaction type is set or an invalid value is provided, default to PartialTransaction
+	if (!(TransactionTypeFlags & (static_cast<uint8>(EInventoryTransactionType::FullTransaction) | static_cast<uint8>(EInventoryTransactionType::PartialTransaction))))
+	{
+		TransactionTypeFlags |= static_cast<uint8>(EInventoryTransactionType::PartialTransaction);
+	}
+
+	// If no sync type is set or an invalid value is provided, default to Sync
+	if (!(TransactionTypeFlags & (static_cast<uint8>(EInventoryTransactionType::Sync) | static_cast<uint8>(EInventoryTransactionType::Async))))
+	{
+		TransactionTypeFlags |= static_cast<uint8>(EInventoryTransactionType::Async);
+	}
+	
+	// Extracting the boolean values from the bitmask
+	const bool bFullOnly = (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::FullTransaction)) != 0;
+	const bool bIsSync = (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::Sync)) != 0;
+	
+	if (bIsSync)
+	{
+		if (bFullOnly)
+		{
+			// First validate
+			for (auto const& Itr : Items)
+			{
+				// Create an empty result struct.
+				FInventoryUpdateResult Result;
+
+				if (Itr.Key == nullptr)
+				{
+					Result.OptionalPayload = Itr.Key;
+					Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
+					Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
+			
+					return  Results;
+				}
+		
+				// Check if the item can be added at all
+				if (!Execute_CanAddItem(this, Itr.Key, Itr.Value))
+				{
+					Result.OptionalPayload = Itr.Key;
+					Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
+					Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
+
+					return  Results;
+				}
+
+				// Check if a similar item already exists in the inventory
+				FItemRetrievalFilter Filter;
+				{
+					Filter.bSearchByGUID = true;
+					Filter.Guid = Itr.Key->GetGuid();
+					Filter.bSearchByItem = true;
+					Filter.Item = Itr.Key;
+				}
+
+				if (const UMounteaInstancedItem* ExistingItem = Execute_SearchSingleItem(this, Filter))
+				{
+					// Calculate the max addable amount
+					const int32 MaxAddAmount = UMounteaInventoryItemBFL::CalculateAddAmount(ExistingItem, Itr.Value);
+					if (MaxAddAmount <= 0)
+					{
+						Result.OptionalPayload = Itr.Key;
+						Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
+						Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
+
+						return  Results;
+					}
+				}
+			}
+		}
+		
+		// Add items
+		for (auto const& Itr : Items)
+		{
+			const FInventoryUpdateResult IndividualResult = Execute_AddItemToInventory(this, Itr.Key, Itr.Value);
+
+			Results.Add(IndividualResult);
+		}
+	}
+	else
+	{
+		AsyncTask(ENamedThreads::GameThread, [this, Items, &Results, bFullOnly]() mutable
+		{
+			bool bSatisfied = true;
+			if (bFullOnly)
+			{
+				// First validate
+				for (auto const& Itr : Items)
+				{
+					// Create an empty result struct.
+					FInventoryUpdateResult Result;
+
+					if (Itr.Key == nullptr)
+					{
+						Result.OptionalPayload = Itr.Key;
+						Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
+						Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
+
+						Results.Add(Result);
+						bSatisfied = false;
+						break;
+					}
+		
+					// Check if the item can be added at all
+					if (!Execute_CanAddItem(this, Itr.Key, Itr.Value))
+					{
+						Result.OptionalPayload = Itr.Key;
+						Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
+						Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
+
+						Results.Add(Result);
+						bSatisfied = false;
+						break;
+					}
+
+					// Check if a similar item already exists in the inventory
+					FItemRetrievalFilter Filter;
+					{
+						Filter.bSearchByGUID = true;
+						Filter.Guid = Itr.Key->GetGuid();
+						Filter.bSearchByItem = true;
+						Filter.Item = Itr.Key;
+					}
+
+					if (const UMounteaInstancedItem* ExistingItem = Execute_SearchSingleItem(this, Filter))
+					{
+						// Calculate the max addable amount
+						const int32 MaxAddAmount = UMounteaInventoryItemBFL::CalculateAddAmount(ExistingItem, Itr.Value);
+						if (MaxAddAmount <= 0)
+						{
+							Result.OptionalPayload = Itr.Key;
+							Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
+							Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Cannot add the item to inventory.");
+
+							Results.Add(Result);
+							bSatisfied = false;
+							break;
+						}
+					}
+				}
+			}
+
+			if (bSatisfied)
+			{
+				for (auto const& Itr : Items)
+				{
+					const FInventoryUpdateResult IndividualResult = Execute_AddItemToInventory(this, Itr.Key, Itr.Value);
+
+					Results.Add(IndividualResult);
+				}
+			}
+		});
+	}
+	
+	return Results;
 }
 
 FInventoryUpdateResult UMounteaInventoryComponent::RemoveItemFromInventory_Implementation(UMounteaInstancedItem* Item)

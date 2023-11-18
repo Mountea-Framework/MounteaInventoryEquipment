@@ -79,6 +79,17 @@ enum class EInventoryUpdateResult : uint8
 	Default										UMETA(Hidden)
 };
 
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EInventoryTransactionType : uint8
+{
+	None = 0                                  UMETA(Hidden),
+	FullTransaction = 1 << 0,      // 0001
+	PartialTransaction = 1 << 1, // 0010
+	Sync = 1 << 2,                         // 0100
+	Async = 1 << 3                        // 1000
+};
+ENUM_CLASS_FLAGS(EInventoryTransactionType);
+
 UENUM(BlueprintType)
 enum class EItemUpdateResult : uint8
 {
@@ -142,7 +153,7 @@ struct FInventoryUpdateResult
 
 	// Default constructor.
 	FInventoryUpdateResult() :
-		OptionalPayload(nullptr), ResultID(500), ResultText(LOCTEXT("MounteaInventoryResults_InventoryUpdateResult", "Empty Message"))
+		OptionalPayload(nullptr), ResultID(-1), ResultText(LOCTEXT("MounteaInventoryResults_InventoryUpdateResult", "Empty Message"))
 	{};
 
 	// Constructor for initializing with a specific result ID and descriptive text.

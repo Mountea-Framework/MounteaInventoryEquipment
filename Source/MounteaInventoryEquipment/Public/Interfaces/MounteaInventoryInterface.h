@@ -89,6 +89,19 @@ public:
 	virtual FInventoryUpdateResult AddItemToInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
 
 	/**
+	 * Adds a bunch of items to the inventory, handling different scenarios such as adding a new item,
+	 * stacking with existing ones, or creating a new item when only a part of it can be added.
+	 * It manages the item quantity, updates inventory slots, and broadcasts relevant events.
+	 * 
+	 * @param Items The map of  items and their quantities to add to the inventory.
+	 * @param TransactionTypeFlags Bitmasks that allows for multiple flags to be combined and checked easily. 
+	 * @return A list of structures containing details about the outcome of the addition processes.
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TArray<FInventoryUpdateResult> AddItemsToInventory(const TMap<UMounteaInstancedItem*, int32>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags);
+	virtual TArray<FInventoryUpdateResult> AddItemsToInventory_Implementation(const TMap<UMounteaInstancedItem*, int32>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags = 10) = 0;
+
+	/**
 	 * Removes a specific item from the inventory, handling the cleanup and updating of inventory slots.
 	 * It ensures that all relevant data structures are updated and broadcasts the item removal event.
 	 * 
