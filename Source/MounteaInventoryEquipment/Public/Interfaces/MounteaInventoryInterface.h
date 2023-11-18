@@ -250,6 +250,10 @@ public:
 	bool DoesHaveAuthority() const;
 	virtual bool DoesHaveAuthority_Implementation() const = 0;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	void RequestNetworkRefresh();
+	virtual void RequestNetworkRefresh_Implementation() = 0;
+	
 public:
 
 	/**
@@ -286,7 +290,17 @@ public:
 		
 		Following functions are already being updated.
 ===============================================================================*/
-
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	FInventoryUpdateResult ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context);
+	virtual FInventoryUpdateResult ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context) = 0;
+	
+/*===============================================================================
+		SUBJECT OF CHANGE
+		
+		Following functions are using outdated, wrong class definitions and functions.
+===============================================================================*/
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void SaveInventory();
 	virtual void SaveInventory_Implementation() = 0;
@@ -295,17 +309,4 @@ public:
 	bool LoadInventoryFromDataTable(const class UMounteaInventoryItemsTable* SourceTable);
 	virtual bool LoadInventoryFromDataTable_Implementation(const class UMounteaInventoryItemsTable* SourceTable) = 0;
 	
-/*===============================================================================
-		SUBJECT OF CHANGE
-		
-		Following functions are using outdated, wrong class definitions and functions.
-===============================================================================*/
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void RequestNetworkRefresh();
-	virtual void RequestNetworkRefresh_Implementation() = 0;
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	void ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context);
-	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) = 0;
 };

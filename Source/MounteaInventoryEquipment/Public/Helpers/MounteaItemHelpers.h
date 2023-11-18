@@ -1,9 +1,14 @@
 ﻿// Copyright Dominik Pavlicek 2022. All Rights Reserved.
 
 #pragma once
+#include "GameplayTagContainer.h"
 
 #include "MounteaItemHelpers.generated.h"
 
+class UMounteaInventoryItemConfig;
+class UMounteaInventoryItemCategory;
+class UMounteaInventoryItemRarity;
+struct FMounteaItemAction;
 class UMounteaInstancedItem;
 
 UENUM(BlueprintType)
@@ -14,6 +19,8 @@ enum class EItemDataSource : uint8
 
 	Default									UMETA(hidden)
 };
+
+#pragma region ItemSlot
 
 /**
  * FItemSlotStack
@@ -235,6 +242,176 @@ public:
 	
 	bool Serialize(class FArchive& Ar);
 };
+
+#pragma endregion 
+
+#pragma region ItemData
+
+#define LOCTEXT_NAMESPACE "MounteaInventoryItem"
+
+USTRUCT(BlueprintType)
+struct FMounteaItemQuantityData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
+	int32 MaxStackSize = 99;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
+	int32 MaxQuantity = 999;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 bIsStackable : 1;
+
+	FMounteaItemQuantityData()
+	{
+		bIsStackable = true;
+	}
+};
+
+/**
+ * Basic structure which contains required Inventory Item data.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaInventoryItemRequiredData
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault), DisplayName="Item Flags (Gameplay Tags)")
+	FGameplayTagContainer ItemFlags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
+	FText ItemName = LOCTEXT("MounteaInventoryItem_ItemName", "New Item");
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UMounteaInventoryItemCategory* ItemCategory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UMounteaInventoryItemRarity* ItemRarity;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="StaticMesh, SkeletalMesh"))
+	UStreamableRenderAsset* ItemMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
+	FMounteaItemQuantityData ItemQuantity;
+
+public:
+
+	bool IsValid() const
+	{
+		return
+		ItemName.IsEmpty() != true &&
+		ItemCategory != nullptr &&
+		ItemRarity != nullptr &&
+		ItemQuantity.MaxQuantity > 0;
+	}
+
+public:
+
+	bool operator==(const FMounteaInventoryItemRequiredData& Other) const
+	{
+		if (ItemFlags.IsEmpty())
+		{
+			return ItemName.EqualTo(Other.ItemName);
+		}
+
+		return ItemName.EqualTo(Other.ItemName) && ItemFlags == Other.ItemFlags;
+	}
+
+	bool operator!=(const FMounteaInventoryItemRequiredData& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	/*
+	FMounteaInventoryItemRequiredData& operator=(const FMounteaInventoryItemRequiredData& Other)
+	{
+		return *this;
+	}
+	*/
+
+	friend uint32 GetTypeHash(const FMounteaInventoryItemRequiredData& Data)
+	{
+		uint32 Hash = 0;
+		Hash = HashCombine(Hash, GetTypeHash(Data.ItemName.ToString()));
+				
+		return Hash;
+	}
+};
+
+/**
+ * Basic structure which contains additional Inventory Item data.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaInventoryItemOptionalData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* ItemIcon = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bHasWeight : 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=0.f, ClampMin=0.f, Units=kg, EditCondition="bHasWeight"))
+	float BaseWeight = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bHasValue : 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasValue"))
+	float ItemBaseValue = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bHasDurability : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
+	float ItemBaseDurability = 10.f;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AActor> SpawnActor;
+};
+
+/**
+ * Container for all Inventory Item Data
+ */
+USTRUCT(BlueprintType)
+struct FMounteaInventoryItemData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FMounteaInventoryItemData(): RequiredData(), OptionalData(), ItemConfig(nullptr)
+	{};
+
+	explicit FMounteaInventoryItemData(const FMounteaInventoryItemRequiredData& InRequiredData, const FMounteaInventoryItemOptionalData InOptionalData, UMounteaInventoryItemConfig* InItemConfig = nullptr)
+		: RequiredData(InRequiredData), OptionalData(InOptionalData), ItemConfig(InItemConfig)
+	{};
+
+public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FMounteaInventoryItemRequiredData RequiredData;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FMounteaInventoryItemOptionalData OptionalData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UMounteaInventoryItemConfig* ItemConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FMounteaItemAction> ItemActions;
+
+public:
+
+	bool IsValid() const
+	{
+		return RequiredData.IsValid();
+	}
+};
+
+#undef LOCTEXT_NAMESPACE
 
 template<>
 struct TStructOpsTypeTraits< FItemSlotStack > : public TStructOpsTypeTraitsBase2< FItemSlotStack >

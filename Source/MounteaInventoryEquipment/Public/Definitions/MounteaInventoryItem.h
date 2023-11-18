@@ -112,7 +112,7 @@ public:
 	 * @return An array of UMounteaInventoryItemAction objects.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	TArray<UMounteaInventoryItemAction*> GetItemActions() const;
+	virtual TArray<UMounteaInventoryItemAction*> GetItemActions() const override;
 
 	/**
 	 * Retrieves the definitions of item actions that this item can perform.
@@ -186,13 +186,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetGuid(const FGuid& NewGuid) override
 	{ ItemGuid = NewGuid; };
-
-	/**
-	 * Initializes the actions associated with this item, setting them up for usage within the game.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	void InitializeItemActions();
-
+	
 	/**
 	 * Ensures the item's data is valid and sets default values if necessary.
 	 */

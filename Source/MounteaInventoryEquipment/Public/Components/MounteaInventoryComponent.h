@@ -59,9 +59,6 @@ public:
 
 	virtual void SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryWBPClass) override;
 	virtual void SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewWBP) override;
-
-	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
-	virtual void SaveInventory_Implementation() override;
 	
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	
@@ -176,19 +173,19 @@ private:
 		Following functions are already being updated.
 ===============================================================================*/
 
+	virtual FInventoryUpdateResult ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context) override;
 
-	
-protected:
+	UFUNCTION(Server, Reliable)
+	void ProcessItemAction_Server(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context);
 	
 /*===============================================================================
 		SUBJECT OF CHANGE
 		
 		Following functions are using outdated, wrong class definitions and functions.
 ===============================================================================*/
-	
-	
-	
-	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) override;
+
+	virtual bool LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable) override;
+	virtual void SaveInventory_Implementation() override;
 
 #pragma endregion
 

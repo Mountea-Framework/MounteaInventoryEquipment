@@ -3,9 +3,9 @@
 
 #include "Definitions/MounteaItemAction.h"
 
-#include "Definitions/MounteaInventoryItem.h"
+#include "Definitions/MounteaInventoryInstancedItem.h"
 
-void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus, FMounteaDynamicDelegateContext Context)
+void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInstancedItem* ItemInFocus, FMounteaDynamicDelegateContext Context)
 {
 	OwningItem = ItemInFocus;
 
@@ -17,7 +17,7 @@ void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInvent
 	ActionContext = Context;
 }
 
-bool UMounteaInventoryItemAction::DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const
+bool UMounteaInventoryItemAction::DisplayAction_Implementation(UMounteaInstancedItem* ItemInFocus) const
 {
 	return GetWorld() != nullptr;
 }

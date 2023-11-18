@@ -11,7 +11,7 @@
 
 struct FMounteaDynamicDelegateContext;
 struct FGameplayTag;
-class UMounteaInventoryItemBase;
+class UMounteaInstancedItem;
 
 /**
  * 
@@ -21,18 +21,20 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemAction : public UObject
 {
 	GENERATED_BODY()
 
+	UMounteaInventoryItemAction() : bRequiresAuthority(1), World(nullptr) {};
+
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|ItemAction")
-	void InitializeAction(UMounteaInventoryItemBase* ItemInFocus, FMounteaDynamicDelegateContext Context);
-	void InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus, FMounteaDynamicDelegateContext Context);
+	void InitializeAction(UMounteaInstancedItem* ItemInFocus, FMounteaDynamicDelegateContext Context);
+	void InitializeAction_Implementation(UMounteaInstancedItem* ItemInFocus, FMounteaDynamicDelegateContext Context);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|ItemAction", DisplayName="Can Display Action")
-	bool DisplayAction(UMounteaInventoryItemBase* ItemInFocus) const;
-	bool DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const;
+	bool DisplayAction(UMounteaInstancedItem* ItemInFocus) const;
+	bool DisplayAction_Implementation(UMounteaInstancedItem* ItemInFocus) const;
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Mountea|ItemAction")
-	void ProcessAction(UMounteaInventoryItemBase* ItemInFocus);
+	FInventoryUpdateResult ProcessAction(UMounteaInstancedItem* ItemInFocus);
 	
 public:
 
@@ -49,10 +51,24 @@ public:
 	{ return ActionIcon; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
-	FORCEINLINE UMounteaInventoryItemBase* GetOwningItem() const
+	FORCEINLINE UMounteaInstancedItem* GetOwningItem() const
 	{
 		return OwningItem;
 	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
+	FORCEINLINE FMounteaDynamicDelegateContext GetActionContext() const
+	{ return ActionContext; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
+	FORCEINLINE bool DoesRequireAuthority() const
+	{ return bRequiresAuthority; };
+
+public:
+	
+	void CopyFromOther(const UMounteaInventoryItemAction* OtherAction);
+	
+public:
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|ItemAction")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
@@ -83,12 +99,6 @@ public:
 		return nullptr;
 	}
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|ItemAction")
-	FORCEINLINE FMounteaDynamicDelegateContext GetActionContext() const
-	{ return ActionContext; }
-
-	void CopyFromOther(const UMounteaInventoryItemAction* OtherAction);
-	
 protected:
 
 	virtual bool IsSupportedForNetworking() const override {	return true; };
@@ -104,6 +114,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(NoResetToDefault, ExposeOnSpawn))
 	UTexture2D* ActionIcon = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required", meta=(NoResetToDefault))
+	uint8 bRequiresAuthority : 1;
+	
 private:
 
 	UPROPERTY(Transient, VisibleAnywhere, Category="3. Debug", meta=(DisplayThumbnail=false), AdvancedDisplay)
@@ -113,7 +126,7 @@ private:
 	class UWorld* World;
 
 	UPROPERTY(VisibleAnywhere, Category="3. Debug", meta=(DisplayThumbnail=false), AdvancedDisplay)
-	UMounteaInventoryItemBase* OwningItem = nullptr;
+	UMounteaInstancedItem* OwningItem = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -157,7 +170,7 @@ public:
 			const uint32 Hash = GetTypeHash(Src.ItemAction->GetActionTag()) + GetTypeHash(Src.ItemAction->GetActionName());
 			return Hash;
 		}
-		return FCrc::MemCrc32(&Src, sizeof(FMounteaItemAction));
+		return 0;
 	}
 };
 

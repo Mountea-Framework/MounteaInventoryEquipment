@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventoryEquipmentConsts.h"
 #include "MounteaItemHelpers.h"
 #include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryItemBFL.generated.h"
+
+#define LOCTEXT_NAMESPACE "MounteaInventoryItemBFL"
 
 /**
  * 
@@ -18,6 +21,42 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	static FInventoryUpdateResult ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context)
+	{
+		FInventoryUpdateResult Result;
+		
+		// Validate the request
+		if (!Action)
+		{
+			Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
+			Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid Action.");
+		
+			return Result;
+		}
+	
+		// Validate the request
+		if (!Item)
+		{
+			Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
+			Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item.");
+		
+			return Result;
+		}
+
+		Action->InitializeAction(Item, Context);
+
+		if (!Item->GetWorld())
+		{
+			Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
+			Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item, there is no world!.");
+		
+			return Result;
+		}
+		
+		return Action->ProcessAction(Item);
+	}
+	
 	// Function to determine the max stack size of the item
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	static int32 DetermineMaxStackSize(UMounteaInstancedItem* Item)
@@ -182,3 +221,5 @@ public:
 		return true;
 	}
 };
+
+#undef LOCTEXT_NAMESPACE

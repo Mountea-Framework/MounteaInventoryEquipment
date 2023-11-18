@@ -50,18 +50,6 @@ bool UMounteaInventoryItemBase::IsValid(UObject* WorldContextObject) const
 	return ItemGuid.IsValid() && ItemData.IsValid();
 }
 
-void UMounteaInventoryItemBase::InitializeItemActions()
-{
-	TArray<UMounteaInventoryItemAction*> Actions = GetItemActions();
-	for (UMounteaInventoryItemAction* ItrAction : Actions)
-	{
-		FMounteaDynamicDelegateContext Context;
-		Context.Command = MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemActionCommands::InitializeAction;
-		Context.Payload = this;
-		ItrAction->InitializeAction(this, Context);
-	}
-}
-
 void UMounteaInventoryItemBase::ClearDataTable()
 {
 	SourceTable = nullptr;

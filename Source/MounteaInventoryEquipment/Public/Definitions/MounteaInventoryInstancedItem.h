@@ -245,6 +245,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Item")
 	virtual bool AreFlagsSet(const FGameplayTagContainer& QueryFlags, const bool bSimpleSearch = true) const override;
 
+	/**
+	 * Obtains the action objects associated with the item, which can be used to perform various interactions with the item.
+	 * @return An array of UMounteaInventoryItemAction objects.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
+	virtual TArray<UMounteaInventoryItemAction*> GetItemActions() const override;
+	
+	/**
+	 * Initializes the actions associated with this item, setting them up for usage within the game.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	void InitializeItemActions();
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);

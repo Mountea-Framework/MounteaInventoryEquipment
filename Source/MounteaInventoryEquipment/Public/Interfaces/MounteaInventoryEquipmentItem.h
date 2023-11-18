@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Helpers/MounteaInventoryHelpers.h"
+#include "Helpers/MounteaItemHelpers.h"
 #include "UObject/Interface.h"
 #include "MounteaInventoryEquipmentItem.generated.h"
 
@@ -17,6 +18,7 @@ class UMounteaInventoryEquipmentItem : public UInterface
 };
 
 class UMounteaInventoryItemConfig;
+class UMounteaInventoryItemAction;
 class IMounteaInventoryInterface;
 
 enum class EItemDataSource : uint8;
@@ -41,4 +43,6 @@ public:
 	
 	virtual TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const = 0;
 	virtual UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const = 0;
+
+	virtual TArray<UMounteaInventoryItemAction*> GetItemActions() const = 0; 
 };

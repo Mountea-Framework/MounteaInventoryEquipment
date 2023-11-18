@@ -92,16 +92,6 @@ UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryUI_Implementatio
 	return InventoryWBP;
 }
 
-bool UMounteaInventoryComponent::LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable)
-{
-	return true;
-}
-
-void UMounteaInventoryComponent::SaveInventory_Implementation()
-{
-	// TODO
-}
-
 void UMounteaInventoryComponent::PostInitProperties()
 {
 	Super::PostInitProperties();
@@ -1161,6 +1151,67 @@ void UMounteaInventoryComponent::OnRep_Items()
 	}
 }
 
+FInventoryUpdateResult UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context)
+{
+	FInventoryUpdateResult Result;
+
+	// Validate the request
+	if (!Action)
+	{
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
+		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid Action.");
+		
+		return Result;
+	}
+	
+	// Validate the request
+	if (!Item)
+	{
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
+		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item.");
+		
+		return Result;
+	}
+
+	const AActor* OwningActor = Execute_GetOwningActor(this);
+	if (!OwningActor)
+	{
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
+		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item, there is no owner!.");
+		
+		return Result;
+	}
+
+	const UWorld* OwningWorld = GetWorld();
+	if (!OwningWorld)
+	{
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
+		Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid item, there is no world!.");
+		
+		return Result;
+	}
+
+	if (Action->DoesRequireAuthority() && !Execute_DoesHaveAuthority(this))
+	{
+		ProcessItemAction_Server(Action, Item, Context);
+
+		Result.OptionalPayload = Action;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing; // Corresponds to "Processing"
+		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
+		
+		return Result;
+	}
+	
+	Result = UMounteaInventoryItemBFL::ProcessItemAction(Action, Item, Context);
+
+	return Result;
+}
+
+void UMounteaInventoryComponent::ProcessItemAction_Server_Implementation(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context)
+{
+	Execute_ProcessItemAction(this, Action, Item, Context);
+}
+
 #if WITH_EDITOR
 
 void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -1189,22 +1240,19 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 
 
 /*===============================================================================
-	SUBJECT OF CHANGE
-	
-	Following functions are using outdated, wrong class definitions and functions.
+		SUBJECT OF CHANGE
+		
+		Following functions are using outdated, wrong class definitions and functions.
 ===============================================================================*/
 
-void UMounteaInventoryComponent::ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItemBase* Item, FMounteaDynamicDelegateContext Context) 
+bool UMounteaInventoryComponent::LoadInventoryFromDataTable_Implementation(const UMounteaInventoryItemsTable* SourceTable)
 {
-	if (!Action)	return;
+	return true;
+}
 
-	if (!Item) return;
-
-	if (!GetOwner()) return;
-
-	Action->InitializeAction(Item, Context);
-	
-	Action->ProcessAction(Item);
+void UMounteaInventoryComponent::SaveInventory_Implementation()
+{
+	// TODO
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -5,6 +5,7 @@
 
 #include "ObjectTrace.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
+#include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 
 #include "Net/UnrealNetwork.h"
@@ -132,6 +133,10 @@ bool UMounteaInstancedItem::ConstructItem()
 		case EItemDataSource::EIDS_SourceTable:
 				bSuccess = CopyFromDataTable();
 				break;
+
+		case EItemDataSource::Default:
+			default:
+				break;	
 	}
 
 	return bSuccess;
@@ -340,6 +345,54 @@ bool UMounteaInstancedItem::AreFlagsSet(const FGameplayTagContainer& QueryFlags,
 	}
 
 	return bAreFlagsSet;
+}
+
+TArray<UMounteaInventoryItemAction*> UMounteaInstancedItem::GetItemActions() const
+{
+	TArray<UMounteaInventoryItemAction*> Result;
+	switch (ItemDataSource)
+	{
+		case EItemDataSource::EIDS_SourceTable:
+			{
+				if (FMounteaInventoryItemData* const Row = GetRow<FMounteaInventoryItemData>(SourceRow, SourceTable))
+				{
+					if (const FMounteaItemAction* ActionContainer = Row->ItemActions.FindByPredicate(
+					[](const FMounteaItemAction& Container)
+					{
+						return Container.ItemAction != nullptr;
+					}))
+					{
+						Result.Add(ActionContainer->ItemAction);
+					}
+				}
+			}
+			break;
+		case EItemDataSource::EIDS_SourceItem:
+			{
+				if (SourceItem)
+				{
+					Result = SourceItem->GetItemActions();
+				}
+			}
+			break;
+		case EItemDataSource::Default:
+		default:
+			break;
+	}
+
+	return Result;
+}
+
+void UMounteaInstancedItem::InitializeItemActions()
+{
+	TArray<UMounteaInventoryItemAction*> Actions = GetItemActions();
+	for (UMounteaInventoryItemAction* ItrAction : Actions)
+	{
+		FMounteaDynamicDelegateContext Context;
+		Context.Command = MounteaInventoryEquipmentConsts::MounteaInventoryWidgetCommands::ItemActionCommands::InitializeAction;
+		Context.Payload = this;
+		ItrAction->InitializeAction(this, Context);
+	}
 }
 
 void UMounteaInstancedItem::SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory)
