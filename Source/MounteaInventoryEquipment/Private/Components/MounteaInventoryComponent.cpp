@@ -1232,14 +1232,6 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 #endif
 
 /*===============================================================================
-		IN PROGRESS
-		
-		Following functions are already being updated.
-===============================================================================*/
-
-
-
-/*===============================================================================
 		SUBJECT OF CHANGE
 		
 		Following functions are using outdated, wrong class definitions and functions.

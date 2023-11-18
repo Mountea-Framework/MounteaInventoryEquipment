@@ -115,6 +115,8 @@ protected:
 	void PostItemUpdated(const FInventoryUpdateResult& UpdateContext);
 
 	void RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const;
+
+	virtual FInventoryUpdateResult ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context) override;
 	
 protected:
 
@@ -166,6 +168,9 @@ private:
 	
 	UFUNCTION(Server, Unreliable)
 	void RequestNetworkRefresh_Server();
+
+	UFUNCTION(Server, Reliable)
+	void ProcessItemAction_Server(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context);
 	
 /*===============================================================================
 		IN PROGRESS
@@ -173,10 +178,6 @@ private:
 		Following functions are already being updated.
 ===============================================================================*/
 
-	virtual FInventoryUpdateResult ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context) override;
-
-	UFUNCTION(Server, Reliable)
-	void ProcessItemAction_Server(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context);
 	
 /*===============================================================================
 		SUBJECT OF CHANGE
