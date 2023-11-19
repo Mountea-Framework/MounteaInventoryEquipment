@@ -7,6 +7,10 @@
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Net/UnrealNetwork.h"
 
+#if WITH_EDITOR
+#include "Kismet2/ComponentEditorUtils.h"
+#endif
+
 #define LOCTEXT_NAMESPACE "MounteaLootableComponent"
 
 UMounteaLootableComponent::UMounteaLootableComponent()
@@ -19,8 +23,7 @@ void UMounteaLootableComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SourceInventory = Execute_GetSourceInventory(this);
-	TargetInventory = Execute_GetTargetInventory(this);
+	SetupSourceComponent();
 }
 
 void UMounteaLootableComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -28,7 +31,6 @@ void UMounteaLootableComponent::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(UMounteaLootableComponent, SourceInventoryComponent, COND_InitialOrOwner);
-	DOREPLIFETIME_CONDITION(UMounteaLootableComponent, TargetInventoryComponent, COND_InitialOrOwner);
 	DOREPLIFETIME_CONDITION(UMounteaLootableComponent, SourceInventory, COND_InitialOrOwner);
 	DOREPLIFETIME_CONDITION(UMounteaLootableComponent, TargetInventory, COND_InitialOrOwner);
 }
@@ -54,9 +56,7 @@ void UMounteaLootableComponent::SetSourceInventory_Implementation(const TScriptI
 
 TScriptInterface<IMounteaInventoryInterface> UMounteaLootableComponent::GetTargetInventory_Implementation() const
 {
-	const TScriptInterface<IMounteaInventoryInterface> Result = TargetInventoryComponent.GetComponent(GetOwner());
-
-	return Result;
+	return TargetInventory;
 }
 
 void UMounteaLootableComponent::SetTargetInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewTarget)
@@ -136,7 +136,17 @@ FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const 
 		return Result;
 	}
 
-	// TODO: Add some validations and logic here
+	if (Execute_DoesHaveAuthority(this) == false)
+	{
+		LootItem_Server(Item);
+		
+		Result.OptionalPayload = Item.Item;
+		Result.ResultID = Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing;; // Corresponds to "Processing"
+		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
+		
+		return Result;
+	}
+	
 	if (SourceInventory->Execute_CanReduceItem(SourceInventory.GetObject(), Item) == false)
 	{
 		Result.OptionalPayload = this;
@@ -154,9 +164,17 @@ FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const 
 
 		return Result;
 	}
+
 	
+
+	//At this point we validated as much as we could, so here we just assume it is all good.
 	SourceInventory->Execute_ReduceItemInInventory(SourceInventory.GetObject(), Item.Item, Item.Quantity);
 	TargetInventory->Execute_AddItemToInventory(TargetInventory.GetObject(), Item.Item, Item.Quantity);
+
+	// Call it out loud and clear. 
+	Result.OptionalPayload = nullptr; // keep it empty so we don't mess UI
+	Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK;
+	Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Loot was successful.");
 	
 	return Result;
 }
@@ -185,6 +203,11 @@ bool UMounteaLootableComponent::DoesHaveAuthority_Implementation() const
 	return GetOwner()->HasAuthority();
 }
 
+void UMounteaLootableComponent::LootItem_Server_Implementation(const FItemTransfer& Item)
+{
+	Execute_LootItem(this, Item);
+}
+
 void UMounteaLootableComponent::SetTargetInventory_Server_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewSource)
 {
 	Execute_SetTargetInventory(this, NewSource);
@@ -200,5 +223,53 @@ void UMounteaLootableComponent::SetSourceInventory_Server_Implementation(const T
 
 bool UMounteaLootableComponent::SetSourceInventory_Server_Validate(const TScriptInterface<IMounteaInventoryInterface>& NewSource)
 { return true; }
+
+void UMounteaLootableComponent::SetupSourceComponent()
+{
+	if (GetOwner() == nullptr) return;
+	
+	if (SourceInventoryComponent.OtherActor == nullptr)
+	{
+		const TArray<UActorComponent*> Components = GetOwner()->GetComponentsByInterface(UMounteaInventoryInterface::StaticClass());
+		if (Components.Num() > 0)
+		{
+			for (const auto& Itr : Components)
+			{
+				if (Itr && Itr->GetFName().IsEqual(SourceInventoryComponent.ComponentProperty))
+				{
+					const TScriptInterface<IMounteaInventoryInterface> NewSource = Itr;
+					SourceInventory = NewSource;
+
+					return;
+				}
+			}
+
+			// We found nothing by name, so we fallback to this default
+			const TScriptInterface<IMounteaInventoryInterface> NewSource = Components[0];
+			SourceInventory = NewSource;
+		}
+	}
+	else
+	{
+		SourceInventory = SourceInventoryComponent.GetComponent( SourceInventoryComponent.OtherActor.Get() ? SourceInventoryComponent.OtherActor.Get() : GetOwner() );
+	}
+}
+
+#if WITH_EDITOR
+
+void UMounteaLootableComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	const FName MemberPropertyName = (PropertyChangedEvent.MemberProperty != nullptr) ? PropertyChangedEvent.MemberProperty->GetFName() : NAME_None;
+
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaLootableComponent, SourceInventoryComponent) || MemberPropertyName == GET_MEMBER_NAME_CHECKED(UMounteaLootableComponent, SourceInventoryComponent))
+	{
+		SetupSourceComponent();
+	}
+}
+
+#endif
 
 #undef LOCTEXT_NAMESPACE

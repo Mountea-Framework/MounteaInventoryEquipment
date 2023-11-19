@@ -45,6 +45,21 @@ protected:
 	void SetSourceInventory_Server(const TScriptInterface<IMounteaInventoryInterface>& NewSource);
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SetTargetInventory_Server(const TScriptInterface<IMounteaInventoryInterface>& NewSource);
+	UFUNCTION(Server, Reliable)
+	void LootItem_Server(const FItemTransfer& Item);
+
+protected:
+
+	void SetupSourceComponent();
+
+#if WITH_EDITOR
+	
+private:
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+#endif
+	
 	
 #pragma endregion
 
@@ -52,18 +67,15 @@ protected:
 
 protected:
 
-	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryInterface"), Replicated)
+	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, AllowedClasses="MounteaInventoryInterface, MounteaInventoryComponent", UseComponentPicker), Replicated)
 	FComponentReference SourceInventoryComponent;
-
-	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryInterface"), Replicated)
-	FComponentReference TargetInventoryComponent;
 
 private:
 
-	UPROPERTY(VisibleAnywhere, Category="2. Debug")
+	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), Replicated)
 	TScriptInterface<IMounteaInventoryInterface> SourceInventory;
 
-	UPROPERTY(VisibleAnywhere, Category="2. Debug")
+	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), Replicated)
 	TScriptInterface<IMounteaInventoryInterface> TargetInventory;
 	
 #pragma endregion 
