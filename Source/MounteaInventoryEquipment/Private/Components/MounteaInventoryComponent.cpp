@@ -384,21 +384,37 @@ TArray<FInventoryUpdateResult> UMounteaInventoryComponent::AddItemsToInventory_I
 
 	TArray<FInventoryUpdateResult> Results;
 
-	// If no transaction type is set or an invalid value is provided, default to PartialTransaction
-	if (!(TransactionTypeFlags & (static_cast<uint8>(EInventoryTransactionType::FullTransaction) | static_cast<uint8>(EInventoryTransactionType::PartialTransaction))))
+	// Bitmask Corrections
 	{
-		TransactionTypeFlags |= static_cast<uint8>(EInventoryTransactionType::PartialTransaction);
-	}
+		// Define the maximum valid value for TransactionTypeFlags
+		const uint8 MaxTransactionTypeValue =
+			static_cast<uint8>(EInventoryTransactionType::EITT_FullTransaction) |
+			static_cast<uint8>(EInventoryTransactionType::EITT_PartialTransaction) |
+			static_cast<uint8>(EInventoryTransactionType::EITT_Sync) |
+			static_cast<uint8>(EInventoryTransactionType::EITT_Async);
+	
+		// Check for empty value
+		if (TransactionTypeFlags == static_cast<uint8>(EInventoryTransactionType::None))
+		{
+			TransactionTypeFlags = static_cast<uint8>(EInventoryTransactionType::EITT_PartialTransaction) | static_cast<uint8>(EInventoryTransactionType::EITT_Sync);
+		}
 
-	// If no sync type is set or an invalid value is provided, default to Sync
-	if (!(TransactionTypeFlags & (static_cast<uint8>(EInventoryTransactionType::Sync) | static_cast<uint8>(EInventoryTransactionType::Async))))
-	{
-		TransactionTypeFlags |= static_cast<uint8>(EInventoryTransactionType::Async);
+		// Check for both FullTransaction and PartialTransaction being selected
+		if ((TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::EITT_FullTransaction)) != 0 && (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::EITT_PartialTransaction)) != 0)
+		{
+			TransactionTypeFlags &= ~static_cast<uint8>(EInventoryTransactionType::EITT_FullTransaction);
+		}
+
+		// Check for both Sync and Async being selected
+		if ((TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::EITT_Sync)) != 0 && (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::EITT_Async)) != 0)
+		{
+			TransactionTypeFlags &= ~static_cast<uint8>(EInventoryTransactionType::EITT_Async);
+		}
 	}
 	
 	// Extracting the boolean values from the bitmask
-	const bool bFullOnly = (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::FullTransaction)) != 0;
-	const bool bIsSync = (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::Sync)) != 0;
+	const bool bFullOnly = (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::EITT_FullTransaction)) != 0;
+	const bool bIsSync = (TransactionTypeFlags & static_cast<uint8>(EInventoryTransactionType::EITT_Sync)) != 0;
 	
 	if (bIsSync)
 	{

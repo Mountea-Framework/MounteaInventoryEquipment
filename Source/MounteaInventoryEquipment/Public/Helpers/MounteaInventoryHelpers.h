@@ -82,11 +82,11 @@ enum class EInventoryUpdateResult : uint8
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
 enum class EInventoryTransactionType : uint8
 {
-	None = 0                                  UMETA(Hidden),
-	FullTransaction = 1 << 0,      // 0001
-	PartialTransaction = 1 << 1, // 0010
-	Sync = 1 << 2,                         // 0100
-	Async = 1 << 3                        // 1000
+	None = 0                                             UMETA(Hidden),
+	EITT_FullTransaction = 1 << 0,      UMETA(DisplayName="Full Transaction")       // 0001
+	EITT_PartialTransaction = 1 << 1  UMETA(DisplayName="Partial Transaction"), // 0010
+	EITT_Sync = 1 << 2                           UMETA(DisplayName="Sync Operation"),       // 0100
+	EITT_Async = 1 << 3                         UMETA(DisplayName="Async Operation")      // 1000
 };
 ENUM_CLASS_FLAGS(EInventoryTransactionType);
 
