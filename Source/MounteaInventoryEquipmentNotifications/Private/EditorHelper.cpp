@@ -1,4 +1,4 @@
-// Copyright Dominik Pavlicek 2022. All Rights Reserved.
+// Copyright Dominik Morse 2022. All Rights Reserved.
 
 #include "EditorHelper.h"
 #include "Styling/SlateStyle.h"

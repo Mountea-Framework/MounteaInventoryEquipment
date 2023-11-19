@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023
+// All rights reserved Dominik Morse 2023
 
 
 #include "MounteaSettings_Details.h"
