@@ -83,7 +83,7 @@ UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true
 enum class EInventoryTransactionType : uint8
 {
 	None = 0                                             UMETA(Hidden),
-	EITT_FullTransaction = 1 << 0,      UMETA(DisplayName="Full Transaction")       // 0001
+	EITT_FullTransaction = 1 << 0       UMETA(DisplayName="Full Transaction"),       // 0001
 	EITT_PartialTransaction = 1 << 1  UMETA(DisplayName="Partial Transaction"), // 0010
 	EITT_Sync = 1 << 2                           UMETA(DisplayName="Sync Operation"),       // 0100
 	EITT_Async = 1 << 3                         UMETA(DisplayName="Async Operation")      // 1000

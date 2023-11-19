@@ -113,6 +113,17 @@ public:
 	virtual FInventoryUpdateResult RemoveItemFromInventory_Implementation(UMounteaInstancedItem* Item) = 0;
 
 	/**
+	 * Removes a bunch of specific items from the inventory, handling the cleanup and updating of inventory slots.
+	 * It ensures that all relevant data structures are updated and broadcasts the item removal event.
+	 * 
+	 * @param Items The list of items to be removed from the inventory.
+	 * @param TransactionTypeFlags Bitmasks that allows for multiple flags to be combined and checked easily. 
+	 * @return A structure containing details about the outcome of the removal process.
+	 */
+	TArray<FInventoryUpdateResult> RemoveItemsFromInventory(const TArray<UMounteaInstancedItem*>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags);
+	virtual TArray<FInventoryUpdateResult> RemoveItemsFromInventory_Implementation(const TArray<UMounteaInstancedItem*>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags = 10) = 0;
+	
+	/**
 	 * Reduces the quantity of a specific item in the inventory. If the item's quantity
 	 * falls to zero or below, it triggers the item's removal from the inventory.
 	 * It updates the relevant inventory slots and broadcasts update or removal events.
