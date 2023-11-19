@@ -86,6 +86,15 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryUIClass_Implementation() const
 {
 	return InventoryWBPClass;
+
+	/* TODO: Implement class config (same as Theme Config, but to hold Classes)
+	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
+
+	if (!Settings) return nullptr;
+
+	return Settings->ClassConfig->DefaultInventoryWBPClass;
+	return InventoryWBPClass;
+	*/
 }
 
 UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryUI_Implementation() const

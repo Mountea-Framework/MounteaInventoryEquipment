@@ -131,13 +131,6 @@ protected:
 	 * @return True if the owning actor is either Authority or Autonomous Proxy, false otherwise.
 	 */
 	bool IsAuthorityOrAutonomousProxy() const;
-	
-#if WITH_EDITOR
-private:
-
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-  
-#endif
 
 private:
 
@@ -175,12 +168,12 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ProcessItemAction_Server(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context);
 	
-/*===============================================================================
-		IN PROGRESS
-		
-		Following functions are already being updated.
-===============================================================================*/
+#if WITH_EDITOR
+private:
 
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+  
+#endif
 	
 /*===============================================================================
 		SUBJECT OF CHANGE

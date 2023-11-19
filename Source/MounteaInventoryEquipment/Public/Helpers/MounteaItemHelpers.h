@@ -225,7 +225,21 @@ public:
 	/** Checks if the slot is valid, meaning it has an item and at least one stack. */
 	bool IsValid() const
 	{
-		return IsEmpty() == false && SlotGuid.IsValid() && Stacks.Num() > 0;
+		const bool bIsEmpty = IsEmpty();
+		const bool bHasGuid = SlotGuid.IsValid();
+		const bool bHasStacks = Stacks.Num() > 0;
+
+		bool bAllStacksValid = true;
+		for (const auto& Itr : Stacks)
+		{
+			if (Itr.IsValid() == false)
+			{
+				bAllStacksValid = false;
+				break;
+			}
+		}
+		
+		return bIsEmpty && bHasGuid && bHasStacks && bAllStacksValid;
 	}
 
 	/** Validates the consistency of stack GUIDs, ensuring they match with the item's GUID. */

@@ -210,6 +210,12 @@ public:
 			return Quantity - AmountToAdd;
 		}
 	}
+
+	UFUNCTION(BlueprintCallable, Category="Inventory")
+	static bool IsSlotValid(const FItemSlot& Slot)
+	{
+		return Slot.IsValid();
+	}
 	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	static bool IsItemValid(const UMounteaInstancedItem* Item)
