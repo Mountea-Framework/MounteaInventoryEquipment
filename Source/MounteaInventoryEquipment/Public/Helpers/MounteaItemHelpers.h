@@ -580,4 +580,28 @@ public:
 
 #undef LOCTEXT_NAMESPACE
 
+#pragma endregion
+
+#pragma region ItemTransfer
+
+USTRUCT(BlueprintType)
+struct FItemTransfer
+{
+	GENERATED_BODY()
+
+	FItemTransfer() : Item(nullptr), Quantity(-1)
+	{};
+
+	FItemTransfer(UMounteaInstancedItem* NewItem, const int32& NewQuantity) : Item(NewItem), Quantity(NewQuantity)
+	{};
+	
+public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMounteaInstancedItem* Item;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Quantity;
+};
+
 #pragma endregion 
