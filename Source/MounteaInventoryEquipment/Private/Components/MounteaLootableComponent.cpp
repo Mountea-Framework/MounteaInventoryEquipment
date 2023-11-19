@@ -93,10 +93,10 @@ bool UMounteaLootableComponent::CanLootItem_Implementation(UMounteaInstancedItem
 
 	if (SourceInventory.GetObject() == nullptr) return false;
 
-	return SourceInventory->Execute_CanAddItem(SourceInventory.GetObject(), Item, Quantity);
+	return SourceInventory->Execute_CanAddItem(SourceInventory.GetObject(), FItemTransfer(Item, Quantity));
 }
 
-FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const FItemTransfer&)
+FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const FItemTransfer& Item)
 {
 	FInventoryUpdateResult Result;
 	
@@ -109,6 +109,55 @@ FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const 
 		return Result;
 	}
 
+	if (TargetInventory.GetObject() == nullptr)
+	{
+		Result.OptionalPayload = this;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden;
+		Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Target Inventory is not setup.");
+
+		return Result;
+	}
+
+	if (Item.Item == nullptr)
+	{
+		Result.OptionalPayload = this;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden;
+		Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid Loot Item.");
+
+		return Result;
+	}
+
+	if (Item.Quantity <= 0)
+	{
+		Result.OptionalPayload = this;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden;
+		Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Invalid Loot Item Quantity.");
+
+		return Result;
+	}
+
+	// TODO: Add some validations and logic here
+	if (SourceInventory->Execute_CanReduceItem(SourceInventory.GetObject(), Item) == false)
+	{
+		Result.OptionalPayload = this;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden;
+		Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Loot item reduction forbidden.");
+
+		return Result;
+	}
+	
+	if (TargetInventory->Execute_CanAddItem(SourceInventory.GetObject(), Item) == false)
+	{
+		Result.OptionalPayload = this;
+		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden;
+		Result.ResultText =  LOCTEXT("InventoryUpdateResult_InvalidRequest", "Loot item addition forbidden.");
+
+		return Result;
+	}
+	
+	SourceInventory->Execute_ReduceItemInInventory(SourceInventory.GetObject(), Item.Item, Item.Quantity);
+	TargetInventory->Execute_AddItemToInventory(TargetInventory.GetObject(), Item.Item, Item.Quantity);
+	
 	return Result;
 }
 

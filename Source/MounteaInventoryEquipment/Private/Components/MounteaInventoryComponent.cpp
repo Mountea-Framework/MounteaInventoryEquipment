@@ -161,7 +161,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
     }
 
     // Check if the item can be added at all
-    if (!Execute_CanAddItem(this, Item, Quantity))
+    if (!Execute_CanAddItem(this, FItemTransfer(Item, Quantity)))
     {
         Result.OptionalPayload = Item;
         Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
@@ -445,7 +445,7 @@ TArray<FInventoryUpdateResult> UMounteaInventoryComponent::AddItemsToInventory_I
 				}
 		
 				// Check if the item can be added at all
-				if (!Execute_CanAddItem(this, Itr.Key, Itr.Value))
+				if (!Execute_CanAddItem(this, FItemTransfer(Itr.Key, Itr.Value)))
 				{
 					Result.OptionalPayload = Itr.Key;
 					Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
@@ -512,7 +512,7 @@ TArray<FInventoryUpdateResult> UMounteaInventoryComponent::AddItemsToInventory_I
 					}
 		
 					// Check if the item can be added at all
-					if (!Execute_CanAddItem(this, Itr.Key, Itr.Value))
+					if (!Execute_CanAddItem(this, FItemTransfer(Itr.Key, Itr.Value)))
 					{
 						Result.OptionalPayload = Itr.Key;
 						Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden; // Corresponds to "Forbidden"
@@ -1069,12 +1069,12 @@ void UMounteaInventoryComponent::ReduceItemInInventory_Server_Implementation(UMo
 bool UMounteaInventoryComponent::ReduceItemInInventory_Server_Validate(UMounteaInstancedItem* Item, const int32& Quantity)
 { return true; }
 
-bool UMounteaInventoryComponent::CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const
+bool UMounteaInventoryComponent::CanAddItem_Implementation(const FItemTransfer& Item) const
 {
 	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaInventoryComponent_CanAddItem );
 	
 	// Check if the Item is valid.
-	if (!UMounteaInventoryItemBFL::IsItemValid(Item))
+	if (!UMounteaInventoryItemBFL::IsItemValid(Item.Item))
 	{
 		return false;
 	}
@@ -1083,15 +1083,15 @@ bool UMounteaInventoryComponent::CanAddItem_Implementation(UMounteaInstancedItem
 	FItemRetrievalFilter Filter;
 	{
 		Filter.bSearchByGUID = true;
-		Filter.Guid = Item->GetGuid();
+		Filter.Guid = Item.Item->GetGuid();
 		Filter.bSearchByItem = true;
-		Filter.Item = Item;
+		Filter.Item = Item.Item;
 	}
 
 	const bool bHasItem = Execute_HasItem(this, Filter);
 
 	// Calculate the maxAddAmount value
-	const int32 MaxAddAmount = UMounteaInventoryItemBFL::CalculateAddAmount(Item, Quantity);
+	const int32 MaxAddAmount = UMounteaInventoryItemBFL::CalculateAddAmount(Item.Item, Item.Quantity);
 
 	// This means there is already no space
 	if (MaxAddAmount == 0)
@@ -1100,11 +1100,11 @@ bool UMounteaInventoryComponent::CanAddItem_Implementation(UMounteaInstancedItem
 	}
 
 	// If the item is stackable
-	if (Item->GetItemData().RequiredData.ItemQuantity.bIsStackable)
+	if (Item.Item->GetItemData().RequiredData.ItemQuantity.bIsStackable)
 	{
 		// If the current item amount we want to add is less than or equal to the max 
 		// amount we can add to the stack, return true.
-		if (Quantity <= MaxAddAmount)
+		if (Item.Quantity <= MaxAddAmount)
 		{
 			return true;
 		}
@@ -1152,6 +1152,34 @@ bool UMounteaInventoryComponent::CanRemoveItem_Implementation(UMounteaInstancedI
 
 	// Return true as the item exists in the inventory and can potentially be removed.
 	return true;
+}
+
+bool UMounteaInventoryComponent::CanReduceItem_Implementation(const FItemTransfer& Item) const
+{
+	if (Item.Item == nullptr)
+	{
+		return false;
+	}
+
+	if (Item.Quantity <= 0)
+	{
+		return false;
+	}
+
+	FItemRetrievalFilter SearchFilter;
+	SearchFilter.Item = Item.Item;
+	SearchFilter.bSearchByItem = true;
+	SearchFilter.Guid = Item.Item->GetGuid();
+	SearchFilter.bSearchByGUID = true;
+
+	
+	const auto ExistingItem = Execute_SearchSingleItem(this, SearchFilter);
+	if (ExistingItem == nullptr)
+	{
+		return false;
+	}
+
+	return ExistingItem->GetQuantity() >= Item.Quantity;
 }
 
 bool UMounteaInventoryComponent::HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const

@@ -80,6 +80,10 @@ struct FItemSlotStack
 		: StackSize(InStackSize), StackGuid(InStackGuid), SlotGuid(InSlotGuid)
 	{};
 
+	// Constructor with parameters for copy logic
+	FItemSlotStack(const FItemSlotStack& Other) : StackSize(Other.StackSize), StackGuid(Other.StackGuid), SlotGuid(Other.SlotGuid)
+	{};
+	
 	// Convenience constructor for creating a stack with a size and parent Slot but generating new GUID.
 	explicit FItemSlotStack(const int32 InStackSize, const FGuid& InSlotGuid)
 		: StackSize(InStackSize), SlotGuid(InSlotGuid)
@@ -135,6 +139,11 @@ public:
 	bool Serialize(class FArchive& Ar);
 	
 	bool operator==(const FItemSlotStack& Other) const;
+
+	bool operator!=(const FItemSlotStack& Other) const
+	{
+		return !(*this==Other);
+	}
 
 	bool operator==(const FGuid& Other) const;
 };

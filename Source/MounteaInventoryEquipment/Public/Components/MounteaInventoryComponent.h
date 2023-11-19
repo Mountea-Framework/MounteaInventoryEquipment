@@ -69,8 +69,9 @@ public:
 	virtual FInventoryUpdateResult ReduceItemInInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) override;
 	virtual TArray<FInventoryUpdateResult> ReduceItemsInInventory_Implementation(const TMap<UMounteaInstancedItem*, int32>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags = 10) override;
 	
-	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const override;
+	virtual bool CanAddItem_Implementation(const FItemTransfer& Item) const override;
 	virtual bool CanRemoveItem_Implementation(UMounteaInstancedItem* Item) const override;
+	virtual bool CanReduceItem_Implementation(const FItemTransfer& Item) const override;
 	
 	virtual UMounteaInstancedItem* SearchSingleItem_Implementation(const FItemRetrievalFilter& SearchFilter) const override;
 	virtual TArray<UMounteaInstancedItem*> SearchMultipleItems_Implementation(const FItemRetrievalFilter& SearchFilter) const override;

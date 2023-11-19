@@ -8,6 +8,7 @@
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryInterface.generated.h"
 
+struct FItemTransfer;
 class IMounteaInventoryInstancedItemInterface;
 class UMounteaInstancedItem;
 class UMounteaBaseUserWidget;
@@ -156,8 +157,8 @@ public:
 	 * @return True if the item can be added, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool CanAddItem(UMounteaInstancedItem* Item, const int32& Quantity) const;
-	virtual bool CanAddItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const = 0;
+	bool CanAddItem(const FItemTransfer& Item) const;
+	virtual bool CanAddItem_Implementation(const FItemTransfer& Item) const = 0;
 
 	/**
 	 * Determines if an item can be removed from the inventory.
@@ -168,6 +169,10 @@ public:
 	bool CanRemoveItem(UMounteaInstancedItem* Item) const;
 	virtual bool CanRemoveItem_Implementation(UMounteaInstancedItem* Item) const = 0;
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	bool CanReduceItem(const FItemTransfer& Item) const;
+	virtual bool CanReduceItem_Implementation(const FItemTransfer& Item) const = 0;
+	
 	/**
 	 * Searches the inventory for a single item that matches the given search filter.
 	 * @param SearchFilter The criteria used to search for the item.
