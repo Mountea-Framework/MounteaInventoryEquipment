@@ -118,7 +118,7 @@ public:
 	 * 
 	 * @param Items The list of items to be removed from the inventory.
 	 * @param TransactionTypeFlags Bitmasks that allows for multiple flags to be combined and checked easily. 
-	 * @return A structure containing details about the outcome of the removal process.
+	 * @return A list of structures containing details about the outcome of the removal process.
 	 */
 	TArray<FInventoryUpdateResult> RemoveItemsFromInventory(const TArray<UMounteaInstancedItem*>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags);
 	virtual TArray<FInventoryUpdateResult> RemoveItemsFromInventory_Implementation(const TArray<UMounteaInstancedItem*>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags = 10) = 0;
@@ -136,6 +136,19 @@ public:
 	FInventoryUpdateResult ReduceItemInInventory(UMounteaInstancedItem* Item, const int32& Quantity = 1);
 	virtual FInventoryUpdateResult ReduceItemInInventory_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) = 0;
 
+	/**
+	 * Reduces the quantity of a specific items in the inventory. If any of those item's quantity
+	 * falls to zero or below, it triggers the item's removal from the inventory.
+	 * It updates the relevant inventory slots and broadcasts update or removal events.
+	 * 
+	 * @param Items The list item for which the quantity should be reduced.
+	 * @param TransactionTypeFlags Bitmasks that allows for multiple flags to be combined and checked easily. 
+	 * @return A list of structures containing details about the outcome of the reduction process.
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	TArray<FInventoryUpdateResult> ReduceItemsInInventory(const TMap<UMounteaInstancedItem*, int32>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags);
+	virtual TArray<FInventoryUpdateResult> ReduceItemsInInventory_Implementation(const TMap<UMounteaInstancedItem*, int32>& Items, UPARAM(meta = (Bitmask, BitmaskEnum = EInventoryTransactionType))  int32 TransactionTypeFlags = 10) = 0;
+	
 	/**
 	 * Determines if an item can be added to the inventory.
 	 * @param Item The item to be added.
