@@ -74,13 +74,12 @@ public:
 
 	/**
 	 * Determines if a specific item can be looted from the source inventory.
-	 * @param Item The item to check for looting feasibility.
-	 * @param Quantity The quantity of the item to check.
+	 * @param Item The item to check for looting feasibility with Item's reference and Quantity.
 	 * @return True if the item can be looted, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool CanLootItem(UMounteaInstancedItem* Item, const int32& Quantity = 1) const;
-	virtual bool CanLootItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) const = 0;
+	bool CanLootItem(const FItemTransfer& Item) const;
+	virtual bool CanLootItem_Implementation(const FItemTransfer& Item) const = 0;
 
 	/**
 	* Attempts to loot a specified item from the source inventory.

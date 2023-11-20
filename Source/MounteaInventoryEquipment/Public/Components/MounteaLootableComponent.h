@@ -42,7 +42,7 @@ public:
 	virtual TScriptInterface<IMounteaInventoryInterface> GetTargetInventory_Implementation() const override;
 	virtual void SetTargetInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewTarget) override;
 	virtual TArray<UMounteaInstancedItem*> GetLootableItems_Implementation() const override;
-	virtual bool CanLootItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity = 1) const override;
+	virtual bool CanLootItem_Implementation(const FItemTransfer& Item) const override;
 	virtual FInventoryUpdateResult LootItem_Implementation(const FItemTransfer& Item) override;
 	virtual TArray<FInventoryUpdateResult> LootAllItems_Implementation(const TArray<FItemTransfer>& Items) override;
 

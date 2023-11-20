@@ -83,17 +83,17 @@ TArray<UMounteaInstancedItem*> UMounteaLootableComponent::GetLootableItems_Imple
 	return Result;
 }
 
-bool UMounteaLootableComponent::CanLootItem_Implementation(UMounteaInstancedItem* Item, const int32& Quantity) const
+bool UMounteaLootableComponent::CanLootItem_Implementation(const FItemTransfer& Item) const
 {
-	if (!Item) return false;
+	if (!Item.Item) return false;
 
-	if (!UMounteaInventoryItemBFL::IsItemValid(Item)) return false;
+	if (!UMounteaInventoryItemBFL::IsItemValid(Item.Item)) return false;
 
-	if (Quantity <= 0) return false;
+	if (Item.Quantity <= 0) return false;
 
 	if (SourceInventory.GetObject() == nullptr) return false;
 
-	return SourceInventory->Execute_CanAddItem(SourceInventory.GetObject(), FItemTransfer(Item, Quantity));
+	return SourceInventory->Execute_CanAddItem(SourceInventory.GetObject(), Item);
 }
 
 FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const FItemTransfer& Item)
@@ -141,7 +141,7 @@ FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const 
 		LootItem_Server(Item);
 		
 		Result.OptionalPayload = Item.Item;
-		Result.ResultID = Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing;; // Corresponds to "Processing"
+		Result.ResultID = Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing;
 		Result.ResultText = LOCTEXT("InventoryUpdateResult_Processing", "Server is processing request.");
 		
 		return Result;
@@ -164,9 +164,7 @@ FInventoryUpdateResult UMounteaLootableComponent::LootItem_Implementation(const 
 
 		return Result;
 	}
-
 	
-
 	//At this point we validated as much as we could, so here we just assume it is all good.
 	SourceInventory->Execute_ReduceItemInInventory(SourceInventory.GetObject(), Item.Item, Item.Quantity);
 	TargetInventory->Execute_AddItemToInventory(TargetInventory.GetObject(), Item.Item, Item.Quantity);
