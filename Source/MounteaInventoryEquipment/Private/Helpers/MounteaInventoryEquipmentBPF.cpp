@@ -8,8 +8,8 @@
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Interfaces/MounteaInventoryInterface.h"
-#include "Interfaces/MounteaInventoryItemWBPInterface.h"
-#include "Interfaces/MounteaInventorySlotWBPInterface.h"
+#include "Interfaces/UI/MounteaInventoryItemWBPInterface.h"
+#include "Interfaces/UI/MounteaInventorySlotWBPInterface.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "Settings/MounteaInventoryThemeConfig.h"
 #include "Setup/MounteaInventoryConfig.h"
@@ -171,8 +171,7 @@ TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryEquipmentBPF::GetItemInven
 	return Target->Execute_GetInventoryConfigClass(Target.GetObject());
 }
 
-TSubclassOf<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBPF::GetItemItemConfigClass(
-	const UMounteaInventoryItemBase* Target)
+TSubclassOf<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBPF::GetItemItemConfigClass(const UMounteaInventoryItemBase* Target)
 {
 	if (!Target) return nullptr;
 
@@ -347,116 +346,7 @@ FIntPoint UMounteaInventoryEquipmentBPF::GetInventorySlotSize()
 	return bFound ? Config->SlotBaseSize : FIntPoint(16, 16);
 }
 
-int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
-{
-	if (RequestedQuantity == 0)
-	{
-		return 0;
-	}
-	
-	if (!Item)
-	{
-		return 0;
-	}
 
-	return 1;
-}
-
-int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
-{
-	// Return 0 if RequestedQuantity is 0 or Item is null
-	if (RequestedQuantity == 0 || !Item)
-	{
-		return 0;
-	}
-    
-	// If the item is not stackable, return 0 if OtherItem is not null (updating case), or 1 if it is null (adding new item case)
-	if (!Item->ItemData.RequiredData.ItemQuantity.bIsStackable)
-	{
-		return OtherItem ? 0 : 1;
-	}
-    
-	// Calculate the maximum possible quantity to be added
-	const int32 CurrentQuantity = 0; // Item->ItemData.ItemQuantity.CurrentQuantity; BREAKING
-	const int32 MaxQuantity = Item->ItemData.RequiredData.ItemQuantity.MaxQuantity;
-	int32 MaxPossible = MaxQuantity - CurrentQuantity;
-
-	// If OtherItem is not null, the requested quantity should be limited by OtherItem's current quantity
-	if (OtherItem)
-	{
-		const int32 UpdateQuantity = 0; // FMath::Min(RequestedQuantity, OtherItem->ItemData.ItemQuantity.CurrentQuantity); BREAKING
-		MaxPossible = FMath::Min(MaxPossible, UpdateQuantity);
-	}
-	else // If OtherItem is null, the requested quantity should be limited by RequestedQuantity
-	{
-	MaxPossible = FMath::Min(MaxPossible, RequestedQuantity);
-	}
-
-	return MaxPossible;
-}
-
-
-
-int32 UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
-{
-	if (!BaseItem) return 0;
-	if (RequestedQuantity == 0) return 0;
-
-	if (OtherItem)
-	{
-		
-	}
-	else
-	{
-		
-	}
-
-	return 0;
-}
-
-int32 UMounteaInventoryEquipmentBPF::RemoveItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
-{
-	if (!BaseItem) return 0;
-	if (RequestedQuantity == 0) return 0;
-
-	if (OtherItem)
-	{
-		
-	}
-	else
-	{
-		
-	}
-
-	return 0;
-}
-
-bool UMounteaInventoryEquipmentBPF::DoesHaveTag(const UMounteaInventoryItemBase* Item, const FGameplayTag Tag)
-{
-	if (Item == nullptr) return false;
-
-	// return Item->GetTags().HasTag(Tag); BREAKING
-	return false;
-}
-
-bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItemBase* Item,
-	const FGameplayTagContainer Tags)
-{
-	if (Item == nullptr) return false;
-
-	// return Item->GetTags().HasAny(Tags); BREAKING
-	return false;
-}
-
-bool UMounteaInventoryEquipmentBPF::DoesHaveAllTags(const UMounteaInventoryItemBase* Item,
-	const FGameplayTagContainer Tags)
-{
-	if (Item == nullptr) return false;
-
-	// return Item->GetTags().HasAll(Tags); BREAKING
-
-	return false;
-}
 
 TArray<FIntPoint> UMounteaInventoryEquipmentBPF::CalculateItemShadow(const FIntPoint& StartCoords,
 	const FIntPoint& Area)
