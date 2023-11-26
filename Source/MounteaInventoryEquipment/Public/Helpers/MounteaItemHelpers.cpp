@@ -95,6 +95,9 @@ bool FItemSlot::Serialize(FArchive& Ar)
 {
 	// Serialize the Item.
 	Ar << Item;
+
+	// Serialize Slot GUID
+	Ar << SlotGuid;
 	
 	// Serialize the Stacks set.
 	Ar << Stacks;

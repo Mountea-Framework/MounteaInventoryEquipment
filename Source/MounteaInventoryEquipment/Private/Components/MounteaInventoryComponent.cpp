@@ -160,7 +160,7 @@ FInventoryUpdateResult UMounteaInventoryComponent::AddItemToInventory_Implementa
     {
         Result.OptionalPayload = Item;
         Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Corresponds to "Bad Request"
-        Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidIQuantity", "Quantity less than 1 is forbidden.");
+        Result.ResultText = LOCTEXT("InventoryUpdateResult_InvalidQuantity", "Quantity less than 1 is forbidden.");
     	
         return Result;
     }

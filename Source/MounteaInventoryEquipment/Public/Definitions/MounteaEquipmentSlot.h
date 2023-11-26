@@ -7,6 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "MounteaEquipmentSlot.generated.h"
 
+class UMounteaInstancedItem;
 class IMounteaEquipmentInterface;
 class UMounteaInventoryItemBase;
 
@@ -39,7 +40,7 @@ public:
 	 * This ID is used to distinguish this slot from others in an equipment system.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE FString GetSlotID() const { return SlotID; };
+	FORCEINLINE FText GetSlotID() const { return SlotID; };
 
 	/**
 	 * Returns the tag that determines which items can be equipped in this slot.
@@ -52,7 +53,7 @@ public:
 	 * Returns the item currently equipped in this slot.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE UMounteaInventoryItemBase* GetSlotItem() const { return ItemInSlot; };
+	FORCEINLINE UMounteaInstancedItem* GetSlotItem() const { return ItemInSlot; };
 
 	/**
 	 * Determines if the equipment slot is currently empty.
@@ -64,7 +65,7 @@ public:
 	FORCEINLINE bool IsEmpty() const { return ItemInSlot == nullptr; };
 
 	UFUNCTION(Category="Mountea|EquipmentSlot")
-	void UpdateItem(UMounteaInventoryItemBase* NewItem);
+	void UpdateItem(UMounteaInstancedItem* NewItem);
 	
 	FORCEINLINE int32 GetRepKey() const { return RepKey; };
 protected:
@@ -75,7 +76,7 @@ protected:
 	 * It can be customized in the editor.
 	 */
 	UPROPERTY(SaveGame, Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, meta=(GetOptions=GetSlotIDs))
-	FString SlotID;
+	FText SlotID;
 
 	/**
 	 * The tag that determines which items can be equipped in this slot.
@@ -89,7 +90,7 @@ protected:
 	 * This property is automatically updated when items are equipped or unequipped.
 	 */
 	UPROPERTY(SaveGame, Category="2. Debug", VisibleAnywhere, BlueprintReadOnly, meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
-	UMounteaInventoryItemBase* ItemInSlot = nullptr;
+	UMounteaInstancedItem* ItemInSlot = nullptr;
 
 private:
 
@@ -117,65 +118,3 @@ protected:
 	
 };
 
-struct FMounteaEquipmentSlotDataCompare
-{
-	FMounteaEquipmentSlotDataCompare(const UMounteaInventoryItemBase* Item, const FString& ID) : SlotItem(Item), SlotID(ID) {};
-	
-	 const UMounteaInventoryItemBase* SlotItem;
-	 const FString SlotID;
-};
-
-USTRUCT(BlueprintType)
-struct FMounteaEquipmentSlotData
-{
-	GENERATED_BODY()
-
-public:
-
-	/**
-	 * The Equipment Slot object associated with this data structure.
-	 *
-	 * This property represents an instance of a `UMounteaEquipmentSlot` object that is linked to this data structure.
-	 * It provides access to the equipment slot's data and functionality, such as its ID, compatible tag, and currently equipped item.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=false))
-	UMounteaEquipmentSlot* Slot;
-
-public:
-	
-	bool operator==(const FMounteaEquipmentSlotData& Other) const
-	{
-		return Slot == Other.Slot;
-	}
-	
-	bool operator==(const FMounteaEquipmentSlotDataCompare& Other) const
-	{
-		if (Slot)
-		{
-			return Slot->GetSlotID() == Other.SlotID && Slot->GetSlotItem() == Other.SlotItem;
-		}
-		return false;
-	}
-
-	bool operator!=(const FMounteaEquipmentSlotData& Other) const
-	{
-		return !(*this == Other);
-	}
-
-	bool operator!=(const FMounteaEquipmentSlotDataCompare& Other) const
-	{
-		return !(*this == Other);
-	}
-
-	friend uint32 GetTypeHash(const FMounteaEquipmentSlotData& Data)
-	{
-		uint32 Hash = 0;
-		if (Data.Slot)
-		{
-			Hash = HashCombine(Hash, GetTypeHash(Data.Slot->GetSlotID()));
-		}
-				
-		return Hash;
-	}
-
-};

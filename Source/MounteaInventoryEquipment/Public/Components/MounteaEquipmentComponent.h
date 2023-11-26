@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Definitions/MounteaEquipmentSlot.h"
+#include "Helpers/MounteaEquipmentHelpers.h"
 #include "Interfaces/MounteaEquipmentInterface.h"
 #include "MounteaEquipmentComponent.generated.h"
-
 
 /**
  * Mountea Equipment Component.
@@ -48,47 +48,107 @@ public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
 	
-	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const override;
-	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const override;
-	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const override;
-	
-	virtual bool EquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
-	virtual bool UnEquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) override;
-	
-	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const override;
-	
-	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip) const override;
+	virtual FText FindSlotForItem_Implementation(const UMounteaInstancedItem* Item) const override;
+	virtual int32 FindSlotByID_Implementation(const FText& SlotID) const override;
+	virtual TArray<FEquipmentSlot> GetAllSlots_Implementation() const override;
+	virtual bool DoesHaveAuthority_Implementation() const override;
 
+public:
+
+	/**
+	 * Checks if the owning actor has a network role of either Authority or Autonomous Proxy.
+	 * The function is used to determine if the actor is in a suitable state to perform certain operations,
+	 * particularly those that are visual or UI-related and may not be relevant or appropriate for actors in other network roles.
+	 * 
+	 * @return True if the owning actor is either Authority or Autonomous Proxy, false otherwise.
+	 */
+	bool IsAuthorityOrAutonomousProxy() const;
+
+	/*===============================================================================
+		IN PROGRESS
+		
+		Following functions are using being changed.
+===============================================================================*/
+
+	virtual FInventoryUpdateResult EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID) override;
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void EquipItem_Server(UMounteaInstancedItem* ItemToEquip, const FText& SlotID);
+	
+	virtual bool CanEquipItem_Implementation(const UMounteaInstancedItem* ItemToEquip) const override;
+
+	UFUNCTION(Server, Unreliable)
+	void PostEquipmentUpdated(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Server, Unreliable)
+	void PostItemEquipped(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Server, Unreliable)
+	void PostItemUnequipped(const FInventoryUpdateResult& UpdateContext);
+
+	UFUNCTION(Client, Unreliable)
+	void PostEquipmentUpdated_Client(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Client, Unreliable)
+	void PostItemEquipped_Client(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(Client, Unreliable)
+	void PostItemUnequipped_Client(const FInventoryUpdateResult& UpdateContext);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void PostEquipmentUpdated_Multicast(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(NetMulticast, Unreliable)
+	void PostItemEquipped_Multicast(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION(NetMulticast, Unreliable)
+	void PostItemUnequipped_Multicast(const FInventoryUpdateResult& UpdateContext);
+	
+/*===============================================================================
+		SUBJECT OF CHANGE
+		
+		Following functions are using outdated, wrong class definitions and functions.
+===============================================================================*/
+	
+	virtual bool IsItemEquipped_Implementation(const UMounteaInstancedItem* Item, const FText& SlotID) const override;
+	
+	virtual FInventoryUpdateResult UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FText& SlotID) override;
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void UnEquipItem_Server(UMounteaInstancedItem* Item, const FText& SlotID);
+	
 	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const override;
 	virtual bool SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI) override;
 
 	virtual FOnEquipmentUpdated& GetEquipmentUpdatedHandle() override { return OnEquipmentUpdated; };
-	virtual FOnSlotUpdated& GetSlotEquippedHandle() override { return OnSlotEquipped; };
-	virtual FOnSlotUpdated& GetSlotUnEquippedHandle() override { return OnSlotUnequipped; };
-
+	virtual FOnEquipmentUpdated& GetSlotEquippedHandle() override { return OnSlotEquipped; };
+	virtual FOnEquipmentUpdated& GetSlotUnEquippedHandle() override { return OnSlotUnequipped; }
+	
 protected:
 	
-	UFUNCTION(Server, Reliable, WithValidation) void EquipItem_Server(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	UFUNCTION(Server, Reliable, WithValidation) void UnEquipItem_Server(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	UFUNCTION(NetMulticast, Unreliable) void EquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	UFUNCTION(NetMulticast, Unreliable) void UnEquipItem_Multicast(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	UFUNCTION() void OnRep_Equipment();
+	UFUNCTION()
+	void OnRep_Equipment();
 	
 #pragma endregion
 	
 #pragma region VARIABLES
+	
 protected:
 	
 	UPROPERTY(SaveGame, Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipment)
-	TArray<FMounteaEquipmentSlotData> EquipmentSlotData;
+	TArray<FEquipmentSlot> EquipmentSlots;
 
 private:
+
+	// Filled from RemoveFromItem to keep track of Items that were removed
+	UPROPERTY(VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
+	TArray<FEquipmentSlot> ModifiedSlots;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
 	UMounteaBaseUserWidget* EquipmentUI;
 	
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
 	int32 ReplicatedItemsKey = 0;
+
+	UPROPERTY(EditAnywhere, Category="2. Debug")
+	float Duration_RequestSyncTimerHandle = 0.1f;
+
+	UPROPERTY()
+	FTimerHandle TimerHandle_RequestEquipmentSyncTimerHandle;
 	
 #pragma endregion
 
@@ -101,17 +161,17 @@ private:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnEquipmentUpdated (Multicast)")
 	FOnEquipmentUpdated OnEquipmentUpdated_Multicast;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotEquipped (Server)" )
-	FOnSlotUpdated OnSlotEquipped;
+	FOnEquipmentUpdated OnSlotEquipped;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotEquipped (Client)" )
-	FOnSlotUpdated OnSlotEquipped_Client;
+	FOnEquipmentUpdated OnSlotEquipped_Client;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotEquipped (Multicast)")
-	FOnSlotUpdated OnSlotEquipped_Multicast;
+	FOnEquipmentUpdated OnSlotEquipped_Multicast;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotUnequipped (Server)" )
-	FOnSlotUpdated OnSlotUnequipped;
+	FOnEquipmentUpdated OnSlotUnequipped;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotUnequipped (Multicast)")
-	FOnSlotUpdated OnSlotUnequipped_Client;
+	FOnEquipmentUpdated OnSlotUnequipped_Client;
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotUnequipped (Multicast)")
-	FOnSlotUpdated OnSlotUnequipped_Multicast;
+	FOnEquipmentUpdated OnSlotUnequipped_Multicast;
 	
 #pragma endregion 
 

@@ -3,11 +3,12 @@
 
 #include "Definitions/MounteaEquipmentSlot.h"
 
+#include "Helpers/MounteaEquipmentHelpers.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
-void UMounteaEquipmentSlot::UpdateItem(UMounteaInventoryItemBase* NewItem)
+void UMounteaEquipmentSlot::UpdateItem(UMounteaInstancedItem* NewItem)
 {
 	if (NewItem!=ItemInSlot)
 	{
@@ -29,7 +30,10 @@ TArray<FString> UMounteaEquipmentSlot::GetSlotIDs()
 	{
 		if (const UMounteaEquipmentConfigData* EquipmentData = Settings->EquipmentConfigData.LoadSynchronous())
 		{
-			EquipmentData->EquipmentSlotIDs.GetKeys(ReturnValues);
+			for (const auto & Itr : EquipmentData->EquipmentSlotIDs)
+			{
+				ReturnValues.Add(Itr.SlotName.ToString());
+			}
 		} 
 	}
 
@@ -67,10 +71,11 @@ void UMounteaEquipmentSlot::PostEditChangeProperty(FPropertyChangedEvent& Proper
 			{
 				if (EquipmentData->EquipmentSlotIDs.Contains(SlotID))
 				{
-					SlotCompatibleTag = *EquipmentData->EquipmentSlotIDs.Find(SlotID);
+					// SlotCompatibleTag = *EquipmentData->EquipmentSlotIDs.Find(SlotID);
 				}
 			} 
 		}
 	}
 }
+
 #endif

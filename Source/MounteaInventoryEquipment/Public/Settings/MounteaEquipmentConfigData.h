@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
+#include "Helpers/MounteaEquipmentHelpers.h"
 #include "MounteaEquipmentConfigData.generated.h"
 
 /**
@@ -18,7 +19,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentConfigData : public UDataAs
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TMap<FString,FGameplayTag> EquipmentSlotIDs;
+	TArray<FMounteaEquipmentSlotIdentity> EquipmentSlotIDs;
 
 	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;

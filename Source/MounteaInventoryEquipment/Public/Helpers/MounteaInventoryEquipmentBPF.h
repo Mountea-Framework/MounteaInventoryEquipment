@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Editor.h"
+#include "MounteaEquipmentHelpers.h"
 #include "InputCore/Classes/InputCoreTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 
@@ -17,7 +18,7 @@ class UMounteaInventoryEquipmentSettings;
 class UMounteaInventoryThemeConfig;
 class UMounteaInventoryConfig;
 class UMounteaInventoryItemConfig;
-struct FMounteaEquipmentSlotDataCompare;
+struct FMounteaEquipmentSlotCompare;
 struct FMounteaEquipmentSlotData;
 class UMounteaEquipmentSlot;
 class IMounteaInventoryInterface;
@@ -94,10 +95,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
 	static UMounteaInventoryItemConfig* GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult);
-	
-	static UMounteaEquipmentSlot* FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FMounteaEquipmentSlotDataCompare& Filter);
-
-	static UMounteaEquipmentSlot* FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FString& SlotID);
 	
 #pragma endregion 
 	

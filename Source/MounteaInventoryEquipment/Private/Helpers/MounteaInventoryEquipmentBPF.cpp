@@ -7,6 +7,7 @@
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
+#include "Helpers/MounteaEquipmentBFL.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/UI/MounteaInventoryItemWBPInterface.h"
 #include "Interfaces/UI/MounteaInventorySlotWBPInterface.h"
@@ -210,26 +211,6 @@ UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const 
 	}
 		
 	return Target->GetItemConfig(ClassFilter, bResult);
-}
-
-UMounteaEquipmentSlot* UMounteaInventoryEquipmentBPF::FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FMounteaEquipmentSlotDataCompare& Filter)
-{
-	for (const auto& Itr : SlotsData)
-	{
-		if (Itr == Filter) return Itr.Slot;
-	}
-
-	return nullptr;
-}
-
-UMounteaEquipmentSlot* UMounteaInventoryEquipmentBPF::FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FString& SlotID)
-{
-	for (const auto& Itr : SlotsData)
-	{
-		if (Itr.Slot && Itr.Slot->GetSlotID().Equals(SlotID)) return Itr.Slot;
-	}
-
-	return nullptr;
 }
 
 bool UMounteaInventoryEquipmentBPF::IsEditor()
