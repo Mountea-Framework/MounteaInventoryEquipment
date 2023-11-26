@@ -11,7 +11,7 @@
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaInventoryItemBFL.h"
-#include "Interfaces/MounteaInventoryWBPInterface.h"
+#include "Interfaces/UI/MounteaInventoryWBPInterface.h"
 
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
