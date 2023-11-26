@@ -19,6 +19,7 @@ class UMounteaInventoryConfig;
 class UMounteaInventoryItemsTable;
 class UMounteaInventoryItemConfig;
 class UMounteaTransactionPayload;
+class UMounteaDefaultsConfig;
 struct FItemUpdateResult;
 
 /**
@@ -36,8 +37,8 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryThemeConfig>> ThemeConfigs;
 
-	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface", AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryWidgetClass;
+	UPROPERTY(Config, EditDefaultsOnly, Category="1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSoftObjectPtr<UMounteaDefaultsConfig> DefaultsConfig;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;
@@ -48,26 +49,26 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaEquipmentConfigData> EquipmentConfigData;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
 	uint8 bUIDebug : 1;
 
 #pragma region COMMANDS
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
 	TSet<FString> InventoryWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
 	TSet<FString> EquipmentWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
 	TSet<FString> ItemsWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
 	TSet<FString> ItemTooltipWidgetCommands;
 	
 #pragma endregion
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "4. Notifications")
 	TMap<int32, FInventoryNotificationData> InventoryUpdateData;
 
 #if WITH_EDITOR

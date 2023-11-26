@@ -1,6 +1,6 @@
 // Copyright Dominik Morse 2023. All Rights Reserved.
 
 
-#include "Interfaces/MounteaItemActionWBPInterface.h"
+#include "Interfaces/UI/MounteaItemActionWBPInterface.h"
 
 // Add default functionality here for any IMounteaItemActionWBPInterface functions that are not pure virtual.

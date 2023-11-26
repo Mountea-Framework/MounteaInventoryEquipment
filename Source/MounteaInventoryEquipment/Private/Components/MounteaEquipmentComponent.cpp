@@ -5,7 +5,7 @@
 
 #include "Engine/ActorChannel.h"
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
-#include "Interfaces/MounteaEquipmentWBPInterface.h"
+#include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "WBP/MounteaBaseUserWidget.h"
