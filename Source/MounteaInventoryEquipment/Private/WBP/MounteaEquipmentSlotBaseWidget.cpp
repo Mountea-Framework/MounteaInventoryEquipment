@@ -1,13 +1,13 @@
 // Copyright Dominik Morse 2023. All Rights Reserved.
 
 
-#include "WBP/MounteaBaseEquipmentSlotWidget.h"
+#include "WBP/MounteaEquipmentSlotBaseWidget.h"
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
-TArray<FString> UMounteaBaseEquipmentSlotWidget::GetSlotIDOptions()
+TArray<FString> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 {
 	TArray<FString> Results;
 

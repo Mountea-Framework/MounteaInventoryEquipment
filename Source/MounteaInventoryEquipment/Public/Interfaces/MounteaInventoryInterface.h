@@ -292,6 +292,22 @@ public:
 	bool DoesHaveAuthority() const;
 	virtual bool DoesHaveAuthority_Implementation() const = 0;
 
+	/**
+	 * Requests a network refresh to ensure that the inventory's state is consistent across the network.
+	 * This function is used to trigger a refresh or update of the inventory's replication state, ensuring
+	 * that all clients have the latest information about the inventory contents.
+	 *
+	 * The function checks the network role and if it's not in a state of authority (e.g., on a client),
+	 * it sends a request to the server to perform the actual refresh. If it is on the server, it directly
+	 * increments a key used for tracking replication changes, which in turn triggers a network update.
+	 *
+	 * This is particularly useful in scenarios where immediate synchronization of inventory changes is crucial,
+	 * such as after adding, removing, or modifying items in the inventory.
+	 *
+	 * Usage:
+	 * Call this function after performing an operation that modifies the inventory (like adding or removing items)
+	 * when you need to ensure that these changes are immediately reflected and synchronized across all connected clients.
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void RequestNetworkRefresh();
 	virtual void RequestNetworkRefresh_Implementation() = 0;
@@ -326,13 +342,25 @@ public:
 	 * @return Reference to the item updated event delegate.
 	 */
 	virtual FOnInventoryUpdated& GetItemUpdatedHandle() = 0;
-	
-/*===============================================================================
-		IN PROGRESS
-		
-		Following functions are already being updated.
-===============================================================================*/
-	
+
+	/**
+	 * Processes a specific action on an item within the inventory. This function manages how an item is manipulated or interacted with, 
+	 * based on the action provided. It ensures that the action is executed correctly and the item is updated as needed.
+	 *
+	 * @param Action The action to be performed on the item. This could be any action derived from UMounteaInventoryItemAction, 
+	 * such as using, equipping, or inspecting the item.
+	 * @param Item The inventory item on which the action is to be performed. This should be a valid instance of UMounteaInstancedItem.
+	 * @param Context Contextual information that may be needed to execute the action. This includes any dynamic parameters or conditions 
+	 * required by the action.
+	 *
+	 * @return FInventoryUpdateResult structure containing the outcome of the action. This includes status codes, messages, and any 
+	 * additional payload that might be relevant to the action's result.
+	 *
+	 * Example Usage:
+	 * Let's say you have an action to consume a health potion. You would call this function with the consume action, the specific potion 
+	 * item, and any necessary context for the action. The function then processes this action, updates the potion's quantity, and returns 
+	 * the result of this operation.
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	FInventoryUpdateResult ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context);
 	virtual FInventoryUpdateResult ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context) = 0;

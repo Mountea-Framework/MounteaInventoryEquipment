@@ -8,7 +8,7 @@
 #include "MounteaInventoryThemeConfig.generated.h"
 
 class UCategoryTheme;
-class UMounteaBaseEquipmentSlotWidget;
+class UMounteaEquipmentSlotBaseWidget;
 class UMounteaBaseUserWidget;
 
 /**
@@ -89,7 +89,7 @@ public:
 	TSubclassOf<UMounteaBaseUserWidget> InventoryItemActionClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface"))
-	TSubclassOf<UMounteaBaseEquipmentSlotWidget> EquipmentSlotClass;
+	TSubclassOf<UMounteaEquipmentSlotBaseWidget> EquipmentSlotClass;
 
 protected:
 

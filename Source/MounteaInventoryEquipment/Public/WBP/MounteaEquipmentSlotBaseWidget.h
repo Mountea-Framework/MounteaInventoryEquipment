@@ -3,15 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventorySlotBaseWidget.h"
 #include "Interfaces/UI/MounteaEquipmentSlotWBPInterface.h"
-#include "WBP/MounteaBaseUserWidget.h"
-#include "MounteaBaseEquipmentSlotWidget.generated.h"
+#include "MounteaEquipmentSlotBaseWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaBaseEquipmentSlotWidget : public UMounteaBaseUserWidget, public IMounteaEquipmentSlotWBPInterface
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentSlotBaseWidget : public UMounteaInventorySlotBaseWidget, public IMounteaEquipmentSlotWBPInterface
 {
 	GENERATED_BODY()
 

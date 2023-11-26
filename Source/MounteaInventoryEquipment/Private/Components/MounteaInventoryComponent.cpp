@@ -15,6 +15,7 @@
 
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+#include "Settings/Config/MounteaDefaultsConfig.h"
 #include "WBP/MounteaBaseUserWidget.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryComponent"
@@ -85,16 +86,20 @@ bool UMounteaInventoryComponent::ReplicateSubobjects(UActorChannel* Channel, FOu
 
 TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryUIClass_Implementation() const
 {
-	return InventoryWBPClass;
-
-	/* TODO: Implement class config (same as Theme Config, but to hold Classes)
+	if (InventoryWBPClass)
+	{
+		return InventoryWBPClass;
+	}
+	
 	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
 
 	if (!Settings) return nullptr;
 
-	return Settings->ClassConfig->DefaultInventoryWBPClass;
-	return InventoryWBPClass;
-	*/
+	const UMounteaDefaultsConfig* DefaultsConfig = Settings->DefaultsConfig.LoadSynchronous();
+
+	if (!DefaultsConfig) return nullptr;
+
+	return DefaultsConfig->DefaultInventoryClass.LoadSynchronous();
 }
 
 UMounteaBaseUserWidget* UMounteaInventoryComponent::GetInventoryUI_Implementation() const

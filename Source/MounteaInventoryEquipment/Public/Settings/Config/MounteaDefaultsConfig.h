@@ -6,6 +6,8 @@
 #include "Engine/DataAsset.h"
 #include "MounteaDefaultsConfig.generated.h"
 
+class UMounteaInventorySlotBaseWidget;
+class UMounteaEquipmentSlotBaseWidget;
 class UMounteaTransactionPayload;
 class UMounteaBaseUserWidget;
 
@@ -67,13 +69,13 @@ public:
 	* This class must implement the MounteaInventorySlotWBPInterface.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Inventory|Slot", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventorySlotWBPInterface"))
-	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryItemSlotClass;
+	TSoftClassPtr<UMounteaInventorySlotBaseWidget> DefaultInventoryItemSlotClass;
 
 	/**
 	 * Default class for the drag-and-drop payload.
 	 * This class is used to manage the data transferred during drag-and-drop operations.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Inventory|Notification", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryNotificationWBPInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Inventory|Item", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryNotificationWBPInterface"))
 	TSoftClassPtr<UMounteaTransactionPayload> DefaultDragDropPayloadClass;
 
 	/**
@@ -127,7 +129,7 @@ public:
 	* This class must implement the MounteaEquipmentSlotWBPInterface.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Equipment|Slot", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface"))
-	TSoftClassPtr<UMounteaBaseUserWidget> DefaultEquipmentSlotClass;
+	TSoftClassPtr<UMounteaEquipmentSlotBaseWidget> DefaultEquipmentSlotClass;
 
 	/**
 	 * Default class for the individual equipment item widget.

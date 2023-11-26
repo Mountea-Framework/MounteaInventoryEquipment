@@ -21,6 +21,10 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBFL : public UBlueprint
 
 public:
 
+/*===============================================================================
+		INVENTORY ACTIONS
+===============================================================================*/
+
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	static FInventoryUpdateResult ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInstancedItem* Item, FMounteaDynamicDelegateContext Context)
 	{
@@ -56,6 +60,10 @@ public:
 		
 		return Action->ProcessAction(Item);
 	}
+
+/*===============================================================================
+		SLOTS MANAGEMENT
+===============================================================================*/
 	
 	// Function to determine the max stack size of the item
 	UFUNCTION(BlueprintCallable, Category="Inventory")
@@ -211,6 +219,10 @@ public:
 		}
 	}
 
+/*===============================================================================
+		VALIDATIONS
+===============================================================================*/
+	
 	UFUNCTION(BlueprintCallable, Category="Inventory")
 	static bool IsSlotValid(const FItemSlot& Slot)
 	{
