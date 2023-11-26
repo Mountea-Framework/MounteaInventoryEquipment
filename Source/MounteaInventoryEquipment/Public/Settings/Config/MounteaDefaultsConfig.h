@@ -28,4 +28,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Inventory|Slot", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventorySlotWBPInterface"))
 	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryItemSlotClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Inventory|Category", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaCategoryContainerWBPInterface"))
+	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryCategoryContainerClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Inventory|Category", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaCategoryWBPInterface"))
+	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryCategoryClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Base Class|Inventory|Action", meta=(ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaCategoryWBPInterface"))
+	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryItemActionClass;
 };
