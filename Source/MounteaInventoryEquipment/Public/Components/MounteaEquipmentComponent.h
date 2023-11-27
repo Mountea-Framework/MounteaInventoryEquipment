@@ -52,7 +52,13 @@ public:
 	virtual TArray<FEquipmentSlot> GetAllSlots_Implementation() const override;
 	virtual bool DoesHaveAuthority_Implementation() const override;
 
-public:
+	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const override;
+	virtual bool IsItemEquipped_Implementation(const UMounteaInstancedItem* Item, const FText& SlotID) const override;
+	
+	virtual bool SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI) override;
+
+	virtual void SetEquipmentUIClass_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentWBPInterface")) TSubclassOf<UMounteaBaseUserWidget> NewWBPClass) override;
+	virtual TSubclassOf<UMounteaBaseUserWidget> GetEquipmentUIClass_Implementation() const override;
 
 	/**
 	 * Checks if the owning actor has a network role of either Authority or Autonomous Proxy.
@@ -62,21 +68,20 @@ public:
 	 * @return True if the owning actor is either Authority or Autonomous Proxy, false otherwise.
 	 */
 	bool IsAuthorityOrAutonomousProxy() const;
-
-	/*===============================================================================
-		IN PROGRESS
-		
-		Following functions are using being changed.
-===============================================================================*/
-
-	virtual FInventoryUpdateResult EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID) override;
 	
-	UFUNCTION(Server, Reliable, WithValidation)
-	void EquipItem_Server(UMounteaInstancedItem* ItemToEquip, const FText& SlotID);
+	virtual FInventoryUpdateResult EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID) override;
+	virtual FInventoryUpdateResult UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FText& SlotID) override;
 	
 	virtual bool CanEquipItem_Implementation(const UMounteaInstancedItem* ItemToEquip) const override;
 	virtual bool CanUnEquipItem_Implementation(const UMounteaInstancedItem* ItemToUnequip) const override;
 
+protected:
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void EquipItem_Server(UMounteaInstancedItem* ItemToEquip, const FText& SlotID);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void UnEquipItem_Server(UMounteaInstancedItem* Item, const FText& SlotID);
+	
 	UFUNCTION(Server, Unreliable)
 	void PostEquipmentUpdated(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(Server, Unreliable)
@@ -104,7 +109,6 @@ public:
 	void PostItemEquipped_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
 	void PostItemUnequipped_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
-
 	
 	UFUNCTION()
 	void PostEquipmentUpdated_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
@@ -112,31 +116,37 @@ public:
 	void PostItemEquipped_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION()
 	void PostItemUnequipped_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+
+public:
 	
+	virtual FOnEquipmentUpdated& GetEquipmentUpdatedHandle() override { return OnEquipmentUpdated; };
+	virtual FOnEquipmentUpdated& GetSlotEquippedHandle() override { return OnSlotEquipped; };
+	virtual FOnEquipmentUpdated& GetSlotUnEquippedHandle() override { return OnSlotUnequipped; }
+
+/*===============================================================================
+		IN PROGRESS
+		
+		Following functions are using being changed.
+===============================================================================*/
+
+		
 /*===============================================================================
 		SUBJECT OF CHANGE
 		
 		Following functions are using outdated, wrong class definitions and functions.
 ===============================================================================*/
-	
-	virtual bool IsItemEquipped_Implementation(const UMounteaInstancedItem* Item, const FText& SlotID) const override;
-	
-	virtual FInventoryUpdateResult UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FText& SlotID) override;
-	
-	UFUNCTION(Server, Reliable, WithValidation)
-	void UnEquipItem_Server(UMounteaInstancedItem* Item, const FText& SlotID);
-	
-	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const override;
-	virtual bool SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI) override;
-
-	virtual FOnEquipmentUpdated& GetEquipmentUpdatedHandle() override { return OnEquipmentUpdated; };
-	virtual FOnEquipmentUpdated& GetSlotEquippedHandle() override { return OnSlotEquipped; };
-	virtual FOnEquipmentUpdated& GetSlotUnEquippedHandle() override { return OnSlotUnequipped; }
-	
+		
 protected:
 	
 	UFUNCTION()
 	void OnRep_Equipment();
+
+#if WITH_EDITOR
+protected:
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
 	
 #pragma endregion
 	
@@ -144,9 +154,12 @@ protected:
 	
 protected:
 	
+	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentWBPInterface"))
+	TSubclassOf<UMounteaBaseUserWidget> EquipmentUIClass;
+	
 	UPROPERTY(SaveGame, Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipment)
 	TArray<FEquipmentSlot> EquipmentSlots;
-
+	
 private:
 
 	// Filled from RemoveFromItem to keep track of Items that were removed
@@ -189,12 +202,5 @@ private:
 	FOnEquipmentUpdated OnSlotUnequipped_Multicast;
 	
 #pragma endregion 
-
-#if WITH_EDITOR
-protected:
-
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	
-#endif
 	
 };

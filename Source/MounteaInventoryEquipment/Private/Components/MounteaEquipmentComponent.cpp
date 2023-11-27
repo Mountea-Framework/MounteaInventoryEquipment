@@ -10,6 +10,7 @@
 #include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+#include "Settings/Config/MounteaDefaultsConfig.h"
 #include "WBP/MounteaBaseUserWidget.h"
 
 #define LOCTEXT_NAMESPACE "MounteaEquipmentComponent"
@@ -462,12 +463,6 @@ void UMounteaEquipmentComponent::PostItemUnequipped_Multicast_RequestUpdate(cons
 	OnSlotUnequipped_Multicast.Broadcast(UpdateContext);
 }
 
-/*===============================================================================
-		IN PROGRESS
-		
-		Following functions are using being changed.
-===============================================================================*/
-
 bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInstancedItem* Item, const FText& SlotID) const
 {
 	return EquipmentSlots.Contains(FMounteaEquipmentSlotCompare(Item, SlotID));
@@ -493,6 +488,37 @@ bool UMounteaEquipmentComponent::SetEquipmentUI_Implementation(UMounteaBaseUserW
 
 	return false;
 }
+
+void UMounteaEquipmentComponent::SetEquipmentUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewWBPClass)
+{
+	if (NewWBPClass == nullptr) return;
+
+	if (NewWBPClass->ImplementsInterface(UMounteaEquipmentWBPInterface::StaticClass()))
+	{
+		EquipmentUIClass = NewWBPClass;
+	}
+}
+
+TSubclassOf<UMounteaBaseUserWidget> UMounteaEquipmentComponent::GetEquipmentUIClass_Implementation() const
+{
+	if (EquipmentUIClass != nullptr ) { return EquipmentUIClass; };
+
+	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
+
+	if (!Settings) return nullptr;
+
+	const UMounteaDefaultsConfig* DefaultsConfig = Settings->DefaultsConfig.LoadSynchronous();
+
+	if (!DefaultsConfig) return nullptr;
+
+	return DefaultsConfig->DefaultEquipmentClass.LoadSynchronous();
+}
+
+/*===============================================================================
+		IN PROGRESS
+		
+		Following functions are using being changed.
+===============================================================================*/
 
 /*===============================================================================
 		SUBJECT OF CHANGE

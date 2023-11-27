@@ -19,6 +19,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
 	FORCEINLINE FText GetSlotID() const { return SlotID; };
+
+	UFUNCTION()
+	void UpdateSlotID(const FText& NewSlotID);
 	
 protected:
 
