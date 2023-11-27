@@ -72,6 +72,10 @@ public:
 	virtual bool CanEquipItem_Implementation(const UMounteaInstancedItem* ItemToEquip) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
+	bool CanUnEquipItem(const UMounteaInstancedItem* ItemToUnequip) const;
+	virtual bool CanUnEquipItem_Implementation(const UMounteaInstancedItem* ItemToUnequip) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	UMounteaBaseUserWidget* GetEquipmentUI() const;
 	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const = 0;
 

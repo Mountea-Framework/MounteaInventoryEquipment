@@ -3,7 +3,6 @@
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 
-#include "Definitions/MounteaEquipmentSlot.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"

@@ -141,11 +141,22 @@ bool UMounteaEquipmentComponent::CanEquipItem_Implementation(const UMounteaInsta
 	return !Execute_IsItemEquipped(this, ItemToEquip, SlotID);
 }
 
-/*===============================================================================
-		IN PROGRESS
-		
-		Following functions are using being changed.
-===============================================================================*/
+bool UMounteaEquipmentComponent::CanUnEquipItem_Implementation(const UMounteaInstancedItem* ItemToUnequip) const
+{
+	if (!ItemToUnequip) return false;
+
+	const FText SlotID = Execute_FindSlotForItem(this, ItemToUnequip);
+
+	if (SlotID.IsEmpty()) return false;
+
+	const int32 SlotIndex = Execute_FindSlotByID(ItemToUnequip, SlotID);
+	if (SlotIndex == INDEX_NONE) return  false;
+
+	const FEquipmentSlot* FoundSlot = EquipmentSlots.FindByKey(SlotID);
+	if (FoundSlot == nullptr) return false;
+
+	return Execute_IsItemEquipped(this, ItemToUnequip, SlotID);
+}
 
 FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID)
 {
@@ -194,13 +205,6 @@ FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMou
 		
 		FoundSlot->UpdateSlot(ItemToEquip);
 		
-		/* TODO: Move this to client request!
-		if (const auto TempEquipmentUI = Execute_GetEquipmentUI(this))
-		{
-			TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget, ItemToEquip);
-			TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget, ItemToEquip);
-		}*/
-
 		ModifiedSlots.Add(*FoundSlot);
 
 		Result.OptionalPayload = ItemToEquip;
@@ -336,35 +340,58 @@ void UMounteaEquipmentComponent::PostItemUnequipped_Multicast_Implementation(con
 
 FInventoryUpdateResult UMounteaEquipmentComponent::UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FText& SlotID)
 {
-	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaEquipmentComponent_UnEquipItem );
-	
-	// Create an empty result struct.
-	FInventoryUpdateResult Result;
-	
-	// Validate the request
-	if (!Item)
-	{
-		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest; // Bad Request
-		Result.ResultText = LOCTEXT("EquipmentUpdateResult_InvalidRequest", "Invalid item.");
-		
-		return Result;
-	}
+	QUICK_SCOPE_CYCLE_COUNTER(STAT_UMounteaEquipmentComponent_UnEquipItem);
+    
+    FInventoryUpdateResult Result;
+    
+    // Validate the request
+    if (!Item)
+    {
+        Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;
+        Result.ResultText = LOCTEXT("EquipmentUpdateResult_InvalidRequest", "Invalid item.");
+        return Result;
+    }
 
-	// Check if there is Authority
-	if (!Execute_DoesHaveAuthority(this))
-	{
-		EquipItem_Server(Item, SlotID);
-		
-		Result.OptionalPayload = Item;
-		Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing; // Corresponds to "Processing"
-		Result.ResultText = LOCTEXT("EquipmentUpdateResult_Processing", "Server is processing request.");
-		
-		return Result;
-	}
+    // Check if there is Authority
+    if (!Execute_DoesHaveAuthority(this))
+    {
+        UnEquipItem_Server(Item, SlotID);
+        Result.OptionalPayload = Item;
+        Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Processing;
+        Result.ResultText = LOCTEXT("EquipmentUpdateResult_Processing", "Server is processing request.");
+        return Result;
+    }
 
-	// TODO
+    // Find the slot by SlotID
+    FEquipmentSlot* FoundSlot = EquipmentSlots.FindByKey(SlotID);
+    if (FoundSlot && FoundSlot->Item == Item)
+    {
+        // Remove the item from the slot
+        FoundSlot->UpdateSlot(nullptr);
+    	
+        ModifiedSlots.Add(*FoundSlot);
 
-	return Result;
+        // Broadcast that the item was unequipped
+        Result.OptionalPayload = Item;
+        Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK;
+        Result.ResultText = LOCTEXT("EquipmentUpdateResult_ItemUnequipped", "Item unequipped.");
+
+        OnSlotUnequipped.Broadcast(Result);
+
+    	// Multicast to Other clients, too, so there can be played animation etc.
+        OnEquipmentUpdated_Multicast.Broadcast(Result);
+    }
+    else
+    {
+        Result.OptionalPayload = Item;
+        Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_Forbidden;
+        Result.ResultText = LOCTEXT("EquipmentUpdateResult_InvalidRequest", "Cannot unequip item. Item not found in the specified slot.");
+    }
+
+    Result.OptionalPayload = this;
+    OnEquipmentUpdated.Broadcast(Result);
+
+    return Result;
 }
 
 void UMounteaEquipmentComponent::UnEquipItem_Server_Implementation(UMounteaInstancedItem* Item, const FText& SlotID)
@@ -375,12 +402,71 @@ void UMounteaEquipmentComponent::UnEquipItem_Server_Implementation(UMounteaInsta
 bool UMounteaEquipmentComponent::UnEquipItem_Server_Validate(UMounteaInstancedItem* ItemToEquip, const FText& SlotID)
 { return true;}
 
-/*===============================================================================
-		SUBJECT OF CHANGE
-		
-		Following functions are using outdated, wrong class definitions and functions.
-===============================================================================*/
+void UMounteaEquipmentComponent::PostEquipmentUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestEquipmentSyncTimerHandle);
+	
+	if (const auto TempEquipmentUI = Execute_GetEquipmentUI(this))
+	{
+		TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::RefreshEquipmentWidget);
+	}
 
+	OnEquipmentUpdated_Client.Broadcast(UpdateContext);
+}
+
+void UMounteaEquipmentComponent::PostItemEquipped_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestEquipmentSyncTimerHandle);
+	
+	if (const auto TempEquipmentUI = Execute_GetEquipmentUI(this))
+	{
+		TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::EquipItemWidget, UpdateContext.OptionalPayload);
+	}
+	
+	OnSlotEquipped_Client.Broadcast(UpdateContext);
+}
+
+void UMounteaEquipmentComponent::PostItemUnequipped_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	if (!GetOwner()) return;
+	if (!GetWorld()) return;
+	
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_RequestEquipmentSyncTimerHandle);
+	
+	if (const auto TempEquipmentUI = Execute_GetEquipmentUI(this))
+	{
+		TempEquipmentUI->ProcessMounteaWidgetCommand(MounteaInventoryEquipmentConsts::MounteaEquipmentWidgetCommands::EquipmentCommands::UnequipItemWidget, UpdateContext.OptionalPayload);
+	}
+	
+	OnSlotUnequipped_Client.Broadcast(UpdateContext);
+}
+
+void UMounteaEquipmentComponent::PostEquipmentUpdated_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	OnEquipmentUpdated_Multicast.Broadcast(UpdateContext);
+}
+
+void UMounteaEquipmentComponent::PostItemEquipped_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	OnSlotEquipped_Multicast.Broadcast(UpdateContext);
+}
+
+void UMounteaEquipmentComponent::PostItemUnequipped_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
+{
+	OnSlotUnequipped_Multicast.Broadcast(UpdateContext);
+}
+
+/*===============================================================================
+		IN PROGRESS
+		
+		Following functions are using being changed.
+===============================================================================*/
 
 bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInstancedItem* Item, const FText& SlotID) const
 {
@@ -407,6 +493,12 @@ bool UMounteaEquipmentComponent::SetEquipmentUI_Implementation(UMounteaBaseUserW
 
 	return false;
 }
+
+/*===============================================================================
+		SUBJECT OF CHANGE
+		
+		Following functions are using outdated, wrong class definitions and functions.
+===============================================================================*/
 
 void UMounteaEquipmentComponent::OnRep_Equipment()
 {

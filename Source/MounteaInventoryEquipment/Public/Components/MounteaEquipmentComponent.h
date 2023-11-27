@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Definitions/MounteaEquipmentSlot.h"
 #include "Helpers/MounteaEquipmentHelpers.h"
 #include "Interfaces/MounteaEquipmentInterface.h"
 #include "MounteaEquipmentComponent.generated.h"
@@ -76,6 +75,7 @@ public:
 	void EquipItem_Server(UMounteaInstancedItem* ItemToEquip, const FText& SlotID);
 	
 	virtual bool CanEquipItem_Implementation(const UMounteaInstancedItem* ItemToEquip) const override;
+	virtual bool CanUnEquipItem_Implementation(const UMounteaInstancedItem* ItemToUnequip) const override;
 
 	UFUNCTION(Server, Unreliable)
 	void PostEquipmentUpdated(const FInventoryUpdateResult& UpdateContext);
@@ -97,6 +97,21 @@ public:
 	void PostItemEquipped_Multicast(const FInventoryUpdateResult& UpdateContext);
 	UFUNCTION(NetMulticast, Unreliable)
 	void PostItemUnequipped_Multicast(const FInventoryUpdateResult& UpdateContext);
+
+	UFUNCTION()
+	void PostEquipmentUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION()
+	void PostItemEquipped_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION()
+	void PostItemUnequipped_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+
+	
+	UFUNCTION()
+	void PostEquipmentUpdated_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION()
+	void PostItemEquipped_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
+	UFUNCTION()
+	void PostItemUnequipped_Multicast_RequestUpdate(const FInventoryUpdateResult& UpdateContext);
 	
 /*===============================================================================
 		SUBJECT OF CHANGE

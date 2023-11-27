@@ -7,9 +7,9 @@
 #include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
-TArray<FString> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
+TArray<FText> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 {
-	TArray<FString> Results;
+	TArray<FText> Results;
 
 	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 	{
@@ -18,7 +18,7 @@ TArray<FString> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 			const auto IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
 			for (const auto& Itr : IDs)
 			{
-				Results.Add(Itr.SlotName.ToString());
+				Results.Add(Itr.SlotName);
 			}
 		}
 	}

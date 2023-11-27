@@ -23,4 +23,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
+
+#if WITH_EDITOR
+
+	virtual void PreEditChange(FEditPropertyChain& PropertyAboutToChange) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
+	
 };
