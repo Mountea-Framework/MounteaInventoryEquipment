@@ -39,7 +39,7 @@ public:
 	
 protected:
 
-	UPROPERTY(Category="1. Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
+	UPROPERTY(Category="2. Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
 	FString SlotID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="0. Debug", meta=(ExposeOnSpawn))
