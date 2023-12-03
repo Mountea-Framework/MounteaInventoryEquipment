@@ -49,21 +49,16 @@ void UMounteaEquipmentConfigData::PostEditChangeProperty(FPropertyChangedEvent& 
 					Slot->Reset();
 					
 					EquipmentSlotIDs.Remove(*Slot);
-
-					if (OnPropertyModified.IsBound())
-					{
-						OnPropertyModified.Broadcast(); //(PropertyChangedEvent.MemberProperty);
-					}
+					
+					OnTagModified.ExecuteIfBound(Itr.SlotTag);
 				}				
 			}
 			
 			EquipmentSlotIDs.Add(FMounteaEquipmentSlotIdentity());
-			
-			if (OnConfigModified.IsBound())
-			{
-				OnConfigModified.Broadcast();
 
-				EquipmentSlotIDs = NewSlots;
+			if (PropertyName == GET_MEMBER_NAME_CHECKED(FMounteaEquipmentSlotIdentity, SlotTag))
+			{
+				OnPropertyModified.ExecuteIfBound(PropertyChangedEvent.Property);
 			}
 		}
 	}

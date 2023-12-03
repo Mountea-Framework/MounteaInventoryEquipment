@@ -29,12 +29,14 @@ public:
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
 	bool ValidateConfig(TArray<FText>& Notifications, TSet<FMounteaEquipmentSlotIdentity>& DirtySlots);
 
-	DECLARE_EVENT(UMounteaEquipmentConfigData, FConfigModified);
+	DECLARE_DELEGATE(FConfigModified);
 	FConfigModified OnConfigModified;
 
-	//DECLARE_EVENT_OneParam(UMounteaEquipmentConfigData, FPropertyModified, FProperty*);
-	DECLARE_EVENT(UMounteaEquipmentConfigData, FPropertyModified);
+	DECLARE_DELEGATE_OneParam(FPropertyModified, FProperty*);
 	FPropertyModified OnPropertyModified;
+
+	DECLARE_DELEGATE_OneParam(FTagPropertyModified, FGameplayTag&);
+	FTagPropertyModified OnTagModified;
 	
 #endif
 	

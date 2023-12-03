@@ -21,6 +21,8 @@
 
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaItemAction.h"
+#include "DetailsPanel/MounteaEquipmentConfig_Details.h"
+#include "DetailsPanel/MounteaEquipmentConfig_DetailsPanel.h"
 
 #include "DetailsPanel/MounteaInventoryItemBase_Details.h"
 #include "DetailsPanel/MounteaItemAction_Details.h"
@@ -42,6 +44,7 @@
 #include "Popups/MIEPopupStyle.h"
 
 #include "Serialization/JsonReader.h"
+#include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "Settings/MounteaInventoryEquipmentSettingsEditor.h"
 #include "Setup/MounteaInventoryItemConfig.h"
@@ -147,31 +150,36 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaInventoryItem_Details::MakeInstance),
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemConfig_Details::MakeInstance),
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemAction_Details::MakeInstance),
-				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaSettings_Details::MakeInstance)
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaSettings_Details::MakeInstance),
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaEquipmentConfig_Details::MakeInstance)
 			};
 			RegisteredCustomClassLayouts =
 			{
 				UMounteaInventoryItemBase::StaticClass()->GetFName(),
 				UMounteaInventoryItemConfig::StaticClass()->GetFName(),
 				UMounteaInventoryItemAction::StaticClass()->GetFName(),
-				UMounteaInventoryEquipmentSettings::StaticClass()->GetFName()
+				UMounteaInventoryEquipmentSettings::StaticClass()->GetFName(),
+				UMounteaEquipmentConfigData::StaticClass()->GetFName()
 			};
 			for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)
 			{
 				PropertyModule.RegisterCustomClassLayout(RegisteredCustomClassLayouts[i], CustomClassLayouts[i]);
 			}
 		}
-
+	
+		
 		{
 			TArray<FOnGetPropertyTypeCustomizationInstance> CustomPropertyTypeLayouts =
 		   {
 				FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaItemConfig_DetailsPanel::MakeInstance),
 				FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaItemAction_DetailsPanel::MakeInstance),
+				//FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaEquipmentSlotIdentity_DetailsPanel::MakeInstance)
 			};
 			RegisteredCustomPropertyTypeLayout =
 			{
 				FMounteaItemConfig::StaticStruct()->GetFName(),
 				FMounteaItemAction::StaticStruct()->GetFName(),
+				//FMounteaEquipmentSlotIdentity::StaticStruct()->GetFName()
 			};
 			for (int32 i = 0; i < RegisteredCustomPropertyTypeLayout.Num(); i++)
 			{
