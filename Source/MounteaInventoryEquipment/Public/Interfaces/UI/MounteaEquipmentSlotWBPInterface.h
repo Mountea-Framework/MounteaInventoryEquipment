@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaEquipmentSlotWBPInterface.generated.h"
 
+class IMounteaEquipmentWBPInterface;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaEquipmentSlotWBPInterface : public UInterface
@@ -19,6 +20,16 @@ class UMounteaEquipmentSlotWBPInterface : public UInterface
 class MOUNTEAINVENTORYEQUIPMENT_API IMounteaEquipmentSlotWBPInterface
 {
 	GENERATED_BODY()
+
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
+	TScriptInterface<IMounteaEquipmentWBPInterface> GetOwningEquipment() const;
+	virtual TScriptInterface<IMounteaEquipmentWBPInterface> GetOwningEquipment_Implementation() const = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
+	void SetOwningEquipment(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment);
+	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment) = 0;
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:

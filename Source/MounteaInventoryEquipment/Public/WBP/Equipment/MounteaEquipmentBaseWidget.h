@@ -15,6 +15,10 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentBaseWidget : public UMounte
 {
 	GENERATED_BODY()
 
+protected:
+
+	virtual void NativeConstruct() override;
+
 public:
 
 	virtual TScriptInterface<IMounteaEquipmentInterface> GetOwningEquipment_Implementation() const override;

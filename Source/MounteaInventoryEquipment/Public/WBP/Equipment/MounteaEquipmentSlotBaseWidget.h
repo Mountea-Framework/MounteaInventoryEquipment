@@ -11,6 +11,7 @@
 
 #include "MounteaEquipmentSlotBaseWidget.generated.h"
 
+class IMounteaEquipmentWBPInterface;
 /**
  * 
  */
@@ -19,6 +20,15 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentSlotBaseWidget : public UMo
 {
 	GENERATED_BODY()
 
+protected:
+
+	virtual void NativeConstruct() override;
+
+public:
+
+	virtual TScriptInterface<IMounteaEquipmentWBPInterface> GetOwningEquipment_Implementation() const override;
+	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment) override;
+	
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
@@ -31,6 +41,9 @@ protected:
 
 	UPROPERTY(Category="1. Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
 	FString SlotID;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="0. Debug", meta=(ExposeOnSpawn))
+	TScriptInterface<IMounteaEquipmentWBPInterface> OwningEquipmentWidget;
 
 private:
 

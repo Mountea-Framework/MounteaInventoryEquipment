@@ -5,6 +5,11 @@
 
 #include "Interfaces/UI/MounteaEquipmentSlotWBPInterface.h"
 
+void UMounteaEquipmentBaseWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
+
 TScriptInterface<IMounteaEquipmentInterface> UMounteaEquipmentBaseWidget::GetOwningEquipment_Implementation() const
 {
 	return OwningEquipment;
@@ -36,6 +41,12 @@ void UMounteaEquipmentBaseWidget::AddEquipmentSlotsWidget_Implementation(UUserWi
 	if (EquipmentSlotWidgets.Contains(NewSlot)) return;
 
 	EquipmentSlotWidgets.AddUnique(NewSlot);
+
+	const TScriptInterface<IMounteaEquipmentSlotWBPInterface> ChildEquipmentSlot = NewSlot;
+	if (ChildEquipmentSlot.GetObject())
+	{
+		ChildEquipmentSlot->Execute_SetOwningEquipment(NewSlot, this);
+	}
 }
 
 void UMounteaEquipmentBaseWidget::SetEquipmentSlotsWidgets_Implementation(const TArray<UUserWidget*>& NewSlots)

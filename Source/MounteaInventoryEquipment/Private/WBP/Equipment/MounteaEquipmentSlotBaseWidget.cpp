@@ -3,9 +3,28 @@
 
 #include "WBP/Equipment/MounteaEquipmentSlotBaseWidget.h"
 
+#include "Components/PanelWidget.h"
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+
+void UMounteaEquipmentSlotBaseWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
+
+TScriptInterface<IMounteaEquipmentWBPInterface> UMounteaEquipmentSlotBaseWidget::GetOwningEquipment_Implementation() const
+{
+	return OwningEquipmentWidget;
+}
+
+void UMounteaEquipmentSlotBaseWidget::SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment)
+{
+	if (OwningEquipmentWidget == NewOwningEquipment) return;
+
+	OwningEquipmentWidget = NewOwningEquipment;
+}
 
 void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedSlot)
 {

@@ -51,10 +51,10 @@ void UMounteaEquipmentConfigData::PostEditChangeProperty(FPropertyChangedEvent& 
 					EquipmentSlotIDs.Remove(*Slot);
 					
 					OnTagModified.ExecuteIfBound(BrokenIdentity.SlotTag);
+
+					EquipmentSlotIDs.Add(FMounteaEquipmentSlotIdentity());
 				}				
 			}
-			
-			EquipmentSlotIDs.Add(FMounteaEquipmentSlotIdentity());
 		}
 	}
 
