@@ -63,7 +63,7 @@ bool UMounteaInstancedItem::InitializeNewItem_Implementation(const FItemInitPara
 	}
 	else if (InitParams.SourceTable && InitParams.SourceRow.IsValid())
 	{
-		const FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(InitParams.SourceRow, InitParams.SourceTable);
+		const FMounteaInventoryItemData* Row = GetRow<FMounteaInventoryItemData>(InitParams.SourceRow, InitParams.SourceTable.Get());
 		
 		if (Row == nullptr)
 		{

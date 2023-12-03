@@ -5,6 +5,8 @@
 #include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 
+#define LOCTEXT_NAMESPACE "MounteaEquipmentSlotIdentity"
+
 FEquipmentSlot::FEquipmentSlot(UMounteaInstancedItem* NewItem)
 {
 	Item = NewItem;
@@ -14,7 +16,7 @@ FEquipmentSlot::FEquipmentSlot(UMounteaInstancedItem* NewItem)
 				
 		if (Item->GetItemData().RequiredData.ItemCategory)
 		{
-			SlotName = Item->GetItemData().RequiredData.ItemCategory->CategoryName;
+			SlotIdentity.SlotName = Item->GetItemData().RequiredData.ItemCategory->CategoryName;
 		}
 	}
 }
@@ -22,56 +24,97 @@ FEquipmentSlot::FEquipmentSlot(UMounteaInstancedItem* NewItem)
 void FEquipmentSlot::UpdateSlot(UMounteaInstancedItem* NewItem)
 {
 	Item = NewItem;
+
+	SlotGuid = Item != nullptr ? Item->GetGuid() : FGuid();
 }
 
 bool FEquipmentSlot::operator==(const FEquipmentSlot& Other) const
 {
-	return Other.SlotGuid != this->SlotGuid;
+	return Other.SlotGuid == SlotGuid;
 }
 
 bool FEquipmentSlot::operator==(const FEquipmentSlot* Other) const
 {
 	if (Other == nullptr) return false;
-	return Other->SlotGuid != this->SlotGuid;
+	return Other->SlotGuid == SlotGuid;
 }
 
 bool FEquipmentSlot::operator==(const FGuid& Other) const
 {
-	return Other == this->SlotGuid;
+	return Other == SlotGuid;
 }
 
 bool FEquipmentSlot::operator==(const FText& Other) const
 {
-	return Other.EqualTo(this->SlotName);
+	return Other.EqualTo(SlotIdentity.SlotName);
 }
 
 bool FEquipmentSlot::operator==(const UMounteaInstancedItem* Other) const
 {
 	if (Other == nullptr) return false;
-	return Other == this->Item;
+	return Other == Item;
 }
 
 bool FEquipmentSlot::operator==(const FMounteaEquipmentSlotCompare& Other) const
 {
-	if (Other.SlotItem && Other.SlotID.IsEmpty() == false)
+	const bool bItemSame = Other.SlotItem == Item;
+	const bool bNameSame = Other.SlotID.EqualTo(SlotIdentity.SlotName);
+	const bool bTagSame = Other.SlotTag == SlotIdentity.SlotTag;
+
+	bool bEqual = true;
+
+	if (Other.SlotItem)
 	{
-		return Other.SlotItem == this->Item && Other.SlotID.EqualTo(this->SlotName);
+		if (bItemSame == false) bEqual = false;
 	}
-	
-	if (Other.SlotItem && Other.SlotID.IsEmpty())
+
+	if (Other.SlotTag.IsValid())
 	{
-		return Other.SlotItem == this->Item;
+		if (bTagSame == false) bEqual = false;
 	}
-	
-	if (Other.SlotItem == nullptr && Other.SlotID.IsEmpty() == false)
+
+	if (Other.SlotID.IsEmpty() == false)
 	{
-		return Other.SlotID.EqualTo(this->SlotName);
+		if (bNameSame == false) bEqual = false;
 	}
-	
-	return false;
+
+	return bEqual;
 }
 
 bool FMounteaEquipmentSlotIdentity::operator==(const FText& Other) const
 {
-	return Other.EqualTo(this->SlotName);
+	if (SlotName.IsEmpty() && Other.IsEmpty()) return true;
+	return Other.ToString() == SlotName.ToString();
 }
+
+bool FMounteaEquipmentSlotIdentity::operator==(const FGameplayTag& Other) const
+{
+	if (SlotTag.IsValid() == false && Other.IsValid() == false) return true;
+	return SlotTag == Other;
+}
+
+bool FMounteaEquipmentSlotIdentity::operator==(const FMounteaEquipmentSlotIdentity& Other) const
+{
+	// Check if both names are empty, then compare only tags
+	if (this->SlotName.IsEmpty() && Other.SlotName.IsEmpty())
+	{
+		return this->SlotTag == Other.SlotTag;
+	}
+
+	// Check if names are the same (regardless of tags)
+	if (this->SlotName.EqualTo(Other.SlotName))
+	{
+		return true;
+	}
+
+	// Check if tags are the same (regardless of names)
+	if (this->SlotTag == Other.SlotTag)
+	{
+		return true;
+	}
+
+	// If none of the above conditions are met, the slots are not considered equal
+	return false;
+}
+
+#undef LOCTEXT_NAMESPACE

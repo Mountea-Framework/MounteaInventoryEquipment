@@ -8,6 +8,7 @@
 #include "Helpers/MounteaEquipmentHelpers.h"
 #include "MounteaEquipmentConfigData.generated.h"
 
+
 /**
  * 
  */
@@ -18,16 +19,22 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentConfigData : public UDataAs
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TArray<FMounteaEquipmentSlotIdentity> EquipmentSlotIDs;
-
-	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
+	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, NoElementDuplicate))
+	TSet<FMounteaEquipmentSlotIdentity> EquipmentSlotIDs;
 
 #if WITH_EDITOR
 
 	virtual void PreEditChange(FEditPropertyChain& PropertyAboutToChange) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
+	bool ValidateConfig(TArray<FText>& Notifications, TSet<FMounteaEquipmentSlotIdentity>& DirtySlots);
+
+	DECLARE_EVENT(UMounteaEquipmentConfigData, FConfigModified);
+	FConfigModified OnConfigModified;
+
+	//DECLARE_EVENT_OneParam(UMounteaEquipmentConfigData, FPropertyModified, FProperty*);
+	DECLARE_EVENT(UMounteaEquipmentConfigData, FPropertyModified);
+	FPropertyModified OnPropertyModified;
 	
 #endif
 	

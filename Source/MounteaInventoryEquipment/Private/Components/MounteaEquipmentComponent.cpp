@@ -78,26 +78,26 @@ AActor* UMounteaEquipmentComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
-FText UMounteaEquipmentComponent::FindSlotForItem_Implementation(const UMounteaInstancedItem* Item) const
+FGameplayTag UMounteaEquipmentComponent::FindSlotForItem_Implementation(const UMounteaInstancedItem* Item) const
 {
-	FText SlotID;
+	FGameplayTag SlotID;
 	
 	if (!Item) return SlotID;
 
 	if (const FEquipmentSlot* ValidSlot = EquipmentSlots.FindByPredicate(
 			[Item](const FEquipmentSlot& Slot)
 			{
-				return Item != nullptr && Slot.SlotTags.HasAny(Item->GetItemFlags());
+				return Item != nullptr && Slot.SlotIdentity.SlotCompatibleTags.HasAny(Item->GetItemFlags());
 			}))
 	{
-		SlotID = ValidSlot->SlotName;
+		SlotID = ValidSlot->SlotIdentity.SlotTag;
 		return SlotID;
 	}
 
 	return SlotID;
 }
 
-int32 UMounteaEquipmentComponent::FindSlotByID_Implementation(const FText& SlotID) const
+int32 UMounteaEquipmentComponent::FindSlotByID_Implementation(const FGameplayTag& SlotID) const
 {
 	return UMounteaEquipmentBFL::FindEquipmentSlotID(EquipmentSlots, SlotID);
 }
@@ -125,13 +125,13 @@ bool UMounteaEquipmentComponent::IsAuthorityOrAutonomousProxy() const
 	return false;
 }
 
-bool UMounteaEquipmentComponent::CanEquipItem_Implementation(const UMounteaInstancedItem* ItemToEquip) const
+bool UMounteaEquipmentComponent::CanEquipItem_Implementation(UMounteaInstancedItem* ItemToEquip) const
 {
 	if (!ItemToEquip) return false;
 
-	const FText SlotID = Execute_FindSlotForItem(this, ItemToEquip);
+	const FGameplayTag SlotID = Execute_FindSlotForItem(this, ItemToEquip);
 
-	if (SlotID.IsEmpty()) return false;
+	if (SlotID.IsValid() == false) return false;
 
 	const int32 SlotIndex = Execute_FindSlotByID(ItemToEquip, SlotID);
 	if (SlotIndex == INDEX_NONE) return  false;
@@ -142,13 +142,13 @@ bool UMounteaEquipmentComponent::CanEquipItem_Implementation(const UMounteaInsta
 	return !Execute_IsItemEquipped(this, ItemToEquip, SlotID);
 }
 
-bool UMounteaEquipmentComponent::CanUnEquipItem_Implementation(const UMounteaInstancedItem* ItemToUnequip) const
+bool UMounteaEquipmentComponent::CanUnEquipItem_Implementation(UMounteaInstancedItem* ItemToUnequip) const
 {
 	if (!ItemToUnequip) return false;
 
-	const FText SlotID = Execute_FindSlotForItem(this, ItemToUnequip);
+	const FGameplayTag SlotID = Execute_FindSlotForItem(this, ItemToUnequip);
 
-	if (SlotID.IsEmpty()) return false;
+	if (SlotID.IsValid() == false) return false;
 
 	const int32 SlotIndex = Execute_FindSlotByID(ItemToUnequip, SlotID);
 	if (SlotIndex == INDEX_NONE) return  false;
@@ -159,7 +159,7 @@ bool UMounteaEquipmentComponent::CanUnEquipItem_Implementation(const UMounteaIns
 	return Execute_IsItemEquipped(this, ItemToUnequip, SlotID);
 }
 
-FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID)
+FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID)
 {
 	QUICK_SCOPE_CYCLE_COUNTER( STAT_UMounteaEquipmentComponent_EquipItem );
 	
@@ -233,12 +233,12 @@ FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMou
 	return Result;
 }
 
-void UMounteaEquipmentComponent::EquipItem_Server_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID)
+void UMounteaEquipmentComponent::EquipItem_Server_Implementation(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID)
 {
 	Execute_EquipItem(this, ItemToEquip, SlotID);
 }
 
-bool UMounteaEquipmentComponent::EquipItem_Server_Validate(UMounteaInstancedItem* ItemToEquip, const FText& SlotID)
+bool UMounteaEquipmentComponent::EquipItem_Server_Validate(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID)
 { return true; }
 
 void UMounteaEquipmentComponent::PostEquipmentUpdated_Implementation(const FInventoryUpdateResult& UpdateContext)
@@ -339,7 +339,7 @@ void UMounteaEquipmentComponent::PostItemUnequipped_Multicast_Implementation(con
 	// TODO
 }
 
-FInventoryUpdateResult UMounteaEquipmentComponent::UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FText& SlotID)
+FInventoryUpdateResult UMounteaEquipmentComponent::UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FGameplayTag& SlotID)
 {
 	QUICK_SCOPE_CYCLE_COUNTER(STAT_UMounteaEquipmentComponent_UnEquipItem);
     
@@ -395,12 +395,12 @@ FInventoryUpdateResult UMounteaEquipmentComponent::UnEquipItem_Implementation(UM
     return Result;
 }
 
-void UMounteaEquipmentComponent::UnEquipItem_Server_Implementation(UMounteaInstancedItem* Item, const FText& SlotID)
+void UMounteaEquipmentComponent::UnEquipItem_Server_Implementation(UMounteaInstancedItem* Item, const FGameplayTag& SlotID)
 {
 	Execute_UnEquipItem(this, Item, SlotID);
 }
 
-bool UMounteaEquipmentComponent::UnEquipItem_Server_Validate(UMounteaInstancedItem* ItemToEquip, const FText& SlotID)
+bool UMounteaEquipmentComponent::UnEquipItem_Server_Validate(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID)
 { return true;}
 
 void UMounteaEquipmentComponent::PostEquipmentUpdated_Client_RequestUpdate(const FInventoryUpdateResult& UpdateContext)
@@ -463,7 +463,7 @@ void UMounteaEquipmentComponent::PostItemUnequipped_Multicast_RequestUpdate(cons
 	OnSlotUnequipped_Multicast.Broadcast(UpdateContext);
 }
 
-bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(const UMounteaInstancedItem* Item, const FText& SlotID) const
+bool UMounteaEquipmentComponent::IsItemEquipped_Implementation(UMounteaInstancedItem* Item, const FGameplayTag& SlotID) const
 {
 	return EquipmentSlots.Contains(FMounteaEquipmentSlotCompare(Item, SlotID));
 }

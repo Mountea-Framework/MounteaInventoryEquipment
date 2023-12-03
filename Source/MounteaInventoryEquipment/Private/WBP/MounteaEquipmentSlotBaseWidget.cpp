@@ -7,28 +7,28 @@
 #include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
-void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FText& NewSlotID)
+void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedSlot)
 {
 	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 	{
 		if (!Settings->EquipmentConfigData.IsNull())
 		{
 			const auto IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
-			if (IDs.Contains(NewSlotID))
+			if (IDs.Contains(AffectedSlot))
 			{
-				SlotID = NewSlotID;
+				SlotID = IDs.Find(AffectedSlot)->GetSlotID();
 
 				return;
 			}
 		}
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("[EquipmentSlot - UpdateSlotID] Slot %s is not supported!"), *NewSlotID.ToString())
+	UE_LOG(LogTemp, Error, TEXT("[EquipmentSlot - UpdateSlotID] Slot %s is not supported!"), *AffectedSlot.ToString())
 }
 
-TArray<FText> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
+TArray<FString> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 {
-	TArray<FText> Results;
+	TArray<FString> Results;
 
 	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 	{
@@ -37,7 +37,7 @@ TArray<FText> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 			const auto IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
 			for (const auto& Itr : IDs)
 			{
-				Results.Add(Itr.SlotName);
+				Results.Add(Itr.GetSlotID());
 			}
 		}
 	}

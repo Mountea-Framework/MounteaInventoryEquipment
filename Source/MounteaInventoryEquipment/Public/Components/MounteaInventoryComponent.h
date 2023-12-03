@@ -214,7 +214,7 @@ protected:
 	TSubclassOf<UMounteaBaseUserWidget> InventoryWBPClass;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
-	UMounteaBaseUserWidget* InventoryWBP = nullptr;
+	TObjectPtr<UMounteaBaseUserWidget> InventoryWBP = nullptr;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, DisallowCreateNew, NoElementDuplicate))
 	TArray<FItemSlot> InventorySlots;

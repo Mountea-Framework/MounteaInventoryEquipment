@@ -101,4 +101,9 @@ namespace MounteaInventoryEquipmentConsts
 		constexpr int32 Status_NotFound        = 404;
 		constexpr int32 Status_GenericIssue = 500;
 	}
+
+	namespace Hyperlinks
+	{
+		const FString EquipmentConfigURL (TEXT("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Equipment-Config"));
+	}
 }

@@ -18,18 +18,18 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentSlotBaseWidget : public UMo
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE FText GetSlotID() const { return SlotID; };
+	FORCEINLINE FString GetSlotID() const { return SlotID; };
 
 	UFUNCTION()
-	void UpdateSlotID(const FText& NewSlotID);
+	void UpdateSlotID(const FGameplayTag& AffectedSlo);
 	
 protected:
 
 	UPROPERTY(Category="2. Required", EditInstanceOnly, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions", NoResetToDefault))
-	FText SlotID;
+	FString SlotID;
 
 private:
 
 	UFUNCTION()
-	static TArray<FText> GetSlotIDOptions();
+	static TArray<FString> GetSlotIDOptions();
 };

@@ -32,7 +32,12 @@ public class MounteaInventoryEquipment : ModuleRules
 				"Projects",
 				
 				"GameplayTags", 
-				"CommonUI"
+				"CommonUI",
+				
+				"Slate",
+				"SlateCore",
+				
+				"EditorStyle"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

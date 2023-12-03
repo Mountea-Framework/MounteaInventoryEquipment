@@ -53,8 +53,8 @@ public:
 	 * @return The ID of the slot that can accommodate the item, or None if none is found.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	FText FindSlotForItem(const UMounteaInstancedItem* Item) const;
-	virtual FText FindSlotForItem_Implementation(const UMounteaInstancedItem* Item) const = 0;
+	FGameplayTag FindSlotForItem(const UMounteaInstancedItem* Item) const;
+	virtual FGameplayTag FindSlotForItem_Implementation(const UMounteaInstancedItem* Item) const = 0;
 
 	/**
 	 * Finds a slot by its ID within the equipment.
@@ -62,8 +62,8 @@ public:
 	 * @return The index of the slot if found, or -1 if not found.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	int32 FindSlotByID(const FText& SlotID) const;
-	virtual int32 FindSlotByID_Implementation(const FText& SlotID) const = 0;
+	int32 FindSlotByID(const FGameplayTag& SlotID) const;
+	virtual int32 FindSlotByID_Implementation(const FGameplayTag& SlotID) const = 0;
 
 	/**
 	 * Equips an item to the specified slot, updating the equipment state accordingly.
@@ -72,8 +72,8 @@ public:
 	 * @return A structure containing details about the outcome of the equip process.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	FInventoryUpdateResult EquipItem(UMounteaInstancedItem* ItemToEquip, const FText& SlotID);
-	virtual FInventoryUpdateResult EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip,const FText& SlotID) = 0;
+	FInventoryUpdateResult EquipItem(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID);
+	virtual FInventoryUpdateResult EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip,const FGameplayTag& SlotID) = 0;
 
 	/**
 	 * Unequips an item from the specified slot, updating the equipment state accordingly.
@@ -82,8 +82,8 @@ public:
 	 * @return A structure containing details about the outcome of the unequip process.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	FInventoryUpdateResult UnEquipItem(UMounteaInstancedItem* ItemToEquip, const FText& SlotID);
-	virtual FInventoryUpdateResult UnEquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID) = 0;
+	FInventoryUpdateResult UnEquipItem(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID);
+	virtual FInventoryUpdateResult UnEquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID) = 0;
 
 	/**
 	 * Checks if a specific item is currently equipped in a specified slot.
@@ -92,8 +92,8 @@ public:
 	 * @return True if the item is equipped in the specified slot, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	bool IsItemEquipped(const UMounteaInstancedItem* ItemToEquip, const FText& SlotID) const;
-	virtual bool IsItemEquipped_Implementation(const UMounteaInstancedItem* ItemToEquip, const FText& SlotID) const = 0;
+	bool IsItemEquipped(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID) const;
+	virtual bool IsItemEquipped_Implementation(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID) const = 0;
 
 	/**
 	 * Retrieves all the equipment slots available.
@@ -109,8 +109,8 @@ public:
 	 * @return True if the item can be equipped, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	bool CanEquipItem(const UMounteaInstancedItem* ItemToEquip) const;
-	virtual bool CanEquipItem_Implementation(const UMounteaInstancedItem* ItemToEquip) const = 0;
+	bool CanEquipItem(UMounteaInstancedItem* ItemToEquip) const;
+	virtual bool CanEquipItem_Implementation(UMounteaInstancedItem* ItemToEquip) const = 0;
 
 	/**
 	 * Checks if a specific item can be unequipped.
@@ -118,8 +118,8 @@ public:
 	 * @return True if the item can be unequipped, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	bool CanUnEquipItem(const UMounteaInstancedItem* ItemToUnequip) const;
-	virtual bool CanUnEquipItem_Implementation(const UMounteaInstancedItem* ItemToUnequip) const = 0;
+	bool CanUnEquipItem(UMounteaInstancedItem* ItemToUnequip) const;
+	virtual bool CanUnEquipItem_Implementation(UMounteaInstancedItem* ItemToUnequip) const = 0;
 
 	/**
 	 * Sets the UI widget for the equipment interface.

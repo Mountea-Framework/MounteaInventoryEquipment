@@ -70,7 +70,7 @@ struct FInventoryNotificationData
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryResults"
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta=(ScriptName="InventoryUpdateResult_DEPRICATED"))
 enum class EInventoryUpdateResult : uint8
 {
 	EIUR_Success  UMETA(DisplayName="Success"),

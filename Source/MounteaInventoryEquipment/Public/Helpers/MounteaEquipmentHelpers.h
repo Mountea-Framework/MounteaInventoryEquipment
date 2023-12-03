@@ -13,16 +13,108 @@ class UMounteaInstancedItem;
 
 #pragma region EquipmentSlot
 
+USTRUCT(BlueprintType)
+struct FMounteaEquipmentSlotIdentity
+{
+	GENERATED_BODY()
+
+	FMounteaEquipmentSlotIdentity() : SlotName(FText()), SlotTag(FGameplayTag()), SlotCompatibleTags(FGameplayTagContainer())
+	{};
+
+	FMounteaEquipmentSlotIdentity(const FGameplayTag& Tag) : SlotTag(Tag)
+	{};
+	
+	FMounteaEquipmentSlotIdentity(const FText& Name, const FGameplayTag& Tag) : SlotName(Name), SlotTag(Tag)
+	{};
+
+	FMounteaEquipmentSlotIdentity(const FText& Name, const FGameplayTag& Tag, const FGameplayTagContainer& Tags) : SlotName(Name), SlotTag(Tag), SlotCompatibleTags(Tags)
+	{};
+
+	FMounteaEquipmentSlotIdentity(const FMounteaEquipmentSlotIdentity& Other) : SlotName(Other.SlotName), SlotTag(Other.SlotTag), SlotCompatibleTags(Other.SlotCompatibleTags)
+	{};
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText SlotName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag SlotTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTagContainer SlotCompatibleTags;
+
+public:
+
+	FString ToString() const
+	{
+		FString Result;
+
+		Result.Append("Name: ");
+		Result.Append(SlotName.ToString());
+		Result.Append(" | ");
+		Result.Append(" Tag: ");
+		Result.Append(SlotTag.ToString());
+		
+		return Result;
+	}
+
+	FString GetSlotID() const { return SlotTag.ToString(); };
+
+	bool IsEmpty() const
+	{
+		return SlotTag.IsValid() == false && SlotName.IsEmpty();
+	}
+
+	void Reset()
+	{
+		SlotName = FText();
+		SlotTag = FGameplayTag();
+		SlotCompatibleTags = FGameplayTagContainer();
+	};
+
+public:
+
+	bool operator==(const FText& Other) const;
+
+	bool operator==(const FGameplayTag& Other) const;
+
+	bool operator==(const FMounteaEquipmentSlotIdentity& Other) const;
+};
+
+template<>
+struct TStructOpsTypeTraits< FMounteaEquipmentSlotIdentity > : public TStructOpsTypeTraitsBase2< FMounteaEquipmentSlotIdentity >
+{
+	enum
+	{
+		WithIdenticalViaEquality = true
+	};
+};
+
+FORCEINLINE  uint32 GetTypeHash(const FMounteaEquipmentSlotIdentity& Data)
+{
+	uint32 KeyHash = 0;
+
+	if (Data.SlotTag.IsValid() == false) return KeyHash;
+	
+	KeyHash = HashCombine(KeyHash, GetTypeHash(Data.SlotTag));
+
+	return KeyHash;
+};
+
 USTRUCT(BlueprintType, Blueprintable, DisplayName="Equipment Slot")
 struct FEquipmentSlot
 {
 	GENERATED_BODY()
 
-	FEquipmentSlot() : Item(nullptr), SlotGuid(FGuid()), SlotName(FText())
+	FEquipmentSlot() : Item(nullptr), SlotGuid(FGuid()), SlotIdentity(FMounteaEquipmentSlotIdentity())
+	{};
+
+	FEquipmentSlot(const FGameplayTag& Tag) : SlotIdentity(Tag)
 	{};
 	
 	FEquipmentSlot(const FEquipmentSlot& Other) :
-		Item(Other.Item), SlotGuid(Other.SlotGuid), SlotName(Other.SlotName), SlotTags(Other.SlotTags)
+	Item(Other.Item), SlotGuid(Other.SlotGuid), SlotIdentity(Other.SlotIdentity.SlotName, Other.SlotIdentity.SlotTag, Other.SlotIdentity.SlotCompatibleTags)
 	{};
 
 	FEquipmentSlot(UMounteaInstancedItem* NewItem);
@@ -34,7 +126,7 @@ public:
 	 * the slot is holding and providing access to its data and behaviors.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(DisplayThumbnail=false))
-	UMounteaInstancedItem* Item = nullptr;
+	TObjectPtr<UMounteaInstancedItem> Item = nullptr;
 
 	/**
 	 * The identifier for the slot. 
@@ -43,11 +135,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	FGuid SlotGuid;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText SlotName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTagContainer SlotTags;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(ShowOnlyInnerProperties=true))
+	FMounteaEquipmentSlotIdentity SlotIdentity;
 
 public:
 
@@ -62,8 +151,9 @@ public:
 	{
 		const bool bIsEmpty = IsEmpty();
 		const bool bHasGuid = SlotGuid.IsValid();
+		const bool bHasTag = SlotIdentity.SlotTag.IsValid();
 				
-		return bIsEmpty && bHasGuid;
+		return bIsEmpty && bHasGuid && bHasTag;
 	}
 
 	bool operator==(const FEquipmentSlot& Other) const;
@@ -101,38 +191,21 @@ struct FMounteaEquipmentSlotCompare
 
 	FMounteaEquipmentSlotCompare() : SlotItem(nullptr), SlotID(FText())
 	{};
+
+	FMounteaEquipmentSlotCompare(const TObjectPtr<UMounteaInstancedItem>& Item,const FGameplayTag& Tag) : SlotItem(Item), SlotTag(Tag)
+	{};
 	
-	FMounteaEquipmentSlotCompare(const UMounteaInstancedItem* Item, const FText& ID) : SlotItem(Item), SlotID(ID)
+	FMounteaEquipmentSlotCompare(const TObjectPtr<UMounteaInstancedItem>& Item, const FText& ID, const FGameplayTag& Tag) : SlotItem(Item), SlotID(ID), SlotTag(Tag)
 	{};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	const UMounteaInstancedItem* SlotItem;
+	TObjectPtr<UMounteaInstancedItem> SlotItem;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText SlotID;
-};
-
-USTRUCT(BlueprintType)
-struct FMounteaEquipmentSlotIdentity
-{
-	GENERATED_BODY()
-
-	FMounteaEquipmentSlotIdentity() : SlotName(FText()), SlotTags(FGameplayTagContainer())
-	{};
-
-	FMounteaEquipmentSlotIdentity(const FText& Name, const FGameplayTagContainer& Tags) : SlotName(Name), SlotTags(Tags)
-	{};
-
-	FMounteaEquipmentSlotIdentity(const FMounteaEquipmentSlotIdentity& Other) : SlotName(Other.SlotName), SlotTags(Other.SlotTags)
-	{};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FText SlotName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTagContainer SlotTags;
-
-	bool operator==(const FText& Other) const;
+	FGameplayTag SlotTag;
 };
 
 #pragma endregion 

@@ -47,13 +47,13 @@ public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
 	
-	virtual FText FindSlotForItem_Implementation(const UMounteaInstancedItem* Item) const override;
-	virtual int32 FindSlotByID_Implementation(const FText& SlotID) const override;
+	virtual FGameplayTag FindSlotForItem_Implementation(const UMounteaInstancedItem* Item) const override;
+	virtual int32 FindSlotByID_Implementation(const FGameplayTag& SlotID) const override;
 	virtual TArray<FEquipmentSlot> GetAllSlots_Implementation() const override;
 	virtual bool DoesHaveAuthority_Implementation() const override;
 
 	virtual UMounteaBaseUserWidget* GetEquipmentUI_Implementation() const override;
-	virtual bool IsItemEquipped_Implementation(const UMounteaInstancedItem* Item, const FText& SlotID) const override;
+	virtual bool IsItemEquipped_Implementation(UMounteaInstancedItem* Item, const FGameplayTag& SlotID) const override;
 	
 	virtual bool SetEquipmentUI_Implementation(UMounteaBaseUserWidget* NewUI) override;
 
@@ -69,18 +69,18 @@ public:
 	 */
 	bool IsAuthorityOrAutonomousProxy() const;
 	
-	virtual FInventoryUpdateResult EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FText& SlotID) override;
-	virtual FInventoryUpdateResult UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FText& SlotID) override;
+	virtual FInventoryUpdateResult EquipItem_Implementation(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID) override;
+	virtual FInventoryUpdateResult UnEquipItem_Implementation(UMounteaInstancedItem* Item, const FGameplayTag& SlotID) override;
 	
-	virtual bool CanEquipItem_Implementation(const UMounteaInstancedItem* ItemToEquip) const override;
-	virtual bool CanUnEquipItem_Implementation(const UMounteaInstancedItem* ItemToUnequip) const override;
+	virtual bool CanEquipItem_Implementation(UMounteaInstancedItem* ItemToEquip) const override;
+	virtual bool CanUnEquipItem_Implementation(UMounteaInstancedItem* ItemToUnequip) const override;
 
 protected:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void EquipItem_Server(UMounteaInstancedItem* ItemToEquip, const FText& SlotID);
+	void EquipItem_Server(UMounteaInstancedItem* ItemToEquip, const FGameplayTag& SlotID);
 	UFUNCTION(Server, Reliable, WithValidation)
-	void UnEquipItem_Server(UMounteaInstancedItem* Item, const FText& SlotID);
+	void UnEquipItem_Server(UMounteaInstancedItem* Item, const FGameplayTag& SlotID);
 	
 	UFUNCTION(Server, Unreliable)
 	void PostEquipmentUpdated(const FInventoryUpdateResult& UpdateContext);
@@ -167,8 +167,8 @@ private:
 	TArray<FEquipmentSlot> ModifiedSlots;
 
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
-	UMounteaBaseUserWidget* EquipmentUI;
-	
+	TObjectPtr<UMounteaBaseUserWidget> EquipmentUI;
+		
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
 	int32 ReplicatedItemsKey = 0;
 

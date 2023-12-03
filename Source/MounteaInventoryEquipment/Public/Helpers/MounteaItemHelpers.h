@@ -209,7 +209,7 @@ public:
 	 * the slot is holding and providing access to its data and behaviors.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta=(DisplayThumbnail=false))
-	UMounteaInstancedItem* Item = nullptr;
+	TObjectPtr<UMounteaInstancedItem> Item = nullptr;
 
 	/**
 	 * The identifier for the slot. 
@@ -370,14 +370,14 @@ public:
 	 * to an item object, enabling the cloning or referencing of specific item properties and behaviors.
 	 */
     UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UMounteaInventoryItemBase* SourceItem = nullptr;
-
+	TObjectPtr<UMounteaInventoryItemBase> SourceItem = nullptr;
+	
 	/**
      * A reference to a data table that provides a template for item creation. It allows for the instantiation
 	 * of items based on predefined data entries, supporting a data-driven approach to item management.
 	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UMounteaInventoryItemsTable* SourceTable = nullptr;
+	TObjectPtr<UMounteaInventoryItemsTable> SourceTable = nullptr;
 
 	/**
 	 * An identifier for the row within the 'SourceTable' that contains the item definition. It enables precise
@@ -402,7 +402,7 @@ public:
 	* that should be considered when the item is being set up within the inventory system.
 	*/
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UObject* OptionalPayload = nullptr;
+	TObjectPtr<UObject> OptionalPayload = nullptr;
 
 public:
 
@@ -462,13 +462,13 @@ public:
 	FText ItemName = LOCTEXT("MounteaInventoryItem_ItemName", "New Item");
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	UMounteaInventoryItemCategory* ItemCategory;
-
+	TSoftObjectPtr<UMounteaInventoryItemCategory> ItemCategory;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	UMounteaInventoryItemRarity* ItemRarity;
+	TSoftObjectPtr<UMounteaInventoryItemRarity> ItemRarity;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="StaticMesh, SkeletalMesh"))
-	UStreamableRenderAsset* ItemMesh = nullptr;
+	TSoftObjectPtr<UStreamableRenderAsset> ItemMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
 	FMounteaItemQuantityData ItemQuantity;
@@ -526,7 +526,7 @@ struct FMounteaInventoryItemOptionalData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* ItemIcon = nullptr;
+	TSoftObjectPtr<UTexture2D> ItemIcon = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bHasWeight : 1;
@@ -577,7 +577,7 @@ public:
 	TSet<TSubclassOf<UMounteaInventoryItemAction>> ItemActions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMounteaInventoryItemConfig* ItemConfig;
+	TObjectPtr<UMounteaInventoryItemConfig> ItemConfig;
 
 public:
 
@@ -607,7 +607,7 @@ struct FItemTransfer
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMounteaInstancedItem* Item;
+	TObjectPtr<UMounteaInstancedItem> Item;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Quantity;

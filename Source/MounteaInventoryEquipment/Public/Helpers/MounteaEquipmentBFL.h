@@ -23,7 +23,10 @@ public:
 		if (const FEquipmentSlot* EmptySlot = Slots.FindByPredicate(
 			[Filter](const FEquipmentSlot& Slot)
 			{
-				return Filter.SlotItem != nullptr && Slot.SlotName.EqualTo(Filter.SlotID) && Slot.SlotTags.HasAny(Filter.SlotItem->GetItemFlags());
+				return
+				Filter.SlotItem != nullptr &&
+					Slot.SlotIdentity.SlotName.EqualTo(Filter.SlotID) &&
+						( Slot.SlotIdentity.SlotTag == Filter.SlotTag || Slot.SlotIdentity.SlotCompatibleTags.HasTag(Filter.SlotTag) );
 			}))
 		{
 			return Slots.Find(*EmptySlot); // Return index of to the found empty slot.
@@ -33,12 +36,12 @@ public:
 		return INDEX_NONE;
 	}
 
-	static int32 FindEquipmentSlotID(const TArray<FEquipmentSlot>& Slots, const FText& ID)
+	static int32 FindEquipmentSlotID(const TArray<FEquipmentSlot>& Slots, const FGameplayTag& ID)
 	{
 		if (const FEquipmentSlot* EmptySlot = Slots.FindByPredicate(
 			[ID](const FEquipmentSlot& Slot)
 			{
-				return Slot.SlotName.EqualTo(ID);
+				return Slot.SlotIdentity.SlotTag == ID;
 			}))
 		{
 			return Slots.Find(*EmptySlot); // Return index of to the found empty slot.
