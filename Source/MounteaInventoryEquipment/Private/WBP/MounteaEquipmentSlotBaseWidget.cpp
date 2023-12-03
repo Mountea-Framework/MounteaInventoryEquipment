@@ -37,6 +37,8 @@ TArray<FString> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 			const auto IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
 			for (const auto& Itr : IDs)
 			{
+				if (Itr.SlotTag.IsValid() == false) continue;
+				
 				Results.Add(Itr.GetSlotID());
 			}
 		}

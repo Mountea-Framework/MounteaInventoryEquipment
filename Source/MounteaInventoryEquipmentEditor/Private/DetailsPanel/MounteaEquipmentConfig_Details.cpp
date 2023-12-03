@@ -17,7 +17,7 @@ FMounteaEquipmentConfig_Details::~FMounteaEquipmentConfig_Details()
 {
 	if (Editing)
 	{
-		Editing->OnPropertyModified.Unbind();
+		Editing->OnTagModified.Unbind();
 	}
 }
 

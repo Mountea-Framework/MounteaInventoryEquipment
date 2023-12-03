@@ -21,11 +21,11 @@ public:
 	FORCEINLINE FString GetSlotID() const { return SlotID; };
 
 	UFUNCTION()
-	void UpdateSlotID(const FGameplayTag& AffectedSlo);
+	void UpdateSlotID(const FGameplayTag& AffectedSlot);
 	
 protected:
 
-	UPROPERTY(Category="2. Required", EditInstanceOnly, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions", NoResetToDefault))
+	UPROPERTY(Category="1. Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
 	FString SlotID;
 
 private:

@@ -35,13 +35,13 @@ struct FMounteaEquipmentSlotIdentity
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FText SlotName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FGameplayTag SlotTag;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FGameplayTagContainer SlotCompatibleTags;
 
 public:
@@ -59,7 +59,7 @@ public:
 		return Result;
 	}
 
-	FString GetSlotID() const { return SlotTag.ToString(); };
+	FString GetSlotID() const { return SlotTag.GetTagName().ToString(); };
 
 	bool IsEmpty() const
 	{

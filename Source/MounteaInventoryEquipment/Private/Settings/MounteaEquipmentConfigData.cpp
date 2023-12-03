@@ -8,7 +8,6 @@
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 
 #if WITH_EDITOR
-#include "GameplayTagsManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Framework/Notifications/NotificationManager.h"
 #endif
@@ -33,33 +32,29 @@ void UMounteaEquipmentConfigData::PostEditChangeProperty(FPropertyChangedEvent& 
 
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaEquipmentConfigData, EquipmentSlotIDs) || MemberPropertyName == GET_MEMBER_NAME_CHECKED(UMounteaEquipmentConfigData, EquipmentSlotIDs) )
 	{
-		TArray<FText> ErrorTexts;
-		TSet<FMounteaEquipmentSlotIdentity> DirtySlots;
+		TArray<FValidationResult> ValidationResults;
 		
-		ValidateConfig(ErrorTexts, DirtySlots);
+		ValidateConfig(ValidationResults);
 
 		TSet<FMounteaEquipmentSlotIdentity> NewSlots = EquipmentSlotIDs;
 
-		if (DirtySlots.Num() > 0)
+		if (ValidationResults.Num() > 0)
 		{
-			for (auto& Itr : DirtySlots)
+			for (auto& [ValidationText, BrokenIdentity, Result, Index] : ValidationResults)
 			{
-				if (FMounteaEquipmentSlotIdentity* Slot = EquipmentSlotIDs.Find(Itr))
+				if (Result != EIVR_Error) continue;
+				
+				if (FMounteaEquipmentSlotIdentity* Slot = EquipmentSlotIDs.Find(BrokenIdentity))
 				{	
 					Slot->Reset();
 					
 					EquipmentSlotIDs.Remove(*Slot);
 					
-					OnTagModified.ExecuteIfBound(Itr.SlotTag);
+					OnTagModified.ExecuteIfBound(BrokenIdentity.SlotTag);
 				}				
 			}
 			
 			EquipmentSlotIDs.Add(FMounteaEquipmentSlotIdentity());
-
-			if (PropertyName == GET_MEMBER_NAME_CHECKED(FMounteaEquipmentSlotIdentity, SlotTag))
-			{
-				OnPropertyModified.ExecuteIfBound(PropertyChangedEvent.Property);
-			}
 		}
 	}
 
@@ -69,20 +64,30 @@ void UMounteaEquipmentConfigData::PostEditChangeProperty(FPropertyChangedEvent& 
 EDataValidationResult UMounteaEquipmentConfigData::IsDataValid(TArray<FText>& ValidationErrors)
 {
 	EDataValidationResult Result = Super::IsDataValid(ValidationErrors);
-	TSet<FMounteaEquipmentSlotIdentity> DirtySlots;
 
-	Result = ValidateConfig(ValidationErrors, DirtySlots) ? Result : EDataValidationResult::Invalid;
+	TArray<FValidationResult> ValidationResults;
+	
+	Result = ValidateConfig(ValidationResults) ? Result : EDataValidationResult::Invalid;
 	
 	return Result;
 }
 
 #endif
 
-bool UMounteaEquipmentConfigData::ValidateConfig(TArray<FText>& Notifications, TSet<FMounteaEquipmentSlotIdentity>& DirtySlots)
+bool UMounteaEquipmentConfigData::ValidateConfig(TArray<FValidationResult>& Results)
 {
+	bool bSatisfied = true;
+
+	TArray<FMounteaEquipmentSlotIdentity> Identities = EquipmentSlotIDs.Array();
+	
 	for (const auto& Itr : EquipmentSlotIDs)
 	{
 		int32 HowMany = 0;
+
+		const auto Index = Identities.Find(Itr);
+		
+		FValidationResult Result;
+		Result.Index = Index;
 
 		for (const auto& Itr2 : EquipmentSlotIDs)
 		{
@@ -91,54 +96,79 @@ bool UMounteaEquipmentConfigData::ValidateConfig(TArray<FText>& Notifications, T
 				HowMany++;
 
 				if (HowMany > 1)
-				{						
-					DirtySlots.Add(Itr);
+				{
+					Result.ValidationText = LOCTEXT("IdentityValidationResult_Error_Duplicate", "Duplicate elements are not allowed in Equipment Slots.");
+					Result.BrokenIdentity = Itr;
+					Result.Result = EIVR_Error;
+					
+					Results.Add(Result);
+
+					bSatisfied = false;
 				}					
 			}
 		}
-
+		
 		if (Itr.SlotTag.IsValid() == false && Itr.SlotName.IsEmpty())
 		{
-			DirtySlots.Add(Itr);
+			Result.ValidationText = LOCTEXT("IdentityValidationResult_Error_NoNameAndTag", "Empty elements are not allowed in Equipment Slots.");
+			Result.BrokenIdentity = Itr;
+			Result.Result = EIVR_Error;
+			Results.Add(Result);
+
+			bSatisfied = false;
+		}
+		else if (Itr.SlotTag.IsValid() == false && Itr.SlotName.IsEmpty() == false)
+		{
+			Result.ValidationText = LOCTEXT("IdentityValidationResult_Warning_NoTag", "Empty `Slot Tag` elements are not allowed in Equipment Slots.");
+			Result.BrokenIdentity = Itr;
+			Result.Result = EIVR_Warning;
+			Results.Add(Result);
+		}
+		else if (Itr.SlotTag.IsValid() && Itr.SlotName.IsEmpty())
+		{
+			Result.ValidationText = LOCTEXT("IdentityValidationResult_Warning_NoName", "Empty `Slot Name` elements are not allowed in Equipment Slots.");
+			Result.BrokenIdentity = Itr;
+			Result.Result = EIVR_Warning;
+			Results.Add(Result);
+		}
+
+		if (Itr.SlotCompatibleTags.IsEmpty())
+		{
+			Result.ValidationText = LOCTEXT("IdentityValidationResult_Warning_NoTags", "Empty `Slot Compatible Tags` elements are not allowed in Equipment Slots.");
+			Result.BrokenIdentity = Itr;
+			Result.Result = EIVR_Warning;
+			Results.Add(Result);
 		}
 	}
 
-	const bool bSatisfied = DirtySlots.Num() > 0;
-	
 #if WITH_EDITOR
-	for (const auto& Itr : DirtySlots)
+	
+	for (const auto& [ValidationText, BrokenIdentity, Result, Index] : Results)
 	{
-		if (const FMounteaEquipmentSlotIdentity* Slot = DirtySlots.Find(Itr))
-		{			
-			FText Message = LOCTEXT("MounteaEquipmentConfigData_DuplicateElement_Title", "Duplicate elements are not allowed in Equipment Slots.");
-			if (Slot->IsEmpty())
-			{
-				Message = LOCTEXT("MounteaEquipmentConfigData_DuplicateElement_Title_Empty", "Empty elements are not allowed in Equipment Slots.");
-			}
+		FText Message = ValidationText;
 				
-			FNotificationInfo InvalidOperation(Message);
+		FNotificationInfo InvalidOperation(Message);
+		{
+			InvalidOperation.SubText = FText::Format(LOCTEXT("MounteaEquipmentConfigData_DuplicateElement_Body", "Please ensure each Slot has unique Tag and Name.\nInvalid index: {0}"), Index);
+			InvalidOperation.bUseThrobber = true;
+			InvalidOperation.bUseSuccessFailIcons = Result == EIVR_Error ? false : true;
+			InvalidOperation.ExpireDuration = 3.0f;
+			InvalidOperation.bFireAndForget = true;
+			InvalidOperation.bAllowThrottleWhenFrameRateIsLow = false;
+			InvalidOperation.Hyperlink = FSimpleDelegate::CreateLambda([]()
 			{
-				InvalidOperation.SubText = LOCTEXT("MounteaEquipmentConfigData_DuplicateElement_Body", "Please ensure each Slot has unique Tag and Name!");
-				InvalidOperation.bUseThrobber = true;
-				InvalidOperation.bUseSuccessFailIcons = true;
-				InvalidOperation.ExpireDuration = 3.0f;
-				InvalidOperation.bFireAndForget = true;
-				InvalidOperation.bAllowThrottleWhenFrameRateIsLow = true;
-				InvalidOperation.Hyperlink = FSimpleDelegate::CreateLambda([]()
-				{
-					FPlatformProcess::LaunchURL(*MounteaInventoryEquipmentConsts::Hyperlinks::EquipmentConfigURL, nullptr, nullptr);
-				});
-				InvalidOperation.HyperlinkText = LOCTEXT("MounteaEquipmentConfigData_DuplicityLink", "Open Documentation");
-					
-			}
-			FSlateNotificationManager::Get().AddNotification(InvalidOperation);
-
-#endif
-		}			
+				FPlatformProcess::LaunchURL(*MounteaInventoryEquipmentConsts::Hyperlinks::EquipmentConfigURL, nullptr, nullptr);
+			});
+			InvalidOperation.HyperlinkText = LOCTEXT("MounteaEquipmentConfigData_DuplicityLink", "Open Documentation");
+		}
+			
+		FSlateNotificationManager::Get().AddNotification(InvalidOperation);
 	}
 
+#endif
+	
 	return bSatisfied;
+	
 }
-
 
 #undef LOCTEXT_NAMESPACE

@@ -8,6 +8,26 @@
 #include "Helpers/MounteaEquipmentHelpers.h"
 #include "MounteaEquipmentConfigData.generated.h"
 
+UENUM()
+enum EIdentityValidationResult
+{
+	EIVR_OK,
+	EIVR_Warning,
+	EIVR_Error,
+
+	Default
+};
+
+USTRUCT()
+struct FValidationResult
+{
+	GENERATED_BODY()
+
+	FText ValidationText;
+	FMounteaEquipmentSlotIdentity BrokenIdentity;
+	EIdentityValidationResult Result;
+	int32 Index;
+};
 
 /**
  * 
@@ -27,13 +47,7 @@ public:
 	virtual void PreEditChange(FEditPropertyChain& PropertyAboutToChange) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual EDataValidationResult IsDataValid(TArray<FText>& ValidationErrors) override;
-	bool ValidateConfig(TArray<FText>& Notifications, TSet<FMounteaEquipmentSlotIdentity>& DirtySlots);
-
-	DECLARE_DELEGATE(FConfigModified);
-	FConfigModified OnConfigModified;
-
-	DECLARE_DELEGATE_OneParam(FPropertyModified, FProperty*);
-	FPropertyModified OnPropertyModified;
+	bool ValidateConfig(TArray<FValidationResult>& Results);
 
 	DECLARE_DELEGATE_OneParam(FTagPropertyModified, FGameplayTag&);
 	FTagPropertyModified OnTagModified;
