@@ -1,7 +1,7 @@
 // Copyright Dominik Morse 2023. All Rights Reserved.
 
 
-#include "WBP/MounteaEquipmentSlotBaseWidget.h"
+#include "WBP/Equipment/MounteaEquipmentSlotBaseWidget.h"
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Settings/MounteaEquipmentConfigData.h"

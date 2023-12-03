@@ -31,6 +31,22 @@ public:
 	virtual TScriptInterface<IMounteaEquipmentInterface> GetOwningEquipment_Implementation() const = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	void SetOwningEquipment(const TScriptInterface<IMounteaEquipmentInterface>& OwningEquipment);
-	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentInterface>& OwningEquipment) = 0;
+	void SetOwningEquipment(const TScriptInterface<IMounteaEquipmentInterface>& NewOwningEquipment);
+	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentInterface>& NewOwningEquipment) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
+	TArray<UUserWidget*> GetEquipmentSlotsWidgets() const;
+	virtual TArray<UUserWidget*> GetEquipmentSlotsWidgets_Implementation() const = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
+	void ResetEquipmentSlotsWidgets();
+	virtual void ResetEquipmentSlotsWidgets_Implementation() = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
+	void AddEquipmentSlotsWidget(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface")) UUserWidget* NewSlot);
+	virtual void AddEquipmentSlotsWidget_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface")) UUserWidget* NewSlot) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
+	void SetEquipmentSlotsWidgets(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface")) const TArray<UUserWidget*>& NewSlots);
+	virtual void SetEquipmentSlotsWidgets_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentSlotWBPInterface")) const TArray<UUserWidget*>& NewSlots) = 0;
 };

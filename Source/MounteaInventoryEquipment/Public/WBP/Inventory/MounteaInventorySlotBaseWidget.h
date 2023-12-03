@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaBaseUserWidget.h"
+#include "WBP/MounteaBaseUserWidget.h"
 #include "MounteaInventorySlotBaseWidget.generated.h"
 
 /**

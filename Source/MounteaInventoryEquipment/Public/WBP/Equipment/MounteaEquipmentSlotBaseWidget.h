@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaInventorySlotBaseWidget.h"
+#include "GameplayTagContainer.h"
+
+#include "WBP/Inventory/MounteaInventorySlotBaseWidget.h"
+
 #include "Interfaces/UI/MounteaEquipmentSlotWBPInterface.h"
+
 #include "MounteaEquipmentSlotBaseWidget.generated.h"
 
 /**
