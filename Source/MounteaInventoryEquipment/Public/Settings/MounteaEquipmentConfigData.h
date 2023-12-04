@@ -42,6 +42,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, NoElementDuplicate))
 	TSet<FMounteaEquipmentSlotIdentity> EquipmentSlotIDs;
 
+	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(NoResetToDefault))
+	FGameplayTag EquippedFlag;
+
 #if WITH_EDITOR
 
 	virtual void PreEditChange(FEditPropertyChain& PropertyAboutToChange) override;
