@@ -25,7 +25,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryItemWBPInterface
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	UMounteaInventoryItemBase* GetItem() const;
+	FItemSlot GetItem() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	UMounteaBaseUserWidget* GetItemUI() const;

@@ -76,7 +76,7 @@ struct FMounteaEventBinding
 /**
  * 
  */
-UCLASS()
+UCLASS(meta=(AutoExpandCategories = "Mountea"), AutoCollapseCategories=("Mountea|Required"), AutoCollapseCategories=("Debug"))
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaBaseUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
@@ -92,7 +92,7 @@ protected:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category="1. Optional", meta=(AllowAbstract=false, DisplayThumbnail=false))
+	UPROPERTY(EditAnywhere, Category="Mountea|Optional", meta=(AllowAbstract=false, DisplayThumbnail=false))
 	UMounteaInventoryThemeConfig* ThemeConfigOverride = nullptr;
 
 public:
@@ -137,6 +137,6 @@ public:
 	
 private:
 
-	UPROPERTY(VisibleAnywhere, Category="0. Debug")
+	UPROPERTY(VisibleAnywhere, Category="Mountea|Debug")
 	TArray<FMounteaEventBinding> MounteaEventBindings;
 };

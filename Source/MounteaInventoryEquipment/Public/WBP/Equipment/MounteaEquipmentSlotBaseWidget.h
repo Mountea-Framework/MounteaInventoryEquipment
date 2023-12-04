@@ -11,6 +11,7 @@
 
 #include "MounteaEquipmentSlotBaseWidget.generated.h"
 
+struct FEquipmentSlot;
 class IMounteaEquipmentWBPInterface;
 /**
  * 
@@ -28,6 +29,11 @@ public:
 
 	virtual TScriptInterface<IMounteaEquipmentWBPInterface> GetOwningEquipment_Implementation() const override;
 	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment) override;
+
+	virtual bool IsSlotEmpty_Implementation() const override;
+
+	virtual FInventoryUpdateResult AttachItemToSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToAttach) override;
+	virtual FInventoryUpdateResult DetachItemToSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach) override;
 	
 public:
 
@@ -39,11 +45,16 @@ public:
 	
 protected:
 
-	UPROPERTY(Category="2. Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
+	UPROPERTY(Category="Mountea|Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
 	FString SlotID;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="0. Debug", meta=(ExposeOnSpawn))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug", meta=(ExposeOnSpawn, DisplayThumbnail=false))
 	TScriptInterface<IMounteaEquipmentWBPInterface> OwningEquipmentWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug")
+	FGuid ParentSlotGuid;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug", meta=(DisplayThumbnail=false))
+	UUserWidget* AttachedItemWidget = nullptr;
 
 private:
 

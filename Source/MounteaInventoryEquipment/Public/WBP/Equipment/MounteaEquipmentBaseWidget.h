@@ -30,9 +30,9 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="0. Debug", meta=(ExposeOnSpawn))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug", meta=(ExposeOnSpawn))
 	TScriptInterface<IMounteaEquipmentInterface> OwningEquipment;
 
-	UPROPERTY(VisibleAnywhere, Category="0. Debug")
+	UPROPERTY(VisibleAnywhere, Category="Mountea|Debug")
 	TArray<UUserWidget*> EquipmentSlotWidgets;
 };
