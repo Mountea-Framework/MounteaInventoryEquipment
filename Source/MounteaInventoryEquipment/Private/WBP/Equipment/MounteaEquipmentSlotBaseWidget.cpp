@@ -8,7 +8,6 @@
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaItemHelpers.h"
 #include "Interfaces/MounteaEquipmentInterface.h"
-#include "Interfaces/UI/MounteaDragDropWBPInterface.h"
 
 #include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Interfaces/UI/MounteaInventoryItemWBPInterface.h"
@@ -37,7 +36,7 @@ void UMounteaEquipmentSlotBaseWidget::SetOwningEquipment_Implementation(const TS
 
 bool UMounteaEquipmentSlotBaseWidget::IsSlotEmpty_Implementation() const
 {
-	return  ParentSlotGuid.IsValid() == false && AttachedItemWidget == nullptr;
+	return  Super::IsSlotEmpty_Implementation();
 }
 
 FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::AttachItemToSlot_Implementation(UUserWidget* ItemToAttach)

@@ -3,12 +3,13 @@
 
 #include "WBP/Inventory/MounteaInventorySlotBaseWidget.h"
 
+#include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Interfaces/UI/MounteaDragDropWBPInterface.h"
+#include "Settings/MounteaInventoryEquipmentSettings.h"
 
 bool UMounteaInventorySlotBaseWidget::IsSlotEmpty_Implementation() const
 {
-	// TODO
-	return true;
+	return ParentSlotGuid.IsValid() == false && AttachedItemWidget == nullptr;
 }
 
 FEventReply UMounteaInventorySlotBaseWidget::ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload)
@@ -23,7 +24,10 @@ FEventReply UMounteaInventorySlotBaseWidget::ResolveDrop_Implementation(UUserWid
 	TScriptInterface<IMounteaInventoryItemWBPInterface> PassedItemWBP = DroppedWidgetInterface->Execute_GetItemWBP(DroppedWidgetInterface.GetObject());
 	if (PassedItemWBP.GetObject() == nullptr) return Result;
 
-	
+	// TODO: actually finish the logic :)
 	
 	return Result;
 }
+
+FString UMounteaInventorySlotBaseWidget::GetSlotID() const
+{ return SlotID; }

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SlateWrapperTypes.h"
 #include "UObject/Interface.h"
 #include "Input/Reply.h"
 #include "MounteaEquipmentSlotWBPInterface.generated.h"
@@ -36,9 +35,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
 	void SetOwningEquipment(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment);
 	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment) = 0;
-
 	
-
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
 	bool CanAttach(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* NewChildWidget, FInventoryUpdateResult& OutResult) const;
 	virtual bool CanAttach_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* NewChildWidget, FInventoryUpdateResult& OutResult) const = 0;
@@ -54,11 +51,4 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
 	FInventoryUpdateResult DetachItemToSlot(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach);
 	virtual FInventoryUpdateResult DetachItemFromSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach) = 0;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	FEventReply ResolveDrop(UUserWidget* DroppedWidget, UObject* Payload);
-	virtual FEventReply ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload) = 0;
-	
-	UFUNCTION(BlueprintImplementableEvent, Category="Mountea|Equipment")
-	void OnEquipmentSlotUpdated(const FString& UpdateMessage, const UUserWidget* AttachedChildWidget);
 };

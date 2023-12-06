@@ -46,25 +46,14 @@ protected:
 	virtual FEventReply ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload) override;	
 
 public:
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE FString GetSlotID() const { return SlotID; };
-
+	
 	UFUNCTION()
 	void UpdateSlotID(const FGameplayTag& AffectedSlot);
 	
 protected:
 
-	UPROPERTY(Category="Mountea|Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
-	FString SlotID;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug", meta=(ExposeOnSpawn, DisplayThumbnail=false))
 	TScriptInterface<IMounteaEquipmentWBPInterface> OwningEquipmentWidget;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug")
-	FGuid ParentSlotGuid;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug", meta=(DisplayThumbnail=false))
-	UUserWidget* AttachedItemWidget = nullptr;
 
 private:
 
