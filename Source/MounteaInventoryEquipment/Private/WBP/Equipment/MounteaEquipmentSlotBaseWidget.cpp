@@ -8,6 +8,7 @@
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaItemHelpers.h"
 #include "Interfaces/MounteaEquipmentInterface.h"
+#include "Interfaces/UI/MounteaDragDropWBPInterface.h"
 
 #include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Interfaces/UI/MounteaInventoryItemWBPInterface.h"
@@ -262,6 +263,11 @@ bool UMounteaEquipmentSlotBaseWidget::CanDetach_Implementation(UUserWidget* OldC
 	}
 
 	return true;
+}
+
+FEventReply UMounteaEquipmentSlotBaseWidget::ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload)
+{
+	return Super::ResolveDrop_Implementation(DroppedWidget, Payload);
 }
 
 void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedSlot)

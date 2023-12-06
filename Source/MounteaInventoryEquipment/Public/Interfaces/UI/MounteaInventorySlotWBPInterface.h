@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SlateWrapperTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaInventorySlotWBPInterface.generated.h"
 
@@ -25,14 +26,19 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventorySlotWBPInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
+	FEventReply ResolveDrop(UUserWidget* DroppedWidget, UObject* Payload);
+	virtual FEventReply ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload) = 0;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	void OccupySlot(const TScriptInterface<IMounteaInventoryItemWBPInterface>& Item);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	void EmptySlot();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
 	bool IsSlotEmpty() const;
+	virtual bool IsSlotEmpty_Implementation() const = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	FIntPoint GetSlotRoots() const;
