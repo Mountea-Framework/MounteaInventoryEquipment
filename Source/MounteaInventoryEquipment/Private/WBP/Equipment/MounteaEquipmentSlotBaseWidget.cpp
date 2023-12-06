@@ -53,7 +53,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::AttachItemToSlot_Impleme
 		if (Execute_CanDetach(this, AttachedItemWidget, Result) == false)
 		{
 			Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;
-			Result.ResultText = LOCTEXT("MounteaEquipmentSlotBaseWidget_DetachItem_Invalid", "Cannot attach item, already equipped one cannot be detached.");
+			Result.ResultText = LOCTEXT("MounteaInventorySlotBaseWidget_DetachItem_Invalid", "Cannot attach item, slot is occupied.");
 
 			return Result;
 		}
@@ -63,8 +63,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::AttachItemToSlot_Impleme
 	
 	const TScriptInterface<IMounteaInventoryItemWBPInterface> NewItem = ItemToAttach;
 	const FGuid NewGuid = NewItem->Execute_GetItem(ItemToAttach).SlotGuid;
-
-	// TODO: Consider moving this to replicated wrapper as the Item Flag can be important for replication
+	
 	if (NewItem.GetObject())
 	{
 		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
@@ -86,7 +85,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::AttachItemToSlot_Impleme
 	Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK;
 	Result.ResultText = LOCTEXT("MounteaEquipmentSlotBaseWidget_AttachItem_OK", "Equipment successful.");
 
-	Execute_OnEquipmentSlotUpdated(this, TEXT("OnAttached"), AttachedItemWidget);
+	Execute_OnInventorySlotUpdated(this, TEXT("OnAttached"), AttachedItemWidget);
 	
 	return Result;
 }
@@ -100,7 +99,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::DetachItemFromSlot_Imple
 		return Result;
 	}
 		
-	Execute_OnEquipmentSlotUpdated(this, TEXT("OnDetached"), ItemToDetach);
+	Execute_OnInventorySlotUpdated(this, TEXT("OnDetached"), ItemToDetach);
 
 	const TScriptInterface<IMounteaInventoryItemWBPInterface> OldItem = ItemToDetach;
 
@@ -275,7 +274,7 @@ void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedS
 	{
 		if (!Settings->EquipmentConfigData.IsNull())
 		{
-			const auto IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
+			const TSet<FMounteaEquipmentSlotIdentity> IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
 			if (IDs.Contains(AffectedSlot))
 			{
 				SlotID = IDs.Find(AffectedSlot)->GetSlotID();

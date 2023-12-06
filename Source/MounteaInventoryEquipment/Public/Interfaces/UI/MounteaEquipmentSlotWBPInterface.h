@@ -36,19 +36,4 @@ public:
 	void SetOwningEquipment(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment);
 	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment) = 0;
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	bool CanAttach(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* NewChildWidget, FInventoryUpdateResult& OutResult) const;
-	virtual bool CanAttach_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* NewChildWidget, FInventoryUpdateResult& OutResult) const = 0;
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	bool CanDetach(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* OldChildWidget, FInventoryUpdateResult& OutResult) const;
-	virtual bool CanDetach_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* OldChildWidget, FInventoryUpdateResult& OutResult) const = 0;
-	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	FInventoryUpdateResult AttachItemToSlot(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToAttach);
-	virtual FInventoryUpdateResult AttachItemToSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToAttach) = 0;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	FInventoryUpdateResult DetachItemToSlot(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach);
-	virtual FInventoryUpdateResult DetachItemFromSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach) = 0;
 };

@@ -11,10 +11,7 @@
 
 #include "MounteaEquipmentSlotBaseWidget.generated.h"
 
-struct FEquipmentSlot;
 class IMounteaEquipmentWBPInterface;
-
-
 
 /**
  * 
@@ -30,9 +27,9 @@ protected:
 
 public:
 
-	virtual TScriptInterface<IMounteaEquipmentWBPInterface> GetOwningEquipment_Implementation() const override;
 	virtual void SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment) override;
-
+	virtual TScriptInterface<IMounteaEquipmentWBPInterface> GetOwningEquipment_Implementation() const override;
+	
 	virtual bool IsSlotEmpty_Implementation() const override;
 
 	virtual FInventoryUpdateResult AttachItemToSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToAttach) override;
