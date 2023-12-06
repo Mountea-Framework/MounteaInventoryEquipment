@@ -38,22 +38,31 @@ public:
 	virtual bool CanAttach_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* NewChildWidget, FInventoryUpdateResult& OutResult) const override;
 	virtual bool CanDetach_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* OldChildWidget, FInventoryUpdateResult& OutResult) const override;
 
+	virtual bool CanDrop_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.IMounteaDragDropWBPInterface")) UUserWidget* PayloadWidget, UObject* Payload) const;
+	
 protected:
 
-	virtual FEventReply ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload) override;	
+	virtual FEventReply ResolveDrop_Implementation(UUserWidget* PayloadWidget, UObject* Payload) override;	
 
 public:
 	
 	UFUNCTION()
 	void UpdateSlotID(const FGameplayTag& AffectedSlot);
-	
-protected:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug", meta=(ExposeOnSpawn, DisplayThumbnail=false))
-	TScriptInterface<IMounteaEquipmentWBPInterface> OwningEquipmentWidget;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Slot")
+	FORCEINLINE FString GetSlotID() const
+	{ return SlotID; };
 
 private:
 
 	UFUNCTION()
 	static TArray<FString> GetSlotIDOptions();
+	
+protected:
+
+	UPROPERTY(Category="Mountea|Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions="GetSlotIDOptions"))
+	FString SlotID;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Debug", meta=(ExposeOnSpawn, DisplayThumbnail=false))
+	TScriptInterface<IMounteaEquipmentWBPInterface> OwningEquipmentWidget;
 };

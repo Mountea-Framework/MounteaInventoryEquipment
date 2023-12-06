@@ -22,16 +22,16 @@ void UMounteaEquipmentSlotBaseWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-TScriptInterface<IMounteaEquipmentWBPInterface> UMounteaEquipmentSlotBaseWidget::GetOwningEquipment_Implementation() const
-{
-	return OwningEquipmentWidget;
-}
-
 void UMounteaEquipmentSlotBaseWidget::SetOwningEquipment_Implementation(const TScriptInterface<IMounteaEquipmentWBPInterface>& NewOwningEquipment)
 {
 	if (OwningEquipmentWidget == NewOwningEquipment) return;
 
 	OwningEquipmentWidget = NewOwningEquipment;
+}
+
+TScriptInterface<IMounteaEquipmentWBPInterface> UMounteaEquipmentSlotBaseWidget::GetOwningEquipment_Implementation() const
+{
+	return OwningEquipmentWidget;
 }
 
 bool UMounteaEquipmentSlotBaseWidget::IsSlotEmpty_Implementation() const
@@ -263,9 +263,19 @@ bool UMounteaEquipmentSlotBaseWidget::CanDetach_Implementation(UUserWidget* OldC
 	return true;
 }
 
-FEventReply UMounteaEquipmentSlotBaseWidget::ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload)
+bool UMounteaEquipmentSlotBaseWidget::CanDrop_Implementation(UUserWidget* PayloadWidget, UObject* Payload) const
 {
-	return Super::ResolveDrop_Implementation(DroppedWidget, Payload);
+	return Super::CanDrop_Implementation(PayloadWidget, Payload);
+}
+
+FEventReply UMounteaEquipmentSlotBaseWidget::ResolveDrop_Implementation(UUserWidget* PayloadWidget, UObject* Payload)
+{
+	if (Execute_CanDrop(this, PayloadWidget, Payload) == false)
+	{
+		return false;
+	}
+
+	return true;
 }
 
 void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedSlot)

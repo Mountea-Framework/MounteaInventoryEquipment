@@ -29,6 +29,9 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataA
 	UMounteaInventoryThemeConfig();
 	
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme", meta=(ShowOnlyInnerProperties))
+	class UInventoryTheme* InventoryTheme = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Theme", meta=(ShowOnlyInnerProperties))
 	class UTextTheme* TextTheme = nullptr;

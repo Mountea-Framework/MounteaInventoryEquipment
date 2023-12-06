@@ -331,6 +331,17 @@ public:
 };
 
 
+UCLASS( DisplayName="Inventory Theme Config")
+class MOUNTEAINVENTORYEQUIPMENT_API UInventoryTheme : public UButtonTheme
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, Category="Theme Config")
+	uint8 bDragDropAllowed : 1;
+};
+
 /**
  * UCategoryThemeConfig
  * 

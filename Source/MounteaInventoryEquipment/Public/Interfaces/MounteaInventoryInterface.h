@@ -8,6 +8,7 @@
 #include "Helpers/MounteaInventoryHelpers.h"
 #include "MounteaInventoryInterface.generated.h"
 
+class UMounteaInventoryThemeConfig;
 struct FItemTransfer;
 class IMounteaInventoryInstancedItemInterface;
 class UMounteaInstancedItem;
@@ -43,7 +44,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryInterface
 	GENERATED_BODY()
 
 public:
-
+	
 	/**
 	 * Retrieves the class type of the user interface associated with this inventory.
 	 * @return The class type of the inventory UI.

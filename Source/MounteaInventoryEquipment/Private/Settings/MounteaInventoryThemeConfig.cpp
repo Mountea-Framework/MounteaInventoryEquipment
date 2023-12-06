@@ -10,6 +10,16 @@ UMounteaInventoryThemeConfig::UMounteaInventoryThemeConfig()
 
 void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 {
+	// Inventory Image Theme
+	{
+		if (InventoryTheme == nullptr)
+		{
+			UInventoryTheme* NewInventoryTheme = NewObject<UInventoryTheme>(GetPackage());
+			
+			InventoryTheme = NewInventoryTheme;
+		}
+	}
+	
 	// Category Image Theme
 	{
 		if (CategoryImageTheme == nullptr)
@@ -106,6 +116,10 @@ void UMounteaInventoryThemeConfig::PostEditChangeProperty(FPropertyChangedEvent&
 	const FString PropertyName = PropertyChangedEvent.Property->GetName();
 
 	// TODO: Rather than making them in-package, create a new ones in the same folder!
+	if (PropertyName.Equals("InventoryTheme"))
+	{
+		GenerateMissingThemes();
+	}
 	if (PropertyName.Equals("CategoryThemes"))
 	{
 		GenerateMissingThemes();
@@ -128,6 +142,8 @@ bool UMounteaInventoryThemeConfig::Rename(const TCHAR* NewName, UObject* NewOute
 
 	if (bSatisfied)
 	{
+		if (InventoryTheme) InventoryTheme->Rename(nullptr, NewOuter, Flags);
+		
 		if (TextTheme) TextTheme->Rename(nullptr, NewOuter, Flags);
 
 		if (ColoursTheme) ColoursTheme->Rename(nullptr, NewOuter, Flags);

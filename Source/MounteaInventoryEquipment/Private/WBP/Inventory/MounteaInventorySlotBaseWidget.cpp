@@ -3,12 +3,15 @@
 
 #include "WBP/Inventory/MounteaInventorySlotBaseWidget.h"
 
+#include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaItemHelpers.h"
+#include "Interfaces/MounteaInventoryInterface.h"
 
 #include "Interfaces/UI/MounteaDragDropWBPInterface.h"
 #include "Interfaces/UI/MounteaInventoryItemWBPInterface.h"
 #include "Interfaces/UI/MounteaInventoryWBPInterface.h"
+#include "Settings/MounteaInventoryEquipmentSettings.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventorySlotBaseWidget"
 
@@ -213,21 +216,44 @@ bool UMounteaInventorySlotBaseWidget::CanDetach_Implementation(UUserWidget* OldC
 	return true;
 }
 
-FEventReply UMounteaInventorySlotBaseWidget::ResolveDrop_Implementation(UUserWidget* DroppedWidget, UObject* Payload)
+bool UMounteaInventorySlotBaseWidget::CanDrop_Implementation(UUserWidget* PayloadWidget, UObject* Payload) const
 {
-	FEventReply Result(false);
+	if (PayloadWidget == nullptr) return false;
 
-	if (DroppedWidget == nullptr) return Result;
+	TScriptInterface<IMounteaDragDropWBPInterface> PayloadWidgetInterface = PayloadWidget;
+	if (PayloadWidgetInterface.GetObject() == nullptr) return false;
 
-	TScriptInterface<IMounteaDragDropWBPInterface> DroppedWidgetInterface = DroppedWidget;
-	if (DroppedWidgetInterface.GetObject() == nullptr) return Result;
+	TScriptInterface<IMounteaInventoryItemWBPInterface> PassedItemWBP = PayloadWidgetInterface->Execute_GetItemWBP(PayloadWidgetInterface.GetObject());
+	if (PassedItemWBP.GetObject() == nullptr) return false;
 
-	TScriptInterface<IMounteaInventoryItemWBPInterface> PassedItemWBP = DroppedWidgetInterface->Execute_GetItemWBP(DroppedWidgetInterface.GetObject());
-	if (PassedItemWBP.GetObject() == nullptr) return Result;
+	TScriptInterface<IMounteaInventoryInterface> Inventory= OwningInventoryWidget->Execute_GetOwningInventory(OwningInventoryWidget.GetObject());
+	if (Inventory.GetObject() == nullptr) return false;
+	
+	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
+	if (Settings == nullptr) return true;
+
+	bool bThemeFound = false;
+	const UMounteaInventoryThemeConfig* InventoryUITheme = OwningInventoryWidget->Execute_GetTheme(OwningInventoryWidget.GetObject(), bThemeFound);
+	if (InventoryUITheme == nullptr || bThemeFound == false) return true;
+
+	if (InventoryUITheme->InventoryTheme == nullptr) return true;
+
+	return InventoryUITheme->InventoryTheme->bDragDropAllowed;
+}
+
+FEventReply UMounteaInventorySlotBaseWidget::ResolveDrop_Implementation(UUserWidget* PayloadWidget, UObject* Payload)
+{
+	if (Execute_CanDrop(this, PayloadWidget, Payload) == false)
+	{
+		return false;
+	}
+
+	TScriptInterface<IMounteaDragDropWBPInterface> PayloadWidgetInterface = PayloadWidget;
+	TScriptInterface<IMounteaInventoryItemWBPInterface> PassedItemWBP = PayloadWidgetInterface->Execute_GetItemWBP(PayloadWidgetInterface.GetObject());
 
 	// TODO: actually finish the logic :)
 	
-	return Result;
+	return true;
 }
 
 #undef LOCTEXT_NAMESPACE

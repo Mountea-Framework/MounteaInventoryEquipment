@@ -28,6 +28,10 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryWBPInterface
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))//, meta=(CompactNodeTitle="Theme Config", HideSelfPin=true))
+	UMounteaInventoryThemeConfig* GetTheme(bool& bResult) const;
+	virtual UMounteaInventoryThemeConfig* GetTheme_Implementation(bool& bResult) const = 0;
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
 	void CreateInventoryNotification(const FInventoryNotificationData& NotificationData);
