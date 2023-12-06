@@ -7,6 +7,7 @@
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Helpers/MounteaItemHelpers.h"
+#include "Interfaces/MounteaEquipmentInterface.h"
 
 #include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Interfaces/UI/MounteaInventoryItemWBPInterface.h"
@@ -90,7 +91,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::AttachItemToSlot_Impleme
 	return Result;
 }
 
-FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::DetachItemToSlot_Implementation(UUserWidget* ItemToDetach)
+FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::DetachItemFromSlot_Implementation(UUserWidget* ItemToDetach)
 {
 	FInventoryUpdateResult Result;
 
@@ -103,7 +104,8 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::DetachItemToSlot_Impleme
 
 	const TScriptInterface<IMounteaInventoryItemWBPInterface> OldItem = ItemToDetach;
 
-	// TODO: Consider moving this to replicated wrapper as the Item Flag can be important for replication
+	// Consider removing this as flags are replicated through the Equipment itself, but we can assume that equipment will be updated
+	// so we can safely remove the flag locally.
 	if (OldItem.GetObject())
 	{
 		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
@@ -130,6 +132,24 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::DetachItemToSlot_Impleme
 
 bool UMounteaEquipmentSlotBaseWidget::CanAttach_Implementation(UUserWidget* NewChildWidget, FInventoryUpdateResult& OutResult) const
 {
+	if (OwningEquipmentWidget.GetObject() == nullptr)
+	{
+		OutResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;
+		OutResult.ResultText = LOCTEXT("MounteaEquipmentSlotBaseWidget_OwningEquipmentWidget_Invalid", "Owning Equipment UI is not valid!");
+
+		return false;
+	}
+
+	const TScriptInterface<IMounteaEquipmentInterface> ParentEquipment = OwningEquipmentWidget->Execute_GetOwningEquipment(OwningEquipmentWidget.GetObject());
+	
+	if (ParentEquipment.GetObject() == nullptr)
+	{
+		OutResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;
+		OutResult.ResultText = LOCTEXT("MounteaEquipmentSlotBaseWidget_OwningEquipment_Invalid", "Owning Equipment is not valid!");
+
+		return false;
+	}
+	
 	if (NewChildWidget == nullptr)
 	{
 		OutResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;
@@ -179,6 +199,24 @@ bool UMounteaEquipmentSlotBaseWidget::CanAttach_Implementation(UUserWidget* NewC
 
 bool UMounteaEquipmentSlotBaseWidget::CanDetach_Implementation(UUserWidget* OldChildWidget, FInventoryUpdateResult& OutResult) const
 {
+	if (OwningEquipmentWidget.GetObject() == nullptr)
+	{
+		OutResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;
+		OutResult.ResultText = LOCTEXT("MounteaEquipmentSlotBaseWidget_OwningEquipmentWidget_Invalid", "Owning Equipment UI is not valid!");
+
+		return false;
+	}
+
+	const TScriptInterface<IMounteaEquipmentInterface> ParentEquipment = OwningEquipmentWidget->Execute_GetOwningEquipment(OwningEquipmentWidget.GetObject());
+	
+	if (ParentEquipment.GetObject() == nullptr)
+	{
+		OutResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;
+		OutResult.ResultText = LOCTEXT("MounteaEquipmentSlotBaseWidget_OwningEquipment_Invalid", "Owning Equipment is not valid!");
+
+		return false;
+	}
+	
 	if (OldChildWidget == nullptr)
 	{
 		OutResult.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_BadRequest;

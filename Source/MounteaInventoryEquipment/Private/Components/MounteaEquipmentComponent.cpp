@@ -9,6 +9,7 @@
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
 #include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "Settings/Config/MounteaDefaultsConfig.h"
 #include "WBP/MounteaBaseUserWidget.h"
@@ -216,6 +217,15 @@ FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMou
 		
 		// Multicast to Other clients, too, so there can be played animation etc.
 		OnEquipmentUpdated_Multicast.Broadcast(Result);
+
+		// Deal with Item Flags
+		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+		{
+			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->EquipmentConfigData.Get())
+			{				
+				ItemToEquip->AddItemFlag(EquipmentSettings->EquippedFlag);
+			}
+		}
 	}
 	else
 	{
@@ -376,6 +386,15 @@ FInventoryUpdateResult UMounteaEquipmentComponent::UnEquipItem_Implementation(UM
         Result.OptionalPayload = Item;
         Result.ResultID = MounteaInventoryEquipmentConsts::InventoryUpdatedCodes::Status_OK;
         Result.ResultText = LOCTEXT("EquipmentUpdateResult_ItemUnequipped", "Item unequipped.");
+
+    	// Deal with Item Flags
+    	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+    	{
+    		if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->EquipmentConfigData.Get())
+    		{
+    			Item->RemoveItemFlag(EquipmentSettings->EquippedFlag);
+    		}
+    	}
 
         OnSlotUnequipped.Broadcast(Result);
 

@@ -53,7 +53,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
 	FInventoryUpdateResult DetachItemToSlot(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach);
-	virtual FInventoryUpdateResult DetachItemToSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach) = 0;
+	virtual FInventoryUpdateResult DetachItemFromSlot_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryItemWBPInterface")) UUserWidget* ItemToDetach) = 0;
 
 	UFUNCTION(BlueprintImplementableEvent, Category="Mountea|Equipment")
 	void OnEquipmentSlotUpdated(const FString& UpdateMessage, const UUserWidget* AttachedChildWidget);
