@@ -3,7 +3,7 @@
 
 #include "Components/MounteaLootableComponent.h"
 
-#include "Helpers/MounteaInventoryItemBFL.h"
+#include "Helpers/BlueprintFunctionLibraries//MounteaInventoryItemBFL.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Net/UnrealNetwork.h"
 

@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Editor.h"
-#include "MounteaEquipmentHelpers.h"
+#include "Helpers/MounteaEquipmentHelpers.h"
 #include "InputCore/Classes/InputCoreTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 
-#include "MounteaInventoryHelpers.h"
+#include "Helpers/MounteaInventoryHelpers.h"
 #include "Settings/ContentTheme.h"
 
 #include "MounteaInventoryEquipmentBFL.generated.h"

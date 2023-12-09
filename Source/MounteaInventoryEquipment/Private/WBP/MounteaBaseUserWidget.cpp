@@ -3,7 +3,7 @@
 
 #include "WBP/MounteaBaseUserWidget.h"
 
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
 #include "Settings/MounteaInventoryThemeConfig.h"
 
 

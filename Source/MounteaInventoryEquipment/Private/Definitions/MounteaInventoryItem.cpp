@@ -2,13 +2,13 @@
 
 
 #include "Definitions/MounteaInventoryItem.h"
-
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Definitions/MounteaInventoryItemRarity.h"
-#include "Helpers/MounteaInventoryEquipmentConsts.h"
 
+#include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
+
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
 void UMounteaInventoryItemBase::PostInitProperties()

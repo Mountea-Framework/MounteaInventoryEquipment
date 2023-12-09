@@ -3,7 +3,7 @@
 
 #include "WBP/Inventory/MounteaInventorySlotBaseWidget.h"
 
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaItemHelpers.h"
 #include "Interfaces/MounteaInventoryInterface.h"

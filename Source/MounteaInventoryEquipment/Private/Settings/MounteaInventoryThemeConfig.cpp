@@ -2,7 +2,7 @@
 
 
 #include "Settings/MounteaInventoryThemeConfig.h"
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
 
 UMounteaInventoryThemeConfig::UMounteaInventoryThemeConfig()
 {

@@ -1,4 +1,4 @@
 ﻿// Copyright Dominik Morse 2023. All Rights Reserved.
 
 
-#include "Helpers/MounteaEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaEquipmentBFL.h"

@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaInventoryEquipmentConsts.h"
-#include "MounteaItemHelpers.h"
+#include "Helpers/MounteaInventoryEquipmentConsts.h"
+#include "Helpers/MounteaItemHelpers.h"
 #include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryItemBFL.generated.h"

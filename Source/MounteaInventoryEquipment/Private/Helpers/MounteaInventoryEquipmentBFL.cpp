@@ -1,12 +1,12 @@
 // Copyright Dominik Morse 2023. All Rights Reserved.
 
 
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
 
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
-#include "Helpers/MounteaEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaEquipmentBFL.h"
 #include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/UI/MounteaInventoryItemWBPInterface.h"
 #include "Interfaces/UI/MounteaInventorySlotWBPInterface.h"

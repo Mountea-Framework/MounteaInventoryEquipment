@@ -5,7 +5,7 @@
 
 #include "Definitions/MounteaInventoryInstancedItem.h"
 
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
 #include "Helpers/MounteaItemHelpers.h"
 #include "Interfaces/MounteaEquipmentInterface.h"
 

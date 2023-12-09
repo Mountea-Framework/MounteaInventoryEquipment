@@ -5,13 +5,18 @@
 
 #include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Engine/ActorChannel.h"
-#include "Helpers/MounteaEquipmentBFL.h"
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
+
+#include "Helpers/BlueprintFunctionLibraries/MounteaEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
+
 #include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
+
 #include "Net/UnrealNetwork.h"
+
 #include "Settings/MounteaEquipmentConfigData.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "Settings/Config/MounteaDefaultsConfig.h"
+
 #include "WBP/MounteaBaseUserWidget.h"
 
 #define LOCTEXT_NAMESPACE "MounteaEquipmentComponent"
@@ -558,10 +563,7 @@ void UMounteaEquipmentComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 
 	if (PropertyChangedEvent.Property->GetName() == TEXT("EquipmentSlotData"))
 	{
-		for (FEquipmentSlot& Itr : EquipmentSlots)
-		{
-			// TODO:
-		}
+		// TODO...
 	}
 }
 

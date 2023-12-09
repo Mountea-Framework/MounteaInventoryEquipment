@@ -4,18 +4,23 @@
 #include "Components/MounteaInventoryComponent.h"
 
 #include "Async/Async.h"
+
 #include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Definitions/MounteaInventoryItem.h"
+
 #include "Engine/ActorChannel.h"
 
-#include "Helpers/MounteaInventoryEquipmentBFL.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
-#include "Helpers/MounteaInventoryItemBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
+#include "Helpers/BlueprintFunctionLibraries/MounteaInventoryItemBFL.h"
+
 #include "Interfaces/UI/MounteaInventoryWBPInterface.h"
 
 #include "Net/UnrealNetwork.h"
+
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "Settings/Config/MounteaDefaultsConfig.h"
+
 #include "WBP/MounteaBaseUserWidget.h"
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryComponent"
