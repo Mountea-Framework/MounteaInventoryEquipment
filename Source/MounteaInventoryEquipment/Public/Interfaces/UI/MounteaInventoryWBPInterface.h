@@ -9,6 +9,7 @@
 
 #include "MounteaInventoryWBPInterface.generated.h"
 
+class UMounteaInventoryThemeConfig;
 class IMounteaInventoryItemWBPInterface;
 class IMounteaInventoryInterface;
 struct FInventoryNotificationData;

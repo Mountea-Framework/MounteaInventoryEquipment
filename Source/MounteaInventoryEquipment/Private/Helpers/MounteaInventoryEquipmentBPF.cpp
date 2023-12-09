@@ -362,7 +362,7 @@ bool UMounteaInventoryEquipmentBPF::IsValidShadow(const TArray<FIntPoint>& Slots
 		return false;
 	}
 
-	const FIntPoint Area = MovedItem->Execute_GetItemSize(MovedItem.GetObject());
+	const FIntPoint Area = MovedItem->Execute_GetItemDimensions(MovedItem.GetObject());
 
 		
 	if (Shadow.Num() < FMath::Max(Area.X, Area.Y))

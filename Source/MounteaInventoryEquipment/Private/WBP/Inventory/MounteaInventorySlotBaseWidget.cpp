@@ -226,8 +226,16 @@ bool UMounteaInventorySlotBaseWidget::CanDrop_Implementation(UUserWidget* Payloa
 	TScriptInterface<IMounteaInventoryItemWBPInterface> PassedItemWBP = PayloadWidgetInterface->Execute_GetItemWBP(PayloadWidgetInterface.GetObject());
 	if (PassedItemWBP.GetObject() == nullptr) return false;
 
+	if (PassedItemWBP->GetItemUI() == nullptr) return false;
+
 	TScriptInterface<IMounteaInventoryInterface> Inventory= OwningInventoryWidget->Execute_GetOwningInventory(OwningInventoryWidget.GetObject());
 	if (Inventory.GetObject() == nullptr) return false;
+
+	FInventoryUpdateResult Result;
+	if (Execute_CanAttach(this, PassedItemWBP->GetItemUI(), Result) == false)
+	{
+		return false;
+	}
 	
 	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
 	if (Settings == nullptr) return true;
@@ -248,10 +256,11 @@ FEventReply UMounteaInventorySlotBaseWidget::ResolveDrop_Implementation(UUserWid
 		return false;
 	}
 
+	// Validity of those values has been checked in `CanDrop` already, here we assume those are safe to work with
 	TScriptInterface<IMounteaDragDropWBPInterface> PayloadWidgetInterface = PayloadWidget;
 	TScriptInterface<IMounteaInventoryItemWBPInterface> PassedItemWBP = PayloadWidgetInterface->Execute_GetItemWBP(PayloadWidgetInterface.GetObject());
 
-	// TODO: actually finish the logic :)
+	Execute_AttachItemToSlot(this, PassedItemWBP->GetItemUI());
 	
 	return true;
 }

@@ -270,12 +270,7 @@ bool UMounteaEquipmentSlotBaseWidget::CanDrop_Implementation(UUserWidget* Payloa
 
 FEventReply UMounteaEquipmentSlotBaseWidget::ResolveDrop_Implementation(UUserWidget* PayloadWidget, UObject* Payload)
 {
-	if (Execute_CanDrop(this, PayloadWidget, Payload) == false)
-	{
-		return false;
-	}
-
-	return true;
+	return Super::ResolveDrop_Implementation(PayloadWidget, Payload);
 }
 
 void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedSlot)
