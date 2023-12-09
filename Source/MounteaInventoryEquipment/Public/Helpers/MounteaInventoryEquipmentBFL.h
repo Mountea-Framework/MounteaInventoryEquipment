@@ -11,7 +11,7 @@
 #include "MounteaInventoryHelpers.h"
 #include "Settings/ContentTheme.h"
 
-#include "MounteaInventoryEquipmentBPF.generated.h"
+#include "MounteaInventoryEquipmentBFL.generated.h"
 
 class UMounteaInventoryItemsTable;
 class UMounteaInventoryEquipmentSettings;
@@ -27,7 +27,7 @@ class IMounteaInventoryInterface;
  * 
  */
 UCLASS()
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentBPF : public UBlueprintFunctionLibrary
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentBFL : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

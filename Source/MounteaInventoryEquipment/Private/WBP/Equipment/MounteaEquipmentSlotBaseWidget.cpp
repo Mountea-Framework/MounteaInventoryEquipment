@@ -5,7 +5,7 @@
 
 #include "Definitions/MounteaInventoryInstancedItem.h"
 
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 #include "Helpers/MounteaItemHelpers.h"
 #include "Interfaces/MounteaEquipmentInterface.h"
 
@@ -66,7 +66,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::AttachItemToSlot_Impleme
 	
 	if (NewItem.GetObject())
 	{
-		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBFL::GetSettings())
 		{
 			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
 			{
@@ -107,7 +107,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::DetachItemFromSlot_Imple
 	// so we can safely remove the flag locally.
 	if (OldItem.GetObject())
 	{
-		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBFL::GetSettings())
 		{
 			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
 			{
@@ -275,7 +275,7 @@ FEventReply UMounteaEquipmentSlotBaseWidget::ResolveDrop_Implementation(UUserWid
 
 void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedSlot)
 {
-	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBFL::GetSettings())
 	{
 		if (!Settings->GetEquipmentConfigData().IsNull())
 		{
@@ -296,7 +296,7 @@ TArray<FString> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 {
 	TArray<FString> Results;
 
-	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBFL::GetSettings())
 	{
 		if (!Settings->GetEquipmentConfigData().IsNull())
 		{

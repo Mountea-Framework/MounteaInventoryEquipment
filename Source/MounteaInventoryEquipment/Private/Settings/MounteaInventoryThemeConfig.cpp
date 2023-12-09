@@ -2,7 +2,7 @@
 
 
 #include "Settings/MounteaInventoryThemeConfig.h"
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 
 UMounteaInventoryThemeConfig::UMounteaInventoryThemeConfig()
 {
@@ -32,7 +32,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 	
 	// Categories Themes
 	{
-		const TSet<UMounteaInventoryItemCategory*> AllCategories = UMounteaInventoryEquipmentBPF::GetAllowedCategories();
+		const TSet<UMounteaInventoryItemCategory*> AllCategories = UMounteaInventoryEquipmentBFL::GetAllowedCategories();
 		TSet<UMounteaInventoryItemCategory*> CategoriesWithTheme;
 	
 		for (const auto& Itr : CategoryThemes)

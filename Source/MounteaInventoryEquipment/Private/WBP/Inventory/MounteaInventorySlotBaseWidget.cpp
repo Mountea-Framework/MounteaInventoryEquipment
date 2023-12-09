@@ -3,7 +3,7 @@
 
 #include "WBP/Inventory/MounteaInventorySlotBaseWidget.h"
 
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaItemHelpers.h"
 #include "Interfaces/MounteaInventoryInterface.h"
@@ -237,7 +237,7 @@ bool UMounteaInventorySlotBaseWidget::CanDrop_Implementation(UUserWidget* Payloa
 		return false;
 	}
 	
-	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
+	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBFL::GetSettings();
 	if (Settings == nullptr) return true;
 
 	bool bThemeFound = false;

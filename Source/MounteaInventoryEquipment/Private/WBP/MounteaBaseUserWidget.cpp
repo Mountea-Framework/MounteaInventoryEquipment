@@ -3,7 +3,7 @@
 
 #include "WBP/MounteaBaseUserWidget.h"
 
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 #include "Settings/MounteaInventoryThemeConfig.h"
 
 
@@ -263,7 +263,7 @@ UMounteaInventoryThemeConfig* UMounteaBaseUserWidget::GetThemeConfig(const TSubc
 	}
 
 	bResult = true;
-	const auto FoundTheme = ThemeConfigOverride != nullptr ? ThemeConfigOverride : UMounteaInventoryEquipmentBPF::GetThemeConfig(ClassFilter, bResult);
+	const auto FoundTheme = ThemeConfigOverride != nullptr ? ThemeConfigOverride : UMounteaInventoryEquipmentBFL::GetThemeConfig(ClassFilter, bResult);
 
 	if (!bResult)
 	{

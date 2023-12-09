@@ -8,7 +8,7 @@
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 
 #include "Helpers/FMounteaTemplatesLibrary.h"
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 
 void UMounteaInventoryItemBase::PostInitProperties()
@@ -17,14 +17,14 @@ void UMounteaInventoryItemBase::PostInitProperties()
 
 	bool bIsEditorNoPlay = false;
 #if WITH_EDITOR
-	bIsEditorNoPlay = UMounteaInventoryEquipmentBPF::IsEditorNoPlay();
+	bIsEditorNoPlay = UMounteaInventoryEquipmentBFL::IsEditorNoPlay();
 #endif
 	
 	if (bIsEditorNoPlay) // This code gets executed only when opening new Asset in Editor
 	{
 		if (ItemDataSource == EItemDataSource::EIDS_SourceTable && SourceTable == nullptr)
 		{
-			SourceTable = UMounteaInventoryEquipmentBPF::GetDefaultItemsTable();
+			SourceTable = UMounteaInventoryEquipmentBFL::GetDefaultItemsTable();
 		}
 
 		EnsureValidConfig();
@@ -101,8 +101,8 @@ void UMounteaInventoryItemBase::EnsureValidConfig()
 	if (ItemConfig.ItemConfig == nullptr)
 	{
 		bool bFound = false;
-		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
-		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBPF::GetItemConfig(this, Class, bFound);
+		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBFL::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
+		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBFL::GetItemConfig(this, Class, bFound);
 	}
 	
 	// Copy Actions Categories

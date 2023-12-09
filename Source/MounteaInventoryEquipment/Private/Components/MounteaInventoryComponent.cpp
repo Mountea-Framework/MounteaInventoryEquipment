@@ -8,7 +8,7 @@
 #include "Definitions/MounteaInventoryItem.h"
 #include "Engine/ActorChannel.h"
 
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 #include "Helpers/MounteaInventoryEquipmentConsts.h"
 #include "Helpers/MounteaInventoryItemBFL.h"
 #include "Interfaces/UI/MounteaInventoryWBPInterface.h"
@@ -91,7 +91,7 @@ TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryUICl
 		return InventoryWBPClass;
 	}
 	
-	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
+	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBFL::GetSettings();
 
 	if (!Settings) return nullptr;
 
@@ -113,7 +113,7 @@ void UMounteaInventoryComponent::PostInitProperties()
 
 	bool bIsEditorNoPlay = false;
 #if WITH_EDITOR
-	bIsEditorNoPlay = UMounteaInventoryEquipmentBPF::IsEditorNoPlay();
+	bIsEditorNoPlay = UMounteaInventoryEquipmentBFL::IsEditorNoPlay();
 #endif
 	
 	if (bIsEditorNoPlay) // This code gets executed only when opening new Asset in Editor
@@ -121,8 +121,8 @@ void UMounteaInventoryComponent::PostInitProperties()
 		if (InventoryConfig.MounteaInventoryConfig == nullptr)
 		{
 			bool bFound = false;
-			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
-			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(this, Class, bFound);
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBFL::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBFL::GetInventoryConfig(this, Class, bFound);
 		}
 	}
 }
@@ -1762,8 +1762,8 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 		if (InventoryConfig.MounteaInventoryConfig == nullptr)
 		{
 			bool bFound = false;
-			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBPF::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
-			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBPF::GetInventoryConfig(GetPackage()->GetOuter(), Class, bFound);
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBFL::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBFL::GetInventoryConfig(GetPackage()->GetOuter(), Class, bFound);
 		}
 	}
 }

@@ -6,7 +6,7 @@
 #include "Definitions/MounteaInventoryInstancedItem.h"
 #include "Engine/ActorChannel.h"
 #include "Helpers/MounteaEquipmentBFL.h"
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 #include "Interfaces/UI/MounteaEquipmentWBPInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaEquipmentConfigData.h"
@@ -219,7 +219,7 @@ FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMou
 		OnEquipmentUpdated_Multicast.Broadcast(Result);
 
 		// Deal with Item Flags
-		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBFL::GetSettings())
 		{
 			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
 			{				
@@ -388,7 +388,7 @@ FInventoryUpdateResult UMounteaEquipmentComponent::UnEquipItem_Implementation(UM
         Result.ResultText = LOCTEXT("EquipmentUpdateResult_ItemUnequipped", "Item unequipped.");
 
     	// Deal with Item Flags
-    	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
+    	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBFL::GetSettings())
     	{
     		if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
     		{
@@ -522,7 +522,7 @@ TSubclassOf<UMounteaBaseUserWidget> UMounteaEquipmentComponent::GetEquipmentUICl
 {
 	if (EquipmentUIClass != nullptr ) { return EquipmentUIClass; };
 
-	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBPF::GetSettings();
+	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBFL::GetSettings();
 
 	if (!Settings) return nullptr;
 

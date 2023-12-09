@@ -1,7 +1,7 @@
 // Copyright Dominik Morse 2023. All Rights Reserved.
 
 
-#include "Helpers/MounteaInventoryEquipmentBPF.h"
+#include "Helpers/MounteaInventoryEquipmentBFL.h"
 
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
@@ -14,22 +14,22 @@
 #include "Settings/MounteaInventoryThemeConfig.h"
 #include "Setup/MounteaInventoryConfig.h"
 
-TScriptInterface<IMounteaInventoryInterface> UMounteaInventoryEquipmentBPF::GetInventoryInterface(AActor* FromActor)
+TScriptInterface<IMounteaInventoryInterface> UMounteaInventoryEquipmentBFL::GetInventoryInterface(AActor* FromActor)
 {
 	return GetInterfaceFrom<UMounteaInventoryInterface, TScriptInterface<IMounteaInventoryInterface>>(FromActor);
 }
 
-bool UMounteaInventoryEquipmentBPF::ItemRetrievalFilter_IsValid(const FItemRetrievalFilter& Filter)
+bool UMounteaInventoryEquipmentBFL::ItemRetrievalFilter_IsValid(const FItemRetrievalFilter& Filter)
 {
 	return Filter.IsValid();
 }
 
-bool UMounteaInventoryEquipmentBPF::IsArrayValid(const TArray<UObject*>& Array)
+bool UMounteaInventoryEquipmentBFL::IsArrayValid(const TArray<UObject*>& Array)
 {
 	return Array.Num() > 0;
 }
 
-UActorComponent* UMounteaInventoryEquipmentBPF::GetSingleComponentByInterface(const AActor* Target, TSubclassOf<UInterface> InterfaceFilter)
+UActorComponent* UMounteaInventoryEquipmentBFL::GetSingleComponentByInterface(const AActor* Target, TSubclassOf<UInterface> InterfaceFilter)
 {
 	if (Target == nullptr) return nullptr;
 
@@ -40,12 +40,12 @@ UActorComponent* UMounteaInventoryEquipmentBPF::GetSingleComponentByInterface(co
 	return TempComps[0];
 }
 
-bool UMounteaInventoryEquipmentBPF::IsInventoryValid(	const TScriptInterface<IMounteaInventoryInterface>& InventoryInterface)
+bool UMounteaInventoryEquipmentBFL::IsInventoryValid(	const TScriptInterface<IMounteaInventoryInterface>& InventoryInterface)
 {
 	return InventoryInterface.GetObject() != nullptr;
 }
 
-UObject* UMounteaInventoryEquipmentBPF::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter,	bool& bResult)
+UObject* UMounteaInventoryEquipmentBFL::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter,	bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{
@@ -69,7 +69,7 @@ UObject* UMounteaInventoryEquipmentBPF::GetObjectByClass(UObject* Object, const 
 	return nullptr;
 }
 
-TArray<UMounteaInventoryThemeConfig*> UMounteaInventoryEquipmentBPF::GetThemeConfigs()
+TArray<UMounteaInventoryThemeConfig*> UMounteaInventoryEquipmentBFL::GetThemeConfigs()
 {
 	TArray<UMounteaInventoryThemeConfig*> Result;
 	if (const auto Settings = GetSettings())
@@ -85,7 +85,7 @@ TArray<UMounteaInventoryThemeConfig*> UMounteaInventoryEquipmentBPF::GetThemeCon
 	return Result;
 }
 
-TArray<FString> UMounteaInventoryEquipmentBPF::GetThemeConfigsNames()
+TArray<FString> UMounteaInventoryEquipmentBFL::GetThemeConfigsNames()
 {
 	TArray<FString> Result;
 
@@ -97,7 +97,7 @@ TArray<FString> UMounteaInventoryEquipmentBPF::GetThemeConfigsNames()
 	return Result;
 }
 
-UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBPF::GetThemeConfigByName(const FString& SearchName)
+UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBFL::GetThemeConfigByName(const FString& SearchName)
 {
 	UMounteaInventoryThemeConfig* Result = nullptr;
 
@@ -114,14 +114,14 @@ UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBPF::GetThemeConfigByNam
 	return Result;
 }
 
-TSubclassOf<UMounteaInventoryThemeConfig> UMounteaInventoryEquipmentBPF::GetThemeConfigClass()
+TSubclassOf<UMounteaInventoryThemeConfig> UMounteaInventoryEquipmentBFL::GetThemeConfigClass()
 {
 	if (GetSettings()->ThemeConfig) return GetSettings()->ThemeConfig->StaticClass();
 
 	return nullptr;
 }
 
-UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBPF::GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter, bool& bResult)
+UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBFL::GetThemeConfig(const TSubclassOf<UMounteaInventoryThemeConfig> ClassFilter, bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{
@@ -145,7 +145,7 @@ UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBPF::GetThemeConfig(cons
 	return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
 }
 
-UContentTheme* UMounteaInventoryEquipmentBPF::GetContentThemeConfig(const TSubclassOf<UContentTheme> ClassFilter, bool& bResult)
+UContentTheme* UMounteaInventoryEquipmentBFL::GetContentThemeConfig(const TSubclassOf<UContentTheme> ClassFilter, bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{
@@ -164,21 +164,21 @@ UContentTheme* UMounteaInventoryEquipmentBPF::GetContentThemeConfig(const TSubcl
 	return nullptr;
 }
 
-TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryEquipmentBPF::GetItemInventoryConfigClass(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
+TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryEquipmentBFL::GetItemInventoryConfigClass(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
 {
 	if (!Target) return nullptr;
 
 	return Target->Execute_GetInventoryConfigClass(Target.GetObject());
 }
 
-TSubclassOf<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBPF::GetItemItemConfigClass(const UMounteaInventoryItemBase* Target)
+TSubclassOf<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBFL::GetItemItemConfigClass(const UMounteaInventoryItemBase* Target)
 {
 	if (!Target) return nullptr;
 
 	return Target->GetItemConfigClass();
 }
 
-UMounteaInventoryConfig* UMounteaInventoryEquipmentBPF::GetInventoryConfig(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
+UMounteaInventoryConfig* UMounteaInventoryEquipmentBFL::GetInventoryConfig(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{
@@ -195,7 +195,7 @@ UMounteaInventoryConfig* UMounteaInventoryEquipmentBPF::GetInventoryConfig(const
 	return Target->Execute_GetInventoryConfig(Target.GetObject(), ClassFilter, bResult);
 }
 
-UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult)
+UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBFL::GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{
@@ -212,7 +212,7 @@ UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const 
 	return Target->GetItemConfig(ClassFilter, bResult);
 }
 
-bool UMounteaInventoryEquipmentBPF::IsEditor()
+bool UMounteaInventoryEquipmentBFL::IsEditor()
 {
 #if WITH_EDITOR
 	return true;
@@ -221,7 +221,7 @@ bool UMounteaInventoryEquipmentBPF::IsEditor()
 	return false;
 }
 
-bool UMounteaInventoryEquipmentBPF::IsEditorNoPlay()
+bool UMounteaInventoryEquipmentBFL::IsEditorNoPlay()
 {
 	// This is to ensure we are not throwing InvalidWorld errors in Editor with no Gameplay.
 	bool bIsEditorCall = false;
@@ -235,7 +235,7 @@ bool UMounteaInventoryEquipmentBPF::IsEditorNoPlay()
 	return bIsEditorCall;
 }
 
-bool UMounteaInventoryEquipmentBPF::IsShipping()
+bool UMounteaInventoryEquipmentBFL::IsShipping()
 {
 		
 #if UE_BUILD_SHIPPING
@@ -245,17 +245,17 @@ bool UMounteaInventoryEquipmentBPF::IsShipping()
 	return false;
 }
 
-UMounteaInventoryEquipmentSettings* UMounteaInventoryEquipmentBPF::GetSettings()
+UMounteaInventoryEquipmentSettings* UMounteaInventoryEquipmentBFL::GetSettings()
 {
 	return GetMutableDefault<UMounteaInventoryEquipmentSettings>();
 }
 
-UMounteaInventoryItemsTable* UMounteaInventoryEquipmentBPF::GetDefaultItemsTable()
+UMounteaInventoryItemsTable* UMounteaInventoryEquipmentBFL::GetDefaultItemsTable()
 {
 	return GetSettings()->DefaultInventoryItemDefinitionsTable.LoadSynchronous();
 }
 
-TSet<UMounteaInventoryItemCategory*> UMounteaInventoryEquipmentBPF::GetAllowedCategories()
+TSet<UMounteaInventoryItemCategory*> UMounteaInventoryEquipmentBFL::GetAllowedCategories()
 {
 	TSet<UMounteaInventoryItemCategory*> ReturnValues;
 	for (auto Itr : GetSettings()->GetInventoryCategories())
@@ -266,7 +266,7 @@ TSet<UMounteaInventoryItemCategory*> UMounteaInventoryEquipmentBPF::GetAllowedCa
 	return ReturnValues;
 }
 
-TSet<UMounteaInventoryItemRarity*> UMounteaInventoryEquipmentBPF::GetAllowedRarities()
+TSet<UMounteaInventoryItemRarity*> UMounteaInventoryEquipmentBFL::GetAllowedRarities()
 {
 	TSet<UMounteaInventoryItemRarity*> ReturnValues;
 	for (auto Itr : GetSettings()->GetInventoryRarities())
@@ -277,22 +277,22 @@ TSet<UMounteaInventoryItemRarity*> UMounteaInventoryEquipmentBPF::GetAllowedRari
 	return ReturnValues;
 }
 
-TArray<FKey> UMounteaInventoryEquipmentBPF::GetDragKeys()
+TArray<FKey> UMounteaInventoryEquipmentBFL::GetDragKeys()
 {
 	return GetSettings()->DragKeys;
 }
 
-TArray<FKey> UMounteaInventoryEquipmentBPF::GetActionRequestKeys()
+TArray<FKey> UMounteaInventoryEquipmentBFL::GetActionRequestKeys()
 {
 	return GetSettings()->ActionRequestKeys;
 }
 
-TSoftClassPtr<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBPF::GetDefaultItemConfigClass()
+TSoftClassPtr<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBFL::GetDefaultItemConfigClass()
 {
 	return GetSettings()->DefaultItemConfigClass;
 }
 
-bool UMounteaInventoryEquipmentBPF::UIDebug()
+bool UMounteaInventoryEquipmentBFL::UIDebug()
 {
 	if (IsShipping())
 	{
@@ -307,19 +307,19 @@ bool UMounteaInventoryEquipmentBPF::UIDebug()
 	return false;
 }
 
-bool UMounteaInventoryEquipmentBPF::IsDragAllowed()
+bool UMounteaInventoryEquipmentBFL::IsDragAllowed()
 {
 	return GetSettings()->bDragDropAllowed;
 }
 
-FIntPoint UMounteaInventoryEquipmentBPF::GetInventoryDimensions()
+FIntPoint UMounteaInventoryEquipmentBFL::GetInventoryDimensions()
 {
 	bool bFound;
 	const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
 	return bFound ? Config->InventoryBaseSize : FIntPoint(6, 10);
 }
 
-FIntPoint UMounteaInventoryEquipmentBPF::GetInventorySlotSize()
+FIntPoint UMounteaInventoryEquipmentBFL::GetInventorySlotSize()
 {
 	bool bFound;
 	const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
@@ -328,7 +328,7 @@ FIntPoint UMounteaInventoryEquipmentBPF::GetInventorySlotSize()
 
 
 
-TArray<FIntPoint> UMounteaInventoryEquipmentBPF::CalculateItemShadow(const FIntPoint& StartCoords,
+TArray<FIntPoint> UMounteaInventoryEquipmentBFL::CalculateItemShadow(const FIntPoint& StartCoords,
 	const FIntPoint& Area)
 {
 	TSet<FIntPoint> Results;
@@ -352,7 +352,7 @@ TArray<FIntPoint> UMounteaInventoryEquipmentBPF::CalculateItemShadow(const FIntP
 	return Results.Array();
 }
 
-bool UMounteaInventoryEquipmentBPF::IsValidShadow(const TArray<FIntPoint>& SlotsCoords,
+bool UMounteaInventoryEquipmentBFL::IsValidShadow(const TArray<FIntPoint>& SlotsCoords,
 	const TArray<TScriptInterface<IMounteaInventorySlotWBPInterface>>& SlotsRefs, const TArray<FIntPoint>& Shadow,
 	const TScriptInterface<IMounteaInventoryItemWBPInterface>& MovedItem)
 {
@@ -430,14 +430,14 @@ bool UMounteaInventoryEquipmentBPF::IsValidShadow(const TArray<FIntPoint>& Slots
 	return true;
 }
 
-bool UMounteaInventoryEquipmentBPF::IsSafeSlot(const FIntPoint& StartCoords, const FIntPoint& Area)
+bool UMounteaInventoryEquipmentBFL::IsSafeSlot(const FIntPoint& StartCoords, const FIntPoint& Area)
 {
 	CalculateItemShadow(StartCoords, Area);
 
 	return false;
 }
 
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter)
+TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBFL::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter)
 {
 	if (!Filter.IsValid()) return TArray<UMounteaInventoryItemBase*>();
 
