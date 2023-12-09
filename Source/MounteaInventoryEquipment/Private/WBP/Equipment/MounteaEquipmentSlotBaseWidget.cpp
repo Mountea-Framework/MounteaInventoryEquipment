@@ -68,7 +68,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::AttachItemToSlot_Impleme
 	{
 		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 		{
-			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->EquipmentConfigData.Get())
+			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
 			{
 				if (const auto Item = NewItem->Execute_GetItem(NewItem.GetObject()).Item )
 				{
@@ -109,7 +109,7 @@ FInventoryUpdateResult UMounteaEquipmentSlotBaseWidget::DetachItemFromSlot_Imple
 	{
 		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 		{
-			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->EquipmentConfigData.Get())
+			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
 			{
 				if (const auto Item = OldItem->Execute_GetItem(OldItem.GetObject()).Item )
 				{
@@ -277,9 +277,9 @@ void UMounteaEquipmentSlotBaseWidget::UpdateSlotID(const FGameplayTag& AffectedS
 {
 	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 	{
-		if (!Settings->EquipmentConfigData.IsNull())
+		if (!Settings->GetEquipmentConfigData().IsNull())
 		{
-			const TSet<FMounteaEquipmentSlotIdentity> IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
+			const TSet<FMounteaEquipmentSlotIdentity> IDs = Settings->GetEquipmentConfigData().LoadSynchronous()->EquipmentSlotIDs;
 			if (IDs.Contains(AffectedSlot))
 			{
 				SlotID = IDs.Find(AffectedSlot)->GetSlotID();
@@ -298,9 +298,9 @@ TArray<FString> UMounteaEquipmentSlotBaseWidget::GetSlotIDOptions()
 
 	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 	{
-		if (!Settings->EquipmentConfigData.IsNull())
+		if (!Settings->GetEquipmentConfigData().IsNull())
 		{
-			const auto IDs = Settings->EquipmentConfigData.LoadSynchronous()->EquipmentSlotIDs;
+			const auto IDs = Settings->GetEquipmentConfigData().LoadSynchronous()->EquipmentSlotIDs;
 			for (const auto& Itr : IDs)
 			{
 				if (Itr.SlotTag.IsValid() == false) continue;

@@ -113,8 +113,8 @@ public:
 
 #pragma region SettingsFunctions
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static const UMounteaInventoryEquipmentSettings* GetSettings();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment", meta=(NativeBreakFunc))
+	static UMounteaInventoryEquipmentSettings* GetSettings();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static UMounteaInventoryItemsTable* GetDefaultItemsTable();

@@ -34,6 +34,52 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public 
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSet<TSoftObjectPtr<UMounteaInventoryThemeConfig>> GetThemeConfigs() const
+	{ return ThemeConfigs; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSoftObjectPtr<UMounteaDefaultsConfig> GetDefaultsConfig() const
+	{ return DefaultsConfig; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> GetInventoryCategories() const
+	{ return InventoryCategories; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> GetInventoryRarities() const
+	{ return InventoryRarities; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSoftObjectPtr<UMounteaEquipmentConfigData> GetEquipmentConfigData() const
+	{ return EquipmentConfigData; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	bool IsDebugEnabled() const
+	{ return bUIDebug; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSet<FString> GetInventoryWidgetCommands() const
+	{ return InventoryWidgetCommands; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSet<FString> GetEquipmentWidgetCommands() const
+	{ return EquipmentWidgetCommands; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSet<FString> GetItemsWidgetCommands() const
+	{ return ItemsWidgetCommands; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSet<FString> GetItemTooltipWidgetCommands() const
+	{ return ItemTooltipWidgetCommands; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TMap<int32, FInventoryNotificationData> GetInventoryUpdateData() const
+	{ return InventoryUpdateData; };
+
+protected:
+
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryThemeConfig>> ThemeConfigs;
 

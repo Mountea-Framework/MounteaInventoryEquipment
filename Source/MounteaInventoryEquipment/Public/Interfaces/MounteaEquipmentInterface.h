@@ -41,6 +41,7 @@ public:
 
 	/**
 	 * Retrieves the actor that owns this equipment. For components it is common to return Owner, for Actors to return themselves.
+	 * 
 	 * @return The owning actor of this equipment.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
@@ -49,6 +50,7 @@ public:
 
 	/**
 	 * Finds a suitable slot for the given item based on the equipment's rules and configuration.
+	 * 
 	 * @param Item The item for which a suitable slot needs to be found.
 	 * @return The ID of the slot that can accommodate the item, or None if none is found.
 	 */
@@ -58,6 +60,7 @@ public:
 
 	/**
 	 * Finds a slot by its ID within the equipment.
+	 * 
 	 * @param SlotID The ID of the slot to find.
 	 * @return The index of the slot if found, or -1 if not found.
 	 */
@@ -67,6 +70,7 @@ public:
 
 	/**
 	 * Equips an item to the specified slot, updating the equipment state accordingly.
+	 * 
 	 * @param ItemToEquip The item to equip.
 	 * @param SlotID The ID of the slot where the item is to be equipped.
 	 * @return A structure containing details about the outcome of the equip process.
@@ -77,6 +81,7 @@ public:
 
 	/**
 	 * Unequips an item from the specified slot, updating the equipment state accordingly.
+	 * 
 	 * @param ItemToEquip The item to unequip.
 	 * @param SlotID The ID of the slot from which the item is to be unequipped.
 	 * @return A structure containing details about the outcome of the unequip process.
@@ -87,6 +92,7 @@ public:
 
 	/**
 	 * Checks if a specific item is currently equipped in a specified slot.
+	 * 
 	 * @param ItemToEquip The item to check if it's equipped.
 	 * @param SlotID The ID of the slot to check.
 	 * @return True if the item is equipped in the specified slot, false otherwise.
@@ -97,6 +103,7 @@ public:
 
 	/**
 	 * Retrieves all the equipment slots available.
+	 * 
 	 * @return An array of all equipment slots.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
@@ -105,6 +112,7 @@ public:
 
 	/**
 	 * Checks if a specific item can be equipped.
+	 * 
 	 * @param ItemToEquip The item to check.
 	 * @return True if the item can be equipped, false otherwise.
 	 */
@@ -114,6 +122,7 @@ public:
 
 	/**
 	 * Checks if a specific item can be unequipped.
+	 * 
 	 * @param ItemToUnequip The item to check.
 	 * @return True if the item can be unequipped, false otherwise.
 	 */
@@ -122,8 +131,8 @@ public:
 	virtual bool CanUnEquipItem_Implementation(UMounteaInstancedItem* ItemToUnequip) const = 0;
 
 	/**
-	 * Sets the UI widget for the equipment interface.
-	 * @param NewUI The new UI widget to set.
+	 * Returns the UI widget for the equipment interface.
+	 * 
 	 * @return True if the UI was successfully set, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
@@ -153,7 +162,9 @@ public:
 	virtual void SetEquipmentUIClass_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaEquipmentWBPInterface")) TSubclassOf<UMounteaBaseUserWidget> NewWBPClass) = 0;
 	
 	/**
-	 * Retrieves the UI widget associated with the equipment interface.
+	 * Sets the UI widget associated with the equipment interface.
+	 *
+	 * @param NewUI The User Interface reference to be used for Equipment UI.
 	 * @return The UI widget of the equipment interface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
@@ -162,9 +173,10 @@ public:
 
 	/**
 	 * Checks if the Equipment has authority within the networked game.
+	 * 
 	 * @return True if the component has authority, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	bool DoesHaveAuthority() const;
 	virtual bool DoesHaveAuthority_Implementation() const = 0;
 	

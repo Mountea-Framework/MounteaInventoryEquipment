@@ -221,7 +221,7 @@ FInventoryUpdateResult UMounteaEquipmentComponent::EquipItem_Implementation(UMou
 		// Deal with Item Flags
 		if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
 		{
-			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->EquipmentConfigData.Get())
+			if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
 			{				
 				ItemToEquip->AddItemFlag(EquipmentSettings->EquippedFlag);
 			}
@@ -390,7 +390,7 @@ FInventoryUpdateResult UMounteaEquipmentComponent::UnEquipItem_Implementation(UM
     	// Deal with Item Flags
     	if (const UMounteaInventoryEquipmentSettings* const Settings = UMounteaInventoryEquipmentBPF::GetSettings())
     	{
-    		if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->EquipmentConfigData.Get())
+    		if (const UMounteaEquipmentConfigData* EquipmentSettings = Settings->GetEquipmentConfigData().Get())
     		{
     			Item->RemoveItemFlag(EquipmentSettings->EquippedFlag);
     		}
@@ -526,7 +526,7 @@ TSubclassOf<UMounteaBaseUserWidget> UMounteaEquipmentComponent::GetEquipmentUICl
 
 	if (!Settings) return nullptr;
 
-	const UMounteaDefaultsConfig* DefaultsConfig = Settings->DefaultsConfig.LoadSynchronous();
+	const UMounteaDefaultsConfig* DefaultsConfig = Settings->GetDefaultsConfig().LoadSynchronous();
 
 	if (!DefaultsConfig) return nullptr;
 

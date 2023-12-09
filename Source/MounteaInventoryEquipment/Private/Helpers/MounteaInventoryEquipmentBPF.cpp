@@ -74,7 +74,7 @@ TArray<UMounteaInventoryThemeConfig*> UMounteaInventoryEquipmentBPF::GetThemeCon
 	TArray<UMounteaInventoryThemeConfig*> Result;
 	if (const auto Settings = GetSettings())
 	{
-		for (auto& Itr : Settings->ThemeConfigs)
+		for (auto& Itr : Settings->GetThemeConfigs())
 		{
 			if (Itr.IsNull()) continue;
 			
@@ -245,9 +245,9 @@ bool UMounteaInventoryEquipmentBPF::IsShipping()
 	return false;
 }
 
-const UMounteaInventoryEquipmentSettings* UMounteaInventoryEquipmentBPF::GetSettings()
+UMounteaInventoryEquipmentSettings* UMounteaInventoryEquipmentBPF::GetSettings()
 {
-	return GetDefault<UMounteaInventoryEquipmentSettings>();
+	return GetMutableDefault<UMounteaInventoryEquipmentSettings>();
 }
 
 UMounteaInventoryItemsTable* UMounteaInventoryEquipmentBPF::GetDefaultItemsTable()
@@ -258,7 +258,7 @@ UMounteaInventoryItemsTable* UMounteaInventoryEquipmentBPF::GetDefaultItemsTable
 TSet<UMounteaInventoryItemCategory*> UMounteaInventoryEquipmentBPF::GetAllowedCategories()
 {
 	TSet<UMounteaInventoryItemCategory*> ReturnValues;
-	for (auto Itr : GetSettings()->InventoryCategories)
+	for (auto Itr : GetSettings()->GetInventoryCategories())
 	{
 		ReturnValues.Add(Itr.LoadSynchronous());
 	}
@@ -269,7 +269,7 @@ TSet<UMounteaInventoryItemCategory*> UMounteaInventoryEquipmentBPF::GetAllowedCa
 TSet<UMounteaInventoryItemRarity*> UMounteaInventoryEquipmentBPF::GetAllowedRarities()
 {
 	TSet<UMounteaInventoryItemRarity*> ReturnValues;
-	for (auto Itr : GetSettings()->InventoryRarities)
+	for (auto Itr : GetSettings()->GetInventoryRarities())
 	{
 		ReturnValues.Add(Itr.LoadSynchronous());
 	}
@@ -301,7 +301,7 @@ bool UMounteaInventoryEquipmentBPF::UIDebug()
 		
 	if (const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>())
 	{
-		return Settings->bUIDebug;
+		return Settings->IsDebugEnabled();
 	}
 
 	return false;

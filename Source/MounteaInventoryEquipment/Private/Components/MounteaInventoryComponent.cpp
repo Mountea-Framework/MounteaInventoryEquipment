@@ -95,7 +95,7 @@ TSubclassOf<UMounteaBaseUserWidget> UMounteaInventoryComponent::GetInventoryUICl
 
 	if (!Settings) return nullptr;
 
-	const UMounteaDefaultsConfig* DefaultsConfig = Settings->DefaultsConfig.LoadSynchronous();
+	const UMounteaDefaultsConfig* DefaultsConfig = Settings->GetDefaultsConfig().LoadSynchronous();
 
 	if (!DefaultsConfig) return nullptr;
 
@@ -1489,7 +1489,7 @@ void UMounteaInventoryComponent::PostItemUpdated_Implementation(const FInventory
 void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUpdateResult& UpdateContext) const
 {
 	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
-	FInventoryNotificationData Data = *Settings->InventoryUpdateData.Find(UpdateContext.ResultID);
+	FInventoryNotificationData Data = *Settings->GetInventoryUpdateData().Find(UpdateContext.ResultID);
 
 	if (Data.Weight >= Settings->MinDisplayWeight)
 	{
