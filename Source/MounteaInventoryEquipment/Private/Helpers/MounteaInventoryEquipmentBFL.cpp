@@ -12,6 +12,7 @@
 #include "Interfaces/UI/MounteaInventorySlotWBPInterface.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
 #include "Settings/MounteaInventoryThemeConfig.h"
+#include "Settings/Config/MounteaDefaultsConfig.h"
 #include "Setup/MounteaInventoryConfig.h"
 
 TScriptInterface<IMounteaInventoryInterface> UMounteaInventoryEquipmentBFL::GetInventoryInterface(AActor* FromActor)
@@ -116,7 +117,7 @@ UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBFL::GetThemeConfigByNam
 
 TSubclassOf<UMounteaInventoryThemeConfig> UMounteaInventoryEquipmentBFL::GetThemeConfigClass()
 {
-	if (GetSettings()->ThemeConfig) return GetSettings()->ThemeConfig->StaticClass();
+	if (GetDefaults() && GetDefaults()->DefaultInventoryThemeConfigClass.Get()) return GetDefaults()->DefaultInventoryThemeConfigClass.LoadSynchronous()->StaticClass();
 
 	return nullptr;
 }
@@ -136,13 +137,14 @@ UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBFL::GetThemeConfig(cons
 		return NewObject<UMounteaInventoryThemeConfig>();
 	}
 
-	if (Settings->ThemeConfig.IsNull())
+	if (GetDefaults()->DefaultInventoryThemeConfigClass.IsNull())
 	{
 		return NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
 	}
 
-	auto const FoundTheme = Settings->ThemeConfig.LoadSynchronous();
-	return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
+	UMounteaInventoryThemeConfig* const NewTheme = NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), GetDefaults()->DefaultInventoryThemeConfigClass.LoadSynchronous());
+	
+	return NewTheme;
 }
 
 UContentTheme* UMounteaInventoryEquipmentBFL::GetContentThemeConfig(const TSubclassOf<UContentTheme> ClassFilter, bool& bResult)
@@ -250,9 +252,9 @@ UMounteaInventoryEquipmentSettings* UMounteaInventoryEquipmentBFL::GetSettings()
 	return GetMutableDefault<UMounteaInventoryEquipmentSettings>();
 }
 
-UMounteaInventoryItemsTable* UMounteaInventoryEquipmentBFL::GetDefaultItemsTable()
+UMounteaDefaultsConfig* UMounteaInventoryEquipmentBFL::GetDefaults()
 {
-	return GetSettings()->DefaultInventoryItemDefinitionsTable.LoadSynchronous();
+	return GetSettings()->GetDefaultsConfig().LoadSynchronous();
 }
 
 TSet<UMounteaInventoryItemCategory*> UMounteaInventoryEquipmentBFL::GetAllowedCategories()
@@ -287,11 +289,6 @@ TArray<FKey> UMounteaInventoryEquipmentBFL::GetActionRequestKeys()
 	return GetSettings()->ActionRequestKeys;
 }
 
-TSoftClassPtr<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBFL::GetDefaultItemConfigClass()
-{
-	return GetSettings()->DefaultItemConfigClass;
-}
-
 bool UMounteaInventoryEquipmentBFL::UIDebug()
 {
 	if (IsShipping())
@@ -306,27 +303,6 @@ bool UMounteaInventoryEquipmentBFL::UIDebug()
 
 	return false;
 }
-
-bool UMounteaInventoryEquipmentBFL::IsDragAllowed()
-{
-	return GetSettings()->bDragDropAllowed;
-}
-
-FIntPoint UMounteaInventoryEquipmentBFL::GetInventoryDimensions()
-{
-	bool bFound;
-	const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
-	return bFound ? Config->InventoryBaseSize : FIntPoint(6, 10);
-}
-
-FIntPoint UMounteaInventoryEquipmentBFL::GetInventorySlotSize()
-{
-	bool bFound;
-	const auto Config = GetThemeConfig(UMounteaInventoryThemeConfig::StaticClass(), bFound);
-	return bFound ? Config->SlotBaseSize : FIntPoint(16, 16);
-}
-
-
 
 TArray<FIntPoint> UMounteaInventoryEquipmentBFL::CalculateItemShadow(const FIntPoint& StartCoords,
 	const FIntPoint& Area)
@@ -437,20 +413,19 @@ bool UMounteaInventoryEquipmentBFL::IsSafeSlot(const FIntPoint& StartCoords, con
 	return false;
 }
 
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBFL::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter)
+TArray<UMounteaInstancedItem*> UMounteaInventoryEquipmentBFL::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInstancedItem*>& ItemsToFilter)
 {
-	if (!Filter.IsValid()) return TArray<UMounteaInventoryItemBase*>();
+	if (!Filter.IsValid()) return ItemsToFilter;
 
-	TArray<UMounteaInventoryItemBase*> TempResult;
+	TArray<UMounteaInstancedItem*> TempResult;
 
 	for (const auto& Itr : ItemsToFilter)
 	{
 		if (!Itr) continue;
 
 		bool bExclude = false;
-
-		/* BREAKING
-		if (Filter.bSearchByTag && Itr->GetTags().HasAny(Filter.Tags))
+		
+		if (Filter.bSearchByTag && Itr->GetItemFlags().HasAny(Filter.Tags))
 		{
 			bExclude = true;
 		}
@@ -466,7 +441,6 @@ TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBFL::ExcludeItems(c
 		{
 			bExclude = true;
 		}
-		*/
 
 		if (!bExclude)
 		{

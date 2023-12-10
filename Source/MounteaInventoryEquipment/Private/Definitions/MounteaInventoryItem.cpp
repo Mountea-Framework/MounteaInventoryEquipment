@@ -10,6 +10,7 @@
 #include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
 
 #include "Settings/MounteaInventoryEquipmentSettings.h"
+#include "Settings/Config/MounteaDefaultsConfig.h"
 
 void UMounteaInventoryItemBase::PostInitProperties()
 {
@@ -22,9 +23,9 @@ void UMounteaInventoryItemBase::PostInitProperties()
 	
 	if (bIsEditorNoPlay) // This code gets executed only when opening new Asset in Editor
 	{
-		if (ItemDataSource == EItemDataSource::EIDS_SourceTable && SourceTable == nullptr)
+		if (ItemDataSource == EItemDataSource::EIDS_SourceTable && SourceTable == nullptr && UMounteaInventoryEquipmentBFL::GetSettings() != nullptr)
 		{
-			SourceTable = UMounteaInventoryEquipmentBFL::GetDefaultItemsTable();
+			SourceTable = UMounteaInventoryEquipmentBFL::GetSettings()->GetDefaultInventoryItemDefinitionsTable().LoadSynchronous();
 		}
 
 		EnsureValidConfig();
@@ -101,7 +102,7 @@ void UMounteaInventoryItemBase::EnsureValidConfig()
 	if (ItemConfig.ItemConfig == nullptr)
 	{
 		bool bFound = false;
-		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBFL::GetSettings()->DefaultItemConfigClass.LoadSynchronous();
+		const TSubclassOf<UMounteaInventoryItemConfig> Class = UMounteaInventoryEquipmentBFL::GetDefaults()->DefaultInventoryItemConfigClass.LoadSynchronous();
 		ItemConfig.ItemConfig = UMounteaInventoryEquipmentBFL::GetItemConfig(this, Class, bFound);
 	}
 	

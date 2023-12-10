@@ -25,11 +25,11 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaBaseWidgetInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory & Equipment")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Base")
 	TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory() const;
 	virtual TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory_Implementation() const = 0;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory & Equipment")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Base")
 	void SetOwningInventory(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory);
 	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory) = 0;
 };

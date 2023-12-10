@@ -13,6 +13,7 @@
 
 #include "MounteaInventoryEquipmentBFL.generated.h"
 
+class UMounteaDefaultsConfig;
 class UMounteaInventoryItemsTable;
 class UMounteaInventoryEquipmentSettings;
 class UMounteaInventoryThemeConfig;
@@ -116,8 +117,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment", meta=(NativeBreakFunc))
 	static UMounteaInventoryEquipmentSettings* GetSettings();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static UMounteaInventoryItemsTable* GetDefaultItemsTable();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment", meta=(NativeBreakFunc))
+	static UMounteaDefaultsConfig* GetDefaults();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TSet<UMounteaInventoryItemCategory*> GetAllowedCategories();
@@ -126,31 +127,19 @@ public:
 	static TSet<UMounteaInventoryItemRarity*> GetAllowedRarities();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
+	static bool UIDebug();
+
+
+	
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FKey> GetDragKeys();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
 	static TArray<FKey> GetActionRequestKeys();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static TSoftClassPtr<UMounteaInventoryItemConfig> GetDefaultItemConfigClass();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool UIDebug();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static bool IsDragAllowed();
-
 #pragma endregion 
-
-#pragma region ThemeFunctions
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static FIntPoint GetInventoryDimensions();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static FIntPoint GetInventorySlotSize();
-
-#pragma endregion 
+ 
 	
 #pragma region QuantityFunctions
 
@@ -180,7 +169,7 @@ public:
 	static bool IsSafeSlot(const FIntPoint& StartCoords, const FIntPoint& Area);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta=(NativeBreakFunc))
-	static TArray<UMounteaInventoryItemBase*> ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter);
+	static TArray<UMounteaInstancedItem*> ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInstancedItem*>& ItemsToFilter);
 	
 #pragma endregion 
 };

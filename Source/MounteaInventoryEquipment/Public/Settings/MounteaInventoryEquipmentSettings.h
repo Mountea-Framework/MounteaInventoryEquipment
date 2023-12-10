@@ -55,9 +55,13 @@ public:
 	{ return EquipmentConfigData; };
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	TSoftObjectPtr<UMounteaInventoryItemsTable> GetDefaultInventoryItemDefinitionsTable() const
+	{ return DefaultInventoryItemDefinitionsTable; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
 	bool IsDebugEnabled() const
 	{ return bUIDebug; };
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
 	TSet<FString> GetInventoryWidgetCommands() const
 	{ return InventoryWidgetCommands; };
@@ -95,6 +99,9 @@ protected:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaEquipmentConfigData> EquipmentConfigData;
 
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TSoftObjectPtr<UMounteaInventoryItemsTable> DefaultInventoryItemDefinitionsTable;
+	
 	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
 	uint8 bUIDebug : 1;
 
@@ -328,7 +335,8 @@ protected:
 ===============================================================================*/
 
 public:
-	
+
+	/*
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
 
@@ -340,6 +348,7 @@ public:
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
 	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
+	*/
 	
 /*===============================================================================
 		SUBJECT OF CHANGE
@@ -348,12 +357,6 @@ public:
 ===============================================================================*/
 
 public:
-	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TSoftObjectPtr<UMounteaInventoryItemsTable> DefaultInventoryItemDefinitionsTable;
-	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
-	uint8 bDragDropAllowed : 1;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
 	TArray<FKey> DragKeys;

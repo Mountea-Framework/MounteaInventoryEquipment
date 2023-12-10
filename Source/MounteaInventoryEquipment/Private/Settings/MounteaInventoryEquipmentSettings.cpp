@@ -105,11 +105,6 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	MinDisplayWeight = 1;
 
 	bUIDebug = false;
-	bDragDropAllowed = true;
-
-	DefaultInventoryConfigClass = UMounteaInventoryConfig::StaticClass();
-	DefaultItemClass = UMounteaInventoryItemBase::StaticClass();
-	DefaultItemConfigClass = UMounteaInventoryItemConfig::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

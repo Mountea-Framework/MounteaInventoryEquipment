@@ -126,7 +126,7 @@ void UMounteaInventoryComponent::PostInitProperties()
 		if (InventoryConfig.MounteaInventoryConfig == nullptr)
 		{
 			bool bFound = false;
-			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBFL::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBFL::GetDefaults()->DefaultInventoryConfigClass.LoadSynchronous();
 			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBFL::GetInventoryConfig(this, Class, bFound);
 		}
 	}
@@ -1767,7 +1767,7 @@ void UMounteaInventoryComponent::PostEditChangeProperty(FPropertyChangedEvent& P
 		if (InventoryConfig.MounteaInventoryConfig == nullptr)
 		{
 			bool bFound = false;
-			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBFL::GetSettings()->DefaultInventoryConfigClass.LoadSynchronous();
+			const TSubclassOf<UMounteaInventoryConfig> Class = UMounteaInventoryEquipmentBFL::GetDefaults()->DefaultInventoryConfigClass.LoadSynchronous();
 			InventoryConfig.MounteaInventoryConfig = UMounteaInventoryEquipmentBFL::GetInventoryConfig(GetPackage()->GetOuter(), Class, bFound);
 		}
 	}

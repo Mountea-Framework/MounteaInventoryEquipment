@@ -4,8 +4,17 @@
 #include "WBP/Inventory/MounteaInventoryItemBaseWidget.h"
 
 #include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
+#include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/UI/MounteaInventoryWBPInterface.h"
+
 #include "Settings/MounteaInventoryThemeConfig.h"
+
+void UMounteaInventoryItemBaseWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	bIsDirty = 0;
+}
 
 TScriptInterface<IMounteaInventoryWBPInterface> UMounteaInventoryItemBaseWidget::GetOwningInventory_Implementation() const
 {
@@ -19,9 +28,44 @@ void UMounteaInventoryItemBaseWidget::SetOwningInventory_Implementation(const TS
 	OwningInventory = NewOwningInventory;
 }
 
+bool UMounteaInventoryItemBaseWidget::IsDirty_Implementation() const
+{
+	return bIsDirty;
+}
+
+void UMounteaInventoryItemBaseWidget::SetDirty_Implementation(const bool NewDirtyState)
+{
+	bIsDirty = NewDirtyState;
+}
+
 FItemSlot UMounteaInventoryItemBaseWidget::GetItem_Implementation() const
 {
-	return ItemSlot;
+	FItemSlot Result;
+
+	if (ItemStack.IsValid() == false)
+	{
+		return Result;
+	}
+
+	if (OwningInventory.GetObject() == nullptr)
+	{
+		return Result;
+	}
+
+	auto Inventory = OwningInventory->Execute_GetOwningInventory(OwningInventory.GetObject());
+
+	if (Inventory.GetObject() == nullptr)
+	{
+		return Result;
+	}
+
+	FItemRetrievalFilter Filter;
+	{
+		Filter.bSearchByGUID = true;
+		Filter.Guid = ItemStack.SlotGuid;
+	}
+	
+	return Inventory->Execute_SearchSingleItem(Inventory.GetObject(), Filter);
 }
 
 UMounteaBaseUserWidget* UMounteaInventoryItemBaseWidget::GetItemUI_Implementation()
@@ -52,14 +96,35 @@ bool UMounteaInventoryItemBaseWidget::MoveToNewCoords_Implementation(const FIntP
 {
 	if (NewCoords == SlotCoordinates) return false;
 
-	SlotCoordinates = NewCoords;
+	// Do not save Root Coords yet, just broadcast and wait for container to update root
+	OnItemWidgetMoved.Broadcast(this, SlotCoordinates);
 
 	return true;
 }
 
 bool UMounteaInventoryItemBaseWidget::ReleaseOldCoords_Implementation(const FIntPoint& OldCoords)
 {
+	PostItemWidgetMoved.Broadcast(this, SlotCoordinates);
+	
 	return true;
+}
+
+TArray<FIntPoint> UMounteaInventoryItemBaseWidget::GetOccupyingCoords_Implementation() const
+{
+	TArray<FIntPoint> Result;
+	Result.Reserve(SlotDimensions.X * SlotDimensions.Y);
+
+	for (int X = 0; X < SlotDimensions.X; ++X)
+	{
+		for (int Y = 0; Y < SlotDimensions.Y; ++Y)
+		{
+			// Calculate the current slot based on root and offset
+			FIntPoint CurrentSlot = SlotCoordinates + FIntPoint(X, Y);
+			Result.Add(CurrentSlot);
+		}
+	}
+
+	return Result;
 }
 
 bool UMounteaInventoryItemBaseWidget::CanBeDragged_Implementation() const
@@ -83,6 +148,7 @@ bool UMounteaInventoryItemBaseWidget::CanBeDragged_Implementation() const
 
 void UMounteaInventoryItemBaseWidget::OnDropped_Implementation()
 {
+	Execute_SetDirty(this, true);
 }
 
 void UMounteaInventoryItemBaseWidget::OnDragged_Implementation()
