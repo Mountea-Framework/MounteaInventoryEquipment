@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/UI/MounteaBaseWidgetInterface.h"
 #include "Interfaces/UI/MounteaInventorySlotWBPInterface.h"
 #include "WBP/MounteaBaseUserWidget.h"
 #include "MounteaInventorySlotBaseWidget.generated.h"
@@ -13,7 +14,7 @@ class IMounteaInventoryWBPInterface;
  * 
  */
 UCLASS()
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventorySlotBaseWidget : public UMounteaBaseUserWidget, public IMounteaInventorySlotWBPInterface
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventorySlotBaseWidget : public UMounteaBaseUserWidget, public IMounteaInventorySlotWBPInterface, public IMounteaBaseWidgetInterface
 {
 	GENERATED_BODY()
 	
@@ -23,7 +24,7 @@ protected:
 
 public:
 
-	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningEquipment) override;
+	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory) override;
 	virtual TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory_Implementation() const override;
 	
 	virtual bool IsSlotEmpty_Implementation() const override;

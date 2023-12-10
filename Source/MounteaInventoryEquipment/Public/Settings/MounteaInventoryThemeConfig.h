@@ -27,6 +27,11 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryThemeConfig : public UDataA
 	GENERATED_BODY()
 
 	UMounteaInventoryThemeConfig();
+
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Theme")
+	UInventoryTheme* GetInventoryTheme() const;
 	
 public:
 

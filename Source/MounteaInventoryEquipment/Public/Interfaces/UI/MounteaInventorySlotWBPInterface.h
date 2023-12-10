@@ -27,15 +27,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventorySlotWBPInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory() const;
-	virtual TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory_Implementation() const = 0;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Equipment")
-	void SetOwningInventory(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory);
-	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory) = 0;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory & Equipment")
 	FEventReply ResolveDrop(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.IMounteaDragDropWBPInterface")) UUserWidget* PayloadWidget, UObject* Payload);
 	virtual FEventReply ResolveDrop_Implementation(UPARAM(meta=(MustImplement="/Script/MounteaInventoryEquipment.IMounteaDragDropWBPInterface")) UUserWidget* PayloadWidget, UObject* Payload) = 0;

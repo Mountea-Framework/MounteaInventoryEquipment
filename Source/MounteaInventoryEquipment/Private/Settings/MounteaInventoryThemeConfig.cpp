@@ -8,6 +8,12 @@ UMounteaInventoryThemeConfig::UMounteaInventoryThemeConfig()
 {
 }
 
+UInventoryTheme* UMounteaInventoryThemeConfig::GetInventoryTheme() const
+{
+	if (InventoryTheme) return InventoryTheme;
+	return NewObject<UInventoryTheme>(GetPackage());
+}
+
 void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 {
 	// Inventory Image Theme

@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryItemWBPInterface.generated.h"
 
+class IMounteaInventoryWBPInterface;
 class UMounteaBaseUserWidget;
 class UMounteaInventoryItemBase;
 
@@ -31,8 +32,8 @@ public:
 	virtual FItemSlot GetItem_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	UMounteaBaseUserWidget* GetItemUI() const;
-	virtual UMounteaBaseUserWidget* GetItemUI_Implementation() const = 0;
+	UMounteaBaseUserWidget* GetItemUI();
+	virtual UMounteaBaseUserWidget* GetItemUI_Implementation() = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	FIntPoint GetRootCoords() const;
@@ -65,4 +66,5 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
 	void OnDragged();
 	virtual void OnDragged_Implementation() = 0;
+	
 };
