@@ -2,6 +2,10 @@
 
 #pragma once
 
+#if WITH_EDITOR
+#include "AssetRegistry/AssetRegistryModule.h"
+#endif
+
 template<typename Name, class TableClass>
 static TArray<Name> GetSourceRows(TableClass* Table)
 {
@@ -52,3 +56,48 @@ static FString GetEnumValueAsString(const FString& Name, TEnum Value)
 	if (!enumPtr) return FString("invalid");
 	return enumPtr->GetDisplayNameTextByValue((int64)Value).ToString();
 }
+
+#if WITH_EDITOR
+
+template <typename Source>
+FString GetFilePath(Source* Asset)
+{
+	if (Asset == nullptr) return FString("");
+	
+	FString FileName = "/";
+	FileName.Append(Asset->GetName());
+
+	FString PackagePath = Asset->GetOutermost()->GetPackage()->GetLoadedPath().GetPackageFName().ToString();
+	PackagePath.ReplaceInline((TEXT("%s"), *FileName), TEXT(""));
+
+	return PackagePath;
+}
+
+
+template <class AssetType>
+AssetType* CreateNewAsset(const FString& SaveObjectPath)
+{
+	AssetType* NewAsset = nullptr;
+
+	if (!SaveObjectPath.IsEmpty())
+	{
+		// Attempt to load existing asset first
+		NewAsset = FindObject<AssetType>(nullptr, *SaveObjectPath);
+
+		// Proceed to creating a new asset, if needed
+		if (!NewAsset)
+		{
+			const FString PackageName = FPackageName::ObjectPathToPackageName(SaveObjectPath);
+			const FString ObjectName = FPackageName::ObjectPathToObjectName(SaveObjectPath);
+
+			NewAsset = NewObject<AssetType>(CreatePackage(*PackageName), AssetType::StaticClass(), FName(*ObjectName), EObjectFlags::RF_Public | EObjectFlags::RF_Standalone);
+
+			FAssetRegistryModule::AssetCreated(NewAsset);
+			NewAsset->MarkPackageDirty();
+		}       
+	}
+
+	return NewAsset;
+}
+
+#endif

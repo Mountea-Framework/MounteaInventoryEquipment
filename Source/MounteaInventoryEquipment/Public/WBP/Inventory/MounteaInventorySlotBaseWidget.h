@@ -24,8 +24,8 @@ protected:
 
 public:
 
-	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory) override;
-	virtual TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory_Implementation() const override;
+	virtual void SetOwningInventoryWidget_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory) override;
+	virtual TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventoryWidget_Implementation() const override;
 	
 	virtual bool IsSlotEmpty_Implementation() const override;
 

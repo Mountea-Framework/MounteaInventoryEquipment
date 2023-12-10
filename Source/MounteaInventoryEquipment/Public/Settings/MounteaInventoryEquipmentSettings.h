@@ -82,47 +82,54 @@ public:
 	TMap<int32, FInventoryNotificationData> GetInventoryUpdateData() const
 	{ return InventoryUpdateData; };
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment")
+	int32 GetMinDisplayWeight() const
+	{ return  MinDisplayWeight; };
+
 protected:
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Setup", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryThemeConfig>> ThemeConfigs;
 
-	UPROPERTY(Config, EditDefaultsOnly, Category="1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(Config, EditDefaultsOnly, Category="1. Setup", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaDefaultsConfig> DefaultsConfig;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Setup", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Setup", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Setup", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaEquipmentConfigData> EquipmentConfigData;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "1. Setup", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaInventoryItemsTable> DefaultInventoryItemDefinitionsTable;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	uint8 bUIDebug : 1;
 
 #pragma region COMMANDS
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> InventoryWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> EquipmentWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> ItemsWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "3. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
 	TSet<FString> ItemTooltipWidgetCommands;
 	
 #pragma endregion
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "4. Notifications")
 	TMap<int32, FInventoryNotificationData> InventoryUpdateData;
+
+	UPROPERTY(config, EditDefaultsOnly, Category = "4. Notifications")
+	int32 MinDisplayWeight = 1;
 
 #if WITH_EDITOR
 
@@ -333,22 +340,6 @@ protected:
 		
 		Following properties are already being updated.
 ===============================================================================*/
-
-public:
-
-	/*
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
-	TSoftClassPtr<UMounteaInventoryItemBase> DefaultItemClass;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
-	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;
-	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
-	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
-	*/
 	
 /*===============================================================================
 		SUBJECT OF CHANGE
@@ -364,9 +355,6 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
 	TArray<FKey> ActionRequestKeys;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
-	int32 MinDisplayWeight = 1;
-		
 	/**
 	 * The maximum number of threads used for parallel execution.
 	 * Increasing this value can improve performance in certain scenarios,

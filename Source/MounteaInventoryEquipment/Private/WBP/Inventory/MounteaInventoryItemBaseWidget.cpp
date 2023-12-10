@@ -16,12 +16,12 @@ void UMounteaInventoryItemBaseWidget::NativeConstruct()
 	bIsDirty = 0;
 }
 
-TScriptInterface<IMounteaInventoryWBPInterface> UMounteaInventoryItemBaseWidget::GetOwningInventory_Implementation() const
+TScriptInterface<IMounteaInventoryWBPInterface> UMounteaInventoryItemBaseWidget::GetOwningInventoryWidget_Implementation() const
 {
 	return OwningInventory;
 }
 
-void UMounteaInventoryItemBaseWidget::SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory)
+void UMounteaInventoryItemBaseWidget::SetOwningInventoryWidget_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory)
 {
 	if (OwningInventory == NewOwningInventory) return;
 
@@ -132,7 +132,7 @@ bool UMounteaInventoryItemBaseWidget::CanBeDragged_Implementation() const
 	const UMounteaInventoryEquipmentSettings* Settings = UMounteaInventoryEquipmentBFL::GetSettings();
 	if (Settings == nullptr) return false;
 
-	const auto InventoryUI = Execute_GetOwningInventory(this);
+	const auto InventoryUI = Execute_GetOwningInventoryWidget(this);
 	if (InventoryUI.GetObject() == nullptr) return false;
 
 	bool bThemeFound;

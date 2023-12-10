@@ -20,14 +20,14 @@ void UMounteaInventorySlotBaseWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-void UMounteaInventorySlotBaseWidget::SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory)
+void UMounteaInventorySlotBaseWidget::SetOwningInventoryWidget_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory)
 {
 	if (NewOwningInventory == OwningInventoryWidget) return;
 
 	OwningInventoryWidget = NewOwningInventory;
 }
 
-TScriptInterface<IMounteaInventoryWBPInterface> UMounteaInventorySlotBaseWidget::GetOwningInventory_Implementation() const
+TScriptInterface<IMounteaInventoryWBPInterface> UMounteaInventorySlotBaseWidget::GetOwningInventoryWidget_Implementation() const
 {
 	return OwningInventoryWidget;
 }

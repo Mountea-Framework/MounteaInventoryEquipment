@@ -1496,7 +1496,7 @@ void UMounteaInventoryComponent::RequestInventoryNotification(const FInventoryUp
 	const UMounteaInventoryEquipmentSettings* Settings = GetDefault<UMounteaInventoryEquipmentSettings>();
 	FInventoryNotificationData Data = *Settings->GetInventoryUpdateData().Find(UpdateContext.ResultID);
 
-	if (Data.Weight >= Settings->MinDisplayWeight)
+	if (Data.Weight >= Settings->GetMinDisplayWeight())
 	{
 		if (!UpdateContext.ResultText.IsEmpty())
 		{

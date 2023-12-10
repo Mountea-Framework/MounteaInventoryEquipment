@@ -2,6 +2,14 @@
 
 
 #include "Settings/MounteaInventoryThemeConfig.h"
+#if WITH_EDITOR
+#include "ContentBrowserModule.h"
+#include "IContentBrowserSingleton.h"
+#endif
+
+#include "AssetToolsModule.h"
+#include "Factories/DataAssetFactory.h"
+#include "Helpers/FMounteaTemplatesLibrary.h"
 #include "Helpers/BlueprintFunctionLibraries/MounteaInventoryEquipmentBFL.h"
 
 UMounteaInventoryThemeConfig::UMounteaInventoryThemeConfig()
@@ -16,21 +24,26 @@ UInventoryTheme* UMounteaInventoryThemeConfig::GetInventoryTheme() const
 
 void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 {
-	// Inventory Image Theme
+
+#if WITH_EDITOR
+	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+
+	const FString FilePath = GetFilePath(this);
+	
+	if (InventoryTheme == nullptr)
 	{
-		if (InventoryTheme == nullptr)
+		UInventoryTheme* NewInventoryTheme = CreateNewAsset<UInventoryTheme>(FilePath);
+		if (NewInventoryTheme)
 		{
-			UInventoryTheme* NewInventoryTheme = NewObject<UInventoryTheme>(GetPackage());
-			
 			InventoryTheme = NewInventoryTheme;
 		}
 	}
-	
+
 	// Category Image Theme
 	{
 		if (CategoryImageTheme == nullptr)
 		{
-			UImageTheme* NewImageTheme = NewObject<UImageTheme>(GetPackage());
+			UImageTheme* NewImageTheme = CreateNewAsset<UImageTheme>(FilePath);
 			
 			CategoryImageTheme = NewImageTheme;
 		}
@@ -60,7 +73,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 
 		for (const auto& Itr : MissingCategories)
 		{
-			UCategoryTheme* NewCategoryTheme = NewObject<UCategoryTheme>(GetPackage(), UCategoryTheme::StaticClass());
+			UCategoryTheme* NewCategoryTheme = CreateNewAsset<UCategoryTheme>(FilePath);
 
 			if (NewCategoryTheme == nullptr) continue;
 			
@@ -78,7 +91,7 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 	{
 		if (TextTheme == nullptr)
 		{
-			UTextTheme* NewTextTheme = NewObject<UTextTheme>(GetPackage());
+			UTextTheme* NewTextTheme = CreateNewAsset<UTextTheme>(FilePath);
 
 			TextTheme = NewTextTheme;
 		}
@@ -88,11 +101,94 @@ void UMounteaInventoryThemeConfig::GenerateMissingThemes()
 	{
 		if (ColoursTheme == nullptr)
 		{
-			UColoursTheme* NewColoursTheme = NewObject<UColoursTheme>(GetPackage());
+			UColoursTheme* NewColoursTheme = CreateNewAsset<UColoursTheme>(FilePath);
 
 			ColoursTheme = NewColoursTheme;
 		}
 	}
+
+#else
+
+	// Inventory Image Theme
+	{
+		if (InventoryTheme == nullptr)
+		{
+			UInventoryTheme* NewInventoryTheme = NewObject<UInventoryTheme>(GetOuter()->GetPackage());
+			
+			InventoryTheme = NewInventoryTheme;
+		}
+	}
+	
+	// Category Image Theme
+	{
+		if (CategoryImageTheme == nullptr)
+		{
+			UImageTheme* NewImageTheme = NewObject<UImageTheme>(GetOuter()->GetPackage());
+			
+			CategoryImageTheme = NewImageTheme;
+		}
+	}
+	
+	// Categories Themes
+	{
+		const TSet<UMounteaInventoryItemCategory*> AllCategories = UMounteaInventoryEquipmentBFL::GetAllowedCategories();
+		TSet<UMounteaInventoryItemCategory*> CategoriesWithTheme;
+	
+		for (const auto& Itr : CategoryThemes)
+		{
+			if (Itr.CategoryTheme) 
+			{
+				CategoriesWithTheme.Add(Itr.CategoryTheme->Category);
+			}
+		}
+
+		TArray<UMounteaInventoryItemCategory*> MissingCategories;
+		for (UMounteaInventoryItemCategory* Category : AllCategories)
+		{
+			if (!CategoriesWithTheme.Contains(Category))
+			{
+				MissingCategories.Add(Category);
+			}
+		}
+
+		for (const auto& Itr : MissingCategories)
+		{
+			UCategoryTheme* NewCategoryTheme = NewObject<UCategoryTheme>(GetOuter()->GetPackage(), UCategoryTheme::StaticClass());
+
+			if (NewCategoryTheme == nullptr) continue;
+			
+			NewCategoryTheme->Category = Itr;
+			NewCategoryTheme->CategoryStyle = CategoryImageTheme;
+
+			FCategoryThemeData NewCategoryThemeData;
+			NewCategoryThemeData.CategoryTheme = NewCategoryTheme;
+		
+			CategoryThemes.Add(NewCategoryThemeData);
+		}
+	}
+
+	// Text Theme
+	{
+		if (TextTheme == nullptr)
+		{
+			UTextTheme* NewTextTheme = NewObject<UTextTheme>(GetOuter()->GetPackage());
+
+			TextTheme = NewTextTheme;
+		}
+	}
+
+	// Colours Theme
+	{
+		if (ColoursTheme == nullptr)
+		{
+			UColoursTheme* NewColoursTheme = NewObject<UColoursTheme>(GetOuter()->GetPackage());
+
+			ColoursTheme = NewColoursTheme;
+		}
+	}
+	
+#endif
+	
 }
 
 
@@ -120,23 +216,28 @@ void UMounteaInventoryThemeConfig::PostEditChangeProperty(FPropertyChangedEvent&
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
 	const FString PropertyName = PropertyChangedEvent.Property->GetName();
-
-	// TODO: Rather than making them in-package, create a new ones in the same folder!
-	if (PropertyName.Equals("InventoryTheme"))
+	
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryThemeConfig, InventoryTheme))
 	{
 		GenerateMissingThemes();
 	}
-	if (PropertyName.Equals("CategoryThemes"))
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryThemeConfig, TextTheme))
 	{
 		GenerateMissingThemes();
 	}
-
-	if (PropertyName.Equals("TextTheme"))
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryThemeConfig, ColoursTheme))
 	{
 		GenerateMissingThemes();
 	}
-
-	if (PropertyName.Equals("ColoursTheme"))
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryThemeConfig, CategoryImageTheme))
+	{
+		GenerateMissingThemes();
+	}
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryThemeConfig, CategoryThemes))
+	{
+		GenerateMissingThemes();
+	}
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryThemeConfig, ButtonStyleThemes))
 	{
 		GenerateMissingThemes();
 	}
@@ -145,20 +246,37 @@ void UMounteaInventoryThemeConfig::PostEditChangeProperty(FPropertyChangedEvent&
 bool UMounteaInventoryThemeConfig::Rename(const TCHAR* NewName, UObject* NewOuter, ERenameFlags Flags)
 {
 	const bool bSatisfied = Super::Rename(NewName, NewOuter, Flags);
-
+	
 	if (bSatisfied)
 	{
-		if (InventoryTheme) InventoryTheme->Rename(nullptr, NewOuter, Flags);
+		FString PropertyName;
 		
-		if (TextTheme) TextTheme->Rename(nullptr, NewOuter, Flags);
+		if (InventoryTheme)
+		{
+			InventoryTheme->Rename(nullptr, NewOuter, Flags);
+		}
+		
+		if (TextTheme)
+		{
+			TextTheme->Rename(nullptr, NewOuter, Flags);
+		}
 
-		if (ColoursTheme) ColoursTheme->Rename(nullptr, NewOuter, Flags);
+		if (ColoursTheme)
+		{
+			ColoursTheme->Rename(nullptr, NewOuter, Flags);
+		}
 
-		if (CategoryImageTheme) CategoryImageTheme->Rename(nullptr, NewOuter, Flags);
+		if (CategoryImageTheme)
+		{
+			CategoryImageTheme->Rename(nullptr, NewOuter, Flags);
+		}
 
 		for (auto& Itr : CategoryThemes)
 		{
-			if (Itr.CategoryTheme) Itr.CategoryTheme->Rename(nullptr, NewOuter, Flags);
+			if (Itr.CategoryTheme)
+			{
+				Itr.CategoryTheme->Rename(nullptr, NewOuter, Flags);
+			}
 		}
 	}
 	

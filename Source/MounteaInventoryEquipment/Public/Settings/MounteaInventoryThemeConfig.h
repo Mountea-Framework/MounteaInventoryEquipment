@@ -109,6 +109,7 @@ protected:
 	virtual bool Rename(const TCHAR* NewName, UObject* NewOuter, ERenameFlags Flags) override;
 
 public:
+	
 	virtual void GenerateMissingThemes_Editor();
 
 	UFUNCTION()

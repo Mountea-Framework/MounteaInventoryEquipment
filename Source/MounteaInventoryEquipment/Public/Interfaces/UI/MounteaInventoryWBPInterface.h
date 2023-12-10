@@ -30,6 +30,14 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryWBPInterface
 
 public:
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const;
+	virtual TScriptInterface<IMounteaInventoryInterface> GetOwningInventory_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
+	void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory);
+	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) = 0;
+
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryThemeConfig"), meta=(DeterminesOutputType = "ClassFilter"))//, meta=(CompactNodeTitle="Theme Config", HideSelfPin=true))
 	UMounteaInventoryThemeConfig* GetTheme(bool& bResult) const;
 	virtual UMounteaInventoryThemeConfig* GetTheme_Implementation(bool& bResult) const = 0;
@@ -39,14 +47,6 @@ public:
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
-	bool GetInventoryVisibility() const;
-	virtual bool GetInventoryVisibility_Implementation() const = 0;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
-	TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const;
-	virtual TScriptInterface<IMounteaInventoryInterface> GetOwningInventory_Implementation() const = 0;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
-	void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory);
-	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory) = 0;
+	ESlateVisibility GetInventoryVisibility() const;
+	virtual ESlateVisibility GetInventoryVisibility_Implementation() const = 0;
 };

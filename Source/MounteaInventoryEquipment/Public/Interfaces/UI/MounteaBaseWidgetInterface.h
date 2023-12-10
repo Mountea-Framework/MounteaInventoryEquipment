@@ -26,10 +26,10 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaBaseWidgetInterface
 public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Base")
-	TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory() const;
-	virtual TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventory_Implementation() const = 0;
+	TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventoryWidget() const;
+	virtual TScriptInterface<IMounteaInventoryWBPInterface> GetOwningInventoryWidget_Implementation() const = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Base")
-	void SetOwningInventory(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory);
-	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory) = 0;
+	void SetOwningInventoryWidget(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory);
+	virtual void SetOwningInventoryWidget_Implementation(const TScriptInterface<IMounteaInventoryWBPInterface>& NewOwningInventory) = 0;
 };
