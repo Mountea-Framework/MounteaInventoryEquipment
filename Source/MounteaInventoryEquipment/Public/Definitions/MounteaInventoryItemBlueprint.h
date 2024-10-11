@@ -126,5 +126,6 @@ public:
 	 * @param NewActions The new array of actions to assign.
 	 */
 	 void SetItemActions(const TArray<TSubclassOf<UMounteaInventoryItemAction>>& NewActions);
+	
 };
 

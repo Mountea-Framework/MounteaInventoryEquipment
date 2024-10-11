@@ -8,7 +8,6 @@
 #include "InputCoreTypes.h"
 #include "Templates/SubclassOf.h"
 #include "Engine/Level.h"
-#include "MounteaInventoryFlagsLibrary.h"
 #include "MounteaInventoryHelpers.generated.h"
 
 class UMounteaInventoryItemCategory;
@@ -176,11 +175,6 @@ public:
 		Hash = HashCombine(Hash, GetTypeHash(Data.ItemName.ToString()));
 				
 		return Hash;
-	}
-
-	static FString ToJson()
-	{
-		return FString();
 	}
 };
 

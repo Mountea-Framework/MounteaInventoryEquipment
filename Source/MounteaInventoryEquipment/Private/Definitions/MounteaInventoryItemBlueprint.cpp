@@ -4,7 +4,7 @@
 
 #include "Definitions/MounteaItemAction.h"
 
-UMounteaInventoryItemBlueprint::UMounteaInventoryItemBlueprint() : BlueprintGuid(FGuid::NewGuid())
+UMounteaInventoryItemBlueprint::UMounteaInventoryItemBlueprint() : BlueprintGuid(FGuid::NewGuid()), PrimaryData(), SecondaryData()
 {
 }
 
