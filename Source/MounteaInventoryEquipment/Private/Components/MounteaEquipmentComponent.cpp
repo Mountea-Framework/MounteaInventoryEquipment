@@ -28,6 +28,11 @@ void UMounteaEquipmentComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	//DOREPLIFETIME(UMounteaEquipmentComponent, EquipmentSlotData);
 }
 
+bool UMounteaEquipmentComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	return Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+}
+
 /*
 bool UMounteaEquipmentComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
 {

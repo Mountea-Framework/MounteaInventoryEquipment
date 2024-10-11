@@ -279,7 +279,7 @@ TArray<FKey> UMounteaInventoryEquipmentBPF::GetActionRequestKeys()
 
 TSoftClassPtr<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBPF::GetDefaultItemConfigClass()
 {
-	return GetSettings()->DefaultItemConfigClass;
+	return nullptr;
 }
 
 bool UMounteaInventoryEquipmentBPF::UIDebug()

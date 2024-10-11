@@ -151,7 +151,7 @@ protected:
 	 * This ID is used to distinguish this slot from others in an equipment system.
 	 * It can be customized in the editor.
 	 */
-	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly, Replicated)
+	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly)
 	FGuid SlotGuid;
 
 private:
