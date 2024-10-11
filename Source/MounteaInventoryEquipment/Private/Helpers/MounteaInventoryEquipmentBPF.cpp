@@ -5,8 +5,10 @@
 
 #include "Definitions/MounteaEquipmentSlot.h"
 #include "Definitions/MounteaInventoryItem.h"
+#include "Definitions/MounteaInventoryItemBlueprint.h"
 #include "Definitions/MounteaInventoryItemCategory.h"
 #include "Helpers/FMounteaTemplatesLibrary.h"
+#include "Interfaces/MounteaInventoryInterface.h"
 #include "Interfaces/MounteaInventoryItemWBPInterface.h"
 #include "Interfaces/MounteaInventorySlotWBPInterface.h"
 #include "Settings/MounteaInventoryEquipmentSettings.h"
@@ -144,6 +146,7 @@ UMounteaInventoryThemeConfig* UMounteaInventoryEquipmentBPF::GetThemeConfig(cons
 	return FoundTheme->IsA(ClassFilter) ? FoundTheme : NewObject<UMounteaInventoryThemeConfig>(GetTransientPackage(), ClassFilter);
 }
 
+/*
 TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryEquipmentBPF::GetItemInventoryConfigClass(const TScriptInterface<IMounteaInventoryInterface> Target, const TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult)
 {
 	if (!Target) return nullptr;
@@ -192,41 +195,15 @@ UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const 
 		
 	return Target->GetItemConfig(ClassFilter, bResult);
 }
-
-UMounteaItemAdditionalData* UMounteaInventoryEquipmentBPF::GetItemAdditionalData(const UMounteaInventoryItem* Target, const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult)
-{
-	if (ClassFilter == nullptr)
-	{
-		bResult = false;
-		return nullptr;
-	}
-		
-	if (Target == nullptr)
-	{
-		bResult = false;
-		return nullptr;
-	}
-		
-	return Target->GetItemAdditionalData(ClassFilter, bResult);
-}
+*/
 
 UMounteaEquipmentSlot* UMounteaInventoryEquipmentBPF::FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FMounteaEquipmentSlotDataCompare& Filter)
 {
-	for (const auto& Itr : SlotsData)
-	{
-		if (Itr == Filter) return Itr.Slot;
-	}
-
 	return nullptr;
 }
 
 UMounteaEquipmentSlot* UMounteaInventoryEquipmentBPF::FindEquipmentSlot(const TArray<FMounteaEquipmentSlotData>& SlotsData, const FString& SlotID)
 {
-	for (const auto& Itr : SlotsData)
-	{
-		if (Itr.Slot && Itr.Slot->GetSlotID().Equals(SlotID)) return Itr.Slot;
-	}
-
 	return nullptr;
 }
 
@@ -266,11 +243,6 @@ bool UMounteaInventoryEquipmentBPF::IsShipping()
 const UMounteaInventoryEquipmentSettings* UMounteaInventoryEquipmentBPF::GetSettings()
 {
 	return GetDefault<UMounteaInventoryEquipmentSettings>();
-}
-
-UMounteaInventoryItemsTable* UMounteaInventoryEquipmentBPF::GetDefaultItemsTable()
-{
-	return GetSettings()->DefaultInventoryItemDefinitionsTable.LoadSynchronous();
 }
 
 TSet<UMounteaInventoryItemCategory*> UMounteaInventoryEquipmentBPF::GetAllowedCategories()
@@ -361,6 +333,7 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventor
 
 int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem* Item, UMounteaInventoryItem* OtherItem, const int32 RequestedQuantity)
 {
+	/*
 	// Return 0 if RequestedQuantity is 0 or Item is null
 	if (RequestedQuantity == 0 || !Item)
 	{
@@ -386,10 +359,13 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 	}
 	else // If OtherItem is null, the requested quantity should be limited by RequestedQuantity
 	{
-	MaxPossible = FMath::Min(MaxPossible, RequestedQuantity);
+		MaxPossible = FMath::Min(MaxPossible, RequestedQuantity);
 	}
 
 	return MaxPossible;
+	*/
+
+	return 0;
 }
 
 
@@ -432,7 +408,7 @@ bool UMounteaInventoryEquipmentBPF::DoesHaveTag(const UMounteaInventoryItem* Ite
 {
 	if (Item == nullptr) return false;
 
-	return Item->GetTags().HasTag(Tag);
+	return Item->GetSourceBlueprint()->GetDefaultTags().HasTag(Tag);
 }
 
 bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItem* Item,
@@ -440,7 +416,7 @@ bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItem* 
 {
 	if (Item == nullptr) return false;
 
-	return Item->GetTags().HasAny(Tags);
+	return Item->GetSourceBlueprint()->GetDefaultTags().HasAny(Tags);
 }
 
 bool UMounteaInventoryEquipmentBPF::DoesHaveAllTags(const UMounteaInventoryItem* Item,
@@ -448,7 +424,7 @@ bool UMounteaInventoryEquipmentBPF::DoesHaveAllTags(const UMounteaInventoryItem*
 {
 	if (Item == nullptr) return false;
 
-	return Item->GetTags().HasAll(Tags);
+	return Item->GetSourceBlueprint()->GetDefaultTags().HasAll(Tags);
 }
 
 TArray<FIntPoint> UMounteaInventoryEquipmentBPF::CalculateItemShadow(const FIntPoint& StartCoords,
@@ -572,7 +548,7 @@ TArray<UMounteaInventoryItem*> UMounteaInventoryEquipmentBPF::ExcludeItems(const
 
 		bool bExclude = false;
 
-		if (Filter.bSearchByTag && Itr->GetTags().HasAny(Filter.Tags))
+		if (Filter.bSearchByTag && Itr->GetSourceBlueprint()->GetDefaultTags().HasAny(Filter.Tags))
 		{
 			bExclude = true;
 		}

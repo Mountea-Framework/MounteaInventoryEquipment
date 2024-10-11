@@ -45,14 +45,8 @@ public:
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
 	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
-	TSoftClassPtr<UMounteaInventoryItemConfig> DefaultItemConfigClass;
-	
 	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface", AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryWidgetClass;
-
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	TSoftObjectPtr<UMounteaInventoryItemsTable> DefaultInventoryItemDefinitionsTable;
 	
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;

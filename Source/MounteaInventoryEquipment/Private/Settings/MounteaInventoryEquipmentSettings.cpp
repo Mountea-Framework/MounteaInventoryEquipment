@@ -69,7 +69,6 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 
 	DefaultInventoryConfigClass = UMounteaInventoryConfig::StaticClass();
 	DefaultItemClass = UMounteaInventoryItem::StaticClass();
-	DefaultItemConfigClass = UMounteaInventoryItemConfig::StaticClass();
 }
 
 #undef LOCTEXT_NAMESPACE

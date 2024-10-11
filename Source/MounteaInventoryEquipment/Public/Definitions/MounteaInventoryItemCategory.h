@@ -145,7 +145,7 @@ public:
 	 * @return The EInventoryCategoryFlags representing the category's flags.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Category", meta=(CustomTag="MounteaK2Getter", Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
-	FORCEINLINE EInventoryCategoryFlags GetCategoryFlags() const { return static_cast<EInventoryCategoryFlags>(CategoryFlags); }
+	FORCEINLINE EInventoryItemFlags GetCategoryFlags() const { return static_cast<EInventoryItemFlags>(CategoryFlags); }
 
 	/**
 	 * Sets the flags defining special properties or behaviors of the category.
@@ -153,7 +153,7 @@ public:
 	 * @param newFlags The new EInventoryCategoryFlags to assign to the category.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory&Equipment|Category", meta=(CustomTag="MounteaK2Setter", Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
-	FORCEINLINE void SetCategoryFlags(EInventoryCategoryFlags newFlags) { CategoryFlags = static_cast<uint8>(newFlags); }
+	FORCEINLINE void SetCategoryFlags(EInventoryItemFlags newFlags) { CategoryFlags = static_cast<uint8>(newFlags); }
 
 	/**
 	 * Gets the actions associated with the category.

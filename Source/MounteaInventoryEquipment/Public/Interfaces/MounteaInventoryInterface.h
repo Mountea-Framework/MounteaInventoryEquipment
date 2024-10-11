@@ -22,7 +22,7 @@ class UMounteaInventoryInterface : public UInterface
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryUpdated, const FInventoryUpdateResult&, UpdateContext);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdated, class UMounteaInventoryItemBase*, Item, const FItemUpdateResult&, UpdateContext);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUpdated, class UMounteaInventoryItem*, Item, const FItemUpdateResult&, UpdateContext);
 
 /**
  * Mountea Inventory Interface.
@@ -42,46 +42,43 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryInterface
 
 public:
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	/*
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass() const;
 	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass_Implementation() const = 0;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	void SetInventoryUIClass(TSubclassOf<UMounteaBaseUserWidget> NewInventoryUIClass);
 	virtual void SetInventoryUIClass_Implementation(TSubclassOf<UMounteaBaseUserWidget> NewInventoryUIClass) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	void SetInventoryUI(UMounteaBaseUserWidget* NewUI);
 	virtual void SetInventoryUI_Implementation(UMounteaBaseUserWidget* NewUI) = 0;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	UMounteaBaseUserWidget* GetInventoryUI() const;
 	virtual UMounteaBaseUserWidget* GetInventoryUI_Implementation() const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
-	bool LoadInventoryFromDataTable(const class UMounteaInventoryItemsTable* SourceTable);
-	virtual bool LoadInventoryFromDataTable_Implementation(const class UMounteaInventoryItemsTable* SourceTable) = 0;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	void SaveInventory();
 	virtual void SaveInventory_Implementation() = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	UMounteaInventoryItem* FindItem(const FItemRetrievalFilter& SearchFilter) const;
 	virtual UMounteaInventoryItem* FindItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 
-	/***
+	***
 	 * ❗  Only checks for first Item that matches Search Filter.
 	 *
 	 * Takes a single argument of type FItemRetrievalFilter, which allows for searching the inventory for an item based on various parameters such as item ID, item class, tags, or GUID.
 	 * When called, HasItem will check the inventory for the existence of an item that matches the provided search filter. If such an item exists, the function will return true; otherwise, it will return false.
 	 * This function can be useful for quickly checking whether a particular item is present in the inventory before attempting to perform further operations with it, such as removing or using it.
-	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	 *
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool HasItem(const FItemRetrievalFilter& SearchFilter) const;
 	virtual bool HasItem_Implementation(const FItemRetrievalFilter& SearchFilter) const = 0;
 
-	/**
+	**
 	 * Returns an array of pointers to UMounteaInventoryItemBase objects that match the specified filter criteria.
 	 * The filter options are defined in the FItemRetrievalFilter structure, which contains fields to search by item, class, tag, or GUID, or a additive combination of each.
 	 * By default, if no filter is specified, the function returns all items in the inventory.
@@ -89,70 +86,71 @@ public:
 	 * @param OptionalFilter An optional item retrieval filter specifying which items to retrieve.
 	 *
 	 * @return An array of inventory items that meet the specified filter criteria. If no filter is provided, returns all items.
-	 */
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	 *
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	TArray<UMounteaInventoryItem*> GetItems(const FItemRetrievalFilter OptionalFilter) const;
 	virtual TArray<UMounteaInventoryItem*> GetItems_Implementation(const FItemRetrievalFilter OptionalFilter) const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool AddOrUpdateItem(UMounteaInventoryItem* NewItem, const int32& Quantity = 1);
 	virtual bool AddOrUpdateItem_Implementation(UMounteaInventoryItem* NewItem, const int32& Quantity = 1) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool AddItemFromClass(TSubclassOf<UMounteaInventoryItem> ItemClass, const int32& Quantity = 1);
 	virtual bool AddItemFromClass_Implementation(TSubclassOf<UMounteaInventoryItem> ItemClass, const int32& Quantity = 1) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool AddItems(TMap<UMounteaInventoryItem*,int32>& NewItems);
 	virtual bool AddItems_Implementation(TMap<UMounteaInventoryItem*,int32>& NewItems) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool AddItemsFromClass(TMap<TSubclassOf<UMounteaInventoryItem>, int32>& NewItemsClasses);
 	virtual bool AddItemsFromClass_Implementation(TMap<TSubclassOf<UMounteaInventoryItem>, int32>& NewItemsClasses) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool RemoveItem(UMounteaInventoryItem* AffectedItem, const int32& Amount = 1);
 	virtual bool RemoveItem_Implementation(UMounteaInventoryItem* AffectedItem, const int32& Amount = 1) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool RemoveItems(TMap<UMounteaInventoryItem*,int32>& AffectedItems);
 	virtual bool RemoveItems_Implementation(TMap<UMounteaInventoryItem*,int32>& AffectedItems) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	void RequestNetworkRefresh();
 	virtual void RequestNetworkRefresh_Implementation() = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	AActor* GetOwningActor() const;
 	virtual AActor* GetOwningActor_Implementation() const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	void ProcessItemAction(UMounteaInventoryItemAction* Action, UMounteaInventoryItem* Item, FMounteaInventoryCommandContext Context);
 	virtual void ProcessItemAction_Implementation(UMounteaInventoryItemAction* Action, UMounteaInventoryItem* Item, FMounteaInventoryCommandContext Context) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryConfig"), meta=(DeterminesOutputType = "ClassFilter"))
 	UMounteaInventoryConfig* GetInventoryConfig( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const;
 	virtual UMounteaInventoryConfig* GetInventoryConfig_Implementation( TSubclassOf<UMounteaInventoryConfig> ClassFilter, bool& bResult) const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass() const;
 	virtual TSubclassOf<UMounteaInventoryConfig> GetInventoryConfigClass_Implementation() const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	TScriptInterface<IMounteaInventoryInterface> GetOtherInventory() const;
 	virtual TScriptInterface<IMounteaInventoryInterface> GetOtherInventory_Implementation() const = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	void SetOtherInventory(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
 	virtual void SetOtherInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& NewInventory) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool SetInventoryFlags();
 	virtual bool SetInventoryFlags_Implementation() = 0;
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory")
 	bool DoesHaveAuthority() const;
 	virtual bool DoesHaveAuthority_Implementation() const = 0;
+	
 	
 public:
 
@@ -160,4 +158,5 @@ public:
 	virtual FOnItemUpdated& GetItemAddedHandle() = 0;
 	virtual FOnItemUpdated& GetItemRemovedHandle() = 0;
 	virtual FOnItemUpdated& GetItemUpdatedHandle() = 0;
+	*/
 };

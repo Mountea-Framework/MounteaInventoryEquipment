@@ -136,14 +136,14 @@ protected:
 #pragma region READONLY
 
 	/** The current state of the equipment slot. */
-	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_SlotState)
+	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly)
 	EEquipmentSlotState SlotState;
 
 	/**
 	 * The item currently equipped in this slot.
 	 * This property is automatically updated when items are equipped or unequipped.
 	 */
-	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly, meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
+	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly, meta=(DisplayThumbnail=false))
 	TObjectPtr<UMounteaInventoryItem> ItemInSlot = nullptr;
 
 	/**
@@ -157,7 +157,7 @@ protected:
 private:
 
 	/** The owning equipment interface for this slot. */
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="2. Read Only", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="2. Read Only", meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaEquipmentInterface> OwningEquipment = nullptr;
 
 #pragma endregion
@@ -178,6 +178,5 @@ protected:
 #endif
 	
 };
-
 
 #undef LOCTEXT_NAMESPACE
