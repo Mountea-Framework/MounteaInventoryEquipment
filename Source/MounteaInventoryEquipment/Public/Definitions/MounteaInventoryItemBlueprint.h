@@ -31,15 +31,15 @@ public:
 protected:
 
 	/** Unique identifier for the item blueprint. Used to distinguish this blueprint from others. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FGuid BlueprintGuid;
 
 	/** Default gameplay tags associated with items created from this blueprint. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FGameplayTagContainer DefaultTags;
 
 	/** Primary data required for items created from this blueprint. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FMounteaInventoryItemRequiredData PrimaryData;
 
 	/** Optional secondary data for items created from this blueprint. */

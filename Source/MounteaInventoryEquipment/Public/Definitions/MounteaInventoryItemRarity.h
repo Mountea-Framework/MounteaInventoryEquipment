@@ -27,23 +27,23 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemRarity : public UDataAs
 protected:
 
     /** Unique identifier for the rarity. Used to distinguish this rarity from others. */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
     FGuid RarityGuid;
 
     /** Display name of the rarity. Used for UI representation and identification. */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Required")
     FText RarityName = LOCTEXT("MounteaInventoryItemRarity_Name", "Default");
     
     /** Gameplay tag associated with the rarity. Can be used for filtering, querying, or applying specific behaviors based on the tag. */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Required")
     FGameplayTag RarityTag;
     
     /** Visual representation of the rarity. Used to display an icon or image associated with the rarity in the UI. */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Required")
     FSlateBrush RarityBrush;
     
     /** Color associated with the rarity. Used for UI elements to represent the rarity's color scheme. */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="1. Required", meta=(HideAlphaChannel))
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(HideAlphaChannel))
     FLinearColor RarityColor = FLinearColor::Gray;
 
     /** Description of the rarity. Provides additional information about the rarity. */

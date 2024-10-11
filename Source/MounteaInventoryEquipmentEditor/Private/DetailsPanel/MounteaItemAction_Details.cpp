@@ -25,7 +25,7 @@ void FMounteaItemAction_Details::CustomizeDetails(IDetailLayoutBuilder& DetailBu
 	EditingAction = WeakObject.Get();
 	if (!EditingAction) return;
 
-	IDetailCategoryBuilder& ItrCategoryBuild = DetailBuilder.EditCategory(TEXT("1. Required"));
+	IDetailCategoryBuilder& ItrCategoryBuild = DetailBuilder.EditCategory(TEXT("Required"));
 
 	TArray<TSharedRef<IPropertyHandle> > RequiredProperties;
 	ItrCategoryBuild.GetDefaultProperties(RequiredProperties);

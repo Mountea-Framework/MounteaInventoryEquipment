@@ -17,9 +17,9 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentConfigData : public UDataAs
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TMap<FGameplayTag,FGameplayTagContainer> CompatibleInventoryFlags;
 
-	UPROPERTY(EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TMap<FString,FGameplayTag> EquipmentSlotIDs;
 };

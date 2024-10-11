@@ -30,27 +30,27 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemCategory : public UData
 protected:
 
 	/** Unique identifier for the category. Used to distinguish this category from others. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FGuid CategoryGuid;
 
 	/** Display name of the category. Used for UI representation and identification. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FText CategoryName = LOCTEXT("MounteaInventoryItemCategory_Name", "Category Name");
 
 	/** Description of the category. Provides additional information about the category. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(MultiLine))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required", meta=(MultiLine))
 	FText CategoryDescription = LOCTEXT("MounteaInventoryItemCategory_Description", "Default");
 
 	/** Visual representation of the category. Used to display an icon or image associated with the category in the UI. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FSlateBrush CategoryBrush;
 	
 	/** Gameplay tags associated with the category. Can be used for filtering, querying, or applying specific behaviors based on tags. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FGameplayTagContainer CategoryTags;
 
 	/** Flags defining special properties or behaviors of the category. Uses the EInventoryCategoryFlags enum as a bitmask. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required", meta=(Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
 	uint8 CategoryFlags;
 	
 	/** Set of actions associated with the category. Actions can define custom behaviors or interactions for items in this category. */

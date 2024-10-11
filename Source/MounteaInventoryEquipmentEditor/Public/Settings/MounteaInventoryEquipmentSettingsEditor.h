@@ -20,7 +20,7 @@ class MOUNTEAINVENTORYEQUIPMENTEDITOR_API UMounteaInventoryEquipmentSettingsEdit
 
 protected:
 
-	UPROPERTY(config, EditDefaultsOnly, Category="1. Config")
+	UPROPERTY(config, EditDefaultsOnly, Category="Config")
 	uint8 bCheckForTagsUpdate : 1;
 
 public:

@@ -202,16 +202,16 @@ protected:
 
 protected:
 
-	UPROPERTY(SaveGame, EditAnywhere, Category="1. Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
+	UPROPERTY(SaveGame, EditAnywhere, Category="Required", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties, MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface"))
 	TSubclassOf<UMounteaBaseUserWidget> InventoryWBPClass;
 
-	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
+	UPROPERTY(Transient, VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	UMounteaBaseUserWidget* InventoryWBP = nullptr;
 
-	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_Items, VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false, ShowOnlyInnerProperties))
 	TArray<UMounteaInventoryItemBase*> Items;
 	
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "Config", NoClear, meta=(NoResetToDefault))
 	FMounteaInventoryConfigBase InventoryConfig;
 
 	*/
@@ -229,7 +229,7 @@ private:
 	 * This attribute is transient.
 	 */
 	/*
-	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_OtherInventory)
+	UPROPERTY(Transient, VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_OtherInventory)
 	TScriptInterface<IMounteaInventoryInterface> OtherInventory;
 
 
@@ -240,7 +240,7 @@ private:
 	FTimerHandle TimerHandle_RequestInventorySyncTimerHandle;
 	UPROPERTY()
 	FTimerHandle TimerHandle_RequestItemSyncTimerHandle;
-	UPROPERTY(EditAnywhere, Category="2. Debug")
+	UPROPERTY(EditAnywhere, Category="ReadOnly")
 	float Duration_RequestSyncTimerHandle = 0.2f;
 
 	TArray<UMounteaInventoryItemBase*> RemovedItems;

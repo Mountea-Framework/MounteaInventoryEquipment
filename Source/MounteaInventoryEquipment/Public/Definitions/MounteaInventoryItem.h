@@ -41,25 +41,25 @@ public:
 protected:
 
 	/** The source blueprint from which this item was created. */
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="1. Read Only")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Read Only")
 	TObjectPtr<UMounteaInventoryItemBlueprint> SourceBlueprint;
 
 	/** Instanced data specific to this item instance. */
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="1. Read Only")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Read Only")
 	FMounteaInventoryItemInstancedData InstancedData;
 
 	/** Unique identifier for this item instance. */
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="1. Read Only")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Read Only")
 	FGuid ItemGuid;
 
 private:
 
 	/** The inventory that owns this item. */
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="1. Read Only", meta=(DisplayThumbnail=false))
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="Read Only", meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
 		
 	/** The world context in which this item exists. */
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="1. Read Only", meta=(DisplayThumbnail=false))
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="Read Only", meta=(DisplayThumbnail=false))
 	UWorld* World;
 
 protected:

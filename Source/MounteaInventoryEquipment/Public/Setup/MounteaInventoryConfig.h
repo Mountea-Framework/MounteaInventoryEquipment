@@ -34,13 +34,13 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryConfig : public UObject
 	
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="1. Required")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Required")
 	FGameplayTagContainer DefaultInventoryFlags;
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="2. Debug", meta=(NoResetToDefault))
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="ReadOnly", meta=(NoResetToDefault))
 	FGameplayTagContainer InventoryFlags;
 
-	UPROPERTY(VisibleAnywhere, Category="2. Debug")
+	UPROPERTY(VisibleAnywhere, Category="ReadOnly")
 	int32 RepKey = 0;
 
 public:

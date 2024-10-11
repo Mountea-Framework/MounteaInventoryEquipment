@@ -33,66 +33,66 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryEquipmentSettings : public 
 
 public:
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryThemeConfig>> ThemeConfigs;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
+	UPROPERTY(config, EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
 	TSoftClassPtr<UMounteaInventoryItem> DefaultItemClass;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
 	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;
 	
-	UPROPERTY(Config, EditAnywhere, Category="1. Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface", AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(Config, EditAnywhere, Category="Required", meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryWBPInterface", AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftClassPtr<UMounteaBaseUserWidget> DefaultInventoryWidgetClass;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemCategory>> InventoryCategories;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSet<TSoftObjectPtr<UMounteaInventoryItemRarity>> InventoryRarities;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
 	TSoftObjectPtr<UMounteaEquipmentConfigData> EquipmentConfigData;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
+	UPROPERTY(config, EditDefaultsOnly, Category = "Optional")
 	uint8 bUIDebug : 1;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. Optional")
+	UPROPERTY(config, EditDefaultsOnly, Category = "Optional")
 	uint8 bDragDropAllowed : 1;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "User Interface")
 	TSet<FString> InventoryWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "User Interface")
 	TSet<FString> EquipmentWidgetCommands;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "User Interface")
 	TMap<EInventoryUpdateResult, FText> InventoryUpdateMessages;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "User Interface")
 	TSet<FString> ItemsWidgetCommands;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "User Interface")
 	TMap<EItemUpdateResult, FText> ItemUpdateMessages;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "2. User Interface")
+	UPROPERTY(config, EditDefaultsOnly, Category = "User Interface")
 	TSet<FString> ItemTooltipWidgetCommands;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
+	UPROPERTY(config, EditDefaultsOnly, Category = "Input")
 	TArray<FKey> DragKeys;
 
-	UPROPERTY(config, EditDefaultsOnly, Category = "4. Input")
+	UPROPERTY(config, EditDefaultsOnly, Category = "Input")
 	TArray<FKey> ActionRequestKeys;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "Notifications")
 	int32 MinDisplayWeight = 1;
 	
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "Notifications")
 	TMap<EInventoryUpdateResult, FInventoryNotificationData> InventoryUpdateData;
-	UPROPERTY(config, EditDefaultsOnly, Category = "5. Notifications")
+	UPROPERTY(config, EditDefaultsOnly, Category = "Notifications")
 	TMap<EItemUpdateResult, FInventoryNotificationData> ItemUpdateData;
 
 	/**
@@ -109,7 +109,7 @@ public:
 	 *
 	 * @see FPlatformMisc::NumberOfWorkerThreadsToSpawn
 	 */
-	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=1, ClampMin=1), AdvancedDisplay)
+	UPROPERTY(config, EditDefaultsOnly, Category = "Optimization", meta=(UIMin=1, ClampMin=1), AdvancedDisplay)
 	int32 ThreadsLimit = 2;
 	
 	/**
@@ -118,7 +118,7 @@ public:
 	* ❗ Warning: Modifying this value without proper knowledge may affect performance and stability.
 	* ❓ Note: The value should be set to a reasonable number based on the expected size of the inventory.
 	*/
-	UPROPERTY(config, EditDefaultsOnly, Category = "6. Optimization", meta=(UIMin=100, ClampMin=100), AdvancedDisplay)
+	UPROPERTY(config, EditDefaultsOnly, Category = "Optimization", meta=(UIMin=100, ClampMin=100), AdvancedDisplay)
 	int32 MultithreadingThreshold = 1000;
 
 

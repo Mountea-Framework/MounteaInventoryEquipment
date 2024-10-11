@@ -79,15 +79,15 @@ protected:
 #pragma region VARIABLES
 protected:
 	
-	UPROPERTY(SaveGame, Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipment)
+	UPROPERTY(SaveGame, Category="Required", EditDefaultsOnly, BlueprintReadOnly, ReplicatedUsing=OnRep_Equipment)
 	TArray<FMounteaEquipmentSlotData> EquipmentSlotData;
 
 private:
 
-	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	UPROPERTY(Transient, VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false))
 	UMounteaBaseUserWidget* EquipmentUI;
 	
-	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false))
+	UPROPERTY(Transient, VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false))
 	int32 ReplicatedItemsKey = 0;
 	
 #pragma endregion

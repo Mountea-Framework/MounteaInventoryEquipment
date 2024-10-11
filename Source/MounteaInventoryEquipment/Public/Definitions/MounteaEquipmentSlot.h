@@ -107,14 +107,14 @@ protected:
 	 *
 	 * 📖 LOCALIZABLE
 	 */
-	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions=GetSlotNames))
+	UPROPERTY(SaveGame, Category="Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions=GetSlotNames))
 	FText SlotName;
 
 	/**
 	 * Tags that define which items are compatible with this slot.
 	 * Only items that match these tags can be equipped.
 	 */
-	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(SaveGame, Category="Required", EditAnywhere, BlueprintReadOnly)
 	FGameplayTagContainer SlotCompatibleTags;
 
 	/**
@@ -122,13 +122,13 @@ protected:
 	 *
 	 * ❗ Occupied is not allowed.
 	 */
-	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(SaveGame, Category="Required", EditAnywhere, BlueprintReadOnly)
 	EEquipmentSlotState DefaultSlotState;
 
 	/**
 	 * Data that defines how the equipment item is attached to this slot.
 	 */
-	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(SaveGame, Category="Required", EditAnywhere, BlueprintReadOnly)
 	FEquipmentAttachmentData EquipmentAttachmentData;
 
 #pragma endregion
