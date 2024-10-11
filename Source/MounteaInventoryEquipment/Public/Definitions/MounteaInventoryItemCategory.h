@@ -49,8 +49,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
 	FGameplayTagContainer CategoryTags;
 
-	/** Flags defining special properties or behaviors of the category. Uses the EInventoryCategoryFlags enum as a bitmask. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required", meta=(Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
+	/** Flags defining special properties or behaviors of the category. Uses the EInventoryItemFlags enum as a bitmask. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required", meta=(Bitmask, BitmaskEnum="EInventoryItemFlags"))
 	uint8 CategoryFlags;
 	
 	/** Set of actions associated with the category. Actions can define custom behaviors or interactions for items in this category. */
@@ -142,17 +142,17 @@ public:
 	/**
 	 * Gets the flags defining special properties or behaviors of the category.
 	 *
-	 * @return The EInventoryCategoryFlags representing the category's flags.
+	 * @return The EInventoryItemFlags representing the category's flags.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Category", meta=(CustomTag="MounteaK2Getter", Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Category", meta=(CustomTag="MounteaK2Getter", Bitmask, BitmaskEnum="EInventoryItemFlags"))
 	FORCEINLINE EInventoryItemFlags GetCategoryFlags() const { return static_cast<EInventoryItemFlags>(CategoryFlags); }
 
 	/**
 	 * Sets the flags defining special properties or behaviors of the category.
 	 *
-	 * @param newFlags The new EInventoryCategoryFlags to assign to the category.
+	 * @param newFlags The new EInventoryItemFlags to assign to the category.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory&Equipment|Category", meta=(CustomTag="MounteaK2Setter", Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory&Equipment|Category", meta=(CustomTag="MounteaK2Setter", Bitmask, BitmaskEnum="EInventoryItemFlags"))
 	FORCEINLINE void SetCategoryFlags(EInventoryItemFlags newFlags) { CategoryFlags = static_cast<uint8>(newFlags); }
 
 	/**
