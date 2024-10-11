@@ -18,7 +18,6 @@
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaItemAction.h"
 
-#include "DetailsPanel/MounteaItemAction_Details.h"
 #include "DetailsPanel/MounteaItemConfig_Details.h"
 #include "DetailsPanel/MounteaItemConfig_DetailsPanel.h"
 #include "DetailsPanel/MounteaSettings_Details.h"
@@ -136,13 +135,11 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 			TArray<FOnGetDetailCustomizationInstance> CustomClassLayouts =
 			{
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemConfig_Details::MakeInstance),
-				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaItemAction_Details::MakeInstance),
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaSettings_Details::MakeInstance)
 			};
 			RegisteredCustomClassLayouts =
 			{
 				UMounteaInventoryItemConfig::StaticClass()->GetFName(),
-				UMounteaInventoryItemAction::StaticClass()->GetFName(),
 				UMounteaInventoryEquipmentSettings::StaticClass()->GetFName()
 			};
 			for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)

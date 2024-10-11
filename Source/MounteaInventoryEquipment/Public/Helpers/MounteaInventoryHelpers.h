@@ -147,7 +147,7 @@ public:
 	FText ItemLongInfo = LOCTEXT("MounteaInventoryItem_ItemShortInfo", "");
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required", meta=(Bitmask, BitmaskEnum="EInventoryItemFlags"))
-	uint8 ItemFlags;
+	int32 ItemFlags;
 
 	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FSlateBrush ItemThumbnail;

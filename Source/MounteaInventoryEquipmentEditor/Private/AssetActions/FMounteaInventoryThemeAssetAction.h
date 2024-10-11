@@ -36,7 +36,7 @@ public:
 			FilterAddNativeParentClassPath(InFilter, ChildNativeClass);
 		}
 
-		InFilter.ClassNames.Add(UBlueprint::StaticClass()->GetFName());
+		InFilter.ClassPaths.Add(UBlueprint::StaticClass()->GetClassPathName());
 		InFilter.bRecursiveClasses = true;
 	};
 	

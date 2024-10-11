@@ -22,7 +22,7 @@ class UMounteaInventoryItem;
  * @see UObject
  * @see UMounteaInventoryItem
  */
-UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Required,Opional,ReadOnly"), DisplayName="Item Action (Base)")
+UCLASS(Abstract, Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Required,Opional"), DisplayName="Item Action (Base)")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemAction : public UObject
 {
 	GENERATED_BODY()
@@ -220,23 +220,23 @@ protected:
 protected:
 
 	/** Unique identifier for the action. Used to distinguish this action from others. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
-	FGuid ActionGuid;
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
+	FGuid ActionGuid = FGuid();
 
 	/** Gameplay tag associated with the action. Can be used for filtering or applying specific behaviors. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
 	FGameplayTag ActionTag;
 
 	/** Display name of the action. Used for UI representation and identification. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
 	FText ActionName;
 
 	/** Description of the action. Provides additional information about the action. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault, MultiLine))
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault, MultiLine))
 	FText ActionDescription;
 
 	/** Visual representation of the action. Used to display an icon or image associated with the action in the UI. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="2. Optional", meta=(NoResetToDefault, ExposeOnSpawn))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Optional", meta=(NoResetToDefault, ExposeOnSpawn))
 	FSlateBrush ActionBrush;
 
 private:
@@ -246,11 +246,11 @@ private:
 	FMounteaInventoryCommandContext ActionContext;
 
 	/** The world context in which this action exists. */
-	UPROPERTY(VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false), AdvancedDisplay)
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false), AdvancedDisplay)
 	UWorld* World;
 
 	/** The owning inventory item of this action. */
-	UPROPERTY(VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false), AdvancedDisplay)
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="ReadOnly", meta=(DisplayThumbnail=false), AdvancedDisplay)
 	TObjectPtr<UMounteaInventoryItem> OwningItem = nullptr;
 };
 

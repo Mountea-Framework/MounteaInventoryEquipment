@@ -15,30 +15,13 @@ class UMounteaInventoryItem;
 /**
  * Mountea Equipment Slot.
  *
- * Represents a single slot in a Mountea Equipment Component.
- *
- * This object provides functionality for managing a specific equipment slot. It allows for the equipping and manipulation of items that can be added and removed.
- * Each equipment slot is compatible with certain types of items, determined by the `SlotCompatibleTag` property.
- * The currently equipped item can be accessed with the `GetSlotItem` function.
- *
- * This class is designed to be highly flexible and extensible, allowing developers to easily create a wide variety of different equipment systems to suit their specific requirements.
- * If the current implementation does not meet your needs, all key methods are exposed as UFUNCTIONs, allowing you to extend and customize the functionality in Blueprints.
- *
- * @see UObject
- * @see UMounteaInventoryItemBase
- * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Equipment-Slot
- */
-
-/**
- * Mountea Equipment Slot.
- *
  * Represents an equipment slot within the Mountea Inventory & Equipment system.
  * Equipment slots define where items can be equipped, including compatibility tags, default state, and attachment data.
  * This class allows for flexible equipment management, enabling features like item equipping, slot state management, and networking replication.
  *
  * @see UDataAsset
  */
-UCLASS(Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea,Inventory"), DisplayName="Equipment Slot")
+UCLASS(Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Required,Opional"), DisplayName="Equipment Slot")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentSlot : public UDataAsset
 {
 	GENERATED_BODY()
@@ -152,7 +135,7 @@ protected:
 	 * It can be customized in the editor.
 	 */
 	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly)
-	FGuid SlotGuid;
+	FGuid SlotGuid = FGuid();;
 
 private:
 

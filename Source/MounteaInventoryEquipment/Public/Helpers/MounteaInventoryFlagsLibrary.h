@@ -6,8 +6,8 @@
 #include "UObject/Object.h"
 #include "MounteaInventoryFlagsLibrary.generated.h"
 
-UENUM(BlueprintType)
-enum class EInventoryItemFlags : uint8
+UENUM()
+enum class EInventoryItemFlags : uint32
 {
 	None        = 0        UMETA(DisplayName="None"),
 	Tradeable   = 1 << 0   UMETA(DisplayName="Tradeable"),

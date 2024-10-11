@@ -54,7 +54,7 @@ protected:
 	uint8 CategoryFlags;
 	
 	/** Set of actions associated with the category. Actions can define custom behaviors or interactions for items in this category. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Optional")
 	TSet<TObjectPtr<UMounteaInventoryItemAction>> CategoryActions;
 
 public:

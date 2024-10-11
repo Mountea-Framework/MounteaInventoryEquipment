@@ -47,11 +47,11 @@ protected:
     FLinearColor RarityColor = FLinearColor::Gray;
 
     /** Description of the rarity. Provides additional information about the rarity. */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="2. Optional")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Optional")
     FText RarityDescription = LOCTEXT("MounteaInventoryItemRarity_Description", "");
 
     /** Price coefficient for the rarity. Used to adjust item prices based on rarity. */
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="2. Optional")
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Optional")
     float RarityPriceCoefficient = 1.f;
 
 public:

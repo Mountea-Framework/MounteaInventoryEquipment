@@ -31,23 +31,23 @@ public:
 protected:
 
 	/** Unique identifier for the item blueprint. Used to distinguish this blueprint from others. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
-	FGuid BlueprintGuid;
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Required")
+	FGuid BlueprintGuid = FGuid();;
 
 	/** Default gameplay tags associated with items created from this blueprint. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required")
 	FGameplayTagContainer DefaultTags;
 
 	/** Primary data required for items created from this blueprint. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required")
 	FMounteaInventoryItemRequiredData PrimaryData;
 
 	/** Optional secondary data for items created from this blueprint. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Optional")
 	FMounteaInventoryItemOptionalData SecondaryData;
 
 	/** Set of actions associated with items created from this blueprint. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="2. Optional")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Optional")
 	TSet<TObjectPtr<UMounteaInventoryItemAction>> ItemActions;
 
 public:
