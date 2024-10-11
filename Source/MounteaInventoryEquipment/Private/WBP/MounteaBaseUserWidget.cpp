@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 
 #include "WBP/MounteaBaseUserWidget.h"
@@ -143,7 +143,7 @@ bool UMounteaBaseUserWidget::UnbindDelegate(const FMounteaDynamicDelegate& Deleg
 	return true;
 }
 
-bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag EventTag, const FName OptionalName, const FMounteaDynamicDelegateContext& Context)
+bool UMounteaBaseUserWidget::CallEvent(const FGameplayTag EventTag, const FName OptionalName, const FMounteaInventoryCommandContext& Context)
 {
 	if (!EventTag.IsValid())
 	{

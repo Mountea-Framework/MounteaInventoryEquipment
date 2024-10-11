@@ -1,4 +1,4 @@
-﻿// All rights reserved Dominik Pavlicek 2023.
+﻿// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "AssetTypeActions_CSVAssetBase.h"
 #include "Utils/MounteaInventoryEquipmentEditorUtilities.h"
 
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 
 class FMounteaInventoryItemsTableAssetAction : public FAssetTypeActions_CSVAssetBase
 {

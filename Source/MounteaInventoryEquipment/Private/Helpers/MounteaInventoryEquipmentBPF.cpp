@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 
 #include "Helpers/MounteaInventoryEquipmentBPF.h"
@@ -152,7 +152,7 @@ TSubclassOf<UMounteaInventoryConfig> UMounteaInventoryEquipmentBPF::GetItemInven
 }
 
 TSubclassOf<UMounteaInventoryItemConfig> UMounteaInventoryEquipmentBPF::GetItemItemConfigClass(
-	const UMounteaInventoryItemBase* Target)
+	const UMounteaInventoryItem* Target)
 {
 	if (!Target) return nullptr;
 
@@ -176,7 +176,7 @@ UMounteaInventoryConfig* UMounteaInventoryEquipmentBPF::GetInventoryConfig(const
 	return Target->Execute_GetInventoryConfig(Target.GetObject(), ClassFilter, bResult);
 }
 
-UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult)
+UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const UMounteaInventoryItem* Target, const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{
@@ -193,7 +193,7 @@ UMounteaInventoryItemConfig* UMounteaInventoryEquipmentBPF::GetItemConfig(const 
 	return Target->GetItemConfig(ClassFilter, bResult);
 }
 
-UMounteaItemAdditionalData* UMounteaInventoryEquipmentBPF::GetItemAdditionalData(const UMounteaInventoryItemBase* Target, const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult)
+UMounteaItemAdditionalData* UMounteaInventoryEquipmentBPF::GetItemAdditionalData(const UMounteaInventoryItem* Target, const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult)
 {
 	if (ClassFilter == nullptr)
 	{
@@ -344,7 +344,7 @@ FIntPoint UMounteaInventoryEquipmentBPF::GetInventorySlotSize()
 	return bFound ? Config->SlotBaseSize : FIntPoint(16, 16);
 }
 
-int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventoryItem* Item, UMounteaInventoryItem* OtherItem, const int32 RequestedQuantity)
 {
 	if (RequestedQuantity == 0)
 	{
@@ -359,7 +359,7 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxSubtractQuantity(UMounteaInventor
 	return 1;
 }
 
-int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItemBase* Item, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem* Item, UMounteaInventoryItem* OtherItem, const int32 RequestedQuantity)
 {
 	// Return 0 if RequestedQuantity is 0 or Item is null
 	if (RequestedQuantity == 0 || !Item)
@@ -394,7 +394,7 @@ int UMounteaInventoryEquipmentBPF::CalculateMaxAddQuantity(UMounteaInventoryItem
 
 
 
-int32 UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+int32 UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItem* BaseItem, UMounteaInventoryItem* OtherItem, const int32 RequestedQuantity)
 {
 	if (!BaseItem) return 0;
 	if (RequestedQuantity == 0) return 0;
@@ -411,7 +411,7 @@ int32 UMounteaInventoryEquipmentBPF::AddItemQuantity(UMounteaInventoryItemBase* 
 	return 0;
 }
 
-int32 UMounteaInventoryEquipmentBPF::RemoveItemQuantity(UMounteaInventoryItemBase* BaseItem, UMounteaInventoryItemBase* OtherItem, const int32 RequestedQuantity)
+int32 UMounteaInventoryEquipmentBPF::RemoveItemQuantity(UMounteaInventoryItem* BaseItem, UMounteaInventoryItem* OtherItem, const int32 RequestedQuantity)
 {
 	if (!BaseItem) return 0;
 	if (RequestedQuantity == 0) return 0;
@@ -428,14 +428,14 @@ int32 UMounteaInventoryEquipmentBPF::RemoveItemQuantity(UMounteaInventoryItemBas
 	return 0;
 }
 
-bool UMounteaInventoryEquipmentBPF::DoesHaveTag(const UMounteaInventoryItemBase* Item, const FGameplayTag Tag)
+bool UMounteaInventoryEquipmentBPF::DoesHaveTag(const UMounteaInventoryItem* Item, const FGameplayTag Tag)
 {
 	if (Item == nullptr) return false;
 
 	return Item->GetTags().HasTag(Tag);
 }
 
-bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItemBase* Item,
+bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItem* Item,
 	const FGameplayTagContainer Tags)
 {
 	if (Item == nullptr) return false;
@@ -443,7 +443,7 @@ bool UMounteaInventoryEquipmentBPF::DoesHaveAnyTag(const UMounteaInventoryItemBa
 	return Item->GetTags().HasAny(Tags);
 }
 
-bool UMounteaInventoryEquipmentBPF::DoesHaveAllTags(const UMounteaInventoryItemBase* Item,
+bool UMounteaInventoryEquipmentBPF::DoesHaveAllTags(const UMounteaInventoryItem* Item,
 	const FGameplayTagContainer Tags)
 {
 	if (Item == nullptr) return false;
@@ -560,11 +560,11 @@ bool UMounteaInventoryEquipmentBPF::IsSafeSlot(const FIntPoint& StartCoords, con
 	return false;
 }
 
-TArray<UMounteaInventoryItemBase*> UMounteaInventoryEquipmentBPF::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItemBase*>& ItemsToFilter)
+TArray<UMounteaInventoryItem*> UMounteaInventoryEquipmentBPF::ExcludeItems(const FItemRetrievalFilter& Filter, const TArray<UMounteaInventoryItem*>& ItemsToFilter)
 {
-	if (!Filter.IsValid()) return TArray<UMounteaInventoryItemBase*>();
+	if (!Filter.IsValid()) return TArray<UMounteaInventoryItem*>();
 
-	TArray<UMounteaInventoryItemBase*> TempResult;
+	TArray<UMounteaInventoryItem*> TempResult;
 
 	for (const auto& Itr : ItemsToFilter)
 	{

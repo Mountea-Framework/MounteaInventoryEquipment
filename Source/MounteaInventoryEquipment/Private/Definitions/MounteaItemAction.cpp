@@ -1,11 +1,11 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 
 #include "Definitions/MounteaItemAction.h"
 
 #include "Definitions/MounteaInventoryItem.h"
 
-void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInventoryItemBase* ItemInFocus, FMounteaDynamicDelegateContext Context)
+void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInventoryItem* ItemInFocus, FMounteaInventoryCommandContext Context)
 {
 	OwningItem = ItemInFocus;
 
@@ -17,9 +17,9 @@ void UMounteaInventoryItemAction::InitializeAction_Implementation(UMounteaInvent
 	ActionContext = Context;
 }
 
-bool UMounteaInventoryItemAction::DisplayAction_Implementation(UMounteaInventoryItemBase* ItemInFocus) const
+bool UMounteaInventoryItemAction::DisplayAction_Implementation(UMounteaInventoryItem* ItemInFocus) const
 {
-	return GetWorld() != nullptr;
+	return IsValid(GetWorld()) && IsValid(OwningItem);
 }
 
 void UMounteaInventoryItemAction::SetWorldFromLevel(ULevel* FromLevel)
@@ -38,18 +38,5 @@ void UMounteaInventoryItemAction::SetWorldFromLevel(ULevel* FromLevel)
 void UMounteaInventoryItemAction::SetWorld(UWorld* NewWorld)
 {
 	World = NewWorld;
-}
-
-void UMounteaInventoryItemAction::CopyFromOther(const UMounteaInventoryItemAction* OtherAction)
-{
-	if (!OtherAction) return;
-	
-	ActionIcon = OtherAction->ActionIcon;
-	ActionName = OtherAction->ActionName;
-	ActionTag = OtherAction->ActionTag;
-	ActionContext = OtherAction->ActionContext;
-
-	World = OtherAction->GetWorld();
-	OwningItem = OtherAction->GetOwningItem();
 }
 

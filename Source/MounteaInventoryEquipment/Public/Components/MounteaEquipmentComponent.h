@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -36,7 +36,6 @@ public:
 
 	UMounteaEquipmentComponent();
 
-#pragma region FUNCTIONS
 protected:
 
 	virtual void BeginPlay() override;
@@ -44,6 +43,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
+	/*
 public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
@@ -113,7 +113,9 @@ private:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Equipment", DisplayName="OnSlotUnequipped (Multicast)")
 	FOnSlotUpdated OnSlotUnequipped_Multicast;
 	
-#pragma endregion 
+#pragma endregion
+
+*/
 
 #if WITH_EDITOR
 protected:

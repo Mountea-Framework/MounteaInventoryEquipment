@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -8,7 +8,7 @@
 
 class IMounteaInventoryItemWBPInterface;
 class IMounteaInventoryWBPInterface;
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)

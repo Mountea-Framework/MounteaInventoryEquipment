@@ -7,7 +7,7 @@
 #include "MounteaItemAssetFactory.generated.h"
 
 class UMounteaInventoryItemsTable;
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 /**
  * 
  */
@@ -29,7 +29,7 @@ public:
 private:
 	// Holds the template of the class we are building
 	UPROPERTY()
-	TSubclassOf<UMounteaInventoryItemBase> ParentClass;
+	TSubclassOf<UMounteaInventoryItem> ParentClass;
 
 	UPROPERTY()
 	UMounteaInventoryItemsTable* SourceTable;

@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -40,7 +40,7 @@ public:
 	TSoftObjectPtr<UMounteaInventoryThemeConfig> ThemeConfig;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true), AdvancedDisplay)
-	TSoftClassPtr<UMounteaInventoryItemBase> DefaultItemClass;
+	TSoftClassPtr<UMounteaInventoryItem> DefaultItemClass;
 
 	UPROPERTY(config, EditDefaultsOnly, Category = "1. Required", meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false, ShowTreeView=true))
 	TSoftClassPtr<UMounteaInventoryConfig> DefaultInventoryConfigClass;

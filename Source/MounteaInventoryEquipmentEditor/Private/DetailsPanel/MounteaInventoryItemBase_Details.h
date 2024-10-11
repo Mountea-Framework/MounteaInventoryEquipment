@@ -4,7 +4,7 @@
 
 #include "IDetailCustomization.h"
 
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 class SScrollBox;
 
 class FMounteaInventoryItem_Details : public IDetailCustomization
@@ -45,6 +45,6 @@ private:
 	
 	IDetailLayoutBuilder* SavedLayoutBuilder = nullptr;
 
-	UMounteaInventoryItemBase* EditingItem = nullptr;
+	UMounteaInventoryItem* EditingItem = nullptr;
 };
 

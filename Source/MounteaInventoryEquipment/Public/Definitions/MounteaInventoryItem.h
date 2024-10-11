@@ -1,288 +1,229 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "MounteaInventoryTableTypes.h"
-#include "MounteaItemAdditionalData.h"
 #include "Helpers/MounteaInventoryHelpers.h"
-#include "Interfaces/MounteaInventoryEquipmentItem.h"
-#include "Interfaces/MounteaInventoryInterface.h"
-#include "Setup/MounteaInventoryItemConfig.h"
-#include "Definitions/MounteaItemAction.h"
-
 #include "MounteaInventoryItem.generated.h"
 
-struct FMounteaItemAction;
-struct FMounteaItemConfig;
-class UMounteaItemAdditionalData;
-class IMounteaInventoryPickupInterface;
+class IMounteaInventoryInterface;
+class UMounteaInventoryItemBlueprint;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, Message);
 
-UENUM(BlueprintType)
-enum class EItemDataSource : uint8
-{
-	EIDS_SourceTable				UMETA(DisplayName="Source Table"),
-	EIDS_ManualInput				UMETA(DisplayName="Manual Input"),
-
-	Default								UMETA(hidden)
-};
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
 
 /**
- * Inventory Item Data Asset
- * 
- * Base class for inventory items,
+ * Mountea Inventory Item.
  *
- * This class represents an item in the inventory system.
- * It serves as a data asset base class and provides functionality for holding item data.
+ * Represents an item in the Mountea Inventory system.
+ * This class serves as the base for inventory items and provides functionality for holding item data.
  * Inventory items are used within an inventory and can be replicated.
  *
- * @see UDataAsset
- * @see IMounteaInventoryEquipmentItem
- * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Inventory-Item-Object
+ * Implements event delegates for item lifecycle events such as added, removed, initialized, and modified.
+ *
+ * @see UObject
+ * @see UMounteaInventoryItemBlueprint
+ * @see FMounteaInventoryItemInstancedData
+ * @see IMounteaInventoryInterface
  */
-UCLASS(BlueprintType, Blueprintable, EditInlineNew, ClassGroup="Mountea", DisplayName="Inventory Item (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemBase : public UDataAsset, public IMounteaInventoryEquipmentItem
+UCLASS(BlueprintType, ClassGroup="Mountea", DisplayName="Inventory Item")
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItem : public UObject
 {
 	GENERATED_BODY()
-	
-	UMounteaInventoryItemBase();
-	virtual ~UMounteaInventoryItemBase() override;
+		
+public:
+
+	UMounteaInventoryItem();
+	virtual ~UMounteaInventoryItem() override;
+
+protected:
+
+	/** The source blueprint from which this item was created. */
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="1. Read Only")
+	TObjectPtr<UMounteaInventoryItemBlueprint> SourceBlueprint;
+
+	/** Instanced data specific to this item instance. */
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="1. Read Only")
+	FMounteaInventoryItemInstancedData InstancedData;
+
+	/** Unique identifier for this item instance. */
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="1. Read Only")
+	FGuid ItemGuid;
 
 private:
-	
-	virtual void PostInitProperties() override;
 
-public:
-	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(ShowOnlyInnerProperties, EditFixedOrder), ReplicatedUsing=OnRep_Item)
-	EItemDataSource ItemDataSource = EItemDataSource::EIDS_SourceTable;
+	/** The inventory that owns this item. */
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="1. Read Only", meta=(DisplayThumbnail=false))
+	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
+		
+	/** The world context in which this item exists. */
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="1. Read Only", meta=(DisplayThumbnail=false))
+	UWorld* World;
 
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(DisplayThumbnail=false, EditCondition="ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
-	UMounteaInventoryItemsTable* SourceTable;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="1. Import", meta=(GetOptions="GetSourceTableRows", EditCondition="SourceTable!=nullptr&&ItemDataSource==EItemDataSource::EIDS_SourceTable", EditFixedOrder))
-	FName SourceRow;
-	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="2. Required", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"), ReplicatedUsing=OnRep_Item)
-	FMounteaInventoryItemRequiredData ItemData;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="3. Optional", meta=(ShowOnlyInnerProperties, EditCondition="ItemDataSource!=EItemDataSource::EIDS_SourceTable"))
-	FMounteaInventoryItemOptionalData ItemOptionalData;
-
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category="3. Optional")
-	TArray<FMounteaItemAction> ItemActions;
-	
 protected:
-	
-	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
-	FMounteaItemConfig ItemConfig;
-	
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
+
+	/** Event triggered when the item is added to an inventory. */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|Events")
 	FItemGenericEvent OnItemAdded;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
+	/** Event triggered when the item is removed from an inventory. */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|Events")
 	FItemGenericEvent OnItemRemoved;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
+	/** Event triggered when the item is initialized. */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|Events")
 	FItemGenericEvent OnItemInitialized;
 
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|5. Debug")
+	/** Event triggered when the item is modified. */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Item|Events")
 	FItemGenericEvent OnItemModified;
-
-private:
-
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug")
-	FGuid ItemGuid = FGuid::NewGuid();
-	
-	UPROPERTY(VisibleAnywhere, Category="5. Debug")
-	int32 RepKey = 0;
-
-    UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Item)
-	TScriptInterface<IMounteaInventoryInterface> OwningInventory = nullptr;
-	
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="5. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Item)
-	class UWorld* World;
 
 public:
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	FORCEINLINE TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const
-	{ return OwningInventory; };
+	/**
+	 * Gets the source blueprint from which this item was created.
+	 *
+	 * @return The source UMounteaInventoryItemBlueprint.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE UMounteaInventoryItemBlueprint* GetSourceBlueprint() const { return SourceBlueprint; }
+
+	/**
+	 * Sets the source blueprint for this item.
+	 *
+	 * @param NewSourceBlueprint The new source blueprint.
+	 */
+	FORCEINLINE void SetSourceBlueprint(UMounteaInventoryItemBlueprint* NewSourceBlueprint) { SourceBlueprint = NewSourceBlueprint; }
+
+	/**
+	 * Gets the instanced data specific to this item instance.
+	 *
+	 * @return The FMounteaInventoryItemInstancedData.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE FMounteaInventoryItemInstancedData GetItemInstancedData() const { return InstancedData; }
+
+	/**
+	 * Sets the instanced data for this item instance.
+	 *
+	 * @param NewInstancedData The new instanced data.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Setter"))
+	FORCEINLINE void SetItemInstancedData(const FMounteaInventoryItemInstancedData& NewInstancedData) { InstancedData = NewInstancedData; }
+
+	/**
+	 * Gets the unique identifier for this item instance.
+	 *
+	 * @return The FGuid representing the item's unique ID.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE FGuid GetItemGuid() const { return ItemGuid; }
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	FORCEINLINE FMounteaInventoryItemRequiredData GetItemData() const
-	{ return ItemData; }
+	FORCEINLINE void SetItemGuid(const FGuid& NewGuid) { ItemGuid = NewGuid; }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	TArray<UMounteaInventoryItemAction*> GetItemActions() const;
-	
+	/**
+	 * Gets the owning inventory of this item.
+	 *
+	 * @return The owning inventory interface.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE TScriptInterface<IMounteaInventoryInterface> GetOwningInventory() const { return OwningInventory; }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	FORCEINLINE TArray<FMounteaItemAction> GetItemActionsDefinitions() const
-	{
-		return ItemActions;
-	}
+	/**
+	 * Sets the owning inventory of this item.
+	 *
+	 * @param NewOwningInventory The new owning inventory interface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Setter"))
+	FORCEINLINE void SetOwningInventory(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory) { OwningInventory = NewOwningInventory; }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory")
-	TSubclassOf<UMounteaInventoryItemConfig> GetItemConfigClass() const
-	{
-		if (ItemConfig.ItemConfig)
-		{
-			return ItemConfig.ItemConfig->StaticClass();
-		}
-		
-		return nullptr;
-	}
+	/**
+	 * Gets the world context in which this item exists.
+	 *
+	 * @return The UWorld instance.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE UWorld* GetItemWorld() const { return World; }
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaInventoryItemConfig"), meta=(DeterminesOutputType = "ClassFilter"))
-	UMounteaInventoryItemConfig* GetItemConfig(const TSubclassOf<UMounteaInventoryItemConfig> ClassFilter, bool& bResult) const
-	{
-		if (ClassFilter == nullptr)
-		{
-			bResult = false;
-			return nullptr;
-		}
+	/**
+	 * Sets the world context for this item.
+	 *
+	 * @param NewWorld The new UWorld instance.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory&Equipment|Item", meta=(CustomTag="MounteaK2Setter"))
+	virtual void SetWorld(UWorld* NewWorld);
 
-		bResult = true;
-		if (ItemConfig.ItemConfig == nullptr)
-		{
-			return NewObject<UMounteaInventoryItemConfig>(GetPackage(), ClassFilter);
-		}
-
-		return ItemConfig.ItemConfig->IsA(ClassFilter) ? ItemConfig.ItemConfig : NewObject<UMounteaInventoryItemConfig>(GetPackage(), ClassFilter);
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory", meta = (ClassFilter = "MounteaItemAdditionalData"), meta=(DeterminesOutputType = "ClassFilter"))
-	UMounteaItemAdditionalData* GetItemAdditionalData(const TSubclassOf<UMounteaItemAdditionalData> ClassFilter, bool& bResult) const
-	{
-		if (ClassFilter == nullptr)
-		{
-			bResult = false;
-			return nullptr;
-		}
-
-		bResult = true;
-		if (ItemOptionalData.ItemAdditionalData == nullptr)
-		{
-			return NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
-		}
-
-		return ItemOptionalData.ItemAdditionalData->IsA(ClassFilter) ? ItemOptionalData.ItemAdditionalData : NewObject<UMounteaItemAdditionalData>(GetPackage(), ClassFilter);
-	}
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item", meta=(WorldContext="WorldContextObject", CallableWithoutWorldContext ) )
-	bool IsValid(UObject* WorldContextObject) const;
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
-	FGuid GetItemGuid() const
-	{ return ItemGuid; };
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	void AddQuantity(const int32 Amount);
-	
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	void SetQuantity(const int32 NewQuantity);
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Item")
-	int32 GetQuantity() const;
-	
-	virtual FItemGenericEvent& GetItemAddedHandle()
-	{ return OnItemAdded; };
-	virtual FItemGenericEvent& GetItemUpdatedHandle()
-	{ return OnItemModified; };
-	virtual FItemGenericEvent& GetItemInitializedHandle()
-	{ return OnItemInitialized; };
-	virtual FItemGenericEvent& GetItemRemovedHandle()
-	{ return OnItemRemoved; };
-
-	bool OwnerHasAuthority() const;
-	
-	void NetFlush()
-	{
-		RepKey++;
-	}
-
-	int GetRepKey() const
-	{ return RepKey; }
-
-	FGameplayTag GetFirstTag() const
-	{
-		return ItemData.ItemFlags.First();
-	};
-	FGameplayTagContainer GetTags() const
-	{
-		return ItemData.ItemFlags;
-	};
-	
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
+	/**
+	 * Sets the world context for this item from a given level.
+	 *
+	 * @param FromLevel The level from which to set the world context.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory&Equipment|Item")
 	virtual void SetWorldFromLevel(ULevel* FromLevel);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	void InitializeItemActions();
-	
-	virtual void SetWorld(UWorld* NewWorld);
-	
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item")
-	void InitializeNewItem(const TScriptInterface<IMounteaInventoryInterface>& NewOwningInventory);
+public:
+
+	virtual FItemGenericEvent& GetItemAddedHandle() { return OnItemAdded; }
+	virtual FItemGenericEvent& GetItemUpdatedHandle() { return OnItemModified; }
+	virtual FItemGenericEvent& GetItemInitializedHandle() { return OnItemInitialized; }
+	virtual FItemGenericEvent& GetItemRemovedHandle() { return OnItemRemoved; }
 
 protected:
 
+	/**
+	 * Called when the item begins play.
+	 *
+	 * @param Message A message providing context.
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Item")
 	void OnItemBeginPlay(const FString& Message);
 
-	UFUNCTION()
-	virtual void OnRep_Item();
-	
+	/**
+	 * Internal handler for when the item is added.
+	 *
+	 * @param Message A message providing context.
+	 */
 	UFUNCTION()
 	void ItemAdded(const FString& Message);
+
+	/**
+	 * Internal handler for when the item is initialized.
+	 *
+	 * @param Message A message providing context.
+	 */
 	UFUNCTION()
 	void ItemInitialized(const FString& Message);
+
+	/**
+	 * Internal handler for when the item is modified.
+	 *
+	 * @param Message A message providing context.
+	 */
 	UFUNCTION()
 	void ItemModified(const FString& Message);
+
+	/**
+	 * Internal handler for when the item is removed.
+	 *
+	 * @param Message A message providing context.
+	 */
 	UFUNCTION()
 	void ItemRemoved(const FString& Message);
-	
-	UFUNCTION()
-	virtual TArray<FName> GetSourceTableRows() const
-	{
-		if (!SourceTable)
-		{
-			return TArray<FName>();
-		}
-
-		return SourceTable->GetRowNames();
-	};
-
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty> & OutLifetimeProps) const override;
-	virtual bool IsSupportedForNetworking() const override;
-	
-
-	/**Mark the object as needing replication. We must call this internally after modifying any replicated properties*/
-	void MarkDirtyForReplication();
-
-	void ClearDataTable();
-	void CopyFromTable();
-	void ClearMappedValues();
-	void CopyTagsFromTypes();
-	void EnsureValidConfig();
 
 	void PostWorldCreated(UWorld* NewWorld);
-	
+
 #if WITH_EDITOR
-	
+
 	virtual void PostDuplicate(bool bDuplicateForPIE) override;
-	
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	
+
 #endif
 
 public:
-	
+
 	FORCEINLINE ULevel* GetLevel() const
 	{
 		return GetTypedOuter<ULevel>();
@@ -291,9 +232,9 @@ public:
 	virtual UWorld* GetWorld() const override
 	{
 		if (World) return World;
-		
+			
 		// CDO objects do not belong to a world
-		// If the actors outer is destroyed or unreachable we are shutting down and the world should be nullptr
+		// If the actor's outer is destroyed or unreachable we are shutting down and the world should be nullptr
 		if (
 			!HasAnyFlags(RF_ClassDefaultObject) && ensureMsgf(GetOuter(), TEXT("Actor: %s has a null OuterPrivate in AActor::GetWorld()"), *GetFullName())
 			&& !GetOuter()->HasAnyFlags(RF_BeginDestroyed) && !GetOuter()->IsUnreachable()
@@ -306,16 +247,6 @@ public:
 		}
 		return nullptr;
 	}
-
-	virtual void SetValidData() override;
-	
-#if WITH_EDITOR
-
-	UFUNCTION()
-	void SetValidDataEditor();
-	
-#endif
-	
 };
 
 #undef LOCTEXT_NAMESPACE

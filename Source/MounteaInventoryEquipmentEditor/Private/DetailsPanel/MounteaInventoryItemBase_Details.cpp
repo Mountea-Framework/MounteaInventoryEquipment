@@ -99,7 +99,7 @@ void FMounteaInventoryItem_Details::CustomizeDetails(IDetailLayoutBuilder& Detai
 	// Only support one object being customized
 	if (ObjectsBeingCustomized.Num() != 1) return;
 
-	const TWeakObjectPtr<UMounteaInventoryItemBase> WeakGraphNode = Cast<UMounteaInventoryItemBase>(ObjectsBeingCustomized[0].Get());
+	const TWeakObjectPtr<UMounteaInventoryItem> WeakGraphNode = Cast<UMounteaInventoryItem>(ObjectsBeingCustomized[0].Get());
 	if (!WeakGraphNode.IsValid()) return;
 
 	EditingItem = WeakGraphNode.Get();

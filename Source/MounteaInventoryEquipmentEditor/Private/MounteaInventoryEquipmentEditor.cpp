@@ -153,7 +153,7 @@ void FMounteaInventoryEquipmentEditor::StartupModule()
 			};
 			RegisteredCustomClassLayouts =
 			{
-				UMounteaInventoryItemBase::StaticClass()->GetFName(),
+				UMounteaInventoryItem::StaticClass()->GetFName(),
 				UMounteaInventoryItemConfig::StaticClass()->GetFName(),
 				UMounteaInventoryItemAction::StaticClass()->GetFName(),
 				UMounteaInventoryEquipmentSettings::StaticClass()->GetFName()

@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "MounteaInventoryItemWBPInterface.generated.h"
 
 class UMounteaBaseUserWidget;
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventoryItemWBPInterface : public UInterface
@@ -25,7 +25,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API IMounteaInventoryItemWBPInterface
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
-	UMounteaInventoryItemBase* GetItem() const;
+	UMounteaInventoryItem* GetItem() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="Mountea|Inventory")
 	UMounteaBaseUserWidget* GetItemUI() const;

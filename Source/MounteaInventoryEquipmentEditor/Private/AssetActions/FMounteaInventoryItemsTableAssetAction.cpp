@@ -1,4 +1,4 @@
-﻿// All rights reserved Dominik Pavlicek 2023.
+﻿// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #include "FMounteaInventoryItemsTableAssetAction.h"
 
@@ -263,7 +263,7 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 			{
 				// Create the factory used to generate the asset
 				UMounteaItemAssetFactory* Factory = NewObject<UMounteaItemAssetFactory>();
-				Factory->SetParentClass(UMounteaInventoryItemBase::StaticClass());
+				Factory->SetParentClass(UMounteaInventoryItem::StaticClass());
 				Factory->SetSource(ItemsTable, Itr);
 
 				FString FindRowContext;
@@ -307,7 +307,7 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 					bool bDuplicateFound = false;
 					for (const auto& AssetListItr : AssetList)
 					{
-						if (UMounteaInventoryItemBase* FoundItem = Cast<UMounteaInventoryItemBase>(AssetListItr.GetAsset()))
+						if (UMounteaInventoryItem* FoundItem = Cast<UMounteaInventoryItem>(AssetListItr.GetAsset()))
 						{
 							if (FoundItem->SourceTable == ItemsTable && FoundItem->SourceRow == Itr)
 							{
@@ -330,7 +330,7 @@ void FMounteaInventoryItemsTableAssetAction::GenerateNewItems(TArray<TWeakObject
 
 				
 				FAssetToolsModule& AssetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
-				if ( UObject* NewAsset = AssetToolsModule.Get().CreateAsset(Name, FPackageName::GetLongPackagePath(PackagePath), UMounteaInventoryItemBase::StaticClass(), Factory) )
+				if ( UObject* NewAsset = AssetToolsModule.Get().CreateAsset(Name, FPackageName::GetLongPackagePath(PackagePath), UMounteaInventoryItem::StaticClass(), Factory) )
 				{
 					ObjectsToSync.Add(NewAsset);
 				}

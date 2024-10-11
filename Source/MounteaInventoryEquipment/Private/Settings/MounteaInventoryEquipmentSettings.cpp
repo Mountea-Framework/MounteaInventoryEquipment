@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 
 #include "Settings/MounteaInventoryEquipmentSettings.h"
@@ -68,7 +68,7 @@ UMounteaInventoryEquipmentSettings::UMounteaInventoryEquipmentSettings()
 	bDragDropAllowed = true;
 
 	DefaultInventoryConfigClass = UMounteaInventoryConfig::StaticClass();
-	DefaultItemClass = UMounteaInventoryItemBase::StaticClass();
+	DefaultItemClass = UMounteaInventoryItem::StaticClass();
 	DefaultItemConfigClass = UMounteaInventoryItemConfig::StaticClass();
 }
 

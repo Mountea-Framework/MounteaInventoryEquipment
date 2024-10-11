@@ -1,14 +1,16 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "UObject/NoExportTypes.h"
+#include "Helpers/MounteaEquipmentDataTypes.h"
 #include "MounteaEquipmentSlot.generated.h"
 
 class IMounteaEquipmentInterface;
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
+
+#define LOCTEXT_NAMESPACE "EquipmentItem"
 
 /**
  * Mountea Equipment Slot.
@@ -27,155 +29,155 @@ class UMounteaInventoryItemBase;
  * @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Equipment-Slot
  */
 
-UCLASS( Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea, Inventory"), DisplayName="Equipment Slot (Base)")
-class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentSlot : public UObject
+/**
+ * Mountea Equipment Slot.
+ *
+ * Represents an equipment slot within the Mountea Inventory & Equipment system.
+ * Equipment slots define where items can be equipped, including compatibility tags, default state, and attachment data.
+ * This class allows for flexible equipment management, enabling features like item equipping, slot state management, and networking replication.
+ *
+ * @see UDataAsset
+ */
+UCLASS(Blueprintable, BlueprintType, EditInlineNew, ClassGroup=("Mountea"), AutoExpandCategories=("Mountea,Inventory"), DisplayName="Equipment Slot")
+class MOUNTEAINVENTORYEQUIPMENT_API UMounteaEquipmentSlot : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
 
 	/**
-	 * Returns the unique identifier for this slot.
-	 * This ID is used to distinguish this slot from others in an equipment system.
+	 * Returns the display name of this slot.
+	 *
+	 * @return The localized display name of the slot.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE FString GetSlotID() const { return SlotID; };
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE FText GetSlotName() const { return SlotName; };
 
 	/**
-	 * Returns the tag that determines which items can be equipped in this slot.
-	 * Only items that contain this tag can be equipped in this slot.
+	 * Returns tags that define which items are compatible with this slot.
+	 * Only items that match these tags can be equipped.
+	 *
+	 * @return The gameplay tag container with the slot's compatible tags.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE FGameplayTag GetSlotTag() const { return SlotCompatibleTag; };
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE FGameplayTagContainer GetSlotTags() const { return SlotCompatibleTags; };
 
 	/**
 	 * Returns the item currently equipped in this slot.
+	 *
+	 * @return The inventory item currently in the slot, or nullptr if empty.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
-	FORCEINLINE UMounteaInventoryItemBase* GetSlotItem() const { return ItemInSlot; };
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE UMounteaInventoryItem* GetSlotItem() const { return ItemInSlot; };
 
+	/**
+	 * Returns the current state of the equipment slot.
+	 *
+	 * @return The equipment slot state.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE EEquipmentSlotState GetSlotState() const { return SlotState; };
+
+	/**
+	 * Returns the unique identifier for this equipment slot.
+	 *
+	 * @return The GUID of the slot.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot", meta=(CustomTag="MounteaK2Getter"))
+	FORCEINLINE FGuid GetSlotGuid() const { return SlotGuid; };
+	
 	/**
 	 * Determines if the equipment slot is currently empty.
 	 *
-	 * This function checks whether there is currently an item equipped in this slot.
-	 * It returns true if the slot is empty (i.e., there is no item equipped), and false otherwise.
+	 * Checks whether there is an item equipped in this slot.
+	 * Returns true if the slot is empty (i.e., there is no item equipped), and false otherwise.
+	 *
+	 * @return True if the slot is empty; false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|EquipmentSlot", meta=(CustomTag="MounteaK2Validate"))
 	FORCEINLINE bool IsEmpty() const { return ItemInSlot == nullptr; };
-
-	UFUNCTION(Category="Mountea|EquipmentSlot")
-	void UpdateItem(UMounteaInventoryItemBase* NewItem);
 	
-	FORCEINLINE int32 GetRepKey() const { return RepKey; };
 protected:
 
-	/**
-	 * The unique identifier for this slot.
-	 * This ID is used to distinguish this slot from others in an equipment system.
-	 * It can be customized in the editor.
-	 */
-	UPROPERTY(SaveGame, Category="1. Required", EditDefaultsOnly, BlueprintReadOnly, meta=(GetOptions=GetSlotIDs))
-	FString SlotID;
+#pragma region REQUIRED
 
 	/**
-	 * The tag that determines which items can be equipped in this slot.
-	 * Only items that contain this tag can be equipped in this slot.
+	 * The unique name for this slot.
+	 * This is the display name of the slot.
+	 *
+	 * 📖 LOCALIZABLE
 	 */
-	UPROPERTY(SaveGame, Category="1. Required", VisibleAnywhere, BlueprintReadOnly)
-	FGameplayTag SlotCompatibleTag;
+	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly, meta=(GetOptions=GetSlotNames))
+	FText SlotName;
+
+	/**
+	 * Tags that define which items are compatible with this slot.
+	 * Only items that match these tags can be equipped.
+	 */
+	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly)
+	FGameplayTagContainer SlotCompatibleTags;
+
+	/**
+	 * The default state of this equipment slot.
+	 *
+	 * ❗ Occupied is not allowed.
+	 */
+	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly)
+	EEquipmentSlotState DefaultSlotState;
+
+	/**
+	 * Data that defines how the equipment item is attached to this slot.
+	 */
+	UPROPERTY(SaveGame, Category="1. Required", EditAnywhere, BlueprintReadOnly)
+	FEquipmentAttachmentData EquipmentAttachmentData;
+
+#pragma endregion
+
+#pragma region READONLY
+
+	/** The current state of the equipment slot. */
+	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_SlotState)
+	EEquipmentSlotState SlotState;
 
 	/**
 	 * The item currently equipped in this slot.
 	 * This property is automatically updated when items are equipped or unequipped.
 	 */
-	UPROPERTY(SaveGame, Category="2. Debug", VisibleAnywhere, BlueprintReadOnly, meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
-	UMounteaInventoryItemBase* ItemInSlot = nullptr;
+	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly, meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
+	TObjectPtr<UMounteaInventoryItem> ItemInSlot = nullptr;
+
+	/**
+	 * The unique identifier for this equipment slot.
+	 * This ID is used to distinguish this slot from others in an equipment system.
+	 * It can be customized in the editor.
+	 */
+	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly, Replicated)
+	FGuid SlotGuid;
 
 private:
 
-	UPROPERTY(VisibleAnywhere, Category="2. Debug")
-	int32 RepKey = 0;
-
-	UPROPERTY(SaveGame, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
+	/** The owning equipment interface for this slot. */
+	UPROPERTY(SaveGame, VisibleAnywhere, Category="2. Read Only", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_Slot)
 	TScriptInterface<IMounteaEquipmentInterface> OwningEquipment = nullptr;
 
-private:
+#pragma endregion
 
-	UFUNCTION() void OnRep_Slot();
-	UFUNCTION()
-	static TArray<FString> GetSlotIDs();
+private:
 	
-	virtual bool IsSupportedForNetworking() const override;
-	void MarkDirtyForReplication();
+	UFUNCTION()
+	static TArray<FString> GetSlotNames();
+	
+	virtual bool IsSupportedForNetworking() const override { return true; };
 	
 #if WITH_EDITOR
 protected:
 	
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) override;
 	
 #endif
 	
 };
 
-struct FMounteaEquipmentSlotDataCompare
-{
-	FMounteaEquipmentSlotDataCompare(const UMounteaInventoryItemBase* Item, const FString& ID) : SlotItem(Item), SlotID(ID) {};
-	
-	 const UMounteaInventoryItemBase* SlotItem;
-	 const FString SlotID;
-};
 
-USTRUCT(BlueprintType)
-struct FMounteaEquipmentSlotData
-{
-	GENERATED_BODY()
-
-public:
-
-	/**
-	 * The Equipment Slot object associated with this data structure.
-	 *
-	 * This property represents an instance of a `UMounteaEquipmentSlot` object that is linked to this data structure.
-	 * It provides access to the equipment slot's data and functionality, such as its ID, compatible tag, and currently equipped item.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "Inventory", meta=(NoResetToDefault, AllowAbstract=false, BlueprintBaseOnly=false))
-	UMounteaEquipmentSlot* Slot;
-
-public:
-	
-	bool operator==(const FMounteaEquipmentSlotData& Other) const
-	{
-		return Slot == Other.Slot;
-	}
-	
-	bool operator==(const FMounteaEquipmentSlotDataCompare& Other) const
-	{
-		if (Slot)
-		{
-			return Slot->GetSlotID() == Other.SlotID && Slot->GetSlotItem() == Other.SlotItem;
-		}
-		return false;
-	}
-
-	bool operator!=(const FMounteaEquipmentSlotData& Other) const
-	{
-		return !(*this == Other);
-	}
-
-	bool operator!=(const FMounteaEquipmentSlotDataCompare& Other) const
-	{
-		return !(*this == Other);
-	}
-
-	friend uint32 GetTypeHash(const FMounteaEquipmentSlotData& Data)
-	{
-		uint32 Hash = 0;
-		if (Data.Slot)
-		{
-			Hash = HashCombine(Hash, GetTypeHash(Data.Slot->GetSlotID()));
-		}
-				
-		return Hash;
-	}
-
-};
+#undef LOCTEXT_NAMESPACE

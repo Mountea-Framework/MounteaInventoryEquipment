@@ -8,11 +8,12 @@
 #include "InputCoreTypes.h"
 #include "Templates/SubclassOf.h"
 #include "Engine/Level.h"
+#include "MounteaInventoryFlagsLibrary.h"
 #include "MounteaInventoryHelpers.generated.h"
 
 class UMounteaInventoryItemCategory;
 class UMounteaInventoryItemRarity;
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 class UTexture;
 class UTexture2D;
 class AActor;
@@ -69,25 +70,25 @@ struct FInventoryNotificationData
 UENUM(BlueprintType)
 enum class EInventoryUpdateResult : uint8
 {
-	EIUR_Success							UMETA(DisplayName="Success"),
-	EIUR_Failed								UMETA(DisplayName="Failed"),
+	EIUR_Success					UMETA(DisplayName="Success"),
+	EIUR_Failed						UMETA(DisplayName="Failed"),
 
-	Default										UMETA(Hidden)
+	Default							UMETA(Hidden)
 };
 
 UENUM(BlueprintType)
 enum class EItemUpdateResult : uint8
 {
 	EIUR_Success_UpdateItem			UMETA(DisplayName="Success - Update Item"),
-	EIUR_Success_AddItem				UMETA(DisplayName="Success - Add Item"),
-	EIUR_Success_SomeAdd				UMETA(DisplayName="Success - Partially Added"),
-	EIUR_Success_RemovedItem			UMETA(DisplayName="Success - Removed Item"),
-	EIUR_Success_EquipItem				UMETA(DisplayName="Success - Equip Item"),
-	EIUR_Success_UnEquipItem			UMETA(DisplayName="Success - Unequip Item"),
-	EIUR_Failed_InvalidItem					UMETA(DisplayName="Failed - Invalid Item"),
-	EIUR_Failed_LimitReached			UMETA(DisplayName="Failed - Max Quantity"),
+	EIUR_Success_AddItem			UMETA(DisplayName="Success - Add Item"),
+	EIUR_Success_SomeAdd			UMETA(DisplayName="Success - Partially Added"),
+	EIUR_Success_RemovedItem		UMETA(DisplayName="Success - Removed Item"),
+	EIUR_Success_EquipItem			UMETA(DisplayName="Success - Equip Item"),
+	EIUR_Success_UnEquipItem		UMETA(DisplayName="Success - Unequip Item"),
+	EIUR_Failed_InvalidItem			UMETA(DisplayName="Failed - Invalid Item"),
+	EIUR_Failed_LimitReached		UMETA(DisplayName="Failed - Max Quantity"),
 
-	Default											UMETA(Hidden)
+	Default							UMETA(Hidden)
 };
 
 USTRUCT(BlueprintType)
@@ -120,26 +121,6 @@ struct FItemUpdateResult
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItem"
 
-USTRUCT(BlueprintType)
-struct FMounteaItemQuantityData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=0, ClampMin=0))
-	int32 CurrentQuantity = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=1, ClampMin=1, EditCondition="bIsStackable"))
-	int32 MaxQuantity = 99;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 bIsStackable : 1;
-
-	FMounteaItemQuantityData()
-	{
-		bIsStackable = true;
-	}
-};
-
 /**
  * Basic structure which contains required Inventory Item data.
  */
@@ -148,34 +129,40 @@ struct FMounteaInventoryItemRequiredData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault), DisplayName="Item Flags (Gameplay Tags)")
-	FGameplayTagContainer ItemFlags;
+public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TObjectPtr<UMounteaInventoryItemCategory> ItemCategory;
+	
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
+	TObjectPtr<UMounteaInventoryItemRarity> ItemRarity;
+
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FText ItemName = LOCTEXT("MounteaInventoryItem_ItemName", "New Item");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	UMounteaInventoryItemCategory* ItemCategory;
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, MultiLine))
+	FText ItemShortInfo = LOCTEXT("MounteaInventoryItem_ItemShortInfo", "");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(AllowAbstract=false, NoResetToDefault, DisplayThumbnail=false))
-	UMounteaInventoryItemRarity* ItemRarity;
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, MultiLine))
+	FText ItemLongInfo = LOCTEXT("MounteaInventoryItem_ItemShortInfo", "");
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="1. Required", meta=(Bitmask, BitmaskEnum="EInventoryCategoryFlags"))
+	uint8 ItemFlags;
+
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
+	FSlateBrush ItemThumbnail;
+
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
+	FSlateBrush ItemCover;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="StaticMesh, SkeletalMesh"))
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="StaticMesh,SkeletalMesh"))
 	UStreamableRenderAsset* ItemMesh = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ShowOnlyInnerProperties))
-	FMounteaItemQuantityData ItemQuantity;
 
 public:
 
 	bool operator==(const FMounteaInventoryItemRequiredData& Other) const
 	{
-		if (ItemFlags.IsEmpty())
-		{
-			return ItemName.EqualTo(Other.ItemName);
-		}
-
-		return ItemName.EqualTo(Other.ItemName) && ItemFlags == Other.ItemFlags;
+		return ItemName.EqualTo(Other.ItemName) && ItemCategory == Other.ItemCategory && ItemRarity == Other.ItemRarity;
 	}
 
 	bool operator!=(const FMounteaInventoryItemRequiredData& Other) const
@@ -183,19 +170,17 @@ public:
 		return !(*this == Other);
 	}
 
-	/*
-	FMounteaInventoryItemRequiredData& operator=(const FMounteaInventoryItemRequiredData& Other)
-	{
-		return *this;
-	}
-	*/
-
 	friend uint32 GetTypeHash(const FMounteaInventoryItemRequiredData& Data)
 	{
 		uint32 Hash = 0;
 		Hash = HashCombine(Hash, GetTypeHash(Data.ItemName.ToString()));
 				
 		return Hash;
+	}
+
+	static FString ToJson()
+	{
+		return FString();
 	}
 };
 
@@ -207,47 +192,70 @@ struct FMounteaInventoryItemOptionalData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture2D* ItemIcon = nullptr;
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bHasDurability : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
+	float MaxDurability = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
+	float BaseDurability = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
+	float DurabilityPenalization = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
+	float DurabilityToPriceCoefficient = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
+	uint8 bHasPrice : 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasValue"))
+	float BasePrice = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasValue"))
+	float SellPriceCoefficient = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0))
+	int32 MaxStackSize = 30;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0))
+	int32 MaxQuantity = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bHasWeight : 1;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(UIMin=0.f, ClampMin=0.f, Units=kg, EditCondition="bHasWeight"))
-	float BaseWeight = 0.1f;
+	float Weight = 0.1f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
-	uint8 bHasValue : 1;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasValue"))
-	float ItemBaseValue = 10.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
-	uint8 bHasDurability : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn, UIMin=0, ClampMin=0, EditCondition="bHasDurability"))
-	float ItemBaseDurability = 10.f;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, meta=(MustImplement="/Script/MounteaInventoryEquipment.MounteaInventoryPickupInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> SpawnActor;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, NoClear, meta=(NoResetToDefault, DisplayThumbnail=false))
-	class UMounteaItemAdditionalData* ItemAdditionalData;
 };
 
-/**
- * Container for all Inventory Item Data
- */
 USTRUCT(BlueprintType)
-struct FMounteaInventoryItemData : public FTableRowBase
+struct FMounteaInventoryItemInstancedData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FMounteaInventoryItemRequiredData RequiredData;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FMounteaInventoryItemOptionalData OptionalData;
+public:
+
+	FMounteaInventoryItemInstancedData() {};
+
+	FMounteaInventoryItemInstancedData(const float InDurability, const int32 InPrice, const int32 InQuantity)
+	: Durability(InDurability), Price(InPrice), Quantity(InQuantity) {};
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0))
+	float Durability = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0))
+	int32 Price = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ExposeOnSpawn, UIMin=0, ClampMin=0))
+	int32 Quantity = 0;
 };
 
 #undef LOCTEXT_NAMESPACE
@@ -283,7 +291,7 @@ struct FItemRetrievalFilter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bSearchByClass : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) //, meta=(EditCondition="bSearchByClass"))
-	TSubclassOf<UMounteaInventoryItemBase> Class;
+	TSubclassOf<UMounteaInventoryItem> Class;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bSearchByGUID : 1;
@@ -293,7 +301,7 @@ struct FItemRetrievalFilter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(InlineEditConditionToggle))
 	uint8 bSearchByItem : 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) //, meta=(EditCondition="bSearchByGUID"))
-	UMounteaInventoryItemBase* Item ;
+	UMounteaInventoryItem* Item ;
 
 	bool IsValid() const
 	{
@@ -303,7 +311,7 @@ struct FItemRetrievalFilter
 	FItemRetrievalFilter(): bSearchByTag(0), bSearchByClass(0), bSearchByGUID(0), bSearchByItem(0), Item(nullptr)
 	{};
 	
-	FItemRetrievalFilter(const bool ByTag, const FGameplayTagContainer& InTags, const bool ByClass, const TSubclassOf<UMounteaInventoryItemBase> InClass, const bool ByGUID, const FGuid InGUID, const bool ByItem, UMounteaInventoryItemBase* InItem)
+	FItemRetrievalFilter(const bool ByTag, const FGameplayTagContainer& InTags, const bool ByClass, const TSubclassOf<UMounteaInventoryItem> InClass, const bool ByGUID, const FGuid InGUID, const bool ByItem, UMounteaInventoryItem* InItem)
 		: bSearchByTag(ByTag), Tags(InTags), bSearchByClass(ByClass), Class(InClass), bSearchByGUID(ByGUID), Guid(InGUID), bSearchByItem(ByItem), Item(InItem)
 	{};
 };
@@ -311,19 +319,7 @@ struct FItemRetrievalFilter
 #pragma endregion
 
 USTRUCT(BlueprintType)
-struct FMounteaItemDescription : public FTableRowBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(MultiLine=true))
-	FText ItemShortDescription;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Short Description", meta=(MultiLine=true))
-	FText ItemLongDescription;
-};
-
-USTRUCT(BlueprintType)
-struct FMounteaDynamicDelegateContext
+struct FMounteaInventoryCommandContext
 {
 	GENERATED_BODY()
 

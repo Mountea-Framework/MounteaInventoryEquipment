@@ -1,4 +1,4 @@
-﻿// All rights reserved Dominik Pavlicek 2023.
+﻿// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -6,7 +6,7 @@
 #include "AssetTypeActions_Base.h"
 #include "Utils/MounteaInventoryEquipmentEditorUtilities.h"
 
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 
 class FMounteaInventoryItemAssetAction : public FAssetTypeActions_Base
 {
@@ -58,7 +58,7 @@ public:
 
 private:
 	
-	void ExecuteRefreshItem(TArray<TWeakObjectPtr<UMounteaInventoryItemBase>> Items);
+	void ExecuteRefreshItem(TArray<TWeakObjectPtr<UMounteaInventoryItem>> Items);
 };
 
 class FAssetActionExtender_MounteaInventoryItem

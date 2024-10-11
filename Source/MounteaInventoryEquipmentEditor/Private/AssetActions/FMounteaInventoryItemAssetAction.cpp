@@ -1,4 +1,4 @@
-﻿// All rights reserved Dominik Pavlicek 2023.
+﻿// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #include "FMounteaInventoryItemAssetAction.h"
 
@@ -28,7 +28,7 @@ FColor FMounteaInventoryItemAssetAction::GetTypeColor() const
 
 UClass* FMounteaInventoryItemAssetAction::GetSupportedClass() const
 {
-	return UMounteaInventoryItemBase::StaticClass();
+	return UMounteaInventoryItem::StaticClass();
 }
 
 uint32 FMounteaInventoryItemAssetAction::GetCategories()
@@ -41,7 +41,7 @@ uint32 FMounteaInventoryItemAssetAction::GetCategories()
 	return  EAssetTypeCategories::Misc;
 }
 
-void FMounteaInventoryItemAssetAction::ExecuteRefreshItem(TArray<TWeakObjectPtr<UMounteaInventoryItemBase>> Items)
+void FMounteaInventoryItemAssetAction::ExecuteRefreshItem(TArray<TWeakObjectPtr<UMounteaInventoryItem>> Items)
 {
 	if (Items.Num() == 1)
 	{
@@ -52,7 +52,7 @@ void FMounteaInventoryItemAssetAction::ExecuteRefreshItem(TArray<TWeakObjectPtr<
 	}
 	else
 	{
-		TArray<UMounteaInventoryItemBase*> ItemsToSync;
+		TArray<UMounteaInventoryItem*> ItemsToSync;
 		for (auto ItemItr = Items.CreateConstIterator(); ItemItr; ++ItemItr)
 		{
 			if (const auto Item = (*ItemItr).Get())
@@ -65,7 +65,7 @@ void FMounteaInventoryItemAssetAction::ExecuteRefreshItem(TArray<TWeakObjectPtr<
 
 void FMounteaInventoryItemAssetAction::GetActions(const TArray<UObject*>& InObjects, FToolMenuSection& Section)
 {
-	const auto Items = GetTypedWeakObjectPtrs<UMounteaInventoryItemBase>(InObjects);
+	const auto Items = GetTypedWeakObjectPtrs<UMounteaInventoryItem>(InObjects);
 	FAssetTypeActions_Base::GetActions(InObjects, Section);
 
 	Section.AddMenuEntry(
@@ -112,7 +112,7 @@ void FAssetActionExtender_MounteaInventoryItem::RegisterMenus()
 		{
 			if (UBlueprint* ItemBP = Cast<UBlueprint>(Object))
 			{
-				if (ItemBP->ParentClass->IsChildOf(UMounteaInventoryItemBase::StaticClass()))
+				if (ItemBP->ParentClass->IsChildOf(UMounteaInventoryItem::StaticClass()))
 				{
 					const TAttribute<FText> Label = LOCTEXT("Item_RefreshItem", "Refresh Item Data");
 					const TAttribute<FText> ToolTip = LOCTEXT("Item_RefreshItemTooltip", "Updates data for selected Item(s).");
@@ -137,7 +137,7 @@ void FAssetActionExtender_MounteaInventoryItem::ExecuteRefreshItem(const FToolMe
 	// TODO Find how to get from UBlueprint to execute its native functions
 	for (const TWeakObjectPtr<UObject>& Object : Context->SelectedObjects)
 	{
-		UMounteaInventoryItemBase* ItemBP = Cast<UMounteaInventoryItemBase>(Object);
+		UMounteaInventoryItem* ItemBP = Cast<UMounteaInventoryItem>(Object);
 		if (ItemBP)
 		{
 			TScriptInterface<IMounteaInventoryEquipmentItem> ItemInterface = ItemBP;

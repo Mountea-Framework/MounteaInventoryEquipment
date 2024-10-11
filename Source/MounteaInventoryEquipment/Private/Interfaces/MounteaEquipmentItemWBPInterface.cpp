@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 
 #include "..\..\Public\Interfaces\MounteaEquipmentItemWBPInterface.h"

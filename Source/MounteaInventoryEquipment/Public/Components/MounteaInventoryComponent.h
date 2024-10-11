@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -12,7 +12,7 @@
 
 class UMounteaTransactionPayload;
 class UMounteaBaseUserWidget;
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryComponent"
 
@@ -42,8 +42,7 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryComponent : public UActorCo
 public:
 	
 	UMounteaInventoryComponent();
-	
-#pragma region FUNCTIONS
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -51,6 +50,8 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
+	/*
+	
 public:
 
 	virtual TSubclassOf<UMounteaBaseUserWidget> GetInventoryUIClass_Implementation() const override;
@@ -143,15 +144,12 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SetOtherInventory_Server(const TScriptInterface<IMounteaInventoryInterface>& NewInventory);
+
+	*/
 	
 private:
 
-	/**
-	 * Do not call directly!
-	 * Use `AddItem` interface function instead.
-	 *
-	 * To use Interface call request `Execute_AddItem({interface}, {item})`
-	 */
+	/*
 	virtual bool AddItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	virtual bool UpdateItem_Internal(UMounteaInventoryItemBase* Item, const int32 Quantity = 0);
 	virtual bool  RemoveItem_Internal(UMounteaInventoryItemBase* Item, int32 Quantity = 0);
@@ -216,6 +214,8 @@ protected:
 	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "4. Config", NoClear, meta=(NoResetToDefault))
 	FMounteaInventoryConfigBase InventoryConfig;
 
+	*/
+
 private:
 	
 	/**
@@ -228,6 +228,7 @@ private:
 	 *
 	 * This attribute is transient.
 	 */
+	/*
 	UPROPERTY(Transient, VisibleAnywhere, Category="2. Debug", meta=(DisplayThumbnail=false), ReplicatedUsing=OnRep_OtherInventory)
 	TScriptInterface<IMounteaInventoryInterface> OtherInventory;
 
@@ -246,16 +247,17 @@ private:
 
 	//TODO: Settings?
 	const int32 ChunkSize = 100;
-	
+
+
+#pragma endregion
+	*/
+
 #if WITH_EDITOR
 private:
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
   
 #endif
-
-
-#pragma endregion
 	
 };
 

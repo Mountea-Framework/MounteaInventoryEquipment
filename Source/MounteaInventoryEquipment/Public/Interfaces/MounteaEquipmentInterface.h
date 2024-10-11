@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -10,7 +10,7 @@
 class UMounteaEquipmentSlot;
 struct FMounteaEquipmentSlotData;
 struct FMounteaEquipmentSlots;
-class UMounteaInventoryItemBase;
+class UMounteaInventoryItem;
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -46,32 +46,32 @@ public:
 	virtual AActor* GetOwningActor_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	FString FindSlotForItem(const UMounteaInventoryItemBase* Item) const;
-	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItemBase* Item) const = 0;
+	FString FindSlotForItem(const UMounteaInventoryItem* Item) const;
+	virtual FString FindSlotForItem_Implementation(const UMounteaInventoryItem* Item) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	UMounteaEquipmentSlot* FindSlotByID(const FString& SlotID) const;
 	virtual UMounteaEquipmentSlot* FindSlotByID_Implementation(const FString& SlotID) const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	bool EquipItem(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	virtual bool EquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip,const FString& SlotID) = 0;
+	bool EquipItem(UMounteaInventoryItem* ItemToEquip, const FString& SlotID);
+	virtual bool EquipItem_Implementation(UMounteaInventoryItem* ItemToEquip,const FString& SlotID) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	bool UnEquipItem(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID);
-	virtual bool UnEquipItem_Implementation(UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) = 0;
+	bool UnEquipItem(UMounteaInventoryItem* ItemToEquip, const FString& SlotID);
+	virtual bool UnEquipItem_Implementation(UMounteaInventoryItem* ItemToEquip, const FString& SlotID) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	bool IsItemEquipped(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const;
-	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItemBase* ItemToEquip, const FString& SlotID) const = 0;
+	bool IsItemEquipped(const UMounteaInventoryItem* ItemToEquip, const FString& SlotID) const;
+	virtual bool IsItemEquipped_Implementation(const UMounteaInventoryItem* ItemToEquip, const FString& SlotID) const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	TArray<FMounteaEquipmentSlotData> GetAllSlots() const;
 	virtual TArray<FMounteaEquipmentSlotData> GetAllSlots_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
-	bool CanEquipItem(const UMounteaInventoryItemBase* ItemToEquip) const;
-	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItemBase* ItemToEquip) const = 0;
+	bool CanEquipItem(const UMounteaInventoryItem* ItemToEquip) const;
+	virtual bool CanEquipItem_Implementation(const UMounteaInventoryItem* ItemToEquip) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Mountea|Equipment")
 	UMounteaBaseUserWidget* GetEquipmentUI() const;

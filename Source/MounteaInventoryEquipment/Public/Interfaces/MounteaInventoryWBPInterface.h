@@ -1,4 +1,4 @@
-// All rights reserved Dominik Pavlicek 2023.
+// All rights reserved Dominik Morse (Pavlicek) 2024
 
 #pragma once
 
@@ -46,6 +46,6 @@ public:
 	virtual void SetOwningInventory_Implementation(const TScriptInterface<IMounteaInventoryInterface>& OwningInventory) = 0;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category="Mountea|Inventory")
-	TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI(const UMounteaInventoryItemBase* ForItem, bool& bFound) const;
-	virtual TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI_Implementation(const UMounteaInventoryItemBase* ForItem, bool& bFound) const = 0;
+	TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI(const UMounteaInventoryItem* ForItem, bool& bFound) const;
+	virtual TScriptInterface<IMounteaInventoryItemWBPInterface> FindItemUI_Implementation(const UMounteaInventoryItem* ForItem, bool& bFound) const = 0;
 };

@@ -11,17 +11,17 @@ UMounteaItemAssetFactory::UMounteaItemAssetFactory()
 	bCreateNew = true;
 	bEditAfterNew = true;
 
-	SupportedClass = UMounteaInventoryItemBase::StaticClass();
+	SupportedClass = UMounteaInventoryItem::StaticClass();
 }
 
 UObject* UMounteaItemAssetFactory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
 	if (ParentClass == nullptr)
 	{
-		ParentClass = UMounteaInventoryItemBase::StaticClass();
+		ParentClass = UMounteaInventoryItem::StaticClass();
 	}
 	
-	UMounteaInventoryItemBase* Item = NewObject<UMounteaInventoryItemBase>(InParent, ParentClass, Name, Flags, Context);
+	UMounteaInventoryItem* Item = NewObject<UMounteaInventoryItem>(InParent, ParentClass, Name, Flags, Context);
 	
 	if (SourceTable)
 	{
@@ -32,7 +32,7 @@ UObject* UMounteaItemAssetFactory::FactoryCreateNew(UClass* Class, UObject* InPa
 	}
 
 	return Item;
-	return NewObject<UMounteaInventoryItemBase>(InParent, ParentClass, Name, Flags, Context);
+	return NewObject<UMounteaInventoryItem>(InParent, ParentClass, Name, Flags, Context);
 }
 
 bool UMounteaItemAssetFactory::ConfigureProperties()
