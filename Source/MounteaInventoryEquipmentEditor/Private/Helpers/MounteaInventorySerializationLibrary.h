@@ -25,4 +25,14 @@ public:
 	static FString ToJson(const class UMounteaInventoryItemBlueprint* ItemBlueprint);
 
 	static FString ToJson(const class UMounteaInventoryItemsLibrary* ItemBlueprintsLibrary);
+
+	static FMounteaInventoryItemRequiredData RequiredDataFromJson(const TSharedPtr<FJsonObject>& JsonObject);
+    
+	static FMounteaInventoryItemOptionalData OptionalDataFromJson(const TSharedPtr<FJsonObject>& JsonObject);
+
+	static FMounteaInventoryItemsLibraryRow ItemBlueprintRowFromJson(const TSharedPtr<FJsonObject>& JsonObject);
+    
+	static UMounteaInventoryItemBlueprint* ItemBlueprintFromJson(const TSharedPtr<FJsonObject>& JsonObject);
+
+	static UMounteaInventoryItemsLibrary* ItemBlueprintsLibraryFromJson(const TSharedPtr<FJsonObject>& JsonObject);
 };

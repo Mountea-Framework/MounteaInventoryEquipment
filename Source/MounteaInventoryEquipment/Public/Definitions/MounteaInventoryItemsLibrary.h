@@ -64,13 +64,12 @@ public:
 	TArray<UMounteaInventoryItemBlueprint*> GetInventoryItemBlueprints() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|ItemBlueprintsLibrary", meta=(CustomTag="MounteaK2Getter"))
-	TArray<FMounteaInventoryItemsLibraryRow> GetInventoryItemBlueprintRows() const;
+	FORCEINLINE TArray<FMounteaInventoryItemsLibraryRow> GetInventoryItemBlueprintRows() const {return InventoryItemBlueprints; };
 	
 protected:
 	
 	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault, UIMin=0,ClampMin=0, TitleProperty="{InitialQuantity} x {InventoryItemBlueprintName}"))
 	TArray<FMounteaInventoryItemsLibraryRow> InventoryItemBlueprints;
-
 
 #if WITH_EDITOR
 

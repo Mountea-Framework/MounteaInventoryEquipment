@@ -67,7 +67,6 @@ FString UMounteaInventorySerializationLibrary::ToJson(const FMounteaInventoryIte
 	return OutputString;
 }
 
-
 FString UMounteaInventorySerializationLibrary::ToJson(const FMounteaInventoryItemsLibraryRow& ItemBlueprintRow)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
@@ -112,7 +111,6 @@ FString UMounteaInventorySerializationLibrary::ToJson(const UMounteaInventoryIte
 	return OutputString;
 }
 
-
 FString UMounteaInventorySerializationLibrary::ToJson(const UMounteaInventoryItemsLibrary* ItemBlueprintsLibrary)
 {
 	if (!IsValid(ItemBlueprintsLibrary))
@@ -152,4 +150,103 @@ FString UMounteaInventorySerializationLibrary::ToJson(const UMounteaInventoryIte
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	return OutputString;
+}
+
+FMounteaInventoryItemRequiredData UMounteaInventorySerializationLibrary::RequiredDataFromJson(const TSharedPtr<FJsonObject>& JsonObject)
+{
+	FMounteaInventoryItemRequiredData resultItemData = FMounteaInventoryItemRequiredData();
+	if (!JsonObject.IsValid()) return resultItemData;
+
+	resultItemData.ItemName = FText::FromString(JsonObject->GetStringField(TEXT("ItemName")));
+	resultItemData.ItemShortInfo = FText::FromString(JsonObject->GetStringField(TEXT("ItemShortInfo")));
+	resultItemData.ItemLongInfo = FText::FromString(JsonObject->GetStringField(TEXT("ItemLongInfo")));
+	resultItemData.ItemFlags = JsonObject->GetNumberField(TEXT("ItemFlags"));
+
+	return resultItemData;
+}
+
+FMounteaInventoryItemOptionalData UMounteaInventorySerializationLibrary::OptionalDataFromJson(const TSharedPtr<FJsonObject>& JsonObject)
+{
+	FMounteaInventoryItemOptionalData resultItemData = FMounteaInventoryItemOptionalData();
+	if (!JsonObject.IsValid()) return resultItemData;
+
+	resultItemData.bHasDurability = JsonObject->GetBoolField(TEXT("bHasDurability"));
+	resultItemData.MaxDurability = JsonObject->GetNumberField(TEXT("MaxDurability"));
+	resultItemData.BaseDurability = JsonObject->GetNumberField(TEXT("BaseDurability"));
+	resultItemData.DurabilityPenalization = JsonObject->GetNumberField(TEXT("DurabilityPenalization"));
+	resultItemData.DurabilityToPriceCoefficient = JsonObject->GetNumberField(TEXT("DurabilityToPriceCoefficient"));
+
+	resultItemData.bHasPrice = JsonObject->GetBoolField(TEXT("bHasPrice"));
+	resultItemData.BasePrice = JsonObject->GetNumberField(TEXT("BasePrice"));
+	resultItemData.SellPriceCoefficient = JsonObject->GetNumberField(TEXT("SellPriceCoefficient"));
+	resultItemData.MaxStackSize = JsonObject->GetNumberField(TEXT("MaxStackSize"));
+	resultItemData.MaxQuantity = JsonObject->GetNumberField(TEXT("MaxQuantity"));
+	resultItemData.bHasWeight = JsonObject->GetBoolField(TEXT("bHasWeight"));
+	resultItemData.Weight = JsonObject->GetNumberField(TEXT("Weight"));
+
+	return resultItemData;
+}
+
+UMounteaInventoryItemBlueprint* UMounteaInventorySerializationLibrary::ItemBlueprintFromJson(const TSharedPtr<FJsonObject>& JsonObject)
+{
+	if (!JsonObject.IsValid()) return nullptr;
+
+	UMounteaInventoryItemBlueprint* resultBlueprint = NewObject<UMounteaInventoryItemBlueprint>();
+	resultBlueprint->SetBlueprintGuid(FGuid::NewGuid());
+	
+	const TArray<TSharedPtr<FJsonValue>>* TagsJsonArray;
+	FGameplayTagContainer TagContainer;
+	if (JsonObject->TryGetArrayField(TEXT("DefaultTags"), TagsJsonArray))
+	{
+		for (const TSharedPtr<FJsonValue>& TagValue : *TagsJsonArray)
+		{
+			const FGameplayTag newGameplayTag = FGameplayTag::RequestGameplayTag(FName(*TagValue->AsString()));
+			TagContainer.AddTag(newGameplayTag);
+		}
+		resultBlueprint->SetDefaultTags(TagContainer);
+	}
+
+	resultBlueprint->SetPrimaryData(RequiredDataFromJson(JsonObject->GetObjectField(TEXT("PrimaryData"))));
+	resultBlueprint->SetSecondaryData(OptionalDataFromJson(JsonObject->GetObjectField(TEXT("SecondaryData"))));
+
+	return resultBlueprint;
+}
+
+FMounteaInventoryItemsLibraryRow UMounteaInventorySerializationLibrary::ItemBlueprintRowFromJson(const TSharedPtr<FJsonObject>& JsonObject)
+{
+	FMounteaInventoryItemsLibraryRow resultRow = FMounteaInventoryItemsLibraryRow();
+	if (!JsonObject.IsValid()) return resultRow;
+
+	resultRow.InitialQuantity = JsonObject->GetIntegerField(TEXT("InitialQuantity"));
+    
+	FString BlueprintJson = JsonObject->GetStringField(TEXT("InventoryItemBlueprint"));
+	TSharedPtr<FJsonObject> BlueprintJsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(BlueprintJson);
+    
+	if (FJsonSerializer::Deserialize(Reader, BlueprintJsonObject))
+	{
+		UMounteaInventoryItemBlueprint* Blueprint = NewObject<UMounteaInventoryItemBlueprint>();
+		resultRow.InventoryItemBlueprint = ItemBlueprintFromJson(BlueprintJsonObject);
+	}
+
+	return resultRow;
+}
+
+UMounteaInventoryItemsLibrary* UMounteaInventorySerializationLibrary::ItemBlueprintsLibraryFromJson(const TSharedPtr<FJsonObject>& JsonObject)
+{
+	if (!JsonObject.IsValid()) return nullptr;
+
+	UMounteaInventoryItemsLibrary* resultLibrary = NewObject<UMounteaInventoryItemsLibrary>();
+
+	const TArray<TSharedPtr<FJsonValue>>* RowsJsonArray;
+	if (JsonObject->TryGetArrayField(TEXT("ItemBlueprintsRows"), RowsJsonArray))
+	{
+		for (const TSharedPtr<FJsonValue>& RowValue : *RowsJsonArray)
+		{
+			FMounteaInventoryItemsLibraryRow Row = ItemBlueprintRowFromJson(RowValue->AsObject());
+			resultLibrary->GetInventoryItemBlueprintRows().Add(Row);
+		}
+	}
+
+	return resultLibrary;
 }
