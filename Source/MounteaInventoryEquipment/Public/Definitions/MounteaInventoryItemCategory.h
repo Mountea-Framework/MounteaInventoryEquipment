@@ -50,7 +50,7 @@ protected:
 	FGameplayTagContainer CategoryTags;
 
 	/** Flags defining special properties or behaviors of the category. Uses the EInventoryItemFlags enum as a bitmask. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required", meta=(Bitmask, BitmaskEnum="EInventoryItemFlags"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Required", meta=(Bitmask, BitmaskEnum="/Script/MounteaInventoryEquipment.EInventoryItemFlags"))
 	uint8 CategoryFlags;
 	
 	/** Set of actions associated with the category. Actions can define custom behaviors or interactions for items in this category. */
