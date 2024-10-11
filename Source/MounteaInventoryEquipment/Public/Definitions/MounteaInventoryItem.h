@@ -28,7 +28,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemGenericEvent, const FString&, M
  * @see FMounteaInventoryItemInstancedData
  * @see IMounteaInventoryInterface
  */
-UCLASS(BlueprintType, ClassGroup="Mountea", DisplayName="Inventory Item")
+UCLASS(BlueprintType, NotBlueprintable, ClassGroup="Mountea", DisplayName="Inventory Item")
 class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItem : public UObject
 {
 	GENERATED_BODY()
