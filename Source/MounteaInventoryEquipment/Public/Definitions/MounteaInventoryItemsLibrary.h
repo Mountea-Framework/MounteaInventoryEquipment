@@ -59,14 +59,15 @@ class MOUNTEAINVENTORYEQUIPMENT_API UMounteaInventoryItemsLibrary : public UData
 	GENERATED_BODY()
 
 public:
-
-	// This returns merged sets
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|ItemBlueprintsLibrary", meta=(CustomTag="MounteaK2Getter"))
 	TArray<UMounteaInventoryItemBlueprint*> GetInventoryItemBlueprints() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|ItemBlueprintsLibrary", meta=(CustomTag="MounteaK2Getter"))
+	TArray<FMounteaInventoryItemsLibraryRow> GetInventoryItemBlueprintRows() const;
 	
 protected:
-
-	// Those can be inline edited
+	
 	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault, UIMin=0,ClampMin=0, TitleProperty="{InitialQuantity} x {InventoryItemBlueprintName}"))
 	TArray<FMounteaInventoryItemsLibraryRow> InventoryItemBlueprints;
 
