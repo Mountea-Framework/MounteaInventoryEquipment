@@ -31,24 +31,24 @@ public:
 protected:
 
 	/** Unique identifier for the item blueprint. Used to distinguish this blueprint from others. */
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Required")
-	FGuid BlueprintGuid = FGuid();;
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
+	FGuid BlueprintGuid;
 
 	/** Default gameplay tags associated with items created from this blueprint. */
-	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
 	FGameplayTagContainer DefaultTags;
 
 	/** Primary data required for items created from this blueprint. */
-	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
 	FMounteaInventoryItemRequiredData PrimaryData;
 
 	/** Optional secondary data for items created from this blueprint. */
-	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Optional")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Optional", meta=(NoResetToDefault))
 	FMounteaInventoryItemOptionalData SecondaryData;
 
 	/** Set of actions associated with items created from this blueprint. */
-	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Optional")
-	TSet<TObjectPtr<UMounteaInventoryItemAction>> ItemActions;
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Optional", meta=(NoResetToDefault))
+	TSet<TSubclassOf<UMounteaInventoryItemAction>> ItemActions;
 
 public:
 
@@ -118,20 +118,13 @@ public:
 	 * @return An array of pointers to the item actions.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory&Equipment|ItemBlueprint", meta=(CustomTag="MounteaK2Getter"))
-	FORCEINLINE TArray<UMounteaInventoryItemAction*> GetItemActions() const { return ItemActions.Array(); }
+	FORCEINLINE TArray<TSubclassOf<UMounteaInventoryItemAction>> GetItemActions() const { return ItemActions.Array(); }
 
 	/**
 	 * Sets the actions associated with items created from this blueprint.
 	 *
 	 * @param NewActions The new array of actions to assign.
 	 */
-	FORCEINLINE void SetItemActions(const TArray<UMounteaInventoryItemAction*>& NewActions)
-	{
-		for (const auto& newAction : NewActions)
-		{
-			if (newAction && !ItemActions.Contains(newAction))
-				ItemActions.Add(newAction);
-		}
-	}
+	 void SetItemActions(const TArray<TSubclassOf<UMounteaInventoryItemAction>>& NewActions);
 };
 

@@ -221,7 +221,7 @@ protected:
 
 	/** Unique identifier for the action. Used to distinguish this action from others. */
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))
-	FGuid ActionGuid = FGuid();
+	FGuid ActionGuid = FGuid::NewGuid();
 
 	/** Gameplay tag associated with the action. Can be used for filtering or applying specific behaviors. */
 	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category="Required", meta=(NoResetToDefault))

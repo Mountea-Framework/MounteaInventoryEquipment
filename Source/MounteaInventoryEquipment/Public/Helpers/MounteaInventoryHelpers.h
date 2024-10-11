@@ -155,7 +155,7 @@ public:
 	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault))
 	FSlateBrush ItemCover;
 	
-	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="StaticMesh,SkeletalMesh"))
+	UPROPERTY(Category="PrimaryData",EditAnywhere, BlueprintReadWrite, meta=(NoResetToDefault, AllowedClasses="/Script/Engine.StaticMesh,/Script/Engine.SkeletalMesh"))
 	UStreamableRenderAsset* ItemMesh = nullptr;
 
 public:

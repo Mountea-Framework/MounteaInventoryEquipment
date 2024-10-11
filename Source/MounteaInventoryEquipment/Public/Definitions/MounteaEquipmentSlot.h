@@ -135,7 +135,7 @@ protected:
 	 * It can be customized in the editor.
 	 */
 	UPROPERTY(SaveGame, Category="2. Read Only", VisibleAnywhere, BlueprintReadOnly)
-	FGuid SlotGuid = FGuid();;
+	FGuid SlotGuid = FGuid::NewGuid();
 
 private:
 
