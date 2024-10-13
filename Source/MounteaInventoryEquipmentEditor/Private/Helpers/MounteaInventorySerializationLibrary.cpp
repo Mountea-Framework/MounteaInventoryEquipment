@@ -72,7 +72,7 @@ FString UMounteaInventorySerializationLibrary::ToJson(const FMounteaInventoryIte
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 
 	JsonObject->SetNumberField(TEXT("InitialQuantity"), ItemBlueprintRow.InitialQuantity);
-	JsonObject->SetStringField(TEXT("InventoryItemBlueprint"), ToJson(ItemBlueprintRow.InventoryItemBlueprint));
+	JsonObject->SetStringField(TEXT("InventoryItemBlueprint"), ToJson(ItemBlueprintRow.InventoryItemBlueprint.LoadSynchronous()));
 
 	FString OutputString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);

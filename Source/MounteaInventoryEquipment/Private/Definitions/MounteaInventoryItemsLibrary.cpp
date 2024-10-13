@@ -14,9 +14,23 @@ void FMounteaInventoryItemsLibraryRow::UpdateDisplayName()
 	InventoryItemBlueprintName = InventoryItemBlueprint ? InventoryItemBlueprint->GetPrimaryData().ItemName.ToString() : TEXT("none");
 }
 
+bool FMounteaInventoryItemsLibraryRow::IsRowValid() const
+{
+	return InventoryItemBlueprint.IsValid();
+}
+
+bool FMounteaInventoryItemsLibraryRow::operator==(const FGuid& ItemGuid) const
+{
+	auto storedItem = InventoryItemBlueprint.LoadSynchronous();
+	if (!IsValid(storedItem))
+		return false;
+
+	return storedItem->GetBlueprintGuid() == ItemGuid;
+}
+
 bool FMounteaInventoryItemsLibraryRow::operator==(const UMounteaInventoryItemBlueprint* ItemBlueprint) const
 {
-	if (!IsValid(ItemBlueprint) || !IsValid(InventoryItemBlueprint))
+	if (!IsValid(ItemBlueprint) || !IsValid(InventoryItemBlueprint.LoadSynchronous()))
 		return false;
 
 	if (ItemBlueprint == InventoryItemBlueprint)
@@ -27,13 +41,18 @@ bool FMounteaInventoryItemsLibraryRow::operator==(const UMounteaInventoryItemBlu
 
 bool FMounteaInventoryItemsLibraryRow::operator==(const FMounteaInventoryItemsLibraryRow& Other) const
 {
-	if (!IsValid(Other.InventoryItemBlueprint) || !IsValid(InventoryItemBlueprint))
+	if (!IsValid(Other.InventoryItemBlueprint.LoadSynchronous()) || !IsValid(InventoryItemBlueprint.LoadSynchronous()))
 		return false;
 
 	if (InventoryItemBlueprint == Other.InventoryItemBlueprint)
 		return true;
 	
 	return InventoryItemBlueprint->GetBlueprintGuid() == Other.InventoryItemBlueprint->GetBlueprintGuid();
+}
+
+bool FMounteaInventoryItemsLibraryRow::operator!=(const FGuid& ItemGuid) const
+{
+	return !(*this==ItemGuid);
 }
 
 bool FMounteaInventoryItemsLibraryRow::operator!=(const UMounteaInventoryItemBlueprint* ItemBlueprint) const
@@ -52,16 +71,52 @@ TArray<UMounteaInventoryItemBlueprint*> UMounteaInventoryItemsLibrary::GetInvent
 	TArray<UMounteaInventoryItemBlueprint*> result;
 
 	for (const auto& Itr : InventoryItemBlueprints)
-		result.Add(Itr.InventoryItemBlueprint);
+		result.Add(Itr.InventoryItemBlueprint.LoadSynchronous());
 
 	return result;
+}
+
+UMounteaInventoryItemBlueprint* UMounteaInventoryItemsLibrary::GetInventoryItemByGuid(const FGuid& ItemGuid, bool& bItemFound) const
+{
+	for (const FMounteaInventoryItemsLibraryRow& Row : InventoryItemBlueprints)
+	{
+		auto rowItem = Row.InventoryItemBlueprint.LoadSynchronous();
+		if (!rowItem) continue;
+		
+		if (Row == ItemGuid)
+		{
+			bItemFound = true;
+			return rowItem;
+		}
+	}
+	
+	bItemFound = false;
+	return nullptr;
+}
+
+UMounteaInventoryItemBlueprint* UMounteaInventoryItemsLibrary::GetInventoryItemByBlueprint(UMounteaInventoryItemBlueprint* ItemBlueprint, bool& bItemFound) const
+{
+	for (const FMounteaInventoryItemsLibraryRow& Row : InventoryItemBlueprints)
+	{
+		auto rowItem = Row.InventoryItemBlueprint.LoadSynchronous();
+		if (!rowItem) continue;
+		
+		if (Row == ItemBlueprint)
+		{
+			bItemFound = true;
+			return rowItem;
+		}
+	}
+	
+	bItemFound = false;
+	return nullptr;
 }
 
 uint32 GetTypeHash(const FMounteaInventoryItemsLibraryRow& Row)
 {
 	uint32 Hash = GetTypeHash(Row.InitialQuantity);
 
-	if (IsValid(Row.InventoryItemBlueprint))
+	if (IsValid(Row.InventoryItemBlueprint.LoadSynchronous()))
 	{
 		Hash = HashCombine(Hash, GetTypeHash(Row.InventoryItemBlueprint->GetBlueprintGuid()));
 	}
