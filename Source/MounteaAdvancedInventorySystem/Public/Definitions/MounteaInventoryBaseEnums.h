@@ -1,0 +1,54 @@
+﻿// All rights reserved Dominik Morse 2024
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "MounteaInventoryBaseEnums.generated.h"
+
+/**
+ * Enum representing the type of inventory.
+ */
+UENUM(BlueprintType)
+enum class EInventoryType : uint8
+{
+	EIT_Player        UMETA(DisplayName = "Player", Tooltip = "Inventory attached to a player character."),
+	EIT_Storage       UMETA(DisplayName = "Storage", Tooltip = "Shared or private storage, such as a chest or stash box."),
+	EIT_Store         UMETA(DisplayName = "Store", Tooltip = "Vendor inventory for buying/selling items."),
+	EIT_Loot          UMETA(DisplayName = "Loot", Tooltip = "Temporary inventory containing lootable items (e.g., defeated enemies)."),
+	EIT_Quest         UMETA(DisplayName = "Quest", Tooltip = "Inventory dedicated to holding quest-related items."),
+
+	Default		UMETA(hidden)
+};
+
+/**
+ * Bitflags representing special behaviors or access rules for an inventory.
+ */
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = true))
+enum class EInventoryFlags : uint8
+{
+	EIF_None          UMETA(DisplayName = "None", Tooltip = "No special behavior or access rules."),
+	EIF_Public        UMETA(DisplayName = "Public", Tooltip = "Inventory is accessible by all actors."),
+	EIF_TeamShared	UMETA(DisplayName = "Team Shared", Tooltip = "Inventory is accessible by teammates."),
+	EIF_Lootable      UMETA(DisplayName = "Lootable", Tooltip = "Inventory is lootable by other actors."),
+	EIF_Temporary     UMETA(DisplayName = "Temporary", Tooltip = "Inventory is temporary and removed after specific events."),
+	EIF_Private       UMETA(DisplayName = "Private", Tooltip = "Inventory is only accessible by the owner.")
+};
+ENUM_CLASS_FLAGS(EInventoryFlags)
+
+/**
+ * Bitflags representing special behaviors or properties for inventory items.
+ */
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = true))
+enum class EInventoryItemFlags : uint8
+{
+	EIIF_None        = 0        UMETA(DisplayName = "None", Tooltip = "No special behavior or properties."),
+	EIIF_Tradeable   = 1 << 0   UMETA(DisplayName = "Tradeable", Tooltip = "Item can be traded between inventories."),
+	EIIF_Stackable   = 1 << 1   UMETA(DisplayName = "Stackable", Tooltip = "Item can stack with others of the same type."),
+	EIIF_Craftable   = 1 << 2   UMETA(DisplayName = "Craftable", Tooltip = "Item can be used in crafting recipes."),
+	EIIF_Dropable	= 1 << 3   UMETA(DisplayName = "Dropable", Tooltip = "Item can be dropped into the world."),
+	EIIF_Consumable  = 1 << 4   UMETA(DisplayName = "Consumable", Tooltip = "Item can be consumed for an effect."),
+	EIIF_QuestItem   = 1 << 5   UMETA(DisplayName = "Quest Item", Tooltip = "Item is required for a quest."),
+	EIIF_Expirable   = 1 << 6   UMETA(DisplayName = "Expirable", Tooltip = "Item has an expiration time or condition."),
+	EIIF_Durable     = 1 << 7   UMETA(DisplayName = "Durable", Tooltip = "Item has durability and can degrade.")
+};
+ENUM_CLASS_FLAGS(EInventoryItemFlags)
