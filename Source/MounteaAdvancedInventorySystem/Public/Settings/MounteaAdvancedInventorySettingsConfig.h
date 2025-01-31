@@ -6,8 +6,10 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventorySettingsConfig.generated.h"
 
+enum class EInventoryType : uint8;
 struct FInventoryRarity;
 struct FInventoryCategory;
+struct FInventoryTypeConfig;
 
 /**
  * 
@@ -23,9 +25,12 @@ public:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category="Rarity")
+	UPROPERTY(EditAnywhere, Category="Types")
+	TMap<EInventoryType, FInventoryTypeConfig> AllowedInventoryTypes;
+
+	UPROPERTY(EditAnywhere, Category="Rarities")
 	TMap<FString, FInventoryRarity> AllowedRarities;
 
-	UPROPERTY(EditAnywhere, Category="Rarity")
+	UPROPERTY(EditAnywhere, Category="Categories")
 	TMap<FString, FInventoryCategory> AllowedCategories;
 };

@@ -100,6 +100,59 @@ struct FInventoryCategory
 
 #undef LOCTEXT_NAMESPACE
 
+#define LOCTEXT_NAMESPACE "InventoryType"
+
+/**
+ * Structure defining inventory type properties.
+ */
+USTRUCT(BlueprintType)
+struct FInventoryTypeConfig
+{
+	GENERATED_BODY()
+
+	FInventoryTypeConfig();
+
+	/** The name of the inventory (e.g., Player, Merchant, Loot), localized */
+	UPROPERTY(EditAnywhere, Category="General")
+	FText InventoryDisplayName = LOCTEXT("InventoryType_DisplayName", "");
+
+	/** Widget class to use for this inventory type */
+	UPROPERTY(EditAnywhere, Category="General", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem/MounteaInventoryBaseWidgetInterface"))
+	TSoftClassPtr<UUserWidget> WidgetClass;
+
+	/** Configuration flags for this inventory type */
+	UPROPERTY(EditAnywhere, Category="Configuration", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryTypeFlags"))
+	uint8 ConfigFlags;
+
+	/** Range of allowed slots (X = Min, Y = Max) */
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(ClampMin=1))
+	FIntPoint SlotsRange = FIntPoint(10, 20);
+
+	/** Starting number of slots (must be within SlotsRange) */
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(ClampMin=1, UIMin=1))
+	int32 StartingSlots = 10;
+	
+	/** Maximum weight this inventory can hold */
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(EditCondition="(ConfigFlags & 1) != 0", ClampMin=0.0, Units="kg"))
+	float MaxWeight = 100.0f;
+
+	/** Maximum total value this inventory can hold */
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(EditCondition="(ConfigFlags & 2) != 0", ClampMin=0.0))
+	float MaxValue = 1000.0f;
+
+	/** Tags defining special properties or restrictions for this inventory type */
+	UPROPERTY(EditAnywhere, Category="Tags")
+	FGameplayTagContainer InventoryTags;
+
+public:
+
+	bool HasWeightLimit() const;
+	bool HasValueLimit() const;
+	bool CanAddItems() const;
+};
+
+#undef LOCTEXT_NAMESPACE
+
 // Equality operator for FInventoryRarity
 FORCEINLINE bool operator==(const FInventoryRarity& LHS, const FInventoryRarity& RHS)
 {

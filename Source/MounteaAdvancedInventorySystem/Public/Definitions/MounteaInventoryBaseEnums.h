@@ -52,3 +52,20 @@ enum class EInventoryItemFlags : uint8
 	EIIF_Durable     = 1 << 7   UMETA(DisplayName = "Durable", Tooltip = "Item has durability and can degrade.")
 };
 ENUM_CLASS_FLAGS(EInventoryItemFlags)
+
+/**
+ * Bitflags representing inventory type configuration and behavior.
+ */
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = true))
+enum class EInventoryTypeFlags : uint8
+{
+	EITF_None           = 0        UMETA(DisplayName = "None", Tooltip = "Default inventory behavior."),
+	EITF_HasWeightLimit = 1 << 0   UMETA(DisplayName = "Has Weight Limit", Tooltip = "Inventory has a maximum weight capacity."),
+	EITF_HasValueLimit  = 1 << 1   UMETA(DisplayName = "Has Value Limit", Tooltip = "Inventory has a maximum total value limit."),
+	EITF_CanAddItems    = 1 << 2   UMETA(DisplayName = "Can Add Items", Tooltip = "Items can be added to this inventory."),
+	EITF_CanRemoveItems = 1 << 3   UMETA(DisplayName = "Can Remove Items", Tooltip = "Items can be removed from this inventory."),
+	EITF_AllowStacking  = 1 << 4   UMETA(DisplayName = "Allow Stacking", Tooltip = "Inventory allows stacking of similar items."),
+	EITF_AutoStack      = 1 << 5   UMETA(DisplayName = "Auto Stack", Tooltip = "Automatically stack similar items when added."),
+	EITF_Persistent     = 1 << 6   UMETA(DisplayName = "Persistent", Tooltip = "Inventory persists between game sessions.")
+};
+ENUM_CLASS_FLAGS(EInventoryTypeFlags)

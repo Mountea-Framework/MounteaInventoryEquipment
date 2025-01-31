@@ -8,6 +8,8 @@
 #include "MounteaInventoryComponent.generated.h"
 
 
+enum class EInventoryType : uint8;
+
 /**
  *  Mountea Inventory Component
  * 
@@ -26,6 +28,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	EInventoryType InventoryType;
 
 	// TODO: VisibleAnywhere
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))

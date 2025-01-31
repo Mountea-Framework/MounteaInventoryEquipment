@@ -40,7 +40,8 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 				"DeveloperSettings",
 				"GameplayTags",
 				
-				"Projects"
+				"Projects",
+				"UMG"
 			}
 			);
 		
