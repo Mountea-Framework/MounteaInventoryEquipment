@@ -5,7 +5,8 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
-UMounteaAdvancedInventorySettings::UMounteaAdvancedInventorySettings() : InventorySettingsConfig(nullptr)
+UMounteaAdvancedInventorySettings::UMounteaAdvancedInventorySettings() : InventorySettingsConfig(nullptr),
+																		 LogVerbosity(14)
 {
 	CategoryName = TEXT("Mountea Framework");
 	SectionName = TEXT("Mountea Inventory System");

@@ -3,8 +3,6 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
-#include "Definitions/MounteaInventoryBaseDataTypes.h"
-#include "Definitions/MounteaInventoryBaseEnums.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySettingsConfig"
 

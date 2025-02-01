@@ -3,13 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventorySettingsConfig.generated.h"
-
-enum class EInventoryType : uint8;
-struct FInventoryRarity;
-struct FInventoryCategory;
-struct FInventoryTypeConfig;
 
 /**
  * 

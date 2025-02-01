@@ -25,13 +25,22 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				"Core", 
 				"CoreUObject", 
 				"Engine", 
-				"UnrealEd"
+				"UnrealEd",
+				
+				"DeveloperSettings",
+				"Projects",
+				
+				"Slate",
+				"SlateCore",
+				
+				"BlueprintGraph",
 			}
 		);
 
 		PrivateDependencyModuleNames.AddRange(
 			new string[] 
 			{
+				"MounteaAdvancedInventorySystem"
 			}
 		);
 
