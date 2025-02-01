@@ -66,7 +66,6 @@ void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChang
 	
 	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemTemplate, ItemCategory))
 	{
-		// TODO: Override `ItemFlags` from Category
 		if (inventorySettingsConfig)
 		{
 			auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory);

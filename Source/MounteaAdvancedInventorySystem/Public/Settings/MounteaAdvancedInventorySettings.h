@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Engine/DeveloperSettings.h"
+#include "Logs/MounteaAdvancedInventorySystemLogTypes.h"
 #include "MounteaAdvancedInventorySettings.generated.h"
 
 class UMounteaAdvancedInventorySettingsConfig;
@@ -44,7 +45,17 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category="Rarity")
 	TSoftObjectPtr<UMounteaAdvancedInventorySettingsConfig> InventorySettingsConfig;
 
+	/**
+	 * Defines logging level that is allowed to be shown.
+	 * Affects on-screen messages.
+	 */
+	UPROPERTY(config, EditDefaultsOnly, Category = "Logging", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EMounteaAdvancedInventoryLoggingVerbosity"))
+	uint8 LogVerbosity;
+
 public:
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory|Settings",  meta=(CustomTag="MounteaK2Getter"))
+	EMounteaAdvancedInventoryLoggingVerbosity GetAllowedLoggVerbosity() const;
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory|Settings",  meta=(CustomTag="MounteaK2Getter"))
 	TArray<FString> GetAllowedRarities() const;

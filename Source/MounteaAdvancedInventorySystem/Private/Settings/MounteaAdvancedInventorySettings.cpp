@@ -11,6 +11,11 @@ UMounteaAdvancedInventorySettings::UMounteaAdvancedInventorySettings() : Invento
 	SectionName = TEXT("Mountea Inventory System");
 }
 
+EMounteaAdvancedInventoryLoggingVerbosity UMounteaAdvancedInventorySettings::GetAllowedLoggVerbosity() const
+{
+	return static_cast<EMounteaAdvancedInventoryLoggingVerbosity>(LogVerbosity);
+}
+
 TArray<FString> UMounteaAdvancedInventorySettings::GetAllowedRarities() const
 {
 	TArray<FString> returnValues;
