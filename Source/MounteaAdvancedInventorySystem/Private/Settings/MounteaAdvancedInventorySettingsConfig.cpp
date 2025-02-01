@@ -3,7 +3,6 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
-
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySettingsConfig"
 
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()

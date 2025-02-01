@@ -8,9 +8,16 @@
 #include "MounteaAdvancedInventorySettingsConfig.generated.h"
 
 /**
- * 
- */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings Config")
+* Data Asset that manages configuration settings for Mountea Advanced Inventory System.
+* Defines inventory types, rarities, and categories with their respective settings.
+*
+* @see UDataAsset
+* @see FInventoryTypeConfig
+* @see FInventoryRarity
+* @see FInventoryCategory
+* @see [MounteaAdvancedInventorySettingsConfig](https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Settings-Config)
+*/
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining inventory types, rarities and categories."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventorySettingsConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

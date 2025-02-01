@@ -1,6 +1,7 @@
 ﻿// All rights reserved Dominik Morse 2024
 
 #include "MounteaAdvancedInventorySettingsConfig_AssetAction.h"
+
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySettingsConfigAssetAction"

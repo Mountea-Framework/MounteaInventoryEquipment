@@ -9,6 +9,7 @@
 #include "MounteaAdvancedInventorySettings.generated.h"
 
 class UMounteaAdvancedInventorySettingsConfig;
+
 /**
  * 
  */
