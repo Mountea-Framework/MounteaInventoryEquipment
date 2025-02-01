@@ -11,13 +11,14 @@
 UENUM(BlueprintType)
 enum class EInventoryType : uint8
 {
-	EIT_Player        UMETA(DisplayName = "Player", Tooltip = "Inventory attached to a player character."),
-	EIT_Storage       UMETA(DisplayName = "Storage", Tooltip = "Shared or private storage, such as a chest or stash box."),
-	EIT_Store         UMETA(DisplayName = "Store", Tooltip = "Vendor inventory for buying/selling items."),
-	EIT_Loot          UMETA(DisplayName = "Loot", Tooltip = "Temporary inventory containing lootable items (e.g., defeated enemies)."),
-	EIT_Quest         UMETA(DisplayName = "Quest", Tooltip = "Inventory dedicated to holding quest-related items."),
+	EIT_Player        UMETA(DisplayName = "Player", Tooltip = "Main character inventory with weight/equipment management."),
+	EIT_NPC           UMETA(DisplayName = "NPC", Tooltip = "NPCs including companions, followers, and regular characters."),
+	EIT_Storage       UMETA(DisplayName = "Storage", Tooltip = "Permanent storage like chests, stashes, and containers."),
+	EIT_Merchant      UMETA(DisplayName = "Merchant", Tooltip = "Vendors with buy/sell functionality and gold limits."),
+	EIT_Loot          UMETA(DisplayName = "Loot", Tooltip = "Temporary loot sources like corpses, containers, ground items."),
+	EIT_Specialized   UMETA(DisplayName = "Specialized", Tooltip = "Special purpose inventories like loadout systems."),
 
-	Default		UMETA(hidden)
+	Default           UMETA(hidden)
 };
 
 /**
@@ -26,12 +27,12 @@ enum class EInventoryType : uint8
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = true))
 enum class EInventoryFlags : uint8
 {
-	EIF_None          UMETA(DisplayName = "None", Tooltip = "No special behavior or access rules."),
-	EIF_Public        UMETA(DisplayName = "Public", Tooltip = "Inventory is accessible by all actors."),
-	EIF_TeamShared	UMETA(DisplayName = "Team Shared", Tooltip = "Inventory is accessible by teammates."),
-	EIF_Lootable      UMETA(DisplayName = "Lootable", Tooltip = "Inventory is lootable by other actors."),
-	EIF_Temporary     UMETA(DisplayName = "Temporary", Tooltip = "Inventory is temporary and removed after specific events."),
-	EIF_Private       UMETA(DisplayName = "Private", Tooltip = "Inventory is only accessible by the owner.")
+	EIF_None               UMETA(DisplayName = "None", Tooltip = "No special behavior or access rules."),
+	EIF_Public         UMETA(DisplayName = "Public", Tooltip = "Inventory is accessible by all actors."),
+	EIF_TeamShared    UMETA(DisplayName = "Team Shared", Tooltip = "Inventory is accessible by teammates."),
+	EIF_Lootable       UMETA(DisplayName = "Lootable", Tooltip = "Inventory is lootable by other actors."),
+	EIF_Temporary      UMETA(DisplayName = "Temporary", Tooltip = "Inventory is temporary and removed after specific events."),
+	EIF_Private        UMETA(DisplayName = "Private", Tooltip = "Inventory is only accessible by the owner.")
 };
 ENUM_CLASS_FLAGS(EInventoryFlags)
 

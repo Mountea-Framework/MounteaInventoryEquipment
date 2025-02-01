@@ -31,9 +31,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	EInventoryType InventoryType;
-
-	// TODO: VisibleAnywhere
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	TArray<FInventoryItem> InventoryItems;
-
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "MounteaInventoryBaseEnums.h"
 #include "MounteaInventoryBaseDataTypes.generated.h"
 
 class UMounteaInventoryItemAction;
@@ -113,16 +114,20 @@ struct FInventoryTypeConfig
 	FInventoryTypeConfig();
 
 	/** The name of the inventory (e.g., Player, Merchant, Loot), localized */
-	UPROPERTY(EditAnywhere, Category="General")
+	UPROPERTY(EditAnywhere, Category="User Interface")
 	FText InventoryDisplayName = LOCTEXT("InventoryType_DisplayName", "");
 
 	/** Widget class to use for this inventory type */
-	UPROPERTY(EditAnywhere, Category="General", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem/MounteaInventoryBaseWidgetInterface"))
+	UPROPERTY(EditAnywhere, Category="User Interface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
 	TSoftClassPtr<UUserWidget> WidgetClass;
 
 	/** Configuration flags for this inventory type */
 	UPROPERTY(EditAnywhere, Category="Configuration", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryTypeFlags"))
 	uint8 ConfigFlags;
+
+	/** Access and behavior flags for this inventory */
+	UPROPERTY(EditAnywhere, Category="Configuration", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryFlags"))
+	uint8 AccessFlags;
 
 	/** Range of allowed slots (X = Min, Y = Max) */
 	UPROPERTY(EditAnywhere, Category="Constrains", meta=(ClampMin=1))
@@ -133,11 +138,19 @@ struct FInventoryTypeConfig
 	int32 StartingSlots = 10;
 	
 	/** Maximum weight this inventory can hold */
-	UPROPERTY(EditAnywhere, Category="Constrains", meta=(EditCondition="(ConfigFlags & 1) != 0", ClampMin=0.0, Units="kg"))
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(ClampMin=0.0, Units="kg"))
 	float MaxWeight = 100.0f;
 
+	/** Thresholds for weight-based effects (in percentages) */
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
+	FVector4 WeightThresholds = FVector4(0.3f, 0.5f, 0.7f, 0.9f);
+
+	/** Movement speed multipliers for each weight threshold */
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
+	FVector4 WeightSpeedMultipliers = FVector4(1.0f, 0.8f, 0.6f, 0.4f);
+
 	/** Maximum total value this inventory can hold */
-	UPROPERTY(EditAnywhere, Category="Constrains", meta=(EditCondition="(ConfigFlags & 2) != 0", ClampMin=0.0))
+	UPROPERTY(EditAnywhere, Category="Constrains", meta=(ClampMin=0.0))
 	float MaxValue = 1000.0f;
 
 	/** Tags defining special properties or restrictions for this inventory type */
@@ -149,6 +162,25 @@ public:
 	bool HasWeightLimit() const;
 	bool HasValueLimit() const;
 	bool CanAddItems() const;
+
+public:
+	/** Access Flag Checks */
+	bool IsPublic() const;
+	bool IsTeamShared() const;
+	bool IsLootable() const;
+	bool IsTemporary() const;
+	bool IsPrivate() const;
+
+	/** Access Flag Setters */
+	void SetPublic(const bool bValue);
+	void SetTeamShared(const bool bValue);
+	void SetLootable(const bool bValue);
+	void SetTemporary(const bool bValue);
+	void SetPrivate(const bool bValue);
+
+	/** General Flag Manipulation */
+	void SetFlag(const EInventoryFlags Flag, const bool bValue);
+	bool HasFlag(const EInventoryFlags Flag) const;
 };
 
 #undef LOCTEXT_NAMESPACE

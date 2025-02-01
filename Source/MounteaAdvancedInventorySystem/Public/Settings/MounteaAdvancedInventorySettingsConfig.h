@@ -25,12 +25,30 @@ public:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category="Types")
+	UPROPERTY(EditAnywhere, Category="Types", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault)) //, ReadOnlyKeys))
 	TMap<EInventoryType, FInventoryTypeConfig> AllowedInventoryTypes;
 
-	UPROPERTY(EditAnywhere, Category="Rarities")
+	UPROPERTY(EditAnywhere, Category="Rarities", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault)) //, ReadOnlyKeys))
 	TMap<FString, FInventoryRarity> AllowedRarities;
 
-	UPROPERTY(EditAnywhere, Category="Categories")
+	UPROPERTY(EditAnywhere, Category="Categories", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault)) //, ReadOnlyKeys))
 	TMap<FString, FInventoryCategory> AllowedCategories;
+
+protected:
+
+	void ValidateInventoryTypes();
+	static FInventoryTypeConfig GetDefaultConfigForType(const EInventoryType Type);
+
+	static void SetupPlayerConfig(FInventoryTypeConfig& Config);
+	static void SetupNPCConfig(FInventoryTypeConfig& Config);
+	static void SetupStorageConfig(FInventoryTypeConfig& Config);
+	static void SetupMerchantConfig(FInventoryTypeConfig& Config);
+	static void SetupLootConfig(FInventoryTypeConfig& Config);
+	static void SetupSpecializedConfig(FInventoryTypeConfig& Config);
+
+#if WITH_EDITOR
+protected:
+	virtual void PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent) override;
+#endif
+	
 };
