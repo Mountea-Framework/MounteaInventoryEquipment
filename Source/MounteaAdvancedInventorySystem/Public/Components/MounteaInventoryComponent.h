@@ -8,6 +8,7 @@
 #include "MounteaInventoryComponent.generated.h"
 
 
+enum class EInventoryFlags : uint8;
 enum class EInventoryType : uint8;
 
 /**
@@ -31,6 +32,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	EInventoryType InventoryType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	EInventoryFlags InventoryTypeFlag;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	TArray<FInventoryItem> InventoryItems;

@@ -10,10 +10,84 @@
 
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()
 {
-   ValidateInventoryTypes();
+	ValidateInventoryTypes();
 }
 
 #if WITH_EDITOR
+void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
+{
+	// Setup base inventory types
+	ValidateInventoryTypes();
+	
+	// Setup item categories
+	FInventoryCategory WeaponCategory;
+	WeaponCategory.CategoryDisplayName = LOCTEXT("WeaponCategory", "Weapons");
+	WeaponCategory.CategoryPriority = 0;
+	WeaponCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
+	AllowedCategories.Add("Weapons", WeaponCategory);
+	
+	FInventoryCategory ArmorCategory;
+	ArmorCategory.CategoryDisplayName = LOCTEXT("ArmorCategory", "Armor");
+	ArmorCategory.CategoryPriority = 1;
+	ArmorCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
+	AllowedCategories.Add("Armors", ArmorCategory);
+	
+	FInventoryCategory ConsumableCategory;
+	ConsumableCategory.CategoryDisplayName = LOCTEXT("ConsumableCategory", "Consumables");
+	ConsumableCategory.CategoryPriority = 2;
+	ConsumableCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable | EInventoryItemFlags::EIIF_Stackable);
+	AllowedCategories.Add("Consumables", ConsumableCategory);
+	
+	FInventoryCategory MaterialCategory;
+	MaterialCategory.CategoryDisplayName = LOCTEXT("MaterialCategory", "Materials");
+	MaterialCategory.CategoryPriority = 3;
+	MaterialCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable | EInventoryItemFlags::EIIF_Stackable);
+	AllowedCategories.Add("Materials", MaterialCategory);
+
+	FInventoryCategory QuestCategory;
+	QuestCategory.CategoryDisplayName = LOCTEXT("QuestCategory", "Quest Items");
+	QuestCategory.CategoryPriority = 4;
+	QuestCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+	AllowedCategories.Add("Quest Items", QuestCategory);
+
+	FInventoryCategory KeysCategory;
+	QuestCategory.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
+	QuestCategory.CategoryPriority = 4;
+	QuestCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+	AllowedCategories.Add("Keys", KeysCategory);
+	
+	// Setup item rarities
+	FInventoryRarity CommonRarity;
+	CommonRarity.RarityDisplayName = LOCTEXT("CommonRarity", "Common");
+	CommonRarity.RarityColor = FLinearColor(0.5f, 0.5f, 0.5f);
+	CommonRarity.BasePriceMultiplier = 1.0f;
+	AllowedRarities.Add("Common", CommonRarity);
+	
+	FInventoryRarity UncommonRarity;
+	UncommonRarity.RarityDisplayName = LOCTEXT("UncommonRarity", "Uncommon");
+	UncommonRarity.RarityColor = FLinearColor(0.2f, 0.8f, 0.2f);
+	UncommonRarity.BasePriceMultiplier = 2.0f;
+	AllowedRarities.Add("Uncommon", UncommonRarity);
+	
+	FInventoryRarity RareRarity;
+	RareRarity.RarityDisplayName = LOCTEXT("RareRarity", "Rare");
+	RareRarity.RarityColor = FLinearColor(0.2f, 0.2f, 1.0f);
+	RareRarity.BasePriceMultiplier = 4.0f;
+	AllowedRarities.Add("Rare", RareRarity);
+	
+	FInventoryRarity EpicRarity;
+	EpicRarity.RarityDisplayName = LOCTEXT("EpicRarity", "Epic");
+	EpicRarity.RarityColor = FLinearColor(0.6f, 0.2f, 0.8f);
+	EpicRarity.BasePriceMultiplier = 8.0f;
+	AllowedRarities.Add("Epic", EpicRarity);
+	
+	FInventoryRarity LegendaryRarity;
+	LegendaryRarity.RarityDisplayName = LOCTEXT("LegendaryRarity", "Legendary");
+	LegendaryRarity.RarityColor = FLinearColor(1.0f, 0.5f, 0.0f);
+	LegendaryRarity.BasePriceMultiplier = 16.0f;
+	AllowedRarities.Add("Legendary", LegendaryRarity);
+}
+
 void UMounteaAdvancedInventorySettingsConfig::PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeChainProperty(PropertyChangedEvent);

@@ -47,6 +47,10 @@ protected:
 	static void SetupSpecializedConfig(FInventoryTypeConfig& Config);
 
 #if WITH_EDITOR
+public:
+	/** Sets default values. Default values can be edited. If requested then Default values will override all `Categories` and `Rarities`! */
+	UFUNCTION(CallInEditor, Category="Default Values")
+	void SetDefaultValues();
 protected:
 	virtual void PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent) override;
 #endif
