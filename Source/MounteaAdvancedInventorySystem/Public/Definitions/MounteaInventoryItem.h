@@ -7,6 +7,7 @@
 #include "UObject/Object.h"
 #include "MounteaInventoryItem.generated.h"
 
+class IMounteaAdvancedInventoryInterface;
 class UMounteaInventoryItemTemplate;
 
 /**
@@ -27,7 +28,9 @@ public:
 public:
 	
 	FInventoryItem();
-	explicit FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity = 1, const float InDurability = 1.f);
+	explicit FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity = 1,
+							const float InDurability = 1.f,
+							TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory = nullptr);
 	
 /*************************************************************/
 /************** CORE FUNCTIONALITY *****************/
@@ -35,6 +38,9 @@ public:
 	
 	/** Check if the item instance is valid */
 	bool IsItemValid() const;
+
+	/** Check if the item instance is owned by Inventory */
+	bool IsItemInInventory() const;
 	
 /*************************************************************/
 /*********************** GETTERS ************************/
@@ -183,6 +189,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
 	TMap<FGameplayTag,FGuid> AffectorSlots;
 
+	/** Inventory which currently owns this Item. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	TScriptInterface<IMounteaAdvancedInventoryInterface> OwningInventory;
+
 
 /*************************************************************/
 /******************* SERIALIZATION**********************/
@@ -199,9 +209,8 @@ public:
 		CustomData.NetSerialize(Ar, Map, bOutSuccess);
 
 		if (Ar.IsLoading())
-		{
 			AffectorSlots.Empty();
-		}
+		
 		int32 NumPairs = AffectorSlots.Num();
 		Ar << NumPairs;
 
@@ -259,7 +268,6 @@ struct TStructOpsTypeTraits< FInventoryItemArray > : public TStructOpsTypeTraits
 		WithNetDeltaSerializer = true,
    };
 };
-
 
 template<>
 struct TStructOpsTypeTraits<FInventoryItem> : public TStructOpsTypeTraitsBase2<FInventoryItem>

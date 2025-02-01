@@ -70,3 +70,19 @@ enum class EInventoryTypeFlags : uint8
 	EITF_Persistent	  = 1 << 6	UMETA(DisplayName = "Persistent", Tooltip = "Inventory persists between game sessions.")
 };
 ENUM_CLASS_FLAGS(EInventoryTypeFlags)
+
+/** Enum for defining how inventory items should be sorted */
+UENUM(BlueprintType)
+enum class EInventorySortType : uint8
+{
+	EIS_None UMETA(DisplayName = "None", Tooltip = "No sorting will be applied to inventory items."),
+	EIS_NameAsc UMETA(DisplayName = "Name (A-Z)", Tooltip = "Sort items alphabetically by name in ascending order."),
+	EIS_NameDesc UMETA(DisplayName = "Name (Z-A)", Tooltip = "Sort items alphabetically by name in descending order."),
+	EIS_QuantityAsc UMETA(DisplayName = "Quantity (Low-High)", Tooltip = "Sort items by their stack size from lowest to highest."),
+	EIS_QuantityDesc UMETA(DisplayName = "Quantity (High-Low)", Tooltip = "Sort items by their stack size from highest to lowest."),
+	EIS_DurabilityAsc UMETA(DisplayName = "Durability (Low-High)", Tooltip = "Sort items by their durability percentage from lowest to highest."),
+	EIS_DurabilityDesc UMETA(DisplayName = "Durability (High-Low)", Tooltip = "Sort items by their durability percentage from highest to lowest."),
+	EIS_Custom UMETA(DisplayName = "Custom", Tooltip = "Custom sorting implementation defined by the user."),
+
+	Default UMETA(Hidden)
+ };

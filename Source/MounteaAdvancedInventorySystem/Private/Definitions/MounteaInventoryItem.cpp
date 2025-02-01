@@ -5,13 +5,14 @@
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
-FInventoryItem::FInventoryItem() : Guid(FGuid()),  Template(nullptr), Quantity(-1), Durability(-1.f)
+FInventoryItem::FInventoryItem() : Guid(FGuid()),  Template(nullptr), Quantity(-1), Durability(-1.f), OwningInventory(nullptr)
 {
 }
 
-FInventoryItem::FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity, const float InDurability)
+FInventoryItem::FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity, const float InDurability, TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory)
 	: Guid(FGuid())
 	, Template(nullptr)
+	, OwningInventory(InOwningInventory)
 {
 	if (!IsValid(InTemplate))
 		return;
@@ -29,6 +30,11 @@ FInventoryItem::FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const 
 bool FInventoryItem::IsItemValid() const
 {
 	return Guid.IsValid() && Template != nullptr;
+}
+
+bool FInventoryItem::IsItemInInventory() const
+{
+	return OwningInventory != nullptr;
 }
 
 bool FInventoryItem::SetTemplate(UMounteaInventoryItemTemplate* InTemplate)
