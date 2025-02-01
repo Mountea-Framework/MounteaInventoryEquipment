@@ -41,7 +41,9 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 				"GameplayTags",
 				
 				"Projects",
-				"UMG"
+				"UMG",
+				
+				"NetCore"
 			}
 			);
 		

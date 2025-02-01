@@ -48,9 +48,9 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
 	AllowedCategories.Add("Quest Items", QuestCategory);
 
 	FInventoryCategory KeysCategory;
-	QuestCategory.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
-	QuestCategory.CategoryPriority = 4;
-	QuestCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+	KeysCategory.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
+	KeysCategory.CategoryPriority = 4;
+	KeysCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
 	AllowedCategories.Add("Keys", KeysCategory);
 	
 	// Setup item rarities

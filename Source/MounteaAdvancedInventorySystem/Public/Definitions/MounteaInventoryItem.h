@@ -14,7 +14,7 @@ class UMounteaInventoryItemTemplate;
 * Contains all runtime data for the item including its template, quantity, durability and custom data.
 */
 USTRUCT(BlueprintType)
-struct FInventoryItem
+struct FInventoryItem : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
@@ -182,4 +182,90 @@ protected:
 	/** Map of affector slots to their corresponding attached items. Items are stored as guids to avoid hard references */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
 	TMap<FGameplayTag,FGuid> AffectorSlots;
+
+
+/*************************************************************/
+/******************* SERIALIZATION**********************/
+/*************************************************************/
+
+public:
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar << Guid;
+		Ar << Template;
+		Ar << Quantity;
+		Ar << Durability;
+		CustomData.NetSerialize(Ar, Map, bOutSuccess);
+
+		if (Ar.IsLoading())
+		{
+			AffectorSlots.Empty();
+		}
+		int32 NumPairs = AffectorSlots.Num();
+		Ar << NumPairs;
+
+		if (Ar.IsLoading())
+		{
+			for (int32 i = 0; i < NumPairs; ++i)
+			{
+				FGameplayTag Key;
+				FGuid Value;
+				Ar << Key;
+				Ar << Value;
+				AffectorSlots.Add(Key, Value);
+			}
+		}
+		else
+		{
+			for (const auto& Pair : AffectorSlots)
+			{
+				FGameplayTag Key = Pair.Key;
+				FGuid Value = Pair.Value;
+				Ar << Key;
+				Ar << Value;
+			}
+		}
+    
+		bOutSuccess = true;
+		return true;
+	}
+
+	void PreReplicatedRemove(const struct FInventoryItemArray& InArraySerializer) {};
+	void PostReplicatedAdd(const struct FInventoryItemArray& InArraySerializer) {};
+	void PostReplicatedChange(const struct FInventoryItemArray& InArraySerializer) {};
+	//void PostReplicatedReceive(const FInventoryItemArray::FPostReplicatedReceiveParameters& Parameters) {};
+};
+
+USTRUCT(BlueprintType)
+struct FInventoryItemArray : public FFastArraySerializer
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	TArray<FInventoryItem> Items;
+
+	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
+	{
+		return FastArrayDeltaSerialize<FInventoryItem>(Items, DeltaParams, *this);
+	}
+};
+
+template<>
+struct TStructOpsTypeTraits< FInventoryItemArray > : public TStructOpsTypeTraitsBase2< FInventoryItemArray >
+{
+	enum 
+	{
+		WithNetDeltaSerializer = true,
+   };
+};
+
+
+template<>
+struct TStructOpsTypeTraits<FInventoryItem> : public TStructOpsTypeTraitsBase2<FInventoryItem>
+{
+	enum 
+	{
+		WithNetSerializer = true,
+	};
 };

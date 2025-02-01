@@ -28,6 +28,13 @@ protected:
 
 	virtual void BeginPlay() override;
 
+protected:
+
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void OnRep_InventoryItems();
+
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
@@ -36,6 +43,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	EInventoryFlags InventoryTypeFlag;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
-	TArray<FInventoryItem> InventoryItems;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	FInventoryItemArray InventoryItems;
 };
