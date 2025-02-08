@@ -118,6 +118,15 @@ public:
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
 	/**
+	 * Finds item index based on Search conditions.
+	 * @param Target The inventory interface to execute on
+	 * @param SearchParams Search params to search by.
+	 * @return Found item index or -1
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", meta=(CustomTag="MounteaK2Getter"))
+	static int32 FindItemIndex(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	
+	/**
 	 * Finds items based on Search conditions.
 	 * @param Target The inventory interface to execute on
 	 * @param SearchParams Search params to search by.
@@ -178,4 +187,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void ProcessInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryNotificationData& Notification);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FString InventoryItemToString(const FInventoryItem& Item);
 };

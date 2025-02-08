@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="Categories", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault)) //, ReadOnlyKeys))
 	TMap<FString, FInventoryCategory> AllowedCategories;
 
+	UPROPERTY(EditAnywhere, Category="Limits", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	float InventoryBaseWeightLimit = 150.f;
+
 protected:
 
 	void ValidateInventoryTypes();

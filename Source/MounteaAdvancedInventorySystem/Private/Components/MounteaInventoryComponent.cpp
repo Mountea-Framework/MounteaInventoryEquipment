@@ -6,6 +6,7 @@
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Net/UnrealNetwork.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
 
 UMounteaInventoryComponent::UMounteaInventoryComponent()
 {
@@ -43,7 +44,6 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
-// TODO: VALIDATE QUANTITY vs STACK SIZE
 bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& Item)
 {
 	if (!Execute_CanAddItem(this, Item))
@@ -51,7 +51,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
 			EInventoryNotificationType::EINT_ItemNotUpdated,
 			EInventoryNotificationCategory::EINC_Error,
-			NSLOCTEXT("Inventory", "ItemNotAdded", "Cannot add item to inventory"),
+			NSLOCTEXT("Inventory", "CannotAddItem", "Cannot add item to inventory"),
 			Item.GetGuid(),
 			this,
 			Item.GetQuantity(),
@@ -60,86 +60,105 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		return false;
 	}
 
-	// Handle source inventory
-	if (Item.IsItemInInventory())
+	auto existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetGuid()));
+	if (!existingItem.IsItemValid())
+		existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetTemplate()));
+
+	if (existingItem.IsItemValid())
 	{
-		if (auto* sourceInventory = Cast<UObject>(Item.GetOwningInventory().GetInterface()))
+		const int32 AvailableSpace = Item.GetTemplate()->MaxQuantity - existingItem.GetQuantity();
+		const int32 AmountToAdd = FMath::Min(Item.GetQuantity(), AvailableSpace);
+
+		// Handle source inventory for partial quantity
+		if (Item.IsItemInInventory())
 		{
-			if (!Execute_RemoveItem(sourceInventory, Item.GetGuid()))
+			if (!Execute_DecreaseItemQuantity(Item.GetOwningInventory().GetObject(), Item.GetGuid(), AmountToAdd))
 			{
 				Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
 					EInventoryNotificationType::EINT_ItemNotUpdated,
 					EInventoryNotificationCategory::EINC_Error,
-					NSLOCTEXT("Inventory", "SourceInventoryError", "Failed to remove from source inventory"),
+					NSLOCTEXT("Inventory", "SourceInventoryError", "Failed to update source inventory"),
 					Item.GetGuid(),
 					this,
-					Item.GetQuantity(),
+					AmountToAdd,
 					0
 				));
 				return false;
 			}
 		}
-	}
 
-	if (const bool bIsStackable = Item.GetTemplate() && (static_cast<uint8>(Item.GetTemplate()->ItemFlags) & static_cast<uint8>(EInventoryItemFlags::EIIF_Stackable)))
-	{
-		auto existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetGuid()));
-		if (!existingItem.IsItemValid())
+		if (Execute_IncreaseItemQuantity(this, existingItem.GetGuid(), AmountToAdd))
 		{
-			existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetTemplate()));
+			const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
+				EInventoryNotificationType::EINT_ItemPartiallyAdded : 
+				EInventoryNotificationType::EINT_ItemAdded;
+
+			Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+				NotifType,
+				EInventoryNotificationCategory::EINC_Info,
+				NSLOCTEXT("Inventory", "ItemQuantityUpdated", "Updated item quantity"),
+				existingItem.GetGuid(),
+				this,
+				existingItem.GetQuantity(),
+				AmountToAdd
+			));
+
+			InventoryItems.MarkArrayDirty();
+			OnItemAdded.Broadcast(existingItem);
+			return true;
 		}
-
-		if (existingItem.IsItemValid())
+	}
+	else
+	{
+		// For new items, we can add with full or capped quantity
+		const int32 AmountToAdd = FMath::Min(Item.GetQuantity(), Item.GetTemplate()->MaxQuantity);
+		
+		// Handle source inventory
+		if (Item.IsItemInInventory())
 		{
-			const int32 newQuantity = existingItem.GetQuantity() + Item.GetQuantity();
-			if (Execute_IncreaseItemQuantity(this, existingItem.GetGuid(), Item.GetQuantity()))
-			{
-				Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
-					EInventoryNotificationType::EINT_ItemAdded,
-					EInventoryNotificationCategory::EINC_Info,
-					NSLOCTEXT("Inventory", "ItemStackIncreased", "Successfully stacked items"),
-					existingItem.GetGuid(),
-					this,
-					newQuantity,
-					Item.GetQuantity()
-				));
-
-				InventoryItems.MarkArrayDirty();
-				
-				return true;
-			}
-			else
+			if (!Execute_DecreaseItemQuantity(Item.GetOwningInventory().GetObject(), Item.GetGuid(), AmountToAdd))
 			{
 				Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
 					EInventoryNotificationType::EINT_ItemNotUpdated,
-					EInventoryNotificationCategory::EINC_Warning,
-					NSLOCTEXT("Inventory", "ItemStackReached", "Item quantity maxed out"),
-					existingItem.GetGuid(),
+					EInventoryNotificationCategory::EINC_Error,
+					NSLOCTEXT("Inventory", "SourceInventoryError", "Failed to update source inventory"),
+					Item.GetGuid(),
 					this,
-					newQuantity,
+					AmountToAdd,
 					0
 				));
 				return false;
 			}
 		}
-	}
-	
-	InventoryItems.Items.Add(Item);
-	InventoryItems.Items.Last().SetOwningInventory(this);
-	InventoryItems.MarkArrayDirty();
-	
-	Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
-		EInventoryNotificationType::EINT_ItemAdded,
-		EInventoryNotificationCategory::EINC_Info,
-		NSLOCTEXT("Inventory", "ItemAdded", "Successfully added items"),
-		Item.GetGuid(),
-		this,
-		Item.GetQuantity(),
-		Item.GetQuantity()
-	));
 
-	OnItemAdded.Broadcast(Item);
-	return true;
+		// Create new item with correct quantity
+		FInventoryItem newItem = Item;
+		if (AmountToAdd != Item.GetQuantity())
+			newItem.Quantity += AmountToAdd;
+
+		InventoryItems.Items.Add(newItem);
+		InventoryItems.Items.Last().SetOwningInventory(this);
+		InventoryItems.MarkArrayDirty();
+
+		const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
+			EInventoryNotificationType::EINT_ItemPartiallyAdded : 
+			EInventoryNotificationType::EINT_ItemAdded;
+
+		Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+			NotifType,
+			EInventoryNotificationCategory::EINC_Info,
+			NSLOCTEXT("Inventory", "ItemAdded", "Successfully added items"),
+			newItem.GetGuid(),
+			this,
+			AmountToAdd,
+			AmountToAdd
+		));
+
+		OnItemAdded.Broadcast(newItem);
+		return true;
+	}
+
+	return false;
 }
 
 bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity, const float Durability)
@@ -163,16 +182,15 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 
 bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid)
 {
-	const auto ItemToRemove = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
-	if (!ItemToRemove.IsItemValid())
-		  return false;
+	const int32 ItemIndex = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
+	if (ItemIndex == INDEX_NONE)
+		return false;
 
-	InventoryItems.Items.RemoveAll([ItemGuid](const FInventoryItem& Item)
-	{
-		  return Item.GetGuid() == ItemGuid;
-	});
+	const FInventoryItem RemovedItem = InventoryItems.Items[ItemIndex];
+	InventoryItems.Items.RemoveAt(ItemIndex);
+	InventoryItems.MarkArrayDirty();
 
-	OnItemRemoved.Broadcast(ItemToRemove);
+	OnItemRemoved.Broadcast(RemovedItem);
 	return true;
 }
 
@@ -205,14 +223,12 @@ bool UMounteaInventoryComponent::CanAddItem_Implementation(const FInventoryItem&
 		return false;
 	
 	auto existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetGuid()));
-	if (existingItem.IsItemValid())
-		return existingItem.GetQuantity() + Item.GetQuantity() <= Item.GetTemplate()->MaxStackSize;
+	if (!existingItem.IsItemValid()) 
+		existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetTemplate()));
 
-	existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetTemplate()));
 	if (existingItem.IsItemValid())
-		return existingItem.GetQuantity() + Item.GetQuantity() <= Item.GetTemplate()->MaxStackSize;
+		return existingItem.GetQuantity() < existingItem.GetTemplate()->MaxQuantity;
 
-	// None found, can Add
 	return true;
 }
 
@@ -248,6 +264,28 @@ FInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FInvent
 	return foundItem ? *foundItem : FInventoryItem();
 }
 
+int32 UMounteaInventoryComponent::FindItemIndex_Implementation(const FInventoryItemSearchParams& SearchParams) const
+{
+	return InventoryItems.Items.IndexOfByPredicate([&SearchParams](const FInventoryItem& Item)
+	{
+		if (SearchParams.bSearchByGuid && Item.GetGuid() != SearchParams.ItemGuid)
+			return false;
+
+		if (SearchParams.bSearchByTemplate && Item.GetTemplate() != SearchParams.Template)
+			return false;
+
+		if (SearchParams.bSearchByTags)
+		{
+			if (SearchParams.bRequireAllTags)
+				return Item.GetCustomData().HasAll(SearchParams.Tags);
+			else
+				return Item.GetCustomData().HasAny(SearchParams.Tags);
+		}
+
+		return true;
+	});
+}
+
 TArray<FInventoryItem> UMounteaInventoryComponent::FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const
 {
 	TArray<FInventoryItem> returnResult;
@@ -263,13 +301,14 @@ TArray<FInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() 
 
 bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
-	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
-	if (inventoryItem.IsItemValid())
+	const int32 index = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
+	if (index != INDEX_NONE)
 	{
-		const int32 OldQuantity = inventoryItem.GetQuantity();
-		if (inventoryItem.SetQuantity(OldQuantity + Amount))
+		const int32 OldQuantity = InventoryItems.Items[index].GetQuantity();
+		if (InventoryItems.Items[index].SetQuantity(OldQuantity + Amount))
 		{
-			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, inventoryItem.GetQuantity());
+			InventoryItems.MarkItemDirty(InventoryItems.Items[index]);
+			OnItemQuantityChanged.Broadcast(InventoryItems.Items[index], OldQuantity, InventoryItems.Items[index].GetQuantity());
 			return true;
 		}
 	}
@@ -278,18 +317,19 @@ bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid
 
 bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
-	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
-	if (inventoryItem.IsItemValid())
+	const int32 index = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
+	if (index != INDEX_NONE)
 	{
-		const int32 OldQuantity = inventoryItem.GetQuantity();
+		const int32 OldQuantity = InventoryItems.Items[index].GetQuantity();
 		const int32 NewQuantity = OldQuantity - Amount;
 				 
 		if (NewQuantity <= 0)
 			return Execute_RemoveItem(this, ItemGuid);
 						 
-		if (inventoryItem.SetQuantity(NewQuantity))
+		if (InventoryItems.Items[index].SetQuantity(NewQuantity))
 		{
-			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, NewQuantity);
+			InventoryItems.MarkItemDirty(InventoryItems.Items[index]);
+			OnItemQuantityChanged.Broadcast(InventoryItems.Items[index], OldQuantity, NewQuantity);
 			return true;
 		}
 	}

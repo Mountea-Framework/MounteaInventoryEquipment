@@ -183,6 +183,15 @@ public:
 	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
 
 	/**
+	* Finds item index based on Search conditions.
+	* @param SearchParams Search params to search by.
+	* @return Found item index or -1
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Search")
+	int32 FindItemIndex(const FInventoryItemSearchParams& SearchParams) const;
+	virtual int32 FindItemIndex_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
+
+	/**
 	* Finds items based on Search conditions.
 	* @param SearchParams Search params to search by.
 	* @return Found items or empty array

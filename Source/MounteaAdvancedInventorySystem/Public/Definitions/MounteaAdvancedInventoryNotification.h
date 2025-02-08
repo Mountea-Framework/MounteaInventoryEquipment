@@ -7,17 +7,21 @@
 #include "MounteaAdvancedInventoryNotification.generated.h"
 
 class IMounteaAdvancedInventoryInterface;
+
 /**
 * Types of inventory notifications.
 */
 UENUM(BlueprintType)
 enum class EInventoryNotificationType : uint8
 {
+	EINT_ItemNotFound UMETA(DisplayName = "Item Not Found", Tooltip = "Item was not found in Inventory"),
 	EINT_ItemAdded UMETA(DisplayName = "Item Added", Tooltip = "Item was successfully added to inventory"),
 	EINT_ItemRemoved UMETA(DisplayName = "Item Removed", Tooltip = "Item was successfully removed from inventory"), 
 	EINT_ItemPartiallyAdded UMETA(DisplayName = "Item Partially Added", Tooltip = "Only part of stack could be added"),
 	EINT_ItemPartiallyRemoved UMETA(DisplayName = "Item Partially Removed", Tooltip = "Only part of stack could be removed"),
 	EINT_ItemNotUpdated UMETA(DisplayName = "Item Not Updated", Tooltip = "Operation failed completely"),
+	EINT_QuantityLimitReached UMETA(DisplayName = "Quantity Limit Reached", Tooltip = "Maximum quantity reached for item type"),
+	EINT_InventoryLimitReached UMETA(DisplayName = "Inventory Limit Reached", Tooltip = "Inventory cannot hold more items"),
 
 	Default UMETA(Hidden)
  };

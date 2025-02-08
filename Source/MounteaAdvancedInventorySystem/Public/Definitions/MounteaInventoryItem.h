@@ -41,6 +41,9 @@ public:
 
 	/** Check if the item instance is owned by Inventory */
 	bool IsItemInInventory() const;
+
+	/** Returns a string representation of the item */
+	FString ToString() const;
 	
 /*************************************************************/
 /*********************** GETTERS ************************/
@@ -190,7 +193,7 @@ public:
 /*********** PROTECTED PROPERTIES ***************/
 /*************************************************************/
 	
-protected:
+public:
 	
 	/** A unique identifier for this specific instance of the inventory item */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")

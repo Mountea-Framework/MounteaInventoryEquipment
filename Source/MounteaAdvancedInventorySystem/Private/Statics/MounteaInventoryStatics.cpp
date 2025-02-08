@@ -43,6 +43,11 @@ FInventoryItem UMounteaInventoryStatics::FindItem(const TScriptInterface<IMounte
 	return Target.GetObject() ? Target->Execute_FindItem(Target.GetObject(), SearchParams) : FInventoryItem();
 }
 
+int32 UMounteaInventoryStatics::FindItemIndex(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams)
+{
+	return Target.GetObject() ? Target->Execute_FindItemIndex(Target.GetObject(), SearchParams) : INDEX_NONE;
+}
+
 TArray<FInventoryItem> UMounteaInventoryStatics::FindItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams)
 {
 	return Target.GetObject() ? Target->Execute_FindItems(Target.GetObject(), SearchParams) : TArray<FInventoryItem>();
@@ -56,9 +61,7 @@ TArray<FInventoryItem> UMounteaInventoryStatics::GetAllItems(const TScriptInterf
 void UMounteaInventoryStatics::ClearInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
 {
 	if (Target.GetObject())
-	{
 		Target->Execute_ClearInventory(Target.GetObject());
-	}
 }
 
 bool UMounteaInventoryStatics::IncreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, int32 Amount)
@@ -79,7 +82,10 @@ bool UMounteaInventoryStatics::ModifyItemDurability(const TScriptInterface<IMoun
 void UMounteaInventoryStatics::ProcessInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryNotificationData& Notification)
 {
 	if (Target.GetObject())
-	{
 		Target->Execute_ProcessInventoryNotification(Target.GetObject(), Notification);
-	}
+}
+
+FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& Item)
+{
+	return Item.ToString();
 }
