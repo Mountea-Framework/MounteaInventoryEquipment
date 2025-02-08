@@ -126,7 +126,7 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 		return false;
 	}
 
-	return AddItem(FInventoryItem(Template, Quantity, Durability, this));
+	return Execute_AddItem(this, FInventoryItem(Template, Quantity, Durability, this), true);
 }
 
 bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid)
@@ -177,7 +177,7 @@ bool UMounteaInventoryComponent::CanAddItemFromTemplate_Implementation(UMounteaI
 	if (!IsValid(Template))
 		return false;
 
-	return CanAddItem(FInventoryItem(Template, Quantity, Template->BaseDurability, nullptr));
+	return Execute_CanAddItem(this, FInventoryItem(Template, Quantity, Template->BaseDurability, nullptr));
 }
 
 FInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FInventoryItemSearchParams& SearchParams)
@@ -219,58 +219,52 @@ TArray<FInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() 
 
 bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
-	for (auto& Item : InventoryItems.Items)
+	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
+	if (inventoryItem.IsItemValid())
 	{
-		  if (Item.GetGuid() == ItemGuid)
-		  {
-				 const int32 OldQuantity = Item.GetQuantity();
-				 if (Item.SetQuantity(OldQuantity + Amount))
-				 {
-						 OnItemQuantityChanged.Broadcast(Item, OldQuantity, Item.GetQuantity());
-						 return true;
-				 }
-		  }
+		const int32 OldQuantity = inventoryItem.GetQuantity();
+		if (inventoryItem.SetQuantity(OldQuantity + Amount))
+		{
+			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, inventoryItem.GetQuantity());
+			return true;
+		}
 	}
 	return false;
 }
 
 bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
-	for (auto& Item : InventoryItems.Items)
+	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
+	if (inventoryItem.IsItemValid())
 	{
-		  if (Item.GetGuid() == ItemGuid)
-		  {
-				 const int32 OldQuantity = Item.GetQuantity();
-				 const int32 NewQuantity = OldQuantity - Amount;
+		const int32 OldQuantity = inventoryItem.GetQuantity();
+		const int32 NewQuantity = OldQuantity - Amount;
 				 
-				 if (NewQuantity <= 0)
-						 return RemoveItem(ItemGuid);
+		if (NewQuantity <= 0)
+			return Execute_RemoveItem(this, ItemGuid);
 						 
-				 if (Item.SetQuantity(NewQuantity))
-				 {
-						 OnItemQuantityChanged.Broadcast(Item, OldQuantity, NewQuantity);
-						 return true;
-				 }
-		  }
+		if (inventoryItem.SetQuantity(NewQuantity))
+		{
+			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, NewQuantity);
+			return true;
+		}
 	}
 	return false;
 }
 
 bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability)
 {
-	for (auto& Item : InventoryItems.Items)
+	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
+	if (inventoryItem.IsItemValid())
 	{
-		  if (Item.GetGuid() == ItemGuid)
-		  {
-				 const float OldDurability = Item.GetDurability();
-				 const float NewDurability = FMath::Clamp(OldDurability + DeltaDurability, 0.f, 1.f);
+		const float OldDurability = inventoryItem.GetDurability();
+		const float NewDurability = FMath::Clamp(OldDurability + DeltaDurability, 0.f, 1.f);
 				 
-				 if (Item.SetDurability(NewDurability))
-				 {
-						 OnItemDurabilityChanged.Broadcast(Item, OldDurability, NewDurability);
-						 return true;
-				 }
-		  }
+		if (inventoryItem.SetDurability(NewDurability))
+		{
+			OnItemDurabilityChanged.Broadcast(inventoryItem, OldDurability, NewDurability);
+			return true;
+		}
 	}
 	return false;
 }
