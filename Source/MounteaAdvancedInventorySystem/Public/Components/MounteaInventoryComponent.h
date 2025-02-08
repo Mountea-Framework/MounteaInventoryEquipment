@@ -48,6 +48,7 @@ protected:
 	virtual FInventoryItem SplitItemStack_Implementation(const FGuid& ItemGuid, int32 SplitAmount) override;
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, float DeltaDurability) override;
 	virtual void ClearInventory_Implementation() override;
+	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) override;
 	
 	// --- Events ------------------------------
 

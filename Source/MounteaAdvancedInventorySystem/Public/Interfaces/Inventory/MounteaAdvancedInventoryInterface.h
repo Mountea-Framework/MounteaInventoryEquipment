@@ -7,6 +7,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryInterface.generated.h"
 
+struct FInventoryNotificationData;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, const FInventoryItem&, AddedItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemRemoved, const FInventoryItem&, RemovedItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemQuantityChanged, const FInventoryItem&, Item, int32, OldQuantity, int32, NewQuantity);
@@ -88,6 +90,13 @@ public:
 	TArray<FInventoryItem> GetAllItems() const;
 	virtual TArray<FInventoryItem> GetAllItems_Implementation() const = 0;
 
+	/**
+	* Clears all items from inventory
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
+	void ClearInventory();
+	virtual void ClearInventory_Implementation() = 0;
+
 	// --- Item Stack Management ------------------------------
 
 	/**
@@ -131,12 +140,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Durability")
 	bool ModifyItemDurability(const FGuid& ItemGuid, float DeltaDurability);
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, float DeltaDurability) = 0;
+	
+	// --- Notification Management ------------------------------
 
 	/**
-	* Clears all items from inventory
-	*/
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
-	void ClearInventory();
-	virtual void ClearInventory_Implementation() = 0;
-	
+	 * 
+	 * @param Notification 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Notifications")
+	void ProcessInventoryNotification(const FInventoryNotificationData& Notification);
+	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) = 0;
 };
