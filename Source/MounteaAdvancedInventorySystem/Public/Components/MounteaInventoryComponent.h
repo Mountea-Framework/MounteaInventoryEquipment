@@ -38,15 +38,18 @@ protected:
 
 protected:
 	virtual AActor* GetOwningActor_Implementation() const override;
-	virtual bool AddItem_Implementation(const FInventoryItem& Item, bool bAutoStack = true) override;
+	virtual bool AddItem_Implementation(const FInventoryItem& Item, const bool bAutoStack = true) override;
+	virtual bool AddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1, const float Durability = 1.f) override;
 	virtual bool RemoveItem_Implementation(const FGuid& ItemGuid) override;
+	virtual bool RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) override;
 	virtual bool CanAddItem_Implementation(const FInventoryItem& Item) const override;
-	virtual FInventoryItem FindItem_Implementation(const FGuid& ItemGuid) override;
+	virtual bool CanAddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) const override;
+	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) override;
+	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) override;
 	virtual TArray<FInventoryItem> GetAllItems_Implementation() const override;
-	virtual bool IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, int32 Amount = 1) override;
-	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, int32 Amount = 1) override;
-	virtual FInventoryItem SplitItemStack_Implementation(const FGuid& ItemGuid, int32 SplitAmount) override;
-	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, float DeltaDurability) override;
+	virtual bool IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
+	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
+	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability) override;
 	virtual void ClearInventory_Implementation() override;
 	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) override;
 	

@@ -7,6 +7,76 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryInterface.generated.h"
 
+class UMounteaInventoryItemTemplate;
+
+USTRUCT(BlueprintType)
+struct FInventoryItemSearchParams
+{
+	GENERATED_BODY()
+
+	FInventoryItemSearchParams()
+		: bSearchByGuid(false)
+		, bSearchByTemplate(false)
+		, bSearchByTags(false)
+		, bRequireAllTags(false)
+	{}
+
+	explicit FInventoryItemSearchParams(const FGuid& InGuid)
+		: bSearchByGuid(true)
+		, ItemGuid(InGuid)
+		, bSearchByTemplate(false)
+		, bSearchByTags(false)
+		, bRequireAllTags(false)
+	{}
+
+	explicit FInventoryItemSearchParams(UMounteaInventoryItemTemplate* const InTemplate)
+		: bSearchByGuid(false)
+		, bSearchByTemplate(true)
+		, Template(InTemplate)
+		, bSearchByTags(false)
+		, bRequireAllTags(false)
+	{}
+
+	explicit FInventoryItemSearchParams(const FGameplayTagContainer& InTags, const bool bInRequireAllTags = false)  
+		: bSearchByGuid(false)
+		, bSearchByTemplate(false)
+		, bSearchByTags(true)
+		, Tags(InTags)
+		, bRequireAllTags(bInRequireAllTags)
+	{}
+
+	FInventoryItemSearchParams(const FGuid& InGuid, UMounteaInventoryItemTemplate* const InTemplate, const FGameplayTagContainer& InTags, const bool bInRequireAllTags = false)
+		: bSearchByGuid(true)
+		, ItemGuid(InGuid)
+		, bSearchByTemplate(true)
+		, Template(InTemplate)
+		, bSearchByTags(true)
+		, Tags(InTags)
+		, bRequireAllTags(bInRequireAllTags)
+	{}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	uint8 bSearchByGuid : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	FGuid ItemGuid;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	uint8 bSearchByTemplate : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	TObjectPtr<UMounteaInventoryItemTemplate> Template;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	uint8 bSearchByTags : 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	FGameplayTagContainer Tags;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	bool bRequireAllTags = false;
+};
+
 struct FInventoryNotificationData;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, const FInventoryItem&, AddedItem);
@@ -52,9 +122,9 @@ public:
 	* @return True if item was added successfully
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
-	bool AddItem(const FInventoryItem& Item, bool bAutoStack = true);
-	virtual bool AddItem_Implementation(const FInventoryItem& Item, bool bAutoStack = true) = 0;
-	
+	bool AddItem(const FInventoryItem& Item, const bool bAutoStack = true);
+	virtual bool AddItem_Implementation(const FInventoryItem& Item, const bool bAutoStack = true) = 0;
+
 	/**
 	* Removes an item from inventory
 	* @param ItemGuid GUID of item to remove
@@ -74,13 +144,53 @@ public:
 	virtual bool CanAddItem_Implementation(const FInventoryItem& Item) const = 0;
 
 	/**
-	* Finds item by GUID
-	* @param ItemGuid GUID to search for
-	* @return Found item or nullptr
+	* Adds an item from template
+	* @param Template The template to create item from
+	* @param Quantity Amount to add
+	* @param Durability Initial durability
+	* @return True if item was added successfully
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
-	FInventoryItem FindItem(const FGuid& ItemGuid);
-	virtual FInventoryItem FindItem_Implementation(const FGuid& ItemGuid) = 0;
+	bool AddItemFromTemplate(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1, const float Durability = 1.f);
+	virtual bool AddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1, const float Durability = 1.f) = 0;
+
+	/**
+	* Removes items by template
+	* @param Template Template to match
+	* @param Quantity Amount to remove
+	* @return True if items were removed
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
+	bool RemoveItemFromTemplate(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1);
+	virtual bool RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) = 0;
+
+	/**
+	* Checks if can add item from template
+	* @param Template Template to check
+	* @param Quantity Amount to validate
+	* @return True if item can be added
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
+	bool CanAddItemFromTemplate(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) const;
+	virtual bool CanAddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) const = 0;
+
+	/**
+	* Finds item based on Search conditions.
+	* @param SearchParams Search params to search by.
+	* @return Found item or nullptr
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Search")
+	FInventoryItem FindItem(const FInventoryItemSearchParams& SearchParams);
+	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) = 0;
+
+	/**
+	* Finds items based on Search conditions.
+	* @param SearchParams Search params to search by.
+	* @return Found items or empty array
+	*/
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Search")
+	TArray<FInventoryItem> FindItems(const FInventoryItemSearchParams& SearchParams);
+	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) = 0;
 
 	/**
 	* Gets all items in inventory
@@ -118,16 +228,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Stack")
 	bool DecreaseItemQuantity(const FGuid& ItemGuid, int32 Amount = 1);
 	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, int32 Amount = 1) = 0;
-
-	/**
-	* Splits item stack into two
-	* @param ItemGuid Source item GUID
-	* @param SplitAmount Amount to split off
-	* @return New item from split
-	*/
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Stack")
-	FInventoryItem SplitItemStack(const FGuid& ItemGuid, int32 SplitAmount);
-	virtual FInventoryItem SplitItemStack_Implementation(const FGuid& ItemGuid, int32 SplitAmount) = 0;
 
 	// --- Durability Management ------------------------------
 

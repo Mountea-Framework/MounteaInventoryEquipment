@@ -1,9 +1,8 @@
 ﻿// All rights reserved Dominik Morse 2024
 
-
 #include "Components/MounteaInventoryComponent.h"
-
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Net/UnrealNetwork.h"
 
@@ -25,13 +24,11 @@ UMounteaInventoryComponent::UMounteaInventoryComponent()
 void UMounteaInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
 	DOREPLIFETIME(UMounteaInventoryComponent, InventoryItems);
 }
 
@@ -45,20 +42,20 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
-bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& Item, bool bAutoStack)
+bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& Item, const bool bAutoStack)
 {
 	if (!CanAddItem(Item))
 	{
-		 Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
-			  EInventoryNotificationType::EINT_ItemNotUpdated,
-			  EInventoryNotificationCategory::EINC_Error,
-			  NSLOCTEXT("Inventory", "ItemNotAdded", "Cannot add item to inventory"),
-			  Item.GetGuid(),
-			  this,
-			  Item.GetQuantity(),
-			  0
-		 ));
-		 return false;
+		  Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+				 EInventoryNotificationType::EINT_ItemNotUpdated,
+				 EInventoryNotificationCategory::EINC_Error,
+				 NSLOCTEXT("Inventory", "ItemNotAdded", "Cannot add item to inventory"),
+				 Item.GetGuid(),
+				 this,
+				 Item.GetQuantity(),
+				 0
+		  ));
+		  return false;
 	}
 
 	const int32 RequestedAmount = Item.GetQuantity();
@@ -66,66 +63,108 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 
 	if(bAutoStack)
 	{
-		 // Stack logic
-		 // AmountToAdd = CalculateActualAddAmount(Item, RequestedAmount);
+		  // Stack logic
+		  // AmountToAdd = CalculateActualAddAmount(Item, RequestedAmount);
 	}
 
 	if(AmountToAdd == 0)
 	{
-		 Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
-			  EInventoryNotificationType::EINT_ItemNotUpdated,
-			  EInventoryNotificationCategory::EINC_Error,
-			  NSLOCTEXT("Inventory", "ItemNotAdded", "Cannot add item to inventory"),
-			  Item.GetGuid(),
-			  this,
-			  RequestedAmount,
-			  0
-		 ));
-		 return false;
+		  Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+				 EInventoryNotificationType::EINT_ItemNotUpdated,
+				 EInventoryNotificationCategory::EINC_Error,
+				 NSLOCTEXT("Inventory", "ItemNotAdded", "Cannot add item to inventory"),
+				 Item.GetGuid(),
+				 this,
+				 RequestedAmount,
+				 0
+		  ));
+		  return false;
 	}
 
 	if(AmountToAdd < RequestedAmount)
 	{
-		 Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
-			  EInventoryNotificationType::EINT_ItemPartiallyAdded,
-			  EInventoryNotificationCategory::EINC_Warning,
-			  NSLOCTEXT("Inventory", "PartialAdd", "Could only add {0} of {1} items"),
-			  Item.GetGuid(),
-			  this,
-			  RequestedAmount,
-			  AmountToAdd
-		 ));
+		  Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+				 EInventoryNotificationType::EINT_ItemPartiallyAdded,
+				 EInventoryNotificationCategory::EINC_Warning,
+				 NSLOCTEXT("Inventory", "PartialAdd", "Could only add {0} of {1} items"),
+				 Item.GetGuid(),
+				 this,
+				 RequestedAmount,
+				 AmountToAdd
+		  ));
 	}
 	else
 	{
-		 Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
-			  EInventoryNotificationType::EINT_ItemAdded,
-			  EInventoryNotificationCategory::EINC_Info,
-			  NSLOCTEXT("Inventory", "ItemAdded", "Successfully added {0} items"),
-			  Item.GetGuid(),
-			  this,
-			  RequestedAmount,
-			  AmountToAdd
-		 ));
+		  Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+				 EInventoryNotificationType::EINT_ItemAdded,
+				 EInventoryNotificationCategory::EINC_Info,
+				 NSLOCTEXT("Inventory", "ItemAdded", "Successfully added {0} items"),
+				 Item.GetGuid(),
+				 this,
+				 RequestedAmount,
+				 AmountToAdd
+		  ));
 	}
 
 	// Add item logic
 	return true;
 }
 
+bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity, const float Durability)
+{
+	if (!IsValid(Template))
+	{
+		Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+			EInventoryNotificationType::EINT_ItemNotUpdated,
+			EInventoryNotificationCategory::EINC_Error,
+			NSLOCTEXT("Inventory", "InvalidTemplate", "Invalid item template"),
+			FGuid(),
+			this,
+			Quantity,
+			0
+		));
+		return false;
+	}
+
+	return AddItem(FInventoryItem(Template, Quantity, Durability, this));
+}
+
 bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid)
 {
-	const auto ItemToRemove = FindItem(ItemGuid);
+	const auto ItemToRemove = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
 	if (!ItemToRemove.IsItemValid())
-		 return false;
+		  return false;
 
 	InventoryItems.Items.RemoveAll([ItemGuid](const FInventoryItem& Item)
 	{
-		 return Item.GetGuid() == ItemGuid;
+		  return Item.GetGuid() == ItemGuid;
 	});
 
 	OnItemRemoved.Broadcast(ItemToRemove);
 	return true;
+}
+
+bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* const Template, const int32 Quantity)
+{
+	if (!IsValid(Template))
+		return false;
+
+	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(Template));
+	if (inventoryItem.IsItemValid())
+	{
+		return Execute_RemoveItem(this, inventoryItem.GetGuid());
+	}
+   
+	Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+		EInventoryNotificationType::EINT_ItemNotUpdated,
+		EInventoryNotificationCategory::EINC_Error,
+		NSLOCTEXT("Inventory", "RemoveTemplateFailed", "Cannot find item matching template with sufficient quantity"),
+		FGuid(),
+		this,
+		Quantity,
+		0
+	));
+	return false;
 }
 
 bool UMounteaInventoryComponent::CanAddItem_Implementation(const FInventoryItem& Item) const
@@ -133,14 +172,44 @@ bool UMounteaInventoryComponent::CanAddItem_Implementation(const FInventoryItem&
 	return Item.IsItemValid() && Item.GetTemplate() != nullptr;
 }
 
-FInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FGuid& ItemGuid)
+bool UMounteaInventoryComponent::CanAddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* const Template, const int32 Quantity) const
 {
-	const auto FoundItem = InventoryItems.Items.FindByPredicate([ItemGuid](const FInventoryItem& Item)
+	if (!IsValid(Template))
+		return false;
+
+	return CanAddItem(FInventoryItem(Template, Quantity, Template->BaseDurability, nullptr));
+}
+
+FInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FInventoryItemSearchParams& SearchParams)
+{
+	const auto FoundItem = InventoryItems.Items.FindByPredicate([&SearchParams](const FInventoryItem& Item)
 	{
-		 return Item.GetGuid() == ItemGuid;
+		if (SearchParams.bSearchByGuid && Item.GetGuid() != SearchParams.ItemGuid)
+			return false;
+
+		if (SearchParams.bSearchByTemplate && Item.GetTemplate() != SearchParams.Template)
+			return false;
+
+		if (SearchParams.bSearchByTags)
+		{
+			if (SearchParams.bRequireAllTags)
+				return Item.GetCustomData().HasAll(SearchParams.Tags);
+			else
+				return Item.GetCustomData().HasAny(SearchParams.Tags);
+		}
+
+		return true;
 	});
 
 	return FoundItem ? *FoundItem : FInventoryItem();
+}
+
+TArray<FInventoryItem> UMounteaInventoryComponent::FindItems_Implementation(const FInventoryItemSearchParams& SearchParams)
+{
+	TArray<FInventoryItem> returnResult;
+	// TODO: Implementation
+
+	return returnResult;
 }
 
 TArray<FInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() const
@@ -148,76 +217,60 @@ TArray<FInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() 
 	return InventoryItems.Items;
 }
 
-bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, int32 Amount)
+bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
 	for (auto& Item : InventoryItems.Items)
 	{
-		 if (Item.GetGuid() == ItemGuid)
-		 {
-			  const int32 OldQuantity = Item.GetQuantity();
-			  if (Item.SetQuantity(OldQuantity + Amount))
-			  {
-					OnItemQuantityChanged.Broadcast(Item, OldQuantity, Item.GetQuantity());
-					return true;
-			  }
-		 }
+		  if (Item.GetGuid() == ItemGuid)
+		  {
+				 const int32 OldQuantity = Item.GetQuantity();
+				 if (Item.SetQuantity(OldQuantity + Amount))
+				 {
+						 OnItemQuantityChanged.Broadcast(Item, OldQuantity, Item.GetQuantity());
+						 return true;
+				 }
+		  }
 	}
 	return false;
 }
 
-bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, int32 Amount)
+bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
 	for (auto& Item : InventoryItems.Items)
 	{
-		 if (Item.GetGuid() == ItemGuid)
-		 {
-			  const int32 OldQuantity = Item.GetQuantity();
-			  const int32 NewQuantity = OldQuantity - Amount;
-			  
-			  if (NewQuantity <= 0)
-					return RemoveItem(ItemGuid);
-					
-			  if (Item.SetQuantity(NewQuantity))
-			  {
-					OnItemQuantityChanged.Broadcast(Item, OldQuantity, NewQuantity);
-					return true;
-			  }
-		 }
+		  if (Item.GetGuid() == ItemGuid)
+		  {
+				 const int32 OldQuantity = Item.GetQuantity();
+				 const int32 NewQuantity = OldQuantity - Amount;
+				 
+				 if (NewQuantity <= 0)
+						 return RemoveItem(ItemGuid);
+						 
+				 if (Item.SetQuantity(NewQuantity))
+				 {
+						 OnItemQuantityChanged.Broadcast(Item, OldQuantity, NewQuantity);
+						 return true;
+				 }
+		  }
 	}
 	return false;
 }
 
-FInventoryItem UMounteaInventoryComponent::SplitItemStack_Implementation(const FGuid& ItemGuid, int32 SplitAmount)
-{
-	auto ExistingItem = FindItem(ItemGuid);
-	if (!ExistingItem.IsItemValid() || SplitAmount <= 0 || ExistingItem.GetQuantity() <= SplitAmount)
-		 return FInventoryItem();
-
-	FInventoryItem NewItem(ExistingItem.GetTemplate(), SplitAmount);
-	if (DecreaseItemQuantity(ItemGuid, SplitAmount))
-	{
-		 AddItem(NewItem, false);
-		 return NewItem;
-	}
-	
-	return FInventoryItem();
-}
-
-bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid& ItemGuid, float DeltaDurability)
+bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability)
 {
 	for (auto& Item : InventoryItems.Items)
 	{
-		 if (Item.GetGuid() == ItemGuid)
-		 {
-			  const float OldDurability = Item.GetDurability();
-			  const float NewDurability = FMath::Clamp(OldDurability + DeltaDurability, 0.f, 1.f);
-			  
-			  if (Item.SetDurability(NewDurability))
-			  {
-					OnItemDurabilityChanged.Broadcast(Item, OldDurability, NewDurability);
-					return true;
-			  }
-		 }
+		  if (Item.GetGuid() == ItemGuid)
+		  {
+				 const float OldDurability = Item.GetDurability();
+				 const float NewDurability = FMath::Clamp(OldDurability + DeltaDurability, 0.f, 1.f);
+				 
+				 if (Item.SetDurability(NewDurability))
+				 {
+						 OnItemDurabilityChanged.Broadcast(Item, OldDurability, NewDurability);
+						 return true;
+				 }
+		  }
 	}
 	return false;
 }
@@ -226,7 +279,7 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 {
 	for (const auto& Item : InventoryItems.Items)
 	{
-		 OnItemRemoved.Broadcast(Item);
+		  OnItemRemoved.Broadcast(Item);
 	}
 	InventoryItems.Items.Empty();
 }
@@ -234,6 +287,5 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
 	LOG_WARNING(TEXT("%s"), *Notification.NotificationText.ToString());
-
 	// TODO: Create new Notification Widget
 }
