@@ -118,7 +118,6 @@ public:
 	/**
 	* Adds an item to the inventory
 	* @param Item The item to add
-	* @param bAutoStack If true, will try to stack with existing items
 	* @return True if item was added successfully
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")

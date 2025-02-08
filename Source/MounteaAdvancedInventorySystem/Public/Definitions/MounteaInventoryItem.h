@@ -153,6 +153,13 @@ public:
 	 */
 	bool SetAffectorSlots(const TMap<FGameplayTag, FGuid>& InAffectorSlots);
 
+	/**
+	 * Sets the new Onwing Inventory
+	 * @param InOwningInventory The new Inventory
+	 * @return True if the Inventory was changed
+	 */
+	bool SetOwningInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& InOwningInventory);
+
 /*************************************************************/
 /******************* OPERATORS ************************/
 /*************************************************************/

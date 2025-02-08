@@ -116,3 +116,12 @@ bool FInventoryItem::SetAffectorSlots(const TMap<FGameplayTag, FGuid>& InAffecto
 
 	return false;
 }
+
+bool FInventoryItem::SetOwningInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& InOwningInventory)
+{
+	if (InOwningInventory == OwningInventory)
+		return false;
+
+	OwningInventory = InOwningInventory;
+	return true;
+}

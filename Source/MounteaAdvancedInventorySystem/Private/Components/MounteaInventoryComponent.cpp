@@ -43,6 +43,7 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
+// TODO: VALIDATE QUANTITY vs STACK SIZE
 bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& Item)
 {
 	if (!Execute_CanAddItem(this, Item))
@@ -102,12 +103,29 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 					newQuantity,
 					Item.GetQuantity()
 				));
+
+				InventoryItems.MarkArrayDirty();
+				
 				return true;
+			}
+			else
+			{
+				Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+					EInventoryNotificationType::EINT_ItemNotUpdated,
+					EInventoryNotificationCategory::EINC_Warning,
+					NSLOCTEXT("Inventory", "ItemStackReached", "Item quantity maxed out"),
+					existingItem.GetGuid(),
+					this,
+					newQuantity,
+					0
+				));
+				return false;
 			}
 		}
 	}
 	
 	InventoryItems.Items.Add(Item);
+	InventoryItems.Items.Last().SetOwningInventory(this);
 	InventoryItems.MarkArrayDirty();
 	
 	Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
@@ -140,7 +158,7 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 		return false;
 	}
 
-	return Execute_AddItem(this, FInventoryItem(Template, Quantity, Durability, this));
+	return Execute_AddItem(this, FInventoryItem(Template, Quantity, Durability, nullptr));
 }
 
 bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid)
@@ -193,8 +211,9 @@ bool UMounteaInventoryComponent::CanAddItem_Implementation(const FInventoryItem&
 	existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetTemplate()));
 	if (existingItem.IsItemValid())
 		return existingItem.GetQuantity() + Item.GetQuantity() <= Item.GetTemplate()->MaxStackSize;
-	
-	return false;
+
+	// None found, can Add
+	return true;
 }
 
 bool UMounteaInventoryComponent::CanAddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* const Template, const int32 Quantity) const
