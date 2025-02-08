@@ -122,8 +122,8 @@ public:
 	* @return True if item was added successfully
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
-	bool AddItem(const FInventoryItem& Item, const bool bAutoStack = true);
-	virtual bool AddItem_Implementation(const FInventoryItem& Item, const bool bAutoStack = true) = 0;
+	bool AddItem(const FInventoryItem& Item);
+	virtual bool AddItem_Implementation(const FInventoryItem& Item) = 0;
 
 	/**
 	* Removes an item from inventory
@@ -180,8 +180,8 @@ public:
 	* @return Found item or nullptr
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Search")
-	FInventoryItem FindItem(const FInventoryItemSearchParams& SearchParams);
-	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) = 0;
+	FInventoryItem FindItem(const FInventoryItemSearchParams& SearchParams) const;
+	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
 
 	/**
 	* Finds items based on Search conditions.
@@ -189,8 +189,8 @@ public:
 	* @return Found items or empty array
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Search")
-	TArray<FInventoryItem> FindItems(const FInventoryItemSearchParams& SearchParams);
-	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) = 0;
+	TArray<FInventoryItem> FindItems(const FInventoryItemSearchParams& SearchParams) const;
+	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
 
 	/**
 	* Gets all items in inventory

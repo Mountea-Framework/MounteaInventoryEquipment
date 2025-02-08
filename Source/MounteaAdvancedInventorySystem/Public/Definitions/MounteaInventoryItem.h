@@ -48,23 +48,46 @@ public:
 	
 public:
 	
-	/** @return The unique identifier of this item instance */
+	/**
+	 * @return The unique identifier of this item instance
+	 */
 	FGuid GetGuid() const { return Guid; }
 	
-	/** @return The template defining this item's base properties */
+	/**
+	 *
+	 *  @return The template defining this item's base properties
+	 */
 	UMounteaInventoryItemTemplate* GetTemplate() const { return Template; }
 	
-	/** @return The current quantity of this item */
+	/**
+	 *
+	 *  @return The current quantity of this item
+	 */
 	int32 GetQuantity() const { return Quantity; }
 	
-	/** @return The current durability of this item */
+	/**
+	 *
+	 *  @return The current durability of this item
+	 */
 	float GetDurability() const { return Durability; }
 	
-	/** @return The custom data tags associated with this item */
+	/**
+	 *
+	 *  @return The custom data tags associated with this item
+	 */
 	const FGameplayTagContainer& GetCustomData() const { return CustomData; }
 	
-	/** @return The map of affector slots and their corresponding item GUIDs */
+	/**
+	 *
+	 *  @return The map of affector slots and their corresponding item GUIDs
+	 */
 	const TMap<FGameplayTag, FGuid>& GetAffectorSlots() const { return AffectorSlots; }
+
+	/**
+	 *
+	 * @return Owning Inventory of this Item. Could be null!
+	 */
+	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const { return OwningInventory; };
 
 /*************************************************************/
 /************************ SETTERS ***********************/

@@ -8,9 +8,9 @@ AActor* UMounteaInventoryStatics::GetOwningActor(const TScriptInterface<IMountea
 	return Target.GetObject() ? Target->Execute_GetOwningActor(Target.GetObject()) : nullptr;
 }
 
-bool UMounteaInventoryStatics::AddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item, const bool bAutoStack)
+bool UMounteaInventoryStatics::AddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item)
 {
-	return Target.GetObject() ? Target->Execute_AddItem(Target.GetObject(), Item, bAutoStack) : false;
+	return Target.GetObject() ? Target->Execute_AddItem(Target.GetObject(), Item) : false;
 }
 
 bool UMounteaInventoryStatics::RemoveItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid)

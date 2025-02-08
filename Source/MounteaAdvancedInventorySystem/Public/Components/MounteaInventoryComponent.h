@@ -38,14 +38,14 @@ protected:
 
 protected:
 	virtual AActor* GetOwningActor_Implementation() const override;
-	virtual bool AddItem_Implementation(const FInventoryItem& Item, const bool bAutoStack = true) override;
+	virtual bool AddItem_Implementation(const FInventoryItem& Item) override;
 	virtual bool AddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1, const float Durability = 1.f) override;
 	virtual bool RemoveItem_Implementation(const FGuid& ItemGuid) override;
 	virtual bool RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) override;
 	virtual bool CanAddItem_Implementation(const FInventoryItem& Item) const override;
 	virtual bool CanAddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) const override;
-	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) override;
-	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) override;
+	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
+	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
 	virtual TArray<FInventoryItem> GetAllItems_Implementation() const override;
 	virtual bool IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
 	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
