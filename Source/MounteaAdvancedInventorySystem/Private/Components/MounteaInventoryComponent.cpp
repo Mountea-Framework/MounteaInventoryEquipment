@@ -7,8 +7,9 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Statics/MounteaInventoryStatics.h"
 
-UMounteaInventoryComponent::UMounteaInventoryComponent()
+UMounteaInventoryComponent::UMounteaInventoryComponent() : InventoryTypeFlag(EInventoryFlags::EIF_Private)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
@@ -49,14 +50,12 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 {
 	if (!Execute_CanAddItem(this, Item))
 	{
-		Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			EInventoryNotificationType::EINT_ItemNotUpdated,
 			EInventoryNotificationCategory::EINC_Error,
-			NSLOCTEXT("Inventory", "CannotAddItem", "Cannot add item to inventory"),
-			Item.GetGuid(),
 			this,
-			Item.GetQuantity(),
-			0
+			Item.GetGuid(),
+			-Item.GetQuantity()
 		));
 		return false;
 	}
@@ -76,19 +75,16 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		const int32 AvailableSpace = Item.GetTemplate()->MaxQuantity - existingItem.GetQuantity();
 		const int32 AmountToAdd = FMath::Min(Item.GetQuantity(), AvailableSpace);
 
-		// Handle source inventory for partial quantity
 		if (Item.IsItemInInventory())
 		{
 			if (!Execute_DecreaseItemQuantity(Item.GetOwningInventory().GetObject(), Item.GetGuid(), AmountToAdd))
 			{
-				Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+				Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 					EInventoryNotificationType::EINT_ItemNotUpdated,
 					EInventoryNotificationCategory::EINC_Error,
-					NSLOCTEXT("Inventory", "SourceInventoryError", "Failed to update source inventory"),
-					Item.GetGuid(),
 					this,
-					AmountToAdd,
-					0
+					Item.GetGuid(),
+					-AmountToAdd
 				));
 				return false;
 			}
@@ -100,48 +96,39 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 				EInventoryNotificationType::EINT_ItemPartiallyAdded : 
 				EInventoryNotificationType::EINT_ItemAdded;
 
-			Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+			Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 				NotifType,
 				EInventoryNotificationCategory::EINC_Info,
-				NSLOCTEXT("Inventory", "ItemQuantityUpdated", "Updated item quantity"),
-				existingItem.GetGuid(),
 				this,
-				existingItem.GetQuantity(),
+				existingItem.GetGuid(),
 				AmountToAdd
 			));
 
 			InventoryItems.MarkArrayDirty();
 			OnItemAdded.Broadcast(existingItem);
-
-			// TODO: Don't spam client if same as server
 			PostItemAdded_Client(existingItem);
 			return true;
 		}
 	}
 	else
 	{
-		// For new items, we can add with full or capped quantity
 		const int32 AmountToAdd = FMath::Min(Item.GetQuantity(), Item.GetTemplate()->MaxQuantity);
 		
-		// Handle source inventory
 		if (Item.IsItemInInventory())
 		{
 			if (!Execute_DecreaseItemQuantity(Item.GetOwningInventory().GetObject(), Item.GetGuid(), AmountToAdd))
 			{
-				Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+				Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 					EInventoryNotificationType::EINT_ItemNotUpdated,
 					EInventoryNotificationCategory::EINC_Error,
-					NSLOCTEXT("Inventory", "SourceInventoryError", "Failed to update source inventory"),
-					Item.GetGuid(),
 					this,
-					AmountToAdd,
-					0
+					Item.GetGuid(),
+					-AmountToAdd
 				));
 				return false;
 			}
 		}
 
-		// Create new item with correct quantity
 		FInventoryItem newItem = Item;
 		if (AmountToAdd != Item.GetQuantity())
 			newItem.Quantity += AmountToAdd;
@@ -154,19 +141,15 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			EInventoryNotificationType::EINT_ItemPartiallyAdded : 
 			EInventoryNotificationType::EINT_ItemAdded;
 
-		Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			NotifType,
 			EInventoryNotificationCategory::EINC_Info,
-			NSLOCTEXT("Inventory", "ItemAdded", "Successfully added items"),
-			newItem.GetGuid(),
 			this,
-			AmountToAdd,
+			newItem.GetGuid(),
 			AmountToAdd
 		));
 
 		OnItemAdded.Broadcast(newItem);
-
-		// TODO: Don't spam client if same as server
 		PostItemAdded_Client(newItem);
 		return true;
 	}
@@ -178,13 +161,12 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 {
 	if (!IsValid(Template))
 	{
-		Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
+		//Invalid item template
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			EInventoryNotificationType::EINT_ItemNotUpdated,
 			EInventoryNotificationCategory::EINC_Error,
-			NSLOCTEXT("Inventory", "InvalidTemplate", "Invalid item template"),
-			FGuid(),
 			this,
-			Quantity,
+			FGuid(),
 			0
 		));
 		return false;
@@ -217,16 +199,15 @@ bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaI
 	{
 		return Execute_RemoveItem(this, inventoryItem.GetGuid());
 	}
-   
-	Execute_ProcessInventoryNotification(this, FInventoryNotificationData(
-		EInventoryNotificationType::EINT_ItemNotUpdated,
-		EInventoryNotificationCategory::EINC_Error,
-		NSLOCTEXT("Inventory", "RemoveTemplateFailed", "Cannot find item matching template with sufficient quantity"),
-		FGuid(),
-		this,
-		Quantity,
-		0
-	));
+
+	// Cannot find item matching template with sufficient quantity
+	Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+			EInventoryNotificationType::EINT_ItemNotUpdated,
+			EInventoryNotificationCategory::EINC_Error,
+			this,
+			FGuid(),
+			0
+		));
 	return false;
 }
 
@@ -405,7 +386,6 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
-	LOG_WARNING(TEXT("%s"), *Notification.NotificationText.ToString());
 	// TODO: Create new Notification Widget
 }
 
@@ -414,7 +394,7 @@ bool UMounteaInventoryComponent::IsAuthority() const
 	AActor* Owner = GetOwner();
 	if (!Owner || !Owner->GetWorld())
 		return false;
-    
+	
 	const ENetMode NetMode = Owner->GetWorld()->GetNetMode();
 	
 	if (NetMode == NM_Standalone)
@@ -422,7 +402,7 @@ bool UMounteaInventoryComponent::IsAuthority() const
 	
 	if (Owner->HasAuthority())
 		return true;
-        
+		
 	return false;
 }
 

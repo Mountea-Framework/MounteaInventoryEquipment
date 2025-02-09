@@ -7,11 +7,18 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryStatics.generated.h"
 
+enum class EInventoryNotificationCategory : uint8;
+class UMounteaAdvancedInventorySettingsConfig;
+enum class EInventoryNotificationType : uint8;
+
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
+	/*************************************************************/
+	/********************* TEMPLATES **********************/
+	/*************************************************************/
 public:
 	template<typename ReturnType, typename Func, typename... Args>
 	static ReturnType ExecuteIfImplements(UObject* Target, const TCHAR* FunctionName, Func Function, Args&&... args)
@@ -40,6 +47,9 @@ public:
 		else return;
 	}
 
+	/*************************************************************/
+	/******************* BLUEPRINTABLE *******************/
+	/*************************************************************/
 public:
 	/**
 	 * Returns the owning actor for this Dialogue Inventory Component.
@@ -195,4 +205,16 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static FString InventoryItemToString(const FInventoryItem& Item);
+
+	/*************************************************************/
+	/************************ INTERNAL ***********************/
+	/*************************************************************/
+public:
+	static FInventoryNotificationData CreateNotificationData(
+		const EInventoryNotificationType Type,
+		const EInventoryNotificationCategory Category,
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,
+		const FGuid& ItemGuid,
+		const int32 QuantityDelta
+	);
 };

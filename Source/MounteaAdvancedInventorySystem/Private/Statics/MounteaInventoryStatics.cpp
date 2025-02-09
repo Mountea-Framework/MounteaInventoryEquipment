@@ -3,6 +3,10 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
+#include "Definitions/MounteaAdvancedInventoryNotification.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+
 AActor* UMounteaInventoryStatics::GetOwningActor(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetOwningActor(Target.GetObject()) : nullptr;
@@ -88,4 +92,30 @@ void UMounteaInventoryStatics::ProcessInventoryNotification(const TScriptInterfa
 FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& Item)
 {
 	return Item.ToString();
+}
+
+FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
+	const EInventoryNotificationType Type,
+	const EInventoryNotificationCategory Category,
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,
+	const FGuid& ItemGuid,
+	const int32 QuantityDelta
+)
+{
+	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
+	if (!Config) return FInventoryNotificationData();
+
+	const FInventoryNotificationConfig* NotifConfig = Config->NotificationConfigs.Find(Category);
+	if (!NotifConfig) return FInventoryNotificationData();
+
+	return FInventoryNotificationData(
+		Type,
+		Category,
+		NotifConfig->MessageTemplate, // TODO: Compile text together
+		ItemGuid,
+		SourceInventory,
+		FMath::Abs(QuantityDelta),
+		0,
+		NotifConfig->DefaultDuration
+	);
 }
