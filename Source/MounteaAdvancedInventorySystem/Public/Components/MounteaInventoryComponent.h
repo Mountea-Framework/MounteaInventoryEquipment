@@ -36,6 +36,7 @@ protected:
 	UFUNCTION()
 	void OnRep_InventoryItems();
 
+	// --- Interface Functions ------------------------------
 protected:
 	virtual AActor* GetOwningActor_Implementation() const override;
 	virtual bool AddItem_Implementation(const FInventoryItem& Item) override;
@@ -45,7 +46,7 @@ protected:
 	virtual bool CanAddItem_Implementation(const FInventoryItem& Item) const override;
 	virtual bool CanAddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) const override;
 	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
-	virtual int32 FindItemIndex_Implementation(const FInventoryItemSearchParams& SearchParams) const;
+	virtual int32 FindItemIndex_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
 	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
 	virtual TArray<FInventoryItem> GetAllItems_Implementation() const override;
 	virtual bool IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
@@ -53,9 +54,28 @@ protected:
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability) override;
 	virtual void ClearInventory_Implementation() override;
 	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) override;
+
+	// --- Class Functions ------------------------------
+protected:
+	bool IsAuthority() const;
+	
+	UFUNCTION(Server, Reliable)
+	void AddItem_Server(const FInventoryItem& Item);
+	UFUNCTION(Server, Reliable)
+	void RemoveItem_Server(const FGuid& ItemGuid);
+
+	UFUNCTION(Client, Unreliable)
+	void PostItemAdded_Client(const FInventoryItem& Item);
+	UFUNCTION(Client, Unreliable)
+	void PostItemRemoved_Client(const FInventoryItem& Item);
+	UFUNCTION(Client, Unreliable)
+	void PostItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
+	UFUNCTION(Client, Unreliable)
+	void PostItemDurabilityChanged(const FInventoryItem& Item, const int32 OldDurability, const int32 NewDurability);
 	
 	// --- Events ------------------------------
-
+protected:
+	
 	/**
 	* Called when item is added to inventory
 	*/

@@ -42,6 +42,9 @@ FString FInventoryItem::ToString() const
 {
 	//FString Builder;
 	TStringBuilder<512> Builder;
+
+	if (!IsItemValid())
+		return TEXT("Invalid Item!");
 	
 	Builder.Appendf(TEXT("Item [%s] (GUID: %s)\n"), 
 		*GetTemplate()->DisplayName.ToString(), 

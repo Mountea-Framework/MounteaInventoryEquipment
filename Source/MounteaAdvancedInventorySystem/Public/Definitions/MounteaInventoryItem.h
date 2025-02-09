@@ -217,9 +217,10 @@ public:
 	/** Custom tags for item-specific metadata or state (e.g., `ItemState.Broken`) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
 	FGameplayTagContainer CustomData;
-	
+
+	// TODO: Replace TMap with hashed array of custom struct
 	/** Map of affector slots to their corresponding attached items. Items are stored as guids to avoid hard references */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", NotReplicated)
 	TMap<FGameplayTag,FGuid> AffectorSlots;
 
 	/** Inventory which currently owns this Item. */

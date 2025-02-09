@@ -1,29 +1,50 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "MounteaAdvancedInventorySystem",
+	"VersionName": "0.0.0.1",
+	"FriendlyName": "Mountea Advanced Inventory System",
 	"Description": "",
-	"Category": "Other",
-	"CreatedBy": "Dominik Morse",
-	"CreatedByURL": "",
+	"Category": "Mountea Framework",
+	"CreatedBy": "Dominik (Pavlicek) Morse",
+	"CreatedByURL": "https://github.com/Mountea-Framework",
 	"DocsURL": "",
 	"MarketplaceURL": "",
-	"SupportURL": "",
+	"SupportURL": "https://discord.gg/waYT2cn37z",
+ 	 "EngineVersion": "5.1.0",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
-	"IsExperimentalVersion": false,
-	"Installed": false,
+	"IsExperimentalVersion": true,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "MounteaAdvancedInventorySystem",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+			  "Linux",
+			  "Mac",
+			  "Win64"
+			]
 		},
 		{
-			"name": "MounteaAdvancedInventorySystemEditor",
-			"type": "Editor",
-			"loadingPhase": "PostEngineInit"
+			"Name": "MounteaAdvancedInventorySystemEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"PlatformAllowList": [
+			  "Linux",
+			  "Mac",
+			  "Win64"
+			]
+		},
+		{
+			"name": "MounteaAdvancedInventorySystemDeveloper",
+			"type": "UncookedOnly",
+			"loadingPhase": "PreDefault",
+			"PlatformAllowList": [
+			  "Linux",
+			  "Mac",
+			  "Win64"
+			]
 		}
 	]
 }

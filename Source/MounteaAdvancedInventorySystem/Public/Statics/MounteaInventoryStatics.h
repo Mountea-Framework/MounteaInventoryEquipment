@@ -188,6 +188,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void ProcessInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryNotificationData& Notification);
 
+	/**
+	 * Translates Inventory Item to string.
+	 * @param Item Item to be translated to String.
+	 * @return  String representation of the Inventory Item.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static FString InventoryItemToString(const FInventoryItem& Item);
 };

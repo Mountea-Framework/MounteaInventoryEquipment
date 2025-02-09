@@ -37,6 +37,7 @@ void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifeti
 void UMounteaInventoryComponent::OnRep_InventoryItems()
 {
 	// Process replicated Items
+	// TODO refresh UI by sending Command
 }
 
 AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
@@ -60,6 +61,12 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		return false;
 	}
 
+	if (!IsAuthority())
+	{
+		AddItem_Server(Item);
+		return true;
+	}
+	
 	auto existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetGuid()));
 	if (!existingItem.IsItemValid())
 		existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetTemplate()));
@@ -105,6 +112,9 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 
 			InventoryItems.MarkArrayDirty();
 			OnItemAdded.Broadcast(existingItem);
+
+			// TODO: Don't spam client if same as server
+			PostItemAdded_Client(existingItem);
 			return true;
 		}
 	}
@@ -155,6 +165,9 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		));
 
 		OnItemAdded.Broadcast(newItem);
+
+		// TODO: Don't spam client if same as server
+		PostItemAdded_Client(newItem);
 		return true;
 	}
 
@@ -301,14 +314,22 @@ TArray<FInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() 
 
 bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
+	if (!IsAuthority())
+		return false;
+	
 	const int32 index = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
-	if (index != INDEX_NONE)
+	if (index != INDEX_NONE && InventoryItems.Items.IsValidIndex(index))
 	{
-		const int32 OldQuantity = InventoryItems.Items[index].GetQuantity();
-		if (InventoryItems.Items[index].SetQuantity(OldQuantity + Amount))
+		auto& inventoryItem = InventoryItems.Items[index];
+		
+		const int32 OldQuantity = inventoryItem.GetQuantity();
+		if (inventoryItem.SetQuantity(OldQuantity + Amount))
 		{
-			InventoryItems.MarkItemDirty(InventoryItems.Items[index]);
-			OnItemQuantityChanged.Broadcast(InventoryItems.Items[index], OldQuantity, InventoryItems.Items[index].GetQuantity());
+			InventoryItems.MarkItemDirty(inventoryItem);
+			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, inventoryItem.GetQuantity());
+
+			// TODO: Don't spam client if same as server
+			PostItemQuantityChanged(inventoryItem, OldQuantity, inventoryItem.GetQuantity());
 			return true;
 		}
 	}
@@ -317,19 +338,27 @@ bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid
 
 bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
+	if (!IsAuthority())
+		return false;
+	
 	const int32 index = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
-	if (index != INDEX_NONE)
+	if (index != INDEX_NONE && InventoryItems.Items.IsValidIndex(index))
 	{
-		const int32 OldQuantity = InventoryItems.Items[index].GetQuantity();
+		auto& inventoryItem = InventoryItems.Items[index];
+		
+		const int32 OldQuantity =inventoryItem.GetQuantity();
 		const int32 NewQuantity = OldQuantity - Amount;
 				 
 		if (NewQuantity <= 0)
 			return Execute_RemoveItem(this, ItemGuid);
 						 
-		if (InventoryItems.Items[index].SetQuantity(NewQuantity))
+		if (inventoryItem.SetQuantity(NewQuantity))
 		{
-			InventoryItems.MarkItemDirty(InventoryItems.Items[index]);
-			OnItemQuantityChanged.Broadcast(InventoryItems.Items[index], OldQuantity, NewQuantity);
+			InventoryItems.MarkItemDirty(inventoryItem);
+			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, NewQuantity);
+
+			// TODO: Don't spam client if same as server
+			PostItemQuantityChanged(inventoryItem, OldQuantity, NewQuantity);
 			return true;
 		}
 	}
@@ -338,15 +367,23 @@ bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid
 
 bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability)
 {
-	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(ItemGuid));
-	if (inventoryItem.IsItemValid())
+	if (!IsAuthority())
+		return false;
+	
+	const int32 index = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
+	if (index != INDEX_NONE && InventoryItems.Items.IsValidIndex(index))
 	{
+		auto& inventoryItem = InventoryItems.Items[index];
 		const float OldDurability = inventoryItem.GetDurability();
 		const float NewDurability = FMath::Clamp(OldDurability + DeltaDurability, 0.f, 1.f);
 				 
 		if (inventoryItem.SetDurability(NewDurability))
 		{
+			InventoryItems.MarkItemDirty(inventoryItem);
 			OnItemDurabilityChanged.Broadcast(inventoryItem, OldDurability, NewDurability);
+
+			// TODO: Don't spam client if same as server
+			PostItemDurabilityChanged(inventoryItem, OldDurability, NewDurability);
 			return true;
 		}
 	}
@@ -355,6 +392,10 @@ bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid
 
 void UMounteaInventoryComponent::ClearInventory_Implementation()
 {
+	// TODO: Server call
+	if (!IsAuthority())
+		return;
+	
 	for (const auto& Item : InventoryItems.Items)
 	{
 		  OnItemRemoved.Broadcast(Item);
@@ -366,4 +407,51 @@ void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(con
 {
 	LOG_WARNING(TEXT("%s"), *Notification.NotificationText.ToString());
 	// TODO: Create new Notification Widget
+}
+
+bool UMounteaInventoryComponent::IsAuthority() const
+{
+	AActor* Owner = GetOwner();
+	if (!Owner || !Owner->GetWorld())
+		return false;
+    
+	const ENetMode NetMode = Owner->GetWorld()->GetNetMode();
+	
+	if (NetMode == NM_Standalone)
+		return true;
+	
+	if (Owner->HasAuthority())
+		return true;
+        
+	return false;
+}
+
+void UMounteaInventoryComponent::AddItem_Server_Implementation(const FInventoryItem& Item)
+{
+	Execute_AddItem(this, Item);
+}
+
+void UMounteaInventoryComponent::RemoveItem_Server_Implementation(const FGuid& ItemGuid)
+{
+	Execute_RemoveItem(this, ItemGuid);
+}
+
+void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInventoryItem& Item)
+{
+	OnItemAdded.Broadcast(Item);
+}
+
+void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FInventoryItem& Item)
+{
+	OnItemRemoved.Broadcast(Item);
+}
+
+void UMounteaInventoryComponent::PostItemQuantityChanged_Implementation(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
+{
+	OnItemQuantityChanged.Broadcast(Item, OldQuantity, NewQuantity);
+}
+
+void UMounteaInventoryComponent::PostItemDurabilityChanged_Implementation(const FInventoryItem& Item, const int32 OldDurability, const int32 NewDurability)
+{
+	OnItemDurabilityChanged.Broadcast(Item, OldDurability, NewDurability);
 }
