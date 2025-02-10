@@ -400,6 +400,18 @@ bool UMounteaInventoryComponent::IsAuthority() const
 	return false;
 }
 
+void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementation(const FGuid& TargetItem, const EInventoryNotificationType NotifType, const int32 QuantityDelta)
+{
+	auto targetItem = Execute_FindItem(this, FInventoryItemSearchParams(TargetItem));
+
+	OnNotificationReceived.Broadcast(UMounteaInventoryStatics::CreateNotificationData(
+		EInventoryNotificationType::EINT_ItemNotUpdated,
+		this,
+		targetItem.GetGuid(),
+		-targetItem.GetQuantity()
+	));
+}
+
 void UMounteaInventoryComponent::AddItem_Server_Implementation(const FInventoryItem& Item)
 {
 	Execute_AddItem(this, Item);

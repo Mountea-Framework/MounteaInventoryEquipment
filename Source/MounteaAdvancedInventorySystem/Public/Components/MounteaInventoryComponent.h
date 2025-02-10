@@ -8,6 +8,7 @@
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "MounteaInventoryComponent.generated.h"
 
+enum class EInventoryNotificationType : uint8;
 // TODO: REMOVE
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationReceived, const FInventoryNotificationData&, NotificationData);
 
@@ -66,6 +67,8 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void RemoveItem_Server(const FGuid& ItemGuid);
 
+	UFUNCTION(Client, Unreliable)
+	void ProcessInventoryNotification_Client(const FGuid& TargetItem, const EInventoryNotificationType NotifType, const int32 QuantityDelta);
 	UFUNCTION(Client, Unreliable)
 	void PostItemAdded_Client(const FInventoryItem& Item);
 	UFUNCTION(Client, Unreliable)
