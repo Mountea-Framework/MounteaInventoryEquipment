@@ -52,7 +52,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 	{
 		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			EInventoryNotificationType::EINT_ItemNotUpdated,
-			EInventoryNotificationCategory::EINC_Error,
 			this,
 			Item.GetGuid(),
 			-Item.GetQuantity()
@@ -81,7 +80,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			{
 				Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 					EInventoryNotificationType::EINT_ItemNotUpdated,
-					EInventoryNotificationCategory::EINC_Error,
 					this,
 					Item.GetGuid(),
 					-AmountToAdd
@@ -98,7 +96,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 
 			Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 				NotifType,
-				EInventoryNotificationCategory::EINC_Info,
 				this,
 				existingItem.GetGuid(),
 				AmountToAdd
@@ -120,7 +117,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			{
 				Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 					EInventoryNotificationType::EINT_ItemNotUpdated,
-					EInventoryNotificationCategory::EINC_Error,
 					this,
 					Item.GetGuid(),
 					-AmountToAdd
@@ -143,7 +139,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 
 		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			NotifType,
-			EInventoryNotificationCategory::EINC_Info,
 			this,
 			newItem.GetGuid(),
 			AmountToAdd
@@ -164,7 +159,6 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 		//Invalid item template
 		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			EInventoryNotificationType::EINT_ItemNotUpdated,
-			EInventoryNotificationCategory::EINC_Error,
 			this,
 			FGuid(),
 			0
@@ -203,7 +197,6 @@ bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaI
 	// Cannot find item matching template with sufficient quantity
 	Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			EInventoryNotificationType::EINT_ItemNotUpdated,
-			EInventoryNotificationCategory::EINC_Error,
 			this,
 			FGuid(),
 			0
@@ -387,6 +380,7 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
 	// TODO: Create new Notification Widget
+	OnNotificationReceived.Broadcast(Notification);
 }
 
 bool UMounteaInventoryComponent::IsAuthority() const

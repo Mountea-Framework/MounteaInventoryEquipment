@@ -40,6 +40,51 @@ enum class EInventoryNotificationCategory : uint8
  };
 
 USTRUCT(BlueprintType)
+struct FInventoryNotificationStyle
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Appearance")
+	FSlateBrush IconBrush;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	TSoftObjectPtr<USoundBase> NotificationSound;
+};
+
+USTRUCT(BlueprintType)
+struct FInventoryNotificationConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	uint8 bIsEnabled : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	EInventoryNotificationCategory NotificationCategory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	FText MessageTemplate;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta=(EditCondition="bHasDuration"))
+	uint8 bShowProgressBar : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	uint8 bCanBeClosed : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	uint8 bHasDuration : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta=(UIMin=0.1,ClampMin=0.1), meta=(EditCondition="bHasDuration"))
+	float DefaultDuration = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	FLinearColor BackgroundColor = FLinearColor(0.1f, 0.1f, 0.1f, 0.9f);
+	
+	UPROPERTY(EditAnywhere, Category="Settings", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
+	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetClassOverride;
+};
+
+USTRUCT(BlueprintType)
 struct FInventoryNotificationData
 {
 	GENERATED_BODY()
@@ -54,17 +99,22 @@ struct FInventoryNotificationData
 		const TScriptInterface<IMounteaAdvancedInventoryInterface> InSourceInventory,
 		const int32 InRequestedAmount = 0,
 		const int32 InProcessedAmount = 0,
-		const float InDuration = 3.0f
+		const float InDuration = 3.0f,
+		const FInventoryNotificationConfig& SourceConfig = FInventoryNotificationConfig(),
+		UObject* InPayload = nullptr
 		) : Type(InType)
-		 , Category(InCategory)
-		 , NotificationText(InText)
-		 , Duration(InDuration)
-		 , ItemGuid(InItemGuid)
-		 , SourceInventory(InSourceInventory)
-		 , RequestedAmount(InRequestedAmount)
-		 , ProcessedAmount(InProcessedAmount)
-	{}
-	
+			, Category(InCategory)
+			, NotificationText(InText)
+			, Duration(InDuration)
+			, ItemGuid(InItemGuid)
+			, SourceInventory(InSourceInventory)
+			, RequestedAmount(InRequestedAmount)
+			, ProcessedAmount(InProcessedAmount)
+			, NotificationPayload(InPayload)
+			, NotificationConfig(SourceConfig)
+	{
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
 	EInventoryNotificationType Type = EInventoryNotificationType::Default;
 	 
@@ -91,4 +141,10 @@ struct FInventoryNotificationData
 	 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
 	int32 ProcessedAmount = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+	TObjectPtr<UObject> NotificationPayload;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Notification")
+	FInventoryNotificationConfig NotificationConfig;
 };

@@ -8,6 +8,8 @@
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "MounteaInventoryComponent.generated.h"
 
+// TODO: REMOVE
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationReceived, const FInventoryNotificationData&, NotificationData);
 
 enum class EInventoryFlags : uint8;
 enum class EInventoryType : uint8;
@@ -99,6 +101,10 @@ protected:
 	*/
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnItemDurabilityChanged OnItemDurabilityChanged;
+
+	// TEMPORARY FOR TESTING ONLY
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
+	FOnNotificationReceived OnNotificationReceived;
 
 private:
 

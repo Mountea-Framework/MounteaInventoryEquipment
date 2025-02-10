@@ -212,7 +212,6 @@ public:
 public:
 	static FInventoryNotificationData CreateNotificationData(
 		const EInventoryNotificationType Type,
-		const EInventoryNotificationCategory Category,
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,
 		const FGuid& ItemGuid,
 		const int32 QuantityDelta

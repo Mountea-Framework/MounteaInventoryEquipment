@@ -96,7 +96,6 @@ FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& It
 
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const EInventoryNotificationType Type,
-	const EInventoryNotificationCategory Category,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,
 	const FGuid& ItemGuid,
 	const int32 QuantityDelta
@@ -105,17 +104,19 @@ FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
 	if (!Config) return FInventoryNotificationData();
 
-	const FInventoryNotificationConfig* NotifConfig = Config->NotificationConfigs.Find(Category);
+	const FInventoryNotificationConfig* NotifConfig = Config->NotificationConfigs.Find(Type);
 	if (!NotifConfig) return FInventoryNotificationData();
 
 	return FInventoryNotificationData(
 		Type,
-		Category,
+		NotifConfig->NotificationCategory,
 		NotifConfig->MessageTemplate, // TODO: Compile text together
 		ItemGuid,
 		SourceInventory,
 		FMath::Abs(QuantityDelta),
 		0,
-		NotifConfig->DefaultDuration
+		NotifConfig->DefaultDuration,
+		*NotifConfig,
+		nullptr
 	);
 }

@@ -10,93 +10,6 @@ UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig
 	ValidateInventoryTypes();
 }
 
-#if WITH_EDITOR
-void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
-{
-	// Setup base inventory types
-	ValidateInventoryTypes();
-	
-	// Setup item categories
-	FInventoryCategory WeaponCategory;
-	WeaponCategory.CategoryDisplayName = LOCTEXT("WeaponCategory", "Weapons");
-	WeaponCategory.CategoryPriority = 0;
-	WeaponCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
-	AllowedCategories.Add("Weapons", WeaponCategory);
-	
-	FInventoryCategory ArmorCategory;
-	ArmorCategory.CategoryDisplayName = LOCTEXT("ArmorCategory", "Armor");
-	ArmorCategory.CategoryPriority = 1;
-	ArmorCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
-	AllowedCategories.Add("Armors", ArmorCategory);
-	
-	FInventoryCategory ConsumableCategory;
-	ConsumableCategory.CategoryDisplayName = LOCTEXT("ConsumableCategory", "Consumables");
-	ConsumableCategory.CategoryPriority = 2;
-	ConsumableCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable | EInventoryItemFlags::EIIF_Stackable);
-	AllowedCategories.Add("Consumables", ConsumableCategory);
-	
-	FInventoryCategory MaterialCategory;
-	MaterialCategory.CategoryDisplayName = LOCTEXT("MaterialCategory", "Materials");
-	MaterialCategory.CategoryPriority = 3;
-	MaterialCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable | EInventoryItemFlags::EIIF_Stackable);
-	AllowedCategories.Add("Materials", MaterialCategory);
-
-	FInventoryCategory QuestCategory;
-	QuestCategory.CategoryDisplayName = LOCTEXT("QuestCategory", "Quest Items");
-	QuestCategory.CategoryPriority = 4;
-	QuestCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
-	AllowedCategories.Add("Quest Items", QuestCategory);
-
-	FInventoryCategory KeysCategory;
-	KeysCategory.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
-	KeysCategory.CategoryPriority = 4;
-	KeysCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
-	AllowedCategories.Add("Keys", KeysCategory);
-	
-	// Setup item rarities
-	FInventoryRarity CommonRarity;
-	CommonRarity.RarityDisplayName = LOCTEXT("CommonRarity", "Common");
-	CommonRarity.RarityColor = FLinearColor(0.5f, 0.5f, 0.5f);
-	CommonRarity.BasePriceMultiplier = 1.0f;
-	AllowedRarities.Add("Common", CommonRarity);
-	
-	FInventoryRarity UncommonRarity;
-	UncommonRarity.RarityDisplayName = LOCTEXT("UncommonRarity", "Uncommon");
-	UncommonRarity.RarityColor = FLinearColor(0.2f, 0.8f, 0.2f);
-	UncommonRarity.BasePriceMultiplier = 2.0f;
-	AllowedRarities.Add("Uncommon", UncommonRarity);
-	
-	FInventoryRarity RareRarity;
-	RareRarity.RarityDisplayName = LOCTEXT("RareRarity", "Rare");
-	RareRarity.RarityColor = FLinearColor(0.2f, 0.2f, 1.0f);
-	RareRarity.BasePriceMultiplier = 4.0f;
-	AllowedRarities.Add("Rare", RareRarity);
-	
-	FInventoryRarity EpicRarity;
-	EpicRarity.RarityDisplayName = LOCTEXT("EpicRarity", "Epic");
-	EpicRarity.RarityColor = FLinearColor(0.6f, 0.2f, 0.8f);
-	EpicRarity.BasePriceMultiplier = 8.0f;
-	AllowedRarities.Add("Epic", EpicRarity);
-	
-	FInventoryRarity LegendaryRarity;
-	LegendaryRarity.RarityDisplayName = LOCTEXT("LegendaryRarity", "Legendary");
-	LegendaryRarity.RarityColor = FLinearColor(1.0f, 0.5f, 0.0f);
-	LegendaryRarity.BasePriceMultiplier = 16.0f;
-	AllowedRarities.Add("Legendary", LegendaryRarity);
-}
-
-void UMounteaAdvancedInventorySettingsConfig::PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeChainProperty(PropertyChangedEvent);
-
-	if (PropertyChangedEvent.GetPropertyName() != GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, AllowedInventoryTypes))
-	{
-		return;
-	}
-
-	ValidateInventoryTypes();
-}
-
 void UMounteaAdvancedInventorySettingsConfig::ValidateInventoryTypes()
 {
 	TArray RequiredTypes = {
@@ -123,26 +36,26 @@ FInventoryTypeConfig UMounteaAdvancedInventorySettingsConfig::GetDefaultConfigFo
 	
 	switch(Type)
 	{
-		case EInventoryType::EIT_Player:
-			SetupPlayerConfig(Config);
-			break;
-		case EInventoryType::EIT_NPC:
-			SetupNPCConfig(Config);
-			break;
-		case EInventoryType::EIT_Storage:
-			SetupStorageConfig(Config);
-			break;
-		case EInventoryType::EIT_Merchant:
-			SetupMerchantConfig(Config);
-			break;
-		case EInventoryType::EIT_Loot:
-			SetupLootConfig(Config);
-			break;
-		case EInventoryType::EIT_Specialized:
-			SetupSpecializedConfig(Config);
-			break;
-		default:
-			break;
+	case EInventoryType::EIT_Player:
+		SetupPlayerConfig(Config);
+		break;
+	case EInventoryType::EIT_NPC:
+		SetupNPCConfig(Config);
+		break;
+	case EInventoryType::EIT_Storage:
+		SetupStorageConfig(Config);
+		break;
+	case EInventoryType::EIT_Merchant:
+		SetupMerchantConfig(Config);
+		break;
+	case EInventoryType::EIT_Loot:
+		SetupLootConfig(Config);
+		break;
+	case EInventoryType::EIT_Specialized:
+		SetupSpecializedConfig(Config);
+		break;
+	default:
+		break;
 	}
 	
 	return Config;
@@ -224,6 +137,165 @@ void UMounteaAdvancedInventorySettingsConfig::SetupSpecializedConfig(FInventoryT
 	Config.AccessFlags = static_cast<uint8>(EInventoryFlags::EIF_Private);
 	Config.SlotsRange = FIntPoint(20, 20);
 	Config.StartingSlots = 20;
+}
+
+#if WITH_EDITOR
+void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
+{
+	// Setup base inventory types
+	ValidateInventoryTypes();
+	
+	// Setup item categories
+	FInventoryCategory WeaponCategory;
+	WeaponCategory.CategoryDisplayName = LOCTEXT("WeaponCategory", "Weapons");
+	WeaponCategory.CategoryPriority = 0;
+	WeaponCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
+	AllowedCategories.Add("Weapons", WeaponCategory);
+	
+	FInventoryCategory ArmorCategory;
+	ArmorCategory.CategoryDisplayName = LOCTEXT("ArmorCategory", "Armor");
+	ArmorCategory.CategoryPriority = 1;
+	ArmorCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
+	AllowedCategories.Add("Armors", ArmorCategory);
+	
+	FInventoryCategory ConsumableCategory;
+	ConsumableCategory.CategoryDisplayName = LOCTEXT("ConsumableCategory", "Consumables");
+	ConsumableCategory.CategoryPriority = 2;
+	ConsumableCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable | EInventoryItemFlags::EIIF_Stackable);
+	AllowedCategories.Add("Consumables", ConsumableCategory);
+	
+	FInventoryCategory MaterialCategory;
+	MaterialCategory.CategoryDisplayName = LOCTEXT("MaterialCategory", "Materials");
+	MaterialCategory.CategoryPriority = 3;
+	MaterialCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable | EInventoryItemFlags::EIIF_Stackable);
+	AllowedCategories.Add("Materials", MaterialCategory);
+
+	FInventoryCategory QuestCategory;
+	QuestCategory.CategoryDisplayName = LOCTEXT("QuestCategory", "Quest Items");
+	QuestCategory.CategoryPriority = 4;
+	QuestCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+	AllowedCategories.Add("Quest Items", QuestCategory);
+
+	FInventoryCategory KeysCategory;
+	KeysCategory.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
+	KeysCategory.CategoryPriority = 4;
+	KeysCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+	AllowedCategories.Add("Keys", KeysCategory);
+	
+	// Setup item rarities
+	FInventoryRarity CommonRarity;
+	CommonRarity.RarityDisplayName = LOCTEXT("CommonRarity", "Common");
+	CommonRarity.RarityColor = FLinearColor(0.5f, 0.5f, 0.5f);
+	CommonRarity.BasePriceMultiplier = 1.0f;
+	AllowedRarities.Add("Common", CommonRarity);
+	
+	FInventoryRarity UncommonRarity;
+	UncommonRarity.RarityDisplayName = LOCTEXT("UncommonRarity", "Uncommon");
+	UncommonRarity.RarityColor = FLinearColor(0.2f, 0.8f, 0.2f);
+	UncommonRarity.BasePriceMultiplier = 2.0f;
+	AllowedRarities.Add("Uncommon", UncommonRarity);
+	
+	FInventoryRarity RareRarity;
+	RareRarity.RarityDisplayName = LOCTEXT("RareRarity", "Rare");
+	RareRarity.RarityColor = FLinearColor(0.2f, 0.2f, 1.0f);
+	RareRarity.BasePriceMultiplier = 4.0f;
+	AllowedRarities.Add("Rare", RareRarity);
+	
+	FInventoryRarity EpicRarity;
+	EpicRarity.RarityDisplayName = LOCTEXT("EpicRarity", "Epic");
+	EpicRarity.RarityColor = FLinearColor(0.6f, 0.2f, 0.8f);
+	EpicRarity.BasePriceMultiplier = 8.0f;
+	AllowedRarities.Add("Epic", EpicRarity);
+	
+	FInventoryRarity LegendaryRarity;
+	LegendaryRarity.RarityDisplayName = LOCTEXT("LegendaryRarity", "Legendary");
+	LegendaryRarity.RarityColor = FLinearColor(1.0f, 0.5f, 0.0f);
+	LegendaryRarity.BasePriceMultiplier = 16.0f;
+	AllowedRarities.Add("Legendary", LegendaryRarity);
+}
+
+void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
+{
+	// Setup notification configs
+	{
+		FInventoryNotificationConfig InventoryLimitConfig;
+		InventoryLimitConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
+		InventoryLimitConfig.MessageTemplate = LOCTEXT("InventoryLimit", "Inventory Limit Reached");
+		InventoryLimitConfig.bShowProgressBar = false;
+		InventoryLimitConfig.bCanBeClosed = true;
+		InventoryLimitConfig.bHasDuration = true;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_InventoryLimitReached, InventoryLimitConfig);
+
+		FInventoryNotificationConfig QuantityLimitConfig;
+		QuantityLimitConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
+		QuantityLimitConfig.MessageTemplate = LOCTEXT("QuantityLimit", "${ItemName} Max Quantity");
+		QuantityLimitConfig.bShowProgressBar = false;
+		QuantityLimitConfig.bCanBeClosed = true;
+		QuantityLimitConfig.bHasDuration = true;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_QuantityLimitReached, QuantityLimitConfig);
+
+		FInventoryNotificationConfig NotFoundConfig;
+		NotFoundConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Error;
+		NotFoundConfig.MessageTemplate = LOCTEXT("ItemNotFound", "${ItemName} Not Found");
+		NotFoundConfig.bShowProgressBar = true;
+		NotFoundConfig.bCanBeClosed = true;
+		NotFoundConfig.bHasDuration = true;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemNotFound, NotFoundConfig);
+
+		FInventoryNotificationConfig ItemAddedConfig;
+		ItemAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
+		ItemAddedConfig.MessageTemplate = LOCTEXT("ItemAdded", "$(quantity)x ${ItemName}");
+		ItemAddedConfig.bShowProgressBar = false;
+		ItemAddedConfig.bCanBeClosed = true;
+		ItemAddedConfig.bHasDuration = true;
+		ItemAddedConfig.DefaultDuration = 2.0f;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemAdded, ItemAddedConfig);
+
+		FInventoryNotificationConfig ItemRemovedConfig;
+		ItemRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
+		ItemRemovedConfig.MessageTemplate = LOCTEXT("ItemRemoved", "Removed ${ItemName}");
+		ItemRemovedConfig.bShowProgressBar = false;
+		ItemRemovedConfig.bCanBeClosed = true;
+		ItemRemovedConfig.bHasDuration = true;
+		ItemRemovedConfig.DefaultDuration = 2.0f;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemRemoved, ItemRemovedConfig);
+
+		FInventoryNotificationConfig PartiallyAddedConfig;
+		PartiallyAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
+		PartiallyAddedConfig.MessageTemplate = LOCTEXT("ItemPartiallyAdded", "$(quantity)x ${ItemName}");
+		PartiallyAddedConfig.bShowProgressBar = false;
+		PartiallyAddedConfig.bCanBeClosed = true;
+		PartiallyAddedConfig.bHasDuration = true;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemPartiallyAdded, PartiallyAddedConfig);
+
+		FInventoryNotificationConfig PartiallyRemovedConfig;
+		PartiallyRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
+		PartiallyRemovedConfig.MessageTemplate = LOCTEXT("ItemPartiallyRemoved", "Removed $(quantity)x ${ItemName}");
+		PartiallyRemovedConfig.bShowProgressBar = false;
+		PartiallyRemovedConfig.bCanBeClosed = true;
+		PartiallyRemovedConfig.bHasDuration = true;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemPartiallyRemoved, PartiallyRemovedConfig);
+
+		FInventoryNotificationConfig NotUpdatedConfig;
+		NotUpdatedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Error;
+		NotUpdatedConfig.MessageTemplate = LOCTEXT("ItemNotUpdated", "Operation Failed!");
+		NotUpdatedConfig.bShowProgressBar = false;
+		NotUpdatedConfig.bCanBeClosed = true;
+		NotUpdatedConfig.bHasDuration = true;
+		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemNotUpdated, NotUpdatedConfig);
+	}
+}
+
+void UMounteaAdvancedInventorySettingsConfig::PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeChainProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.GetPropertyName() != GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, AllowedInventoryTypes))
+	{
+		return;
+	}
+
+	ValidateInventoryTypes();
 }
 #endif
 
