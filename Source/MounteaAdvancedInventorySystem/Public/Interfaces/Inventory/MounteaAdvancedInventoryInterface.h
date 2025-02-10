@@ -248,6 +248,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Durability")
 	bool ModifyItemDurability(const FGuid& ItemGuid, float DeltaDurability);
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, float DeltaDurability) = 0;
+
+	// --- UI Management ------------------------------
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|User Interface")
+	UUserWidget* GetNotificationsContainer() const;
+	virtual UUserWidget* GetNotificationsContainer_Implementation() = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|User Interface")
+	bool SetNotificationsContainer(UUserWidget* Container);
+	virtual bool SetNotificationsContainer_Implementation(UUserWidget* Container) = 0;
 	
 	// --- Notification Management ------------------------------
 

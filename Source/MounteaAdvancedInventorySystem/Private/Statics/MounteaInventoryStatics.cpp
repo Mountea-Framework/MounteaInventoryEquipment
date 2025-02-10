@@ -3,7 +3,9 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
+#include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
@@ -89,6 +91,31 @@ void UMounteaInventoryStatics::ProcessInventoryNotification(const TScriptInterfa
 		Target->Execute_ProcessInventoryNotification(Target.GetObject(), Notification);
 }
 
+UUserWidget* UMounteaInventoryStatics::GetNotificationsContainer(UObject* Inventory)
+{
+	if (!IsValid(Inventory))
+		return nullptr;
+
+	if (!Inventory->Implements<UMounteaAdvancedInventoryInterface>())
+		return nullptr;
+
+	return IMounteaAdvancedInventoryInterface::Execute_GetNotificationsContainer(Inventory);
+}
+
+bool UMounteaInventoryStatics::SetNotificationsContainer(UObject* Inventory, UUserWidget* Container)
+{
+	if (!IsValid(Inventory))
+		return false;
+
+	if (!Inventory->Implements<UMounteaAdvancedInventoryInterface>())
+		return false;
+
+	if (!Container->Implements<UMounteaInventoryNotificationContainerWidgetInterface>())
+		return false;
+
+	return IMounteaAdvancedInventoryInterface::Execute_SetNotificationsContainer(Inventory, Container);
+}
+
 FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& Item)
 {
 	return Item.ToString();
@@ -110,6 +137,7 @@ FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	return FInventoryNotificationData(
 		Type,
 		NotifConfig->NotificationCategory,
+		NotifConfig->MessageTitle,
 		NotifConfig->MessageTemplate, // TODO: Compile text together
 		ItemGuid,
 		SourceInventory,

@@ -54,9 +54,6 @@ public:
 	/******************* BLUEPRINTABLE *******************/
 	/*************************************************************/
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
-	static void CreateNotification(UObject* Notification, const FInventoryNotificationData& NotificationData);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
 	static void AddNotification(UObject* Container, UUserWidget* NewNotification);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
@@ -65,4 +62,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
 	static void ClearNotifications(UObject* Container);
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	static void CreateNotification(UObject* Notification, const FInventoryNotificationData& NotificationData, const TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface>& Container);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	static void ExpireNotification(UObject* Notification);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	static void DeleteNotification(UObject* Notification);
 };

@@ -56,6 +56,8 @@ protected:
 	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability) override;
 	virtual void ClearInventory_Implementation() override;
+	virtual UUserWidget* GetNotificationsContainer_Implementation() override;
+	virtual bool SetNotificationsContainer_Implementation(UUserWidget* Container) override;
 	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) override;
 
 	// --- Class Functions ------------------------------
@@ -119,4 +121,7 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	FInventoryItemArray InventoryItems;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	TObjectPtr<UUserWidget> InventoryWidget;
 };

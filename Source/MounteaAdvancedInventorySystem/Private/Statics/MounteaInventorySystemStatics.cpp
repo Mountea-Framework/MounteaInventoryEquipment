@@ -9,3 +9,8 @@ bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* Worl
 {
 	return !UKismetSystemLibrary::IsDedicatedServer(WorldContext);
 }
+
+UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig()
+{
+	return GetMutableDefault<UMounteaAdvancedInventorySettingsConfig>();
+}

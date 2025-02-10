@@ -378,6 +378,16 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 	InventoryItems.Items.Empty();
 }
 
+UUserWidget* UMounteaInventoryComponent::GetNotificationsContainer_Implementation()
+{
+	// TODO: MOVE TO UI COMPONENT!
+}
+
+bool UMounteaInventoryComponent::SetNotificationsContainer_Implementation(UUserWidget* Container)
+{
+	// TODO: MOVE TO UI COMPONENT!
+}
+
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
 	// TODO: Create new Notification Widget

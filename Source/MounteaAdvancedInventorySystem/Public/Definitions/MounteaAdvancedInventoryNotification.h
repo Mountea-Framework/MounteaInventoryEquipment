@@ -61,6 +61,9 @@ struct FInventoryNotificationConfig
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	EInventoryNotificationCategory NotificationCategory;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	FText MessageTitle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	FText MessageTemplate;
@@ -94,6 +97,7 @@ struct FInventoryNotificationData
 	FInventoryNotificationData(
 		const EInventoryNotificationType InType,
 		const EInventoryNotificationCategory InCategory,
+		const FText& InTitle,
 		const FText& InText,
 		const FGuid& InItemGuid,
 		const TScriptInterface<IMounteaAdvancedInventoryInterface> InSourceInventory,
@@ -103,6 +107,7 @@ struct FInventoryNotificationData
 		UObject* InPayload = nullptr
 		) : Type(InType)
 			, Category(InCategory)
+			, NotificationTitle(InTitle)
 			, NotificationText(InText)
 			, Duration(InDuration)
 			, ItemGuid(InItemGuid)
@@ -118,6 +123,9 @@ struct FInventoryNotificationData
 	 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
 	EInventoryNotificationCategory Category = EInventoryNotificationCategory::EINC_Info;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+	FText NotificationTitle;
 	 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
 	FText NotificationText;

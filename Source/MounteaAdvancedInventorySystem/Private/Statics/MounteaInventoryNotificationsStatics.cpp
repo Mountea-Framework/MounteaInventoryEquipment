@@ -6,13 +6,31 @@
 #include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
 
 void UMounteaInventoryNotificationsStatics::CreateNotification(
-	UObject* Notification,	const FInventoryNotificationData& NotificationData)
+	UObject* Notification,	const FInventoryNotificationData& NotificationData, const TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface>& Container)
 {
 	if (!IsValid(Notification))
 		return;
 
 	if (Notification->Implements<UMounteaInventoryNotificationWidgetInterface>())
-		return IMounteaInventoryNotificationWidgetInterface::Execute_CreateNotification(Notification, NotificationData);
+		return IMounteaInventoryNotificationWidgetInterface::Execute_CreateNotification(Notification, NotificationData, Container);
+}
+
+void UMounteaInventoryNotificationsStatics::ExpireNotification(UObject* Notification)
+{
+	if (!IsValid(Notification))
+		return;
+
+	if (Notification->Implements<UMounteaInventoryNotificationWidgetInterface>())
+		return IMounteaInventoryNotificationWidgetInterface::Execute_ExpireNotification(Notification);
+}
+
+void UMounteaInventoryNotificationsStatics::DeleteNotification(UObject* Notification)
+{
+	if (!IsValid(Notification))
+		return;
+
+	if (Notification->Implements<UMounteaInventoryNotificationWidgetInterface>())
+		return IMounteaInventoryNotificationWidgetInterface::Execute_DeleteNotification(Notification);
 }
 
 void UMounteaInventoryNotificationsStatics::AddNotification(UObject* Container, UUserWidget* NewNotification)
