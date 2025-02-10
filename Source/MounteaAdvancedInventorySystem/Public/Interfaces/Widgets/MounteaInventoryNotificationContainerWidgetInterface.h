@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryNotificationContainerWidgetInterface.generated.h"
 
+class UUserWidget;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventoryNotificationContainerWidgetInterface : public UInterface
@@ -24,5 +26,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventoryNotificationContainerW
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Notification")
-	void AddNotification();
+	void AddNotification(UUserWidget* NewNotification);
+	virtual void AddNotification_Implementation(UUserWidget* NewNotification) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Notification")
+	void RemoveNotification(UUserWidget* Notification);
+	virtual void RemoveNotification_Implementation(UUserWidget* Notification) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Notification")
+	void ClearNotifications();
+	virtual void ClearNotifications_Implementation() = 0;
 };

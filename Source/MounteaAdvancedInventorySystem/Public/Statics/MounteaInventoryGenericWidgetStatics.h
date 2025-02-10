@@ -3,19 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interfaces/Widgets/MounteaInventoryNotificationWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
-#include "MounteaInventoryNotificationsStatics.generated.h"
-
-struct FInventoryNotificationData;
-class UUserWidget;
+#include "MounteaInventoryGenericWidgetStatics.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryNotificationsStatics : public UBlueprintFunctionLibrary
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryGenericWidgetStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
@@ -34,7 +31,7 @@ public:
 			else return;
 		}
 
-		if (Target->Implements<IMounteaInventoryNotificationWidgetInterface>())
+		if (Target->Implements<IMounteaInventoryGenericWidgetInterface>())
 		{
 			if constexpr (std::is_void_v<ReturnType>)
 			{
@@ -44,7 +41,7 @@ public:
 			return Function(Target, Forward<Args>(args)...);
 		}
 
-		LOG_ERROR(TEXT("[%s] Target does not implement 'MounteaInventoryNotificationWidgetInterface'!"), FunctionName);
+		LOG_ERROR(TEXT("[%s] Target does not implement 'MounteaInventoryGenericWidgetInterface'!"), FunctionName);
 		if constexpr (!std::is_void_v<ReturnType>)
 			return ReturnType{};
 		else return;
@@ -54,15 +51,5 @@ public:
 	/******************* BLUEPRINTABLE *******************/
 	/*************************************************************/
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
-	static void CreateNotification(UObject* Notification, const FInventoryNotificationData& NotificationData);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
-	static void AddNotification(UObject* Container, UUserWidget* NewNotification);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveNotification(UObject* Container, UUserWidget* Notification);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
-	static void ClearNotifications(UObject* Container);
-
+	static void ProcessInventoryWidgetCommand( UObject* GenericWidget, const FString& Command); 
 };

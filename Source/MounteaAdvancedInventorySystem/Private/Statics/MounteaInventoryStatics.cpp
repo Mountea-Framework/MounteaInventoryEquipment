@@ -114,7 +114,6 @@ FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 		ItemGuid,
 		SourceInventory,
 		FMath::Abs(QuantityDelta),
-		0,
 		NotifConfig->DefaultDuration,
 		*NotifConfig,
 		nullptr

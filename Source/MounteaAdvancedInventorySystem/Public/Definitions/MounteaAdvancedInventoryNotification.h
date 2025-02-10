@@ -97,8 +97,7 @@ struct FInventoryNotificationData
 		const FText& InText,
 		const FGuid& InItemGuid,
 		const TScriptInterface<IMounteaAdvancedInventoryInterface> InSourceInventory,
-		const int32 InRequestedAmount = 0,
-		const int32 InProcessedAmount = 0,
+		const int32 InDeltaAmount = 0,
 		const float InDuration = 3.0f,
 		const FInventoryNotificationConfig& SourceConfig = FInventoryNotificationConfig(),
 		UObject* InPayload = nullptr
@@ -108,8 +107,7 @@ struct FInventoryNotificationData
 			, Duration(InDuration)
 			, ItemGuid(InItemGuid)
 			, SourceInventory(InSourceInventory)
-			, RequestedAmount(InRequestedAmount)
-			, ProcessedAmount(InProcessedAmount)
+			, DeltaAmount(InDeltaAmount)
 			, NotificationPayload(InPayload)
 			, NotificationConfig(SourceConfig)
 	{
@@ -137,10 +135,7 @@ struct FInventoryNotificationData
 	TScriptInterface<IMounteaAdvancedInventoryInterface> SourceInventory;
 	 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
-	int32 RequestedAmount = 0;
-	 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
-	int32 ProcessedAmount = 0;
+	int32 DeltaAmount = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
 	TObjectPtr<UObject> NotificationPayload;

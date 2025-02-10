@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="Limits", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	float InventoryBaseWeightLimit = 150.f;
 
+	UPROPERTY(EditAnywhere, Category="Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
+	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
+	
 	UPROPERTY(EditAnywhere, Category="Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
 	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetClass;
 
@@ -51,7 +54,7 @@ public:
 	TMap<EInventoryNotificationType, FInventoryNotificationConfig> NotificationConfigs;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notifications")
-	FVector2D NotificationSizeOverride = FVector2D(400.0f, 100.0f);
+	FVector2D NotificationSizeOverride = FVector2D(400.0f, 50.0f);
 	
 protected:
 

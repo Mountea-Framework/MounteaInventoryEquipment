@@ -8,6 +8,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaInventoryStatics.h"
+#include "Statics/MounteaInventorySystemStatics.h"
 
 UMounteaInventoryComponent::UMounteaInventoryComponent() : InventoryTypeFlag(EInventoryFlags::EIF_Private)
 {
@@ -380,6 +381,12 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
 	// TODO: Create new Notification Widget
+	if (IsAuthority() && !UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	{
+		ProcessInventoryNotification_Client(Notification.ItemGuid, Notification.Type, Notification.DeltaAmount);
+		return;
+	}
+	
 	OnNotificationReceived.Broadcast(Notification);
 }
 
@@ -408,7 +415,7 @@ void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementat
 		EInventoryNotificationType::EINT_ItemNotUpdated,
 		this,
 		targetItem.GetGuid(),
-		-targetItem.GetQuantity()
+		QuantityDelta
 	));
 }
 
