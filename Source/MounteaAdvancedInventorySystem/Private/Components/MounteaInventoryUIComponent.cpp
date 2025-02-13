@@ -36,6 +36,9 @@ void UMounteaInventoryUIComponent::BeginPlay()
 		else
 		{
 			Execute_SetParentInventory(this, inventoryComponent);
+			ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
+
+			ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::UMounteaInventoryUIComponent::CreateInventoryNotification);
 		}
 	}
 }
@@ -79,6 +82,7 @@ void UMounteaInventoryUIComponent::SetNotificationContainer_Implementation(UUser
 
 void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData)
 {
+	LOG_WARNING(TEXT("Notification: %s"), *NotificationData.ToString())
 	// TODO: Create new notification in the Container
 }
 

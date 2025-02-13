@@ -8,6 +8,7 @@
 #include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Statics/MounteaInventorySystemStatics.h"
 
 AActor* UMounteaInventoryStatics::GetOwningActor(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
 {
@@ -109,11 +110,18 @@ FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const FInventoryNotificationConfig* NotifConfig = Config->NotificationConfigs.Find(Type);
 	if (!NotifConfig) return FInventoryNotificationData();
 
+	auto inventoryItem = SourceInventory->Execute_FindItem(SourceInventory.GetObject(), FInventoryItemSearchParams(ItemGuid));
+	if (!inventoryItem.IsItemValid()) return FInventoryNotificationData();
+
+	FText notificationText = NotifConfig->MessageTemplate;
+	notificationText = UMounteaInventorySystemStatics::ReplaceRegexInText(TEXT("${quantity}"), FText::FromString(FString::FromInt(FMath::Abs(QuantityDelta))), notificationText);
+	notificationText = UMounteaInventorySystemStatics::ReplaceRegexInText(TEXT("${itemName}"), inventoryItem.GetItemName(), notificationText);
+	
 	return FInventoryNotificationData(
 		Type,
 		NotifConfig->NotificationCategory,
 		NotifConfig->MessageTitle,
-		NotifConfig->MessageTemplate, // TODO: Compile text together
+		notificationText,
 		ItemGuid,
 		SourceInventory,
 		FMath::Abs(QuantityDelta),

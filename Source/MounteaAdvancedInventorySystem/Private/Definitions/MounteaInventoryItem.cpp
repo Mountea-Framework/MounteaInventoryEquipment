@@ -82,6 +82,11 @@ FString FInventoryItem::ToString() const
 	return Builder.ToString();
 }
 
+FText FInventoryItem::GetItemName() const
+{
+	return IsValid(Template) ? Template->DisplayName : NSLOCTEXT("InventoryItem", "InvalidName", "Invalid");
+}
+
 bool FInventoryItem::SetTemplate(UMounteaInventoryItemTemplate* InTemplate)
 {
 	if (InTemplate != Template && IsValid(InTemplate))

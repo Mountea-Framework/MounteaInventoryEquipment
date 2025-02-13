@@ -165,4 +165,7 @@ struct FInventoryNotificationData
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Notification")
 	FInventoryNotificationConfig NotificationConfig;
+
+public:
+	FString ToString() const;
 };

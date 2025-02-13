@@ -408,15 +408,18 @@ bool UMounteaInventoryComponent::IsAuthority() const
 
 void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementation(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta)
 {
-	// TODO: Wait for next Tick GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UMounteaInventoryComponent::ProcessNotification, notificationData);
-	auto targetItem = Execute_FindItem(this, FInventoryItemSearchParams(TargetItem));
-
-	OnNotificationProcessed.Broadcast(UMounteaInventoryStatics::CreateNotificationData(
-		MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
-		this,
-		targetItem.GetGuid(),
-		QuantityDelta
-	));
+	// Wait for the next tick before executing the broadcast to avoid timing issues with replication (item might not exist yet)
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this, NotifType, TargetItem, QuantityDelta]()
+	{
+		auto targetItem = Execute_FindItem(this, FInventoryItemSearchParams(TargetItem));
+		
+		OnNotificationProcessed.Broadcast(UMounteaInventoryStatics::CreateNotificationData(
+			NotifType,
+			this,
+			targetItem.GetGuid(),
+			QuantityDelta
+		));
+	});
 }
 
 void UMounteaInventoryComponent::AddItem_Server_Implementation(const FInventoryItem& Item)

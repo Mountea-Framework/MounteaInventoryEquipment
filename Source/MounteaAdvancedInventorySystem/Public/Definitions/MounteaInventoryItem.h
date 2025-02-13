@@ -50,6 +50,11 @@ public:
 /*************************************************************/
 	
 public:
+	/**
+	 * 
+	 * @return Returns Item name from Template. 'Invalid' if not valid!
+	 */
+	FText GetItemName() const;
 	
 	/**
 	 * @return The unique identifier of this item instance
