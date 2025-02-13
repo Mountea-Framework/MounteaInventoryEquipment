@@ -239,7 +239,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig QuantityLimitConfig;
 		QuantityLimitConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
-		QuantityLimitConfig.MessageTemplate = LOCTEXT("QuantityLimit", "${ItemName} Max Quantity");
+		QuantityLimitConfig.MessageTemplate = LOCTEXT("QuantityLimit", "${itemName} Max Quantity");
 		QuantityLimitConfig.bShowProgressBar = false;
 		QuantityLimitConfig.bCanBeClosed = true;
 		QuantityLimitConfig.bHasDuration = true;
@@ -247,7 +247,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig NotFoundConfig;
 		NotFoundConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Error;
-		NotFoundConfig.MessageTemplate = LOCTEXT("ItemNotFound", "${ItemName} Not Found");
+		NotFoundConfig.MessageTemplate = LOCTEXT("ItemNotFound", "${itemName} Not Found");
 		NotFoundConfig.bShowProgressBar = true;
 		NotFoundConfig.bCanBeClosed = true;
 		NotFoundConfig.bHasDuration = true;
@@ -255,7 +255,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig ItemAddedConfig;
 		ItemAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
-		ItemAddedConfig.MessageTemplate = LOCTEXT("ItemAdded", "$(quantity)x ${ItemName}");
+		ItemAddedConfig.MessageTemplate = LOCTEXT("ItemAdded", "$(quantity)x ${itemName}");
 		ItemAddedConfig.bShowProgressBar = false;
 		ItemAddedConfig.bCanBeClosed = true;
 		ItemAddedConfig.bHasDuration = true;
@@ -264,7 +264,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig ItemRemovedConfig;
 		ItemRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
-		ItemRemovedConfig.MessageTemplate = LOCTEXT("ItemRemoved", "Removed ${ItemName}");
+		ItemRemovedConfig.MessageTemplate = LOCTEXT("ItemRemoved", "Removed ${itemName}");
 		ItemRemovedConfig.bShowProgressBar = false;
 		ItemRemovedConfig.bCanBeClosed = true;
 		ItemRemovedConfig.bHasDuration = true;
@@ -273,7 +273,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig PartiallyAddedConfig;
 		PartiallyAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
-		PartiallyAddedConfig.MessageTemplate = LOCTEXT("ItemPartiallyAdded", "$(quantity)x ${ItemName}");
+		PartiallyAddedConfig.MessageTemplate = LOCTEXT("ItemPartiallyAdded", "$(quantity)x ${itemName}");
 		PartiallyAddedConfig.bShowProgressBar = false;
 		PartiallyAddedConfig.bCanBeClosed = true;
 		PartiallyAddedConfig.bHasDuration = true;
@@ -281,7 +281,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig PartiallyRemovedConfig;
 		PartiallyRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
-		PartiallyRemovedConfig.MessageTemplate = LOCTEXT("ItemPartiallyRemoved", "Removed $(quantity)x ${ItemName}");
+		PartiallyRemovedConfig.MessageTemplate = LOCTEXT("ItemPartiallyRemoved", "Removed $(quantity)x ${itemName}");
 		PartiallyRemovedConfig.bShowProgressBar = false;
 		PartiallyRemovedConfig.bCanBeClosed = true;
 		PartiallyRemovedConfig.bHasDuration = true;

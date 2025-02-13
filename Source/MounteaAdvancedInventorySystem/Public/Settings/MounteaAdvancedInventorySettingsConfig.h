@@ -29,34 +29,44 @@ public:
 
 public:
 
+	// --- Types ------------------------------
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Types", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	TMap<EInventoryType, FInventoryTypeConfig> AllowedInventoryTypes;
 
+	// --- Rarities ------------------------------
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rarities", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	TMap<FString, FInventoryRarity> AllowedRarities;
 
+	// --- Categories ------------------------------
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Categories", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	TMap<FString, FInventoryCategory> AllowedCategories;
 
+	// --- Limits ------------------------------
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Limits", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	float InventoryBaseWeightLimit = 150.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
+	// --- Notifications ------------------------------
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|UserInterface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
 	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|UserInterface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
 	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications", meta=(ShowOnlyInnerProperties, ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Style", meta=(ShowOnlyInnerProperties, ForceInlineRow))
 	TMap<EInventoryNotificationCategory, FInventoryNotificationStyle> NotificationCategoryStyle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rarities", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	TSet<FString> NotificationTypes;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications", meta=(ShowOnlyInnerProperties, ForceInlineRow), meta=(GetKeyOptions="GetNotificationTypes"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config", meta=(ShowOnlyInnerProperties, ForceInlineRow), meta=(GetKeyOptions="GetNotificationTypes"))
 	TMap<FString, FInventoryNotificationConfig> NotificationConfigs;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|UserInterface")
 	FVector2D NotificationSizeOverride = FVector2D(400.0f, 50.0f);
 	
 protected:
