@@ -26,23 +26,41 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				"CoreUObject", 
 				"Engine", 
 				"UnrealEd",
-				
-				"DeveloperSettings",
-				"Projects",
-				
-				"Slate",
-				"SlateCore",
-				
-				"BlueprintGraph",
+				"AssetTools",
 			}
 		);
 
 		PrivateDependencyModuleNames.AddRange(
 			new string[] 
 			{
-				"MounteaAdvancedInventorySystem"
+				"MounteaAdvancedInventorySystem",
+
+				"UnrealEd",
+				"DeveloperSettings",
+				"Projects",
+
+				"Slate",
+				"SlateCore",
+				"EditorStyle",
+
+				"BlueprintGraph",
+				"ToolMenus",
+				"AssetTools",
+				"GraphEditor",
+				"PropertyEditor",
+				"Kismet",
+				"KismetWidgets",
+				"ApplicationCore",
+				"MainFrame",
+
+				"InputCore",
+				"GameplayTags",
+				"UMGEditor",
+				"Blutility",
+				"DesktopPlatform"
 			}
 		);
+
 
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[] 

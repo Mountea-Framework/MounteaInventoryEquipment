@@ -16,6 +16,20 @@ public:
 
 private:
 
+	void LauncherButtonClicked() const;
+	void DialoguerButtonClicked() const;
+	void YoutubeButtonClicked() const;
+	void WikiButtonClicked() const;
+	void PluginButtonClicked() const;
+	void RegisterMenus();
+	void SettingsButtonClicked() const;
+	void EditorSettingsButtonClicked() const;
+	TSharedRef<SWidget> MakeMounteaMenuWidget() const;
+
+private:
+
 	TSharedPtr<FSlateStyleSet> AdvancedInventorySet;
 	TArray<TSharedPtr<class FAssetTypeActions_Base>> AssetActions;
+
+	TSharedPtr<class FUICommandList> PluginCommands;
 };

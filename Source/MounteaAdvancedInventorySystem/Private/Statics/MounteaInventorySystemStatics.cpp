@@ -17,25 +17,30 @@ UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMoun
 
 FText UMounteaInventorySystemStatics::ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText)
 {
-	FString	sourceString = SourceText.ToString();
-	FRegexPattern	regexPattern(Regex);
-	FRegexMatcher	regexMatcher(regexPattern, sourceString);
+	FString SourceString = SourceText.ToString();
+	FRegexPattern RegexPattern(Regex);
+	FRegexMatcher RegexMatcher(RegexPattern, SourceString);
 
-	FString	formattedString;
-
-	int32	previousPosition = 0;
-	FString	replacementText = Replacement.ToString();
-
-	while (regexMatcher.FindNext())
+	if (!RegexMatcher.FindNext()) 
 	{
-		formattedString += sourceString.Mid(previousPosition, regexMatcher.GetMatchBeginning() - previousPosition);
-		formattedString += replacementText;
-		previousPosition = regexMatcher.GetMatchEnding();
+		return SourceText;
 	}
-	
-	formattedString += sourceString.Mid(previousPosition);
-	
-	return FText::FromString(formattedString);
+
+	FString FormattedString;
+	int32 PreviousPosition = 0;
+	FString ReplacementText = Replacement.ToString();
+
+	do
+	{
+		FormattedString += SourceString.Mid(PreviousPosition, RegexMatcher.GetMatchBeginning() - PreviousPosition);
+		FormattedString += ReplacementText;
+		PreviousPosition = RegexMatcher.GetMatchEnding();
+	} 
+	while (RegexMatcher.FindNext());
+
+	FormattedString += SourceString.Mid(PreviousPosition);
+
+	return FText::FromString(FormattedString);
 }
 
 FString UMounteaInventorySystemStatics::ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText)

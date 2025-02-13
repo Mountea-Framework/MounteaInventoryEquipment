@@ -255,7 +255,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig ItemAddedConfig;
 		ItemAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
-		ItemAddedConfig.MessageTemplate = LOCTEXT("ItemAdded", "$(quantity)x ${itemName}");
+		ItemAddedConfig.MessageTemplate = LOCTEXT("ItemAdded", "${quantity}x ${itemName}");
 		ItemAddedConfig.bShowProgressBar = false;
 		ItemAddedConfig.bCanBeClosed = true;
 		ItemAddedConfig.bHasDuration = true;
@@ -264,7 +264,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig ItemRemovedConfig;
 		ItemRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
-		ItemRemovedConfig.MessageTemplate = LOCTEXT("ItemRemoved", "Removed ${itemName}");
+		ItemRemovedConfig.MessageTemplate = LOCTEXT("ItemRemoved", "-${quantity}x ${itemName}");
 		ItemRemovedConfig.bShowProgressBar = false;
 		ItemRemovedConfig.bCanBeClosed = true;
 		ItemRemovedConfig.bHasDuration = true;
@@ -273,7 +273,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig PartiallyAddedConfig;
 		PartiallyAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
-		PartiallyAddedConfig.MessageTemplate = LOCTEXT("ItemPartiallyAdded", "$(quantity)x ${itemName}");
+		PartiallyAddedConfig.MessageTemplate = LOCTEXT("ItemPartiallyAdded", "${quantity}x ${itemName}");
 		PartiallyAddedConfig.bShowProgressBar = false;
 		PartiallyAddedConfig.bCanBeClosed = true;
 		PartiallyAddedConfig.bHasDuration = true;
@@ -281,7 +281,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 
 		FInventoryNotificationConfig PartiallyRemovedConfig;
 		PartiallyRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
-		PartiallyRemovedConfig.MessageTemplate = LOCTEXT("ItemPartiallyRemoved", "Removed $(quantity)x ${itemName}");
+		PartiallyRemovedConfig.MessageTemplate = LOCTEXT("ItemPartiallyRemoved", "-${quantity}x ${itemName}");
 		PartiallyRemovedConfig.bShowProgressBar = false;
 		PartiallyRemovedConfig.bCanBeClosed = true;
 		PartiallyRemovedConfig.bHasDuration = true;
