@@ -11,20 +11,35 @@ class IMounteaAdvancedInventoryInterface;
 /**
 * Types of inventory notifications.
 */
-UENUM(BlueprintType)
-enum class EInventoryNotificationType : uint8
+namespace MounteaInventoryNotificationBaseTypes
 {
-	EINT_ItemNotFound UMETA(DisplayName = "Item Not Found", Tooltip = "Item was not found in Inventory"),
-	EINT_ItemAdded UMETA(DisplayName = "Item Added", Tooltip = "Item was successfully added to inventory"),
-	EINT_ItemRemoved UMETA(DisplayName = "Item Removed", Tooltip = "Item was successfully removed from inventory"), 
-	EINT_ItemPartiallyAdded UMETA(DisplayName = "Item Partially Added", Tooltip = "Only part of stack could be added"),
-	EINT_ItemPartiallyRemoved UMETA(DisplayName = "Item Partially Removed", Tooltip = "Only part of stack could be removed"),
-	EINT_ItemNotUpdated UMETA(DisplayName = "Item Not Updated", Tooltip = "Operation failed completely"),
-	EINT_QuantityLimitReached UMETA(DisplayName = "Quantity Limit Reached", Tooltip = "Maximum quantity reached for item type"),
-	EINT_InventoryLimitReached UMETA(DisplayName = "Inventory Limit Reached", Tooltip = "Inventory cannot hold more items"),
+	const FString ItemNotFound(TEXT("Item Not Found"));
+	const FString ItemAdded(TEXT("Item Added"));
+	const FString ItemRemoved(TEXT("Item Removed"));
+	const FString ItemPartiallyAdded(TEXT("Item Partially Added"));
+	const FString ItemPartiallyRemoved(TEXT("Item Partially Removed"));
+	const FString ItemNotUpdated(TEXT("Item Not Updated"));
+	const FString QuantityLimitReached(TEXT("Quantity Limit Reached"));
+	const FString InventoryLimitReached(TEXT("Inventory Limit Reached"));
 
-	Default UMETA(Hidden)
- };
+	inline const TMap<FString, FString> NotificationMap = {
+		{ TEXT("ItemNotFound"), ItemNotFound },
+		{ TEXT("ItemAdded"), ItemAdded },
+		{ TEXT("ItemRemoved"), ItemRemoved },
+		{ TEXT("ItemPartiallyAdded"), ItemPartiallyAdded },
+		{ TEXT("ItemPartiallyRemoved"), ItemPartiallyRemoved },
+		{ TEXT("ItemNotUpdated"), ItemNotUpdated },
+		{ TEXT("QuantityLimitReached"), QuantityLimitReached },
+		{ TEXT("InventoryLimitReached"), InventoryLimitReached }
+	};
+
+	inline TArray<FString> GetAllNotificationTypes()
+	{
+		TArray<FString> Keys;
+		NotificationMap.GenerateValueArray(Keys);
+		return Keys;
+	}
+}
 
 /**
 * Categories of inventory notifications.
@@ -95,7 +110,7 @@ struct FInventoryNotificationData
 	FInventoryNotificationData() = default;
 	
 	FInventoryNotificationData(
-		const EInventoryNotificationType InType,
+		const FString InType,
 		const EInventoryNotificationCategory InCategory,
 		const FText& InTitle,
 		const FText& InText,
@@ -119,7 +134,7 @@ struct FInventoryNotificationData
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
-	EInventoryNotificationType Type = EInventoryNotificationType::Default;
+	FString Type = TEXT("");
 	 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
 	EInventoryNotificationCategory Category = EInventoryNotificationCategory::EINC_Info;

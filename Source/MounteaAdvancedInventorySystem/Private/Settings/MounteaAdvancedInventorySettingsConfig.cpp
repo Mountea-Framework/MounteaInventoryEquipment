@@ -139,6 +139,17 @@ void UMounteaAdvancedInventorySettingsConfig::SetupSpecializedConfig(FInventoryT
 	Config.StartingSlots = 20;
 }
 
+TArray<FString> UMounteaAdvancedInventorySettingsConfig::GetNotificationTypes() const
+{
+	TArray<FString> returnValue;
+	returnValue.Append(NotificationTypes.Array());
+
+	// Dynamically get all notification types
+	returnValue.Append(MounteaInventoryNotificationBaseTypes::GetAllNotificationTypes());
+
+	return returnValue;
+}
+
 #if WITH_EDITOR
 void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
 {
@@ -224,7 +235,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		InventoryLimitConfig.bShowProgressBar = false;
 		InventoryLimitConfig.bCanBeClosed = true;
 		InventoryLimitConfig.bHasDuration = true;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_InventoryLimitReached, InventoryLimitConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::InventoryLimitReached, InventoryLimitConfig);
 
 		FInventoryNotificationConfig QuantityLimitConfig;
 		QuantityLimitConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
@@ -232,7 +243,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		QuantityLimitConfig.bShowProgressBar = false;
 		QuantityLimitConfig.bCanBeClosed = true;
 		QuantityLimitConfig.bHasDuration = true;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_QuantityLimitReached, QuantityLimitConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::QuantityLimitReached, QuantityLimitConfig);
 
 		FInventoryNotificationConfig NotFoundConfig;
 		NotFoundConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Error;
@@ -240,7 +251,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		NotFoundConfig.bShowProgressBar = true;
 		NotFoundConfig.bCanBeClosed = true;
 		NotFoundConfig.bHasDuration = true;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemNotFound, NotFoundConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::ItemNotFound, NotFoundConfig);
 
 		FInventoryNotificationConfig ItemAddedConfig;
 		ItemAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
@@ -249,7 +260,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		ItemAddedConfig.bCanBeClosed = true;
 		ItemAddedConfig.bHasDuration = true;
 		ItemAddedConfig.DefaultDuration = 2.0f;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemAdded, ItemAddedConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::ItemAdded, ItemAddedConfig);
 
 		FInventoryNotificationConfig ItemRemovedConfig;
 		ItemRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
@@ -258,7 +269,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		ItemRemovedConfig.bCanBeClosed = true;
 		ItemRemovedConfig.bHasDuration = true;
 		ItemRemovedConfig.DefaultDuration = 2.0f;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemRemoved, ItemRemovedConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::ItemRemoved, ItemRemovedConfig);
 
 		FInventoryNotificationConfig PartiallyAddedConfig;
 		PartiallyAddedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Warning;
@@ -266,7 +277,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		PartiallyAddedConfig.bShowProgressBar = false;
 		PartiallyAddedConfig.bCanBeClosed = true;
 		PartiallyAddedConfig.bHasDuration = true;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemPartiallyAdded, PartiallyAddedConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded, PartiallyAddedConfig);
 
 		FInventoryNotificationConfig PartiallyRemovedConfig;
 		PartiallyRemovedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Info;
@@ -274,7 +285,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		PartiallyRemovedConfig.bShowProgressBar = false;
 		PartiallyRemovedConfig.bCanBeClosed = true;
 		PartiallyRemovedConfig.bHasDuration = true;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemPartiallyRemoved, PartiallyRemovedConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::ItemPartiallyRemoved, PartiallyRemovedConfig);
 
 		FInventoryNotificationConfig NotUpdatedConfig;
 		NotUpdatedConfig.NotificationCategory = EInventoryNotificationCategory::EINC_Error;
@@ -282,7 +293,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 		NotUpdatedConfig.bShowProgressBar = false;
 		NotUpdatedConfig.bCanBeClosed = true;
 		NotUpdatedConfig.bHasDuration = true;
-		NotificationConfigs.Add(EInventoryNotificationType::EINT_ItemNotUpdated, NotUpdatedConfig);
+		NotificationConfigs.Add(MounteaInventoryNotificationBaseTypes::ItemNotUpdated, NotUpdatedConfig);
 	}
 }
 

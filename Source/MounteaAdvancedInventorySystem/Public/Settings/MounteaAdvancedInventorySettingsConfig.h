@@ -49,9 +49,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications", meta=(ShowOnlyInnerProperties, ForceInlineRow))
 	TMap<EInventoryNotificationCategory, FInventoryNotificationStyle> NotificationCategoryStyle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rarities", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	TSet<FString> NotificationTypes;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications", meta=(ShowOnlyInnerProperties, ForceInlineRow))
-	TMap<EInventoryNotificationType, FInventoryNotificationConfig> NotificationConfigs;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications", meta=(ShowOnlyInnerProperties, ForceInlineRow), meta=(GetKeyOptions="GetNotificationTypes"))
+	TMap<FString, FInventoryNotificationConfig> NotificationConfigs;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications")
 	FVector2D NotificationSizeOverride = FVector2D(400.0f, 50.0f);
@@ -67,6 +70,9 @@ protected:
 	static void SetupMerchantConfig(FInventoryTypeConfig& Config);
 	static void SetupLootConfig(FInventoryTypeConfig& Config);
 	static void SetupSpecializedConfig(FInventoryTypeConfig& Config);
+
+	UFUNCTION()
+	TArray<FString> GetNotificationTypes() const;
 
 #if WITH_EDITOR
 public:

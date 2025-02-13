@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryInterface.generated.h"
@@ -77,13 +78,11 @@ struct FInventoryItemSearchParams
 	bool bRequireAllTags = false;
 };
 
-struct FInventoryNotificationData;
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, const FInventoryItem&, AddedItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemRemoved, const FInventoryItem&, RemovedItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemQuantityChanged, const FInventoryItem&, Item, int32, OldQuantity, int32, NewQuantity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemDurabilityChanged, const FInventoryItem&, Item, float, OldDurability, float, NewDurability);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationProcessed, const FInventoryNotificationData&, NotificationData);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -249,14 +248,6 @@ public:
 	bool ModifyItemDurability(const FGuid& ItemGuid, float DeltaDurability);
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, float DeltaDurability) = 0;
 
-	// --- UI Management ------------------------------
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|User Interface")
-	UUserWidget* GetNotificationsContainer() const;
-	virtual UUserWidget* GetNotificationsContainer_Implementation() = 0;
-	
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|User Interface")
-	bool SetNotificationsContainer(UUserWidget* Container);
-	virtual bool SetNotificationsContainer_Implementation(UUserWidget* Container) = 0;
 	
 	// --- Notification Management ------------------------------
 

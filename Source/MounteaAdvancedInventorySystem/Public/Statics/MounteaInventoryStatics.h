@@ -197,12 +197,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void ProcessInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryNotificationData& Notification);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetNotificationsContainer(UObject* Inventory);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"))
-	static bool SetNotificationsContainer(UObject* Inventory, UUserWidget* Container);
 	
 	/**
 	 * Translates Inventory Item to string.
@@ -217,7 +211,7 @@ public:
 	/*************************************************************/
 public:
 	static FInventoryNotificationData CreateNotificationData(
-		const EInventoryNotificationType Type,
+		const FString& Type,
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,
 		const FGuid& ItemGuid,
 		const int32 QuantityDelta

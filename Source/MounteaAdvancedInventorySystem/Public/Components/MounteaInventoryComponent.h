@@ -9,8 +9,6 @@
 #include "MounteaInventoryComponent.generated.h"
 
 enum class EInventoryNotificationType : uint8;
-// TODO: REMOVE
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationReceived, const FInventoryNotificationData&, NotificationData);
 
 enum class EInventoryFlags : uint8;
 enum class EInventoryType : uint8;
@@ -56,8 +54,6 @@ protected:
 	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability) override;
 	virtual void ClearInventory_Implementation() override;
-	virtual UUserWidget* GetNotificationsContainer_Implementation() override;
-	virtual bool SetNotificationsContainer_Implementation(UUserWidget* Container) override;
 	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) override;
 
 	// --- Class Functions ------------------------------
@@ -70,7 +66,7 @@ protected:
 	void RemoveItem_Server(const FGuid& ItemGuid);
 
 	UFUNCTION(Client, Unreliable)
-	void ProcessInventoryNotification_Client(const FGuid& TargetItem, const EInventoryNotificationType NotifType, const int32 QuantityDelta);
+	void ProcessInventoryNotification_Client(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta);
 	UFUNCTION(Client, Unreliable)
 	void PostItemAdded_Client(const FInventoryItem& Item);
 	UFUNCTION(Client, Unreliable)
@@ -107,9 +103,11 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnItemDurabilityChanged OnItemDurabilityChanged;
 
-	// TEMPORARY FOR TESTING ONLY
+	/**
+	* Called when inventory Notification is processed
+	*/
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
-	FOnNotificationReceived OnNotificationReceived;
+	FOnNotificationProcessed OnNotificationProcessed;
 
 private:
 

@@ -52,7 +52,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 	if (!Execute_CanAddItem(this, Item))
 	{
 		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-			EInventoryNotificationType::EINT_ItemNotUpdated,
+			MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 			this,
 			Item.GetGuid(),
 			-Item.GetQuantity()
@@ -80,7 +80,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			if (!Execute_DecreaseItemQuantity(Item.GetOwningInventory().GetObject(), Item.GetGuid(), AmountToAdd))
 			{
 				Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-					EInventoryNotificationType::EINT_ItemNotUpdated,
+					MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 					this,
 					Item.GetGuid(),
 					-AmountToAdd
@@ -92,8 +92,8 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		if (Execute_IncreaseItemQuantity(this, existingItem.GetGuid(), AmountToAdd))
 		{
 			const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
-				EInventoryNotificationType::EINT_ItemPartiallyAdded : 
-				EInventoryNotificationType::EINT_ItemAdded;
+				MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
+				MounteaInventoryNotificationBaseTypes::ItemAdded;
 
 			Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 				NotifType,
@@ -117,7 +117,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			if (!Execute_DecreaseItemQuantity(Item.GetOwningInventory().GetObject(), Item.GetGuid(), AmountToAdd))
 			{
 				Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-					EInventoryNotificationType::EINT_ItemNotUpdated,
+					MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 					this,
 					Item.GetGuid(),
 					-AmountToAdd
@@ -135,8 +135,8 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		InventoryItems.MarkArrayDirty();
 
 		const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
-			EInventoryNotificationType::EINT_ItemPartiallyAdded : 
-			EInventoryNotificationType::EINT_ItemAdded;
+			MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
+			MounteaInventoryNotificationBaseTypes::ItemAdded;
 
 		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
 			NotifType,
@@ -159,7 +159,7 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 	{
 		//Invalid item template
 		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-			EInventoryNotificationType::EINT_ItemNotUpdated,
+			MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 			this,
 			FGuid(),
 			0
@@ -197,7 +197,7 @@ bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaI
 
 	// Cannot find item matching template with sufficient quantity
 	Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-			EInventoryNotificationType::EINT_ItemNotUpdated,
+			MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 			this,
 			FGuid(),
 			0
@@ -378,26 +378,15 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 	InventoryItems.Items.Empty();
 }
 
-UUserWidget* UMounteaInventoryComponent::GetNotificationsContainer_Implementation()
-{
-	// TODO: MOVE TO UI COMPONENT!
-}
-
-bool UMounteaInventoryComponent::SetNotificationsContainer_Implementation(UUserWidget* Container)
-{
-	// TODO: MOVE TO UI COMPONENT!
-}
-
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
-	// TODO: Create new Notification Widget
 	if (IsAuthority() && !UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
 		ProcessInventoryNotification_Client(Notification.ItemGuid, Notification.Type, Notification.DeltaAmount);
 		return;
 	}
 	
-	OnNotificationReceived.Broadcast(Notification);
+	OnNotificationProcessed.Broadcast(Notification);
 }
 
 bool UMounteaInventoryComponent::IsAuthority() const
@@ -417,12 +406,13 @@ bool UMounteaInventoryComponent::IsAuthority() const
 	return false;
 }
 
-void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementation(const FGuid& TargetItem, const EInventoryNotificationType NotifType, const int32 QuantityDelta)
+void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementation(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta)
 {
+	// TODO: Wait for next Tick GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UMounteaInventoryComponent::ProcessNotification, notificationData);
 	auto targetItem = Execute_FindItem(this, FInventoryItemSearchParams(TargetItem));
 
-	OnNotificationReceived.Broadcast(UMounteaInventoryStatics::CreateNotificationData(
-		EInventoryNotificationType::EINT_ItemNotUpdated,
+	OnNotificationProcessed.Broadcast(UMounteaInventoryStatics::CreateNotificationData(
+		MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 		this,
 		targetItem.GetGuid(),
 		QuantityDelta
