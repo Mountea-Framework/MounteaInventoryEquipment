@@ -258,4 +258,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Notifications")
 	void ProcessInventoryNotification(const FInventoryNotificationData& Notification);
 	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) = 0;
+
+	// --- Events  ------------------------------
+	virtual FOnItemAdded& GetOnItemAddedEventHandle() = 0;
+	virtual FOnItemRemoved& GetOnItemRemovedEventHandle() = 0;
+	virtual FOnItemQuantityChanged& GetOnItemQuantityChangedEventHandle() = 0;
+	virtual FOnItemDurabilityChanged& GetOnItemDurabilityChangedEventHandle() = 0;
+	virtual FOnNotificationProcessed& GetOnNotificationProcessedEventHandle() = 0;
 };

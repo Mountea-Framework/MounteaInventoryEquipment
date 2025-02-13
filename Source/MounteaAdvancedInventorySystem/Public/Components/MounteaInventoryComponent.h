@@ -75,8 +75,20 @@ protected:
 	void PostItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
 	UFUNCTION(Client, Unreliable)
 	void PostItemDurabilityChanged(const FInventoryItem& Item, const int32 OldDurability, const int32 NewDurability);
-	
+
 	// --- Events ------------------------------
+protected:
+	virtual FOnItemAdded& GetOnItemAddedEventHandle() override
+	{ return OnItemAdded; };
+	virtual FOnItemRemoved& GetOnItemRemovedEventHandle() override
+	{ return OnItemRemoved; };
+	virtual FOnItemQuantityChanged& GetOnItemQuantityChangedEventHandle() override
+	{ return OnItemQuantityChanged; };
+	virtual FOnItemDurabilityChanged& GetOnItemDurabilityChangedEventHandle() override
+	{ return OnItemDurabilityChanged; };
+	virtual FOnNotificationProcessed& GetOnNotificationProcessedEventHandle() override
+	{ return OnNotificationProcessed; };
+
 protected:
 	
 	/**
