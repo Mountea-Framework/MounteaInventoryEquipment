@@ -11,6 +11,35 @@ class IMounteaAdvancedInventoryInterface;
 class UMounteaInventoryItemTemplate;
 
 /**
+ * Snapshot of replication-relevant item data.
+ * Used to track changes between replication states.
+ */
+USTRUCT()
+struct FInventoryItemSnapshot
+{
+	GENERATED_BODY()
+
+	FInventoryItemSnapshot() = default;
+    
+	explicit FInventoryItemSnapshot(const struct FInventoryItem& Item);
+
+	bool HasQuantityChanged(const FInventoryItem& Current) const;
+
+	int32 GetQuantityDelta(const FInventoryItem& Current) const;
+
+	bool HasDurabilityChanged(const FInventoryItem& Current) const;
+
+	float GetDurabilityDelta(const FInventoryItem& Current) const;
+
+	bool HasCustomDataChanged(const FInventoryItem& Current) const;
+
+private:
+	int32 Quantity = INDEX_NONE;
+	float Durability = -1.f;
+	FGameplayTagContainer CustomData;
+};
+
+/**
 * Represents a single instance of an inventory item.
 * Contains all runtime data for the item including its template, quantity, durability and custom data.
 */
@@ -232,6 +261,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
 	TScriptInterface<IMounteaAdvancedInventoryInterface> OwningInventory;
 
+private:
+	/** Snapshot of the item state before replication changes */
+	UPROPERTY(NotReplicated, Transient)
+	mutable FInventoryItemSnapshot PreReplicationSnapshot;
+    
+	/** Takes a snapshot of current state before replication */
+	void CapturePreReplicationSnapshot() const
+	{
+		PreReplicationSnapshot = FInventoryItemSnapshot(*this);
+	}
+
 
 /*************************************************************/
 /******************* SERIALIZATION**********************/
@@ -239,49 +279,11 @@ public:
 
 public:
 
-	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
-	{
-		Ar << Guid;
-		Ar << Template;
-		Ar << Quantity;
-		Ar << Durability;
-		CustomData.NetSerialize(Ar, Map, bOutSuccess);
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-		if (Ar.IsLoading())
-			AffectorSlots.Empty();
-		
-		int32 NumPairs = AffectorSlots.Num();
-		Ar << NumPairs;
-
-		if (Ar.IsLoading())
-		{
-			for (int32 i = 0; i < NumPairs; ++i)
-			{
-				FGameplayTag Key;
-				FGuid Value;
-				Ar << Key;
-				Ar << Value;
-				AffectorSlots.Add(Key, Value);
-			}
-		}
-		else
-		{
-			for (const auto& Pair : AffectorSlots)
-			{
-				FGameplayTag Key = Pair.Key;
-				FGuid Value = Pair.Value;
-				Ar << Key;
-				Ar << Value;
-			}
-		}
-    
-		bOutSuccess = true;
-		return true;
-	}
-
-	void PreReplicatedRemove(const struct FInventoryItemArray& InArraySerializer) {};
-	void PostReplicatedAdd(const struct FInventoryItemArray& InArraySerializer) {};
-	void PostReplicatedChange(const struct FInventoryItemArray& InArraySerializer) {};
+	void PreReplicatedRemove(const struct FInventoryItemArray& InArraySerializer);
+	void PostReplicatedAdd(const struct FInventoryItemArray& InArraySerializer);
+	void PostReplicatedChange(const struct FInventoryItemArray& InArraySerializer);
 	//void PostReplicatedReceive(const FInventoryItemArray::FPostReplicatedReceiveParameters& Parameters) {};
 };
 

@@ -21,6 +21,10 @@ namespace MounteaInventoryNotificationBaseTypes
 	const FString ItemNotUpdated(TEXT("Item Not Updated"));
 	const FString QuantityLimitReached(TEXT("Quantity Limit Reached"));
 	const FString InventoryLimitReached(TEXT("Inventory Limit Reached"));
+	const FString DurabilityIncreased(TEXT("Item Durability Increased"));
+	const FString DurabilityDecreased(TEXT("Item Durability Decreased"));
+	const FString DurabilityMax(TEXT("Item Durability Max"));
+	const FString DurabilityZero(TEXT("Item Durability Zero"));
 
 	inline const TMap<FString, FString> NotificationMap = {
 		{ TEXT("ItemNotFound"), ItemNotFound },
@@ -30,7 +34,11 @@ namespace MounteaInventoryNotificationBaseTypes
 		{ TEXT("ItemPartiallyRemoved"), ItemPartiallyRemoved },
 		{ TEXT("ItemNotUpdated"), ItemNotUpdated },
 		{ TEXT("QuantityLimitReached"), QuantityLimitReached },
-		{ TEXT("InventoryLimitReached"), InventoryLimitReached }
+		{ TEXT("InventoryLimitReached"), InventoryLimitReached },
+		{ TEXT("DurabilityIncreased"), DurabilityIncreased },
+		{ TEXT("DurabilityDecreased"), DurabilityDecreased },
+		{ TEXT("DurabilityMax"), DurabilityMax },
+		{ TEXT("DurabilityZero"), DurabilityZero }
 	};
 
 	inline TArray<FString> GetAllNotificationTypes()
@@ -40,6 +48,7 @@ namespace MounteaInventoryNotificationBaseTypes
 		return Keys;
 	}
 }
+
 
 /**
 * Categories of inventory notifications.

@@ -33,7 +33,7 @@ void UMounteaInventoryComponent::BeginPlay()
 void UMounteaInventoryComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UMounteaInventoryComponent, InventoryItems);
+	DOREPLIFETIME_CONDITION(UMounteaInventoryComponent, InventoryItems, COND_InitialOrOwner);
 }
 
 void UMounteaInventoryComponent::OnRep_InventoryItems()
@@ -55,7 +55,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 			this,
 			Item.GetGuid(),
-			-Item.GetQuantity()
+			0
 		));
 		return false;
 	}
@@ -83,7 +83,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 					MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 					this,
 					Item.GetGuid(),
-					-AmountToAdd
+					0
 				));
 				return false;
 			}
@@ -91,6 +91,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 
 		if (Execute_IncreaseItemQuantity(this, existingItem.GetGuid(), AmountToAdd))
 		{
+			/*
 			const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
 				MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
 				MounteaInventoryNotificationBaseTypes::ItemAdded;
@@ -101,6 +102,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 				existingItem.GetGuid(),
 				AmountToAdd
 			));
+			*/
 
 			InventoryItems.MarkArrayDirty();
 			OnItemAdded.Broadcast(existingItem);
@@ -120,7 +122,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 					MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 					this,
 					Item.GetGuid(),
-					-AmountToAdd
+					0
 				));
 				return false;
 			}
@@ -134,6 +136,8 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		InventoryItems.Items.Last().SetOwningInventory(this);
 		InventoryItems.MarkArrayDirty();
 
+		// TODO: Let FastArray in FInventoryItem handle the adding notification
+		/*
 		const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
 			MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
 			MounteaInventoryNotificationBaseTypes::ItemAdded;
@@ -144,7 +148,8 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			newItem.GetGuid(),
 			AmountToAdd
 		));
-
+		*/
+		
 		OnItemAdded.Broadcast(newItem);
 		PostItemAdded_Client(newItem);
 		return true;
@@ -177,15 +182,24 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 		return false;
 
 	const FInventoryItem RemovedItem = InventoryItems.Items[ItemIndex];
+	
+	OnItemRemoved.Broadcast(RemovedItem);
+	
+	if (!IsAuthority())
+	{
+		RemoveItem_Server(ItemGuid);
+		return true;
+	}
+	
 	InventoryItems.Items.RemoveAt(ItemIndex);
 	InventoryItems.MarkArrayDirty();
 
-	OnItemRemoved.Broadcast(RemovedItem);
 	return true;
 }
 
 bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* const Template, const int32 Quantity)
 {
+	// TODO: Either Remove or Decrease!
 	if (!IsValid(Template))
 		return false;
 
