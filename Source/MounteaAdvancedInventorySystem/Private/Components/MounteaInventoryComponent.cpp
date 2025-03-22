@@ -92,8 +92,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		if (Execute_IncreaseItemQuantity(this, existingItem.GetGuid(), AmountToAdd))
 		{
 			InventoryItems.MarkArrayDirty();
-			OnItemAdded.Broadcast(existingItem);
-			PostItemAdded_Client(existingItem);
 			return true;
 		}
 	}
@@ -180,19 +178,8 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 		RemoveItem_Server(ItemGuid);
 		return true;
 	}
-
-	// TODO: Standalone, but do NOT affect LISTEN SERVER
-	/*
-	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
-	{
-		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-				MounteaInventoryNotificationBaseTypes::ItemRemoved,
-				this,
-				RemovedItem.GetGuid(),
-				RemovedItem.GetQuantity()
-			));
-	}
-	*/
+	
+	PostItemRemoved_Client(RemovedItem);
 	
 	InventoryItems.Items.RemoveAt(ItemIndex);
 	InventoryItems.MarkArrayDirty();
@@ -466,11 +453,31 @@ void UMounteaInventoryComponent::RemoveItem_Server_Implementation(const FGuid& I
 
 void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInventoryItem& Item)
 {
+	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	{
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+				MounteaInventoryNotificationBaseTypes::ItemAdded,
+				this,
+				Item.GetGuid(),
+				Item.Quantity
+			));
+	}
+	
 	OnItemAdded.Broadcast(Item);
 }
 
 void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FInventoryItem& Item)
 {
+	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	{
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+				MounteaInventoryNotificationBaseTypes::ItemRemoved,
+				this,
+				Item.GetGuid(),
+				Item.GetQuantity()
+			));
+	}
+	
 	OnItemRemoved.Broadcast(Item);
 }
 
