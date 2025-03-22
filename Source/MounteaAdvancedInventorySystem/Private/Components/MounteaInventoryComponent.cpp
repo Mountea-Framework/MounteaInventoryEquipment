@@ -123,7 +123,8 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		InventoryItems.Items.Last().SetOwningInventory(this);
 		InventoryItems.MarkArrayDirty();
 
-		// Standalone
+		// TODO: Standalone, but do NOT affect LISTEN SERVER
+		/*
 		if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 		{
 			const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
@@ -137,6 +138,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 				AmountToAdd
 			));
 		}
+		*/
 		
 		OnItemAdded.Broadcast(newItem);
 		PostItemAdded_Client(newItem);
@@ -179,6 +181,8 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 		return true;
 	}
 
+	// TODO: Standalone, but do NOT affect LISTEN SERVER
+	/*
 	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
 		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
@@ -188,6 +192,7 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 				RemovedItem.GetQuantity()
 			));
 	}
+	*/
 	
 	InventoryItems.Items.RemoveAt(ItemIndex);
 	InventoryItems.MarkArrayDirty();

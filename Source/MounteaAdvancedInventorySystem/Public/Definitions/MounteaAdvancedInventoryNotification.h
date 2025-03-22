@@ -119,7 +119,7 @@ struct FInventoryNotificationData
 	FInventoryNotificationData() = default;
 	
 	FInventoryNotificationData(
-		const FString InType,
+		const FString& InType,
 		const EInventoryNotificationCategory InCategory,
 		const FText& InTitle,
 		const FText& InText,
