@@ -91,19 +91,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 
 		if (Execute_IncreaseItemQuantity(this, existingItem.GetGuid(), AmountToAdd))
 		{
-			/*
-			const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
-				MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
-				MounteaInventoryNotificationBaseTypes::ItemAdded;
-
-			Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-				NotifType,
-				this,
-				existingItem.GetGuid(),
-				AmountToAdd
-			));
-			*/
-
 			InventoryItems.MarkArrayDirty();
 			OnItemAdded.Broadcast(existingItem);
 			PostItemAdded_Client(existingItem);
@@ -136,19 +123,20 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		InventoryItems.Items.Last().SetOwningInventory(this);
 		InventoryItems.MarkArrayDirty();
 
-		// TODO: Let FastArray in FInventoryItem handle the adding notification
-		/*
-		const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
-			MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
-			MounteaInventoryNotificationBaseTypes::ItemAdded;
-
-		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-			NotifType,
-			this,
-			newItem.GetGuid(),
-			AmountToAdd
-		));
-		*/
+		// Standalone
+		if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+		{
+			const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
+				MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
+				MounteaInventoryNotificationBaseTypes::ItemAdded;
+				
+			Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+				NotifType,
+				this,
+				newItem.GetGuid(),
+				AmountToAdd
+			));
+		}
 		
 		OnItemAdded.Broadcast(newItem);
 		PostItemAdded_Client(newItem);
@@ -190,6 +178,16 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 		RemoveItem_Server(ItemGuid);
 		return true;
 	}
+
+	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	{
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+				MounteaInventoryNotificationBaseTypes::ItemRemoved,
+				this,
+				RemovedItem.GetGuid(),
+				RemovedItem.GetQuantity()
+			));
+	}
 	
 	InventoryItems.Items.RemoveAt(ItemIndex);
 	InventoryItems.MarkArrayDirty();
@@ -199,24 +197,34 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 
 bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* const Template, const int32 Quantity)
 {
-	// TODO: Either Remove or Decrease!
 	if (!IsValid(Template))
 		return false;
 
 	auto inventoryItem = Execute_FindItem(this, FInventoryItemSearchParams(Template));
-	if (inventoryItem.IsItemValid())
+	if (!inventoryItem.IsItemValid())
+	{
+		// Cannot find item matching template with sufficient quantity
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+				MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
+				this,
+				FGuid(),
+				0
+			));
+		return false;
+	}
+	
+	if (inventoryItem.Quantity - Quantity <= 0)
 	{
 		return Execute_RemoveItem(this, inventoryItem.GetGuid());
 	}
-
-	// Cannot find item matching template with sufficient quantity
-	Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-			MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
-			this,
-			FGuid(),
-			0
-		));
-	return false;
+	else
+	{
+		if (!IsAuthority())
+			ChangeItemQuantity_Server(inventoryItem.GetGuid(), -Quantity);
+		else
+			Execute_DecreaseItemQuantity(this, inventoryItem.GetGuid(), Quantity);
+		return true;
+	}	
 }
 
 bool UMounteaInventoryComponent::CanAddItem_Implementation(const FInventoryItem& Item) const
@@ -346,7 +354,6 @@ bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid
 			InventoryItems.MarkItemDirty(inventoryItem);
 			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, NewQuantity);
 
-			// TODO: Don't spam client if same as server
 			PostItemQuantityChanged(inventoryItem, OldQuantity, NewQuantity);
 			return true;
 		}
@@ -394,13 +401,10 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
-	if (IsAuthority() && !UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
-	{
+	if (!IsAuthority() || (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld())))
+		OnNotificationProcessed.Broadcast(Notification);
+	else if (IsAuthority() && !UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 		ProcessInventoryNotification_Client(Notification.ItemGuid, Notification.Type, Notification.DeltaAmount);
-		return;
-	}
-	
-	OnNotificationProcessed.Broadcast(Notification);
 }
 
 bool UMounteaInventoryComponent::IsAuthority() const
@@ -418,6 +422,15 @@ bool UMounteaInventoryComponent::IsAuthority() const
 		return true;
 		
 	return false;
+}
+
+void UMounteaInventoryComponent::ChangeItemQuantity_Server_Implementation(const FGuid& ItemGuid,
+	const int32 DeltaAmount)
+{
+	if (DeltaAmount < 0)
+		Execute_DecreaseItemQuantity(this, ItemGuid, FMath::Abs(DeltaAmount));
+	else if (DeltaAmount > 0)
+		Execute_IncreaseItemQuantity(this, ItemGuid, FMath::Abs(DeltaAmount));
 }
 
 void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementation(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta)
@@ -458,6 +471,16 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FIn
 
 void UMounteaInventoryComponent::PostItemQuantityChanged_Implementation(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
 {
+	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	{
+		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+				OldQuantity > NewQuantity ? MounteaInventoryNotificationBaseTypes::ItemRemoved : MounteaInventoryNotificationBaseTypes::ItemAdded,
+				this,
+				Item.GetGuid(),
+				OldQuantity > NewQuantity ? FMath::Abs(OldQuantity - NewQuantity) : -FMath::Abs(OldQuantity - NewQuantity)
+			));
+	}
+	
 	OnItemQuantityChanged.Broadcast(Item, OldQuantity, NewQuantity);
 }
 

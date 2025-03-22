@@ -294,8 +294,8 @@ void FInventoryItem::PostReplicatedChange(const FInventoryItemArray& InArraySeri
 	{
 		const int32 QuantityDelta = PreReplicationSnapshot.GetQuantityDelta(*this);
 		const FString NotificationType = QuantityDelta > 0 
-			? MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded 
-			: MounteaInventoryNotificationBaseTypes::ItemPartiallyRemoved;
+			? MounteaInventoryNotificationBaseTypes::ItemAdded 
+			: MounteaInventoryNotificationBaseTypes::ItemRemoved;
 
 		OwningInventory->Execute_ProcessInventoryNotification(
 			OwningInventory.GetObject(),
@@ -376,7 +376,6 @@ void FInventoryItem::PostReplicatedChange(const FInventoryItemArray& InArraySeri
 	// Update snapshot for next replication cycle
 	CapturePreReplicationSnapshot();
 }
-
 
 void FInventoryItem::PreReplicatedRemove(const struct FInventoryItemArray& InArraySerializer)
 {
