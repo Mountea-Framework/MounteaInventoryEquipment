@@ -120,23 +120,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		InventoryItems.Items.Add(newItem);
 		InventoryItems.Items.Last().SetOwningInventory(this);
 		InventoryItems.MarkArrayDirty();
-
-		// TODO: Standalone, but do NOT affect LISTEN SERVER
-		/*
-		if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
-		{
-			const auto NotifType = AmountToAdd < Item.GetQuantity() ? 
-				MounteaInventoryNotificationBaseTypes::ItemPartiallyAdded : 
-				MounteaInventoryNotificationBaseTypes::ItemAdded;
-				
-			Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
-				NotifType,
-				this,
-				newItem.GetGuid(),
-				AmountToAdd
-			));
-		}
-		*/
 		
 		OnItemAdded.Broadcast(newItem);
 		PostItemAdded_Client(newItem);
