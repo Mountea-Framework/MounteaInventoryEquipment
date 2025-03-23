@@ -82,7 +82,7 @@ void UMounteaInventoryUIComponent::SetNotificationContainer_Implementation(UUser
 
 void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData)
 {
-	LOG_WARNING(TEXT("Notification: %s"), *NotificationData.ToString())
+	//LOG_WARNING(TEXT("Notification: %s"), *NotificationData.ToString())
 	// TODO: Create new notification in the Container
 }
 

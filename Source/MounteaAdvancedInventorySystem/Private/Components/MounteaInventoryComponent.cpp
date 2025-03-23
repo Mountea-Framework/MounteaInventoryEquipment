@@ -51,12 +51,13 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 {
 	if (!Execute_CanAddItem(this, Item))
 	{
-		Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+		auto notificationData =  UMounteaInventoryStatics::CreateNotificationData(
 			MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
 			this,
 			Item.GetGuid(),
 			0
-		));
+		);
+		Execute_ProcessInventoryNotification(this, notificationData);
 		return false;
 	}
 
@@ -376,6 +377,9 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
+	if (!Notification.NotificationConfig.bIsEnabled)
+		return;
+	
 	if (!IsAuthority() || (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld())))
 		OnNotificationProcessed.Broadcast(Notification);
 	else if (IsAuthority() && !UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
