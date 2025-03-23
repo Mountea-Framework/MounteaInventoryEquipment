@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryNotificationsStatics.generated.h"
 
+class IMounteaAdvancedInventoryUIInterface;
 struct FInventoryNotificationData;
 class UUserWidget;
 

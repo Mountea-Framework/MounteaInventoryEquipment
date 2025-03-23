@@ -108,7 +108,7 @@ struct FInventoryNotificationConfig
 	FLinearColor BackgroundColor = FLinearColor(0.1f, 0.1f, 0.1f, 0.9f);
 	
 	UPROPERTY(EditAnywhere, Category="Settings", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
-	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetClassOverride;
+	TSoftClassPtr<UUserWidget> NotificationWidgetClassOverride;
 };
 
 USTRUCT(BlueprintType)

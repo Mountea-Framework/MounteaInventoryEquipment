@@ -4,8 +4,12 @@
 #include "Components/MounteaInventoryUIComponent.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Definitions/MounteaInventoryBaseCommands.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventoryNotificationWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
@@ -113,15 +117,32 @@ bool UMounteaInventoryUIComponent::CreateInventoryUI_Implementation()
 	}
 
 	InventoryWidget = newWidget;
-
-	// TODO: Inventory Generic Widget and execute InitializeInventoryUI command
+	TScriptInterface<IMounteaInventoryBaseWidgetInterface> inventoryInterface = InventoryWidget;
+	ensure(inventoryInterface.GetObject() != nullptr);
+	
+	inventoryInterface->Execute_InitializeInventoryWidget(InventoryWidget, this);
+	
+	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CreateInventoryWidget);
+	}
 
 	return true;
 }
 
 void UMounteaInventoryUIComponent::RemoveInventoryUI_Implementation()
 {
-	// TODO: Remove UI from viewport
+	TScriptInterface<IMounteaInventoryBaseWidgetInterface> inventoryInterface = InventoryWidget;
+	ensure(inventoryInterface.GetObject() != nullptr);
+	
+	inventoryInterface->Execute_RemoveInventoryWidget(InventoryWidget);
+	
+	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::RemoveInventoryWidget);
+	}
 }
 
 void UMounteaInventoryUIComponent::SetInventoryUIVisibility_Implementation(const ESlateVisibility NewVisibility)
@@ -136,16 +157,53 @@ UUserWidget* UMounteaInventoryUIComponent::GetNotificationContainer_Implementati
 
 void UMounteaInventoryUIComponent::SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer)
 {
+	if (InventoryNotificationContainerWidget != NewNotificationContainer)
+		InventoryNotificationContainerWidget = NewNotificationContainer;
 }
 
 void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData)
 {
-	//LOG_WARNING(TEXT("Notification: %s"), *NotificationData.ToString())
-	// TODO: Create new notification in the Container
+	if (!IsValid(InventoryNotificationContainerWidget))
+	{
+		LOG_WARNING(TEXT("[CreateInventoryNotification] Invalid Notification Container!"))
+		return;
+	}
+
+	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
+	ensure(notificationContainerInterface.GetObject() != nullptr);
+	
+	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
+	if (!Config)
+	{
+		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))
+		return;
+	}
+
+	if (!Config->NotificationWidgetClass)
+	{
+		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load `NotificationWidgetClass` from Config!"))
+		return;
+	}
+	
+	auto notificationClass = Config->NotificationWidgetClass.LoadSynchronous();
+	auto notificationWidget = CreateWidget(InventoryNotificationContainerWidget, notificationClass);
+
+	IMounteaInventoryNotificationWidgetInterface::Execute_CreateNotification(notificationWidget, NotificationData, InventoryNotificationContainerWidget);
+
+	notificationContainerInterface->Execute_AddNotification(InventoryNotificationContainerWidget, notificationWidget);
 }
 
 void UMounteaInventoryUIComponent::RemoveInventoryNotifications_Implementation()
 {
-	// TODO: Clear the container
+	if (!IsValid(InventoryNotificationContainerWidget))
+	{
+		LOG_WARNING(TEXT("[CreateInventoryNotification] Invalid Notification Container!"))
+		return;
+	}
+
+	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
+	ensure(notificationContainerInterface.GetObject() != nullptr);
+
+	IMounteaInventoryNotificationContainerWidgetInterface::Execute_ClearNotifications(InventoryNotificationContainerWidget);
 }
 

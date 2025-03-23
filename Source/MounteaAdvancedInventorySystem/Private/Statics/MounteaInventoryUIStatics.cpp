@@ -4,6 +4,7 @@
 #include "Statics/MounteaInventoryUIStatics.h"
 
 #include "GameFramework/PlayerState.h"
+#include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -89,4 +90,26 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 		return FindPlayerController(ownerActor, SearchDepth);
 	
 	return nullptr;
+}
+
+void UMounteaInventoryUIStatics::InitializeInventoryWidget(
+	const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
+{
+	if (Target.GetObject() && Parent.GetObject())
+		Target->Execute_InitializeInventoryWidget(Target.GetObject(), Parent);
+}
+
+void UMounteaInventoryUIStatics::RemoveInventoryWidget(
+	const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target)
+{
+	if (Target.GetObject())
+		Target->Execute_RemoveInventoryWidget(Target.GetObject());
+}
+
+bool UMounteaInventoryUIStatics::SetSourceInventory(
+	const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
+{
+	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;
 }

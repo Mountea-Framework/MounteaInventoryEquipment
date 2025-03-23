@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class IMounteaInventoryBaseWidgetInterface;
 /**
  * 
  */
@@ -137,4 +138,31 @@ public:
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
+
+	// --- Inventory  ------------------------------
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param Parent 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void InitializeInventoryWidget(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
+
+	/**
+	 * 
+	 * @param Target 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void RemoveInventoryWidget(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param ParentInventory 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static bool SetSourceInventory(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
+	
 };

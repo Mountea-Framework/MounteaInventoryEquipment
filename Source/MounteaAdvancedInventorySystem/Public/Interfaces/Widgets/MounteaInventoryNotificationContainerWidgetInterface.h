@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryNotificationContainerWidgetInterface.generated.h"
 
+class IMounteaAdvancedInventoryUIInterface;
 class UUserWidget;
 
 // This class does not need to be modified.
