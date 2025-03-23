@@ -49,16 +49,16 @@ public:
 	 * @return True if UI was successfully created, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	bool CreateInventoryUI();
-	virtual bool CreateInventoryUI_Implementation() = 0;
+	bool CreateInventoryUIWrapper();
+	virtual bool CreateInventoryUIWrapper_Implementation() = 0;
 
 	/**
 	 * Returns the inventory UI.
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	UUserWidget* GetInventoryUI() const;
-	virtual UUserWidget* GetInventoryUI_Implementation() const = 0;
+	UUserWidget* GetInventoryUIWrapper() const;
+	virtual UUserWidget* GetInventoryUIWrapper_Implementation() const = 0;
 
 	/**
 	 * Removes the inventory UI.
@@ -72,8 +72,8 @@ public:
 	 * @param NewVisibility - The new visibility state of the UI.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	void SetInventoryUIVisibility(const ESlateVisibility NewVisibility);
-	virtual void SetInventoryUIVisibility_Implementation(const ESlateVisibility NewVisibility) = 0;
+	void SetInventoryUIVisibility(const bool bShowInventory);
+	virtual void SetInventoryUIVisibility_Implementation(const bool bShowInventory) = 0;
 
 	// --- Notification  ------------------------------
 

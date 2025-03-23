@@ -64,6 +64,9 @@ public:
 	static void ClearNotifications(UObject* Container);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	static void SetNotificationsContainerVisibility(UObject* Container, const bool bShowContainer);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
 	static void CreateNotification(UObject* Notification, const FInventoryNotificationData& NotificationData, const TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface>& Container);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
@@ -71,4 +74,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
 	static void DeleteNotification(UObject* Notification);
+
+	
 };

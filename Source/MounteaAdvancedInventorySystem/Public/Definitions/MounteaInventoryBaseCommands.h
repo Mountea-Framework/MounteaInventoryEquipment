@@ -6,36 +6,34 @@
 
 namespace InventoryUICommands
 {
-	const FString CreateInventoryWidget	(TEXT("Create Inventory Widget"));
-	const FString RemoveInventoryWidget	(TEXT("Remove Inventory Widget"));
-	const FString OpenInventoryWidget	(TEXT("Open Inventory Widget"));
-	const FString CloseInventoryWidget	(TEXT("Close Inventory Widget"));
-	const FString ToggleInventoryWidget	(TEXT("Toggle Inventory Widget"));
-	const FString RefreshInventoryDisplay	(TEXT("Refresh Inventory Display"));
-	const FString ShowItemDetails	(TEXT("Show Item Details"));
-	const FString SortInventoryItems	 (TEXT("Sort Inventory Items"));
-	const FString FilterInventoryItems	(TEXT("Filter Inventory Items"));
-	const FString ClearInventorySelection	(TEXT("Clear Inventory Selection"));
-	const FString ShowInventoryNotification	(TEXT("Show Inventory Notification"));
+	const FString CreateInventoryWidget(TEXT("CreateInventoryWidget"));
+	const FString RemoveInventoryWidget(TEXT("RemoveInventoryWidget"));
+	const FString OpenInventoryWidget(TEXT("OpenInventoryWidget"));
+	const FString CloseInventoryWidget(TEXT("CloseInventoryWidget"));
+	const FString ToggleInventoryWidget(TEXT("ToggleInventoryWidget"));
+	const FString RefreshInventoryDisplay(TEXT("RefreshInventoryDisplay"));
+	const FString ShowItemDetails(TEXT("ShowItemDetails"));
+	const FString SortInventoryItems(TEXT("SortInventoryItems"));
+	const FString FilterInventoryItems(TEXT("FilterInventoryItems"));
+	const FString ClearInventorySelection(TEXT("ClearInventorySelection"));
+	const FString ShowInventoryNotification(TEXT("ShowInventoryNotification"));
 
-	inline const TMap<FString, FString> CommandsMap = {
-		{ TEXT("CreateDialogueWidget"), CreateInventoryWidget },
-		{ TEXT("RemoveDialogueWidget"), RemoveInventoryWidget },
-		{ TEXT("OpenInventoryWidget"), OpenInventoryWidget },
-		{ TEXT("CloseInventoryWidget"), CloseInventoryWidget },
-		{ TEXT("ToggleInventoryWidget"), ToggleInventoryWidget },
-		{ TEXT("RefreshInventoryDisplay"), RefreshInventoryDisplay },
-		{ TEXT("ShowItemDetails"), ShowItemDetails },
-		{ TEXT("SortInventoryItems"), SortInventoryItems },
-		{ TEXT("FilterInventoryItems"), FilterInventoryItems },
-		{ TEXT("ClearInventorySelection"), ClearInventorySelection },
-		{ TEXT("ShowInventoryNotification"), ShowInventoryNotification }
+	inline const TSet<FString> CommandsSet = {
+		CreateInventoryWidget,
+		RemoveInventoryWidget,
+		OpenInventoryWidget,
+		CloseInventoryWidget,
+		ToggleInventoryWidget,
+		RefreshInventoryDisplay,
+		ShowItemDetails,
+		SortInventoryItems,
+		FilterInventoryItems,
+		ClearInventorySelection,
+		ShowInventoryNotification
 	};
 
 	inline TArray<FString> GetAllCommandTypes()
 	{
-		TArray<FString> Keys;
-		CommandsMap.GenerateValueArray(Keys);
-		return Keys;
+		return CommandsSet.Array();
 	}
 }

@@ -16,7 +16,7 @@
 * @see FInventoryTypeConfig
 * @see FInventoryRarity
 * @see FInventoryCategory
-* @see [MounteaAdvancedInventorySettingsConfig](https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Settings-Config)
+* @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Settings-Config
 */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining inventory types, rarities and categories."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventorySettingsConfig : public UPrimaryDataAsset

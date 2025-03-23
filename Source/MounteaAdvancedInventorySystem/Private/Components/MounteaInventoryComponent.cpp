@@ -39,6 +39,7 @@ void UMounteaInventoryComponent::OnRep_InventoryItems()
 {
 	// Process replicated Items
 	// TODO refresh UI by sending Command
+	// Do I need to do anything? Maybe I dont
 }
 
 AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
@@ -148,6 +149,8 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 
 bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid)
 {
+	if (!IsActive()) return false;
+	
 	const int32 ItemIndex = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
 	if (ItemIndex == INDEX_NONE)
 		return false;
@@ -204,6 +207,8 @@ bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaI
 
 bool UMounteaInventoryComponent::CanAddItem_Implementation(const FInventoryItem& Item) const
 {
+	if (!IsActive()) return false;
+	
 	if (!Item.IsItemValid() || !Item.GetTemplate())
 		return false;
 	
@@ -286,6 +291,8 @@ TArray<FInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() 
 
 bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
+	if (!IsActive()) return false;
+	
 	if (!IsAuthority())
 		return false;
 	
@@ -310,6 +317,8 @@ bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid
 
 bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount)
 {
+	if (!IsActive()) return false;
+	
 	if (!IsAuthority())
 		return false;
 	
@@ -328,7 +337,6 @@ bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid
 		{
 			InventoryItems.MarkItemDirty(inventoryItem);
 			OnItemQuantityChanged.Broadcast(inventoryItem, OldQuantity, NewQuantity);
-
 			PostItemQuantityChanged(inventoryItem, OldQuantity, NewQuantity);
 			return true;
 		}
@@ -338,6 +346,8 @@ bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid
 
 bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability)
 {
+	if (!IsActive()) return false;
+	
 	if (!IsAuthority())
 		return false;
 	
@@ -352,8 +362,6 @@ bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid
 		{
 			InventoryItems.MarkItemDirty(inventoryItem);
 			OnItemDurabilityChanged.Broadcast(inventoryItem, OldDurability, NewDurability);
-
-			// TODO: Don't spam client if same as server
 			PostItemDurabilityChanged(inventoryItem, OldDurability, NewDurability);
 			return true;
 		}

@@ -59,3 +59,13 @@ void UMounteaInventoryNotificationsStatics::ClearNotifications(UObject* Containe
 	if (Container->Implements<UMounteaInventoryNotificationContainerWidgetInterface>())
 		return IMounteaInventoryNotificationContainerWidgetInterface::Execute_ClearNotifications(Container);
 }
+
+void UMounteaInventoryNotificationsStatics::SetNotificationsContainerVisibility(UObject* Container,
+	const bool bShowContainer)
+{
+	if (!IsValid(Container))
+		return;
+
+	if (Container->Implements<UMounteaInventoryNotificationContainerWidgetInterface>())
+		return IMounteaInventoryNotificationContainerWidgetInterface::Execute_SetNotificationsContainerVisibility(Container, bShowContainer);
+}

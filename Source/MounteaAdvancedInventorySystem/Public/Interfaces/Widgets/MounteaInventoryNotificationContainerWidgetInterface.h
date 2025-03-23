@@ -37,4 +37,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Notification")
 	void ClearNotifications();
 	virtual void ClearNotifications_Implementation() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Notification")
+	void SetNotificationsContainerVisibility(const bool bShowContainer);
+	virtual void SetNotificationsContainerVisibility_Implementation(const bool bShowContainer) = 0;
 };

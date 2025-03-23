@@ -61,12 +61,10 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIComponen
 
 void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
-	// TODO: broadcast
-	if (ParentInventory != NewParentInventory)
-		ParentInventory = NewParentInventory;
+	if (ParentInventory != NewParentInventory) ParentInventory = NewParentInventory;
 }
 
-bool UMounteaInventoryUIComponent::CreateInventoryUI_Implementation()
+bool UMounteaInventoryUIComponent::CreateInventoryUIWrapper_Implementation()
 {
 	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
 	if (!Config)
@@ -145,9 +143,19 @@ void UMounteaInventoryUIComponent::RemoveInventoryUI_Implementation()
 	}
 }
 
-void UMounteaInventoryUIComponent::SetInventoryUIVisibility_Implementation(const ESlateVisibility NewVisibility)
+void UMounteaInventoryUIComponent::SetInventoryUIVisibility_Implementation(const bool bShowInventory)
 {
-	// TODO: Execute command to show/hide
+	if (!IsValid(InventoryWidget))
+	{
+		LOG_WARNING(TEXT("[SetInventoryUIVisibility] Invalid Inventory UI!"))
+		return;
+	}
+	
+	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, bShowInventory ?  InventoryUICommands::OpenInventoryWidget : InventoryUICommands::CloseInventoryWidget);
+	}
 }
 
 UUserWidget* UMounteaInventoryUIComponent::GetNotificationContainer_Implementation() const
@@ -179,7 +187,7 @@ void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(co
 		return;
 	}
 
-	if (!Config->NotificationWidgetClass)
+	if (Config->NotificationWidgetClass.IsNull())
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load `NotificationWidgetClass` from Config!"))
 		return;
@@ -187,6 +195,11 @@ void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(co
 	
 	auto notificationClass = Config->NotificationWidgetClass.LoadSynchronous();
 	auto notificationWidget = CreateWidget(InventoryNotificationContainerWidget, notificationClass);
+	if (!IsValid(notificationWidget))
+	{
+		LOG_ERROR(TEXT("[CreateInventoryNotification] Failed to Create Inventory Notification!"))
+		return;
+	}
 
 	IMounteaInventoryNotificationWidgetInterface::Execute_CreateNotification(notificationWidget, NotificationData, InventoryNotificationContainerWidget);
 

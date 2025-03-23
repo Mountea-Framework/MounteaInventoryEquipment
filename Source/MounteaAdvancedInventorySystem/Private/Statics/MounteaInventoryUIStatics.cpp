@@ -20,14 +20,14 @@ void UMounteaInventoryUIStatics::SetParentInventory(
 		Target->Execute_SetParentInventory(Target.GetObject(), NewParentInventory);
 }
 
-bool UMounteaInventoryUIStatics::CreateInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+bool UMounteaInventoryUIStatics::CreateInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	return Target.GetObject() ? Target->Execute_CreateInventoryUI(Target.GetObject()) : false;
+	return Target.GetObject() ? Target->Execute_CreateInventoryUIWrapper(Target.GetObject()) : false;
 }
 
-UUserWidget* UMounteaInventoryUIStatics::GetInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+UUserWidget* UMounteaInventoryUIStatics::GetInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	return Target.GetObject() ? Target->Execute_GetInventoryUI(Target.GetObject()) : nullptr;
+	return Target.GetObject() ? Target->Execute_GetInventoryUIWrapper(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::RemoveInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -37,10 +37,10 @@ void UMounteaInventoryUIStatics::RemoveInventoryUI(const TScriptInterface<IMount
 }
 
 void UMounteaInventoryUIStatics::SetInventoryUIVisibility(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility NewVisibility)
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory)
 {
 	if (Target.GetObject())
-		Target->Execute_SetInventoryUIVisibility(Target.GetObject(), NewVisibility);
+		Target->Execute_SetInventoryUIVisibility(Target.GetObject(), bShowInventory);
 }
 
 UUserWidget* UMounteaInventoryUIStatics::GetNotificationContainer(

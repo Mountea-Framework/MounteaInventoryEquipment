@@ -79,7 +79,7 @@ public:
 	 * @return True if UI was successfully created and initialized, otherwise false
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static bool CreateInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static bool CreateInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
 	 * Returns the inventory UI.
@@ -87,7 +87,7 @@ public:
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static UUserWidget* GetInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
 	 * Removes the inventory UI from the viewport and cleans up resources.
@@ -102,7 +102,7 @@ public:
 	 * @param NewVisibility The new visibility state to apply to the UI (Visible, Hidden, Collapsed, etc.)
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static void SetInventoryUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility NewVisibility);
+	static void SetInventoryUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory);
 
 	// --- Notification  ------------------------------
 
