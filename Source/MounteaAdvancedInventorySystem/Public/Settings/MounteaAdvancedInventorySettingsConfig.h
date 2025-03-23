@@ -49,12 +49,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Limits", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	float InventoryBaseWeightLimit = 150.f;
 
+	// --- User Interface ------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
+
 	// --- Notifications ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|UserInterface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
 	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|UserInterface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
 	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Style", meta=(ShowOnlyInnerProperties, ForceInlineRow))
