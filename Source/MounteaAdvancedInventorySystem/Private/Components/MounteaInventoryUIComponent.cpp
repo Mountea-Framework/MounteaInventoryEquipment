@@ -3,9 +3,16 @@
 
 #include "Components/MounteaInventoryUIComponent.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
+#include "Statics/MounteaInventoryUIStatics.h"
+
+class UMounteaAdvancedInventorySettings;
 
 UMounteaInventoryUIComponent::UMounteaInventoryUIComponent()
 {
@@ -57,7 +64,58 @@ void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScri
 
 bool UMounteaInventoryUIComponent::CreateInventoryUI_Implementation()
 {
-	// TODO: Get default class from Config and then save UI
+	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
+	if (!Config)
+	{
+		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory Config!"))
+		return false;
+	}
+
+	auto widgetClass = Config->InventoryWidgetClass.LoadSynchronous();
+	if (!IsValid(widgetClass))
+	{
+		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory UI Class from Config!"))
+		return false;
+	}
+	if (!widgetClass->ImplementsInterface(UMounteaInventoryBaseWidgetInterface::StaticClass()))
+	{
+		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI Class must implement `MounteaInventoryBaseWidgetInterface`!"))
+		return false;
+	}
+
+	FString Message = TEXT("");
+	bool bSuccess = true;
+	
+	int seachDepth = 0;
+	APlayerController* playerController = UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), seachDepth);
+	if (!playerController || !playerController->IsLocalController())
+	{
+		Message = !playerController ? TEXT("Invalid Player Controller!") : TEXT("UI can be shown only to Local Players!");
+		bSuccess = false;
+	}
+	if (!bSuccess)
+	{
+		LOG_ERROR(TEXT("[Create Inventory UI] Failed to find Player Controller. Message:\n%s"), *Message)
+		return false;
+	}
+
+	if (!playerController->IsLocalController())
+	{
+		LOG_WARNING(TEXT("[Create Inventory UI] UI Can be created for Local Players only!"))
+		return false;
+	}
+
+	auto newWidget = CreateWidget<UUserWidget>(playerController, widgetClass);
+	if (!newWidget->Implements<UMounteaInventoryBaseWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI  must implement `MounteaInventoryBaseWidgetInterface`!"))
+		return false;
+	}
+
+	InventoryWidget = newWidget;
+
+	// TODO: Inventory Generic Widget and execute InitializeInventoryUI command
+
 	return true;
 }
 

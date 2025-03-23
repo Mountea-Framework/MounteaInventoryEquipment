@@ -3,6 +3,8 @@
 
 #include "Statics/MounteaInventoryUIStatics.h"
 
+#include "GameFramework/PlayerState.h"
+
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
@@ -20,6 +22,11 @@ void UMounteaInventoryUIStatics::SetParentInventory(
 bool UMounteaInventoryUIStatics::CreateInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_CreateInventoryUI(Target.GetObject()) : false;
+}
+
+UUserWidget* UMounteaInventoryUIStatics::GetInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	return Target.GetObject() ? Target->Execute_GetInventoryUI(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::RemoveInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -61,4 +68,25 @@ void UMounteaInventoryUIStatics::RemoveInventoryNotifications(
 {
 	if (Target.GetObject())
 		Target->Execute_RemoveInventoryNotifications(Target.GetObject());
+}
+
+APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
+{
+	SearchDepth++;
+	if (SearchDepth >= 8)
+		return nullptr;
+	
+	if (APlayerController* playerController = Cast<APlayerController>(Actor))
+		return playerController;
+
+	if (APlayerState* playerState = Cast<APlayerState>(Actor))
+		return playerState->GetPlayerController();
+
+	if (APawn* actorPawn = Cast<APawn>(Actor))
+		return Cast<APlayerController>(actorPawn->GetController());
+	
+	if (AActor* ownerActor = Actor->GetOwner())
+		return FindPlayerController(ownerActor, SearchDepth);
+	
+	return nullptr;
 }

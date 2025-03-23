@@ -53,6 +53,14 @@ public:
 	virtual bool CreateInventoryUI_Implementation() = 0;
 
 	/**
+	 * Returns the inventory UI.
+	 * @return UI if UI exists, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UUserWidget* GetInventoryUI() const;
+	virtual UUserWidget* GetInventoryUI_Implementation() const = 0;
+
+	/**
 	 * Removes the inventory UI.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")

@@ -6,7 +6,6 @@
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Net/UnrealNetwork.h"
-#include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaInventoryStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 

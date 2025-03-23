@@ -81,6 +81,14 @@ public:
 	static bool CreateInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
+	 * Returns the inventory UI.
+	 * @param Target The UI interface to get the inventory UI from
+	 * @return UI if UI exists, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static UUserWidget* GetInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+
+	/**
 	 * Removes the inventory UI from the viewport and cleans up resources.
 	 * @param Target The UI interface to remove the inventory UI from
 	 */
@@ -127,4 +135,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	
+	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 };

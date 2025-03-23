@@ -4,6 +4,7 @@
 #include "Statics/MounteaInventorySystemStatics.h"
 
 #include "Kismet/KismetSystemLibrary.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
 
 bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* WorldContext)
 {
@@ -12,7 +13,8 @@ bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* Worl
 
 UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig()
 {
-	return GetMutableDefault<UMounteaAdvancedInventorySettingsConfig>();
+	auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	return settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
 }
 
 FText UMounteaInventorySystemStatics::ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText)
