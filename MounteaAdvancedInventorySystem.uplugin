@@ -10,7 +10,7 @@
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "https://discord.gg/waYT2cn37z",
- 	 "EngineVersion": "5.1.0",
+	"EngineVersion": "5.1.0",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
 	"IsExperimentalVersion": true,
@@ -21,9 +21,9 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"PlatformAllowList": [
-			  "Linux",
-			  "Mac",
-			  "Win64"
+				"Linux",
+				"Mac",
+				"Win64"
 			]
 		},
 		{
@@ -31,20 +31,26 @@
 			"Type": "Editor",
 			"LoadingPhase": "PostEngineInit",
 			"PlatformAllowList": [
-			  "Linux",
-			  "Mac",
-			  "Win64"
+				"Linux",
+				"Mac",
+				"Win64"
 			]
 		},
 		{
-			"name": "MounteaAdvancedInventorySystemDeveloper",
-			"type": "UncookedOnly",
-			"loadingPhase": "PreDefault",
+			"Name": "MounteaAdvancedInventorySystemDeveloper",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "PreDefault",
 			"PlatformAllowList": [
-			  "Linux",
-			  "Mac",
-			  "Win64"
+				"Linux",
+				"Mac",
+				"Win64"
 			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "CommonUI",
+			"Enabled": true
 		}
 	]
 }

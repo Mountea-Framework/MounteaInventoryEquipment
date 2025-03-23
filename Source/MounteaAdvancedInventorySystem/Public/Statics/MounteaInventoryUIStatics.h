@@ -94,7 +94,7 @@ public:
 	 * @param Target The UI interface to remove the inventory UI from
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static void RemoveInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
 	 * Sets the visibility state of the inventory UI widget.
@@ -102,7 +102,7 @@ public:
 	 * @param NewVisibility The new visibility state to apply to the UI (Visible, Hidden, Collapsed, etc.)
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static void SetInventoryUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory);
+	static void SetInventoryUIWrapperVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory);
 
 	// --- Notification  ------------------------------
 
@@ -154,7 +154,7 @@ public:
 	 * @param Target 
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveInventoryWidget(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target);
+	static void RemoveInventoryWidgetWrapper(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target);
 
 	/**
 	 * 

@@ -64,16 +64,16 @@ public:
 	 * Removes the inventory UI.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	void RemoveInventoryUI();
-	virtual void RemoveInventoryUI_Implementation() = 0;
+	void RemoveInventoryUIWrapper();
+	virtual void RemoveInventoryUIWrapper_Implementation() = 0;
 
 	/**
 	 * Sets the visibility of the inventory UI.
 	 * @param NewVisibility - The new visibility state of the UI.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	void SetInventoryUIVisibility(const bool bShowInventory);
-	virtual void SetInventoryUIVisibility_Implementation(const bool bShowInventory) = 0;
+	void SetInventoryUIWrapperVisibility(const bool bShowInventory);
+	virtual void SetInventoryUIWrapperVisibility_Implementation(const bool bShowInventory) = 0;
 
 	// --- Notification  ------------------------------
 

@@ -36,8 +36,8 @@ public:
 	 * 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory")
-	void RemoveInventoryWidget();
-	virtual void RemoveInventoryWidget_Implementation() = 0;
+	void RemoveInventoryWidgetWrapper();
+	virtual void RemoveInventoryWidgetWrapper_Implementation() = 0;
 
 	// TODO: Do I need this?
 	/**

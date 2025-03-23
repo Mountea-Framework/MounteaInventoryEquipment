@@ -123,31 +123,31 @@ bool UMounteaInventoryUIComponent::CreateInventoryUIWrapper_Implementation()
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CreateInventoryWidget);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CreateInventoryWidgetWrapper);
 	}
 
 	return true;
 }
 
-void UMounteaInventoryUIComponent::RemoveInventoryUI_Implementation()
+void UMounteaInventoryUIComponent::RemoveInventoryUIWrapper_Implementation()
 {
 	TScriptInterface<IMounteaInventoryBaseWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
-	inventoryInterface->Execute_RemoveInventoryWidget(InventoryWidget);
+	inventoryInterface->Execute_RemoveInventoryWidgetWrapper(InventoryWidget);
 	
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::RemoveInventoryWidget);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::RemoveInventoryWidgetWrapper);
 	}
 }
 
-void UMounteaInventoryUIComponent::SetInventoryUIVisibility_Implementation(const bool bShowInventory)
+void UMounteaInventoryUIComponent::SetInventoryUIWrapperVisibility_Implementation(const bool bShowInventory)
 {
 	if (!IsValid(InventoryWidget))
 	{
-		LOG_WARNING(TEXT("[SetInventoryUIVisibility] Invalid Inventory UI!"))
+		LOG_WARNING(TEXT("[SetInventoryUIWrapperVisibility] Invalid Inventory UI!"))
 		return;
 	}
 	

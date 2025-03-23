@@ -24,7 +24,8 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 			new string[]
 			{
 				"Core", 
-				"GameplayTags",
+				"GameplayTags", 
+				"CommonUI",
 			}
 			);
 			

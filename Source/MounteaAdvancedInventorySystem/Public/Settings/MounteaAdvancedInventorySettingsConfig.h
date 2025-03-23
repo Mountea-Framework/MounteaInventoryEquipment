@@ -54,6 +54,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Config", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	TSet<FString> WidgetCommands;
+
 	// --- Notifications ------------------------------
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
@@ -85,6 +88,8 @@ protected:
 	static void SetupMerchantConfig(FInventoryTypeConfig& Config);
 	static void SetupLootConfig(FInventoryTypeConfig& Config);
 	static void SetupSpecializedConfig(FInventoryTypeConfig& Config);
+
+	void SetupWidgetCommands();
 
 	UFUNCTION()
 	TArray<FString> GetNotificationTypes() const;

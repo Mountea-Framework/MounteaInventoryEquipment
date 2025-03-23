@@ -3,10 +3,13 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
+#include "Definitions/MounteaInventoryBaseCommands.h"
+
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySettingsConfig"
 
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()
 {
+	SetupWidgetCommands();
 	ValidateInventoryTypes();
 }
 
@@ -36,26 +39,26 @@ FInventoryTypeConfig UMounteaAdvancedInventorySettingsConfig::GetDefaultConfigFo
 	
 	switch(Type)
 	{
-	case EInventoryType::EIT_Player:
-		SetupPlayerConfig(Config);
-		break;
-	case EInventoryType::EIT_NPC:
-		SetupNPCConfig(Config);
-		break;
-	case EInventoryType::EIT_Storage:
-		SetupStorageConfig(Config);
-		break;
-	case EInventoryType::EIT_Merchant:
-		SetupMerchantConfig(Config);
-		break;
-	case EInventoryType::EIT_Loot:
-		SetupLootConfig(Config);
-		break;
-	case EInventoryType::EIT_Specialized:
-		SetupSpecializedConfig(Config);
-		break;
-	default:
-		break;
+		case EInventoryType::EIT_Player:
+			SetupPlayerConfig(Config);
+			break;
+		case EInventoryType::EIT_NPC:
+			SetupNPCConfig(Config);
+			break;
+		case EInventoryType::EIT_Storage:
+			SetupStorageConfig(Config);
+			break;
+		case EInventoryType::EIT_Merchant:
+			SetupMerchantConfig(Config);
+			break;
+		case EInventoryType::EIT_Loot:
+			SetupLootConfig(Config);
+			break;
+		case EInventoryType::EIT_Specialized:
+			SetupSpecializedConfig(Config);
+			break;
+		default:
+			break;
 	}
 	
 	return Config;
@@ -137,6 +140,16 @@ void UMounteaAdvancedInventorySettingsConfig::SetupSpecializedConfig(FInventoryT
 	Config.AccessFlags = static_cast<uint8>(EInventoryFlags::EIF_Private);
 	Config.SlotsRange = FIntPoint(20, 20);
 	Config.StartingSlots = 20;
+}
+
+void UMounteaAdvancedInventorySettingsConfig::SetupWidgetCommands()
+{
+	auto coreCommands = InventoryUICommands::GetAllCommandTypes();
+	for (const FString& command : InventoryUICommands::CommandsSet)
+	{
+		if (!WidgetCommands.Contains(command))
+			WidgetCommands.Add(command);
+	}
 }
 
 TArray<FString> UMounteaAdvancedInventorySettingsConfig::GetNotificationTypes() const
@@ -300,6 +313,11 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 void UMounteaAdvancedInventorySettingsConfig::PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeChainProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, WidgetCommands))
+	{
+		SetupWidgetCommands();
+	}
 
 	if (PropertyChangedEvent.GetPropertyName() != GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, AllowedInventoryTypes))
 	{
