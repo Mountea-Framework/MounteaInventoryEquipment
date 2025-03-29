@@ -73,7 +73,7 @@ bool UMounteaInventoryUIComponent::CreateInventoryUIWrapper_Implementation()
 		return false;
 	}
 
-	auto widgetClass = Config->InventoryWidgetClass.LoadSynchronous();
+	auto widgetClass = Config->UserInterfaceWrapperClass.LoadSynchronous();
 	if (!IsValid(widgetClass))
 	{
 		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory UI Class from Config!"))
