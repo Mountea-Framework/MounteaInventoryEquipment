@@ -51,14 +51,22 @@ public:
 
 	// --- User Interface ------------------------------
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Wrapper", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
 	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryWidgetInterface"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Config", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
 	TSet<FString> WidgetCommands;
+
+	// --- User Interface: Items
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryItemSlotWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryItemWidgetClass;
 
 	// --- Notifications ------------------------------
 	
