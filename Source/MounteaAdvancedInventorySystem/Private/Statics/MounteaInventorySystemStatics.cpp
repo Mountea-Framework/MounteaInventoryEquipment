@@ -49,3 +49,8 @@ FString UMounteaInventorySystemStatics::ReplaceRegexInString(const FString& Rege
 {
 	return ReplaceRegexInText(Regex, FText::FromString(Replacement), FText::FromString(SourceText)).ToString();
 }
+
+FGameplayTag UMounteaInventorySystemStatics::GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex)
+{
+	return Source.IsValidIndex(TagIndex) ? Source.GetByIndex(TagIndex) : Source.First(); 
+}
