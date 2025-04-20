@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventoryBaseWidgetInterface;
 /**
  * 
@@ -164,5 +165,23 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static bool SetSourceInventory(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
+
+	// --- Category Widget ------------------------------
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param CategoryId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	void SetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target, const FString& CategoryId);
+
+	/**
+	 * 
+	 * @param Target  
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Categories"))
+	FString GetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target);
 	
 };

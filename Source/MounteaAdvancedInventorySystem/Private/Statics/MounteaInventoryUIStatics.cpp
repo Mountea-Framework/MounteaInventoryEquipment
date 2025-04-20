@@ -3,8 +3,10 @@
 
 #include "Statics/MounteaInventoryUIStatics.h"
 
+#include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
+#include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -112,4 +114,15 @@ bool UMounteaInventoryUIStatics::SetSourceInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
 {
 	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;
+}
+
+void UMounteaInventoryUIStatics::SetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target, const FString& CategoryId)
+{
+	if (Target.GetObject())
+		Target->Execute_SetInventoryCategoryKey(Target.GetObject(), CategoryId);
+}
+
+FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target)
+{
+	return Target.GetObject() ? Target->Execute_GetInventoryCategoryKey(Target.GetObject()) : TEXT("none");
 }
