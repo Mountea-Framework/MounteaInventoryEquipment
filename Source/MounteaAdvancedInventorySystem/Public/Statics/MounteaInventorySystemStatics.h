@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventorySystemStatics.generated.h"
 
@@ -49,4 +50,13 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text", meta=(CustomTag="MounteaK2Getter"))
 	static FString ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText);
+
+	/**
+	 * 
+	 * @param Source
+	 * @param TagIndex 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags", meta=(CustomTag="MounteaK2Getter"))
+	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
 };
