@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "CommonButtonBase.h"
 #include "GameplayTagContainer.h"
-#include "MounteaAdvancedInventoryBaseWidget.h"
+#include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "MounteaAdvancedInventoryButtonWidget.generated.h"
 
 /**
@@ -34,9 +34,9 @@ private:
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Button", meta=(NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button", meta=(NoResetToDefault))
 	FGameplayTag ButtonActionTag;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Button", meta=(NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button", meta=(NoResetToDefault))
 	FString ButtonActionContext;
 };
