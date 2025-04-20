@@ -73,6 +73,13 @@ void UMounteaInventoryUIStatics::RemoveInventoryNotifications(
 		Target->Execute_RemoveInventoryNotifications(Target.GetObject());
 }
 
+void UMounteaInventoryUIStatics::CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const FString& SelectedCategoryId)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIInterface::Execute_CategorySelected(Target.GetObject(), SelectedCategoryId);
+}
+
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
 {
 	SearchDepth++;

@@ -107,4 +107,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	void RemoveInventoryNotifications();
 	virtual void RemoveInventoryNotifications_Implementation() = 0;
+
+	// --- Categories
+	/**
+	 * 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void CategorySelected(const FString& SelectedCategoryId);
+	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
 };

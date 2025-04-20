@@ -37,6 +37,8 @@ public:
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) override;
 	virtual void RemoveInventoryNotifications_Implementation() override;
 
+	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess), meta=(ExposeOnSpawn))

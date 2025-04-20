@@ -220,3 +220,9 @@ void UMounteaInventoryUIComponent::RemoveInventoryNotifications_Implementation()
 	IMounteaInventoryNotificationContainerWidgetInterface::Execute_ClearNotifications(InventoryNotificationContainerWidget);
 }
 
+void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString& SelectedCategoryId)
+{
+	// TODO...
+	// Refresh UI to udpate items
+}
+
