@@ -68,6 +68,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryItemWidgetClass;
 
+	// --- User Interface: Categories
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory|Categories", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryCategoryWidgetClass;
+	
 	// --- Notifications ------------------------------
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
