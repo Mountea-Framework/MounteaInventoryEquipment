@@ -116,13 +116,15 @@ bool UMounteaInventoryUIStatics::SetSourceInventory(
 	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;
 }
 
-void UMounteaInventoryUIStatics::SetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target, const FString& CategoryId)
+void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UUserWidget* Target, const FString& CategoryId)
 {
-	if (Target.GetObject())
-		Target->Execute_SetInventoryCategoryKey(Target.GetObject(), CategoryId);
+	if (IsValid(Target))
+		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetInventoryCategoryKey(Target, CategoryId);
 }
 
-FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target)
+FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(UUserWidget* Target)
 {
-	return Target.GetObject() ? Target->Execute_GetInventoryCategoryKey(Target.GetObject()) : TEXT("none");
+	return (
+		IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>()
+		) ? IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_GetInventoryCategoryKey(Target) : TEXT("none");
 }

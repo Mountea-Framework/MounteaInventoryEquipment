@@ -174,7 +174,7 @@ public:
 	 * @param CategoryId 
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
-	void SetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target, const FString& CategoryId);
+	static void SetInventoryCategoryKey(UUserWidget* Target, const FString& CategoryId);
 
 	/**
 	 * 
@@ -182,6 +182,6 @@ public:
 	 * @return 
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Categories"))
-	FString GetInventoryCategoryKey(const TScriptInterface<IMounteaAdvancedInventoryCategoryWidgetInterface>& Target);
+	static FString GetInventoryCategoryKey(UUserWidget* Target);
 	
 };
