@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
+#include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryItemWidgetInterface.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
@@ -133,7 +134,7 @@ bool UMounteaInventoryUIStatics::SetSourceInventory(
 
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UUserWidget* Target, const FString& CategoryId)
 {
-	if (IsValid(Target))
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())
 		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetInventoryCategoryKey(Target, CategoryId);
 }
 
@@ -142,6 +143,13 @@ FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(UUserWidget* Target)
 	return (
 		IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>()
 		) ? IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_GetInventoryCategoryKey(Target) : TEXT("none");
+}
+
+void UMounteaInventoryUIStatics::SetCategoryOwningInventoryUI(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())
+		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::SetInventoryItemId(UUserWidget* Target, const FGuid& ItemGuid)
@@ -155,4 +163,18 @@ FGuid UMounteaInventoryUIStatics::GetInventoryItemId(UUserWidget* Target)
 	return (
 		IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()
 		) ? IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryItemId(Target) : FGuid();
+}
+
+void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+}
+
+void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
+		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }

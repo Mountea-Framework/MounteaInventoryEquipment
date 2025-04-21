@@ -25,6 +25,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	// --- Interface Functions ------------------------------
+	
 public:
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override;
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
