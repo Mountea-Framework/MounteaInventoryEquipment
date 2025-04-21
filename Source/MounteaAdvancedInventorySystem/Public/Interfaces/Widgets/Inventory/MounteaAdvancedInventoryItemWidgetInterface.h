@@ -20,4 +20,20 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemWidgetInte
 	GENERATED_BODY()
 
 public:
+	
+	/**
+	 * 
+	 * @param ItemGuid 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void SetInventoryItemId(const FGuid& ItemGuid);
+	virtual void SetInventoryItemId_Implementation(const FGuid& ItemGuid) = 0;
+
+	/**
+	 * 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	FGuid GetInventoryItemId() const;
+	virtual FGuid GetInventoryItemId_Implementation() const = 0;
 };

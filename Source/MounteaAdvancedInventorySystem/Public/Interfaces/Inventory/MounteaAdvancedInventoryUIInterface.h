@@ -115,4 +115,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	void CategorySelected(const FString& SelectedCategoryId);
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
+
+	// --- Items
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void ItemSelected(const FGuid& SelectedItem);
+	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
 };

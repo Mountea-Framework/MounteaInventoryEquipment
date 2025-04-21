@@ -53,6 +53,8 @@ public:
 	/******************* BLUEPRINTABLE *********************/
 	/*************************************************************/
 public:
+
+	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	
 	// --- Inventory  ------------------------------
 	
@@ -106,7 +108,8 @@ public:
 	static void SetInventoryUIWrapperVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory);
 
 	// --- Notification  ------------------------------
-
+#pragma region Notification
+	
 	/**
 	 * Retrieves the widget that contains and manages inventory notifications.
 	 * @param Target The UI interface to get the notification container from
@@ -138,18 +141,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
-	/**
-	 * 
-	 * @param Target 
-	 * @param SelectedCategoryId 
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static void CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FString& SelectedCategoryId);
+#pragma endregion
 	
-	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
-
-	// --- Inventory  ------------------------------
-
+	// --- InventoryUI  ------------------------------
+#pragma region InventoryUI
+	
 	/**
 	 * 
 	 * @param Target 
@@ -174,8 +170,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static bool SetSourceInventory(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 
-	// --- Category Widget ------------------------------
+	/**
+	 * 
+	 * @param Target 
+	 * @param SelectedCategoryId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FString& SelectedCategoryId);
 
+	/**
+	 * 
+	 * @param Target 
+	 * @param ItemGuid 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FGuid& ItemGuid);
+	
+#pragma endregion
+	
+	// --- Category Widget ------------------------------
+#pragma region Category
+	
 	/**
 	 * 
 	 * @param Target 
@@ -189,7 +204,29 @@ public:
 	 * @param Target  
 	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Categories"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Getter"))
 	static FString GetInventoryCategoryKey(UUserWidget* Target);
 	
+#pragma endregion	
+	
+	// --- Item Widget ------------------------------
+#pragma region Item
+	
+	/**
+	 * 
+	 * @param Target 
+	 * @param ItemGuid 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items", meta=(CustomTag="MounteaK2Setter"))
+	static void SetInventoryItemId(UUserWidget* Target, const FGuid& ItemGuid);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items", meta=(CustomTag="MounteaK2Getter"))
+	static FGuid GetInventoryItemId(UUserWidget* Target);
+	
+#pragma endregion
 };

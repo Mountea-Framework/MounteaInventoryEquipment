@@ -38,6 +38,7 @@ public:
 	virtual void RemoveInventoryNotifications_Implementation() override;
 
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
+	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) override;
 
 private:
 

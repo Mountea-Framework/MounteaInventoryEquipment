@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
+#include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryItemWidgetInterface.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -80,6 +81,13 @@ void UMounteaInventoryUIStatics::CategorySelected(const TScriptInterface<IMounte
 		IMounteaAdvancedInventoryUIInterface::Execute_CategorySelected(Target.GetObject(), SelectedCategoryId);
 }
 
+void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const FGuid& ItemGuid)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
+}
+
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
 {
 	SearchDepth++;
@@ -134,4 +142,17 @@ FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(UUserWidget* Target)
 	return (
 		IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>()
 		) ? IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_GetInventoryCategoryKey(Target) : TEXT("none");
+}
+
+void UMounteaInventoryUIStatics::SetInventoryItemId(UUserWidget* Target, const FGuid& ItemGuid)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetInventoryItemId(Target, ItemGuid);
+}
+
+FGuid UMounteaInventoryUIStatics::GetInventoryItemId(UUserWidget* Target)
+{
+	return (
+		IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()
+		) ? IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryItemId(Target) : FGuid();
 }

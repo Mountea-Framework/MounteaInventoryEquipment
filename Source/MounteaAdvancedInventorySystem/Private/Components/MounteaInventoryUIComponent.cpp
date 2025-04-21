@@ -226,3 +226,9 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 	// Refresh UI to udpate items
 }
 
+void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& SelectedItem)
+{
+	// TODO...
+	// Refresh UI to selected item
+}
+
