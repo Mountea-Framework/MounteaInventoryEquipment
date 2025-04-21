@@ -200,6 +200,19 @@ public:
 	static void SetInventoryOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
 	
 #pragma endregion
+
+	// --- Categories Wrapper Widget ------------------------------
+#pragma region CategoriesWrapper
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param OwningInventoryUI 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	static void SetICategoriesWrapperOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	
+#pragma endregion
 	
 	// --- Category Widget ------------------------------
 #pragma region Category
