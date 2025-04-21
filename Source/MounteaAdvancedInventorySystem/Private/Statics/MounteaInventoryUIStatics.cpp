@@ -9,6 +9,7 @@
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryItemWidgetInterface.h"
+#include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -87,6 +88,13 @@ void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdv
 {
 	if (Target.GetObject())
 		IMounteaAdvancedInventoryUIInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
+}
+
+void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryWidgetInterface>())
+		IMounteaAdvancedInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)

@@ -185,6 +185,19 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FGuid& ItemGuid);
+
+#pragma endregion
+
+	// --- Inventory
+#pragma region Inventory
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param OwningInventoryUI 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
+	static void SetInventoryOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
 	
 #pragma endregion
 	
