@@ -10,6 +10,7 @@ struct FInventoryNotificationData;
 class IMounteaAdvancedInventoryInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&, SelectedItemId);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -124,4 +125,5 @@ public:
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
 
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() = 0;
+	virtual FInventoryItemSelected& GetOnItemSelectedHandle() = 0;
 };

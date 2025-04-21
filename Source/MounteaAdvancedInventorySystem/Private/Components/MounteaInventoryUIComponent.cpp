@@ -222,8 +222,9 @@ void UMounteaInventoryUIComponent::RemoveInventoryNotifications_Implementation()
 
 void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString& SelectedCategoryId)
 {
-	// TODO...
-	// Refresh UI to udpate items
+	if (ActiveCategoryId.Equals(SelectedCategoryId, ESearchCase::IgnoreCase)) return;
+	ActiveCategoryId = SelectedCategoryId;
+	
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
@@ -235,12 +236,15 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 
 void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& SelectedItem)
 {
-	// TODO...
-	// Refresh UI to selected item
+	if (ActiveItemGuid == SelectedItem) return;
+	ActiveItemGuid = SelectedItem;
+	
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
 		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemSelected, nullptr);
 	}
+
+	OnItemSelected.Broadcast(SelectedItem);
 }
 

@@ -43,11 +43,22 @@ public:
 
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
 	{ return OnCategorySelected; };
+	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
+	{ return OnItemSelected; };
 
 protected:
 
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryCategorySelected OnCategorySelected;
+
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	FInventoryItemSelected OnItemSelected;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	FString ActiveCategoryId;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	FGuid ActiveItemGuid;
 	
 private:
 
