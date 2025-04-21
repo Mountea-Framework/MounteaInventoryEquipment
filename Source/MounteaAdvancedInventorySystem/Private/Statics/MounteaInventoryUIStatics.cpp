@@ -98,11 +98,23 @@ void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UUserWidget* Targ
 		IMounteaAdvancedInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::SetICategoriesWrapperOwningInventoryUI(UUserWidget* Target,
+void UMounteaInventoryUIStatics::SetCategoriesWrapperOwningInventoryUI(UUserWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface>())
 		IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+}
+
+void UMounteaInventoryUIStatics::SetActiveCategoryIndex(UUserWidget* Target, const int32 ActiveCategoryIndex)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface>())
+		IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_SetActiveCategoryIndex(Target, ActiveCategoryIndex);
+}
+
+int32 UMounteaInventoryUIStatics::GetActiveCategoryIndex(UUserWidget* Target)
+{
+	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface>())
+		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryIndex(Target) : INDEX_NONE;
 }
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)

@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.generated.h"
 
+class IMounteaAdvancedInventoryUIInterface;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface : public UInterface
 {
@@ -25,7 +27,23 @@ public:
 	 * 
 	 * @param OwningInventoryUI 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories")
 	void SetOwningInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
 	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI) = 0;
+
+	/**
+	 * 
+	 * @param ActiveCategoryIndex 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories")
+	void SetActiveCategoryIndex(const int32 ActiveCategoryIndex = 0);
+	virtual void SetActiveCategoryIndex_Implementation(const int32 ActiveCategoryIndex = 0) = 0;
+
+	/**
+	 * 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories")
+	int32 GetActiveCategoryIndex() const;
+	virtual int32 GetActiveCategoryIndex_Implementation() const = 0;
 };
