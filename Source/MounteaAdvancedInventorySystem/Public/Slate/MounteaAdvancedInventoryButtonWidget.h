@@ -19,7 +19,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API
 
 public:
 	
-	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command) override {};
+	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload) override {};
 
 private:
 	

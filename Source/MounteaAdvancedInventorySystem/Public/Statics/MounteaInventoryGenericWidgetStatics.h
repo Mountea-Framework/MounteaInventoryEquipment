@@ -51,5 +51,5 @@ public:
 	/******************* BLUEPRINTABLE *******************/
 	/*************************************************************/
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
-	static void ProcessInventoryWidgetCommand( UObject* GenericWidget, const FString& Command); 
+	static void ProcessInventoryWidgetCommand( UObject* GenericWidget, const FString& Command, UObject* OptionalPayload); 
 };

@@ -123,7 +123,7 @@ bool UMounteaInventoryUIComponent::CreateInventoryUIWrapper_Implementation()
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CreateInventoryWidgetWrapper);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CreateInventoryWidgetWrapper, nullptr);
 	}
 
 	return true;
@@ -139,7 +139,7 @@ void UMounteaInventoryUIComponent::RemoveInventoryUIWrapper_Implementation()
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::RemoveInventoryWidgetWrapper);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::RemoveInventoryWidgetWrapper, nullptr);
 	}
 }
 
@@ -154,7 +154,7 @@ void UMounteaInventoryUIComponent::SetInventoryUIWrapperVisibility_Implementatio
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, bShowInventory ?  InventoryUICommands::OpenInventoryWidget : InventoryUICommands::CloseInventoryWidget);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, bShowInventory ?  InventoryUICommands::OpenInventoryWidget : InventoryUICommands::CloseInventoryWidget, nullptr);
 	}
 }
 
@@ -227,7 +227,7 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CategorySelected);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CategorySelected, nullptr);
 	}
 
 	OnCategorySelected.Broadcast(SelectedCategoryId);
@@ -240,7 +240,7 @@ void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& Sele
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemSelected);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemSelected, nullptr);
 	}
 }
 

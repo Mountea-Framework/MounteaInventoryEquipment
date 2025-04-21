@@ -4,11 +4,11 @@
 #include "Statics/MounteaInventoryGenericWidgetStatics.h"
 
 void UMounteaInventoryGenericWidgetStatics::ProcessInventoryWidgetCommand(UObject* GenericWidget,
-	const FString& Command)
+	const FString& Command, UObject* OptionalPayload)
 {
 	if (!IsValid(GenericWidget))
 		return;
 
 	if (GenericWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		return IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(GenericWidget, Command);
+		return IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(GenericWidget, Command, OptionalPayload);
 }

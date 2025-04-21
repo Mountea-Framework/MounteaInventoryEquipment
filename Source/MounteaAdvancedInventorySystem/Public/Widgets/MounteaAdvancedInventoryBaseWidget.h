@@ -17,5 +17,5 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryBaseWidget : p
 
 public:
 
-	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command) override {};
+	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload = nullptr) override {};
 };
