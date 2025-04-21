@@ -35,7 +35,7 @@ public:
 			else return;
 		}
 
-		if (Target->Implements<IMounteaInventoryNotificationWidgetInterface>())
+		if (Target->Implements<UMounteaInventoryNotificationWidgetInterface>())
 		{
 			if constexpr (std::is_void_v<ReturnType>)
 			{

@@ -18,7 +18,10 @@ namespace InventoryUICommands
 	const FString ToggleInventoryWidget(TEXT("ToggleInventoryWidget"));
 	
 	const FString RefreshInventoryDisplay(TEXT("RefreshInventoryDisplay"));
-	
+
+	const FString CategorySelected(TEXT("CategorySelected"));
+
+	const FString ItemSelected(TEXT("ItemSelected"));
 	const FString ShowItemDetails(TEXT("ShowItemDetails"));
 	
 	const FString SortInventoryItems(TEXT("SortInventoryItems"));
@@ -36,6 +39,9 @@ namespace InventoryUICommands
 
 		OpenEquipmentWidget,
 		CloseEquipmentWidget,
+
+		CategorySelected,
+		ItemSelected,
 		
 		ToggleInventoryWidget,
 		RefreshInventoryDisplay,

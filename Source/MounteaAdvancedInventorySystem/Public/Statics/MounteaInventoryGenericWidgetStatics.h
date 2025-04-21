@@ -31,7 +31,7 @@ public:
 			else return;
 		}
 
-		if (Target->Implements<IMounteaInventoryGenericWidgetInterface>())
+		if (Target->Implements<UMounteaInventoryGenericWidgetInterface>())
 		{
 			if constexpr (std::is_void_v<ReturnType>)
 			{

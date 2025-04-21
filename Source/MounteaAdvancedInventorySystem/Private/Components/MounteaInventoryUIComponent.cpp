@@ -224,11 +224,21 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 {
 	// TODO...
 	// Refresh UI to udpate items
+	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CategorySelected);
+	}
 }
 
 void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& SelectedItem)
 {
 	// TODO...
 	// Refresh UI to selected item
+	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemSelected);
+	}
 }
 
