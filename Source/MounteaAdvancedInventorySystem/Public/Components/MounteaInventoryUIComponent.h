@@ -41,6 +41,14 @@ public:
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) override;
 
+	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
+	{ return OnCategorySelected; };
+
+protected:
+
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	FInventoryCategorySelected OnCategorySelected;
+	
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess), meta=(ExposeOnSpawn))

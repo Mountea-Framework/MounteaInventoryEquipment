@@ -24,6 +24,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventoryGenericWidgetInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
-	void ProcessInventoryWidgetCommand(const FString& Command);
-	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command) = 0;
+	void ProcessInventoryWidgetCommand(const FString& Command, UObject* OptionalPayload = nullptr);
+	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload = nullptr) = 0;
 };

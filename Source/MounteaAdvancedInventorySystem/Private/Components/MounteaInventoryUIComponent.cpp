@@ -229,6 +229,8 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
 		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CategorySelected);
 	}
+
+	OnCategorySelected.Broadcast(SelectedCategoryId);
 }
 
 void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& SelectedItem)

@@ -9,6 +9,8 @@
 struct FInventoryNotificationData;
 class IMounteaAdvancedInventoryInterface;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryUIInterface : public UInterface
@@ -69,7 +71,7 @@ public:
 
 	/**
 	 * Sets the visibility of the inventory UI.
-	 * @param NewVisibility - The new visibility state of the UI.
+	 * @param bShowInventory The new visibility state of the UI.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	void SetInventoryUIWrapperVisibility(const bool bShowInventory);
@@ -120,4 +122,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	void ItemSelected(const FGuid& SelectedItem);
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
+
+	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() = 0;
 };
