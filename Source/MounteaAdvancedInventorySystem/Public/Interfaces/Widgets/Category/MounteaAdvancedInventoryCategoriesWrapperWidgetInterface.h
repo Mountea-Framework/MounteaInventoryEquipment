@@ -33,17 +33,17 @@ public:
 
 	/**
 	 * 
-	 * @param ActiveCategoryIndex 
+	 * @param ActiveCategoryId 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories")
-	void SetActiveCategoryIndex(const int32 ActiveCategoryIndex = 0);
-	virtual void SetActiveCategoryIndex_Implementation(const int32 ActiveCategoryIndex = 0) = 0;
+	void SetActiveCategoryId(const FString& ActiveCategoryId);
+	virtual void SetActiveCategoryId_Implementation(const FString& ActiveCategoryId) = 0;
 
 	/**
 	 * 
 	 * @return 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories")
-	int32 GetActiveCategoryIndex() const;
-	virtual int32 GetActiveCategoryIndex_Implementation() const = 0;
+	FString GetActiveCategoryId() const;
+	virtual FString GetActiveCategoryId_Implementation() const = 0;
 };

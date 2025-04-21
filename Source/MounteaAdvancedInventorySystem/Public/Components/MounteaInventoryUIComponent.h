@@ -39,7 +39,9 @@ public:
 	virtual void RemoveInventoryNotifications_Implementation() override;
 
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
+	virtual FString GetSelectedCategoryId_Implementation() const override { return ActiveCategoryId; };
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) override;
+	virtual FGuid GetActiveItemGuid_Implementation() const override { return ActiveItemGuid; };
 
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
 	{ return OnCategorySelected; };

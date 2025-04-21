@@ -112,6 +112,7 @@ public:
 	virtual void RemoveInventoryNotifications_Implementation() = 0;
 
 	// --- Categories
+	
 	/**
 	 * 
 	 */
@@ -119,10 +120,31 @@ public:
 	void CategorySelected(const FString& SelectedCategoryId);
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
 
+	/**
+	 * 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	FString GetSelectedCategoryId() const;
+	virtual FString GetSelectedCategoryId_Implementation() const = 0;
+
 	// --- Items
+	
+	/**
+	 * 
+	 * @param SelectedItem 
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	void ItemSelected(const FGuid& SelectedItem);
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
+
+	/**
+	 * 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	FGuid GetActiveItemGuid() const;
+	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
 
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() = 0;
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() = 0;
