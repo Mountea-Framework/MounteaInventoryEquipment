@@ -43,6 +43,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(GetOptions="GetAllowedCategories"))
 	FString ItemCategory;
 
+	// TODO: SUBCATEGORY!
+	// OPTIONAL
+	// CONFIG: ParentCategory, ChildCategories!
+	/**
+	 * Represents the subcategory of the inventory item, which provides additional classification beyond the main category.
+	 * Used to further organize and identify items, such as distinguishing between different types within the same category.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(GetOptions="GetAllowedSubCategories"))
+	FString ItemSubCategory = TEXT("");
+
 	/** Reference to the item’s rarity (e.g., Common, Rare, Epic). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(GetOptions="GetAllowedRarities"))
 	FString ItemRarity;
@@ -141,6 +151,8 @@ protected:
 
 	UFUNCTION()
 	static TArray<FString> GetAllowedCategories();
+	UFUNCTION()
+	TArray<FString> GetAllowedSubCategories() const;
 	UFUNCTION()
 	static TArray<FString> GetAllowedRarities();
 

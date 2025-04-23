@@ -67,6 +67,14 @@ struct FInventoryCategory
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
 	FText CategoryDisplayName = LOCTEXT("InventoryCategory_DisplayName", "");
 
+	// TODO: custom structure to hold Gameplay Tags?
+	/**
+	 * Array of localized subcategory names associated with the inventory category.
+	 * Used for further categorization within a primary category, allowing more detailed item classification.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
+	TArray<FText> SubCategories;
+
 	/**
 	 * Priority for sorting categories in UI or other contexts.
 	 */

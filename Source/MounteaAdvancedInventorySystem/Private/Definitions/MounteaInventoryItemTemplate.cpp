@@ -4,6 +4,7 @@
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
 #include "Definitions/MounteaInventoryBaseEnums.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
@@ -41,6 +42,28 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedCategories()
 	return inventorySettings->GetAllowedCategories();
 }
 
+TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
+{
+	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(inventorySettings))
+	{
+		TArray<FString> returnValues;
+		returnValues.Add(TEXT(""));
+		return returnValues;
+	}
+	auto inventorySettingsConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(inventorySettingsConfig))
+		TArray<FString> returnValues;
+
+	TArray<FString> returnValues;
+	if (const auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory))
+	{
+		for (auto subCategory : categoryConfiguration->SubCategories)
+			returnValues.Add(subCategory.ToString());
+	}
+	return returnValues;
+}
+
 TArray<FString> UMounteaInventoryItemTemplate::GetAllowedRarities()
 {
 	TArray<FString> returnValues;
@@ -71,6 +94,8 @@ void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChang
 			auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory);
 			ItemFlags = categoryConfiguration->CategoryFlags;
 		}
+
+		ItemSubCategory = TEXT("");
 	}
 }
 
