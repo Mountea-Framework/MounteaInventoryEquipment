@@ -62,6 +62,9 @@ public:
 
 	// --- User Interface: Items
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryItemSlotsWrapperWidgetClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryItemSlotWidgetClass;
 
