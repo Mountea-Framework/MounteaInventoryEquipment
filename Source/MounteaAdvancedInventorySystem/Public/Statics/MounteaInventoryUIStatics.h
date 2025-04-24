@@ -322,4 +322,17 @@ public:
 	static void SetItemSlotOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
 	
 #pragma endregion
+
+	// --- Item Slots Wrapper ------------------------------
+#pragma region ItemSlotsWrapper
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param OwningInventoryUI 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"))
+	static void SetItemSlotsWrapperOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	
+#pragma endregion
 };

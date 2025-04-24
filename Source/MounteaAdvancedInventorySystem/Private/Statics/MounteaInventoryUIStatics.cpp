@@ -11,6 +11,7 @@
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
+#include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -223,4 +224,11 @@ void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Targe
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+}
+
+void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
+		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
