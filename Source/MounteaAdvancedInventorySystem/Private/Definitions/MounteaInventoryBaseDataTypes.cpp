@@ -8,7 +8,11 @@ FInventoryRarity::FInventoryRarity() : RarityColor(FColor::Silver)
 {
 }
 
-FInventoryCategory::FInventoryCategory() : DisplayIcon(nullptr), CategoryFlags(0)
+FInventoryCategoryData::FInventoryCategoryData(): DisplayIcon(nullptr), CategoryFlags(0)
+{
+}
+
+FInventoryCategory::FInventoryCategory() : CategoryData()
 {
 }
 

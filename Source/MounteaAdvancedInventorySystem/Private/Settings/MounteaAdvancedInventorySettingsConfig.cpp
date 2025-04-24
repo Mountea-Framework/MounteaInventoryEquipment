@@ -4,6 +4,7 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySettingsConfig"
 
@@ -171,39 +172,39 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
 	
 	// Setup item categories
 	FInventoryCategory WeaponCategory;
-	WeaponCategory.CategoryDisplayName = LOCTEXT("WeaponCategory", "Weapons");
-	WeaponCategory.CategoryPriority = 0;
-	WeaponCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
+	WeaponCategory.CategoryData.CategoryDisplayName = LOCTEXT("WeaponCategory", "Weapons");
+	WeaponCategory.CategoryData.CategoryPriority = 0;
+	WeaponCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
 	AllowedCategories.Add("Weapons", WeaponCategory);
 	
 	FInventoryCategory ArmorCategory;
-	ArmorCategory.CategoryDisplayName = LOCTEXT("ArmorCategory", "Armor");
-	ArmorCategory.CategoryPriority = 1;
-	ArmorCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
+	ArmorCategory.CategoryData.CategoryDisplayName = LOCTEXT("ArmorCategory", "Armor");
+	ArmorCategory.CategoryData.CategoryPriority = 1;
+	ArmorCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
 	AllowedCategories.Add("Armors", ArmorCategory);
 	
 	FInventoryCategory ConsumableCategory;
-	ConsumableCategory.CategoryDisplayName = LOCTEXT("ConsumableCategory", "Consumables");
-	ConsumableCategory.CategoryPriority = 2;
-	ConsumableCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable | EInventoryItemFlags::EIIF_Stackable);
+	ConsumableCategory.CategoryData.CategoryDisplayName = LOCTEXT("ConsumableCategory", "Consumables");
+	ConsumableCategory.CategoryData.CategoryPriority = 2;
+	ConsumableCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable | EInventoryItemFlags::EIIF_Stackable);
 	AllowedCategories.Add("Consumables", ConsumableCategory);
 	
 	FInventoryCategory MaterialCategory;
-	MaterialCategory.CategoryDisplayName = LOCTEXT("MaterialCategory", "Materials");
-	MaterialCategory.CategoryPriority = 3;
-	MaterialCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable | EInventoryItemFlags::EIIF_Stackable);
+	MaterialCategory.CategoryData.CategoryDisplayName = LOCTEXT("MaterialCategory", "Materials");
+	MaterialCategory.CategoryData.CategoryPriority = 3;
+	MaterialCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable | EInventoryItemFlags::EIIF_Stackable);
 	AllowedCategories.Add("Materials", MaterialCategory);
 
 	FInventoryCategory QuestCategory;
-	QuestCategory.CategoryDisplayName = LOCTEXT("QuestCategory", "Quest Items");
-	QuestCategory.CategoryPriority = 4;
-	QuestCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+	QuestCategory.CategoryData.CategoryDisplayName = LOCTEXT("QuestCategory", "Quest Items");
+	QuestCategory.CategoryData.CategoryPriority = 4;
+	QuestCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
 	AllowedCategories.Add("Quest Items", QuestCategory);
 
 	FInventoryCategory KeysCategory;
-	KeysCategory.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
-	KeysCategory.CategoryPriority = 4;
-	KeysCategory.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+	KeysCategory.CategoryData.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
+	KeysCategory.CategoryData.CategoryPriority = 4;
+	KeysCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
 	AllowedCategories.Add("Keys", KeysCategory);
 	
 	// Setup item rarities
@@ -318,14 +319,41 @@ void UMounteaAdvancedInventorySettingsConfig::PostEditChangeChainProperty(struct
 	{
 		SetupWidgetCommands();
 	}
-
-	if (PropertyChangedEvent.GetPropertyName() != GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, AllowedInventoryTypes))
+	
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, AllowedInventoryTypes))
 	{
-		return;
-	}
-
-	ValidateInventoryTypes();
+		ValidateInventoryTypes();
+	}	
 }
+
+void UMounteaAdvancedInventorySettingsConfig::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.GetMemberPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, AllowedCategories))
+	{
+		for (auto& category : AllowedCategories)
+		{
+			FInventoryCategory& categoryData = category.Value;
+			TMap<FString, FInventoryCategoryData>& subCategories = categoryData.SubCategories;
+
+			for (auto& subcategory : subCategories)
+			{
+				FInventoryCategoryData& subCategoryData = subcategory.Value;
+				
+				if (subCategoryData.CategoryFlags == 0)
+					subCategoryData.CategoryFlags = categoryData.CategoryData.CategoryFlags;
+
+				if (subCategoryData.AllowedActions.Num() == 0)
+					subCategoryData.AllowedActions = categoryData.CategoryData.AllowedActions;
+
+				if (subCategoryData.CategoryTags.IsEmpty())
+					subCategoryData.CategoryTags.AppendTags(categoryData.CategoryData.CategoryTags);
+			}
+		}
+	}	
+}
+
 #endif
 
 #undef LOCTEXT_NAMESPACE

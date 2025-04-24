@@ -43,9 +43,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(GetOptions="GetAllowedCategories"))
 	FString ItemCategory;
 
-	// TODO: SUBCATEGORY!
-	// OPTIONAL
-	// CONFIG: ParentCategory, ChildCategories!
 	/**
 	 * Represents the subcategory of the inventory item, which provides additional classification beyond the main category.
 	 * Used to further organize and identify items, such as distinguishing between different types within the same category.

@@ -57,10 +57,8 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
 
 	TArray<FString> returnValues;
 	if (const auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory))
-	{
-		for (auto subCategory : categoryConfiguration->SubCategories)
-			returnValues.Add(subCategory.ToString());
-	}
+		categoryConfiguration->SubCategories.GetKeys(returnValues);
+	
 	return returnValues;
 }
 
@@ -92,7 +90,7 @@ void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChang
 		if (inventorySettingsConfig)
 		{
 			auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory);
-			ItemFlags = categoryConfiguration->CategoryFlags;
+			ItemFlags = categoryConfiguration->CategoryData.CategoryFlags;
 		}
 
 		ItemSubCategory = TEXT("");

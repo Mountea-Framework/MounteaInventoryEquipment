@@ -31,22 +31,22 @@ public:
 
 	// --- Types ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Types", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Types", meta=(ForceInlineRow, NoResetToDefault))
 	TMap<EInventoryType, FInventoryTypeConfig> AllowedInventoryTypes;
 
 	// --- Rarities ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rarities", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rarities", meta=(ForceInlineRow, NoResetToDefault))
 	TMap<FString, FInventoryRarity> AllowedRarities;
 
 	// --- Categories ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Categories", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Categories", meta=(ForceInlineRow, NoResetToDefault))
 	TMap<FString, FInventoryCategory> AllowedCategories;
 
 	// --- Limits ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Limits", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Limits", meta=(NoResetToDefault))
 	float InventoryBaseWeightLimit = 150.f;
 
 	// --- User Interface ------------------------------
@@ -57,7 +57,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Inventory", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Config", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Config", meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;
 
 	// --- User Interface: Items
@@ -84,13 +84,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Notifications", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
 	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Style", meta=(ShowOnlyInnerProperties, ForceInlineRow))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Style", meta=(ForceInlineRow))
 	TMap<EInventoryNotificationCategory, FInventoryNotificationStyle> NotificationCategoryStyle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config", meta=(ShowOnlyInnerProperties, ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config", meta=(NoResetToDefault))
 	TSet<FString> NotificationTypes;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config", meta=(ShowOnlyInnerProperties, ForceInlineRow), meta=(GetKeyOptions="GetNotificationTypes"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config", meta=(ForceInlineRow), meta=(GetKeyOptions="GetNotificationTypes"))
 	TMap<FString, FInventoryNotificationConfig> NotificationConfigs;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|UserInterface")
@@ -123,6 +123,7 @@ public:
 	void SetDefaultNotificationConfig();
 protected:
 	virtual void PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent) override;
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 	
 };

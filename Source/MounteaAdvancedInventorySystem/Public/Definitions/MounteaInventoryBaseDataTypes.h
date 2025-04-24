@@ -52,28 +52,21 @@ struct FInventoryRarity
 #define LOCTEXT_NAMESPACE "InventoryCategory"
 
 /**
- * Structure defining inventory category properties.
+ * Structure representing the category data for an inventory system, providing configuration and metadata
+ * for organizing and defining inventory item categories.
  */
 USTRUCT(BlueprintType)
-struct FInventoryCategory
+struct FInventoryCategoryData
 {
 	GENERATED_BODY()
 
-	FInventoryCategory();
+	FInventoryCategoryData();
 
 	/**
 	 * The name of the item category (e.g., Weapon, Armor, Consumable), localized.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
 	FText CategoryDisplayName = LOCTEXT("InventoryCategory_DisplayName", "");
-
-	// TODO: custom structure to hold Gameplay Tags?
-	/**
-	 * Array of localized subcategory names associated with the inventory category.
-	 * Used for further categorization within a primary category, allowing more detailed item classification.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
-	TArray<FText> SubCategories;
 
 	/**
 	 * Priority for sorting categories in UI or other contexts.
@@ -105,6 +98,31 @@ struct FInventoryCategory
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
 	TSet<TSoftClassPtr<UMounteaInventoryItemAction>> AllowedActions;
+};
+
+/**
+ * Structure defining inventory category properties.
+ */
+USTRUCT(BlueprintType)
+struct FInventoryCategory
+{
+	GENERATED_BODY()
+
+	FInventoryCategory();
+
+	/**
+	 * Represents inventory category data, providing properties and metadata
+	 * for managing and representing inventory category.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ShowOnlyInnerProperties))
+	FInventoryCategoryData CategoryData;
+		
+	/**
+	 * Array of localized subcategory names associated with the inventory category.
+	 * Used for further categorization within a primary category, allowing more detailed item classification.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ForceInlineRow, ShowOnlyInnerProperties))
+	TMap<FString,FInventoryCategoryData> SubCategories;
 };
 
 #undef LOCTEXT_NAMESPACE
@@ -211,11 +229,11 @@ FORCEINLINE bool operator!=(const FInventoryRarity& LHS, const FInventoryRarity&
 // Equality operator for FInventoryCategory
 FORCEINLINE bool operator==(const FInventoryCategory& LHS, const FInventoryCategory& RHS)
 {
-	return LHS.CategoryDisplayName.EqualTo(RHS.CategoryDisplayName) &&
-		   LHS.CategoryPriority == RHS.CategoryPriority &&
-		   LHS.CategoryTags == RHS.CategoryTags &&
-		   LHS.DisplayIcon == RHS.DisplayIcon &&
-		   LHS.CategoryFlags == RHS.CategoryFlags;
+	return LHS.CategoryData.CategoryDisplayName.EqualTo(RHS.CategoryData.CategoryDisplayName) &&
+		   LHS.CategoryData.CategoryPriority == RHS.CategoryData.CategoryPriority &&
+		   LHS.CategoryData.CategoryTags == RHS.CategoryData.CategoryTags &&
+		   LHS.CategoryData.DisplayIcon == RHS.CategoryData.DisplayIcon &&
+		   LHS.CategoryData.CategoryFlags == RHS.CategoryData.CategoryFlags;
 }
 
 // Inequality operator for FInventoryCategory
