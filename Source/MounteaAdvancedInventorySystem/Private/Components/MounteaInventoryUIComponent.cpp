@@ -52,6 +52,10 @@ void UMounteaInventoryUIComponent::BeginPlay()
 
 			ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
 			ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
+			ParentInventory->GetOnItemRemovedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemRemoved);
+
+			ParentInventory->GetOnItemDurabilityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemDurabilityChanged);
+			ParentInventory->GetOnItemQuantityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemQuantityChanged);
 		}
 	}
 }
@@ -238,6 +242,38 @@ void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FInvent
 	}
 }
 
+void UMounteaInventoryUIComponent::ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem)
+{
+	if (!IsValid(InventoryWidget))
+	{
+		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!"))
+		return;
+	}
+
+	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
+		newPayload->PayloadData.Add(ModifiedItem.Guid);
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemModified, newPayload);
+	}
+}
+
+void UMounteaInventoryUIComponent::ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem)
+{
+	if (!IsValid(InventoryWidget))
+	{
+		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!"))
+		return;
+	}
+
+	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
+		newPayload->PayloadData.Add(RemovedItem.Guid);
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemRemoved, newPayload);
+	}
+}
+
 void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString& SelectedCategoryId)
 {
 	if (ActiveCategoryId.Equals(SelectedCategoryId, ESearchCase::IgnoreCase)) return;
@@ -264,5 +300,17 @@ void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& Sele
 	}
 
 	OnItemSelected.Broadcast(SelectedItem);
+}
+
+void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability,
+	const float NewDurability)
+{
+	Execute_ProcessItemModified(this, Item);
+}
+
+void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity,
+	const int32 NewQuantity)
+{
+	Execute_ProcessItemModified(this, Item);
 }
 

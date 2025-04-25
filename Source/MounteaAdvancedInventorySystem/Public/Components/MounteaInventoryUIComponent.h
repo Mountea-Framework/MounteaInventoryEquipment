@@ -40,6 +40,8 @@ public:
 	virtual void RemoveInventoryNotifications_Implementation() override;
 
 	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) override;
+	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) override;
+	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) override;
 
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
 	virtual FString GetSelectedCategoryId_Implementation() const override { return ActiveCategoryId; };
@@ -50,6 +52,13 @@ public:
 	{ return OnCategorySelected; };
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
 	{ return OnItemSelected; };
+
+protected:
+
+	UFUNCTION()
+	void ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability, const float NewDurability);
+	UFUNCTION()
+	void ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
 
 protected:
 

@@ -20,6 +20,8 @@ namespace InventoryUICommands
 	const FString RefreshInventory(TEXT("RefreshInventory"));
 
 	const FString ItemAdded(TEXT("ItemAdded"));
+	const FString ItemRemoved(TEXT("ItemRemoved"));
+	const FString ItemModified(TEXT("ItemModified"));
 
 	const FString CategorySelected(TEXT("CategorySelected"));
 
@@ -46,6 +48,8 @@ namespace InventoryUICommands
 		ItemSelected,
 
 		ItemAdded,
+		ItemRemoved,
+		ItemModified,
 		
 		ToggleInventoryWidget,
 		RefreshInventory,

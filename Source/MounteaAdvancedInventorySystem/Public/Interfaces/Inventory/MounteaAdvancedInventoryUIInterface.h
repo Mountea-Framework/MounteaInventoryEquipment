@@ -131,9 +131,29 @@ public:
 
 	// --- Items
 
+	/**
+	 * 
+	 * @param AddedItem 
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	void ProcessItemAdded(const FInventoryItem& AddedItem);
 	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) = 0;
+
+	/**
+	 * 
+	 * @param RemovedItem 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void ProcessItemRemoved(const FInventoryItem& RemovedItem);
+	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) = 0;
+
+	/**
+	 * 
+	 * @param ModifiedItem 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void ProcessItemModified(const FInventoryItem& ModifiedItem);
+	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) = 0;
 	
 	/**
 	 * 
