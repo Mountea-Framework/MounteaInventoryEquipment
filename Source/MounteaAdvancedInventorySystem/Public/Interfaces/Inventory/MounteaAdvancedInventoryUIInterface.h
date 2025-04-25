@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryUIInterface.generated.h"
 
+struct FInventoryItem;
 struct FInventoryNotificationData;
 class IMounteaAdvancedInventoryInterface;
 
@@ -129,6 +130,10 @@ public:
 	virtual FString GetSelectedCategoryId_Implementation() const = 0;
 
 	// --- Items
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void ProcessItemAdded(const FInventoryItem& AddedItem);
+	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) = 0;
 	
 	/**
 	 * 

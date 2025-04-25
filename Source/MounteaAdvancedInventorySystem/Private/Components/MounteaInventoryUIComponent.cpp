@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryBaseCommands.h"
+#include "Helpers/MounteaAdvancedInventoryWidgetPayload.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
@@ -49,7 +50,8 @@ void UMounteaInventoryUIComponent::BeginPlay()
 			Execute_SetParentInventory(this, inventoryComponent);
 			ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
 
-			ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::UMounteaInventoryUIComponent::CreateInventoryNotification);
+			ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
+			ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
 		}
 	}
 }
@@ -218,6 +220,22 @@ void UMounteaInventoryUIComponent::RemoveInventoryNotifications_Implementation()
 	ensure(notificationContainerInterface.GetObject() != nullptr);
 
 	IMounteaInventoryNotificationContainerWidgetInterface::Execute_ClearNotifications(InventoryNotificationContainerWidget);
+}
+
+void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FInventoryItem& AddedItem)
+{
+	if (!IsValid(InventoryWidget))
+	{
+		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!"))
+		return;
+	}
+
+	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
+		newPayload->PayloadData.Add(AddedItem.Guid);
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemAdded, newPayload);
+	}
 }
 
 void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString& SelectedCategoryId)

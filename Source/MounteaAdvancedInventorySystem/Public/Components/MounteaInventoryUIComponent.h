@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
 
@@ -21,7 +22,7 @@ public:
 	UMounteaInventoryUIComponent();
 
 protected:
-
+	
 	virtual void BeginPlay() override;
 
 	// --- Interface Functions ------------------------------
@@ -37,6 +38,8 @@ public:
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) override;
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) override;
 	virtual void RemoveInventoryNotifications_Implementation() override;
+
+	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) override;
 
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
 	virtual FString GetSelectedCategoryId_Implementation() const override { return ActiveCategoryId; };
