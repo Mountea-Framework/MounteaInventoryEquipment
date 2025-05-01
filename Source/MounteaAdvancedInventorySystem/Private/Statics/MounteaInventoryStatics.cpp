@@ -109,6 +109,12 @@ FInventoryCategory UMounteaInventoryStatics::GetInventoryCategory(const FInvento
 	return inventorySettingsConfig->AllowedCategories.Contains(categoryKey) ? inventorySettingsConfig->AllowedCategories.FindChecked(categoryKey) : FInventoryCategory();
 }
 
+FString UMounteaInventoryStatics::GetInventoryCategoryKey(const FInventoryItem& Item)
+{
+	if (!Item.Template) return TEXT("");
+	return Item.Template->ItemCategory;
+}
+
 FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryItem& Item)
 {
 	if (!Item.Template) return FInventoryRarity();
@@ -118,6 +124,12 @@ FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryIt
 	if (!inventorySettingsConfig) return FInventoryRarity();
 	const auto rarityKey = Item.Template->ItemCategory;
 	return inventorySettingsConfig->AllowedRarities.Contains(rarityKey) ? inventorySettingsConfig->AllowedRarities.FindChecked(rarityKey) : FInventoryRarity();
+}
+
+FString UMounteaInventoryStatics::GetInventoryRarityKey(const FInventoryItem& Item)
+{
+	if (!Item.Template) return TEXT("");
+	return Item.Template->ItemCategory;
 }
 
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(

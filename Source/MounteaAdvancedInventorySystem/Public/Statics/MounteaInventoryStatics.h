@@ -220,7 +220,19 @@ public:
 	 * @param Item 
 	 * @return 
 	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FString GetInventoryCategoryKey(const FInventoryItem& Item);
+
+	/**
+	 * 
+	 * @param Item 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static FInventoryRarity GetInventoryRarity(const FInventoryItem& Item);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FString GetInventoryRarityKey(const FInventoryItem& Item);
 	
 	/*************************************************************/
 	/************************ INTERNAL ***********************/
