@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
@@ -206,6 +207,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static FString InventoryItemToString(const FInventoryItem& Item);
 
+	/**
+	 * 
+	 * @param Item 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FInventoryCategory GetInventoryCategory(const FInventoryItem& Item);
+
+	/**
+	 * 
+	 * @param Item 
+	 * @return 
+	 */
+	static FInventoryRarity GetInventoryRarity(const FInventoryItem& Item);
+	
 	/*************************************************************/
 	/************************ INTERNAL ***********************/
 	/*************************************************************/

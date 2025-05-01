@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
@@ -95,6 +96,28 @@ void UMounteaInventoryStatics::ProcessInventoryNotification(const TScriptInterfa
 FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& Item)
 {
 	return Item.ToString();
+}
+
+FInventoryCategory UMounteaInventoryStatics::GetInventoryCategory(const FInventoryItem& Item)
+{
+	if (!Item.Template) return FInventoryCategory();
+	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!settings) return FInventoryCategory();
+	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!inventorySettingsConfig) return FInventoryCategory();
+	const auto categoryKey = Item.Template->ItemCategory;
+	return inventorySettingsConfig->AllowedCategories.Contains(categoryKey) ? inventorySettingsConfig->AllowedCategories.FindChecked(categoryKey) : FInventoryCategory();
+}
+
+FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryItem& Item)
+{
+	if (!Item.Template) return FInventoryRarity();
+	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!settings) return FInventoryRarity();
+	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!inventorySettingsConfig) return FInventoryRarity();
+	const auto rarityKey = Item.Template->ItemCategory;
+	return inventorySettingsConfig->AllowedRarities.Contains(rarityKey) ? inventorySettingsConfig->AllowedRarities.FindChecked(rarityKey) : FInventoryRarity();
 }
 
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
