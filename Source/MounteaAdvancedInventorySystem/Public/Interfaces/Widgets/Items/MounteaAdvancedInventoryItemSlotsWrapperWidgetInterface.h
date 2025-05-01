@@ -38,4 +38,16 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
 	void AddItem(const FGuid& ItemId);
 	virtual void AddItem_Implementation(const FGuid& ItemId) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void UpdateItem(const FGuid& ItemId);
+	virtual void UpdateItem_Implementation(const FGuid& ItemId) = 0;
+
+	/**
+	 * 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void RemoveItem(const FGuid& ItemId);
+	virtual void RemoveItem_Implementation(const FGuid& ItemId) = 0;
 };

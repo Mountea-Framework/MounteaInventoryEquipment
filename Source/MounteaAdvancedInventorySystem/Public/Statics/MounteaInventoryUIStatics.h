@@ -333,6 +333,30 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"))
 	static void SetItemSlotsWrapperOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item")
+	static void SlotsWrapper_AddItem(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Update Item")
+	static void SlotsWrapper_UpdateItem(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item")
+	static void SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId);
 	
 #pragma endregion
 };
