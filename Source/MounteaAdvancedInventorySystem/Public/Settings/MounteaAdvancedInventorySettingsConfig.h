@@ -51,6 +51,12 @@ public:
 
 	// --- User Interface ------------------------------
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
+	FVector2D ItemSlotSize = FVector2D(128.0f, 128.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual", meta=(UIMin=0.1f,UIMax=1.f,ClampMin=0.1f,ClampMax=1.f))
+	float ItemSlotAspectRatio = 1.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Wrapper", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
 	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
 
