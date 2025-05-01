@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemsGridWidgetInterface.generated.h"
 
@@ -123,4 +124,29 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
 	bool IsItemInGrid(const FGuid& ItemId) const;
 	virtual bool IsItemInGrid_Implementation(const FGuid& ItemId) const = 0;
+
+	/**
+	 * Retrieves the data of a specific inventory grid slot.
+	 *
+	 * This method returns information about a grid slot based on its index.
+	 * It is used to fetch details such as the position of the slot and the item it contains.
+	 *
+	 * @param SlotIndex The index of the grid slot to retrieve data for.
+	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	FMounteaInventoryGridSlot GetGridSlotData(const int32 SlotIndex) const;
+	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation(const int32 SlotIndex) const = 0;
+
+	/**
+	 * Retrieves the data of all inventory grid slots.
+	 *
+	 * This method returns a set of FMounteaInventoryGridSlot, each representing an individual slot in the inventory grid.
+	 * The data includes information such as the slot's position and the item it contains.
+	 *
+	 * @return A set of FMounteaInventoryGridSlot containing the data for all slots in the grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	TSet<FMounteaInventoryGridSlot> GetGridSlotsData() const;
+	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsData_Implementation() const = 0;
 };
