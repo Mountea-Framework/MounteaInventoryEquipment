@@ -412,4 +412,129 @@ public:
 	static void SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId);
 	
 #pragma endregion
+
+// --- Items Grid ------------------------------
+#pragma region ItemsGrid
+
+	/**
+	 * Adds an item to the first available (empty) slot in the grid.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param ItemId The unique identifier of the item to add
+	 * @return True if the item was successfully added; false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Empty Slot")
+	static bool ItemsGrid_AddItemToEmptySlot(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * Adds an item to a specific slot in the grid.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param ItemId The unique identifier of the item to add
+	 * @param SlotIndex The index of the slot to place the item into
+	 * @return True if the item was successfully added; false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Slot")
+	static bool ItemsGrid_AddItemToSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex);
+
+	/**
+	 * Removes an item from the specified slot.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param SlotIndex The index of the slot from which to remove the item
+	 * @return True if the item was successfully removed; false if the slot is empty or invalid
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item From Slot")
+	static bool ItemsGrid_RemoveItemFromSlot(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Gets the item ID from a specific slot.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param SlotIndex The index of the slot to query
+	 * @return The unique identifier (FGuid) of the item in the slot. 
+	 *         If the slot is empty, returns an invalid FGuid
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Item In Slot")
+	static FGuid ItemsGrid_GetItemInSlot(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Swaps the items between two specific slots.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param SlotIndex1 The index of the first slot
+	 * @param SlotIndex2 The index of the second slot
+	 * @return True if the swap was successful; false if either slot is invalid
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Swap Items Between Slots")
+	static bool ItemsGrid_SwapItemsBetweenSlots(UUserWidget* Target, const int32 SlotIndex1, const int32 SlotIndex2);
+
+	/**
+	 * Clears all items from every slot in the grid.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * This is useful for resetting or clearing the inventory grid entirely
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Clear All Slots")
+	static void ItemsGrid_ClearAllSlots(UUserWidget* Target);
+
+	/**
+	 * Gets the total number of slots in the grid.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @return The total number of slots available in the inventory grid
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Total Slots")
+	static int32 ItemsGrid_GetTotalSlots(UUserWidget* Target);
+
+	/**
+	 * Checks if a specific slot is empty.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param SlotIndex The index of the slot to check
+	 * @return True if the slot is empty; false if it contains an item
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Is Slot Empty")
+	static bool ItemsGrid_IsSlotEmpty(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Gets the slot index that contains the specified item.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param ItemId The unique identifier (FGuid) of the item to locate
+	 * @return The index of the slot that contains the item, or -1 if the item is not found
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Slot Index By Item")
+	static int32 ItemsGrid_GetSlotIndexByItem(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * Checks if a specific item exists anywhere in the grid.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param ItemId The unique identifier of the item to check for
+	 * @return True if the item is found in the grid; false if it is not present
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Is Item In Grid")
+	static bool ItemsGrid_IsItemInGrid(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * Retrieves the data of a specific inventory grid slot.
+	 *
+	 * @param Target The items grid widget interface to query
+	 * @param SlotIndex The index of the grid slot to retrieve data for
+	 * @return FMounteaInventoryGridSlot containing information about the specified slot
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Grid Slot Data")
+	static FMounteaInventoryGridSlot ItemsGrid_GetGridSlotData(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Retrieves the data of all inventory grid slots.
+	 *
+	 * @param Target The items grid widget interface to query
+	 * @return A set of FMounteaInventoryGridSlot containing the data for all slots in the grid
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Grid Slots Data")
+	static TSet<FMounteaInventoryGridSlot> ItemsGrid_GetGridSlotsData(UUserWidget* Target);
+
+#pragma endregion
 };
