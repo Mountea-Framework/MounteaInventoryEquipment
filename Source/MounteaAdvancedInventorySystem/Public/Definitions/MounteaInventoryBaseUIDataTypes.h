@@ -35,7 +35,21 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
 	FGuid OccupiedItemId;
 
+	/**
+	 * Specifies the associated user interface widget for the inventory slot.
+	 *
+	 * This property holds a reference to a UUserWidget, which can be used to visually represent
+	 * the slot within the inventory system. Allows customization and configuration of slot appearance
+	 * and behavior through the editor and Blueprints.
+	 *
+	 * Editable in the editor and accessible in Blueprints.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
+	TObjectPtr<UUserWidget> SlotWidget;
+
 public:
+
+	bool IsValid() const { return SlotWidget != nullptr; };
 		
 	void ResetSlot()	{	OccupiedItemId = FGuid();	};
 	

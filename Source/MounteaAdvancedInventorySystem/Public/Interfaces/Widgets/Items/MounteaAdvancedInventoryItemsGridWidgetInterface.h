@@ -149,4 +149,16 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
 	TSet<FMounteaInventoryGridSlot> GetGridSlotsData() const;
 	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsData_Implementation() const = 0;
+
+	/**
+	 * Retrieves the user interface widget associated with an individual item slot in the grid.
+	 *
+	 * This method allows access to the UI representation of a specific item slot, useful for customization,
+	 * updates, or interaction within the inventory system.
+	 *
+	 * @return The UUserWidget representing the item slot. Returns nullptr if no widget is associated.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UUserWidget* GetItemWidgetInSlot(const int32 SlotIndex) const;
+	virtual UUserWidget* GetItemWidgetInSlot_Implementation(const int32 SlotIndex) const = 0;
 };

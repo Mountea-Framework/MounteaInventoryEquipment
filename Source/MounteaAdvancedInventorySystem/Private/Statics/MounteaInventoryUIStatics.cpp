@@ -153,8 +153,14 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 	return nullptr;
 }
 
+void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData,
+	const FMounteaInventoryGridSlot& TargetData)
+{
+	SourceData = TargetData;
+}
+
 void UMounteaInventoryUIStatics::StoreItem(FMounteaInventoryGridSlot& SourceData,
-	const FGuid& ItemId)
+										   const FGuid& ItemId)
 {
 	SourceData.OccupiedItemId = ItemId;
 }
@@ -232,8 +238,14 @@ void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UUserWidget* Target,
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
 
+void UMounteaInventoryUIStatics::Item_RefreshWidget(UUserWidget* Target)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_RefreshWidget(Target);
+}
+
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+															  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
@@ -351,4 +363,9 @@ FMounteaInventoryGridSlot UMounteaInventoryUIStatics::ItemsGrid_GetGridSlotData(
 TSet<FMounteaInventoryGridSlot> UMounteaInventoryUIStatics::ItemsGrid_GetGridSlotsData(UUserWidget* Target)
 {
 	return IsValid(Target) ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(Target) : TSet<FMounteaInventoryGridSlot>();
+}
+
+UUserWidget* UMounteaInventoryUIStatics::ItemsGrid_GetItemWidgetInSlot(UUserWidget* Target, const int32 SlotIndex)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetItemWidgetInSlot(Target, SlotIndex) : nullptr;
 }
