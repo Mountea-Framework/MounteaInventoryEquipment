@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+struct FMounteaInventoryGridSlot;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventoryBaseWidgetInterface;
 /**
@@ -55,27 +56,26 @@ public:
 public:
 
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
-	
-	// --- Inventory  ------------------------------
-	
-	/**
-	 * Retrieves the parent inventory associated with this UI.
-	 * @param Target The UI interface to get the parent inventory from
-	 * @return The parent inventory interface that manages the items and slots
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
-	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
-	 * Sets the parent inventory for this UI.
-	 * @param Target The UI interface to set the parent inventory on
-	 * @param NewParentInventory The inventory interface to associate with this UI
+	 *
+	 * @param SourceData 
+	 * @param ItemId 
+	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static void StoreItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData, const FGuid& ItemId);
+
+	/**
+	 * 
+	 * @param SourceData 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static void ResetItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData);
 
 	// --- Main UI  ------------------------------
-
+#pragma region MainUI
+	
 	/**
 	 * Creates and initializes the inventory UI widgets.
 	 * @param Target The UI interface to create the inventory UI for
@@ -106,7 +106,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void SetInventoryUIWrapperVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory);
-
+#pragma endregion
+	
 	// --- Notification  ------------------------------
 #pragma region Notification
 	
@@ -206,7 +207,22 @@ public:
 
 	// --- Inventory
 #pragma region Inventory
+	/**
+	 * Retrieves the parent inventory associated with this UI.
+	 * @param Target The UI interface to get the parent inventory from
+	 * @return The parent inventory interface that manages the items and slots
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
+	/**
+	 * Sets the parent inventory for this UI.
+	 * @param Target The UI interface to set the parent inventory on
+	 * @param NewParentInventory The inventory interface to associate with this UI
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
+	
 	/**
 	 * 
 	 * @param Target 
@@ -320,6 +336,43 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"))
 	static void SetItemSlotOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+
+	/**
+	 * 
+	 *
+	 * @param OwningInventoryUI 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Slot")
+	static void ItemSlot_AddItemToSlot(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * 
+	 *
+	 * @param OwningInventoryUI 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item From Slot")
+	static void ItemSlot_RemoveItemFromSlot(UUserWidget* Target, const FGuid& ItemId);
+	
+	/**
+	 * Stores the grid slot data for inventory purposes.
+	 * This is optional information not all Slots need have (non-grid
+	 * based inventory layouts won't have any grid slot data).
+	 *
+	 * @param OwningInventoryUI 
+	 * @param SlotData The grid slot data to be stored.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"))
+	static void StoreGridSlotData(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Item Slot Data")
+	static FMounteaInventoryGridSlot GetGridSlotData(UUserWidget* Target);
 	
 #pragma endregion
 

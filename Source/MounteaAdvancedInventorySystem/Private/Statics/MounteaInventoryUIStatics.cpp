@@ -4,6 +4,7 @@
 #include "Statics/MounteaInventoryUIStatics.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
@@ -151,6 +152,17 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 	return nullptr;
 }
 
+void UMounteaInventoryUIStatics::StoreItem(FMounteaInventoryGridSlot& SourceData,
+	const FGuid& ItemId)
+{
+	SourceData.OccupiedItemId = ItemId;
+}
+
+void UMounteaInventoryUIStatics::ResetItem(FMounteaInventoryGridSlot& SourceData)
+{
+	SourceData.ResetSlot();
+}
+
 void UMounteaInventoryUIStatics::InitializeInventoryWidget(
 	const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
@@ -226,8 +238,33 @@ void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Targe
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
 
+void UMounteaInventoryUIStatics::ItemSlot_AddItemToSlot(UUserWidget* Target, const FGuid& ItemId)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
+		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_AddItemToSlot(Target, ItemId);
+}
+
+void UMounteaInventoryUIStatics::ItemSlot_RemoveItemFromSlot(UUserWidget* Target, const FGuid& ItemId)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
+		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_RemoveItemFromSlot(Target, ItemId);
+}
+
+void UMounteaInventoryUIStatics::StoreGridSlotData(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
+		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(Target, SlotData);
+}
+
+FMounteaInventoryGridSlot UMounteaInventoryUIStatics::GetGridSlotData(UUserWidget* Target)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
+		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(Target);
+	return FMounteaInventoryGridSlot();
+}
+
 void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UUserWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+																	  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
 		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
