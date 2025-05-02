@@ -52,6 +52,9 @@ public:
 	// --- User Interface ------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
+	float ItemSlotPadding = 5.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
 	FIntPoint InventoryGridDimensions = FIntPoint(5, 8);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
