@@ -52,6 +52,9 @@ public:
 	// --- User Interface ------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
+	FIntPoint InventoryGridDimensions = FIntPoint(5, 8);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
 	FVector2D ItemSlotSize = FVector2D(128.0f, 128.0f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual", meta=(UIMin=0.1f,UIMax=10.f,ClampMin=0.1f,ClampMax=10.f))
