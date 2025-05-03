@@ -7,6 +7,7 @@
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
@@ -14,6 +15,8 @@
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemsGridWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -153,8 +156,23 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 	return nullptr;
 }
 
+void UMounteaInventoryUIStatics::ApplyTheme(UUserWidget* Target)
+{
+	if (!IsValid(Target)) return;
+	IMounteaInventoryGenericWidgetInterface::Execute_ApplyTheme(Target);
+}
+
+UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig()
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return nullptr;
+	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return nullptr;
+	return config->BaseTheme.IsValid() ? config->BaseTheme.LoadSynchronous() : nullptr;
+}
+
 void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData,
-	const FMounteaInventoryGridSlot& TargetData)
+												 const FMounteaInventoryGridSlot& TargetData)
 {
 	SourceData = TargetData;
 }

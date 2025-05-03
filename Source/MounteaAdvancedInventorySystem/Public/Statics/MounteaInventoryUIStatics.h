@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class UMounteaAdvancedInventoryThemeConfig;
 struct FMounteaInventoryGridSlot;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventoryBaseWidgetInterface;
@@ -56,6 +57,28 @@ public:
 public:
 
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
+
+	/**
+	 * Applies the specified theme to the given user widget.
+	 * This function ensures that the provided widget is valid and executes the ApplyTheme logic via the Mountea Inventory Generic Widget Interface.
+	 *
+	 * @param Target The user widget to which the theme will be applied. Must be a valid object.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Setter"))
+	static void ApplyTheme(UUserWidget* Target);
+
+	/**
+	 * Retrieves the theme configuration for the Mountea Advanced Inventory system.
+	 *
+	 * This method fetches the theme configuration by accessing the global settings
+	 * for the Mountea Advanced Inventory system, resolving any configured BaseTheme.
+	 *
+	 * @return Pointer to UMounteaAdvancedInventoryThemeConfig if the configuration
+	 *         is valid and successfully resolved. Returns nullptr if the configuration
+	 *         is invalid or unavailable.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventoryThemeConfig* GetThemeConfig();
 
 	/**
 	 * 
