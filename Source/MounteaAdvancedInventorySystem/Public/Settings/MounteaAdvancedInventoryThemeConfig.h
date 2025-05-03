@@ -52,6 +52,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
 	FLinearColor TertiaryHovered = FColor::FromHex("#474747");
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
+	FLinearColor TertiaryHoverBorder = FColor::FromHex("#e0e0e0");
+
 	// Active State
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Active")
 	FLinearColor PrimaryActive = FColor::FromHex("#4d4d4d");

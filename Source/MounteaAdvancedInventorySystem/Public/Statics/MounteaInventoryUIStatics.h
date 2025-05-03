@@ -130,6 +130,43 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void ResetItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData);
 
+	// --- Theme  ------------------------------
+#pragma region Theme
+	
+	/**
+	 * Applies a theme-based style transformation to a button style, allowing customization of corners.
+	 *
+	 * @param BaseBrush The base button style to which the transformations will be applied.
+	 * @param Level The theme level that determines the specific stylization applied.
+	 * @param bApplyCorner1 If true, applies the style to the top-left corner.
+	 * @param bApplyCorner2 If true, applies the style to the top-right corner.
+	 * @param bApplyCorner3 If true, applies the style to the bottom-left corner.
+	 * @param bApplyCorner4 If true, applies the style to the bottom-right corner.
+	 * @return A new button style object with the modified properties based on the provided theme and corner options.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="2"))
+	static FButtonStyle ApplyButtonStyle(
+		const FButtonStyle& BaseBrush,
+		EMounteaThemeLevel Level,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+
+	/**
+	 * Creates a customized FButtonStyle based on the given base button style and visual theme level.
+	 *
+	 * @param BaseBrush The base button style to use as a reference for creating the new style.
+	 * @param Level The theme level to determine the visual adjustments for the button style.
+	 * @return A new FButtonStyle object with customized normal, hovered, pressed, and disabled states, along with optional outline, padding, and sound settings.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FButtonStyle MakeButtonStyle(
+		const FButtonStyle& BaseBrush,
+		EMounteaThemeLevel Level
+	);
+	
 	/**
 	 * Constructs a new FSlateBrush with adjusted properties based on the given theme parameters.
 	 *
@@ -161,7 +198,7 @@ public:
 	 * @param bApplyCorner4 Whether or not to apply changes to Corner 4 of the brush.
 	 * @return A new FSlateBrush with the applied theme settings and optional corner modifications.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="4"))
 	static FSlateBrush ApplySlateBrush(
 		const FSlateBrush& SourceBrush,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
@@ -185,7 +222,7 @@ public:
 	 * @param bApplyCorner4 Whether to apply the configured border radius to the fourth corner.
 	 * @return A new FSlateBrushOutlineSettings instance with modified colors and corner radii.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
 	static FSlateBrushOutlineSettings MakeSlateBrushOutline(const FSlateBrushOutlineSettings& SourceOutline,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
 		EMounteaThemeState State = EMounteaThemeState::Normal,
@@ -210,7 +247,7 @@ public:
 	 *  @param bApplyCorner4 Determines whether the outline is applied to the fourth corner.
 	 *  @return A new FSlateBrush instance with the updated outline settings.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
 	static FSlateBrush ApplySlateBrushOutline(const FSlateBrush& SourceBrush,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
 		EMounteaThemeState State = EMounteaThemeState::Normal,
@@ -220,6 +257,7 @@ public:
 		const bool bApplyCorner4 = true
 	);
 
+#pragma endregion
 
 	// --- Main UI  ------------------------------
 #pragma region MainUI

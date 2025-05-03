@@ -197,8 +197,50 @@ void UMounteaInventoryUIStatics::ResetItem(FMounteaInventoryGridSlot& SourceData
 	SourceData.ResetSlot();
 }
 
+FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(
+	const FButtonStyle& BaseBrush,
+	const EMounteaThemeLevel Level)
+{
+	FButtonStyle returnValue;
+	returnValue.Normal = MakeSlateBrush(BaseBrush.Normal, Level, EMounteaThemeState::Normal, EMounteaThemeType::Background);
+	returnValue.Hovered = MakeSlateBrush(BaseBrush.Hovered, Level, EMounteaThemeState::Hovered, EMounteaThemeType::Background);
+	returnValue.Pressed = MakeSlateBrush(BaseBrush.Pressed, Level, EMounteaThemeState::Active, EMounteaThemeType::Background);
+	returnValue.Disabled = MakeSlateBrush(BaseBrush.Disabled, Level, EMounteaThemeState::Disabled, EMounteaThemeType::Background);
+
+	FSlateBrushOutlineSettings OutlineSettings;
+	OutlineSettings = MakeSlateBrushOutline(OutlineSettings, Level, EMounteaThemeState::Hovered, true, true, true, true);
+	returnValue.Hovered.OutlineSettings = OutlineSettings;
+
+	// Optional: Customize padding or text alignment
+	returnValue.PressedPadding = BaseBrush.PressedPadding;
+	returnValue.NormalPadding = BaseBrush.NormalPadding;
+	returnValue.PressedSlateSound = FSlateSound();
+	returnValue.HoveredSlateSound = FSlateSound();
+
+	return returnValue;
+}
+
+
+FButtonStyle UMounteaInventoryUIStatics::ApplyButtonStyle(const FButtonStyle& BaseBrush, EMounteaThemeLevel Level,
+	const bool bApplyCorner1, const bool bApplyCorner2, const bool bApplyCorner3, const bool bApplyCorner4)
+{
+	FButtonStyle returnValue;
+	returnValue.Normal = ApplySlateBrush(BaseBrush.Normal, Level, EMounteaThemeState::Normal, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
+	returnValue.Hovered = ApplySlateBrush(BaseBrush.Hovered, Level, EMounteaThemeState::Hovered, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
+	returnValue.Pressed = ApplySlateBrush(BaseBrush.Pressed, Level, EMounteaThemeState::Active, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
+	returnValue.Disabled = ApplySlateBrush(BaseBrush.Disabled, Level, EMounteaThemeState::Disabled, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
+
+	// Optional: Customize padding or text alignment
+	returnValue.PressedPadding = BaseBrush.PressedPadding;
+	returnValue.NormalPadding = BaseBrush.NormalPadding;
+	returnValue.PressedSlateSound = FSlateSound();
+	returnValue.HoveredSlateSound = FSlateSound();
+
+	return returnValue;
+}
+
 FSlateBrush UMounteaInventoryUIStatics::MakeSlateBrush(const FSlateBrush& SourceBrush, const EMounteaThemeLevel Level,
-	const EMounteaThemeState State, const EMounteaThemeType Type)
+													   const EMounteaThemeState State, const EMounteaThemeType Type)
 {
 	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
 	if (!IsValid(settings)) return SourceBrush;
@@ -387,7 +429,7 @@ FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
 					returnValue.Color = theme->PrimaryHoverBorder;
 					break;
 				case EMounteaThemeState::Active:
-					returnValue.Color = theme->PrimaryActive;
+					returnValue.Color = theme->PrimaryFocus;
 					break;
 				case EMounteaThemeState::Disabled:
 					returnValue.Color = theme->PrimaryDisabled;
@@ -405,7 +447,7 @@ FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
 					returnValue.Color = theme->SecondaryHoverBorder;
 					break;
 				case EMounteaThemeState::Active:
-					returnValue.Color = theme->SecondaryActive;
+					returnValue.Color = theme->SecondaryFocus;
 					break;
 				case EMounteaThemeState::Disabled:
 					returnValue.Color = theme->SecondaryDisabled;
@@ -420,10 +462,10 @@ FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
 					returnValue.Color = theme->TertiaryNormal;
 					break;
 				case EMounteaThemeState::Hovered:
-					returnValue.Color = theme->TertiaryHovered;
+					returnValue.Color = theme->TertiaryHoverBorder;
 					break;
 				case EMounteaThemeState::Active:
-					returnValue.Color = theme->TertiaryActive;
+					returnValue.Color = theme->TertiaryFocus;
 					break;
 				case EMounteaThemeState::Disabled:
 					returnValue.Color = theme->TertiaryDisabled;
