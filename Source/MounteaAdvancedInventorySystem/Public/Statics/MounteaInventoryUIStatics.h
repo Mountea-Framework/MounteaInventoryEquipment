@@ -147,8 +147,71 @@ public:
 		EMounteaThemeType Type = EMounteaThemeType::Default
 	);
 
+	/**
+	 * Applies a theme to a specified FSlateBrush based on the given parameters.
+	 * Modifies the appearance of the brush based on the theme's level, state, and type.
+	 *
+	 * @param SourceBrush The original FSlateBrush to which the theme settings will be applied.
+	 * @param Level The theme level to apply (e.g., primary, secondary).
+	 * @param State The state of the theme (e.g., active, inactive).
+	 * @param Type The type of the theme (e.g., solid, gradient).
+	 * @param bApplyCorner1 Whether or not to apply changes to Corner 1 of the brush.
+	 * @param bApplyCorner2 Whether or not to apply changes to Corner 2 of the brush.
+	 * @param bApplyCorner3 Whether or not to apply changes to Corner 3 of the brush.
+	 * @param bApplyCorner4 Whether or not to apply changes to Corner 4 of the brush.
+	 * @return A new FSlateBrush with the applied theme settings and optional corner modifications.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FSlateBrush ApplySlateBrush(
+		const FSlateBrush& SourceBrush,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		EMounteaThemeType Type = EMounteaThemeType::Default,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+	
+	/**
+	 * Creates a modified FSlateBrushOutlineSettings instance by applying theme-based colors and corner radii.
+	 *
+	 * @param SourceOutline The original outline settings to be modified.
+	 * @param Level The theme level used to determine the outline's color.
+	 * @param State The theme state used to further refine the outline's color based on the current state.
+	 * @param bApplyCorner1 Whether to apply the configured border radius to the first corner.
+	 * @param bApplyCorner2 Whether to apply the configured border radius to the second corner.
+	 * @param bApplyCorner3 Whether to apply the configured border radius to the third corner.
+	 * @param bApplyCorner4 Whether to apply the configured border radius to the fourth corner.
+	 * @return A new FSlateBrushOutlineSettings instance with modified colors and corner radii.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
 	static FSlateBrushOutlineSettings MakeSlateBrushOutline(const FSlateBrushOutlineSettings& SourceOutline,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+
+	/**
+	 *  Applies an outline to the input FSlateBrush based on the specified theme level and state.
+	 *
+	 *  This method modifies the outline settings of the given SourceBrush to reflect the applied
+	 *  theme parameters and corner configurations.
+	 *
+	 *  @param SourceBrush The FSlateBrush to which the outline is to be applied.
+	 *  @param Level The theme level that determines the outline style.
+	 *  @param State The theme state used for additional outline customization.
+	 *  @param bApplyCorner1 Determines whether the outline is applied to the first corner.
+	 *  @param bApplyCorner2 Determines whether the outline is applied to the second corner.
+	 *  @param bApplyCorner3 Determines whether the outline is applied to the third corner.
+	 *  @param bApplyCorner4 Determines whether the outline is applied to the fourth corner.
+	 *  @return A new FSlateBrush instance with the updated outline settings.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FSlateBrush ApplySlateBrushOutline(const FSlateBrush& SourceBrush,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
 		EMounteaThemeState State = EMounteaThemeState::Normal,
 		const bool bApplyCorner1 = true,

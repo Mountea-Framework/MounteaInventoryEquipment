@@ -165,11 +165,19 @@ void UMounteaInventoryUIStatics::ApplyTheme(UUserWidget* Target)
 
 UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig()
 {
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings)) return nullptr;
-	auto config = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(config)) return nullptr;
-	return config->BaseTheme.IsValid() ? config->BaseTheme.LoadSynchronous() : nullptr;
+	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings))
+	{
+		LOG_ERROR(TEXT("[GetThemeConfig] Settings not found!"))
+		return nullptr;
+	}
+	const auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config))
+	{
+		LOG_ERROR(TEXT("[GetThemeConfig] Config not found!"))
+		return nullptr;
+	}
+	return config->BaseTheme.LoadSynchronous();
 }
 
 void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData,
@@ -342,6 +350,15 @@ FSlateBrush UMounteaInventoryUIStatics::MakeSlateBrush(const FSlateBrush& Source
 	return returnValue;
 }
 
+FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrush(const FSlateBrush& SourceBrush, const EMounteaThemeLevel Level,
+	const EMounteaThemeState State, const EMounteaThemeType Type, const bool bApplyCorner1, const bool bApplyCorner2,
+	const bool bApplyCorner3, const bool bApplyCorner4)
+{
+	FSlateBrush returnValue = MakeSlateBrush(SourceBrush, Level, State, Type);
+	returnValue.OutlineSettings = MakeSlateBrushOutline(returnValue.OutlineSettings, Level, State, bApplyCorner1,bApplyCorner2, bApplyCorner3, bApplyCorner4);
+	return returnValue;
+}
+
 FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
 	const FSlateBrushOutlineSettings& SourceOutline, const EMounteaThemeLevel Level, const EMounteaThemeState State,
 	const bool bApplyCorner1, const bool bApplyCorner2,
@@ -424,6 +441,16 @@ FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
 
 	returnValue.CornerRadii = Radius;
 
+	return returnValue;
+}
+
+FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrushOutline(const FSlateBrush& SourceBrush,
+	EMounteaThemeLevel Level, EMounteaThemeState State, const bool bApplyCorner1, const bool bApplyCorner2,
+	const bool bApplyCorner3, const bool bApplyCorner4)
+{
+	FSlateBrush returnValue = SourceBrush;
+	returnValue.OutlineSettings = MakeSlateBrushOutline(SourceBrush.OutlineSettings, Level, State, bApplyCorner1,
+														bApplyCorner2, bApplyCorner3, bApplyCorner4);
 	return returnValue;
 }
 

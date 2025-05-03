@@ -95,4 +95,11 @@ public:
 	// Accent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Highlight")
 	FLinearColor Accent = FColor::FromHex("#9C7E4AFF");
+
+	// Audio
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio")
+	TSoftObjectPtr<USoundBase> ButtonPressedSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio")
+	TSoftObjectPtr<USoundBase> ButtonHoveredSound;
 };
