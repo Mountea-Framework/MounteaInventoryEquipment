@@ -22,8 +22,27 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventoryGenericWidgetInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-
+	
+	/**
+	 * Processes a specific command for the inventory widget with optional additional data.
+	 *
+	 * This method is intended to handle inventory and/or equipment-related commands for user interface elements.
+	 * It can optionally utilize a payload object to provide additional context or data for the command.
+	 *
+	 * @param Command The command string to process, typically indicating an action or directive.
+	 * @param OptionalPayload An optional UObject providing additional context or data. Can be nullptr.
+	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
 	void ProcessInventoryWidgetCommand(const FString& Command, UObject* OptionalPayload = nullptr);
 	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload = nullptr) = 0;
+
+	/**
+	 * Applies a visual theme or styling configuration to the widget.
+	 *
+	 * This method is intended to be overridden in Blueprint or C++ to define the specific
+	 * logic for applying themes to inventory or equipment-related user interface elements.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	void ApplyTheme();
+	virtual void ApplyTheme_Implementation() = 0;
 };

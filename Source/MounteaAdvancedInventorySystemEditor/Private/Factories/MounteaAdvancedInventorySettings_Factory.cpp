@@ -19,7 +19,7 @@ UObject* UMounteaAdvancedInventorySettings_Factory::FactoryCreateNew(UClass* Cla
 
 bool UMounteaAdvancedInventorySettings_Factory::ConfigureProperties()
 {
-	static const FText TitleText = FText::FromString(TEXT("Pick Parent Class for new Mountea Dialogue Additional Data"));
+	static const FText TitleText = FText::FromString(TEXT("Pick Parent Class for new Mountea Inventory Settings Config"));
 	
 	UClass* ChosenClass = nullptr;
 	const bool bPressedOk = FMounteaAdvancedInventoryEditorUtilities::PickChildrenOfClass(TitleText, ChosenClass, UMounteaAdvancedInventorySettingsConfig::StaticClass());
