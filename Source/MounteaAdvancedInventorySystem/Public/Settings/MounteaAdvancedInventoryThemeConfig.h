@@ -84,11 +84,15 @@ public:
 
 	// Text Colors
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	FLinearColor PrimaryText = FColor::FromHex("#ffffff");
+	FLinearColor PrimaryText = FColor::FromHex("#D0C8B0FF");
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	FLinearColor SecondaryText = FColor::FromHex("#e0e0e0");
+	FLinearColor SecondaryText = FColor::FromHex("#9C7E4AFF");
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	FLinearColor TertiaryText = FColor::FromHex("#b0b0b0");
+	FLinearColor TertiaryText = FColor::FromHex("#8F7443FF");
+
+	// Accent
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Highlight")
+	FLinearColor Accent = FColor::FromHex("#9C7E4AFF");
 };

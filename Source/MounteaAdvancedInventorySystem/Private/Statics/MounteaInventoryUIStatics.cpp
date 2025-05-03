@@ -17,6 +17,7 @@
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryThemeConfig.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -186,6 +187,244 @@ void UMounteaInventoryUIStatics::StoreItem(FMounteaInventoryGridSlot& SourceData
 void UMounteaInventoryUIStatics::ResetItem(FMounteaInventoryGridSlot& SourceData)
 {
 	SourceData.ResetSlot();
+}
+
+FSlateBrush UMounteaInventoryUIStatics::MakeSlateBrush(const FSlateBrush& SourceBrush, const EMounteaThemeLevel Level,
+	const EMounteaThemeState State, const EMounteaThemeType Type)
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return SourceBrush;
+
+	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return SourceBrush;
+
+	auto theme = config->BaseTheme.LoadSynchronous();
+	if (!IsValid(theme)) return SourceBrush;
+
+	FSlateBrush returnValue = SourceBrush;
+
+	switch (Type)
+	{
+	case EMounteaThemeType::Text:
+		switch (Level)
+		{
+		case EMounteaThemeLevel::Primary:
+			returnValue.TintColor = theme->PrimaryText;
+			break;
+		case EMounteaThemeLevel::Secondary:
+			returnValue.TintColor = theme->SecondaryText;
+			break;
+		case EMounteaThemeLevel::Tertiary:
+			returnValue.TintColor = theme->TertiaryText;
+			break;
+		}
+		break;
+
+	case EMounteaThemeType::Background:
+		switch (Level)
+		{
+		case EMounteaThemeLevel::Primary:
+			switch (State)
+			{
+			case EMounteaThemeState::Normal:
+				returnValue.TintColor = theme->BackgroundPrimary;
+				break;
+			case EMounteaThemeState::Hovered:
+				returnValue.TintColor = theme->PrimaryHovered;
+				break;
+			case EMounteaThemeState::Active:
+				returnValue.TintColor = theme->PrimaryActive;
+				break;
+			case EMounteaThemeState::Disabled:
+				returnValue.TintColor = theme->BackgroundDisabled;
+				break;
+			}
+			break;
+
+		case EMounteaThemeLevel::Secondary:
+			switch (State)
+			{
+			case EMounteaThemeState::Normal:
+				returnValue.TintColor = theme->BackgroundSecondary;
+				break;
+			case EMounteaThemeState::Hovered:
+				returnValue.TintColor = theme->SecondaryHovered;
+				break;
+			case EMounteaThemeState::Active:
+				returnValue.TintColor = theme->SecondaryActive;
+				break;
+			case EMounteaThemeState::Disabled:
+				returnValue.TintColor = theme->BackgroundDisabled;
+				break;
+			}
+			break;
+
+		case EMounteaThemeLevel::Tertiary:
+			switch (State)
+			{
+			case EMounteaThemeState::Normal:
+				returnValue.TintColor = theme->BackgroundTertiary;
+				break;
+			case EMounteaThemeState::Hovered:
+				returnValue.TintColor = theme->TertiaryHovered;
+				break;
+			case EMounteaThemeState::Active:
+				returnValue.TintColor = theme->TertiaryActive;
+				break;
+			case EMounteaThemeState::Disabled:
+				returnValue.TintColor = theme->BackgroundDisabled;
+				break;
+			}
+			break;
+		}
+		break;
+
+	case EMounteaThemeType::Default:
+		switch (Level)
+		{
+		case EMounteaThemeLevel::Primary:
+			switch (State)
+			{
+			case EMounteaThemeState::Normal:
+				returnValue.TintColor = theme->PrimaryNormal;
+				break;
+			case EMounteaThemeState::Hovered:
+				returnValue.TintColor = theme->PrimaryHovered;
+				break;
+			case EMounteaThemeState::Active:
+				returnValue.TintColor = theme->PrimaryActive;
+				break;
+			case EMounteaThemeState::Disabled:
+				returnValue.TintColor = theme->PrimaryDisabled;
+				break;
+			}
+			break;
+
+		case EMounteaThemeLevel::Secondary:
+			switch (State)
+			{
+			case EMounteaThemeState::Normal:
+				returnValue.TintColor = theme->SecondaryNormal;
+				break;
+			case EMounteaThemeState::Hovered:
+				returnValue.TintColor = theme->SecondaryHovered;
+				break;
+			case EMounteaThemeState::Active:
+				returnValue.TintColor = theme->SecondaryActive;
+				break;
+			case EMounteaThemeState::Disabled:
+				returnValue.TintColor = theme->SecondaryDisabled;
+				break;
+			}
+			break;
+
+		case EMounteaThemeLevel::Tertiary:
+			switch (State)
+			{
+			case EMounteaThemeState::Normal:
+				returnValue.TintColor = theme->TertiaryNormal;
+				break;
+			case EMounteaThemeState::Hovered:
+				returnValue.TintColor = theme->TertiaryHovered;
+				break;
+			case EMounteaThemeState::Active:
+				returnValue.TintColor = theme->TertiaryActive;
+				break;
+			case EMounteaThemeState::Disabled:
+				returnValue.TintColor = theme->TertiaryDisabled;
+				break;
+			}
+			break;
+		}
+		break;
+	}
+
+	return returnValue;
+}
+
+FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
+	const FSlateBrushOutlineSettings& SourceOutline, const EMounteaThemeLevel Level, const EMounteaThemeState State,
+	const bool bApplyCorner1, const bool bApplyCorner2,
+	const bool bApplyCorner3, const bool bApplyCorner4)
+{
+	FSlateBrushOutlineSettings returnValue = SourceOutline;
+
+	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return returnValue;
+
+	const auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return returnValue;
+
+	const auto theme = config->BaseTheme.LoadSynchronous();
+	if (!IsValid(theme)) return returnValue;
+
+	switch (Level)
+	{
+		case EMounteaThemeLevel::Primary:
+			switch (State)
+			{
+				case EMounteaThemeState::Normal:
+					returnValue.Color = theme->PrimaryNormal;
+					break;
+				case EMounteaThemeState::Hovered:
+					returnValue.Color = theme->PrimaryHoverBorder;
+					break;
+				case EMounteaThemeState::Active:
+					returnValue.Color = theme->PrimaryActive;
+					break;
+				case EMounteaThemeState::Disabled:
+					returnValue.Color = theme->PrimaryDisabled;
+					break;
+			}
+			break;
+
+		case EMounteaThemeLevel::Secondary:
+			switch (State)
+			{
+				case EMounteaThemeState::Normal:
+					returnValue.Color = theme->SecondaryNormal;
+					break;
+				case EMounteaThemeState::Hovered:
+					returnValue.Color = theme->SecondaryHoverBorder;
+					break;
+				case EMounteaThemeState::Active:
+					returnValue.Color = theme->SecondaryActive;
+					break;
+				case EMounteaThemeState::Disabled:
+					returnValue.Color = theme->SecondaryDisabled;
+					break;
+			}
+			break;
+
+		case EMounteaThemeLevel::Tertiary:
+			switch (State)
+			{
+				case EMounteaThemeState::Normal:
+					returnValue.Color = theme->TertiaryNormal;
+					break;
+				case EMounteaThemeState::Hovered:
+					returnValue.Color = theme->TertiaryHovered;
+					break;
+				case EMounteaThemeState::Active:
+					returnValue.Color = theme->TertiaryActive;
+					break;
+				case EMounteaThemeState::Disabled:
+					returnValue.Color = theme->TertiaryDisabled;
+					break;
+			}
+			break;
+	}
+
+	FVector4 Radius = returnValue.CornerRadii;
+
+	if (bApplyCorner1) Radius.X = config->BaseBorderRadius.X;
+	if (bApplyCorner2) Radius.Y = config->BaseBorderRadius.Y;
+	if (bApplyCorner3) Radius.Z = config->BaseBorderRadius.Z;
+	if (bApplyCorner4) Radius.W = config->BaseBorderRadius.W;
+
+	returnValue.CornerRadii = Radius;
+
+	return returnValue;
 }
 
 void UMounteaInventoryUIStatics::InitializeInventoryWidget(

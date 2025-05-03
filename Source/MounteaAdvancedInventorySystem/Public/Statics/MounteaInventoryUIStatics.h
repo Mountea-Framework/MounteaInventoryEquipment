@@ -12,6 +12,32 @@ class UMounteaAdvancedInventoryThemeConfig;
 struct FMounteaInventoryGridSlot;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventoryBaseWidgetInterface;
+
+UENUM(BlueprintType)
+enum class EMounteaThemeLevel : uint8
+{
+	Primary		UMETA(DisplayName = "Primary"),
+	Secondary	UMETA(DisplayName = "Secondary"),
+	Tertiary	UMETA(DisplayName = "Tertiary")
+};
+
+UENUM(BlueprintType)
+enum class EMounteaThemeState : uint8
+{
+	Normal		UMETA(DisplayName = "Normal"),
+	Hovered		UMETA(DisplayName = "Hovered"),
+	Active		UMETA(DisplayName = "Active"),
+	Disabled	UMETA(DisplayName = "Disabled")
+};
+
+UENUM(BlueprintType)
+enum class EMounteaThemeType : uint8
+{
+	Text UMETA(DisplayName="Text"),
+	Background UMETA(DisplayName="Background"),
+	Default UMETA(DisplayName="Default")
+};
+
 /**
  * 
  */
@@ -103,6 +129,34 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void ResetItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData);
+
+	/**
+	 * Constructs a new FSlateBrush with adjusted properties based on the given theme parameters.
+	 *
+	 * @param SourceBrush The original FSlateBrush to be used as a base for the new brush.
+	 * @param Level Specifies the thematic level (Primary, Secondary, Tertiary) to be applied to the brush.
+	 * @param State Specifies the current state (Normal, Hovered, Active, Disabled) that affects the coloring of the brush.
+	 * @param Type Specifies the type of the theme (Text, Background, Default) which determines how the brush is modified.
+	 * @return A new FSlateBrush with updated values based on the provided theming parameters.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FSlateBrush MakeSlateBrush(
+		const FSlateBrush& SourceBrush,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		EMounteaThemeType Type = EMounteaThemeType::Default
+	);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FSlateBrushOutlineSettings MakeSlateBrushOutline(const FSlateBrushOutlineSettings& SourceOutline,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+
 
 	// --- Main UI  ------------------------------
 #pragma region MainUI
