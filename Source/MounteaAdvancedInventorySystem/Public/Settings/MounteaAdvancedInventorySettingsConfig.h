@@ -8,6 +8,7 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventorySettingsConfig.generated.h"
 
+class UMounteaAdvancedInventoryThemeConfig;
 /**
 * Data Asset that manages configuration settings for Mountea Advanced Inventory System.
 * Defines inventory types, rarities, and categories with their respective settings.
@@ -51,10 +52,13 @@ public:
 
 	// --- User Interface ------------------------------
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Theme")
+	TSoftObjectPtr<UMounteaAdvancedInventoryThemeConfig> BaseTheme;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Theme", meta=(UIMin=0.f,ClampMin=0.f))
 	FVector4 BaseBorderRadius = FVector4(6.f);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Theme")
 	float ItemSlotPadding = 5.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual")
