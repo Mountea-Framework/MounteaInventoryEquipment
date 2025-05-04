@@ -21,28 +21,38 @@ bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToSlot_Implementation(cons
 {
 	if (!Execute_IsSlotEmpty(this, SlotIndex)) return false;
 
-	FMounteaInventoryGridSlot& gridSlot = GridSlots.Array()[SlotIndex];
-	const auto slotWidget = gridSlot.SlotWidget;
+	FMounteaInventoryGridSlot tempGridSlot = GridSlots.Array()[SlotIndex];
+	GridSlots.Remove(tempGridSlot);
+
+	const TObjectPtr<UUserWidget>& slotWidget = tempGridSlot.SlotWidget;
 	if (!IsValid(slotWidget)) return false;
 	if (!slotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) return false;
 	
-	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_AddItemToSlot(gridSlot.SlotWidget, ItemId);
+	tempGridSlot.OccupiedItemId = ItemId;
+	GridSlots.Add(tempGridSlot);
 
-	gridSlot.OccupiedItemId = ItemId;
+	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_AddItemToSlot(slotWidget, ItemId);
+
 	return true;
 }
 
 bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromSlot_Implementation(const int32 SlotIndex)
 {
-	FMounteaInventoryGridSlot& gridSlot = GridSlots.Array()[SlotIndex];
-	const auto slotWidget = gridSlot.SlotWidget;
+	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return false;
+
+	FMounteaInventoryGridSlot tempGridSlot = GridSlots.Array()[SlotIndex];
+	GridSlots.Remove(tempGridSlot);
+
+	const TObjectPtr<UUserWidget>& slotWidget = tempGridSlot.SlotWidget;
 	if (!IsValid(slotWidget)) return false;
 	if (!slotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) return false;
-	const auto itemId = Execute_GetItemInSlot(this, SlotIndex);
-	
+
+	const FGuid itemId = tempGridSlot.OccupiedItemId;
 	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_RemoveItemFromSlot(slotWidget, itemId);
 
-	gridSlot.ResetSlot();
+	tempGridSlot.ResetSlot();
+	GridSlots.Add(tempGridSlot);
+
 	return true;
 }
 
@@ -55,37 +65,44 @@ FGuid UMounteaAdvancedInventoryItemsGridWidget::GetItemInSlot_Implementation(con
 
 bool UMounteaAdvancedInventoryItemsGridWidget::SwapItemsBetweenSlots_Implementation(const int32 SlotIndex1, const int32 SlotIndex2)
 {
-	if (!GridSlots.Array().IsValidIndex(SlotIndex1) || !GridSlots.Array().IsValidIndex(SlotIndex2)) return false;
+	if (!GridSlots.Array().IsValidIndex(SlotIndex1) || !GridSlots.Array().IsValidIndex(SlotIndex2))
+		return false;
 
-	FMounteaInventoryGridSlot& sourceSlot = GridSlots.Array()[SlotIndex1];
-	FMounteaInventoryGridSlot& targetSlot = GridSlots.Array()[SlotIndex2];
+	FMounteaInventoryGridSlot tempSlot1 = GridSlots.Array()[SlotIndex1];
+	FMounteaInventoryGridSlot tempSlot2 = GridSlots.Array()[SlotIndex2];
 
-	const FGuid tempItemId = sourceSlot.OccupiedItemId;
-	sourceSlot.OccupiedItemId = targetSlot.OccupiedItemId;
-	targetSlot.OccupiedItemId = tempItemId;
+	GridSlots.Remove(tempSlot1);
+	GridSlots.Remove(tempSlot2);
 
-	if (IsValid(sourceSlot.SlotWidget) && sourceSlot.SlotWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(sourceSlot.SlotWidget);
+	Swap(tempSlot1.OccupiedItemId, tempSlot2.OccupiedItemId);
 
-	if (IsValid(targetSlot.SlotWidget) && targetSlot.SlotWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(targetSlot.SlotWidget);
+	GridSlots.Add(tempSlot1);
+	GridSlots.Add(tempSlot2);
+
+	if (IsValid(tempSlot1.SlotWidget) && tempSlot1.SlotWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(tempSlot1.SlotWidget);
+
+	if (IsValid(tempSlot2.SlotWidget) && tempSlot2.SlotWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(tempSlot2.SlotWidget);
 
 	return true;
 }
 
 void UMounteaAdvancedInventoryItemsGridWidget::ClearAllSlots_Implementation()
 {
-	for (auto& gridSlot : GridSlots)
+	TSet<FMounteaInventoryGridSlot> clearGridSlots;
+	for (const auto& gridSlot : GridSlots)
 	{
-		const FGuid occupiedItemId = gridSlot.OccupiedItemId;
-		gridSlot.OccupiedItemId = FGuid();
-		
-		const TObjectPtr<UUserWidget>& slotWidget = gridSlot.SlotWidget;
-		if (!IsValid(slotWidget)) continue;
-		if (!slotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
-		
-		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(slotWidget, gridSlot);
+		FMounteaInventoryGridSlot tempGridSlot = gridSlot;
+		tempGridSlot.OccupiedItemId = FGuid();
+		const TObjectPtr<UUserWidget>& slotWidget = tempGridSlot.SlotWidget;
+		if (IsValid(slotWidget) && slotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
+			IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(slotWidget, tempGridSlot);
+		clearGridSlots.Add(tempGridSlot);
 	}
+
+	GridSlots.Empty();
+	GridSlots.Append(clearGridSlots);
 }
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::GetTotalSlots_Implementation() const
