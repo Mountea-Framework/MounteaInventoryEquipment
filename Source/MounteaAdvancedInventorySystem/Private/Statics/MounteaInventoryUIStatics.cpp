@@ -220,9 +220,40 @@ FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(
 	return returnValue;
 }
 
+FScrollBarStyle UMounteaInventoryUIStatics::MakeScrollBarStyle(const FScrollBarStyle& SourceStyle,
+	const EMounteaThemeLevel Level,
+	const EMounteaThemeState State)
+{
+	auto returnValue = SourceStyle;
+	switch (State)
+	{
+		case EMounteaThemeState::Normal:
+			returnValue.NormalThumbImage = MakeSlateBrush(SourceStyle.NormalThumbImage, Level, State, EMounteaThemeType::Background);
+			break;
+		case EMounteaThemeState::Hovered:
+			returnValue.HoveredThumbImage = MakeSlateBrush(SourceStyle.NormalThumbImage, Level, State, EMounteaThemeType::Background);
+			break;
+		case EMounteaThemeState::Active:
+			returnValue.DraggedThumbImage = MakeSlateBrush(SourceStyle.NormalThumbImage, Level, State, EMounteaThemeType::Background);
+			break;
+		case EMounteaThemeState::Disabled:
+			break;
+	}
+	return returnValue;
+}
+
+FScrollBarStyle UMounteaInventoryUIStatics::ApplyScrollBarStyle(const FScrollBarStyle& SourceStyle,
+	const EMounteaThemeLevel Level)
+{
+	auto returnValue = SourceStyle;
+	returnValue.NormalThumbImage = ApplySlateBrush(SourceStyle.NormalThumbImage, Level, EMounteaThemeState::Normal, EMounteaThemeType::Background);
+	returnValue.HoveredThumbImage = ApplySlateBrush(SourceStyle.NormalThumbImage, Level, EMounteaThemeState::Hovered, EMounteaThemeType::Background);
+	returnValue.DraggedThumbImage = ApplySlateBrush(SourceStyle.NormalThumbImage, Level, EMounteaThemeState::Active, EMounteaThemeType::Background);
+	return returnValue;
+}
 
 FButtonStyle UMounteaInventoryUIStatics::ApplyButtonStyle(const FButtonStyle& BaseBrush, EMounteaThemeLevel Level,
-	const bool bApplyCorner1, const bool bApplyCorner2, const bool bApplyCorner3, const bool bApplyCorner4)
+														  const bool bApplyCorner1, const bool bApplyCorner2, const bool bApplyCorner3, const bool bApplyCorner4)
 {
 	FButtonStyle returnValue;
 	returnValue.Normal = ApplySlateBrush(BaseBrush.Normal, Level, EMounteaThemeState::Normal, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);

@@ -166,6 +166,35 @@ public:
 		const FButtonStyle& BaseBrush,
 		EMounteaThemeLevel Level
 	);
+
+	/**
+	 * Generates a customized FScrollBarStyle based on an existing source style, theme level, and state.
+	 *
+	 * @param SourceStyle The base scrollbar style from which the new style will be derived.
+	 * @param Level Represents the theme level to apply specific visual adjustments.
+	 * @param State Specifies the state of the element (e.g., Normal, Hovered, Active, or Disabled)
+	 *              to determine which part of the scrollbar style to modify.
+	 * @return A modified FScrollBarStyle instance reflecting the provided theme level and state adjustments.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FScrollBarStyle MakeScrollBarStyle(
+		const FScrollBarStyle& SourceStyle,
+		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		const EMounteaThemeState State = EMounteaThemeState::Normal
+	);
+
+	/**
+	 * Modifies the given scroll bar style based on the specified Mountea theme level.
+	 *
+	 * @param SourceStyle The original FScrollBarStyle to be updated.
+	 * @param Level The theme level used for applying specific styling adjustments.
+	 * @return A modified copy of the original FScrollBarStyle with updated properties according to the chosen theme level.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FScrollBarStyle ApplyScrollBarStyle(
+		const FScrollBarStyle& SourceStyle,
+		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary
+	);
 	
 	/**
 	 * Constructs a new FSlateBrush with adjusted properties based on the given theme parameters.
