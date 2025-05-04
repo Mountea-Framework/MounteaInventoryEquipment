@@ -32,7 +32,7 @@ public:
 	/** Primary Data **/
 
 	/** A globally unique identifier for this item template. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", DuplicateTransient)
 	FGuid Guid;
 
 	/** The item’s name, displayed in-game. */
