@@ -17,7 +17,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemEffect : public UO
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", DuplicateTransient)
 	FGuid EffectGuid;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")

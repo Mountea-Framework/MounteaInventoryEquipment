@@ -51,6 +51,7 @@ void UMounteaInventoryUIComponent::BeginPlay()
 			ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
 
 			ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
+			
 			ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
 			ParentInventory->GetOnItemRemovedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemRemoved);
 
@@ -230,8 +231,7 @@ void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FInvent
 {
 	if (!IsValid(InventoryWidget))
 	{
-		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!"))
-		return;
+		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!")) return;
 	}
 
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
@@ -262,8 +262,7 @@ void UMounteaInventoryUIComponent::ProcessItemRemoved_Implementation(const FInve
 {
 	if (!IsValid(InventoryWidget))
 	{
-		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!"))
-		return;
+		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!")) return;
 	}
 
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
@@ -314,3 +313,28 @@ void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryIt
 	Execute_ProcessItemModified(this, Item);
 }
 
+void UMounteaInventoryUIComponent::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
+{
+	SavedGridSlots.Add(SlotData);
+}
+
+void UMounteaInventoryUIComponent::RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
+{
+	SavedGridSlots.Remove(SlotData);
+}
+
+void UMounteaInventoryUIComponent::AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
+{
+	SavedGridSlots.Append(SlotData);
+}
+
+void UMounteaInventoryUIComponent::RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
+{
+	SavedGridSlots = SavedGridSlots.Difference(SlotData);
+}
+
+void UMounteaInventoryUIComponent::UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
+{
+	SavedGridSlots.Remove(SlotData);
+	SavedGridSlots.Add(SlotData);
+}

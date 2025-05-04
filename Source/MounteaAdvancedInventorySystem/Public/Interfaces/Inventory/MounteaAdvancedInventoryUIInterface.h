@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryUIInterface.generated.h"
 
@@ -170,6 +171,73 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	FGuid GetActiveItemGuid() const;
 	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
+
+	/**
+	 * Retrieves the saved inventory grid slots.
+	 *
+	 * This function provides a set of saved inventory grid slots, represented as FMounteaInventoryGridSlot objects.
+	 * It is used to maintain and manage the inventory layout, allowing you to save and restore UI states.
+	 *
+	 * @return A set of saved FMounteaInventoryGridSlot instances representing the current saved state of the inventory grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	TSet<FMounteaInventoryGridSlot> GetSavedSlots() const;
+	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const = 0;
+
+	/**
+	 * Adds a single grid slot to the inventory.
+	 *
+	 * This function adds a single FMounteaInventoryGridSlot to the grid, allowing an item to be placed into a new slot.
+	 * 
+	 * @param SlotData The data of the slot being added to the grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void AddSlot(const FMounteaInventoryGridSlot& SlotData);
+	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
+
+	/**
+	 * Removes a single grid slot from the inventory.
+	 *
+	 * This function removes a specific FMounteaInventoryGridSlot from the grid, effectively clearing that slot.
+	 *
+	 * @param SlotData The data of the slot being removed from the grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void RemoveSlot(const FMounteaInventoryGridSlot& SlotData);
+	virtual void RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
+
+	/**
+	 * Adds multiple grid slots to the inventory.
+	 *
+	 * This function adds a collection of FMounteaInventoryGridSlots to the grid, expanding the inventory layout.
+	 *
+	 * @param SlotData A set of FMounteaInventoryGridSlot instances to be added to the grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void AddSlots(const TSet<FMounteaInventoryGridSlot>& SlotData);
+	virtual void AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) = 0;
+
+	/**
+	 * Removes multiple grid slots from the inventory.
+	 *
+	 * This function removes a collection of FMounteaInventoryGridSlots from the grid, clearing those slots.
+	 *
+	 * @param SlotData A set of FMounteaInventoryGridSlot instances to be removed from the grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void RemoveSlots(const TSet<FMounteaInventoryGridSlot>& SlotData);
+	virtual void RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) = 0;
+
+	/**
+	 * Updates an existing grid slot in the inventory.
+	 *
+	 * This function updates the data of an existing FMounteaInventoryGridSlot, modifying the information of the slot.
+	 * 
+	 * @param SlotData The updated data of the grid slot to be modified.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void UpdateSlot(const FMounteaInventoryGridSlot& SlotData);
+	virtual void UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() = 0;
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() = 0;

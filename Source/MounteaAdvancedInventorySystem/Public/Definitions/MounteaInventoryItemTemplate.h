@@ -32,7 +32,7 @@ public:
 	/** Primary Data **/
 
 	/** A globally unique identifier for this item template. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", DuplicateTransient)
 	FGuid Guid;
 
 	/** The item’s name, displayed in-game. */
@@ -86,11 +86,11 @@ public:
 
 	/** A small icon representing the item in the inventory UI. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")
-	TSoftObjectPtr<UTexture> ItemThumbnail;
+	TSoftObjectPtr<UTexture2D> ItemThumbnail;
 
 	/** A larger visual representation of the item, used for detailed views. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")
-	TSoftObjectPtr<UTexture> ItemCover;
+	TSoftObjectPtr<UTexture2D> ItemCover;
 
 	/** The 3D mesh associated with the item (StaticMesh or SkeletalMesh). */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")

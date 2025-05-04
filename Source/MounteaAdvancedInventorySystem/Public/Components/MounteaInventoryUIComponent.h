@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
@@ -48,6 +49,13 @@ public:
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) override;
 	virtual FGuid GetActiveItemGuid_Implementation() const override { return ActiveItemGuid; };
 
+	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const override {return SavedGridSlots;};
+	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
+	virtual void RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
+	virtual void AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) override;
+	virtual void RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) override;
+	virtual void UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
+
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
 	{ return OnCategorySelected; };
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
@@ -73,6 +81,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	FGuid ActiveItemGuid;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	TSet<FMounteaInventoryGridSlot> SavedGridSlots;
 	
 private:
 

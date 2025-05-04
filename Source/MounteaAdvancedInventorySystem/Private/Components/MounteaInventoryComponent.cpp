@@ -382,6 +382,12 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 	InventoryItems.Items.Empty();
 }
 
+bool UMounteaInventoryComponent::HasItem_Implementation(const FInventoryItemSearchParams& SearchParams) const
+{
+	const FInventoryItem foundItem = Execute_FindItem(this, SearchParams);
+	return foundItem.IsItemValid();
+}
+
 void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification)
 {
 	if (!Notification.NotificationConfig.bIsEnabled)
@@ -395,13 +401,11 @@ void UMounteaInventoryComponent::ProcessInventoryNotification_Implementation(con
 
 bool UMounteaInventoryComponent::IsAuthority() const
 {
-	AActor* Owner = GetOwner();
+	const AActor* Owner = GetOwner();
 	if (!Owner || !Owner->GetWorld())
 		return false;
-	
-	const ENetMode NetMode = Owner->GetWorld()->GetNetMode();
-	
-	if (NetMode == NM_Standalone)
+
+	if (const ENetMode NetMode = Owner->GetWorld()->GetNetMode(); NetMode == NM_Standalone)
 		return true;
 	
 	if (Owner->HasAuthority())

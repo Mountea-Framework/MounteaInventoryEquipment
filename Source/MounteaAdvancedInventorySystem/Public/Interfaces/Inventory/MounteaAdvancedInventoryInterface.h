@@ -214,6 +214,16 @@ public:
 	void ClearInventory();
 	virtual void ClearInventory_Implementation() = 0;
 
+	/**
+	 * Checks if an item matching the provided search parameters exists in the inventory.
+	 *
+	 * @param SearchParams The search parameters used to locate the item.
+	 * @return True if an item matching the search parameters exists in the inventory, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
+	bool HasItem(const FInventoryItemSearchParams& SearchParams) const;
+	virtual bool HasItem_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
+
 	// --- Item Stack Management ------------------------------
 
 	/**

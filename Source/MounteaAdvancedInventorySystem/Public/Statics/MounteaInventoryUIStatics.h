@@ -8,8 +8,36 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class UMounteaAdvancedInventoryThemeConfig;
+struct FMounteaInventoryGridSlot;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventoryBaseWidgetInterface;
+
+UENUM(BlueprintType)
+enum class EMounteaThemeLevel : uint8
+{
+	Primary		UMETA(DisplayName = "Primary"),
+	Secondary	UMETA(DisplayName = "Secondary"),
+	Tertiary	UMETA(DisplayName = "Tertiary")
+};
+
+UENUM(BlueprintType)
+enum class EMounteaThemeState : uint8
+{
+	Normal		UMETA(DisplayName = "Normal"),
+	Hovered		UMETA(DisplayName = "Hovered"),
+	Active		UMETA(DisplayName = "Active"),
+	Disabled	UMETA(DisplayName = "Disabled")
+};
+
+UENUM(BlueprintType)
+enum class EMounteaThemeType : uint8
+{
+	Text UMETA(DisplayName="Text"),
+	Background UMETA(DisplayName="Background"),
+	Default UMETA(DisplayName="Default")
+};
+
 /**
  * 
  */
@@ -56,26 +84,213 @@ public:
 
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	
-	// --- Inventory  ------------------------------
-	
 	/**
-	 * Retrieves the parent inventory associated with this UI.
-	 * @param Target The UI interface to get the parent inventory from
-	 * @return The parent inventory interface that manages the items and slots
+	 * Applies the specified theme to the given user widget.
+	 * This function ensures that the provided widget is valid and executes the ApplyTheme logic via the Mountea Inventory Generic Widget Interface.
+	 *
+	 * @param Target The user widget to which the theme will be applied. Must be a valid object.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
-	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Setter"))
+	static void ApplyTheme(UUserWidget* Target);
 
 	/**
-	 * Sets the parent inventory for this UI.
-	 * @param Target The UI interface to set the parent inventory on
-	 * @param NewParentInventory The inventory interface to associate with this UI
+	 * Retrieves the theme configuration for the Mountea Advanced Inventory system.
+	 *
+	 * This method fetches the theme configuration by accessing the global settings
+	 * for the Mountea Advanced Inventory system, resolving any configured BaseTheme.
+	 *
+	 * @return Pointer to UMounteaAdvancedInventoryThemeConfig if the configuration
+	 *         is valid and successfully resolved. Returns nullptr if the configuration
+	 *         is invalid or unavailable.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventoryThemeConfig* GetThemeConfig();
+
+	/**
+	 * 
+	 * @param SourceData 
+	 * @param TargetData 
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
-	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
+	static void SetGridSlotData(UPARAM(ref) FMounteaInventoryGridSlot& SourceData, const FMounteaInventoryGridSlot& TargetData);
+
+	/**
+	 *
+	 * @param SourceData 
+	 * @param ItemId 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void StoreItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData, const FGuid& ItemId);
+
+	/**
+	 * 
+	 * @param SourceData 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void ResetItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData);
+
+	// --- Theme  ------------------------------
+#pragma region Theme
+	
+	/**
+	 * Applies a theme-based style transformation to a button style, allowing customization of corners.
+	 *
+	 * @param BaseBrush The base button style to which the transformations will be applied.
+	 * @param Level The theme level that determines the specific stylization applied.
+	 * @param bApplyCorner1 If true, applies the style to the top-left corner.
+	 * @param bApplyCorner2 If true, applies the style to the top-right corner.
+	 * @param bApplyCorner3 If true, applies the style to the bottom-left corner.
+	 * @param bApplyCorner4 If true, applies the style to the bottom-right corner.
+	 * @return A new button style object with the modified properties based on the provided theme and corner options.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="2"))
+	static FButtonStyle ApplyButtonStyle(
+		const FButtonStyle& BaseBrush,
+		EMounteaThemeLevel Level,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+
+	/**
+	 * Creates a customized FButtonStyle based on the given base button style and visual theme level.
+	 *
+	 * @param BaseBrush The base button style to use as a reference for creating the new style.
+	 * @param Level The theme level to determine the visual adjustments for the button style.
+	 * @return A new FButtonStyle object with customized normal, hovered, pressed, and disabled states, along with optional outline, padding, and sound settings.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FButtonStyle MakeButtonStyle(
+		const FButtonStyle& BaseBrush,
+		EMounteaThemeLevel Level
+	);
+
+	/**
+	 * Generates a customized FScrollBarStyle based on an existing source style, theme level, and state.
+	 *
+	 * @param SourceStyle The base scrollbar style from which the new style will be derived.
+	 * @param Level Represents the theme level to apply specific visual adjustments.
+	 * @param State Specifies the state of the element (e.g., Normal, Hovered, Active, or Disabled)
+	 *              to determine which part of the scrollbar style to modify.
+	 * @return A modified FScrollBarStyle instance reflecting the provided theme level and state adjustments.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FScrollBarStyle MakeScrollBarStyle(
+		const FScrollBarStyle& SourceStyle,
+		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		const EMounteaThemeState State = EMounteaThemeState::Normal
+	);
+
+	/**
+	 * Modifies the given scroll bar style based on the specified Mountea theme level.
+	 *
+	 * @param SourceStyle The original FScrollBarStyle to be updated.
+	 * @param Level The theme level used for applying specific styling adjustments.
+	 * @return A modified copy of the original FScrollBarStyle with updated properties according to the chosen theme level.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FScrollBarStyle ApplyScrollBarStyle(
+		const FScrollBarStyle& SourceStyle,
+		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary
+	);
+	
+	/**
+	 * Constructs a new FSlateBrush with adjusted properties based on the given theme parameters.
+	 *
+	 * @param SourceBrush The original FSlateBrush to be used as a base for the new brush.
+	 * @param Level Specifies the thematic level (Primary, Secondary, Tertiary) to be applied to the brush.
+	 * @param State Specifies the current state (Normal, Hovered, Active, Disabled) that affects the coloring of the brush.
+	 * @param Type Specifies the type of the theme (Text, Background, Default) which determines how the brush is modified.
+	 * @return A new FSlateBrush with updated values based on the provided theming parameters.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FSlateBrush MakeSlateBrush(
+		const FSlateBrush& SourceBrush,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		EMounteaThemeType Type = EMounteaThemeType::Default
+	);
+
+	/**
+	 * Applies a theme to a specified FSlateBrush based on the given parameters.
+	 * Modifies the appearance of the brush based on the theme's level, state, and type.
+	 *
+	 * @param SourceBrush The original FSlateBrush to which the theme settings will be applied.
+	 * @param Level The theme level to apply (e.g., primary, secondary).
+	 * @param State The state of the theme (e.g., active, inactive).
+	 * @param Type The type of the theme (e.g., solid, gradient).
+	 * @param bApplyCorner1 Whether or not to apply changes to Corner 1 of the brush.
+	 * @param bApplyCorner2 Whether or not to apply changes to Corner 2 of the brush.
+	 * @param bApplyCorner3 Whether or not to apply changes to Corner 3 of the brush.
+	 * @param bApplyCorner4 Whether or not to apply changes to Corner 4 of the brush.
+	 * @return A new FSlateBrush with the applied theme settings and optional corner modifications.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="4"))
+	static FSlateBrush ApplySlateBrush(
+		const FSlateBrush& SourceBrush,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		EMounteaThemeType Type = EMounteaThemeType::Default,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+	
+	/**
+	 * Creates a modified FSlateBrushOutlineSettings instance by applying theme-based colors and corner radii.
+	 *
+	 * @param SourceOutline The original outline settings to be modified.
+	 * @param Level The theme level used to determine the outline's color.
+	 * @param State The theme state used to further refine the outline's color based on the current state.
+	 * @param bApplyCorner1 Whether to apply the configured border radius to the first corner.
+	 * @param bApplyCorner2 Whether to apply the configured border radius to the second corner.
+	 * @param bApplyCorner3 Whether to apply the configured border radius to the third corner.
+	 * @param bApplyCorner4 Whether to apply the configured border radius to the fourth corner.
+	 * @return A new FSlateBrushOutlineSettings instance with modified colors and corner radii.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
+	static FSlateBrushOutlineSettings MakeSlateBrushOutline(const FSlateBrushOutlineSettings& SourceOutline,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+
+	/**
+	 *  Applies an outline to the input FSlateBrush based on the specified theme level and state.
+	 *
+	 *  This method modifies the outline settings of the given SourceBrush to reflect the applied
+	 *  theme parameters and corner configurations.
+	 *
+	 *  @param SourceBrush The FSlateBrush to which the outline is to be applied.
+	 *  @param Level The theme level that determines the outline style.
+	 *  @param State The theme state used for additional outline customization.
+	 *  @param bApplyCorner1 Determines whether the outline is applied to the first corner.
+	 *  @param bApplyCorner2 Determines whether the outline is applied to the second corner.
+	 *  @param bApplyCorner3 Determines whether the outline is applied to the third corner.
+	 *  @param bApplyCorner4 Determines whether the outline is applied to the fourth corner.
+	 *  @return A new FSlateBrush instance with the updated outline settings.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
+	static FSlateBrush ApplySlateBrushOutline(const FSlateBrush& SourceBrush,
+		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		EMounteaThemeState State = EMounteaThemeState::Normal,
+		const bool bApplyCorner1 = true,
+		const bool bApplyCorner2 = true,
+		const bool bApplyCorner3 = true,
+		const bool bApplyCorner4 = true
+	);
+
+#pragma endregion
 
 	// --- Main UI  ------------------------------
-
+#pragma region MainUI
+	
 	/**
 	 * Creates and initializes the inventory UI widgets.
 	 * @param Target The UI interface to create the inventory UI for
@@ -106,7 +321,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void SetInventoryUIWrapperVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory);
-
+#pragma endregion
+	
 	// --- Notification  ------------------------------
 #pragma region Notification
 	
@@ -206,7 +422,22 @@ public:
 
 	// --- Inventory
 #pragma region Inventory
+	/**
+	 * Retrieves the parent inventory associated with this UI.
+	 * @param Target The UI interface to get the parent inventory from
+	 * @return The parent inventory interface that manages the items and slots
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
+	/**
+	 * Sets the parent inventory for this UI.
+	 * @param Target The UI interface to set the parent inventory on
+	 * @param NewParentInventory The inventory interface to associate with this UI
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
+	
 	/**
 	 * 
 	 * @param Target 
@@ -307,6 +538,13 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items", meta=(CustomTag="MounteaK2Setter"))
 	static void SetItemOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+
+	/**
+	 * 
+	 * @param Target 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items", meta=(CustomTag="MounteaK2Setter"), DisplayName="Refresh Item Widget")
+	static void Item_RefreshWidget(UUserWidget* Target);
 	
 #pragma endregion
 
@@ -320,6 +558,43 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"))
 	static void SetItemSlotOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+
+	/**
+	 * 
+	 *
+	 * @param OwningInventoryUI 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Slot")
+	static void ItemSlot_AddItemToSlot(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * 
+	 *
+	 * @param OwningInventoryUI 
+	 * @param ItemId 
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item From Slot")
+	static void ItemSlot_RemoveItemFromSlot(UUserWidget* Target, const FGuid& ItemId);
+	
+	/**
+	 * Stores the grid slot data for inventory purposes.
+	 * This is optional information not all Slots need have (non-grid
+	 * based inventory layouts won't have any grid slot data).
+	 *
+	 * @param OwningInventoryUI 
+	 * @param SlotData The grid slot data to be stored.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"))
+	static void StoreGridSlotData(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Item Slot Data")
+	static FMounteaInventoryGridSlot GetGridSlotData(UUserWidget* Target);
 	
 #pragma endregion
 
@@ -358,5 +633,172 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item")
 	static void SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId);
 	
+#pragma endregion
+
+// --- Items Grid ------------------------------
+#pragma region ItemsGrid
+
+	/**
+	 * Adds an item to the first available (empty) slot in the grid.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param ItemId The unique identifier of the item to add
+	 * @return True if the item was successfully added; false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Empty Slot")
+	static bool ItemsGrid_AddItemToEmptySlot(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * Adds an item to a specific slot in the grid.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param ItemId The unique identifier of the item to add
+	 * @param SlotIndex The index of the slot to place the item into
+	 * @return True if the item was successfully added; false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Slot")
+	static bool ItemsGrid_AddItemToSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex);
+
+	/**
+	 * Removes an item from the specified slot.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param SlotIndex The index of the slot from which to remove the item
+	 * @return True if the item was successfully removed; false if the slot is empty or invalid
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item From Slot")
+	static bool ItemsGrid_RemoveItemFromSlot(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Gets the item ID from a specific slot.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param SlotIndex The index of the slot to query
+	 * @return The unique identifier (FGuid) of the item in the slot. 
+	 *         If the slot is empty, returns an invalid FGuid
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Item In Slot")
+	static FGuid ItemsGrid_GetItemInSlot(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Swaps the items between two specific slots.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * @param SlotIndex1 The index of the first slot
+	 * @param SlotIndex2 The index of the second slot
+	 * @return True if the swap was successful; false if either slot is invalid
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Swap Items Between Slots")
+	static bool ItemsGrid_SwapItemsBetweenSlots(UUserWidget* Target, const int32 SlotIndex1, const int32 SlotIndex2);
+
+	/**
+	 * Clears all items from every slot in the grid.
+	 * 
+	 * @param Target The items grid widget interface to operate on
+	 * This is useful for resetting or clearing the inventory grid entirely
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Clear All Slots")
+	static void ItemsGrid_ClearAllSlots(UUserWidget* Target);
+
+	/**
+	 * Gets the total number of slots in the grid.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @return The total number of slots available in the inventory grid
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Total Slots")
+	static int32 ItemsGrid_GetTotalSlots(UUserWidget* Target);
+
+	/**
+	 * Checks if a specific slot is empty.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param SlotIndex The index of the slot to check
+	 * @return True if the slot is empty; false if it contains an item
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Is Slot Empty")
+	static bool ItemsGrid_IsSlotEmpty(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Gets the slot index that contains the specified item.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param ItemId The unique identifier (FGuid) of the item to locate
+	 * @return The index of the slot that contains the item, or -1 if the item is not found
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Slot Index By Item")
+	static int32 ItemsGrid_GetSlotIndexByItem(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * Checks if a specific item exists anywhere in the grid.
+	 * 
+	 * @param Target The items grid widget interface to query
+	 * @param ItemId The unique identifier of the item to check for
+	 * @return True if the item is found in the grid; false if it is not present
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Is Item In Grid")
+	static bool ItemsGrid_IsItemInGrid(UUserWidget* Target, const FGuid& ItemId);
+
+	/**
+	 * Retrieves the data of a specific inventory grid slot.
+	 *
+	 * @param Target The items grid widget interface to query
+	 * @param SlotIndex The index of the grid slot to retrieve data for
+	 * @return FMounteaInventoryGridSlot containing information about the specified slot
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Grid Slot Data")
+	static FMounteaInventoryGridSlot ItemsGrid_GetGridSlotData(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Retrieves the data of all inventory grid slots.
+	 *
+	 * @param Target The items grid widget interface to query
+	 * @return A set of FMounteaInventoryGridSlot containing the data for all slots in the grid
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Grid Slots Data")
+	static TSet<FMounteaInventoryGridSlot> ItemsGrid_GetGridSlotsData(UUserWidget* Target);
+
+	/**
+	 * 
+	 * @param Target 
+	 * @param SlotIndex 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Item Slot From Grid")
+	static UUserWidget* ItemsGrid_GetItemWidgetInSlot(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Attempts to find an empty widget slot within the specified target widget.
+	 *
+	 * @param Target The target user widget implementing MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @return A pointer to the found empty widget slot, or nullptr if no empty slot exists or the target is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Widget Slot")
+	static UUserWidget* ItemsGrid_FindEmptyWidgetSlot(UUserWidget* Target);
+
+	/**
+	 * Finds the index of the first empty slot within a grid managed by a specified user widget.
+	 *
+	 * @param Target The target user widget that implements the MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @return The index of the first empty slot if found, otherwise INDEX_NONE.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index")
+	static int32 ItemsGrid_FindEmptySlotIndex(UUserWidget* Target);
+
+	/**
+	 * Adds a new slot to the inventory grid widget.
+	 *
+	 * This function allows adding a slot with specified data to the grid, enabling
+	 * customization and extension of the inventory UI.
+	 *
+	 * @param Target The target user widget that implements the MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @param SlotData The data representing the slot to be added to the inventory grid.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Grid Slot")
+	static void ItemsGrid_AddSlot(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index (Helper)")
+	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target);
+
 #pragma endregion
 };

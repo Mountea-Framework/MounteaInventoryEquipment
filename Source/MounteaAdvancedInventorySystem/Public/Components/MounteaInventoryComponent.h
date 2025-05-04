@@ -54,6 +54,7 @@ protected:
 	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability) override;
 	virtual void ClearInventory_Implementation() override;
+	virtual bool HasItem_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
 	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) override;
 
 	// --- Class Functions ------------------------------

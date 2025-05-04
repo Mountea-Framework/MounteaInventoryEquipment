@@ -72,17 +72,23 @@ void UMounteaInventoryStatics::ClearInventory(const TScriptInterface<IMounteaAdv
 		Target->Execute_ClearInventory(Target.GetObject());
 }
 
-bool UMounteaInventoryStatics::IncreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, int32 Amount)
+bool UMounteaInventoryStatics::HasItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FInventoryItemSearchParams& SearchParams)
+{
+	return IsValid(Target.GetObject()) ? Target->Execute_HasItem(Target.GetObject(), SearchParams) : false;
+}
+
+bool UMounteaInventoryStatics::IncreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, const int32 Amount)
 {
 	return Target.GetObject() ? Target->Execute_IncreaseItemQuantity(Target.GetObject(), ItemGuid, Amount) : false;
 }
 
-bool UMounteaInventoryStatics::DecreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, int32 Amount)
+bool UMounteaInventoryStatics::DecreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, const int32 Amount)
 {
 	return Target.GetObject() ? Target->Execute_DecreaseItemQuantity(Target.GetObject(), ItemGuid, Amount) : false;
 }
 
-bool UMounteaInventoryStatics::ModifyItemDurability(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, float DeltaDurability)
+bool UMounteaInventoryStatics::ModifyItemDurability(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, const float DeltaDurability)
 {
 	return Target.GetObject() ? Target->Execute_ModifyItemDurability(Target.GetObject(), ItemGuid, DeltaDurability) : false;
 }
@@ -122,7 +128,7 @@ FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryIt
 	if (!settings) return FInventoryRarity();
 	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
 	if (!inventorySettingsConfig) return FInventoryRarity();
-	const auto rarityKey = Item.Template->ItemCategory;
+	const auto rarityKey = Item.Template->ItemRarity;
 	return inventorySettingsConfig->AllowedRarities.Contains(rarityKey) ? inventorySettingsConfig->AllowedRarities.FindChecked(rarityKey) : FInventoryRarity();
 }
 

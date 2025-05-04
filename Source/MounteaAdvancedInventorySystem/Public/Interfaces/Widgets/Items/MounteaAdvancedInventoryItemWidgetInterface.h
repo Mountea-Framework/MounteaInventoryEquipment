@@ -44,4 +44,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
 	FGuid GetInventoryItemId() const;
 	virtual FGuid GetInventoryItemId_Implementation() const = 0;
+
+	/**
+	 * 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void RefreshItemWidget();
+	virtual void RefreshItemWidget_Implementation() = 0;
 };

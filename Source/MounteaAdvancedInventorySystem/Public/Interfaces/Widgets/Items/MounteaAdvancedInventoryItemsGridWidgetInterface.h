@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemsGridWidgetInterface.generated.h"
 
@@ -123,4 +124,89 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
 	bool IsItemInGrid(const FGuid& ItemId) const;
 	virtual bool IsItemInGrid_Implementation(const FGuid& ItemId) const = 0;
+
+	/**
+	 * Retrieves the data of a specific inventory grid slot.
+	 *
+	 * This method returns information about a grid slot based on its index.
+	 * It is used to fetch details such as the position of the slot and the item it contains.
+	 *
+	 * @param SlotIndex The index of the grid slot to retrieve data for.
+	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	FMounteaInventoryGridSlot GetGridSlotData(const int32 SlotIndex) const;
+	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation(const int32 SlotIndex) const = 0;
+
+	/**
+	 * Retrieves the data of all inventory grid slots.
+	 *
+	 * This method returns a set of FMounteaInventoryGridSlot, each representing an individual slot in the inventory grid.
+	 * The data includes information such as the slot's position and the item it contains.
+	 *
+	 * @return A set of FMounteaInventoryGridSlot containing the data for all slots in the grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	TSet<FMounteaInventoryGridSlot> GetGridSlotsData() const;
+	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsData_Implementation() const = 0;
+
+	/**
+	 * Finds the widget corresponding to the first empty slot in the grid.
+	 *
+	 * This method is used to retrieve the user interface widget tied to the first available empty slot,
+	 * enabling interaction or customization of the slot in the inventory system.
+	 *
+	 * @return A UUserWidget pointer representing the first empty slot in the grid.
+	 *         Returns nullptr if no empty slots are available.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UUserWidget* FindEmptyWidgetSlot() const;
+	virtual UUserWidget* FindEmptyWidgetSlot_Implementation() const = 0;
+
+	/**
+	 * Finds the index of the first available empty slot in the inventory grid.
+	 *
+	 * This method searches the inventory grid for an unused slot and returns its index.
+	 *
+	 * @return The index of the first empty slot, or -1 if no empty slots are available.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	int32 FindEmptySlotIndex() const;
+	virtual int32 FindEmptySlotIndex_Implementation() const = 0;
+
+	/**
+	 * Retrieves the widget corresponding to a specific item slot in the grid.
+	 *
+	 * This function allows querying the UI widget associated with the specified slot index.
+	 *
+	 * @param SlotIndex The index of the slot to retrieve the widget for.
+	 * @return The widget associated with the specified slot index, or nullptr if no widget exists for the given index.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UUserWidget* GetItemSlotWidget(const int32 SlotIndex) const;
+	virtual UUserWidget* GetItemSlotWidget_Implementation(const int32 SlotIndex) const = 0;
+
+	/**
+	 * Retrieves the user interface widget associated with an individual item slot in the grid.
+	 *
+	 * This method allows access to the UI representation of a specific item slot, useful for customization,
+	 * updates, or interaction within the inventory system.
+	 *
+	 * @return The UUserWidget representing the item slot. Returns nullptr if no widget is associated.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UUserWidget* GetItemWidgetInSlot(const int32 SlotIndex) const;
+	virtual UUserWidget* GetItemWidgetInSlot_Implementation(const int32 SlotIndex) const = 0;
+
+	/**
+	 * Adds a new slot to the inventory grid widget.
+	 *
+	 * This function allows adding a slot with specified data to the grid, enabling
+	 * customization and extension of the inventory UI.
+	 *
+	 * @param SlotData The data representing the slot to be added to the inventory grid.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	void AddSlot(const FMounteaInventoryGridSlot& SlotData);
+	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 };
