@@ -57,7 +57,7 @@ public:
 
 	bool operator==(const FMounteaInventoryGridSlot& Other) const
 	{
-		return SlotPosition == Other.SlotPosition && OccupiedItemId == Other.OccupiedItemId;
+		return SlotPosition == Other.SlotPosition;
 	}
 
 	bool operator!=(const FMounteaInventoryGridSlot& Other) const

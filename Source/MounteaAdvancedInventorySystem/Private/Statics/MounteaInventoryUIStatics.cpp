@@ -743,6 +743,7 @@ void UMounteaInventoryUIStatics::ItemsGrid_AddSlot(UUserWidget* Target, const FM
 		IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddSlot(Target, SlotData);
 }
 
+// TODO: Implement logic for stacking etc
 int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target)
 {
 	if (!IsValid(Target)) return INDEX_NONE;

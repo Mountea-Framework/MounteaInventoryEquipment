@@ -313,3 +313,28 @@ void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryIt
 	Execute_ProcessItemModified(this, Item);
 }
 
+void UMounteaInventoryUIComponent::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
+{
+	SavedGridSlots.Add(SlotData);
+}
+
+void UMounteaInventoryUIComponent::RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
+{
+	SavedGridSlots.Remove(SlotData);
+}
+
+void UMounteaInventoryUIComponent::AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
+{
+	SavedGridSlots.Append(SlotData);
+}
+
+void UMounteaInventoryUIComponent::RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
+{
+	SavedGridSlots = SavedGridSlots.Difference(SlotData);
+}
+
+void UMounteaInventoryUIComponent::UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
+{
+	SavedGridSlots.Remove(SlotData);
+	SavedGridSlots.Add(SlotData);
+}
