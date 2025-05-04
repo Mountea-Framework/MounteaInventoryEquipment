@@ -128,7 +128,7 @@ FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryIt
 	if (!settings) return FInventoryRarity();
 	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
 	if (!inventorySettingsConfig) return FInventoryRarity();
-	const auto rarityKey = Item.Template->ItemCategory;
+	const auto rarityKey = Item.Template->ItemRarity;
 	return inventorySettingsConfig->AllowedRarities.Contains(rarityKey) ? inventorySettingsConfig->AllowedRarities.FindChecked(rarityKey) : FInventoryRarity();
 }
 
