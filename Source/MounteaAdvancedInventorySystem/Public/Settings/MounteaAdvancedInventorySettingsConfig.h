@@ -9,6 +9,7 @@
 #include "MounteaAdvancedInventorySettingsConfig.generated.h"
 
 class UMounteaAdvancedInventoryThemeConfig;
+
 /**
 * Data Asset that manages configuration settings for Mountea Advanced Inventory System.
 * Defines inventory types, rarities, and categories with their respective settings.

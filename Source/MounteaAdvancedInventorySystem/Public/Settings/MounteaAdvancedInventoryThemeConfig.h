@@ -6,6 +6,13 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryThemeConfig.generated.h"
 
+/**
+ * @class UMounteaAdvancedInventoryThemeConfig
+ * @brief A configuration asset for the Mountea Inventory System, used to define visual and audio elements for the inventory UI.
+ *
+ * This class provides customization options to configure the colors, text properties, and sounds for various states of the inventory system, including background, focus, hover, active, and disabled states.
+ * It is designed for use within the Mountea Inventory System and can be extended or modified as required.
+ */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Theme Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining colours."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryThemeConfig : public UPrimaryDataAsset
 {

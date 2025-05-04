@@ -3,3 +3,9 @@
 
 #include "Widgets/MounteaAdvancedInventoryBaseWidget.h"
 
+void UMounteaAdvancedInventoryBaseWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	Execute_ApplyTheme(this);
+}
