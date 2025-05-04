@@ -7,6 +7,8 @@
 #include "Widgets/MounteaAdvancedInventoryBaseWidget.h"
 #include "MounteaAdvancedInventoryItemsGridWidget.generated.h"
 
+class IMounteaAdvancedInventoryUIInterface;
+
 /**
  * Widget class that implements advanced inventory grid behavior.
  */
@@ -42,4 +44,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="Widget|Data")
 	TSet<FMounteaInventoryGridSlot> GridSlots;
+
+	UPROPERTY(BlueprintReadWrite, Category="Widget|Data")
+	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent;
 };
