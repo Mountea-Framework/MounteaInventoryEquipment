@@ -151,6 +151,30 @@ public:
 	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsData_Implementation() const = 0;
 
 	/**
+	 * Finds the widget corresponding to the first empty slot in the grid.
+	 *
+	 * This method is used to retrieve the user interface widget tied to the first available empty slot,
+	 * enabling interaction or customization of the slot in the inventory system.
+	 *
+	 * @return A UUserWidget pointer representing the first empty slot in the grid.
+	 *         Returns nullptr if no empty slots are available.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UUserWidget* FindEmptyWidgetSlot() const;
+	virtual UUserWidget* FindEmptyWidgetSlot_Implementation() const = 0;
+
+	/**
+	 * Finds the index of the first available empty slot in the inventory grid.
+	 *
+	 * This method searches the inventory grid for an unused slot and returns its index.
+	 *
+	 * @return The index of the first empty slot, or -1 if no empty slots are available.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	int32 FindEmptySlotIndex() const;
+	virtual int32 FindEmptySlotIndex_Implementation() const = 0;
+
+	/**
 	 * Retrieves the user interface widget associated with an individual item slot in the grid.
 	 *
 	 * This method allows access to the UI representation of a specific item slot, useful for customization,

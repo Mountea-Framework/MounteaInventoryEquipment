@@ -83,7 +83,7 @@ public:
 public:
 
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
-
+	
 	/**
 	 * Applies the specified theme to the given user widget.
 	 * This function ensures that the provided widget is valid and executes the ApplyTheme logic via the Mountea Inventory Generic Widget Interface.
@@ -766,6 +766,27 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Item Slot From Grid")
 	static UUserWidget* ItemsGrid_GetItemWidgetInSlot(UUserWidget* Target, const int32 SlotIndex);
+
+	/**
+	 * Attempts to find an empty widget slot within the specified target widget.
+	 *
+	 * @param Target The target user widget implementing MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @return A pointer to the found empty widget slot, or nullptr if no empty slot exists or the target is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Widget Slot")
+	static UUserWidget* ItemsGrid_FindEmptyWidgetSlot(UUserWidget* Target);
+
+	/**
+	 * Finds the index of the first empty slot within a grid managed by a specified user widget.
+	 *
+	 * @param Target The target user widget that implements the MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @return The index of the first empty slot if found, otherwise INDEX_NONE.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index")
+	static int32 ItemsGrid_FindEmptySlotIndex(UUserWidget* Target);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index (Helper)")
+	static int32 Helper_FindEmptyGridSlotIndex(UUserWidget* Target);
 
 #pragma endregion
 };

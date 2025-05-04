@@ -726,3 +726,32 @@ UUserWidget* UMounteaInventoryUIStatics::ItemsGrid_GetItemWidgetInSlot(UUserWidg
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetItemWidgetInSlot(Target, SlotIndex) : nullptr;
 }
+
+UUserWidget* UMounteaInventoryUIStatics::ItemsGrid_FindEmptyWidgetSlot(UUserWidget* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_FindEmptyWidgetSlot(Target) : nullptr;
+}
+
+int32 UMounteaInventoryUIStatics::ItemsGrid_FindEmptySlotIndex(UUserWidget* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_FindEmptySlotIndex(Target) : INDEX_NONE;
+}
+
+int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(UUserWidget* Target)
+{
+	if (!IsValid(Target)) return INDEX_NONE;
+	if (!Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) return INDEX_NONE;
+
+	auto gridSlots = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(Target).Array();
+	for (int i = 0; i < gridSlots.Num(); i++)
+	{
+		const auto gridSlot = gridSlots[i];
+		auto slotWidget = gridSlot.SlotWidget;
+		if (!IsValid(slotWidget)) continue;
+		if (!slotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
+		
+		if (!IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(slotWidget)) continue;
+		return i;
+	}
+	return INDEX_NONE;
+}

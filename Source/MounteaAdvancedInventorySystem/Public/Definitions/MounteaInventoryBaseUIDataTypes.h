@@ -53,7 +53,7 @@ public:
 		
 	void ResetSlot()	{	OccupiedItemId = FGuid();	};
 	
-	bool IsEmpty() const	{	return OccupiedItemId.IsValid() == false;	};
+	bool IsEmpty() const	{	return OccupiedItemId.IsValid() == false && SlotWidget == nullptr;	};
 
 	bool operator==(const FMounteaInventoryGridSlot& Other) const
 	{

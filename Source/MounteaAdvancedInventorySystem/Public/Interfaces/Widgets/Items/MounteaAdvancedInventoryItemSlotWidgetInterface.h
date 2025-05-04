@@ -71,4 +71,22 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
 	void RemoveItemFromSlot(const FGuid& ItemId);
 	virtual void RemoveItemFromSlot_Implementation(const FGuid& ItemId) = 0;
+
+	/**
+	 * Checks whether the slot is empty.
+	 *
+	 * @return True if the slot is empty, otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	bool IsSlotEmpty() const;
+	virtual bool IsSlotEmpty_Implementation() const = 0;
+
+	/**
+	 * Retrieves the item widget currently in the inventory slot.
+	 *
+	 * @return The item widget in the slot, or nullptr if no widget is present.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UUserWidget* GetItemWidgetInSlot() const;
+	virtual UUserWidget* GetItemWidgetInSlot_Implementation() const = 0;
 };
