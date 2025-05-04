@@ -598,7 +598,7 @@ void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UUserWidget* Target,
 void UMounteaInventoryUIStatics::Item_RefreshWidget(UUserWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
-		IMounteaAdvancedInventoryItemWidgetInterface::Execute_RefreshWidget(Target);
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_RefreshItemWidget(Target);
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Target,
@@ -735,6 +735,12 @@ UUserWidget* UMounteaInventoryUIStatics::ItemsGrid_FindEmptyWidgetSlot(UUserWidg
 int32 UMounteaInventoryUIStatics::ItemsGrid_FindEmptySlotIndex(UUserWidget* Target)
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_FindEmptySlotIndex(Target) : INDEX_NONE;
+}
+
+void UMounteaInventoryUIStatics::ItemsGrid_AddSlot(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>())
+		IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddSlot(Target, SlotData);
 }
 
 int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target)

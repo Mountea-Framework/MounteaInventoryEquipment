@@ -11,7 +11,7 @@
 
 bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToEmptySlot_Implementation(const FGuid& ItemId)
 {
-	const int32 EmptySlotIndex = FindEmptySlotIndex();
+	const int32 EmptySlotIndex = Execute_FindEmptySlotIndex(this);
 	if (!GridSlots.Array().IsValidIndex(EmptySlotIndex)) return false;
 
 	return Execute_AddItemToSlot(this, ItemId, EmptySlotIndex);

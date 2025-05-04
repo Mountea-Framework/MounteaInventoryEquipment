@@ -543,7 +543,7 @@ public:
 	 * 
 	 * @param Target 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items", meta=(CustomTag="MounteaK2Setter"), DisplayName="Refresh Item Widget")
 	static void Item_RefreshWidget(UUserWidget* Target);
 	
 #pragma endregion
@@ -785,6 +785,18 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index")
 	static int32 ItemsGrid_FindEmptySlotIndex(UUserWidget* Target);
 
+	/**
+	 * Adds a new slot to the inventory grid widget.
+	 *
+	 * This function allows adding a slot with specified data to the grid, enabling
+	 * customization and extension of the inventory UI.
+	 *
+	 * @param Target The target user widget that implements the MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @param SlotData The data representing the slot to be added to the inventory grid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index")
+	static void ItemsGrid_AddSlot(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData);
+	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index (Helper)")
 	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target);
 

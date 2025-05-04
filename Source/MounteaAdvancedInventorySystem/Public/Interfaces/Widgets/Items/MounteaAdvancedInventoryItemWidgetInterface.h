@@ -49,6 +49,6 @@ public:
 	 * 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
-	void RefreshWidget();
-	virtual void RefreshWidget_Implementation() = 0;
+	void RefreshItemWidget();
+	virtual void RefreshItemWidget_Implementation() = 0;
 };
