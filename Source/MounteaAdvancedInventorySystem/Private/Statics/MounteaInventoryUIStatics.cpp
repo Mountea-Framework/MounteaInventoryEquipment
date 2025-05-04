@@ -737,7 +737,7 @@ int32 UMounteaInventoryUIStatics::ItemsGrid_FindEmptySlotIndex(UUserWidget* Targ
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_FindEmptySlotIndex(Target) : INDEX_NONE;
 }
 
-int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(UUserWidget* Target)
+int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target)
 {
 	if (!IsValid(Target)) return INDEX_NONE;
 	if (!Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) return INDEX_NONE;

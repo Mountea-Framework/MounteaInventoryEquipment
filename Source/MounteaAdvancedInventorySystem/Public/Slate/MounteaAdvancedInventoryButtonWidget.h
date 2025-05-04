@@ -21,6 +21,7 @@ public:
 	
 	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload) override {};
 	virtual void ApplyTheme_Implementation() override;
+	virtual void RefreshWidget_Implementation() override {};
 
 private:
 	

@@ -786,7 +786,7 @@ public:
 	static int32 ItemsGrid_FindEmptySlotIndex(UUserWidget* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index (Helper)")
-	static int32 Helper_FindEmptyGridSlotIndex(UUserWidget* Target);
+	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target);
 
 #pragma endregion
 };

@@ -45,4 +45,16 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
 	void ApplyTheme();
 	virtual void ApplyTheme_Implementation() = 0;
+
+	/**
+	 * Refreshes the widget to update its visual representation or data.
+	 *
+	 * This method can be overridden to define specific logic for refreshing
+	 * the user interface element associated with inventory or equipment systems.
+	 * It may be used for reloading data, updating state, or applying changes made
+	 * to the widget’s configuration or content.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	void RefreshWidget();
+	virtual void RefreshWidget_Implementation() = 0;
 };
