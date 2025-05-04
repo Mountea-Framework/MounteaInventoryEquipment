@@ -162,6 +162,16 @@ public:
 	static void ClearInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
 
 	/**
+	 * Checks if the provided Inventory Interface contains an item matching the specified search parameters.
+	 *
+	 * @param Target The inventory interface to execute on.
+	 * @param SearchParams The parameters to filter and match the desired item in the inventory.
+	 * @return True if the specified item exists in the inventory, False otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Getter"))
+	static bool HasItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	
+	/**
 	 * Increases item quantity
 	 * @param Target The inventory interface to execute on
 	 * @param ItemGuid Target item GUID
