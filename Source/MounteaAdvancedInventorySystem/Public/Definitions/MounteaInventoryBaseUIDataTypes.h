@@ -21,7 +21,7 @@ public:
 	 * Editable in the editor and accessible in Blueprints.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FIntPoint SlotPosition;
+	FIntPoint SlotPosition = FIntPoint::ZeroValue;
 
 	/**
 	 * Represents the unique identifier for the item occupying the grid slot.
