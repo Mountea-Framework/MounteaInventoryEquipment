@@ -167,7 +167,7 @@ UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::FindEmptyWidgetSlot_Imple
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::FindEmptySlotIndex_Implementation(const FGuid& ItemId) const
 {
-	return UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(this, ItemId);
+	return UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(this, ItemId, ParentUIComponent.GetObject() );
 }
 
 UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemSlotWidget_Implementation(const int32 SlotIndex) const

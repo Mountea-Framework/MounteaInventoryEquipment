@@ -59,4 +59,11 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags", meta=(CustomTag="MounteaK2Getter"))
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
+
+	template<typename TEnum>
+	static constexpr bool HasFlag(uint8 value, TEnum flag)
+	{
+		static_assert(std::is_enum<TEnum>::value, "TEnum must be an enum type.");
+		return (value & static_cast<uint8>(flag)) != 0;
+	}
 };

@@ -808,7 +808,7 @@ public:
 	static void ItemsGrid_AddSlot(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index (Helper)")
-	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId);
+	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, const UObject* ParentInventory);
 
 #pragma endregion
 };

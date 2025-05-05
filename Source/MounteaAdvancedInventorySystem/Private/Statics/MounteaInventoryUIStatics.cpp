@@ -4,8 +4,13 @@
 #include "Statics/MounteaInventoryUIStatics.h"
 
 #include "Blueprint/UserWidget.h"
+
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
+
 #include "GameFramework/PlayerState.h"
+
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
@@ -15,9 +20,12 @@
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemsGridWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
+
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+
+#include "Statics/MounteaInventorySystemStatics.h"
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -749,11 +757,29 @@ void UMounteaInventoryUIStatics::ItemsGrid_AddSlot(UUserWidget* Target, const FM
 }
 
 // TODO: Implement logic for stacking etc
-int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId)
+int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, const UObject* ParentInventory)
 {
 	if (!IsValid(Target)) return INDEX_NONE;
 	if (!Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) return INDEX_NONE;
+	if (!ItemId.IsValid()) return INDEX_NONE;
+	if (!IsValid(ParentInventory)) return INDEX_NONE;
 
+	// TODO: Allow IMounteaAdvancedInventoryInterface
+	if (!ParentInventory->Implements<UMounteaAdvancedInventoryUIInterface>()) return INDEX_NONE;
+
+	auto inventoryRef = IMounteaAdvancedInventoryUIInterface::Execute_GetParentInventory(ParentInventory);
+	if (!IsValid(inventoryRef.GetObject())) return INDEX_NONE;
+
+	const auto inventoryItem = IMounteaAdvancedInventoryInterface::Execute_FindItem(inventoryRef.GetObject(), FInventoryItemSearchParams(ItemId));
+	if (!inventoryItem.IsItemValid()) return INDEX_NONE;
+	if (!inventoryItem.Template) return INDEX_NONE;
+
+	const auto itemTemplate = inventoryItem.Template;
+	if (UMounteaInventorySystemStatics::HasFlag(itemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Stackable))
+	{
+		LOG_ERROR(TEXT("ITEM IS STACKABLE! FIND AVAILABLE STACK FIRST!"))
+	}
+	
 	auto gridSlots = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(Target).Array();
 	for (int i = 0; i < gridSlots.Num(); i++)
 	{
