@@ -9,6 +9,8 @@
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySettingsConfig"
 
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()
+	: Super()
+	, bAlwaysStackStackableItems(false)
 {
 	SetupWidgetCommands();
 	ValidateInventoryTypes();
