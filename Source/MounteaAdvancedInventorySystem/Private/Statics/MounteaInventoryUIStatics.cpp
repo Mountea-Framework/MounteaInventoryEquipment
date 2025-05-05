@@ -756,7 +756,7 @@ void UMounteaInventoryUIStatics::ItemsGrid_AddSlot(UUserWidget* Target, const FM
 		IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddSlot(Target, SlotData);
 }
 
-// TODO: Implement logic for stacking etc
+// TODO: Create Helper function that will be called in recursion which will already have neccessary inputs to avoid the initial getting
 int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, const UObject* ParentInventory)
 {
 	if (!IsValid(Target)) return INDEX_NONE;
@@ -774,21 +774,29 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidge
 	if (!inventoryItem.IsItemValid()) return INDEX_NONE;
 	if (!inventoryItem.Template) return INDEX_NONE;
 
-	const auto itemTemplate = inventoryItem.Template;
-	if (UMounteaInventorySystemStatics::HasFlag(itemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Stackable))
-	{
-		LOG_ERROR(TEXT("ITEM IS STACKABLE! FIND AVAILABLE STACK FIRST!"))
-	}
-	
 	auto gridSlots = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(Target).Array();
+	if (gridSlots.Num() == 0) return INDEX_NONE;
+	
+	const auto itemTemplate = inventoryItem.Template;
+	const bool bIsStackable = UMounteaInventorySystemStatics::HasFlag(itemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Stackable);
+	
 	for (int i = 0; i < gridSlots.Num(); i++)
 	{
 		const auto gridSlot = gridSlots[i];
 		auto slotWidget = gridSlot.SlotWidget;
 		if (!IsValid(slotWidget)) continue;
 		if (!slotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
-		
-		if (!IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(slotWidget)) continue;
+
+		const bool bSlotIsEmpty = IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(slotWidget);
+		if (bIsStackable)
+		{
+			// TODO: should we find least - empty stack and update it? Or just use empty space? => Config (`bAlwaysStackStackableItems`!
+			continue;
+		}
+		else
+		{
+			if (!bSlotIsEmpty) continue;
+		}
 		return i;
 	}
 	return INDEX_NONE;
