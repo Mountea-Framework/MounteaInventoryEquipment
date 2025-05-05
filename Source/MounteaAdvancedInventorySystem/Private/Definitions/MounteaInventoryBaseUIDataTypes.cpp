@@ -8,8 +8,8 @@
 FString FMounteaInventoryGridSlot::ToString() const
 {
 	FString returnString = TEXT("Slot: ");
-	returnString.Append(TEXT("SlotPosition: ")).Append(SlotPosition.ToString()).Append(TEXT("/n"));
-	returnString.Append(TEXT("OccupiedItemId: ")).Append(OccupiedItemId.ToString()).Append(TEXT("/n"));
+	returnString.Append(TEXT("SlotPosition: ")).Append(SlotPosition.ToString()).Append(TEXT(" | "));
+	returnString.Append(TEXT("OccupiedItemId: ")).Append(OccupiedItemId.ToString()).Append(TEXT(" | "));
 	returnString.Append(TEXT("SlotWidget: ")).Append( SlotWidget ? *SlotWidget->GetName() : TEXT("None") );
 	return returnString;
 }
