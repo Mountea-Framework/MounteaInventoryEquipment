@@ -11,7 +11,7 @@
 
 bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToEmptySlot_Implementation(const FGuid& ItemId)
 {
-	const int32 EmptySlotIndex = Execute_FindEmptySlotIndex(this);
+	const int32 EmptySlotIndex = Execute_FindEmptySlotIndex(this, ItemId);
 	if (!GridSlots.Array().IsValidIndex(EmptySlotIndex)) return false;
 
 	return Execute_AddItemToSlot(this, ItemId, EmptySlotIndex);
@@ -165,9 +165,9 @@ UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::FindEmptyWidgetSlot_Imple
 	return EmptySlot ? EmptySlot->SlotWidget : nullptr;
 }
 
-int32 UMounteaAdvancedInventoryItemsGridWidget::FindEmptySlotIndex_Implementation() const
+int32 UMounteaAdvancedInventoryItemsGridWidget::FindEmptySlotIndex_Implementation(const FGuid& ItemId) const
 {
-	return UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(this);
+	return UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(this, ItemId);
 }
 
 UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemSlotWidget_Implementation(const int32 SlotIndex) const

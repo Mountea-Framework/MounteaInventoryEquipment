@@ -171,8 +171,8 @@ public:
 	 * @return The index of the first empty slot, or -1 if no empty slots are available.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
-	int32 FindEmptySlotIndex() const;
-	virtual int32 FindEmptySlotIndex_Implementation() const = 0;
+	int32 FindEmptySlotIndex(const FGuid& ItemId) const;
+	virtual int32 FindEmptySlotIndex_Implementation(const FGuid& ItemId) const = 0;
 
 	/**
 	 * Retrieves the widget corresponding to a specific item slot in the grid.

@@ -35,7 +35,7 @@ public:
 	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation(const int32 SlotIndex) const override;
 	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsData_Implementation() const override;
 	virtual UUserWidget* FindEmptyWidgetSlot_Implementation() const override;
-	virtual int32 FindEmptySlotIndex_Implementation() const override;
+	virtual int32 FindEmptySlotIndex_Implementation(const FGuid& ItemId) const override;
 	virtual UUserWidget* GetItemSlotWidget_Implementation(const int32 SlotIndex) const override;
 	virtual UUserWidget* GetItemWidgetInSlot_Implementation(const int32 SlotIndex) const override;
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
