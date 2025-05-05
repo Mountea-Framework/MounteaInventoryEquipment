@@ -69,10 +69,24 @@ protected:
 	void ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
 
 protected:
-
+	
+	/**
+	 * Delegate that is broadcast when an inventory category is selected.
+	 *
+	* This BlueprintAssignable delegate allows other components to handle the logic
+	 * for Category selection in the inventory.
+	 * It broadcasts FSTRING CategoryId.
+	 */
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryCategorySelected OnCategorySelected;
 
+	/**
+	 * Delegate triggered when an inventory item is selected.
+	 *
+	 * This BlueprintAssignable delegate allows other components to handle the logic
+	 * for Item selection in the inventory.
+	 * It broadcasts FGUID ItemId.
+	 */
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryItemSelected OnItemSelected;
 
@@ -82,11 +96,25 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	FGuid ActiveItemGuid;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	/**
+	 * Represents the set of saved inventory grid slots.
+	 *
+	 * This variable stores a collection of FMounteaInventoryGridSlot data structures,
+	 * which define the slots in the inventory grid system. It is used for managing
+	 * and persisting slot configurations across game sessions.
+	 */
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	TSet<FMounteaInventoryGridSlot> SavedGridSlots;
 	
 private:
-
+	
+	/**
+	 * Represents the parent inventory interface.
+	 *
+	 * This variable serves as a reference to the parent inventory system, allowing interaction with the advanced inventory interface.
+	 * It enables communication between the inventory UI component and the parent inventory for functions such as handling item modifications,
+	 * notifications, and other inventory-related operations.
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess), meta=(ExposeOnSpawn))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 

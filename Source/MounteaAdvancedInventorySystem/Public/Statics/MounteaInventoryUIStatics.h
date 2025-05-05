@@ -130,6 +130,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
 	static void ResetItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData);
 
+	/**
+	 * Converts the provided inventory grid slot data to a string representation.
+	 *
+	 * @param SourceData The source data representing the inventory grid slot to be converted.
+	 * @return A string representing the inventory grid slot data.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Getter"), DisplayName="ToString")
+	static FString GridSlot_ToString(const FMounteaInventoryGridSlot& SourceData);
+
 	// --- Theme  ------------------------------
 #pragma region Theme
 	
@@ -780,10 +789,11 @@ public:
 	 * Finds the index of the first empty slot within a grid managed by a specified user widget.
 	 *
 	 * @param Target The target user widget that implements the MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @param ItemId The unique identifier of the item to check for
 	 * @return The index of the first empty slot if found, otherwise INDEX_NONE.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index")
-	static int32 ItemsGrid_FindEmptySlotIndex(UUserWidget* Target);
+	static int32 ItemsGrid_FindEmptySlotIndex(UUserWidget* Target, const FGuid& ItemId);
 
 	/**
 	 * Adds a new slot to the inventory grid widget.
@@ -798,7 +808,7 @@ public:
 	static void ItemsGrid_AddSlot(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index (Helper)")
-	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target);
+	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, const UObject* ParentInventory);
 
 #pragma endregion
 };

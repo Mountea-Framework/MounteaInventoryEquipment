@@ -73,6 +73,22 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 
 	if (existingItem.IsItemValid())
 	{
+		const auto existingTemplate = existingItem.GetTemplate();
+		const auto newTemplate = Item.GetTemplate();
+		if (UMounteaInventorySystemStatics::HasFlag(existingTemplate->ItemFlags, EInventoryItemFlags::EIIF_Unique)
+			|| UMounteaInventorySystemStatics::HasFlag(newTemplate->ItemFlags, EInventoryItemFlags::EIIF_Unique)
+			/*|| !UMounteaInventorySystemStatics::HasFlag(newTemplate->ItemFlags, EInventoryItemFlags::EIIF_Stackable)
+			|| !UMounteaInventorySystemStatics::HasFlag(existingTemplate->ItemFlags, EInventoryItemFlags::EIIF_Stackable)*/)
+		{
+			Execute_ProcessInventoryNotification(this, UMounteaInventoryStatics::CreateNotificationData(
+				MounteaInventoryNotificationBaseTypes::ItemNotUpdated,
+				this,
+				Item.GetGuid(),
+				0
+			));
+			return false;
+		}
+		
 		const int32 AvailableSpace = Item.GetTemplate()->MaxQuantity - existingItem.GetQuantity();
 		const int32 AmountToAdd = FMath::Min(Item.GetQuantity(), AvailableSpace);
 

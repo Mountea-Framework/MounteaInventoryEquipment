@@ -335,6 +335,7 @@ void UMounteaInventoryUIComponent::RemoveSlots_Implementation(const TSet<FMounte
 
 void UMounteaInventoryUIComponent::UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
 {
-	SavedGridSlots.Remove(SlotData);
+	if (SavedGridSlots.Contains(SlotData))
+		SavedGridSlots.Remove(SlotData);
 	SavedGridSlots.Add(SlotData);
 }

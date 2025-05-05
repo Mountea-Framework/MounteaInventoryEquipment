@@ -71,6 +71,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Visual", meta=(UIMin=0.1f,UIMax=10.f,ClampMin=0.1f,ClampMax=10.f))
 	float ItemSlotAspectRatio = 1.f;
 
+	/**
+	 * Determines if stackable items should always automatically stack together when added to the inventory.
+	 * If set to true, stackable items will occupy the same inventory slot until the maximum stack size is reached.
+	 * Improves inventory organization by reducing the number of individual item slots occupied.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Theme")
+	uint8 bAlwaysStackStackableItems : 1;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="UserInterface|Classes|Wrapper", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
 	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
 

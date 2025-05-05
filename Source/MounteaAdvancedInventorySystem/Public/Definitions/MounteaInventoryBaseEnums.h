@@ -49,7 +49,7 @@ enum class EInventoryItemFlags : uint8
 	EIIF_Dropable	= 1 << 3	UMETA(DisplayName = "Dropable", Tooltip = "Item can be dropped into the world."),
 	EIIF_Consumable  = 1 << 4	UMETA(DisplayName = "Consumable", Tooltip = "Item can be consumed for an effect."),
 	EIIF_QuestItem	= 1 << 5	UMETA(DisplayName = "Quest Item", Tooltip = "Item is required for a quest."),
-	EIIF_Expirable	= 1 << 6	UMETA(DisplayName = "Expirable", Tooltip = "Item has an expiration time or condition."),
+	EIIF_Unique	= 1 << 6	UMETA(DisplayName = "Unique", Tooltip = "Item is unique and can be only once in Inventory!"),
 	EIIF_Durable	  = 1 << 7	UMETA(DisplayName = "Durable", Tooltip = "Item has durability and can degrade.")
 };
 ENUM_CLASS_FLAGS(EInventoryItemFlags)
