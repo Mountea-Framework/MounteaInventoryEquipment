@@ -33,6 +33,8 @@ bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToSlot_Implementation(cons
 
 	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_AddItemToSlot(slotWidget, ItemId);
 
+	ParentUIComponent->Execute_AddSlot(ParentUIComponent.GetObject(), tempGridSlot);
+
 	return true;
 }
 
@@ -50,6 +52,8 @@ bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromSlot_Implementation
 	const FGuid itemId = tempGridSlot.OccupiedItemId;
 	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_RemoveItemFromSlot(slotWidget, itemId);
 
+	ParentUIComponent->Execute_UpdateSlot(ParentUIComponent.GetObject(), tempGridSlot);
+	
 	tempGridSlot.ResetSlot();
 	GridSlots.Add(tempGridSlot);
 

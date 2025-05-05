@@ -197,6 +197,11 @@ void UMounteaInventoryUIStatics::ResetItem(FMounteaInventoryGridSlot& SourceData
 	SourceData.ResetSlot();
 }
 
+FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGridSlot& SourceData)
+{
+	return SourceData.ToString();
+}
+
 FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(
 	const FButtonStyle& BaseBrush,
 	const EMounteaThemeLevel Level)

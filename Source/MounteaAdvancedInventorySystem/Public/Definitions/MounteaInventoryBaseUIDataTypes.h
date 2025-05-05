@@ -64,6 +64,8 @@ public:
 	{
 		return !(*this == Other);
 	}
+
+	FString ToString() const;
 };
 
 FORCEINLINE uint32 GetTypeHash(const FMounteaInventoryGridSlot& Slot)
