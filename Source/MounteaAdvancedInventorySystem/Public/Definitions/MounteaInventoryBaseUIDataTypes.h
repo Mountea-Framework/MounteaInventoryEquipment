@@ -47,13 +47,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
 	TObjectPtr<UUserWidget> SlotWidget;
 
+	/**
+	 * Represents the quantity of items in the slot.
+	 *
+	 * This property holds an integer value indicating the number of items
+	 * currently stored in the inventory slot. It assists in managing stackable
+	 * items.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	int32 SlotQuantity = INDEX_NONE;
+
 public:
 
 	bool IsValid() const { return SlotWidget != nullptr; };
 		
 	void ResetSlot()	{	OccupiedItemId = FGuid();	};
 	
-	bool IsEmpty() const	{	return OccupiedItemId.IsValid() == false || SlotWidget == nullptr;	};
+	bool IsEmpty() const	{	return OccupiedItemId.IsValid() == false; };
 
 	bool operator==(const FMounteaInventoryGridSlot& Other) const
 	{
@@ -70,5 +80,5 @@ public:
 
 FORCEINLINE uint32 GetTypeHash(const FMounteaInventoryGridSlot& Slot)
 {
-	return GetTypeHash(Slot.SlotPosition) ^ GetTypeHash(Slot.OccupiedItemId);
+	return GetTypeHash(Slot.SlotPosition);
 }
