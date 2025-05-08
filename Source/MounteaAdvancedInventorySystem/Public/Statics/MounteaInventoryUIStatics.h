@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
 struct FMounteaInventoryGridSlot;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
@@ -629,10 +630,11 @@ public:
 	/**
 	 * 
 	 * @param Target 
-	 * @param ItemId 
+	 * @param ItemId
+	 * @param OptionalItemSlot
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Update Item")
-	static void SlotsWrapper_UpdateItem(UUserWidget* Target, const FGuid& ItemId);
+	static void SlotsWrapper_UpdateItem(UUserWidget* Target, const FGuid& ItemId, const int32 OptionalItemSlot = -1);
 
 	/**
 	 * 
@@ -808,7 +810,22 @@ public:
 	static void ItemsGrid_AddSlot(UUserWidget* Target, const FMounteaInventoryGridSlot& SlotData);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Find Empty Slot Index (Helper)")
-	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, const UObject* ParentInventory);
+	static int32 Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, UObject* ParentInventory);
+	static int32 FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems);
 
+	/**
+	 * Updates the item located in a specific slot of the inventory grid.
+	 *
+	 * This method attempts to update the item in the specified slot index by using the provided item ID.
+	 * If a slot index is not specified, the default slot index (0) will be used.
+	 *
+	 * @param Target The target user widget that implements the MounteaAdvancedInventoryItemsGridWidgetInterface.
+	 * @param ItemId A globally unique identifier (GUID) for the item to be updated.
+	 * @param SlotIndex The index of the slot in which the item is updated (default is 0).
+	 * @return Returns true if the item was successfully updated, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Grid Slot")
+	static bool  ItemsGrid_UpdateItemInSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex = 0);
+	
 #pragma endregion
 };
