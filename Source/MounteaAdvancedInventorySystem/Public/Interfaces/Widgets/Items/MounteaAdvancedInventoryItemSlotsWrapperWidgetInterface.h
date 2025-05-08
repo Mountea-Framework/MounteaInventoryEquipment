@@ -40,8 +40,8 @@ public:
 	virtual void AddItem_Implementation(const FGuid& ItemId) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
-	void UpdateItem(const FGuid& ItemId);
-	virtual void UpdateItem_Implementation(const FGuid& ItemId) = 0;
+	void UpdateItem(const FGuid& ItemId, const int32 OptionalItemSlot = INDEX_NONE);
+	virtual void UpdateItem_Implementation(const FGuid& ItemId, const int32 OptionalItemSlot = INDEX_NONE) = 0;
 
 	/**
 	 * 

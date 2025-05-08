@@ -5,6 +5,7 @@
 
 #include "Algo/AnyOf.h"
 #include "Algo/Find.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
 #include "Statics/MounteaInventoryUIStatics.h"
@@ -131,6 +132,8 @@ int32 UMounteaAdvancedInventoryItemsGridWidget::GetSlotIndexByItem_Implementatio
 			return checkedSlot.OccupiedItemId == ItemId;
 		});
 
+	LOG_ERROR(TEXT("GetSlotIndex: Found Slot %d"), (FoundSlot ? Slots.IndexOfByKey(*FoundSlot) : -1))
+
 	return FoundSlot ? Slots.IndexOfByKey(*FoundSlot) : -1;
 }
 
@@ -193,4 +196,30 @@ UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemWidgetInSlot_Imple
 void UMounteaAdvancedInventoryItemsGridWidget::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
 {
 	GridSlots.Add(SlotData);
+}
+
+bool UMounteaAdvancedInventoryItemsGridWidget::UpdateItemInSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex)
+{
+	if (!ItemId.IsValid()) return false;
+	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return false;
+
+	auto slotData = Execute_GetGridSlotData(this, SlotIndex);
+	if (!slotData.IsValid()) return false;
+
+	if (!IsValid(ParentUIComponent.GetObject())) return false;
+	const auto parentInventory = ParentUIComponent->Execute_GetParentInventory(ParentUIComponent.GetObject());
+
+	if (!IsValid(parentInventory.GetObject())) return false;
+
+	const auto item = parentInventory->Execute_FindItem(parentInventory.GetObject(), FInventoryItemSearchParams(ItemId));
+	if (!item.IsItemValid()) return false;
+
+	if (item.GetQuantity() == slotData.SlotQuantity)
+	{
+		LOG_WARNING(TEXT("[UpdateItem] Item %s is not UI dirty, quantity has not changed"), *item.GetItemName().ToString())
+		return false;
+	}
+
+	
+	return true;
 }

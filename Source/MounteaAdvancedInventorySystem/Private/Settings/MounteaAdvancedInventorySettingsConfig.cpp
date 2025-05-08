@@ -117,7 +117,7 @@ void UMounteaAdvancedInventorySettingsConfig::SetupMerchantConfig(FInventoryType
 										  EInventoryTypeFlags::EITF_CanAddItems |
 										  EInventoryTypeFlags::EITF_CanRemoveItems |
 										  EInventoryTypeFlags::EITF_AllowStacking);
-	Config.AccessFlags = static_cast<uint8>(EInventoryFlags::EIF_Private);
+Config.AccessFlags = static_cast<uint8>(EInventoryFlags::EIF_Private);
 	Config.SlotsRange = FIntPoint(50, 50);
 	Config.StartingSlots = 50;
 	Config.MaxValue = 5000.0f;

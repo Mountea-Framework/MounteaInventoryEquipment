@@ -209,4 +209,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
 	void AddSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
+
+	/**
+	 * Updates the item located in a specific slot of the inventory grid.
+	 *
+	 * This method attempts to update the item in the specified slot index by using the provided item ID.
+	 * If a slot index is not specified, the default slot index (0) will be used.
+	 *
+	 * @param ItemId A globally unique identifier (GUID) for the item to be updated.
+	 * @param SlotIndex The index of the slot in which the item is updated (default is 0).
+	 * @return Returns true if the item was successfully updated, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	bool UpdateItemInSlot(const FGuid& ItemId, const int32 SlotIndex = 0);
+	virtual bool UpdateItemInSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex = 0) = 0;
 };
