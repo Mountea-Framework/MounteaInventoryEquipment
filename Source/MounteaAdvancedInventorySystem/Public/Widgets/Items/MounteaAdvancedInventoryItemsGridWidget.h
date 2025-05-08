@@ -40,6 +40,8 @@ public:
 	virtual UUserWidget* GetItemWidgetInSlot_Implementation(const int32 SlotIndex) const override;
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
 	virtual bool UpdateItemInSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex = 0) override;
+	virtual int32 GetStacksSizeForItem_Implementation(const FGuid& ItemId)  override;
+	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem_Implementation(const FGuid& ItemId)   override;
 	
 protected:
 

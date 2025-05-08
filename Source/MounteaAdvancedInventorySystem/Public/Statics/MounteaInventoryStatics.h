@@ -52,6 +52,19 @@ public:
 	/******************* BLUEPRINTABLE *********************/
 	/*************************************************************/
 public:
+
+	/**
+	 * Checks if the specified flags are set in the value.
+	 * @param Value - The value to check
+	 * @param FlagMask - The flag(s) to check for
+	 * @return - True if all flags in the mask are set in the value
+	 */
+	UFUNCTION(BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static bool HasInventoryFlags(const uint8 Value, UPARAM(meta = (Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags")) const int32 FlagMask)
+	{
+		return (Value & FlagMask) == FlagMask;
+	}
+	
 	/**
 	 * Returns the owning actor for this Dialogue Inventory Component.
 	 * @param Target The inventory interface to execute on

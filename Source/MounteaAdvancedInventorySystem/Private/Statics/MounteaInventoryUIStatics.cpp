@@ -781,21 +781,20 @@ int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IM
 		if (bIsStackable && !bSlotIsEmpty && bAlwaysStackItems)
 		{
 			auto slotItem = IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(gridSlot.SlotWidget);
-
-			// TODO: Find Item using Guid
-			/*
-			if (slotItem.IsItemValid() && slotItem.Template == ItemTemplate)
-			{
-				int32 currentStack = slotItem.ItemStats.StackSize;
-				int32 maxStack = slotItem.Template->MaxStackSize;
+			if (!slotItem.IsValid()) continue;
+			if (slotItem.IsEmpty()) continue;
+			auto itemInSlot = InventoryInterface->Execute_FindItem(InventoryInterface.GetObject(), FInventoryItemSearchParams(slotItem.OccupiedItemId));
+			if (!itemInSlot.IsItemValid()) continue;
+			if (InventoryItem != itemInSlot) continue;
+			
+			const int32 currentStack = slotItem.SlotQuantity;
+			const int32 maxStack = InventoryItem.Template->MaxStackSize;
 				
-				if (currentStack < maxStack && currentStack < leastFilledStackAmount)
-				{
-					leastFilledStackAmount = currentStack;
-					leastFilledStackIndex = i;
-				}
+			if (currentStack < maxStack && currentStack < leastFilledStackAmount)
+			{
+				leastFilledStackAmount = currentStack;
+				leastFilledStackIndex = i;
 			}
-			*/
 		}
 	}
 
@@ -855,6 +854,5 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidge
 	const bool bIsStackable = UMounteaInventorySystemStatics::HasFlag(inventoryItem.Template->ItemFlags, EInventoryItemFlags::EIIF_Stackable);
 	const bool bAlwaysStack = config->bAlwaysStackStackableItems;
 	
-	// Call the recursive helper with already validated data
 	return FindEmptyGridSlotRecursive(InventoryInterface, inventoryItem, gridSlots, bIsStackable, bAlwaysStack);
 }

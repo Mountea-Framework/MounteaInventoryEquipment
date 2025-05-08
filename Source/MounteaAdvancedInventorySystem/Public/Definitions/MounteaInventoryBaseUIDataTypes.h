@@ -61,7 +61,7 @@ public:
 
 	bool IsValid() const { return SlotWidget != nullptr; };
 		
-	void ResetSlot()	{	OccupiedItemId = FGuid();	};
+	void ResetSlot()	{	OccupiedItemId = FGuid(); SlotQuantity = INDEX_NONE;	};
 	
 	bool IsEmpty() const	{	return OccupiedItemId.IsValid() == false; };
 

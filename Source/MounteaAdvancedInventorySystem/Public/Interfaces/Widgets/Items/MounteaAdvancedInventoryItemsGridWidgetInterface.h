@@ -223,4 +223,30 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
 	bool UpdateItemInSlot(const FGuid& ItemId, const int32 SlotIndex = 0);
 	virtual bool UpdateItemInSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex = 0) = 0;
+
+	/**
+	 * Retrieves the stack size for a specific item in the inventory from all slots.
+	 *
+	 * This method allows querying the total number of items stacked together
+	 * for a given item identified by its unique ID.
+	 *
+	 * @param ItemId The unique identifier (FGuid) of the item for which the stack size is requested.
+	 * @return The total number of items in the stack for the specified item. Returns 0 if the item is not found.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	int32 GetStacksSizeForItem(const FGuid& ItemId) ;
+	virtual int32 GetStacksSizeForItem_Implementation(const FGuid& ItemId)  = 0;
+
+	/**
+	 * Retrieves the data for grid slots associated with a specific item.
+	 *
+	 * This function is intended to provide detailed information about the grid slots
+	 * where a specific inventory item is located or associated within the items grid.
+	 *
+	 * @param ItemId The unique identifier of the inventory item to query grid slot data for.
+	 * @return A set of grid slot data associated with the specified item.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem(const FGuid& ItemId) ;
+	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem_Implementation(const FGuid& ItemId)  = 0;
 };

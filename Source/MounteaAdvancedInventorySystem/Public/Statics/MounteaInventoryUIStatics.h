@@ -824,7 +824,7 @@ public:
 	 * @param SlotIndex The index of the slot in which the item is updated (default is 0).
 	 * @return Returns true if the item was successfully updated, false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Grid Slot")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Update Item")
 	static bool  ItemsGrid_UpdateItemInSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex = 0);
 	
 #pragma endregion
