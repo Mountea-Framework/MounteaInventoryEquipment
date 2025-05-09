@@ -10,7 +10,7 @@
 
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()
 	: Super()
-	, bAlwaysStackStackableItems(false)
+	, bAlwaysStackStackableItems(true)
 {
 	SetupWidgetCommands();
 	ValidateInventoryTypes();
