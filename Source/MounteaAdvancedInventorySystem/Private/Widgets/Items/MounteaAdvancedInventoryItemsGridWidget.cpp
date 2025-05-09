@@ -213,6 +213,18 @@ int32 UMounteaAdvancedInventoryItemsGridWidget::GetSlotIndexByItem_Implementatio
 	return FoundSlot ? Slots.IndexOfByKey(*FoundSlot) : -1;
 }
 
+int32 UMounteaAdvancedInventoryItemsGridWidget::GetGridSlotIndexByCoords_Implementation(
+	const FIntPoint& SlotCoords) const
+{
+	const FMounteaInventoryGridSlot* FoundSlot = Algo::FindByPredicate(GridSlots,
+		[&SlotCoords](const FMounteaInventoryGridSlot& checkedSlot)
+		{
+			return checkedSlot.SlotPosition == SlotCoords;
+		});
+
+	return FoundSlot ? GridSlots.Array().IndexOfByKey(*FoundSlot) : -1;
+}
+
 bool UMounteaAdvancedInventoryItemsGridWidget::IsItemInGrid_Implementation(const FGuid& ItemId) const
 {
 	return Algo::AnyOf(GridSlots,

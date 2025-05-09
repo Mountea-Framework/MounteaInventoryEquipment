@@ -762,6 +762,19 @@ public:
 	static int32 ItemsGrid_GetSlotIndexByItem(UUserWidget* Target, const FGuid& ItemId);
 
 	/**
+	 * Retrieves the data of a specific inventory grid slot based on coordinates.
+	 *
+	 * This method returns information about a grid slot based on its coordinates.
+	 * It is used to fetch details such as the position of the slot and the item it contains.
+	 *
+	 * @param Target The items grid widget interface to query
+	 * @param SlotCoords The coordinates of the grid slot to retrieve data for.
+	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Slot Index By Coords")
+	static int32 ItemsGrid_GetGridSlotIndexByCoords(UUserWidget* Target, const FIntPoint& SlotCoords);
+
+	/**
 	 * Checks if a specific item exists anywhere in the grid.
 	 * 
 	 * @param Target The items grid widget interface to query
@@ -849,7 +862,7 @@ public:
 	static bool  ItemsGrid_UpdateItemInSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex = 0);
 	static bool Helper_ItemsGrid_UpdateItemInSlot(UUserWidget* GridWidget, 
 		const FGuid& ItemId, 
-		const int32 SlotIndex,
+		int32 SlotIndex,
 		TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent);
 	
 #pragma endregion

@@ -153,6 +153,19 @@ public:
 	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation(const int32 SlotIndex) const = 0;
 
 	/**
+	 * Retrieves the data of a specific inventory grid slot based on coordinates.
+	 *
+	 * This method returns information about a grid slot based on its coordinates.
+	 * It is used to fetch details such as the position of the slot and the item it contains.
+	 *
+	 * @param SlotCoords The coordinates of the grid slot to retrieve data for.
+	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	int32 GetGridSlotIndexByCoords(const FIntPoint& SlotCoords) const;
+	virtual int32 GetGridSlotIndexByCoords_Implementation(const FIntPoint& SlotCoords) const = 0;
+	
+	/**
 	 * Retrieves the data of all inventory grid slots.
 	 *
 	 * This method returns a set of FMounteaInventoryGridSlot, each representing an individual slot in the inventory grid.

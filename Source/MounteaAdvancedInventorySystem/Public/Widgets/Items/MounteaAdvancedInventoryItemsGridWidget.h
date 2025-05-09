@@ -32,6 +32,7 @@ public:
 	virtual int32 GetTotalSlots_Implementation() const override;
 	virtual bool IsSlotEmpty_Implementation(const int32 SlotIndex) const override;
 	virtual int32 GetSlotIndexByItem_Implementation(const FGuid& ItemId) const override;
+	virtual int32 GetGridSlotIndexByCoords_Implementation(const FIntPoint& SlotCoords) const override;
 	virtual bool IsItemInGrid_Implementation(const FGuid& ItemId) const override;
 	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation(const int32 SlotIndex) const override;
 	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsData_Implementation() const override;
