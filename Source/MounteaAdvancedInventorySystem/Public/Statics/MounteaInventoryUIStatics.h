@@ -306,7 +306,7 @@ public:
 	 * @param Target The UI interface to create the inventory UI for
 	 * @return True if UI was successfully created and initialized, otherwise false
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool CreateInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
@@ -393,7 +393,7 @@ public:
 	 * @param ParentInventory 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool SetSourceInventory(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 
 	/**
@@ -628,18 +628,22 @@ public:
 	static void SlotsWrapper_AddItem(UUserWidget* Target, const FGuid& ItemId);
 
 	/**
-	 * 
-	 * @param Target 
-	 * @param ItemId
-	 * @param OptionalItemSlot
+	 * Updates an inventory item slot in the provided User Widget by invoking the appropriate interface method.
+	 *
+	 * @param Target The User Widget instance where the inventory slots are managed.
+	 *               This must implement the UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.
+	 * @param ItemId The unique identifier (GUID) of the inventory item to be updated.
+	 * @param OptionalItemSlot An optional integer specifying the specific slot where the update should occur.
+	 *                         If not provided, the default behavior is applied by the interface.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Update Item")
 	static void SlotsWrapper_UpdateItem(UUserWidget* Target, const FGuid& ItemId, const int32 OptionalItemSlot = -1);
 
 	/**
-	 * 
-	 * @param Target 
-	 * @param ItemId 
+	 * Removes an item with the specified ItemId from the Slots Wrapper within the given Target widget.
+	 *
+	 * @param Target The widget that implements the Slots Wrapper interface where the item will be removed.
+	 * @param ItemId The unique identifier of the item to be removed from the Slots Wrapper.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item")
 	static void SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId);
@@ -656,7 +660,7 @@ public:
 	 * @param ItemId The unique identifier of the item to add
 	 * @return True if the item was successfully added; false otherwise
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Empty Slot")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Add Item To Empty Slot")
 	static bool ItemsGrid_AddItemToEmptySlot(UUserWidget* Target, const FGuid& ItemId);
 
 	/**
@@ -667,7 +671,7 @@ public:
 	 * @param SlotIndex The index of the slot to place the item into
 	 * @return True if the item was successfully added; false otherwise
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Item To Slot")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Add Item To Slot")
 	static bool ItemsGrid_AddItemToSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex);
 
 	/**
@@ -677,7 +681,7 @@ public:
 	 * @param SlotIndex The index of the slot from which to remove the item
 	 * @return True if the item was successfully removed; false if the slot is empty or invalid
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item From Slot")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Remove Item From Slot")
 	static bool ItemsGrid_RemoveItemFromSlot(UUserWidget* Target, const int32 SlotIndex);
 
 	/**
@@ -699,7 +703,7 @@ public:
 	 * @param SlotIndex2 The index of the second slot
 	 * @return True if the swap was successful; false if either slot is invalid
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Swap Items Between Slots")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Swap Items Between Slots")
 	static bool ItemsGrid_SwapItemsBetweenSlots(UUserWidget* Target, const int32 SlotIndex1, const int32 SlotIndex2);
 
 	/**
@@ -727,7 +731,7 @@ public:
 	 * @param SlotIndex The index of the slot to check
 	 * @return True if the slot is empty; false if it contains an item
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Is Slot Empty")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Is Slot Empty")
 	static bool ItemsGrid_IsSlotEmpty(UUserWidget* Target, const int32 SlotIndex);
 
 	/**
@@ -747,7 +751,7 @@ public:
 	 * @param ItemId The unique identifier of the item to check for
 	 * @return True if the item is found in the grid; false if it is not present
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), DisplayName="Is Item In Grid")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Getter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Is Item In Grid")
 	static bool ItemsGrid_IsItemInGrid(UUserWidget* Target, const FGuid& ItemId);
 
 	/**
@@ -824,7 +828,7 @@ public:
 	 * @param SlotIndex The index of the slot in which the item is updated (default is 0).
 	 * @return Returns true if the item was successfully updated, false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), DisplayName="Update Item")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Update Item")
 	static bool  ItemsGrid_UpdateItemInSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex = 0);
 	
 #pragma endregion
