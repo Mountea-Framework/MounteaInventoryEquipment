@@ -686,6 +686,20 @@ public:
 	static bool ItemsGrid_RemoveItemFromSlot(UUserWidget* Target, const int32 SlotIndex);
 
 	/**
+	 * Removes an item from the inventory grid.
+	 *
+	 * This method attempts to remove a specified quantity of an item, identified by its unique ID, from the inventory grid.
+	 * If the Quantity parameter is set to -1, it removes all occurrences of the item.
+	 *
+	 * @param Target The items grid widget interface to operate on
+	 * @param ItemId The unique identifier (GUID) of the item to be removed.
+	 * @param Quantity The number of items to remove. Defaults to -1, which removes all instances of the item.
+	 * @return Returns true if the item(s) were successfully removed; otherwise, returns false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Remove Item")
+	static bool ItemsGrid_RemoveItem(UUserWidget* Target, const FGuid& ItemId, const int32 Quantity = -1);
+
+	/**
 	 * Gets the item ID from a specific slot.
 	 * 
 	 * @param Target The items grid widget interface to query

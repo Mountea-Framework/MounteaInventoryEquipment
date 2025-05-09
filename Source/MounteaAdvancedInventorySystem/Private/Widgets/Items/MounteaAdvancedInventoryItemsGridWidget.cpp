@@ -72,6 +72,73 @@ bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromSlot_Implementation
 	return true;
 }
 
+bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItem_Implementation(const FGuid& ItemId, const int32 Quantity)
+{
+	if (!ItemId.IsValid()) return false;
+	
+	auto allSlots = Execute_GetGridSlotsDataForItem(this, ItemId);
+	if (allSlots.Num() == 0) return false;
+	
+	// If Quantity is -1 or 0, remove all
+	if (Quantity <= 0)
+	{
+		bool bSuccess = true;
+		for (const auto& slot : allSlots)
+		{
+			int32 slotIndex = Execute_GetSlotIndexByItem(this, slot.OccupiedItemId);
+			if (slotIndex != INDEX_NONE)
+			{
+				if (!Execute_RemoveItemFromSlot(this, slotIndex))
+					bSuccess = false;
+			}
+		}
+		return bSuccess;
+	}
+
+	allSlots.Sort([](const FMounteaInventoryGridSlot& a, const FMounteaInventoryGridSlot& b) {
+		if (a.SlotPosition.Y != b.SlotPosition.Y)
+			return a.SlotPosition.Y > b.SlotPosition.Y; // Sort by Y descending first
+		return a.SlotPosition.X > b.SlotPosition.X; // Then by X descending
+	});
+	
+	int32 remainingQuantity = Quantity;
+	bool bAnyRemoved = false;
+	
+	for (const auto& slot : allSlots)
+	{
+		if (remainingQuantity <= 0) break;
+		
+		int32 slotIndex = Execute_GetSlotIndexByItem(this, slot.OccupiedItemId);
+		if (slotIndex == INDEX_NONE) continue;
+		
+		if (slot.SlotQuantity <= remainingQuantity)
+		{
+			// Remove entire slot
+			if (Execute_RemoveItemFromSlot(this, slotIndex))
+			{
+				remainingQuantity -= slot.SlotQuantity;
+				bAnyRemoved = true;
+			}
+		}
+		else
+		{
+			// Reduce quantity in slot
+			FMounteaInventoryGridSlot updatedSlot = slot;
+			updatedSlot.SlotQuantity -= remainingQuantity;
+			GridSlots.Emplace(updatedSlot);
+			ParentUIComponent->Execute_UpdateSlot(ParentUIComponent.GetObject(), updatedSlot);
+			
+			if (IsValid(updatedSlot.SlotWidget))
+				IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(updatedSlot.SlotWidget);
+				
+			remainingQuantity = 0;
+			bAnyRemoved = true;
+		}
+	}
+	
+	return bAnyRemoved;
+}
+
 FGuid UMounteaAdvancedInventoryItemsGridWidget::GetItemInSlot_Implementation(const int32 SlotIndex) const
 {
 	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return FGuid();

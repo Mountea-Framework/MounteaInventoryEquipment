@@ -689,6 +689,11 @@ bool UMounteaInventoryUIStatics::ItemsGrid_RemoveItemFromSlot(UUserWidget* Targe
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItemFromSlot(Target, SlotIndex) : false;
 }
 
+bool UMounteaInventoryUIStatics::ItemsGrid_RemoveItem(UUserWidget* Target, const FGuid& ItemId, const int32 Quantity)
+{
+	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItem(Target, ItemId, Quantity) : false;
+}
+
 FGuid UMounteaInventoryUIStatics::ItemsGrid_GetItemInSlot(UUserWidget* Target, const int32 SlotIndex)
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetItemInSlot(Target, SlotIndex) : FGuid();
