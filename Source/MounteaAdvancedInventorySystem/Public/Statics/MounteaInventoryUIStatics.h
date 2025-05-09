@@ -551,10 +551,11 @@ public:
 
 	/**
 	 * 
-	 * @param Target 
+	 * @param Target
+	 * @param Quantity 
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items", meta=(CustomTag="MounteaK2Setter"), DisplayName="Refresh Item Widget")
-	static void Item_RefreshWidget(UUserWidget* Target);
+	static void Item_RefreshWidget(UUserWidget* Target, const int32 Quantity);
 	
 #pragma endregion
 

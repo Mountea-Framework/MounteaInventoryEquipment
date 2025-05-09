@@ -3,6 +3,7 @@
 
 #include "Statics/MounteaInventoryUIStatics.h"
 
+#include "Algo/Copy.h"
 #include "Blueprint/UserWidget.h"
 
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
@@ -609,10 +610,10 @@ void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UUserWidget* Target,
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::Item_RefreshWidget(UUserWidget* Target)
+void UMounteaInventoryUIStatics::Item_RefreshWidget(UUserWidget* Target, const int32 Quantity)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
-		IMounteaAdvancedInventoryItemWidgetInterface::Execute_RefreshItemWidget(Target);
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_RefreshItemWidget(Target, Quantity);
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Target,
@@ -757,61 +758,12 @@ void UMounteaInventoryUIStatics::ItemsGrid_AddSlot(UUserWidget* Target, const FM
 		IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddSlot(Target, SlotData);
 }
 
-// New recursive helper that doesn't repeat validation
-int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems)
-{
-	int32 leastFilledStackIndex = INDEX_NONE;
-	int32 leastFilledStackAmount = MAX_int32;
-	int32 firstEmptySlotIndex = INDEX_NONE;
-
-	for (int i = 0; i < GridSlots.Num(); i++)
-	{
-		const auto& gridSlot = GridSlots[i];
-		if (!IsValid(gridSlot.SlotWidget)) continue;
-		if (!gridSlot.SlotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
-
-		bool bSlotIsEmpty = IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(gridSlot.SlotWidget);
-		
-		if (bSlotIsEmpty && firstEmptySlotIndex == INDEX_NONE)
-		{
-			firstEmptySlotIndex = i;
-			if (!bIsStackable) return i;
-		}
-		
-		if (bIsStackable && !bSlotIsEmpty && bAlwaysStackItems)
-		{
-			auto slotItem = IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(gridSlot.SlotWidget);
-			if (!slotItem.IsValid()) continue;
-			if (slotItem.IsEmpty()) continue;
-			auto itemInSlot = InventoryInterface->Execute_FindItem(InventoryInterface.GetObject(), FInventoryItemSearchParams(slotItem.OccupiedItemId));
-			if (!itemInSlot.IsItemValid()) continue;
-			if (InventoryItem != itemInSlot) continue;
-			
-			const int32 currentStack = slotItem.SlotQuantity;
-			const int32 maxStack = InventoryItem.Template->MaxStackSize;
-				
-			if (currentStack < maxStack && currentStack < leastFilledStackAmount)
-			{
-				leastFilledStackAmount = currentStack;
-				leastFilledStackIndex = i;
-			}
-		}
-	}
-
-	LOG_ERROR(TEXT("FindEmptySlot: Found Empty slot at index %d"), (bIsStackable && bAlwaysStackItems && leastFilledStackIndex != INDEX_NONE ? 
-		   leastFilledStackIndex : firstEmptySlotIndex))
-
-	return bIsStackable && bAlwaysStackItems && leastFilledStackIndex != INDEX_NONE ? 
-		   leastFilledStackIndex : firstEmptySlotIndex;
-}
-
 bool UMounteaInventoryUIStatics::ItemsGrid_UpdateItemInSlot(UUserWidget* Target, const FGuid& ItemId,
 	const int32 SlotIndex)
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_UpdateItemInSlot(Target, ItemId, SlotIndex) : false;
 }
 
-// Main function with fixes for TODOs
 int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, UObject* ParentInventory)
 {
 	if (!IsValid(Target)) return INDEX_NONE;
@@ -855,4 +807,71 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidge
 	const bool bAlwaysStack = config->bAlwaysStackStackableItems;
 	
 	return FindEmptyGridSlotRecursive(InventoryInterface, inventoryItem, gridSlots, bIsStackable, bAlwaysStack);
+}
+
+int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems)
+{
+	// For non-stackable items, just find first empty slot
+	if (!bIsStackable || !bAlwaysStackItems)
+	{
+		for (int i = 0; i < GridSlots.Num(); i++)
+		{
+			const auto& gridSlot = GridSlots[i];
+			if (!IsValid(gridSlot.SlotWidget)) continue;
+			if (!gridSlot.SlotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
+			
+			if (IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(gridSlot.SlotWidget))
+				return i;
+		}
+		return INDEX_NONE;
+	}
+	
+	// For stackable items
+	int32 firstEmptySlotIndex = INDEX_NONE;
+	int32 leastFilledStackIndex = INDEX_NONE;
+	int32 leastFilledStackAmount = MAX_int32;
+	const int32 maxStack = InventoryItem.Template->MaxStackSize;
+	
+	TSet<FMounteaInventoryGridSlot> itemSlots;
+	Algo::CopyIf(GridSlots, itemSlots, [&InventoryItem](const FMounteaInventoryGridSlot& gridSlot) {
+		return gridSlot.OccupiedItemId == InventoryItem.GetGuid();
+	});
+	
+	// Find slot with this item that has the most available space
+	if (bAlwaysStackItems && !itemSlots.IsEmpty())
+	{
+		for (int i = 0; i < itemSlots.Num(); i++)
+		{
+			const auto& gridSlot = itemSlots.Array()[i];
+			if (gridSlot.OccupiedItemId != InventoryItem.GetGuid()) continue;
+			
+			const int32 currentStack = gridSlot.SlotQuantity;
+			if (currentStack >= maxStack) continue;
+			
+			if (currentStack < leastFilledStackAmount)
+			{
+				leastFilledStackAmount = currentStack;
+				leastFilledStackIndex = i;
+			}
+		}
+	}
+	
+	// Find first empty slot
+	for (int i = 0; i < GridSlots.Num(); i++)
+	{
+		const auto& gridSlot = GridSlots[i];
+		if (!IsValid(gridSlot.SlotWidget)) continue;
+		if (!gridSlot.SlotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
+		
+		if (IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(gridSlot.SlotWidget))
+		{
+			firstEmptySlotIndex = i;
+			break;
+		}
+	}
+	
+	// Return the appropriate slot index
+	if (bAlwaysStackItems && leastFilledStackIndex != INDEX_NONE)
+		return leastFilledStackIndex;
+	return firstEmptySlotIndex;
 }
