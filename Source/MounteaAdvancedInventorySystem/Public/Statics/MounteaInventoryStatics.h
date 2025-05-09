@@ -59,7 +59,7 @@ public:
 	 * @param FlagMask - The flag(s) to check for
 	 * @return - True if all flags in the mask are set in the value
 	 */
-	UFUNCTION(BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"), meta=(ExpandBoolAsExecs="ReturnValue"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
 	static bool HasInventoryFlags(const uint8 Value, UPARAM(meta = (Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags")) const int32 FlagMask)
 	{
 		return (Value & FlagMask) == FlagMask;
@@ -98,7 +98,7 @@ public:
 	 * @param Item Item to check
 	 * @return True if item can be added
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Validate"), meta=(ExpandBoolAsExecs="ReturnValue"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Validate"))
 	static bool CanAddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item);
 
 	/**
@@ -129,7 +129,7 @@ public:
 	 * @param Quantity Amount to validate
 	 * @return True if item can be added
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Validate"), meta=(ExpandBoolAsExecs="ReturnValue"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Validate"))
 	static bool CanAddItemFromTemplate(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1);
 
 	/**
@@ -181,7 +181,7 @@ public:
 	 * @param SearchParams The parameters to filter and match the desired item in the inventory.
 	 * @return True if the specified item exists in the inventory, False otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Getter"), meta=(ExpandBoolAsExecs="ReturnValue"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Getter"))
 	static bool HasItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
