@@ -667,10 +667,10 @@ void UMounteaInventoryUIStatics::SlotsWrapper_UpdateItem(UUserWidget* Target, co
 		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_UpdateItem(Target, ItemId, OptionalItemSlot);
 }
 
-void UMounteaInventoryUIStatics::SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId)
+void UMounteaInventoryUIStatics::SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId, const int32 Quantity)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
-		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_RemoveItem(Target, ItemId);
+		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_RemoveItem(Target, ItemId, Quantity);
 }
 
 bool UMounteaInventoryUIStatics::ItemsGrid_AddItemToEmptySlot(UUserWidget* Target, const FGuid& ItemId)
@@ -691,7 +691,7 @@ bool UMounteaInventoryUIStatics::ItemsGrid_RemoveItemFromSlot(UUserWidget* Targe
 
 bool UMounteaInventoryUIStatics::ItemsGrid_RemoveItem(UUserWidget* Target, const FGuid& ItemId, const int32 Quantity)
 {
-	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItem(Target, ItemId, Quantity) : false;
+	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItemFromGrid(Target, ItemId, Quantity) : false;
 }
 
 FGuid UMounteaInventoryUIStatics::ItemsGrid_GetItemInSlot(UUserWidget* Target, const int32 SlotIndex)

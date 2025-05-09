@@ -66,8 +66,8 @@ public:
 	 * @return Returns true if the item(s) were successfully removed; otherwise, returns false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
-	bool RemoveItem(const FGuid& ItemId, const int32 Quantity = -1);
-	virtual bool RemoveItem_Implementation(const FGuid& ItemId, const int32 Quantity = -1) = 0;
+	bool RemoveItemFromGrid(const FGuid& ItemId, const int32 Quantity = -1);
+	virtual bool RemoveItemFromGrid_Implementation(const FGuid& ItemId, const int32 Quantity = -1) = 0;
 	
 	/**
 	 * Gets the item ID from a specific slot.

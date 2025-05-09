@@ -72,7 +72,7 @@ bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromSlot_Implementation
 	return true;
 }
 
-bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItem_Implementation(const FGuid& ItemId, const int32 Quantity)
+bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromGrid_Implementation(const FGuid& ItemId, const int32 Quantity)
 {
 	if (!ItemId.IsValid()) return false;
 	

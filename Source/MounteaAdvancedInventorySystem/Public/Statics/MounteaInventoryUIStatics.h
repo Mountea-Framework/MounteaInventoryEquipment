@@ -642,12 +642,14 @@ public:
 
 	/**
 	 * Removes an item with the specified ItemId from the Slots Wrapper within the given Target widget.
+	 * If Quantity is not provided, all Items are expected to be removed.
 	 *
 	 * @param Target The widget that implements the Slots Wrapper interface where the item will be removed.
 	 * @param ItemId The unique identifier of the item to be removed from the Slots Wrapper.
+	 * @param Quantity How many units of the item should be removed from Inventory UI.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots", meta=(CustomTag="MounteaK2Setter"), DisplayName="Remove Item")
-	static void SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId);
+	static void SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId, const int32 Quantity = -1);
 	
 #pragma endregion
 

@@ -25,7 +25,7 @@ public:
 	virtual bool AddItemToEmptySlot_Implementation(const FGuid& ItemId) override;
 	virtual bool AddItemToSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex) override;
 	virtual bool RemoveItemFromSlot_Implementation(const int32 SlotIndex) override;
-	virtual bool RemoveItem_Implementation(const FGuid& ItemId, const int32 Quantity = -1) override;
+	virtual bool RemoveItemFromGrid_Implementation(const FGuid& ItemId, const int32 Quantity = -1) override;
 	virtual FGuid GetItemInSlot_Implementation(const int32 SlotIndex) const override;
 	virtual bool SwapItemsBetweenSlots_Implementation(const int32 SlotIndex1, const int32 SlotIndex2) override;
 	virtual void ClearAllSlots_Implementation() override;
