@@ -831,6 +831,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"), DisplayName="Update Item")
 	static bool  ItemsGrid_UpdateItemInSlot(UUserWidget* Target, const FGuid& ItemId, const int32 SlotIndex = 0);
+	static bool Helper_ItemsGrid_UpdateItemInSlot(UUserWidget* GridWidget, 
+		const FGuid& ItemId, 
+		const int32 SlotIndex,
+		TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent);
 	
 #pragma endregion
 };
