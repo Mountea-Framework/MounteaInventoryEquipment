@@ -9,6 +9,8 @@
 #include "Commands/FMAISCommands.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
@@ -246,6 +248,19 @@ void FMounteaAdvancedInventorySystemEditor::SettingsButtonClicked() const
 	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
 }
 
+void FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked() const
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	auto config = settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
+	if (!IsValid(config))
+	{
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
+		return;
+	}
+
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+}
+
 void FMounteaAdvancedInventorySystemEditor::EditorSettingsButtonClicked() const
 {
 	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
@@ -257,6 +272,15 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 
 	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "Mountea Advanced Inventory Settings"));
 	{
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("MounteaSystemEditor_ConfigButton_Label", "Mountea Advanced Inventory Config"),
+			LOCTEXT("MounteaSystemEditor_ConfigButton_ToolTip", "📄 Open Mountea Inventory Configuration\n\n❔ Define inventory types, rarities, categories, limits, UI layouts, and notification behaviors used by the core system."),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked)
+			)
+		);
+		
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_SettingsButton_Label", "Mountea Advanced Inventory Settings"),
 			LOCTEXT("MounteaSystemEditor_SettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Settings\n\n❔ Configure core Advanced Inventory system settings including default behaviors, performance options, and Advanced Inventory flow parameters. Customize your Advanced Inventory system's foundation here."),
