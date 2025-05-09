@@ -11,6 +11,7 @@
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
+#include "Statics/MounteaInventoryStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
 bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToEmptySlot_Implementation(const FGuid& ItemId)
@@ -206,34 +207,207 @@ void UMounteaAdvancedInventoryItemsGridWidget::AddSlot_Implementation(const FMou
 	GridSlots.Add(SlotData);
 }
 
+// TODO: if item is NOT stackable and quantity is greater than 1, return false
+// TODO: if no slot has this item, return AddItem to add item
+// TODO: if at least one slot has this item, get all slots with item
+// SUM quantity in all slots and find difference between current SUM and Quantity in item
+// if SUM < item Quantity, we are adding
+// we will add as much as we can to provided slot
+// if SUM is still less then Quantity, we need to add to all slots with this item - if no slots with this item, we need to start adding
+// if all slots with this item are full and we still have something left to add, we start adding
+// if SUM > item Quantity, we are removing and we need to reduce quantity in slot until SUM == Quantity
+// if we removed quantity in provided slot and SUM is still greater we need to start removing from next slot until SUM == Quantity (recursive search)
+// if SUM == item Quantity, we are updating quantity in slot
+// we should utilize same logic for Add Item To Slot and Remove Item From Slot
 bool UMounteaAdvancedInventoryItemsGridWidget::UpdateItemInSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex)
 {
 	if (!ItemId.IsValid()) return false;
-	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return false;
 
-	auto slotData = Execute_GetGridSlotData(this, SlotIndex);
-	if (!slotData.IsValid()) return false;
-	
 	if (!IsValid(ParentUIComponent.GetObject())) return false;
 	const auto parentInventory = ParentUIComponent->Execute_GetParentInventory(ParentUIComponent.GetObject());
-
 	if (!IsValid(parentInventory.GetObject())) return false;
 
 	const auto item = parentInventory->Execute_FindItem(parentInventory.GetObject(), FInventoryItemSearchParams(ItemId));
 	if (!item.IsItemValid()) return false;
-		
-	if (item.GetQuantity() == slotData.SlotQuantity)
+
+	// Check if item is stackable, if not and quantity > 1, return false
+	const bool bIsStackable = UMounteaInventoryStatics::HasInventoryFlags(item.Template->ItemFlags, static_cast<int32>(EInventoryItemFlags::EIIF_Stackable));
+	//if (!bIsStackable && item.GetQuantity() > 1) return false; // TODO: This is not true, if not stackable we just try to add items to empty slots!
+	
+	// Get item data
+	auto itemSlots = Execute_GetGridSlotsDataForItem(this, ItemId);
+	const int32 currentTotalQuantity = Execute_GetStacksSizeForItem(this, ItemId);
+	const int32 targetTotalQuantity = item.GetQuantity();
+	const int32 maxStackSize = item.Template->MaxStackSize;
+	
+	// If quantity hasn't changed, no update needed
+	if (currentTotalQuantity == targetTotalQuantity && itemSlots.Num() > 0)
 	{
-		LOG_WARNING(TEXT("[UpdateItem] Item %s is not UI dirty, quantity has not changed"), *item.GetItemName().ToString())
+		LOG_WARNING(TEXT("[UpdateItem] Item %s is not UI dirty, quantity has not changed"), *item.GetItemName().ToString());
 		return false;
 	}
-	
-	auto newSlotData = slotData;
-	newSlotData.SlotQuantity = item.GetQuantity();
-	GridSlots.Emplace(newSlotData);
 
-	IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(slotData.SlotWidget);
-	return true;
+	bool bAnySlotUpdated = false;
+
+	// Helper function to update a slot's quantity and refresh UI
+	auto updateSlotQuantity = [&](FMounteaInventoryGridSlot& slot, int32 newQuantity) -> void {
+		slot.SlotQuantity = newQuantity;
+		GridSlots.Emplace(slot);
+		ParentUIComponent->Execute_UpdateSlot(ParentUIComponent.GetObject(), slot);
+		
+		if (IsValid(slot.SlotWidget))
+			IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(slot.SlotWidget);
+			
+		bAnySlotUpdated = true;
+	};
+	
+	// Case 1: We need to add items (SUM < item Quantity)
+	if (targetTotalQuantity > currentTotalQuantity)
+	{
+		int32 quantityToAdd = targetTotalQuantity - currentTotalQuantity;
+		
+		// If no slots exist for this item, add it to an empty slot
+		if (itemSlots.Num() == 0)
+		{
+			int32 emptySlotIndex = SlotIndex != INDEX_NONE ? SlotIndex : Execute_FindEmptySlotIndex(this, ItemId);
+			if (emptySlotIndex != INDEX_NONE && Execute_IsSlotEmpty(this, emptySlotIndex))
+			{
+				int32 quantityToAddToSlot = FMath::Min(maxStackSize, quantityToAdd);
+				if (Execute_AddItemToSlot(this, ItemId, emptySlotIndex))
+				{
+					FMounteaInventoryGridSlot slotData = GridSlots.Array()[emptySlotIndex];
+					updateSlotQuantity(slotData, quantityToAddToSlot);
+					quantityToAdd -= quantityToAddToSlot;
+				}
+			}
+		}
+		// Otherwise, first try to add to the specified slot if provided
+		else if (SlotIndex != INDEX_NONE && GridSlots.Array().IsValidIndex(SlotIndex))
+		{
+			FMounteaInventoryGridSlot slotData = Execute_GetGridSlotData(this, SlotIndex);
+			
+			// If specified slot is empty, add item to it
+			if (slotData.IsEmpty())
+			{
+				int32 quantityToAddToSlot = FMath::Min(maxStackSize, quantityToAdd);
+				if (Execute_AddItemToSlot(this, ItemId, SlotIndex))
+				{
+					slotData = Execute_GetGridSlotData(this, SlotIndex); // Re-get after adding
+					updateSlotQuantity(slotData, quantityToAddToSlot);
+					quantityToAdd -= quantityToAddToSlot;
+				}
+			}
+			// If slot already has this item, update its quantity
+			else if (slotData.OccupiedItemId == ItemId)
+			{
+				int32 availableSpace = maxStackSize - slotData.SlotQuantity;
+				int32 quantityToAddToSlot = FMath::Min(availableSpace, quantityToAdd);
+				
+				if (quantityToAddToSlot > 0)
+				{
+					updateSlotQuantity(slotData, slotData.SlotQuantity + quantityToAddToSlot);
+					quantityToAdd -= quantityToAddToSlot;
+				}
+			}
+
+			itemSlots.Remove(slotData); // Remove the slot from the list of slots with this item
+		}
+		
+		// Fill up existing item slots
+		if (quantityToAdd > 0)
+		{
+			for (auto& slot : itemSlots)
+			{
+				if (quantityToAdd <= 0) break;
+				
+				const int32 availableSpace = maxStackSize - slot.SlotQuantity;
+				const int32 quantityToAddToSlot = FMath::Min(availableSpace, quantityToAdd);
+				
+				if (quantityToAddToSlot > 0)
+				{
+					updateSlotQuantity(slot, slot.SlotQuantity + quantityToAddToSlot);
+					quantityToAdd -= quantityToAddToSlot;
+				}
+			}
+		}
+		
+		// Create new slots if needed
+		while (quantityToAdd > 0)
+		{
+			int32 emptySlotIndex = Execute_FindEmptySlotIndex(this, ItemId);
+			if (emptySlotIndex == INDEX_NONE) break; // No more empty slots
+			
+			int32 quantityToAddToSlot = FMath::Min(maxStackSize, quantityToAdd);
+
+			if (Execute_AddItemToSlot(this, ItemId, emptySlotIndex))
+			{
+				FMounteaInventoryGridSlot slotData = GridSlots.Array()[emptySlotIndex];
+				updateSlotQuantity(slotData, quantityToAddToSlot);
+				quantityToAdd -= quantityToAddToSlot;
+			}
+			else
+			{
+				break; // Failed to add to slot
+			}
+		}
+	}
+	
+	// Case 2: We need to remove items (SUM > item Quantity)
+	else if (targetTotalQuantity < currentTotalQuantity)
+	{
+		int32 quantityToRemove = currentTotalQuantity - targetTotalQuantity;
+    
+		if (SlotIndex != INDEX_NONE && GridSlots.Array().IsValidIndex(SlotIndex))
+		{
+			FMounteaInventoryGridSlot slotData = Execute_GetGridSlotData(this, SlotIndex);
+			if (slotData.OccupiedItemId == ItemId)
+			{
+				const int32 quantityToRemoveFromSlot = FMath::Min(slotData.SlotQuantity, quantityToRemove);
+            
+				if (quantityToRemoveFromSlot >= slotData.SlotQuantity)
+				{
+					Execute_RemoveItemFromSlot(this, SlotIndex);
+					bAnySlotUpdated = true;
+				}
+				else
+					updateSlotQuantity(slotData, slotData.SlotQuantity - quantityToRemoveFromSlot);
+            
+				quantityToRemove -= quantityToRemoveFromSlot;
+				itemSlots.Remove(slotData);
+			}
+		}
+
+		if (quantityToRemove > 0)
+		{
+			for (auto& slot : itemSlots)
+			{
+				if (quantityToRemove <= 0) break;
+            
+				const int32 slotIndex = Execute_GetSlotIndexByItem(this, slot.OccupiedItemId);
+				if (slotIndex == INDEX_NONE) continue;
+            
+				const int32 quantityToRemoveFromSlot = FMath::Min(slot.SlotQuantity, quantityToRemove);
+            
+				if (quantityToRemoveFromSlot >= slot.SlotQuantity)
+				{
+					Execute_RemoveItemFromSlot(this, slotIndex);
+					bAnySlotUpdated = true;
+				}
+				else
+					updateSlotQuantity(slot, slot.SlotQuantity - quantityToRemoveFromSlot);
+            
+				quantityToRemove -= quantityToRemoveFromSlot;
+			}
+		}
+	}
+
+	// Case 3: SUM == item Quantity (handled by equality check at beginning)
+	else
+	{
+		return true;
+	}
+
+	return bAnySlotUpdated;
 }
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::GetStacksSizeForItem_Implementation(const FGuid& ItemId)
