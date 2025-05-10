@@ -48,10 +48,17 @@ public:
 		else return;
 	}
 
-	/*************************************************************/
-	/******************* BLUEPRINTABLE *********************/
-	/*************************************************************/
 public:
+
+	/**
+	 * Creates a new inventory item associated with the given unique identifier.
+	 * This item is NOT valid item! This is to simplify searching for item related data!
+	 * 
+	 * @param ItemGuid - The globally unique identifier (GUID) for the new item
+	 * @return - A new inventory item initialized with the specified GUID
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta = (Keywords = "construct build", NativeMakeFunc), meta=(CustomTag="MounteaK2Getter"))
+	static FInventoryItem NewInventoryItem(const FGuid& ItemGuid);
 
 	/**
 	 * Checks if the specified flags are set in the value.

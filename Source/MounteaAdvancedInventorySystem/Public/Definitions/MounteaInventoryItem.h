@@ -43,7 +43,7 @@ private:
 * Represents a single instance of an inventory item.
 * Contains all runtime data for the item including its template, quantity, durability and custom data.
 */
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType,meta=(HasNativeMake="/Script/MounteaAdvancedInventorySystem.MounteaInventoryStatics.NewInventoryItem"))
 struct FInventoryItem : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
@@ -57,6 +57,7 @@ public:
 public:
 	
 	FInventoryItem();
+	FInventoryItem(const FGuid& ItemGuid) : Guid(ItemGuid) {};
 	explicit FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity = 1,
 							const float InDurability = 1.f,
 							TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory = nullptr);
