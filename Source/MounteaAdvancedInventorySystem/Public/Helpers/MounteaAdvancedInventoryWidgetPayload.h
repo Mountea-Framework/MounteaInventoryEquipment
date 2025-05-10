@@ -18,4 +18,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
 	TArray<FGuid> PayloadData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
+	int32 PayloadIndex = INDEX_NONE;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
+	TArray<int32> PayloadQuantities;;
 };

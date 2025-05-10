@@ -3,6 +3,7 @@
 
 #include "Statics/MounteaInventoryUIStatics.h"
 
+#include "Algo/Copy.h"
 #include "Blueprint/UserWidget.h"
 
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
@@ -10,20 +11,21 @@
 
 #include "GameFramework/PlayerState.h"
 
-#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
-#include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemsGridWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+#include "Statics/MounteaInventoryStatics.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
 
@@ -608,10 +610,10 @@ void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UUserWidget* Target,
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::Item_RefreshWidget(UUserWidget* Target)
+void UMounteaInventoryUIStatics::Item_RefreshWidget(UUserWidget* Target, const int32 Quantity)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
-		IMounteaAdvancedInventoryItemWidgetInterface::Execute_RefreshItemWidget(Target);
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_RefreshItemWidget(Target, Quantity);
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Target,
@@ -659,16 +661,16 @@ void UMounteaInventoryUIStatics::SlotsWrapper_AddItem(UUserWidget* Target, const
 		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_AddItem(Target, ItemId);
 }
 
-void UMounteaInventoryUIStatics::SlotsWrapper_UpdateItem(UUserWidget* Target, const FGuid& ItemId)
+void UMounteaInventoryUIStatics::SlotsWrapper_UpdateItem(UUserWidget* Target, const FGuid& ItemId, const int32 OptionalItemSlot)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
-		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_UpdateItem(Target, ItemId);
+		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_UpdateItem(Target, ItemId, OptionalItemSlot);
 }
 
-void UMounteaInventoryUIStatics::SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId)
+void UMounteaInventoryUIStatics::SlotsWrapper_RemoveItem(UUserWidget* Target, const FGuid& ItemId, const int32 Quantity)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
-		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_RemoveItem(Target, ItemId);
+		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_RemoveItem(Target, ItemId, Quantity);
 }
 
 bool UMounteaInventoryUIStatics::ItemsGrid_AddItemToEmptySlot(UUserWidget* Target, const FGuid& ItemId)
@@ -685,6 +687,11 @@ bool UMounteaInventoryUIStatics::ItemsGrid_AddItemToSlot(UUserWidget* Target, co
 bool UMounteaInventoryUIStatics::ItemsGrid_RemoveItemFromSlot(UUserWidget* Target, const int32 SlotIndex)
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItemFromSlot(Target, SlotIndex) : false;
+}
+
+bool UMounteaInventoryUIStatics::ItemsGrid_RemoveItem(UUserWidget* Target, const FGuid& ItemId, const int32 Quantity)
+{
+	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItemFromGrid(Target, ItemId, Quantity) : false;
 }
 
 FGuid UMounteaInventoryUIStatics::ItemsGrid_GetItemInSlot(UUserWidget* Target, const int32 SlotIndex)
@@ -717,6 +724,11 @@ bool UMounteaInventoryUIStatics::ItemsGrid_IsSlotEmpty(UUserWidget* Target, cons
 int32 UMounteaInventoryUIStatics::ItemsGrid_GetSlotIndexByItem(UUserWidget* Target, const FGuid& ItemId)
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetSlotIndexByItem(Target, ItemId) : INDEX_NONE;
+}
+
+int32 UMounteaInventoryUIStatics::ItemsGrid_GetGridSlotIndexByCoords(UUserWidget* Target, const FIntPoint& SlotCoords)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotIndexByCoords(Target, SlotCoords) : INDEX_NONE;
 }
 
 bool UMounteaInventoryUIStatics::ItemsGrid_IsItemInGrid(UUserWidget* Target, const FGuid& ItemId)
@@ -756,48 +768,362 @@ void UMounteaInventoryUIStatics::ItemsGrid_AddSlot(UUserWidget* Target, const FM
 		IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddSlot(Target, SlotData);
 }
 
-// TODO: Create Helper function that will be called in recursion which will already have neccessary inputs to avoid the initial getting
-int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, const UObject* ParentInventory)
+bool UMounteaInventoryUIStatics::ItemsGrid_UpdateItemInSlot(UUserWidget* Target, const FGuid& ItemId,
+	const int32 SlotIndex)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>() ? IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_UpdateItemInSlot(Target, ItemId, SlotIndex) : false;
+}
+
+int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UUserWidget* Target, const FGuid& ItemId, UObject* ParentInventory)
 {
 	if (!IsValid(Target)) return INDEX_NONE;
 	if (!Target->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) return INDEX_NONE;
 	if (!ItemId.IsValid()) return INDEX_NONE;
 	if (!IsValid(ParentInventory)) return INDEX_NONE;
 
-	// TODO: Allow IMounteaAdvancedInventoryInterface
-	if (!ParentInventory->Implements<UMounteaAdvancedInventoryUIInterface>()) return INDEX_NONE;
+	const bool bHasUIInterface = ParentInventory->Implements<UMounteaAdvancedInventoryUIInterface>();
+	const bool bHasInventoryInterface = ParentInventory->Implements<UMounteaAdvancedInventoryInterface>();
+	if (!bHasUIInterface && !bHasInventoryInterface) return INDEX_NONE;
 
-	auto inventoryRef = IMounteaAdvancedInventoryUIInterface::Execute_GetParentInventory(ParentInventory);
-	if (!IsValid(inventoryRef.GetObject())) return INDEX_NONE;
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return INDEX_NONE;
 
-	const auto inventoryItem = IMounteaAdvancedInventoryInterface::Execute_FindItem(inventoryRef.GetObject(), FInventoryItemSearchParams(ItemId));
-	if (!inventoryItem.IsItemValid()) return INDEX_NONE;
-	if (!inventoryItem.Template) return INDEX_NONE;
+	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return INDEX_NONE;
+	
+	UObject* inventoryObject = nullptr;
+	TScriptInterface<IMounteaAdvancedInventoryInterface> InventoryInterface = nullptr;
+	if (bHasUIInterface)
+	{
+		auto inventoryRef = IMounteaAdvancedInventoryUIInterface::Execute_GetParentInventory(ParentInventory);
+		inventoryObject = inventoryRef.GetObject();
+		InventoryInterface = inventoryRef;
+	}
+	else
+	{
+		inventoryObject = ParentInventory;
+		InventoryInterface = inventoryObject;
+	}
+	
+	if (!IsValid(inventoryObject)) return INDEX_NONE;
 
-	auto gridSlots = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(Target).Array();
+	const auto inventoryItem = IMounteaAdvancedInventoryInterface::Execute_FindItem(inventoryObject, FInventoryItemSearchParams(ItemId));
+	if (!inventoryItem.IsItemValid() || !inventoryItem.Template) return INDEX_NONE;
+
+	const auto gridSlots = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(Target).Array();
 	if (gridSlots.Num() == 0) return INDEX_NONE;
 	
-	const auto itemTemplate = inventoryItem.Template;
-	const bool bIsStackable = UMounteaInventorySystemStatics::HasFlag(itemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Stackable);
+	const bool bIsStackable = UMounteaInventorySystemStatics::HasFlag(inventoryItem.Template->ItemFlags, EInventoryItemFlags::EIIF_Stackable);
+	const bool bAlwaysStack = config->bAlwaysStackStackableItems;
 	
-	for (int i = 0; i < gridSlots.Num(); i++)
-	{
-		const auto gridSlot = gridSlots[i];
-		auto slotWidget = gridSlot.SlotWidget;
-		if (!IsValid(slotWidget)) continue;
-		if (!slotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
+	return FindEmptyGridSlotRecursive(InventoryInterface, inventoryItem, gridSlots, bIsStackable, bAlwaysStack);
+}
 
-		const bool bSlotIsEmpty = IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(slotWidget);
-		if (bIsStackable)
+int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems)
+{
+	// For non-stackable items, just find first empty slot
+	if (!bIsStackable || !bAlwaysStackItems)
+	{
+		for (int i = 0; i < GridSlots.Num(); i++)
 		{
-			// TODO: should we find least - empty stack and update it? Or just use empty space? => Config (`bAlwaysStackStackableItems`!
-			continue;
+			const auto& gridSlot = GridSlots[i];
+			if (!IsValid(gridSlot.SlotWidget)) continue;
+			if (!gridSlot.SlotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
+			
+			if (IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(gridSlot.SlotWidget))
+				return i;
 		}
+		return INDEX_NONE;
+	}
+	
+	// For stackable items
+	int32 firstEmptySlotIndex = INDEX_NONE;
+	int32 leastFilledStackIndex = INDEX_NONE;
+	int32 leastFilledStackAmount = MAX_int32;
+	const int32 maxStack = InventoryItem.Template->MaxStackSize;
+	
+	TSet<FMounteaInventoryGridSlot> itemSlots;
+	Algo::CopyIf(GridSlots, itemSlots, [&InventoryItem](const FMounteaInventoryGridSlot& gridSlot) {
+		return gridSlot.OccupiedItemId == InventoryItem.GetGuid();
+	});
+	
+	// Find slot with this item that has the most available space
+	if (bAlwaysStackItems && !itemSlots.IsEmpty())
+	{
+		for (int i = 0; i < itemSlots.Num(); i++)
+		{
+			const auto& gridSlot = itemSlots.Array()[i];
+			if (gridSlot.OccupiedItemId != InventoryItem.GetGuid()) continue;
+			
+			const int32 currentStack = gridSlot.SlotQuantity;
+			if (currentStack >= maxStack) continue;
+			
+			if (currentStack < leastFilledStackAmount)
+			{
+				leastFilledStackAmount = currentStack;
+				leastFilledStackIndex = i;
+			}
+		}
+	}
+	
+	// Find first empty slot
+	for (int i = 0; i < GridSlots.Num(); i++)
+	{
+		const auto& gridSlot = GridSlots[i];
+		if (!IsValid(gridSlot.SlotWidget)) continue;
+		if (!gridSlot.SlotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) continue;
+		
+		if (IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_IsSlotEmpty(gridSlot.SlotWidget))
+		{
+			firstEmptySlotIndex = i;
+			break;
+		}
+	}
+	
+	// Return the appropriate slot index
+	if (bAlwaysStackItems && leastFilledStackIndex != INDEX_NONE)
+		return leastFilledStackIndex;
+	return firstEmptySlotIndex;
+}
+
+bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(
+	UUserWidget* GridWidget, 
+	const FGuid& ItemId, 
+	int32 SlotIndex,
+	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent)
+{
+	if (!ItemId.IsValid() || !IsValid(GridWidget)) return false;
+	if (!GridWidget->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) return false;
+	if (!IsValid(ParentUIComponent.GetObject())) return false;
+	
+	const auto parentInventory = ParentUIComponent->Execute_GetParentInventory(ParentUIComponent.GetObject());
+	if (!IsValid(parentInventory.GetObject())) return false;
+
+	const auto item = parentInventory->Execute_FindItem(parentInventory.GetObject(), FInventoryItemSearchParams(ItemId));
+	if (!item.IsItemValid()) return false;
+
+	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	const auto config = settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
+		
+	const bool bIsStackable = UMounteaInventoryStatics::HasInventoryFlags(
+		item.Template->ItemFlags, static_cast<int32>(EInventoryItemFlags::EIIF_Stackable)
+	) && config ? config->bAlwaysStackStackableItems : true;
+	
+	auto itemSlots = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsDataForItem(GridWidget, ItemId);
+	const int32 currentTotalQuantity = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetStacksSizeForItem(GridWidget, ItemId);
+	const int32 targetTotalQuantity = item.GetQuantity();
+	const int32 maxStackSize = item.Template->MaxStackSize;
+	
+	if (currentTotalQuantity == targetTotalQuantity && itemSlots.Num() > 0)
+		return false;
+
+	bool bAnySlotUpdated = false;
+
+	// Helper function to update a slot's quantity and refresh UI
+	auto updateSlotQuantity = [&](FMounteaInventoryGridSlot& slot, const int32 newQuantity) -> void {
+		slot.SlotQuantity = newQuantity;
+		IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddSlot(GridWidget, slot);
+		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(slot.SlotWidget, slot);
+		ParentUIComponent->Execute_UpdateSlot(ParentUIComponent.GetObject(), slot);
+		
+		if (IsValid(slot.SlotWidget))
+			IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(slot.SlotWidget);
+			
+		bAnySlotUpdated = true;
+	};
+
+	itemSlots.Sort([](const FMounteaInventoryGridSlot& a, const FMounteaInventoryGridSlot& b) {
+			if (a.SlotPosition.Y != b.SlotPosition.Y)
+				return a.SlotPosition.Y > b.SlotPosition.Y; // Sort by Y descending first
+			return a.SlotPosition.X > b.SlotPosition.X; // Then by X descending
+		});
+
+	if (SlotIndex == INDEX_NONE)
+		SlotIndex = 0;
+	
+	// Case 1: We need to add items (SUM < item Quantity)
+	if (targetTotalQuantity > currentTotalQuantity)
+	{
+		int32 quantityToAdd = targetTotalQuantity - currentTotalQuantity;
+		
+		// Handle non-stackable items differently
+		if (!bIsStackable)
+		{
+			bool bSpecifiedSlotUsed = false;
+			
+			while (quantityToAdd > 0)
+			{
+				int32 emptySlotIndex = INDEX_NONE;
+				
+				// Use specified slot first if available and not used yet
+				if (SlotIndex != INDEX_NONE && !bSpecifiedSlotUsed && 
+					IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_IsSlotEmpty(GridWidget, SlotIndex))
+				{
+					emptySlotIndex = SlotIndex;
+					bSpecifiedSlotUsed = true;
+				}
+				else
+					emptySlotIndex = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_FindEmptySlotIndex(GridWidget, ItemId);
+				
+				if (emptySlotIndex == INDEX_NONE) break; // No more empty slots
+				
+				if (IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddItemToSlot(GridWidget, ItemId, emptySlotIndex))
+				{
+					FMounteaInventoryGridSlot slotData = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotData(GridWidget, emptySlotIndex);
+					updateSlotQuantity(slotData, 1); // Each non-stackable item gets quantity of 1
+					quantityToAdd--;
+				}
+				else
+				{
+					break; // Failed to add to slot
+				}
+			}
+		}
+		// Handle stackable items
 		else
 		{
-			if (!bSlotIsEmpty) continue;
+			// If no slots exist for this item, add it to an empty slot
+			if (itemSlots.Num() == 0)
+			{
+				int32 emptySlotIndex = SlotIndex != INDEX_NONE ? SlotIndex : 
+					IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_FindEmptySlotIndex(GridWidget, ItemId);
+				
+				if (emptySlotIndex != INDEX_NONE && 
+					IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_IsSlotEmpty(GridWidget, emptySlotIndex))
+				{
+					int32 quantityToAddToSlot = FMath::Min(maxStackSize, quantityToAdd);
+					if (IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddItemToSlot(GridWidget, ItemId, emptySlotIndex))
+					{
+						FMounteaInventoryGridSlot slotData = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotData(GridWidget, emptySlotIndex);
+						updateSlotQuantity(slotData, quantityToAddToSlot);
+						quantityToAdd -= quantityToAddToSlot;
+					}
+				}
+			}
+			// Otherwise, first try to add to the specified slot if provided
+			else if (SlotIndex != INDEX_NONE && 
+					IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(GridWidget).Array().IsValidIndex(SlotIndex))
+			{
+				FMounteaInventoryGridSlot slotData = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotData(GridWidget, SlotIndex);
+				
+				if (slotData.IsEmpty())
+				{
+					int32 quantityToAddToSlot = FMath::Min(maxStackSize, quantityToAdd);
+					if (IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddItemToSlot(GridWidget, ItemId, SlotIndex))
+					{
+						slotData = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotData(GridWidget, SlotIndex);
+						updateSlotQuantity(slotData, quantityToAddToSlot);
+						quantityToAdd -= quantityToAddToSlot;
+					}
+				}
+				else if (slotData.OccupiedItemId == ItemId)
+				{
+					int32 availableSpace = maxStackSize - slotData.SlotQuantity;
+					int32 quantityToAddToSlot = FMath::Min(availableSpace, quantityToAdd);
+					
+					if (quantityToAddToSlot > 0)
+					{
+						updateSlotQuantity(slotData, slotData.SlotQuantity + quantityToAddToSlot);
+						quantityToAdd -= quantityToAddToSlot;
+					}
+				}
+
+				itemSlots.Remove(slotData);
+			}
+			
+			// Fill up existing item slots
+			if (quantityToAdd > 0)
+			{
+				for (auto& slot : itemSlots)
+				{
+					if (quantityToAdd <= 0) break;
+					
+					const int32 availableSpace = maxStackSize - slot.SlotQuantity;
+					const int32 quantityToAddToSlot = FMath::Min(availableSpace, quantityToAdd);
+					
+					if (quantityToAddToSlot > 0)
+					{
+						updateSlotQuantity(slot, slot.SlotQuantity + quantityToAddToSlot);
+						quantityToAdd -= quantityToAddToSlot;
+					}
+				}
+			}
+			
+			// Create new slots if needed
+			while (quantityToAdd > 0)
+			{
+				int32 emptySlotIndex = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_FindEmptySlotIndex(GridWidget, ItemId);
+				if (emptySlotIndex == INDEX_NONE) break;
+				
+				int32 quantityToAddToSlot = FMath::Min(maxStackSize, quantityToAdd);
+
+				if (IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_AddItemToSlot(GridWidget, ItemId, emptySlotIndex))
+				{
+					FMounteaInventoryGridSlot slotData = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotData(GridWidget, emptySlotIndex);
+					updateSlotQuantity(slotData, quantityToAddToSlot);
+					quantityToAdd -= quantityToAddToSlot;
+				}
+				else
+				{
+					break;
+				}
+			}
 		}
-		return i;
 	}
-	return INDEX_NONE;
+	
+	// Case 2: We need to remove items (SUM > item Quantity)
+	else if (targetTotalQuantity < currentTotalQuantity)
+	{
+		int32 quantityToRemove = currentTotalQuantity - targetTotalQuantity;
+	
+		if (SlotIndex != INDEX_NONE && 
+			IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotsData(GridWidget).Array().IsValidIndex(SlotIndex))
+		{
+			FMounteaInventoryGridSlot slotData = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotData(GridWidget, SlotIndex);
+			if (slotData.OccupiedItemId == ItemId)
+			{
+				const int32 quantityToRemoveFromSlot = FMath::Min(slotData.SlotQuantity, quantityToRemove);
+			
+				if (quantityToRemoveFromSlot >= slotData.SlotQuantity)
+				{
+					IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItemFromSlot(GridWidget, SlotIndex);
+					bAnySlotUpdated = true;
+				}
+				else
+					updateSlotQuantity(slotData, slotData.SlotQuantity - quantityToRemoveFromSlot);
+			
+				quantityToRemove -= quantityToRemoveFromSlot;
+				itemSlots.Remove(slotData);
+			}
+		}
+		
+		if (quantityToRemove > 0)
+		{
+			auto itemSlotsArray = itemSlots.Array();
+			for (int32 i = 0; i < itemSlots.Num(); i++)
+			{
+				if (!itemSlotsArray.IsValidIndex(i)) continue;
+				
+				auto& slot =itemSlotsArray[i];
+				if (quantityToRemove <= 0) break;
+			
+				const int32 slotIndex = IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_GetGridSlotIndexByCoords(GridWidget, slot.SlotPosition);
+				if (slotIndex == INDEX_NONE) continue;
+			
+				const int32 quantityToRemoveFromSlot = FMath::Min(slot.SlotQuantity, quantityToRemove);
+			
+				if (quantityToRemoveFromSlot >= slot.SlotQuantity)
+				{
+					IMounteaAdvancedInventoryItemsGridWidgetInterface::Execute_RemoveItemFromSlot(GridWidget, slotIndex);
+					bAnySlotUpdated = true;
+				}
+				else
+					updateSlotQuantity(slot, slot.SlotQuantity - quantityToRemoveFromSlot);
+			
+				quantityToRemove -= quantityToRemoveFromSlot;
+			}
+		}
+	}
+
+	return bAnySlotUpdated;
 }

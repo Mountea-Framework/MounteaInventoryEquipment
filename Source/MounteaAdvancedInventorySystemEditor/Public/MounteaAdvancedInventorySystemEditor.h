@@ -23,6 +23,7 @@ private:
 	void PluginButtonClicked() const;
 	void RegisterMenus();
 	void SettingsButtonClicked() const;
+	void ConfigButtonClicked() const;
 	void EditorSettingsButtonClicked() const;
 	TSharedRef<SWidget> MakeMounteaMenuWidget() const;
 

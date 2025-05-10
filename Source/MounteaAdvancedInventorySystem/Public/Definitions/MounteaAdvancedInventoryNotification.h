@@ -80,6 +80,14 @@ struct FInventoryNotificationConfig
 {
 	GENERATED_BODY()
 
+	FInventoryNotificationConfig()
+		: bIsEnabled(true)
+		, NotificationCategory(EInventoryNotificationCategory::EINC_Info)
+		, bShowProgressBar(false)
+		, bCanBeClosed(true)
+		, bHasDuration(false)
+	{};
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
 	uint8 bIsEnabled : 1;
 

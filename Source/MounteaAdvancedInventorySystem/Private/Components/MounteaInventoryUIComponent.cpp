@@ -254,6 +254,7 @@ void UMounteaInventoryUIComponent::ProcessItemModified_Implementation(const FInv
 	{
 		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
 		newPayload->PayloadData.Add(ModifiedItem.Guid);
+		newPayload->PayloadQuantities.Add(ModifiedItem.Quantity);
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemModified, newPayload);
 	}
 }

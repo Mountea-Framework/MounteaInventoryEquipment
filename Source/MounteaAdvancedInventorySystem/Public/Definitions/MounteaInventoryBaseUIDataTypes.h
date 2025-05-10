@@ -21,7 +21,7 @@ public:
 	 * Editable in the editor and accessible in Blueprints.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FIntPoint SlotPosition;
+	FIntPoint SlotPosition = FIntPoint::ZeroValue;
 
 	/**
 	 * Represents the unique identifier for the item occupying the grid slot.
@@ -61,7 +61,7 @@ public:
 
 	bool IsValid() const { return SlotWidget != nullptr; };
 		
-	void ResetSlot()	{	OccupiedItemId = FGuid();	};
+	void ResetSlot()	{	OccupiedItemId = FGuid(); SlotQuantity = INDEX_NONE;	};
 	
 	bool IsEmpty() const	{	return OccupiedItemId.IsValid() == false; };
 

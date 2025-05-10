@@ -56,6 +56,20 @@ public:
 	virtual bool RemoveItemFromSlot_Implementation(const int32 SlotIndex) = 0;
 
 	/**
+	 * Removes an item from the inventory grid.
+	 *
+	 * This method attempts to remove a specified quantity of an item, identified by its unique ID, from the inventory grid.
+	 * If the Quantity parameter is set to -1, it removes all occurrences of the item.
+	 *
+	 * @param ItemId The unique identifier (GUID) of the item to be removed.
+	 * @param Quantity The number of items to remove. Defaults to -1, which removes all instances of the item.
+	 * @return Returns true if the item(s) were successfully removed; otherwise, returns false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	bool RemoveItemFromGrid(const FGuid& ItemId, const int32 Quantity = -1);
+	virtual bool RemoveItemFromGrid_Implementation(const FGuid& ItemId, const int32 Quantity = -1) = 0;
+	
+	/**
 	 * Gets the item ID from a specific slot.
 	 * 
 	 * @param SlotIndex The index of the slot to query.
@@ -139,6 +153,19 @@ public:
 	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation(const int32 SlotIndex) const = 0;
 
 	/**
+	 * Retrieves the data of a specific inventory grid slot based on coordinates.
+	 *
+	 * This method returns information about a grid slot based on its coordinates.
+	 * It is used to fetch details such as the position of the slot and the item it contains.
+	 *
+	 * @param SlotCoords The coordinates of the grid slot to retrieve data for.
+	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	int32 GetGridSlotIndexByCoords(const FIntPoint& SlotCoords) const;
+	virtual int32 GetGridSlotIndexByCoords_Implementation(const FIntPoint& SlotCoords) const = 0;
+	
+	/**
 	 * Retrieves the data of all inventory grid slots.
 	 *
 	 * This method returns a set of FMounteaInventoryGridSlot, each representing an individual slot in the inventory grid.
@@ -209,4 +236,44 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
 	void AddSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
+
+	/**
+	 * Updates the item located in a specific slot of the inventory grid.
+	 *
+	 * This method attempts to update the item in the specified slot index by using the provided item ID.
+	 * If a slot index is not specified, the default slot index (0) will be used.
+	 *
+	 * @param ItemId A globally unique identifier (GUID) for the item to be updated.
+	 * @param SlotIndex The index of the slot in which the item is updated (default is 0).
+	 * @return Returns true if the item was successfully updated, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	bool UpdateItemInSlot(const FGuid& ItemId, const int32 SlotIndex = 0);
+	virtual bool UpdateItemInSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex = 0) = 0;
+
+	/**
+	 * Retrieves the stack size for a specific item in the inventory from all slots.
+	 *
+	 * This method allows querying the total number of items stacked together
+	 * for a given item identified by its unique ID.
+	 *
+	 * @param ItemId The unique identifier (FGuid) of the item for which the stack size is requested.
+	 * @return The total number of items in the stack for the specified item. Returns 0 if the item is not found.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	int32 GetStacksSizeForItem(const FGuid& ItemId) ;
+	virtual int32 GetStacksSizeForItem_Implementation(const FGuid& ItemId)  = 0;
+
+	/**
+	 * Retrieves the data for grid slots associated with a specific item.
+	 *
+	 * This function is intended to provide detailed information about the grid slots
+	 * where a specific inventory item is located or associated within the items grid.
+	 *
+	 * @param ItemId The unique identifier of the inventory item to query grid slot data for.
+	 * @return A set of grid slot data associated with the specified item.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem(const FGuid& ItemId) ;
+	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem_Implementation(const FGuid& ItemId)  = 0;
 };
