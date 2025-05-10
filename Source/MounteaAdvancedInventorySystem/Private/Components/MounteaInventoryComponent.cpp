@@ -1,6 +1,8 @@
 ﻿// All rights reserved Dominik Morse 2024
 
 #include "Components/MounteaInventoryComponent.h"
+
+#include "Algo/Copy.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -263,6 +265,12 @@ FInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FInvent
 			else
 				return Item.GetCustomData().HasAny(SearchParams.Tags);
 		}
+		
+		if (SearchParams.bSearchByCategory && Item.GetTemplate()->ItemCategory != SearchParams.CategoryId)
+			return false;
+		
+		if (SearchParams.bSearchByRarity && Item.GetTemplate()->ItemRarity != SearchParams.RarityId)
+			return false;
 
 		return true;
 	});
@@ -295,8 +303,48 @@ int32 UMounteaInventoryComponent::FindItemIndex_Implementation(const FInventoryI
 TArray<FInventoryItem> UMounteaInventoryComponent::FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const
 {
 	TArray<FInventoryItem> returnResult;
-	// TODO: Implementation
+	
+	if (!SearchParams.bSearchByGuid && !SearchParams.bSearchByTemplate && 
+		!SearchParams.bSearchByTags && !SearchParams.bSearchByCategory && 
+		!SearchParams.bSearchByRarity)
+	{
+		return InventoryItems.Items;
+	}
+    
+	Algo::CopyIf(InventoryItems.Items, returnResult, [&SearchParams](const FInventoryItem& Item) -> bool
+	{
+		if (!Item.IsItemValid())
+			return false;
+		
+		if (SearchParams.bSearchByGuid && Item.GetGuid() == SearchParams.ItemGuid)
+			return true;
 
+		if (SearchParams.bSearchByTemplate && Item.GetTemplate() == SearchParams.Template)
+			return true;
+
+		if (SearchParams.bSearchByTags)
+		{
+			if (SearchParams.bRequireAllTags)
+			{
+				if (Item.GetCustomData().HasAll(SearchParams.Tags))
+					return true;
+			}
+			else
+			{
+				if (Item.GetCustomData().HasAny(SearchParams.Tags))
+					return true;
+			}
+		}
+
+		if (SearchParams.bSearchByCategory && Item.GetTemplate()->ItemCategory == SearchParams.CategoryId)
+			return true;
+        
+		if (SearchParams.bSearchByRarity && Item.GetTemplate()->ItemRarity == SearchParams.RarityId)
+			return true;
+		
+		return false;
+	});
+    
 	return returnResult;
 }
 

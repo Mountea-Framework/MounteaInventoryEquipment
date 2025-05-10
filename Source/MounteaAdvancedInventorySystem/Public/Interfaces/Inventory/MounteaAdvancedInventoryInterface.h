@@ -10,6 +10,10 @@
 
 class UMounteaInventoryItemTemplate;
 
+/**
+ * Defines a structure used to set parameters for searching inventory items.
+ * Provides multiple criteria such as GUID, templates, tags, categories, and rarity to customize search queries.
+ */
 USTRUCT(BlueprintType)
 struct FInventoryItemSearchParams
 {
@@ -20,7 +24,10 @@ struct FInventoryItemSearchParams
 		, bSearchByTemplate(false)
 		, bSearchByTags(false)
 		, bRequireAllTags(false)
-	{}
+		, bSearchByCategory(false)
+		, bSearchByRarity(false)
+	{
+	}
 
 	explicit FInventoryItemSearchParams(const FGuid& InGuid)
 		: bSearchByGuid(true)
@@ -28,6 +35,8 @@ struct FInventoryItemSearchParams
 		, bSearchByTemplate(false)
 		, bSearchByTags(false)
 		, bRequireAllTags(false)
+		, bSearchByCategory(false)
+		, bSearchByRarity(false)
 	{}
 
 	explicit FInventoryItemSearchParams(UMounteaInventoryItemTemplate* const InTemplate)
@@ -36,14 +45,18 @@ struct FInventoryItemSearchParams
 		, Template(InTemplate)
 		, bSearchByTags(false)
 		, bRequireAllTags(false)
+		, bSearchByCategory(false)
+		, bSearchByRarity(false)
 	{}
 
-	explicit FInventoryItemSearchParams(const FGameplayTagContainer& InTags, const bool bInRequireAllTags = false)  
+	explicit FInventoryItemSearchParams(const FGameplayTagContainer& InTags, const bool bInRequireAllTags = false)	
 		: bSearchByGuid(false)
 		, bSearchByTemplate(false)
 		, bSearchByTags(true)
 		, Tags(InTags)
 		, bRequireAllTags(bInRequireAllTags)
+		, bSearchByCategory(false)
+		, bSearchByRarity(false)
 	{}
 
 	FInventoryItemSearchParams(const FGuid& InGuid, UMounteaInventoryItemTemplate* const InTemplate, const FGameplayTagContainer& InTags, const bool bInRequireAllTags = false)
@@ -54,7 +67,10 @@ struct FInventoryItemSearchParams
 		, bSearchByTags(true)
 		, Tags(InTags)
 		, bRequireAllTags(bInRequireAllTags)
-	{}
+		, bSearchByCategory(false)
+		, bSearchByRarity(false)
+	{
+	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
 	uint8 bSearchByGuid : 1;
@@ -75,7 +91,19 @@ struct FInventoryItemSearchParams
 	FGameplayTagContainer Tags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
-	bool bRequireAllTags = false;
+	uint8 bRequireAllTags : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	uint8 bSearchByCategory : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	FString CategoryId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	uint8 bSearchByRarity : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	FString RarityId;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, const FInventoryItem&, AddedItem);
@@ -269,7 +297,7 @@ public:
 	void ProcessInventoryNotification(const FInventoryNotificationData& Notification);
 	virtual void ProcessInventoryNotification_Implementation(const FInventoryNotificationData& Notification) = 0;
 
-	// --- Events  ------------------------------
+	// --- Events	------------------------------
 	virtual FOnItemAdded& GetOnItemAddedEventHandle() = 0;
 	virtual FOnItemRemoved& GetOnItemRemovedEventHandle() = 0;
 	virtual FOnItemQuantityChanged& GetOnItemQuantityChangedEventHandle() = 0;
