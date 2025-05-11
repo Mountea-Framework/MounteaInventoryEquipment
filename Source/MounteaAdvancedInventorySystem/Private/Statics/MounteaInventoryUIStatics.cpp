@@ -160,6 +160,24 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 	return nullptr;
 }
 
+bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	if (!IsValid(Target.GetObject())) return false;
+	switch (Target->Execute_GetMainUIVisibility(Target.GetObject()))
+	{
+		case ESlateVisibility::Visible:
+		case ESlateVisibility::HitTestInvisible:
+		case ESlateVisibility::SelfHitTestInvisible:
+			return true;
+			break;
+		case ESlateVisibility::Collapsed:
+		case ESlateVisibility::Hidden:
+			return false;
+			break;
+	}
+	return false;
+}
+
 void UMounteaInventoryUIStatics::ApplyTheme(UUserWidget* Target)
 {
 	if (!IsValid(Target)) return;

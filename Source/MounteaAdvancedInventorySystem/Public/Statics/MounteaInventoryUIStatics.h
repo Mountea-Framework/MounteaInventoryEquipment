@@ -94,6 +94,21 @@ public:
 
 	// --- Helpers  ------------------------------
 #pragma region Helpers
+
+
+	/**
+	 * Checks whether the main UI is currently open.
+	 *
+	 * This function determines if the main UI associated with the given
+	 * Mountea Advanced Inventory UI Interface target is opened and
+	 * visible to the user by evaluating its visibility state.
+	 *
+	 * @param Target Reference to an object implementing the MounteaAdvancedInventoryUIInterface.
+	 * @return True if the main UI is open and visible in any form (Visible, HitTestInvisible, or SelfHitTestInvisible);
+	 *         False if it is collapsed, hidden, or the target is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static bool IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 	/**
 	 * 

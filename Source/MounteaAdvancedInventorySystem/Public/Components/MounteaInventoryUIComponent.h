@@ -34,8 +34,7 @@ public:
 	
 	virtual bool CreateMainUIWrapper_Implementation() override;
 	virtual ESlateVisibility GetMainUIVisibility_Implementation() const override;
-	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) override;
-	
+	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) override;	
 	virtual UUserWidget* GetMainUIWrapper_Implementation() const override { return InventoryWidget; };
 	virtual void RemoveMainUIWrapper_Implementation() override;
 	
@@ -99,6 +98,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	FGuid ActiveItemGuid;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	TObjectPtr<UUserWidget> ActiveItemWidget;
 
 	/**
 	 * Represents the set of saved inventory grid slots.
