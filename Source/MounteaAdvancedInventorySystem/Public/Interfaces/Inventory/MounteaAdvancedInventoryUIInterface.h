@@ -29,6 +29,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryUIInterface
 	GENERATED_BODY()
 
 public:
+	
 	// --- Inventory  ------------------------------
 
 	/**
@@ -47,7 +48,17 @@ public:
 	void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
 
-	// --- Main UI  ------------------------------
+	/**
+	 * Retrieves the visibility state of the main inventory UI.
+	 *
+	 * This function determines the current visibility status of the main UI
+	 * and returns an appropriate ESlateVisibility value.
+	 *
+	 * @return The visibility state of the main UI.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	ESlateVisibility GetMainUIVisibility() const;
+	virtual ESlateVisibility GetMainUIVisibility_Implementation() const = 0;
 
 	/**
 	 * Creates the inventory UI.

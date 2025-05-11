@@ -397,8 +397,20 @@ public:
 	static bool SetSourceInventory(const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 
 	/**
+	 * Retrieves the visibility state of the main inventory UI.
+	 *
+	 * This function determines the current visibility status of the main UI
+	 * and returns an appropriate ESlateVisibility value.
+	 *
+	 * @param Target MounteaAdvancedInventoryUI Object
+	 * @return The visibility state of the main UI.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static ESlateVisibility GetMainUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	
+	/**
 	 * 
-	 * @param Target 
+	 * @param Target MounteaAdvancedInventoryUI Object
 	 * @param SelectedCategoryId 
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))

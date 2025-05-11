@@ -564,6 +564,12 @@ bool UMounteaInventoryUIStatics::SetSourceInventory(
 	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;
 }
 
+ESlateVisibility UMounteaInventoryUIStatics::GetMainUIVisibility(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	return Target.GetObject() ? Target->Execute_GetMainUIVisibility(Target.GetObject()) : ESlateVisibility::Hidden;
+}
+
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UUserWidget* Target, const FString& CategoryId)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())

@@ -136,6 +136,11 @@ bool UMounteaInventoryUIComponent::CreateInventoryUIWrapper_Implementation()
 	return true;
 }
 
+ESlateVisibility UMounteaInventoryUIComponent::GetMainUIVisibility_Implementation() const
+{
+	return IsValid(InventoryWidget) ? InventoryWidget->GetVisibility() : ESlateVisibility::Hidden;
+}
+
 void UMounteaInventoryUIComponent::RemoveInventoryUIWrapper_Implementation()
 {
 	TScriptInterface<IMounteaInventoryBaseWidgetInterface> inventoryInterface = InventoryWidget;
