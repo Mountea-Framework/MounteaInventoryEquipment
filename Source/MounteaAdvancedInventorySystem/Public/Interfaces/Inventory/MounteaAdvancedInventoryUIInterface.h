@@ -49,7 +49,7 @@ public:
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
 
 	/**
-	 * Retrieves the visibility state of the main inventory UI.
+	 * Retrieves the visibility state of the main UI.
 	 *
 	 * This function determines the current visibility status of the main UI
 	 * and returns an appropriate ESlateVisibility value.
@@ -59,6 +59,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
 	ESlateVisibility GetMainUIVisibility() const;
 	virtual ESlateVisibility GetMainUIVisibility_Implementation() const = 0;
+
+	/**
+	 * Updates the visibility state of the main  UI.
+	 *
+	 * @param NewVisibility The new visibility state of the UI, defined as an ESlateVisibility value.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	void SetMainUIVisibility(const ESlateVisibility NewVisibility);
+	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) = 0;
 
 	/**
 	 * Creates the inventory UI.

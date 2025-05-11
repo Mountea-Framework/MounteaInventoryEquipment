@@ -570,6 +570,13 @@ ESlateVisibility UMounteaInventoryUIStatics::GetMainUIVisibility(
 	return Target.GetObject() ? Target->Execute_GetMainUIVisibility(Target.GetObject()) : ESlateVisibility::Hidden;
 }
 
+void UMounteaInventoryUIStatics::SetMainUIVisibility(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility Visibility)
+{
+	if (Target.GetObject())
+		Target->Execute_SetMainUIVisibility(Target.GetObject(), Visibility);
+}
+
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UUserWidget* Target, const FString& CategoryId)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())

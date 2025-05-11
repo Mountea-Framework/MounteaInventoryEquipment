@@ -138,7 +138,14 @@ bool UMounteaInventoryUIComponent::CreateInventoryUIWrapper_Implementation()
 
 ESlateVisibility UMounteaInventoryUIComponent::GetMainUIVisibility_Implementation() const
 {
-	return IsValid(InventoryWidget) ? InventoryWidget->GetVisibility() : ESlateVisibility::Hidden;
+	return IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryBaseWidgetInterface>()
+	? IMounteaInventoryBaseWidgetInterface::Execute_GetMainUIVisibility(InventoryWidget) : ESlateVisibility::Hidden;
+}
+
+void UMounteaInventoryUIComponent::SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility)
+{
+	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryBaseWidgetInterface>())
+		IMounteaInventoryBaseWidgetInterface::Execute_SetMainUIVisibility(InventoryWidget, NewVisibility);
 }
 
 void UMounteaInventoryUIComponent::RemoveInventoryUIWrapper_Implementation()

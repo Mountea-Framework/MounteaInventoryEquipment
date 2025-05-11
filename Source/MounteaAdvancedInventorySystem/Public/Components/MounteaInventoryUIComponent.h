@@ -31,11 +31,15 @@ protected:
 public:
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override;
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
+	
 	virtual bool CreateInventoryUIWrapper_Implementation() override;
 	virtual ESlateVisibility GetMainUIVisibility_Implementation() const override;
+	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) override;
+	
 	virtual UUserWidget* GetInventoryUIWrapper_Implementation() const override { return InventoryWidget; };
 	virtual void RemoveInventoryUIWrapper_Implementation() override;
 	virtual void SetInventoryUIWrapperVisibility_Implementation(const bool bShowInventory) override;
+	
 	virtual UUserWidget* GetNotificationContainer_Implementation() const override;
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) override;
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) override;
