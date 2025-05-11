@@ -11,6 +11,11 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
+UMounteaAdvancedInventorySettings* UMounteaInventoryStatics::GetInventorySettings()
+{
+	return GetMutableDefault<UMounteaAdvancedInventorySettings>();
+}
+
 FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
 {
 	return FInventoryItem(ItemGuid);
