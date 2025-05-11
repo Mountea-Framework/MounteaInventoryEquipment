@@ -278,7 +278,7 @@ UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemWidgetInSlot_Imple
 
 	if (!checkedSlot.SlotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) return nullptr;
 
-	return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetItemWidgetInSlot(checkedSlot.SlotWidget);
+	return checkedSlot.SlotWidget;
 }
 
 void UMounteaAdvancedInventoryItemsGridWidget::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)

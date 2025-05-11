@@ -42,3 +42,9 @@ TArray<FString> UMounteaAdvancedInventorySettings::GetAllowedCategories() const
 	inventorySettingsConfig->AllowedCategories.GetKeys(returnValues);
 	return returnValues;
 }
+
+TSoftObjectPtr<UInputMappingContext> UMounteaAdvancedInventorySettings::
+GetAdvancedInventoryEquipmentInputMapping() const
+{
+	return AdvancedInventoryEquipmentInputMapping;
+}

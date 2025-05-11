@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryStatics.generated.h"
 
+class UMounteaAdvancedInventorySettings;
 enum class EInventoryNotificationCategory : uint8;
 class UMounteaAdvancedInventorySettingsConfig;
 enum class EInventoryNotificationType : uint8;
@@ -48,10 +49,26 @@ public:
 		else return;
 	}
 
-	/*************************************************************/
-	/******************* BLUEPRINTABLE *********************/
-	/*************************************************************/
 public:
+	
+	/**
+	 * Retrieves the configuration settings for the Mountea Inventory System.
+	 * Provides access to inventory-related configurations such as inventory types, rarities, and categories.
+	 *
+	 * @return - A reference to the Mountea Advanced Inventory Settings configuration object
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventorySettings* GetInventorySettings();
+
+	/**
+	 * Creates a new inventory item associated with the given unique identifier.
+	 * This item is NOT valid item! This is to simplify searching for item related data!
+	 * 
+	 * @param ItemGuid - The globally unique identifier (GUID) for the new item
+	 * @return - A new inventory item initialized with the specified GUID
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta = (Keywords = "construct,build,make", NativeMakeFunc), meta=(CustomTag="MounteaK2Getter"))
+	static FInventoryItem NewInventoryItem(const FGuid& ItemGuid);
 
 	/**
 	 * Checks if the specified flags are set in the value.

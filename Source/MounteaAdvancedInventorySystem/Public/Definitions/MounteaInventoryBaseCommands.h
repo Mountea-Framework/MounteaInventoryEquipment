@@ -6,8 +6,8 @@
 
 namespace InventoryUICommands
 {
-	const FString CreateInventoryWidgetWrapper(TEXT("CreateInventoryWidgetWrapper"));
-	const FString RemoveInventoryWidgetWrapper(TEXT("RemoveInventoryWidgetWrapper"));
+	const FString CreateWrapper(TEXT("CreateWrapper"));
+	const FString RemoveWrapper(TEXT("RemoveWrapper"));
 	
 	const FString OpenInventoryWidget(TEXT("OpenInventoryWidget"));
 	const FString CloseInventoryWidget(TEXT("CloseInventoryWidget"));
@@ -35,8 +35,8 @@ namespace InventoryUICommands
 	const FString ShowInventoryNotification(TEXT("ShowInventoryNotification"));
 
 	inline const TSet<FString> CommandsSet = {
-		CreateInventoryWidgetWrapper,
-		RemoveInventoryWidgetWrapper,
+		CreateWrapper,
+		RemoveWrapper,
 		
 		OpenInventoryWidget,
 		CloseInventoryWidget,

@@ -11,6 +11,16 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
+UMounteaAdvancedInventorySettings* UMounteaInventoryStatics::GetInventorySettings()
+{
+	return GetMutableDefault<UMounteaAdvancedInventorySettings>();
+}
+
+FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
+{
+	return FInventoryItem(ItemGuid);
+}
+
 AActor* UMounteaInventoryStatics::GetOwningActor(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetOwningActor(Target.GetObject()) : nullptr;

@@ -44,7 +44,10 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 				"Projects",
 				"UMG",
 				
-				"NetCore"
+				"NetCore",
+				
+				"InputCore",
+				"EnhancedInput"
 			}
 			);
 		

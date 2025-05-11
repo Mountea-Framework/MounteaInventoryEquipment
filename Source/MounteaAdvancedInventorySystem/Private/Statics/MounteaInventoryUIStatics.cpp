@@ -11,7 +11,7 @@
 
 #include "GameFramework/PlayerState.h"
 
-#include "Interfaces/Widgets/MounteaInventoryBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
@@ -43,27 +43,20 @@ void UMounteaInventoryUIStatics::SetParentInventory(
 		Target->Execute_SetParentInventory(Target.GetObject(), NewParentInventory);
 }
 
-bool UMounteaInventoryUIStatics::CreateInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+bool UMounteaInventoryUIStatics::CreateMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	return Target.GetObject() ? Target->Execute_CreateInventoryUIWrapper(Target.GetObject()) : false;
+	return Target.GetObject() ? Target->Execute_CreateMainUIWrapper(Target.GetObject()) : false;
 }
 
-UUserWidget* UMounteaInventoryUIStatics::GetInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+UUserWidget* UMounteaInventoryUIStatics::GetMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	return Target.GetObject() ? Target->Execute_GetInventoryUIWrapper(Target.GetObject()) : nullptr;
+	return Target.GetObject() ? Target->Execute_GetMainUIWrapper(Target.GetObject()) : nullptr;
 }
 
-void UMounteaInventoryUIStatics::RemoveInventoryUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+void UMounteaInventoryUIStatics::RemoveMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
 	if (Target.GetObject())
-		Target->Execute_RemoveInventoryUIWrapper(Target.GetObject());
-}
-
-void UMounteaInventoryUIStatics::SetInventoryUIWrapperVisibility(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const bool bShowInventory)
-{
-	if (Target.GetObject())
-		Target->Execute_SetInventoryUIWrapperVisibility(Target.GetObject(), bShowInventory);
+		Target->Execute_RemoveMainUIWrapper(Target.GetObject());
 }
 
 UUserWidget* UMounteaInventoryUIStatics::GetNotificationContainer(
@@ -165,6 +158,24 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 		return FindPlayerController(ownerActor, SearchDepth);
 	
 	return nullptr;
+}
+
+bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	if (!IsValid(Target.GetObject())) return false;
+	switch (Target->Execute_GetMainUIVisibility(Target.GetObject()))
+	{
+		case ESlateVisibility::Visible:
+		case ESlateVisibility::HitTestInvisible:
+		case ESlateVisibility::SelfHitTestInvisible:
+			return true;
+			break;
+		case ESlateVisibility::Collapsed:
+		case ESlateVisibility::Hidden:
+			return false;
+			break;
+	}
+	return false;
 }
 
 void UMounteaInventoryUIStatics::ApplyTheme(UUserWidget* Target)
@@ -542,26 +553,39 @@ FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrushOutline(const FSlateBrush
 	return returnValue;
 }
 
-void UMounteaInventoryUIStatics::InitializeInventoryWidget(
-	const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target,
+void UMounteaInventoryUIStatics::InitializeMainUIWidget(
+	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
 {
 	if (Target.GetObject() && Parent.GetObject())
-		Target->Execute_InitializeInventoryWidget(Target.GetObject(), Parent);
+		Target->Execute_InitializeMainUI(Target.GetObject(), Parent);
 }
 
 void UMounteaInventoryUIStatics::RemoveInventoryWidgetWrapper(
-	const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target)
+	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target)
 {
 	if (Target.GetObject())
-		Target->Execute_RemoveInventoryWidgetWrapper(Target.GetObject());
+		Target->Execute_RemoveMainUI(Target.GetObject());
 }
 
 bool UMounteaInventoryUIStatics::SetSourceInventory(
-	const TScriptInterface<IMounteaInventoryBaseWidgetInterface>& Target,
+	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
 {
 	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;
+}
+
+ESlateVisibility UMounteaInventoryUIStatics::GetMainUIVisibility(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	return Target.GetObject() ? Target->Execute_GetMainUIVisibility(Target.GetObject()) : ESlateVisibility::Hidden;
+}
+
+void UMounteaInventoryUIStatics::SetMainUIVisibility(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility Visibility)
+{
+	if (Target.GetObject())
+		Target->Execute_SetMainUIVisibility(Target.GetObject(), Visibility);
 }
 
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UUserWidget* Target, const FString& CategoryId)
