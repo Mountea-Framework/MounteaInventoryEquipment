@@ -4,21 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "MounteaInventoryBaseWidgetInterface.generated.h"
+#include "MounteaInventorySystemBaseWidgetInterface.generated.h"
 
 class IMounteaAdvancedInventoryInterface;
 class IMounteaAdvancedInventoryUIInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
-class UMounteaInventoryBaseWidgetInterface : public UInterface
+class UMounteaInventorySystemBaseWidgetInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 /**
- * 
+ * An interface for managing base inventory widget functionality in the Mountea Advanced Inventory System.
+ * This interface provides the necessary functions to initialize, display, and configure inventory UI elements.
+ *
+ * This Interface should be applied to main wrapper.
  */
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventoryBaseWidgetInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventorySystemBaseWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -29,15 +32,15 @@ public:
 	 * @param Parent 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	void InitializeInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
-	virtual void InitializeInventoryWidget_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent) = 0;
+	void InitializeMainUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
+	virtual void InitializeMainUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent) = 0;
 
 	/**
 	 * 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	void RemoveInventoryWidgetWrapper();
-	virtual void RemoveInventoryWidgetWrapper_Implementation() = 0;
+	void RemoveMainUI();
+	virtual void RemoveMainUI_Implementation() = 0;
 
 	// TODO: Do I need this?
 	/**

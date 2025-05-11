@@ -36,7 +36,7 @@ public:
 	 * Retrieves the parent inventory associated with this UI.
 	 * @return The parent inventory interface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory() const;
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const = 0;
 
@@ -44,7 +44,7 @@ public:
 	 * Sets the parent inventory for this UI.
 	 * @param NewParentInventory - The inventory interface to associate.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
 
@@ -56,7 +56,7 @@ public:
 	 *
 	 * @return The visibility state of the main UI.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	ESlateVisibility GetMainUIVisibility() const;
 	virtual ESlateVisibility GetMainUIVisibility_Implementation() const = 0;
 
@@ -65,7 +65,7 @@ public:
 	 *
 	 * @param NewVisibility The new visibility state of the UI, defined as an ESlateVisibility value.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	void SetMainUIVisibility(const ESlateVisibility NewVisibility);
 	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) = 0;
 
@@ -73,32 +73,25 @@ public:
 	 * Creates the inventory UI.
 	 * @return True if UI was successfully created, otherwise false.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	bool CreateInventoryUIWrapper();
-	virtual bool CreateInventoryUIWrapper_Implementation() = 0;
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	bool CreateMainUIWrapper();
+	virtual bool CreateMainUIWrapper_Implementation() = 0;
 
 	/**
 	 * Returns the inventory UI.
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	UUserWidget* GetInventoryUIWrapper() const;
-	virtual UUserWidget* GetInventoryUIWrapper_Implementation() const = 0;
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	UUserWidget* GetMainUIWrapper() const;
+	virtual UUserWidget* GetMainUIWrapper_Implementation() const = 0;
 
 	/**
 	 * Removes the inventory UI.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	void RemoveInventoryUIWrapper();
-	virtual void RemoveInventoryUIWrapper_Implementation() = 0;
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	void RemoveMainUIWrapper();
+	virtual void RemoveMainUIWrapper_Implementation() = 0;
 
-	/**
-	 * Sets the visibility of the inventory UI.
-	 * @param bShowInventory The new visibility state of the UI.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
-	void SetInventoryUIWrapperVisibility(const bool bShowInventory);
-	virtual void SetInventoryUIWrapperVisibility_Implementation(const bool bShowInventory) = 0;
 
 	// --- Notification  ------------------------------
 
@@ -106,7 +99,7 @@ public:
 	 * Retrieves the notification container widget.
 	 * @return A pointer to the notification container widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
 	UUserWidget* GetNotificationContainer() const;
 	virtual UUserWidget* GetNotificationContainer_Implementation() const = 0;
 
@@ -114,7 +107,7 @@ public:
 	 * Sets the notification container widget.
 	 * @param NewNotificationContainer - The new notification container widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
 	void SetNotificationContainer(UUserWidget* NewNotificationContainer);
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) = 0;
 
@@ -122,14 +115,14 @@ public:
 	 * Creates a new inventory notification.
 	 * @param NotificationData - The data defining the notification.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
 	void CreateInventoryNotification(const FInventoryNotificationData& NotificationData);
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;
 
 	/**
 	 * Removes all active inventory notifications.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
 	void RemoveInventoryNotifications();
 	virtual void RemoveInventoryNotifications_Implementation() = 0;
 
@@ -138,7 +131,7 @@ public:
 	/**
 	 * 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Category")
 	void CategorySelected(const FString& SelectedCategoryId);
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
 
@@ -146,7 +139,7 @@ public:
 	 * 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Category")
 	FString GetSelectedCategoryId() const;
 	virtual FString GetSelectedCategoryId_Implementation() const = 0;
 
@@ -156,7 +149,7 @@ public:
 	 * 
 	 * @param AddedItem 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ProcessItemAdded(const FInventoryItem& AddedItem);
 	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) = 0;
 
@@ -164,7 +157,7 @@ public:
 	 * 
 	 * @param RemovedItem 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ProcessItemRemoved(const FInventoryItem& RemovedItem);
 	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) = 0;
 
@@ -172,7 +165,7 @@ public:
 	 * 
 	 * @param ModifiedItem 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ProcessItemModified(const FInventoryItem& ModifiedItem);
 	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) = 0;
 	
@@ -180,7 +173,7 @@ public:
 	 * 
 	 * @param SelectedItem 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ItemSelected(const FGuid& SelectedItem);
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
 
@@ -188,7 +181,7 @@ public:
 	 * 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	FGuid GetActiveItemGuid() const;
 	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
 
@@ -200,7 +193,7 @@ public:
 	 *
 	 * @return A set of saved FMounteaInventoryGridSlot instances representing the current saved state of the inventory grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
 	TSet<FMounteaInventoryGridSlot> GetSavedSlots() const;
 	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const = 0;
 
@@ -211,7 +204,7 @@ public:
 	 * 
 	 * @param SlotData The data of the slot being added to the grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
 	void AddSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 
@@ -222,7 +215,7 @@ public:
 	 *
 	 * @param SlotData The data of the slot being removed from the grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
 	void RemoveSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 
@@ -233,7 +226,7 @@ public:
 	 *
 	 * @param SlotData A set of FMounteaInventoryGridSlot instances to be added to the grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
 	void AddSlots(const TSet<FMounteaInventoryGridSlot>& SlotData);
 	virtual void AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) = 0;
 
@@ -244,7 +237,7 @@ public:
 	 *
 	 * @param SlotData A set of FMounteaInventoryGridSlot instances to be removed from the grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
 	void RemoveSlots(const TSet<FMounteaInventoryGridSlot>& SlotData);
 	virtual void RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) = 0;
 
@@ -255,7 +248,7 @@ public:
 	 * 
 	 * @param SlotData The updated data of the grid slot to be modified.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI")
+	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
 	void UpdateSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 
