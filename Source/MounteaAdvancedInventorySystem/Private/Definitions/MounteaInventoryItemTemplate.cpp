@@ -24,7 +24,7 @@ UMounteaInventoryItemTemplate::UMounteaInventoryItemTemplate():
 	DurabilityToPriceCoefficient(0),
 	bHasPrice(false),
 	BasePrice(0),
-	SellPriceCoefficient(0),
+	SellPriceCoefficient(1.f),
 	bHasWeight(false),
 	Weight(0)
 {

@@ -148,6 +148,11 @@ FString UMounteaInventoryStatics::GetInventoryRarityKey(const FInventoryItem& It
 	return Item.Template->ItemCategory;
 }
 
+FText UMounteaInventoryStatics::GetInventoryItemName(const FInventoryItem& Item)
+{
+	return Item.GetItemName();
+}
+
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const FString& Type,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,
