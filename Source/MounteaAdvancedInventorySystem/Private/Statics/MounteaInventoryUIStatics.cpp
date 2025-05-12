@@ -614,6 +614,22 @@ void UMounteaInventoryUIStatics::SetActiveState(UUserWidget* Target, const bool 
 		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetActiveState(Target, bIsActive);
 }
 
+UUserWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	return (
+		IsValid(Target.GetObject()) )
+	? IMounteaAdvancedInventoryUIInterface::Execute_GetActiveItemWidget(Target.GetObject()) : nullptr;
+}
+
+void UMounteaInventoryUIStatics::SetActiveItemWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewActiveItemWidget)
+{
+	if (!IsValid(Target.GetObject())) return;
+
+	Target->Execute_SetActiveItemWidget(Target.GetObject(), NewActiveItemWidget);
+}
+
 void UMounteaInventoryUIStatics::SetInventoryItemId(UUserWidget* Target, const FGuid& ItemGuid)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
@@ -670,6 +686,11 @@ FMounteaInventoryGridSlot UMounteaInventoryUIStatics::GetGridSlotData(UUserWidge
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
 		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(Target);
 	return FMounteaInventoryGridSlot();
+}
+
+UUserWidget* UMounteaInventoryUIStatics::ItemSlot_GetItemWidgetInSlot(UUserWidget* Target)
+{
+	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) ? IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetItemWidgetInSlot(Target) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UUserWidget* Target,
