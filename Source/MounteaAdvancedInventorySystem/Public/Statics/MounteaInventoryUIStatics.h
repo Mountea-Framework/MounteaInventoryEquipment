@@ -107,7 +107,7 @@ public:
 	 * @return True if the main UI is open and visible in any form (Visible, HitTestInvisible, or SelfHitTestInvisible);
 	 *         False if it is collapsed, hidden, or the target is invalid.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Getter"))
 	static bool IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 	/**
@@ -115,7 +115,7 @@ public:
 	 * @param SourceData 
 	 * @param TargetData 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|GridSlots", meta=(CustomTag="MounteaK2Setter"))
 	static void SetGridSlotData(UPARAM(ref) FMounteaInventoryGridSlot& SourceData, const FMounteaInventoryGridSlot& TargetData);
 
 	/**
@@ -124,14 +124,14 @@ public:
 	 * @param ItemId 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item", meta=(CustomTag="MounteaK2Setter"))
 	static void StoreItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData, const FGuid& ItemId);
 
 	/**
 	 * 
 	 * @param SourceData 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item", meta=(CustomTag="MounteaK2Setter"))
 	static void ResetItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData);
 
 	/**
@@ -181,7 +181,7 @@ public:
 	 * @param bApplyCorner4 If true, applies the style to the bottom-right corner.
 	 * @return A new button style object with the modified properties based on the provided theme and corner options.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="2"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="2"))
 	static FButtonStyle ApplyButtonStyle(
 		const FButtonStyle& BaseBrush,
 		EMounteaThemeLevel Level,
@@ -198,7 +198,7 @@ public:
 	 * @param Level The theme level to determine the visual adjustments for the button style.
 	 * @return A new FButtonStyle object with customized normal, hovered, pressed, and disabled states, along with optional outline, padding, and sound settings.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"))
 	static FButtonStyle MakeButtonStyle(
 		const FButtonStyle& BaseBrush,
 		EMounteaThemeLevel Level
@@ -213,7 +213,7 @@ public:
 	 *              to determine which part of the scrollbar style to modify.
 	 * @return A modified FScrollBarStyle instance reflecting the provided theme level and state adjustments.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"))
 	static FScrollBarStyle MakeScrollBarStyle(
 		const FScrollBarStyle& SourceStyle,
 		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
@@ -227,7 +227,7 @@ public:
 	 * @param Level The theme level used for applying specific styling adjustments.
 	 * @return A modified copy of the original FScrollBarStyle with updated properties according to the chosen theme level.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"))
 	static FScrollBarStyle ApplyScrollBarStyle(
 		const FScrollBarStyle& SourceStyle,
 		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary
@@ -242,7 +242,7 @@ public:
 	 * @param Type Specifies the type of the theme (Text, Background, Default) which determines how the brush is modified.
 	 * @return A new FSlateBrush with updated values based on the provided theming parameters.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"))
 	static FSlateBrush MakeSlateBrush(
 		const FSlateBrush& SourceBrush,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
@@ -264,7 +264,7 @@ public:
 	 * @param bApplyCorner4 Whether or not to apply changes to Corner 4 of the brush.
 	 * @return A new FSlateBrush with the applied theme settings and optional corner modifications.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="4"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="4"))
 	static FSlateBrush ApplySlateBrush(
 		const FSlateBrush& SourceBrush,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
@@ -288,7 +288,7 @@ public:
 	 * @param bApplyCorner4 Whether to apply the configured border radius to the fourth corner.
 	 * @return A new FSlateBrushOutlineSettings instance with modified colors and corner radii.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
 	static FSlateBrushOutlineSettings MakeSlateBrushOutline(const FSlateBrushOutlineSettings& SourceOutline,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
 		EMounteaThemeState State = EMounteaThemeState::Normal,
@@ -313,7 +313,7 @@ public:
 	 *  @param bApplyCorner4 Determines whether the outline is applied to the fourth corner.
 	 *  @return A new FSlateBrush instance with the updated outline settings.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Styling", meta=(CustomTag="MounteaK2Getter"), meta=(AdvancedDisplay="3"))
 	static FSlateBrush ApplySlateBrushOutline(const FSlateBrush& SourceBrush,
 		EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
 		EMounteaThemeState State = EMounteaThemeState::Normal,
@@ -377,7 +377,7 @@ public:
 	 * Removes the inventory UI from the viewport and cleans up resources.
 	 * @param Target The UI interface to remove the inventory UI from
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
 	static void RemoveMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 #pragma endregion
@@ -390,7 +390,7 @@ public:
 	 * @param Target The UI interface to get the notification container from
 	 * @return A pointer to the user widget that serves as the notification container
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Getter"))
 	static UUserWidget* GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
@@ -398,7 +398,7 @@ public:
 	 * @param Target The UI interface to set the notification container for
 	 * @param NewNotificationContainer The user widget to use as the notification container
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewNotificationContainer);
 
 	/**
@@ -406,14 +406,14 @@ public:
 	 * @param Target The UI interface to create the notification in
 	 * @param NotificationData The data structure containing all notification parameters (text, duration, etc.)
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryNotificationData& NotificationData);
 
 	/**
 	 * Removes all currently active inventory notifications from the UI.
 	 * @param Target The UI interface to remove notifications from
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 #pragma endregion
@@ -425,7 +425,7 @@ public:
 	 * 
 	 * @param Target 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void RemoveInventoryWidgetWrapper(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target);
 
 	/**
@@ -434,7 +434,7 @@ public:
 	 * @param ParentInventory 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool SetSourceInventory(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 	
 	/**
@@ -442,7 +442,7 @@ public:
 	 * @param Target MounteaAdvancedInventoryUI Object
 	 * @param SelectedCategoryId 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FString& SelectedCategoryId);
 
 	/**
@@ -450,7 +450,7 @@ public:
 	 * @param Target 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
 	static FString GetSelectedCategoryId(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 	/**
@@ -458,7 +458,7 @@ public:
 	 * @param Target 
 	 * @param ItemGuid 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FGuid& ItemGuid);
 
 	/**
@@ -466,7 +466,7 @@ public:
 	 * @param Target 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
 	static FGuid GetSelectedItemGuid(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 #pragma endregion
@@ -478,7 +478,7 @@ public:
 	 * @param Target The UI interface to get the parent inventory from
 	 * @return The parent inventory interface that manages the items and slots
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
 	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
@@ -486,7 +486,7 @@ public:
 	 * @param Target The UI interface to set the parent inventory on
 	 * @param NewParentInventory The inventory interface to associate with this UI
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	
 	/**
@@ -494,7 +494,7 @@ public:
 	 * @param Target 
 	 * @param OwningInventoryUI 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void SetInventoryOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
 	
 #pragma endregion
