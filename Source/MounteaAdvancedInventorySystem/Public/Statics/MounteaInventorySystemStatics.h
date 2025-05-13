@@ -22,11 +22,30 @@ public:
 	/************************ INTERNAL ***********************/
 	/*************************************************************/
 	static bool CanExecuteCosmeticEvents(const UWorld* WorldContext);
+
+	/**
+	 * Retrieves the given object if it is of the specified class type.
+	 *
+	 * This function checks whether the provided `Object` is of the class type specified by `ClassFilter`.
+	 * If the `Object` is of the specified class or a subclass thereof, it returns the `Object` of the specified class and sets `bResult` to `true`.
+	 * Otherwise, it returns `nullptr` and sets `bResult` to `false`.
+	 *
+	 * @param Object		The object to check and potentially retrieve.
+	 * @param ClassFilter	The class type to check against. Only objects of this class or subclasses will be returned.
+	 * @param bResult		(Out) `true` if the object is of the specified class type; `false` otherwise.
+	 * @return					The casted `Object` if it is of the specified class type; otherwise, `nullptr`.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
+		meta = (ClassFilter = "Object"),
+		meta=(DeterminesOutputType = "ClassFilter"),
+		meta=(CustomTag="MounteaK2Getter"))
+	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 	
 	/*************************************************************/
 	/******************* BLUEPRINTABLE *******************/
 	/*************************************************************/
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
+		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettingsConfig* GetMounteaAdvancedInventoryConfig();
 
 	/**
@@ -37,7 +56,8 @@ public:
 	 * @param SourceText The original text where the replacement will occur.
 	 * @return The modified text with the replacements applied.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
+		meta=(CustomTag="MounteaK2Getter"))
 	static FText ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText);
 
 	/**
@@ -48,7 +68,8 @@ public:
 	 * @param SourceText The original string where the replacement will occur.
 	 * @return The modified string with the replacements applied.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
+		meta=(CustomTag="MounteaK2Getter"))
 	static FString ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText);
 
 	/**
@@ -57,7 +78,8 @@ public:
 	 * @param TagIndex 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags",
+		meta=(CustomTag="MounteaK2Getter"))
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
 	
 	template<typename TEnum>

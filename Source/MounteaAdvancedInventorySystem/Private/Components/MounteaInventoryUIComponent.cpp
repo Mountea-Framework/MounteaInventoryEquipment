@@ -172,7 +172,6 @@ void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UUserWidge
 {
 	if (ActiveItemWidget != NewActiveItemWidget)
 	{
-		if (ActiveItemWidget) ActiveItemWidget->SetFocus();
 		ActiveItemWidget = NewActiveItemWidget;
 		NewActiveItemWidget->SetFocus();
 	}
