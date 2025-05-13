@@ -662,6 +662,12 @@ void UMounteaInventoryUIStatics::Item_SetParentSlot(UUserWidget* Target, UUserWi
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetParentSlot(Target, ParentSlot);
 }
 
+void UMounteaInventoryUIStatics::Item_HighlightItem(UUserWidget* Target, const bool bIsSelected)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_HighlightItem(Target, bIsSelected);
+}
+
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Target,
 															  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {

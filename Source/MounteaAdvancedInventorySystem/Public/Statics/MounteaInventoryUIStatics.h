@@ -633,6 +633,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
 		meta=(CustomTag="MounteaK2Setter"), DisplayName="Set Parent Slot")
 	static void Item_SetParentSlot(UUserWidget* Target, UUserWidget* ParentSlot);
+
+	/**
+	 * Highlights or un-highlights an inventory item within the UI by interacting with the provided widget.
+	 *
+	 * @param Target The target widget that implements the UMounteaAdvancedInventoryItemWidgetInterface.
+	 * @param bIsSelected A boolean indicating whether to highlight (true) or un-highlight (false) the item.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+		meta=(CustomTag="MounteaK2Setter"), DisplayName="Highlight Item")
+	static void Item_HighlightItem(UUserWidget* Target, const bool bIsSelected = false);
 	
 #pragma endregion
 
