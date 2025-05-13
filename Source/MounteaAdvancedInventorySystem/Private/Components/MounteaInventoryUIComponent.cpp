@@ -4,16 +4,22 @@
 #include "Components/MounteaInventoryUIComponent.h"
 
 #include "Blueprint/UserWidget.h"
+
 #include "Definitions/MounteaInventoryBaseCommands.h"
+
 #include "Helpers/MounteaAdvancedInventoryWidgetPayload.h"
+
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryNotificationWidgetInterface.h"
+
 #include "Logs/MounteaAdvancedInventoryLog.h"
+
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+
 #include "Statics/MounteaInventorySystemStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
@@ -162,6 +168,15 @@ void UMounteaInventoryUIComponent::RemoveMainUIWrapper_Implementation()
 	}
 }
 
+void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget)
+{
+	if (ActiveItemWidget != NewActiveItemWidget)
+	{
+		ActiveItemWidget = NewActiveItemWidget;
+		NewActiveItemWidget->SetFocus();
+	}
+}
+
 UUserWidget* UMounteaInventoryUIComponent::GetNotificationContainer_Implementation() const
 {
 	return InventoryNotificationContainerWidget;
@@ -275,6 +290,8 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 {
 	if (ActiveCategoryId.Equals(SelectedCategoryId, ESearchCase::IgnoreCase)) return;
 	ActiveCategoryId = SelectedCategoryId;
+	ActiveItemGuid = FGuid();
+	ActiveItemWidget = nullptr;
 	
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{

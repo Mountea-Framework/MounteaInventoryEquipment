@@ -276,4 +276,5 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
 	TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem(const FGuid& ItemId) ;
 	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem_Implementation(const FGuid& ItemId)  = 0;
+	
 };

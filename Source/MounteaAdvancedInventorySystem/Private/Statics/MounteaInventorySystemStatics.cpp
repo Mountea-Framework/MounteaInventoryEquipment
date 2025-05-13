@@ -11,6 +11,19 @@ bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* Worl
 	return !UKismetSystemLibrary::IsDedicatedServer(WorldContext);
 }
 
+UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter,
+	bool& bResult)
+{
+	bResult = false;
+
+	if (ClassFilter == nullptr) return nullptr;
+	if (Object == nullptr) return nullptr;
+	if (!Object->IsA(ClassFilter)) return nullptr;
+
+	bResult = true;
+	return Object;
+}
+
 UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig()
 {
 	auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -19,8 +32,8 @@ UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMoun
 
 FText UMounteaInventorySystemStatics::ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText)
 {
-	FString SourceString = SourceText.ToString();
-	FRegexPattern RegexPattern(Regex);
+	const FString SourceString = SourceText.ToString();
+	const FRegexPattern RegexPattern(Regex);
 	FRegexMatcher RegexMatcher(RegexPattern, SourceString);
 
 	if (!RegexMatcher.FindNext()) 

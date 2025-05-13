@@ -37,6 +37,9 @@ public:
 	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) override;	
 	virtual UUserWidget* GetMainUIWrapper_Implementation() const override { return InventoryWidget; };
 	virtual void RemoveMainUIWrapper_Implementation() override;
+
+	virtual UUserWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
+	virtual void SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget) override;
 	
 	virtual UUserWidget* GetNotificationContainer_Implementation() const override;
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) override;

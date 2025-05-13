@@ -91,8 +91,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	void RemoveMainUIWrapper();
 	virtual void RemoveMainUIWrapper_Implementation() = 0;
-
-
+	
 	// --- Notification  ------------------------------
 
 	/**
@@ -143,7 +142,25 @@ public:
 	FString GetSelectedCategoryId() const;
 	virtual FString GetSelectedCategoryId_Implementation() const = 0;
 
-	// --- Items
+	/**
+	 * Retrieves the currently active item widget in the inventory UI.
+	 *
+	 * This function returns a pointer to the active item widget currently being displayed or interacted with.
+	 *
+	 * @return A pointer to the UUserWidget representing the active item widget, or nullptr if no widget is active.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Item")
+	UUserWidget* GetActiveItemWidget() const;
+	virtual UUserWidget* GetActiveItemWidget_Implementation() const = 0;
+
+	/**
+	 * Sets the active item widget in the UI.
+	 *
+	 * @param NewActiveItemWidget The new widget to be set as the active item widget.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Item")
+	void SetActiveItemWidget(UUserWidget* NewActiveItemWidget);
+	virtual void SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget) = 0;
 
 	/**
 	 * 

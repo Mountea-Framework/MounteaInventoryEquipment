@@ -273,6 +273,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static FString GetInventoryRarityKey(const FInventoryItem& Item);
+
+	/**
+	 * Retrieves the display name of the specified inventory item.
+	 * This name represents how the item is identified or labeled in the inventory system.
+	 *
+	 * @param Item - A reference to the inventory item for which the name is to be retrieved
+	 * @return - The display name of the specified inventory item as an FText object
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FText GetInventoryItemName(const FInventoryItem& Item);
 	
 	/*************************************************************/
 	/************************ INTERNAL ***********************/
