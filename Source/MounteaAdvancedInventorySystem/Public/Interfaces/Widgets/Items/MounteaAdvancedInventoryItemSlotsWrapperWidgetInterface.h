@@ -51,4 +51,23 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
 	void RemoveItem(const FGuid& ItemId, const int32 Quantity = -1);
 	virtual void RemoveItem_Implementation(const FGuid& ItemId, const int32 Quantity = -1) = 0;
+
+	/**
+	 * Retrieves the currently selected item widget.
+	 *
+	 * @return Returns a pointer to the selected UUserWidget instance.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UUserWidget* GetSelectedItemWidget() const;
+	virtual UUserWidget* GetSelectedItemWidget_Implementation() const = 0;
+
+	/**
+	 * Attempts to set Item Widget as Selected one.
+	 *
+	 * @param NewSelectedItemWidget The widget to set as the currently selected item widget.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void SetSelectedItemWidget(UUserWidget* NewSelectedItemWidget);
+	virtual void SetSelectedItemWidget_Implementation(UUserWidget* NewSelectedItemWidget) = 0;
+
 };

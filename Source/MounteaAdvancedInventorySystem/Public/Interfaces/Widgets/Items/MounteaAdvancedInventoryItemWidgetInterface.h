@@ -51,4 +51,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
 	void RefreshItemWidget(const int32 Quantity);
 	virtual void RefreshItemWidget_Implementation(const int32 Quantity) = 0;
+
+	/**
+	 *
+	 * @param ParentSlot The parent slot to be assigned to the inventory item widget.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void SetParentSlot(UUserWidget* ParentSlot);
+	virtual void SetParentSlot_Implementation(UUserWidget* ParentSlot) = 0;
 };

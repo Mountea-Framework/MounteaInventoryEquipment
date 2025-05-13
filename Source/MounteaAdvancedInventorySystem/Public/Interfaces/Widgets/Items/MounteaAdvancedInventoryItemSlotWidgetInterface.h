@@ -89,4 +89,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
 	UUserWidget* GetItemWidgetInSlot() const;
 	virtual UUserWidget* GetItemWidgetInSlot_Implementation() const = 0;
+
+	/**
+	 * Handles the logic for selecting an item in the corresponding inventory slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	void SelectItemInSlot();
+	virtual void SelectItemInSlot_Implementation() = 0;
 };
