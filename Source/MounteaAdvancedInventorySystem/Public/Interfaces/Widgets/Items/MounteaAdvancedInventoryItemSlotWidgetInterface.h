@@ -33,6 +33,15 @@ public:
 	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI) = 0;
 
 	/**
+	 * Sets the parent widget that contains the slot.
+	 *
+	 * @param ParentSlotsWrapper The parent widget that contains the slots.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	void SetParentSlotsWrapper(UUserWidget* ParentSlotsWrapper);
+	virtual void SetParentSlotsWrapper_Implementation(UUserWidget* ParentSlotsWrapper) = 0;
+
+	/**
 	 * Stores the grid slot data for inventory purposes.
 	 * This is optional information not all Slots need have (non-grid
 	 * based inventory layouts won't have any grid slot data).

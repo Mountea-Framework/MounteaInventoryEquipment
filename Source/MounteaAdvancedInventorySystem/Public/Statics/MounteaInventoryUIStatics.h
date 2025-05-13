@@ -631,7 +631,7 @@ public:
 	 * @param ParentSlot The parent slot to be assigned to the inventory item widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
-		meta=(CustomTag="MounteaK2Setter"), DisplayName="Refresh Item Widget")
+		meta=(CustomTag="MounteaK2Setter"), DisplayName="Set Parent Slot")
 	static void Item_SetParentSlot(UUserWidget* Target, UUserWidget* ParentSlot);
 	
 #pragma endregion
@@ -707,6 +707,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"), DisplayName="Select Item In Slot")
 	static void ItemSlot_SelectItemInSlot(UUserWidget* Target);
+
+	/**
+	 * Sets the parent widget that contains the slot.
+	 *
+	 * @param Target 
+	 * @param ParentSlotsWrapper The parent widget that contains the slots.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+		meta=(CustomTag="MounteaK2Setter"), DisplayName="Set Parent Slots Wrapper")
+	static void ItemSlot_SetParentSlotsWrapper(UUserWidget* Target, UUserWidget* ParentSlotsWrapper);
 	
 #pragma endregion
 

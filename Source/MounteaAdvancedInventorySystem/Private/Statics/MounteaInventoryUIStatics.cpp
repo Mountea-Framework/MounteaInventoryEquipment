@@ -706,6 +706,12 @@ void UMounteaInventoryUIStatics::ItemSlot_SelectItemInSlot(UUserWidget* Target)
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SelectItemInSlot(Target);
 }
 
+void UMounteaInventoryUIStatics::ItemSlot_SetParentSlotsWrapper(UUserWidget* Target, UUserWidget* ParentSlotsWrapper)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
+		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetParentSlotsWrapper(Target, ParentSlotsWrapper);
+}
+
 void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UUserWidget* Target,
 																	  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
