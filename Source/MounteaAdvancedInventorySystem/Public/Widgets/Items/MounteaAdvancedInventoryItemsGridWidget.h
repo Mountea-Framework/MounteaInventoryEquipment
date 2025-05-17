@@ -49,7 +49,4 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="Widget|Data")
 	TSet<FMounteaInventoryGridSlot> GridSlots;
-
-	UPROPERTY(BlueprintReadWrite, Category="Widget|Data")
-	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent;
 };

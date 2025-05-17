@@ -14,6 +14,7 @@
 #include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Interfaces/Widgets/BaseWidget/MounteaAdvancedBaseInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
@@ -551,6 +552,15 @@ FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrushOutline(const FSlateBrush
 	returnValue.OutlineSettings = MakeSlateBrushOutline(SourceBrush.OutlineSettings, Level, State, bApplyCorner1,
 														bApplyCorner2, bApplyCorner3, bApplyCorner4);
 	return returnValue;
+}
+
+void UMounteaInventoryUIStatics::SetOwningInventoryUI(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI)
+{
+	if (!IsValid(Target)) return;
+	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>()) return;
+
+	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::InitializeMainUIWidget(

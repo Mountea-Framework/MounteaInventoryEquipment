@@ -325,6 +325,20 @@ public:
 
 #pragma endregion
 
+	// --- Base Widget  ------------------------------
+#pragma region BaseWidget
+
+	/**
+	 * Sets the reference to the owning inventory UI interface.
+	 * This function allows the widget to be associated with a specific inventory UI.
+	 *
+	 * @param Target The UI interface to create the inventory UI for, must implement `IMounteaAdvancedBaseInventoryWidgetInterface`
+	 * @param NewOwningInventoryUI A TScriptInterface reference to the inventory UI interface that owns this widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Base", meta=(CustomTag="MounteaK2Setter"))
+	static void SetOwningInventoryUI(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
+	
+#pragma endregion
 	// --- Main UI  ------------------------------
 #pragma region MainUI
 
