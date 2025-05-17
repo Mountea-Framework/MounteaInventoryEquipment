@@ -3,10 +3,8 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
-#include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
-#include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"

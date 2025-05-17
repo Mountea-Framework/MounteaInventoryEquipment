@@ -3,7 +3,7 @@
 
 #include "Statics/MounteaInventoryNotificationsStatics.h"
 
-#include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
+#include "Interfaces/Widgets/Notification/MounteaInventoryNotificationContainerWidgetInterface.h"
 
 void UMounteaInventoryNotificationsStatics::CreateNotification(
 	UObject* Notification,	const FInventoryNotificationData& NotificationData, const TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface>& Container)

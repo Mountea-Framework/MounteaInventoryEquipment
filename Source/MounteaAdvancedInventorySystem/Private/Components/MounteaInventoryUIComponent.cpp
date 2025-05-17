@@ -12,8 +12,8 @@
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
-#include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
-#include "Interfaces/Widgets/MounteaInventoryNotificationWidgetInterface.h"
+#include "Interfaces/Widgets/Notification/MounteaInventoryNotificationContainerWidgetInterface.h"
+#include "Interfaces/Widgets/Notification/MounteaInventoryNotificationWidgetInterface.h"
 
 #include "Logs/MounteaAdvancedInventoryLog.h"
 
