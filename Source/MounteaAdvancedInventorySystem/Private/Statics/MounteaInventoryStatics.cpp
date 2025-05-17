@@ -151,6 +151,21 @@ FText UMounteaInventoryStatics::GetInventoryItemName(const FInventoryItem& Item)
 	return Item.GetItemName();
 }
 
+FText UMounteaInventoryStatics::GetInventoryItemShortInfo(const FInventoryItem& Item)
+{
+	return Item.GetItemShortInfo();
+}
+
+FText UMounteaInventoryStatics::GetInventoryItemLongInfo(const FInventoryItem& Item)
+{
+	return Item.GetItemLongInfo();
+}
+
+UTexture2D* UMounteaInventoryStatics::GetInventoryItemCover(const FInventoryItem& Item)
+{
+	return Item.GetCover();
+}
+
 bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 {
 	return Item.IsItemValid();

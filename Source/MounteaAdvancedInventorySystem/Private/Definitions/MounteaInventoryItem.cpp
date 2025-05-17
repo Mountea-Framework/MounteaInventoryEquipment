@@ -120,6 +120,21 @@ FText FInventoryItem::GetItemName() const
 	return IsValid(Template) ? Template->DisplayName : NSLOCTEXT("InventoryItem", "InvalidName", "Invalid");
 }
 
+FText FInventoryItem::GetItemShortInfo() const
+{
+	return IsValid(Template) ? Template->ItemShortInfo : NSLOCTEXT("InventoryItem", "InvalidShortInfo", "Invalid");
+}
+
+FText FInventoryItem::GetItemLongInfo() const
+{
+	return IsValid(Template) ? Template->ItemLongInfo : NSLOCTEXT("InventoryItem", "ItemLongInfo", "Invalid");
+}
+
+UTexture2D* FInventoryItem::GetCover() const
+{
+	return IsValid(Template) ? Template->ItemCover.LoadSynchronous() : nullptr;
+}
+
 bool FInventoryItem::SetTemplate(UMounteaInventoryItemTemplate* InTemplate)
 {
 	if (InTemplate != Template && IsValid(InTemplate))

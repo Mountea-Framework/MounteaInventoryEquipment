@@ -20,4 +20,5 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemPanelWidge
 	GENERATED_BODY()
 
 public:
+
 };
