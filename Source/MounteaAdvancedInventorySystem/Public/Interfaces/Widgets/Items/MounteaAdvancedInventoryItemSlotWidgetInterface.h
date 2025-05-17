@@ -25,14 +25,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemSlotWidget
 public:
 
 	/**
-	 * 
-	 * @param OwningInventoryUI 
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
-	void SetOwningInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
-	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI) = 0;
-
-	/**
 	 * Sets the parent widget that contains the slot.
 	 *
 	 * @param ParentSlotsWrapper The parent widget that contains the slots.

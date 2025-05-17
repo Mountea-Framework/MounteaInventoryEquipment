@@ -85,6 +85,7 @@ public:
 	/*************************************************************/
 	
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
+	static void SetOwningInventoryUIInternal(UUserWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
 	
 public:
 

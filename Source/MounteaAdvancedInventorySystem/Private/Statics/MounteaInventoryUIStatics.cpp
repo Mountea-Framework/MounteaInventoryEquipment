@@ -30,6 +30,46 @@
 
 #include "Statics/MounteaInventorySystemStatics.h"
 
+APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
+{
+	SearchDepth++;
+	if (SearchDepth >= 8)
+		return nullptr;
+	
+	if (APlayerController* playerController = Cast<APlayerController>(Actor))
+		return playerController;
+
+	if (APlayerState* playerState = Cast<APlayerState>(Actor))
+		return playerState->GetPlayerController();
+
+	if (APawn* actorPawn = Cast<APawn>(Actor))
+		return Cast<APlayerController>(actorPawn->GetController());
+	
+	if (AActor* ownerActor = Actor->GetOwner())
+		return FindPlayerController(ownerActor, SearchDepth);
+	
+	return nullptr;
+}
+
+void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI)
+{
+	if (!IsValid(Target))
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI. Reason: Target is null."));
+		return;
+	}
+
+	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>())
+	{
+		UE_LOG(LogTemp, Error, TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI for %s. Reason: Target does not implement IMounteaAdvancedBaseInventoryWidgetInterface."),
+			*Target->GetName());
+		return;
+	}
+
+	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
+}
+
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
@@ -117,15 +157,13 @@ FGuid UMounteaInventoryUIStatics::GetSelectedItemGuid(
 void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UUserWidget* Target,
 															   const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryWidgetInterface>())
-		IMounteaAdvancedInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::SetCategoriesWrapperOwningInventoryUI(UUserWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface>())
-		IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::SetActiveCategoryId(UUserWidget* Target, const FString& ActiveCategoryId)
@@ -138,27 +176,6 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UUserWidget* Target)
 {
 	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface>())
 		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryId(Target) : TEXT("none");
-}
-
-APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
-{
-	SearchDepth++;
-	if (SearchDepth >= 8)
-		return nullptr;
-	
-	if (APlayerController* playerController = Cast<APlayerController>(Actor))
-		return playerController;
-
-	if (APlayerState* playerState = Cast<APlayerState>(Actor))
-		return playerState->GetPlayerController();
-
-	if (APawn* actorPawn = Cast<APawn>(Actor))
-		return Cast<APlayerController>(actorPawn->GetController());
-	
-	if (AActor* ownerActor = Actor->GetOwner())
-		return FindPlayerController(ownerActor, SearchDepth);
-	
-	return nullptr;
 }
 
 bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
@@ -557,10 +574,7 @@ FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrushOutline(const FSlateBrush
 void UMounteaInventoryUIStatics::SetOwningInventoryUI(UUserWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI)
 {
-	if (!IsValid(Target)) return;
-	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>()) return;
-
-	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
+	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::InitializeMainUIWidget(
@@ -614,8 +628,7 @@ FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(UUserWidget* Target)
 void UMounteaInventoryUIStatics::SetCategoryOwningInventoryUI(UUserWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())
-		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::SetActiveState(UUserWidget* Target, const bool bIsActive)
@@ -656,8 +669,7 @@ FGuid UMounteaInventoryUIStatics::GetInventoryItemId(UUserWidget* Target)
 void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UUserWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
-		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::Item_RefreshWidget(UUserWidget* Target, const int32 Quantity)
@@ -681,8 +693,7 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UUserWidget* Target, const b
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UUserWidget* Target,
 															  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
-		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::ItemSlot_AddItemToSlot(UUserWidget* Target, const FGuid& ItemId)
@@ -731,8 +742,7 @@ void UMounteaInventoryUIStatics::ItemSlot_SetParentSlotsWrapper(UUserWidget* Tar
 void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UUserWidget* Target,
 																	  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
-		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_SetOwningInventoryUI(Target, OwningInventoryUI);
+	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::SlotsWrapper_AddItem(UUserWidget* Target, const FGuid& ItemId)
