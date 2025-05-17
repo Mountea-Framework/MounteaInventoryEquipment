@@ -153,6 +153,11 @@ FText UMounteaInventoryStatics::GetInventoryItemName(const FInventoryItem& Item)
 	return Item.GetItemName();
 }
 
+bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
+{
+	return Item.IsItemValid();
+}
+
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const FString& Type,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,

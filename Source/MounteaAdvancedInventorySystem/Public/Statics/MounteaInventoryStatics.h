@@ -9,8 +9,8 @@
 #include "MounteaInventoryStatics.generated.h"
 
 class UMounteaAdvancedInventorySettings;
-enum class EInventoryNotificationCategory : uint8;
 class UMounteaAdvancedInventorySettingsConfig;
+enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
 
 UCLASS()
@@ -283,6 +283,16 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static FText GetInventoryItemName(const FInventoryItem& Item);
+
+	/**
+	 * Determines whether the provided inventory item is valid.
+	 * Validity is based on the item's internal validation rules.
+	 *
+	 * @param Item - The inventory item to be evaluated for validity
+	 * @return - True if the inventory item is valid, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Validate"))
+	static bool IsInventoryItemValid(const FInventoryItem& Item);
 	
 	/*************************************************************/
 	/************************ INTERNAL ***********************/
