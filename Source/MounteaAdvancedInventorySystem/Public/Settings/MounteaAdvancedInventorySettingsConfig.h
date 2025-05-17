@@ -82,15 +82,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Settings", DisplayName="⚠ Always Stack Stackable Items")
 	uint8 bAlwaysStackStackableItems : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Wrapper", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
-	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryWidgetInterface"))
-	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Config", meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;
 
+	// --- User Interface: Main UI
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Wrapper", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemBaseWidgetInterface"))
+	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
+
+	// --- User Interface: Inventory
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
+	
 	// --- User Interface: Items
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface"))

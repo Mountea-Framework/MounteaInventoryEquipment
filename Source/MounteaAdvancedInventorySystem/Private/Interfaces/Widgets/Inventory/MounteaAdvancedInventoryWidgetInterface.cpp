@@ -4,4 +4,4 @@
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 
 
-// Add default functionality here for any IMounteaInventoryWidgetInterface functions that are not pure virtual.
+// Add default functionality here for any IMounteaAdvancedInventoryWidgetInterface functions that are not pure virtual.

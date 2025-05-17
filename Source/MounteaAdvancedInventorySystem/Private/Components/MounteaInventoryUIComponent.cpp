@@ -94,7 +94,7 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 	}
 	if (!widgetClass->ImplementsInterface(UMounteaInventorySystemBaseWidgetInterface::StaticClass()))
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI Class must implement `MounteaInventoryBaseWidgetInterface`!"))
+		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI Class must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
 	}
 
@@ -123,7 +123,7 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 	auto newWidget = CreateWidget<UUserWidget>(playerController, widgetClass);
 	if (!newWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>())
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI  must implement `MounteaInventoryBaseWidgetInterface`!"))
+		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI  must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
 	}
 
