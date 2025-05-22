@@ -5,6 +5,7 @@
 
 #include "Algo/Copy.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -557,6 +558,7 @@ FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
 	if (bApplyCorner4) Radius.W = config->BaseBorderRadius.W;
 
 	returnValue.CornerRadii = Radius;
+	returnValue.Width = config->BaseBorderWidth;
 
 	return returnValue;
 }
@@ -569,6 +571,142 @@ FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrushOutline(const FSlateBrush
 	returnValue.OutlineSettings = MakeSlateBrushOutline(SourceBrush.OutlineSettings, Level, State, bApplyCorner1,
 														bApplyCorner2, bApplyCorner3, bApplyCorner4);
 	return returnValue;
+}
+
+FSlateFontInfo UMounteaInventoryUIStatics::ApplySlateFontInfo(const FSlateFontInfo& SourceFont,
+	const EMounteaThemeLevel Level, const EMounteaThemeState State)
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return SourceFont;
+
+	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return SourceFont;
+
+	auto theme = config->BaseTheme.LoadSynchronous();
+	if (!IsValid(theme)) return SourceFont;
+
+	FSlateFontInfo returnValue = SourceFont;
+
+	float sizeMultiplier = 1.0f;
+	switch (Level)
+	{
+		case EMounteaThemeLevel::Primary:
+			sizeMultiplier = 1.0f;
+			break;
+		case EMounteaThemeLevel::Secondary:
+			sizeMultiplier = 0.9f;
+			break;
+		case EMounteaThemeLevel::Tertiary:
+			sizeMultiplier = 0.8f;
+			break;
+	}
+
+	switch (State)
+	{
+		case EMounteaThemeState::Normal:
+			break;
+		case EMounteaThemeState::Hovered:
+			sizeMultiplier *= 1.05f;
+			break;
+		case EMounteaThemeState::Active:
+			sizeMultiplier *= 1.1f;
+			break;
+		case EMounteaThemeState::Disabled:
+			sizeMultiplier *= 0.95f;
+			break;
+	}
+
+	returnValue.Size = FMath::RoundToInt(SourceFont.Size * sizeMultiplier);
+
+	if (State == EMounteaThemeState::Disabled)
+	{
+		returnValue.OutlineSettings.OutlineSize = 0;
+	}
+
+	return returnValue;
+}
+
+FTextBlockStyle UMounteaInventoryUIStatics::ApplyTextBlockStyle(const FTextBlockStyle& SourceStyle,
+	const EMounteaThemeLevel Level, const EMounteaThemeState State)
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return SourceStyle;
+
+	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return SourceStyle;
+
+	auto theme = config->BaseTheme.LoadSynchronous();
+	if (!IsValid(theme)) return SourceStyle;
+
+	FTextBlockStyle returnValue = SourceStyle;
+
+	FLinearColor textColor;
+	switch (Level)
+	{
+		case EMounteaThemeLevel::Primary:
+			textColor = theme->PrimaryText;
+			break;
+		case EMounteaThemeLevel::Secondary:
+			textColor = theme->SecondaryText;
+			break;
+		case EMounteaThemeLevel::Tertiary:
+			textColor = theme->TertiaryText;
+			break;
+		default:
+			textColor = theme->PrimaryText;
+			break;
+	}
+
+	switch (State)
+	{
+		case EMounteaThemeState::Normal:
+			break;
+		case EMounteaThemeState::Hovered:
+			textColor = FLinearColor(
+				FMath::Min(textColor.R * 1.1f, 1.0f),
+				FMath::Min(textColor.G * 1.1f, 1.0f),
+				FMath::Min(textColor.B * 1.1f, 1.0f),
+				textColor.A
+			);
+			break;
+		case EMounteaThemeState::Active:
+			textColor = theme->Accent;
+			break;
+		case EMounteaThemeState::Disabled:
+			textColor = FLinearColor(textColor.R, textColor.G, textColor.B, textColor.A * 0.5f);
+			break;
+	}
+
+	returnValue.ColorAndOpacity = textColor;
+
+	returnValue.ShadowOffset = FVector2D(1.0f, 1.0f);
+	returnValue.ShadowColorAndOpacity = FLinearColor(0.0f, 0.0f, 0.0f, 0.3f);
+
+	return returnValue;
+}
+
+void UMounteaInventoryUIStatics::ApplyTextBlockTheme(UTextBlock* TextBlock, const EMounteaThemeLevel Level,
+	const EMounteaThemeState State)
+{
+	if (!IsValid(TextBlock))
+	{
+		LOG_WARNING(TEXT("[ApplyTextBlockTheme] Invalid TextBlock provided!"))
+		return;
+	}
+	
+	FSlateFontInfo currentFont = TextBlock->GetFont();
+	FSlateFontInfo themedFont = ApplySlateFontInfo(currentFont, Level, State);
+	TextBlock->SetFont(themedFont);
+
+	FTextBlockStyle currentStyle;
+	currentStyle.ColorAndOpacity = TextBlock->GetColorAndOpacity();
+	currentStyle.ShadowOffset = TextBlock->GetShadowOffset();
+	currentStyle.ShadowColorAndOpacity = TextBlock->GetShadowColorAndOpacity();
+	
+	FTextBlockStyle themedStyle = ApplyTextBlockStyle(currentStyle, Level, State);
+	TextBlock->SetColorAndOpacity(themedStyle.ColorAndOpacity);
+	TextBlock->SetShadowOffset(themedStyle.ShadowOffset);
+	TextBlock->SetShadowColorAndOpacity(themedStyle.ShadowColorAndOpacity);
 }
 
 void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)

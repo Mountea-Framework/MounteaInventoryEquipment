@@ -9,6 +9,7 @@
 #include "MounteaInventoryUIStatics.generated.h"
 
 class UWidget;
+class UTextBlock;
 class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
 struct FMounteaInventoryGridSlot;
@@ -323,6 +324,50 @@ public:
 		const bool bApplyCorner2 = true,
 		const bool bApplyCorner3 = true,
 		const bool bApplyCorner4 = true
+	);
+
+	/**
+	 * Applies theme styling to a font info object.
+	 *
+	 * @param SourceFont The original FSlateFontInfo to be themed.
+	 * @param Level The theme level to apply.
+	 * @param State The theme state to apply.
+	 * @return A new FSlateFontInfo with applied theme styling.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FSlateFontInfo ApplySlateFontInfo(
+		const FSlateFontInfo& SourceFont,
+		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		const EMounteaThemeState State = EMounteaThemeState::Normal
+	);
+
+	/**
+	 * Applies theme styling to a text block style object.
+	 *
+	 * @param SourceStyle The original FTextBlockStyle to be themed.
+	 * @param Level The theme level to apply.
+	 * @param State The theme state to apply.
+	 * @return A new FTextBlockStyle with applied theme colors and styling.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Getter"))
+	static FTextBlockStyle ApplyTextBlockStyle(
+		const FTextBlockStyle& SourceStyle,
+		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		const EMounteaThemeState State = EMounteaThemeState::Normal
+	);
+
+	/**
+	 * Applies theme styling directly to a UTextBlock widget.
+	 *
+	 * @param TextBlock The text block widget to apply theming to.
+	 * @param Level The theme level to apply.
+	 * @param State The theme state to apply.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI", meta=(CustomTag="MounteaK2Setter"))
+	static void ApplyTextBlockTheme(
+		UTextBlock* TextBlock,
+		const EMounteaThemeLevel Level = EMounteaThemeLevel::Primary,
+		const EMounteaThemeState State = EMounteaThemeState::Normal
 	);
 
 #pragma endregion

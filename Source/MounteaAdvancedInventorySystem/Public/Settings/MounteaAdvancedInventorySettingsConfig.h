@@ -59,6 +59,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Theme", meta=(UIMin=0.f,ClampMin=0.f))
 	FVector4 BaseBorderRadius = FVector4(6.f);
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Visual", meta=(UIMin=0.f,ClampMin=0.f))
+	float BaseBorderWidth = 1.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Visual")
 	float ItemSlotPadding = 5.f;
 	
