@@ -1,10 +1,12 @@
 ﻿// All rights reserved Dominik Morse 2024
 
 #include "Actors/ItemPreview/MounteaAdvancedInventoryItemPreviewRenderer.h"
+#include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Components/SceneCaptureComponent2D.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/SkeletalMesh.h"
@@ -14,50 +16,64 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	PrimaryActorTick.bCanEverTick = false;
 
 	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootScene"));
-	RootComponent = RootSceneComponent;
+	RootComponent	  = RootSceneComponent;
 
-	PreviewPivotSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
-	PreviewPivotSceneComponent->SetupAttachment(RootComponent);
+	PreviewPivotComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
+	PreviewPivotComponent->SetupAttachment(RootComponent);
+
+	EmissionDomeComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EmissionDome"));
+	EmissionDomeComponent->SetupAttachment(RootComponent);
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMeshComponent->SetupAttachment(PreviewPivotSceneComponent);
-	StaticMeshComponent->SetVisibility(false);
+	StaticMeshComponent->SetupAttachment(PreviewPivotComponent);
+	StaticMeshComponent->SetVisibility(false);	
+	StaticMeshComponent->bVisibleInRayTracing = false;
+	StaticMeshComponent->bVisibleInRealTimeSkyCaptures = false;
+	StaticMeshComponent->bVisibleInReflectionCaptures = false;
+	StaticMeshComponent->bUseAsOccluder = false;
+	StaticMeshComponent->bVisibleInSceneCaptureOnly = true;
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	SkeletalMeshComponent->SetupAttachment(PreviewPivotSceneComponent);
+	SkeletalMeshComponent->SetupAttachment(PreviewPivotComponent);
 	SkeletalMeshComponent->SetVisibility(false);
+	SkeletalMeshComponent->bVisibleInRayTracing = false;
+	SkeletalMeshComponent->bVisibleInRealTimeSkyCaptures = false;
+	SkeletalMeshComponent->bVisibleInReflectionCaptures = false;
+	SkeletalMeshComponent->bVisibleInSceneCaptureOnly = true;
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArmComponent->SetupAttachment(RootComponent);
-	SpringArmComponent->TargetArmLength = 200.0f;
+	SpringArmComponent->SetupAttachment(RootSceneComponent);
+	SpringArmComponent->TargetArmLength  = 300;
+	SpringArmComponent->bEnableCameraLag = false;
 	SpringArmComponent->bDoCollisionTest = false;
-	SpringArmComponent->SetRelativeRotation(FRotator(-20.0f, 45.0f, 0.0f));
+	SpringArmComponent->SetRelativeRotation(FRotator(0, 0, 0.0f));
+	SpringArmComponent->SetRelativeLocation(FVector(0, 0, 90));
 
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCaptureComponent->SetupAttachment(SpringArmComponent);
-	SceneCaptureComponent->CaptureSource = SCS_FinalColorLDR;
-	SceneCaptureComponent->ProjectionType = ECameraProjectionMode::Perspective;
-	SceneCaptureComponent->FOVAngle = 45.0f;
+	SceneCaptureComponent->CaptureSource	  = SCS_FinalColorLDR;
+	SceneCaptureComponent->ProjectionType	 = ECameraProjectionMode::Perspective;
+	SceneCaptureComponent->FOVAngle		   = 45.0f;
 	SceneCaptureComponent->bCaptureEveryFrame = true;
 	SceneCaptureComponent->bCaptureOnMovement = true;
 	SceneCaptureComponent->ShowOnlyActors.Add(this);
-
-	RenderTarget = nullptr;
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	AutoFitMeshInView();
+	SetCameraRotation(0, 0);
+	SetCameraDistance(300.f);
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRenderTarget)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRT)
 {
-	RenderTarget = NewRenderTarget;
+	RenderTarget = NewRT;
 	if (SceneCaptureComponent)
 	{
-		SceneCaptureComponent->TextureTarget = NewRenderTarget;
-		SceneCaptureComponent->ShowOnlyActors.Empty();
-		SceneCaptureComponent->ShowOnlyActors.Add(this);
+		SceneCaptureComponent->TextureTarget = NewRT;
 		SceneCaptureComponent->CaptureScene();
 	}
 }
@@ -65,7 +81,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRende
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh)
 {
 	ClearMesh();
-	if (StaticMeshComponent && Mesh)
+	if (Mesh)
 	{
 		StaticMeshComponent->SetStaticMesh(Mesh);
 		StaticMeshComponent->SetVisibility(true);
@@ -76,7 +92,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Me
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh)
 {
 	ClearMesh();
-	if (SkeletalMeshComponent && Mesh)
+	if (Mesh)
 	{
 		SkeletalMeshComponent->SetSkeletalMesh(Mesh);
 		SkeletalMeshComponent->SetVisibility(true);
@@ -84,60 +100,43 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float Yaw, float Pitch) const
+void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh()
 {
-	Pitch = FMath::Clamp(Pitch, -80.0f, 80.0f);
-	PreviewPivotSceneComponent->SetRelativeRotation(FRotator(Pitch, Yaw, 0.0f));
+	StaticMeshComponent->SetStaticMesh(nullptr);
+	StaticMeshComponent->SetVisibility(false);
+	SkeletalMeshComponent->SetSkeletalMesh(nullptr);
+	SkeletalMeshComponent->SetVisibility(false);
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(float Distance) const
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(float Yaw, float Pitch)
 {
-	Distance = FMath::Clamp(Distance, 50.0f, 1000.0f);
-	if (SpringArmComponent)
-	{
-		SpringArmComponent->TargetArmLength = Distance;
-	}
+	float clampedPitch = FMath::Clamp(Pitch, -80.0f, 80.0f);
+	SpringArmComponent->SetRelativeRotation(FRotator(clampedPitch, Yaw, 0.0f));
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh() const
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(float Distance)
 {
-	if (StaticMeshComponent)
-	{
-		StaticMeshComponent->SetStaticMesh(nullptr);
-		StaticMeshComponent->SetVisibility(false);
-	}
-	if (SkeletalMeshComponent)
-	{
-		SkeletalMeshComponent->SetSkeletalMesh(nullptr);
-		SkeletalMeshComponent->SetVisibility(false);
-	}
+	float clampedDistance = FMath::Clamp(Distance, 50.0f, 1000.0f);
+	SpringArmComponent->TargetArmLength = clampedDistance;
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView() const
+void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView()
 {
-	UPrimitiveComponent* activeMesh = GetActiveMeshComponent();
-	if (!activeMesh) return;
+	UPrimitiveComponent* activeComp = GetActiveMeshComponent();
+	if (!activeComp)
+		return;
+	auto localBounds = activeComp->GetLocalBounds();
 
-	auto localBounds = activeMesh->GetLocalBounds();
-
-	float maxExtend = FMath::Max3(localBounds.BoxExtent.X, localBounds.BoxExtent.Y, localBounds.BoxExtent.Z);
-	float optimalDistance = maxExtend * 2.5f;
-	SpringArmComponent->TargetArmLength = FMath::Clamp(optimalDistance, 100.0f, 800.0f);
+	float maxExtent	   = FMath::Max3(localBounds.BoxExtent.X, localBounds.BoxExtent.Y, localBounds.BoxExtent.Z);
+	float desiredDistance = maxExtent * 2.5f;
+	SpringArmComponent->TargetArmLength = FMath::Clamp(desiredDistance, 100.0f, 800.0f);
 }
 
 UPrimitiveComponent* AMounteaAdvancedInventoryItemPreviewRenderer::GetActiveMeshComponent() const
 {
-	if (StaticMeshComponent && StaticMeshComponent->IsVisible())
+	if (StaticMeshComponent->IsVisible())
 		return StaticMeshComponent;
-	if (SkeletalMeshComponent && SkeletalMeshComponent->IsVisible())
+	if (SkeletalMeshComponent->IsVisible())
 		return SkeletalMeshComponent;
 	return nullptr;
 }
-
-#if WITH_EDITOR
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetPreviewMesh()
-{
-	if (UPrimitiveComponent* activeMesh = GetActiveMeshComponent())
-		activeMesh->SetVisibility(true);
-}
-#endif

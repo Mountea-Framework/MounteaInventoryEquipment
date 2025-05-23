@@ -6,25 +6,20 @@
 #include "GameFramework/Actor.h"
 #include "MounteaAdvancedInventoryItemPreviewRenderer.generated.h"
 
-class USpringArmComponent;
+class USceneComponent;
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
+class USpringArmComponent;
+class UCameraComponent;
 class USceneCaptureComponent2D;
-class USceneComponent;
 class UTextureRenderTarget2D;
 class UStaticMesh;
 class USkeletalMesh;
 
 /**
- * Represents a preview renderer for advanced inventory items.
- *
- * This actor is designed to render both static and skeletal meshes for preview purposes,
- * with customization options such as dynamic mesh updates, camera distance, and rotation adjustments.
- * It provides functionality to handle mesh clearing and ensures the previewed items fit within the
- * defined view by automatically adjusting the camera if required.
+ * Renders a single mesh into a render target for UI preview.
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"),
-	   HideCategories=("Cooking"), meta=(DisplayName="Mountea Item Renderer"))
+UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API AMounteaAdvancedInventoryItemPreviewRenderer : public AActor
 {
 	GENERATED_BODY()
@@ -32,89 +27,66 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API AMounteaAdvancedInventoryItemPreviewRen
 public:
 	AMounteaAdvancedInventoryItemPreviewRenderer();
 
+	/** Assign the render target for capturing. */
+	UFUNCTION(BlueprintCallable, Category="Item Preview")
+	void SetRenderTarget(UTextureRenderTarget2D* NewRT);
+
+	/** Display a static mesh. */
+	UFUNCTION(BlueprintCallable, Category="Item Preview")
+	void SetStaticMesh(UStaticMesh* Mesh);
+
+	/** Display a skeletal mesh. */
+	UFUNCTION(BlueprintCallable, Category="Item Preview")
+	void SetSkeletalMesh(USkeletalMesh* Mesh);
+
+	/** Clear any displayed mesh. */
+	UFUNCTION(BlueprintCallable, Category="Item Preview")
+	void ClearMesh();
+
+	/** Rotate the preview camera. */
+	UFUNCTION(BlueprintCallable, Category="Item Preview")
+	void SetCameraRotation(float Yaw, float Pitch);
+
+	/** Zoom the preview camera. */
+	UFUNCTION(BlueprintCallable, Category="Item Preview")
+	void SetCameraDistance(float Distance);
+
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	/**
-	 * Assigns a render target to the preview renderer for capturing rendered output.
-	 *
-	 * @param NewRenderTarget A pointer to a UTextureRenderTarget2D to be used for rendering.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item Renderer")
-	void SetRenderTarget(UTextureRenderTarget2D* NewRenderTarget);
+	/** Scene root. */
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<USceneComponent> RootSceneComponent;
 
-	/**
-	 * Sets a new static mesh for the preview renderer.
-	 *
-	 * @param Mesh A pointer to the UStaticMesh to be set for rendering. Pass nullptr to clear.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item Renderer")
-	void SetStaticMesh(UStaticMesh* Mesh);
+	/** Pivot for mesh rotation. */
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<USceneComponent> PreviewPivotComponent;
 
-	/**
-	 * Sets a new skeletal mesh for the preview renderer.
-	 *
-	 * @param Mesh A pointer to the USkeletalMesh to be set for rendering. Pass nullptr to clear.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item Renderer")
-	void SetSkeletalMesh(USkeletalMesh* Mesh);
+	/** Component that should be used to generate lightning for this actor. */
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UStaticMeshComponent> EmissionDomeComponent;
 
-	/**
-	 * Updates the camera's rotation in the preview renderer.
-	 *
-	 * @param Yaw Rotation around the vertical axis, in degrees.
-	 * @param Pitch Rotation around the horizontal axis, clamped between -80.0f and 80.0f.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item Renderer")
-	void SetCameraRotation(float Yaw, float Pitch) const;
+	/** Holds a static mesh. */
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-	/**
-	 * Adjusts the distance of the camera from the previewed item.
-	 *
-	 * @param Distance The desired distance, in units (clamped between 50.0f and 1000.0f).
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item Renderer")
-	void SetCameraDistance(float Distance) const;
+	/** Holds a skeletal mesh. */
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
-	/**
-	 * Clears the current mesh from the preview renderer.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Item Renderer")
-	void ClearMesh() const;
+	/** Arm to position the camera. */
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
-#if WITH_EDITOR
-	UFUNCTION(BlueprintCallable, CallInEditor, Category="Preview")
-	void SetPreviewMesh();
+	/** Scene capture that writes into the RT. */
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
 
-	UFUNCTION(BlueprintCallable, CallInEditor, Category="Preview")
-	FORCEINLINE void ClearPreviewMesh() { ClearMesh(); };
-#endif
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Components")
-	USceneComponent* RootSceneComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Components")
-	USceneComponent* PreviewPivotSceneComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Components")
-	UStaticMeshComponent* StaticMeshComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Components")
-	USkeletalMeshComponent* SkeletalMeshComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Components")
-	USpringArmComponent* SpringArmComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Components")
-	USceneCaptureComponent2D* SceneCaptureComponent;
-
-	/** The render target where the scene capture will output the preview image. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Rendering")
-	UTextureRenderTarget2D* RenderTarget;
+	/** The render target to capture into. */
+	UPROPERTY(EditAnywhere, Category="Rendering")
+	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 
 private:
-	void AutoFitMeshInView() const;
+	void AutoFitMeshInView();
 	UPrimitiveComponent* GetActiveMeshComponent() const;
 };
