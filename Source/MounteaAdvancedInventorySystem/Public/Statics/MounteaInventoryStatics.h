@@ -61,6 +61,18 @@ public:
 	static UMounteaAdvancedInventorySettings* GetInventorySettings();
 
 	/**
+	 * Retrieves the advanced configuration settings for the Mountea Inventory System.
+	 * Facilitates access to inventory-specific configurations like inventory types, rarities, and categories.
+	 *
+	 * @return - A pointer to the Mountea Advanced Inventory Settings configuration object
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventorySettingsConfig* GetInventorySettingsConfig();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static UPrimaryDataAsset* GetTemplateConfig(const FString& Key);
+
+	/**
 	 * Creates a new inventory item associated with the given unique identifier.
 	 * This item is NOT valid item! This is to simplify searching for item related data!
 	 * 

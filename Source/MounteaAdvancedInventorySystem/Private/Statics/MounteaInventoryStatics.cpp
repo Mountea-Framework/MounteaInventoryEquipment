@@ -14,6 +14,21 @@ UMounteaAdvancedInventorySettings* UMounteaInventoryStatics::GetInventorySetting
 	return GetMutableDefault<UMounteaAdvancedInventorySettings>();
 }
 
+UMounteaAdvancedInventorySettingsConfig* UMounteaInventoryStatics::GetInventorySettingsConfig()
+{
+	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!settings) return nullptr;
+	return settings->InventorySettingsConfig.LoadSynchronous();
+}
+
+UPrimaryDataAsset* UMounteaInventoryStatics::GetTemplateConfig(const FString& Key)
+{
+	const auto config = GetInventorySettingsConfig();
+	if (!config) return nullptr;
+	const auto templateConfig = config->TemplatesConfig.Find(Key);
+	return templateConfig ? templateConfig->LoadSynchronous() : nullptr;
+}
+
 FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
 {
 	return FInventoryItem(ItemGuid);

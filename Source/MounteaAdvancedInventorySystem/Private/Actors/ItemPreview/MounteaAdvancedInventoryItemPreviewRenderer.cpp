@@ -1,54 +1,71 @@
 ﻿// All rights reserved Dominik Morse 2024
 
-
 #include "Actors/ItemPreview/MounteaAdvancedInventoryItemPreviewRenderer.h"
-
+#include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Engine/TextureRenderTarget2D.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/SkeletalMesh.h"
 
 AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPreviewRenderer()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	// Create root component
 	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootScene"));
 	RootComponent = RootSceneComponent;
 
-	// Create mesh components
+	PreviewPivotSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
+	PreviewPivotSceneComponent->SetupAttachment(RootComponent);
+
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMeshComponent->SetupAttachment(RootComponent);
+	StaticMeshComponent->SetupAttachment(PreviewPivotSceneComponent);
 	StaticMeshComponent->SetVisibility(false);
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	SkeletalMeshComponent->SetupAttachment(RootComponent);
+	SkeletalMeshComponent->SetupAttachment(PreviewPivotSceneComponent);
 	SkeletalMeshComponent->SetVisibility(false);
 
-	// Create spring arm for camera positioning
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->TargetArmLength = 200.0f;
 	SpringArmComponent->bDoCollisionTest = false;
 	SpringArmComponent->SetRelativeRotation(FRotator(-20.0f, 45.0f, 0.0f));
 
-	// Create scene capture component
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCaptureComponent->SetupAttachment(SpringArmComponent);
 	SceneCaptureComponent->CaptureSource = SCS_FinalColorLDR;
 	SceneCaptureComponent->ProjectionType = ECameraProjectionMode::Perspective;
 	SceneCaptureComponent->FOVAngle = 45.0f;
+	SceneCaptureComponent->bCaptureEveryFrame = true;
+	SceneCaptureComponent->bCaptureOnMovement = true;
+	SceneCaptureComponent->ShowOnlyActors.Add(this);
+
+	RenderTarget = nullptr;
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+}
+
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRenderTarget)
+{
+	RenderTarget = NewRenderTarget;
+	if (SceneCaptureComponent)
+	{
+		SceneCaptureComponent->TextureTarget = NewRenderTarget;
+		SceneCaptureComponent->ShowOnlyActors.Empty();
+		SceneCaptureComponent->ShowOnlyActors.Add(this);
+		SceneCaptureComponent->CaptureScene();
+	}
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh)
 {
 	ClearMesh();
-    
-	if (Mesh)
+	if (StaticMeshComponent && Mesh)
 	{
 		StaticMeshComponent->SetStaticMesh(Mesh);
 		StaticMeshComponent->SetVisibility(true);
@@ -59,8 +76,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Me
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh)
 {
 	ClearMesh();
-    
-	if (Mesh)
+	if (SkeletalMeshComponent && Mesh)
 	{
 		SkeletalMeshComponent->SetSkeletalMesh(Mesh);
 		SkeletalMeshComponent->SetVisibility(true);
@@ -68,60 +84,60 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(float Yaw, float Pitch)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float Yaw, float Pitch) const
 {
 	Pitch = FMath::Clamp(Pitch, -80.0f, 80.0f);
-	SpringArmComponent->SetRelativeRotation(FRotator(Pitch, Yaw, 0.0f));
+	PreviewPivotSceneComponent->SetRelativeRotation(FRotator(Pitch, Yaw, 0.0f));
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(float Distance)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(float Distance) const
 {
 	Distance = FMath::Clamp(Distance, 50.0f, 1000.0f);
-	SpringArmComponent->TargetArmLength = Distance;
+	if (SpringArmComponent)
+	{
+		SpringArmComponent->TargetArmLength = Distance;
+	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh()
+void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh() const
 {
-	StaticMeshComponent->SetStaticMesh(nullptr);
-	StaticMeshComponent->SetVisibility(false);
-    
-	SkeletalMeshComponent->SetSkeletalMesh(nullptr);
-	SkeletalMeshComponent->SetVisibility(false);
+	if (StaticMeshComponent)
+	{
+		StaticMeshComponent->SetStaticMesh(nullptr);
+		StaticMeshComponent->SetVisibility(false);
+	}
+	if (SkeletalMeshComponent)
+	{
+		SkeletalMeshComponent->SetSkeletalMesh(nullptr);
+		SkeletalMeshComponent->SetVisibility(false);
+	}
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView() const
 {
 	UPrimitiveComponent* activeMesh = GetActiveMeshComponent();
-	if (!activeMesh)
-		return;
+	if (!activeMesh) return;
 
-	const auto meshBounds = activeMesh->GetLocalBounds();
-    
-	float maxExtend = FMath::Max3(meshBounds.BoxExtent.X, meshBounds.BoxExtent.Y, meshBounds.BoxExtent.Z);
+	auto localBounds = activeMesh->GetLocalBounds();
+
+	float maxExtend = FMath::Max3(localBounds.BoxExtent.X, localBounds.BoxExtent.Y, localBounds.BoxExtent.Z);
 	float optimalDistance = maxExtend * 2.5f;
-    
 	SpringArmComponent->TargetArmLength = FMath::Clamp(optimalDistance, 100.0f, 800.0f);
 }
 
 UPrimitiveComponent* AMounteaAdvancedInventoryItemPreviewRenderer::GetActiveMeshComponent() const
 {
-	if (StaticMeshComponent->IsVisible())
+	if (StaticMeshComponent && StaticMeshComponent->IsVisible())
 		return StaticMeshComponent;
-	else if (SkeletalMeshComponent->IsVisible())
+	if (SkeletalMeshComponent && SkeletalMeshComponent->IsVisible())
 		return SkeletalMeshComponent;
-    
 	return nullptr;
 }
 
 #if WITH_EDITOR
-
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetPreviewMesh()
 {
-	auto activeMesh = GetActiveMeshComponent();
-	if (!activeMesh)
-		return;
-	
-	activeMesh->SetVisibility(true);
+	if (UPrimitiveComponent* activeMesh = GetActiveMeshComponent())
+		activeMesh->SetVisibility(true);
 }
-
 #endif
