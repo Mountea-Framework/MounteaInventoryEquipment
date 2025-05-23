@@ -51,6 +51,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="♾ Limits", meta=(NoResetToDefault))
 	float InventoryBaseWeightLimit = 150.f;
 
+	// --- Templates ------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🏗 Templates", meta=(NoResetToDefault))
+	TMap<FString,TSoftObjectPtr<UPrimaryDataAsset>> TemplatesConfig;
+
 	// --- User Interface ------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Theme")
