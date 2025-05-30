@@ -16,9 +16,8 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
 	Super::NativeConstruct();	
 }
 
-void UMounteaAdvancedInventoryInteractableObjectWidget::NativeDestruct()
+void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()
 {
-	Super::NativeDestruct();
 	if( PreviewScene && RendererActor )
 	{
 		PreviewScene->GetWorld()->DestroyActor( RendererActor );
@@ -27,21 +26,35 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::NativeDestruct()
 	PreviewScene.Reset();
 }
 
+void UMounteaAdvancedInventoryInteractableObjectWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
+	CleanUpPreviewScene();
+}
+
 bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWidget()
 {
-	PreviewScene = MakeUnique<FPreviewScene>( FPreviewScene::ConstructionValues() );
-	UWorld* PreviewWorld = PreviewScene->GetWorld();
-	RendererActor = PreviewWorld->SpawnActor<AMounteaAdvancedInventoryItemPreviewRenderer>(RendererActorClass);
-	if (!IsValid(RendererActor)) return false;
-
 	auto templateConfig = UMounteaInventoryStatics::GetTemplateConfig(TEXT("InteractivePreview"));
 	if (!templateConfig) return false;
 
 	auto interactiveConfig = Cast<UMounteaAdvancedInventoryInteractiveWidgetConfig>(templateConfig);
 	if (!interactiveConfig) return false;
 
+	RendererActorClass = interactiveConfig->RendererActor.LoadSynchronous();
+	if (!RendererActorClass)
+		RendererActorClass = AMounteaAdvancedInventoryItemPreviewRenderer::StaticClass();
+
 	PreviewRenderTarget = interactiveConfig->DefaultRenderTarget.LoadSynchronous();
 	if (!PreviewRenderTarget) return false;
+	
+	PreviewScene = MakeUnique<FPreviewScene>( FPreviewScene::ConstructionValues() );
+	UWorld* PreviewWorld = PreviewScene->GetWorld();
+	RendererActor = PreviewWorld->SpawnActor<AMounteaAdvancedInventoryItemPreviewRenderer>(RendererActorClass);
+	if (!IsValid(RendererActor))
+	{
+		CleanUpPreviewScene();
+		return false;
+	}	
 	
 	RendererActor->SetRenderTarget( PreviewRenderTarget );
 	if (PreviewImage && PreviewRenderTarget)

@@ -23,6 +23,7 @@ public:
 	virtual void NativeDestruct() override;
 	
 	bool InitializeInteractableWidget();
+	void CleanUpPreviewScene();
 	void SetPreviewMesh(UStaticMesh* StaticMesh);
 	void SetPreviewSkeletalMesh(USkeletalMesh* SkeletalMesh);
 	void ClearPreview();
