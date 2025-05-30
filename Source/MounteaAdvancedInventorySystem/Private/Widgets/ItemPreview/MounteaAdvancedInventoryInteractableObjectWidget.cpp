@@ -32,6 +32,17 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::NativeDestruct()
 	CleanUpPreviewScene();
 }
 
+void UMounteaAdvancedInventoryInteractableObjectWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	if (PreviewScene)
+	{
+		PreviewScene->UpdateCaptureContents();
+		PreviewScene->GetWorld()->Tick(LEVELTICK_All, InDeltaTime);
+		RendererActor->CaptureScene();
+	}
+}
+
 bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWidget()
 {
 	auto templateConfig = UMounteaInventoryStatics::GetTemplateConfig(TEXT("InteractivePreview"));
@@ -54,7 +65,11 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 	{
 		CleanUpPreviewScene();
 		return false;
-	}	
+	}
+
+	PreviewScene->SetLightBrightness( 3.0f );
+	PreviewScene->SetSkyBrightness( 1.0f );
+	PreviewScene->UpdateCaptureContents();
 	
 	RendererActor->SetRenderTarget( PreviewRenderTarget );
 	if (PreviewImage && PreviewRenderTarget)

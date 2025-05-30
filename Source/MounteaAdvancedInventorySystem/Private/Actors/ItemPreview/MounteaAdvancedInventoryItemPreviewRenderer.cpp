@@ -21,9 +21,6 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	PreviewPivotComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
 	PreviewPivotComponent->SetupAttachment(RootComponent);
 
-	EmissionDomeComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EmissionDome"));
-	EmissionDomeComponent->SetupAttachment(RootComponent);
-
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComponent->SetupAttachment(PreviewPivotComponent);
 	StaticMeshComponent->SetVisibility(false);	
@@ -54,9 +51,12 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	SceneCaptureComponent->CaptureSource	  = SCS_FinalColorLDR;
 	SceneCaptureComponent->ProjectionType	 = ECameraProjectionMode::Perspective;
 	SceneCaptureComponent->FOVAngle = 45.0f;
-	SceneCaptureComponent->bCaptureEveryFrame = true;
-	SceneCaptureComponent->bCaptureOnMovement = true;
+	SceneCaptureComponent->bCaptureEveryFrame = false;
+	SceneCaptureComponent->bCaptureOnMovement = false;
+	SceneCaptureComponent->bAlwaysPersistRenderingState = true;
 	SceneCaptureComponent->ShowOnlyActors.Add(this);
+	SceneCaptureComponent->ShowOnlyComponents.Add(StaticMeshComponent);
+	SceneCaptureComponent->ShowOnlyComponents.Add(SkeletalMeshComponent);
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
@@ -118,6 +118,15 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(float Dista
 {
 	float clampedDistance = FMath::Clamp(Distance, 50.0f, 1000.0f);
 	SpringArmComponent->TargetArmLength = clampedDistance;
+}
+
+void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene()
+{
+	if (!IsValid(SceneCaptureComponent)) return;
+
+	if (SceneCaptureComponent->bCaptureEveryFrame) return;
+	
+ 	SceneCaptureComponent->CaptureScene();
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView()

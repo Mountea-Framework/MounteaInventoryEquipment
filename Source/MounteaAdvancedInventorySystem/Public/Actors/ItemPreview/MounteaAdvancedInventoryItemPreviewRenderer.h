@@ -28,28 +28,24 @@ public:
 	AMounteaAdvancedInventoryItemPreviewRenderer();
 
 	/** Assign the render target for capturing. */
-	UFUNCTION(BlueprintCallable, Category="Item Preview")
 	void SetRenderTarget(UTextureRenderTarget2D* NewRT);
 
 	/** Display a static mesh. */
-	UFUNCTION(BlueprintCallable, Category="Item Preview")
 	void SetStaticMesh(UStaticMesh* Mesh);
 
 	/** Display a skeletal mesh. */
-	UFUNCTION(BlueprintCallable, Category="Item Preview")
 	void SetSkeletalMesh(USkeletalMesh* Mesh);
 
 	/** Clear any displayed mesh. */
-	UFUNCTION(BlueprintCallable, Category="Item Preview")
 	void ClearMesh();
 
 	/** Rotate the preview camera. */
-	UFUNCTION(BlueprintCallable, Category="Item Preview")
 	void SetCameraRotation(float Yaw, float Pitch);
 
 	/** Zoom the preview camera. */
-	UFUNCTION(BlueprintCallable, Category="Item Preview")
 	void SetCameraDistance(float Distance);
+
+	void CaptureScene();
 
 protected:
 	virtual void BeginPlay() override;
@@ -61,10 +57,6 @@ protected:
 	/** Pivot for mesh rotation. */
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USceneComponent> PreviewPivotComponent;
-
-	/** Component that should be used to generate lightning for this actor. */
-	UPROPERTY(VisibleAnywhere, Category="Components")
-	TObjectPtr<UStaticMeshComponent> EmissionDomeComponent;
 
 	/** Holds a static mesh. */
 	UPROPERTY(VisibleAnywhere, Category="Components")
