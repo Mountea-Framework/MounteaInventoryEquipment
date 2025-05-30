@@ -43,12 +43,13 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	SpringArmComponent->TargetArmLength  = 300;
 	SpringArmComponent->bEnableCameraLag = false;
 	SpringArmComponent->bDoCollisionTest = false;
-	SpringArmComponent->SetRelativeRotation(FRotator(0, 0, 0.0f));
+	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
 	SpringArmComponent->SetRelativeLocation(FVector(0, 0, 90));
 
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCaptureComponent->SetupAttachment(SpringArmComponent);
-	SceneCaptureComponent->CaptureSource	  = SCS_FinalColorLDR;
+	SceneCaptureComponent->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
+	SceneCaptureComponent->CaptureSource	  = SCS_SceneColorHDR;
 	SceneCaptureComponent->ProjectionType	 = ECameraProjectionMode::Perspective;
 	SceneCaptureComponent->FOVAngle = 45.0f;
 	SceneCaptureComponent->bCaptureEveryFrame = false;
@@ -70,7 +71,6 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRT)
 {
-	RenderTarget = NewRT;
 	if (SceneCaptureComponent)
 	{
 		SceneCaptureComponent->TextureTarget = NewRT;
@@ -100,7 +100,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh()
+void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh() const
 {
 	StaticMeshComponent->SetStaticMesh(nullptr);
 	StaticMeshComponent->SetVisibility(false);
@@ -108,19 +108,19 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh()
 	SkeletalMeshComponent->SetVisibility(false);
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(float Yaw, float Pitch)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float Yaw, const float Pitch) const
 {
-	float clampedPitch = FMath::Clamp(Pitch, -80.0f, 80.0f);
+	const float clampedPitch = FMath::Clamp(Pitch, -80.0f, 80.0f);
 	SpringArmComponent->SetRelativeRotation(FRotator(clampedPitch, Yaw, 0.0f));
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(float Distance)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(const float Distance) const
 {
-	float clampedDistance = FMath::Clamp(Distance, 50.0f, 1000.0f);
+	const float clampedDistance = FMath::Clamp(Distance, 50.0f, 1000.0f);
 	SpringArmComponent->TargetArmLength = clampedDistance;
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene()
+void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const
 {
 	if (!IsValid(SceneCaptureComponent)) return;
 
@@ -129,15 +129,15 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene()
  	SceneCaptureComponent->CaptureScene();
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView()
+void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView() const
 {
 	UPrimitiveComponent* activeComp = GetActiveMeshComponent();
 	if (!activeComp)
 		return;
-	auto localBounds = activeComp->GetLocalBounds();
+	const auto localBounds = activeComp->GetLocalBounds();
 
-	float maxExtent	   = FMath::Max3(localBounds.BoxExtent.X, localBounds.BoxExtent.Y, localBounds.BoxExtent.Z);
-	float desiredDistance = maxExtent * 2.5f;
+	const float maxExtent = FMath::Max3(localBounds.BoxExtent.X, localBounds.BoxExtent.Y, localBounds.BoxExtent.Z);
+	const float desiredDistance = maxExtent * 2.5f;
 	SpringArmComponent->TargetArmLength = FMath::Clamp(desiredDistance, 100.0f, 800.0f);
 }
 

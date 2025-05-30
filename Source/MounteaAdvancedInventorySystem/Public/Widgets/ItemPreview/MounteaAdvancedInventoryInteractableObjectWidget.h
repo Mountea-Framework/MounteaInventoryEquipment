@@ -25,9 +25,9 @@ public:
 	
 	bool InitializeInteractableWidget();
 	void CleanUpPreviewScene();
-	void SetPreviewMesh(UStaticMesh* StaticMesh);
-	void SetPreviewSkeletalMesh(USkeletalMesh* SkeletalMesh);
-	void ClearPreview();
+	void SetPreviewMesh(UStaticMesh* StaticMesh) const;
+	void SetPreviewSkeletalMesh(USkeletalMesh* SkeletalMesh) const;
+	void ClearPreview() const;
 
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -38,8 +38,11 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> PreviewImage;
 
-	UPROPERTY(EditAnywhere, Category="Preview Settings")
+	UPROPERTY(VisibleAnywhere, Category="Preview Settings")
 	TObjectPtr<UTextureRenderTarget2D> PreviewRenderTarget;
+	
+	UPROPERTY(VisibleAnywhere, Category="Preview Settings")
+	TObjectPtr<UMaterialInstanceDynamic> PreviewMaterialInstance;
 
 	UPROPERTY(EditAnywhere, Category="Preview Settings")
 	TSubclassOf<AMounteaAdvancedInventoryItemPreviewRenderer> RendererActorClass;

@@ -37,15 +37,15 @@ public:
 	void SetSkeletalMesh(USkeletalMesh* Mesh);
 
 	/** Clear any displayed mesh. */
-	void ClearMesh();
+	void ClearMesh() const;
 
 	/** Rotate the preview camera. */
-	void SetCameraRotation(float Yaw, float Pitch);
+	void SetCameraRotation(float Yaw, float Pitch) const;
 
 	/** Zoom the preview camera. */
-	void SetCameraDistance(float Distance);
+	void SetCameraDistance(float Distance) const;
 
-	void CaptureScene();
+	void CaptureScene() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -79,6 +79,6 @@ protected:
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 
 private:
-	void AutoFitMeshInView();
+	void AutoFitMeshInView() const;
 	UPrimitiveComponent* GetActiveMeshComponent() const;
 };
