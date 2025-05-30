@@ -30,6 +30,7 @@
 #include "Statics/MounteaInventoryStatics.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
+#include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
 {
@@ -1390,4 +1391,29 @@ bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(
 	}
 
 	return bAnySlotUpdated;
+}
+
+bool UMounteaInventoryUIStatics::ItemPreview_InitializeInteractableWidget(UMounteaAdvancedInventoryInteractableObjectWidget* Target)
+{
+	return IsValid(Target) ? Target->InitializeInteractableWidget() : false;
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_SetPreviewMesh(UMounteaAdvancedInventoryInteractableObjectWidget* Target,
+	UStaticMesh* StaticMesh)
+{
+	if (IsValid(Target))
+		Target->SetPreviewMesh(StaticMesh);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_SetPreviewSkeletalMesh(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, USkeletalMesh* SkeletalMesh)
+{
+	if (IsValid(Target))
+		Target->SetPreviewSkeletalMesh(SkeletalMesh);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_ClearPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target)
+{
+	if (IsValid(Target))
+		Target->ClearPreview();
 }

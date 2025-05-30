@@ -15,6 +15,7 @@ class UMounteaAdvancedInventoryThemeConfig;
 struct FMounteaInventoryGridSlot;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventorySystemBaseWidgetInterface;
+class UMounteaAdvancedInventoryInteractableObjectWidget;
 
 UENUM(BlueprintType)
 enum class EMounteaThemeLevel : uint8
@@ -1088,6 +1089,53 @@ public:
 		const FGuid& ItemId, 
 		int32 SlotIndex,
 		TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent);
+	
+#pragma endregion
+
+// --- Items Preview ------------------------------
+#pragma region ItemsPreview
+
+	/**
+	 * Initializes the given Interactable Widget.
+	 *
+	 * @param Target A pointer to the UMounteaAdvancedInventoryInteractableObjectWidget that needs initialization.
+	 * @return True if the Target widget is valid and initialized successfully, otherwise false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Initialize Interactable Widget")
+	static bool ItemPreview_InitializeInteractableWidget(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
+
+	/**
+	 * Sets the preview mesh for the specified target widget.
+	 *
+	 * @param Target The target widget to set the preview mesh on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param StaticMesh The static mesh to be used as the preview mesh for the target widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Preview Mesh")
+	static void ItemPreview_SetPreviewMesh(UMounteaAdvancedInventoryInteractableObjectWidget* Target, UStaticMesh* StaticMesh);
+
+	/**
+	 * Sets the preview mesh for the specified target widget.
+	 *
+	 * @param Target The target widget to set the preview mesh on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param SkeletalMesh The skeletal mesh to be used as the preview mesh for the target widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Preview Skeletal Mesh")
+	static void ItemPreview_SetPreviewSkeletalMesh(UMounteaAdvancedInventoryInteractableObjectWidget* Target, USkeletalMesh* SkeletalMesh);
+
+	/**
+	 * Clears the preview of the given inventory interactable object widget.
+	 *
+	 * @param Target A pointer to the UMounteaAdvancedInventoryInteractableObjectWidget for which the preview will be cleared. Must be a valid widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Clear Preview")
+	static void ItemPreview_ClearPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
 	
 #pragma endregion
 };

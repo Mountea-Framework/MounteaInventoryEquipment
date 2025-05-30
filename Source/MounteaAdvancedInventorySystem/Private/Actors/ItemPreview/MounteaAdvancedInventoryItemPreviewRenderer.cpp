@@ -53,7 +53,7 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	SceneCaptureComponent->SetupAttachment(SpringArmComponent);
 	SceneCaptureComponent->CaptureSource	  = SCS_FinalColorLDR;
 	SceneCaptureComponent->ProjectionType	 = ECameraProjectionMode::Perspective;
-	SceneCaptureComponent->FOVAngle		   = 45.0f;
+	SceneCaptureComponent->FOVAngle = 45.0f;
 	SceneCaptureComponent->bCaptureEveryFrame = true;
 	SceneCaptureComponent->bCaptureOnMovement = true;
 	SceneCaptureComponent->ShowOnlyActors.Add(this);

@@ -1,108 +1,64 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// MounteaAdvancedInventoryInteractableObjectWidget.cpp
+
 
 #include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
 #include "Actors/ItemPreview/MounteaAdvancedInventoryItemPreviewRenderer.h"
 #include "Components/Image.h"
-#include "Engine/World.h"
-#include "Engine/LevelStreamingDynamic.h"
-#include "Materials/MaterialInstanceDynamic.h"
+#include "Engine/StaticMesh.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/TextureRenderTarget2D.h"
-#include "Kismet/GameplayStatics.h"
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryInteractiveWidgetConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
 {
-	Super::NativeConstruct();
-	InitializePreviewLevel();
+	Super::NativeConstruct();	
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::NativeDestruct()
 {
-	CleanupPreviewLevel();
 	Super::NativeDestruct();
-}
-
-void UMounteaAdvancedInventoryInteractableObjectWidget::InitializePreviewLevel()
-{
-	auto templateConfig = UMounteaInventoryStatics::GetTemplateConfig(TEXT("InteractivePreview"));
-	if (!templateConfig) return;
-
-	auto interactiveConfig = Cast<UMounteaAdvancedInventoryInteractiveWidgetConfig>(templateConfig);
-	if (!interactiveConfig) return;
-	PreviewWorld = interactiveConfig->PreviewLevelAsset.LoadSynchronous();
-	
-	if (!PreviewWorld|| LevelInstance)
-		return;
-
-	FVector location = FVector::ZeroVector;
-	FRotator rotation = FRotator::ZeroRotator;
-	if (PreviewParentActor)
+	if( PreviewScene && RendererActor )
 	{
-		location = PreviewParentActor->GetActorLocation();
-		rotation = PreviewParentActor->GetActorRotation();
-	}
-
-	bool loadSucceeded = false;
-	LevelInstance = ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(
-		GetWorld(),
-		PreviewWorld,
-		location,
-		rotation,
-		loadSucceeded
-	);
-	if (!LevelInstance || !loadSucceeded)
-		return;
-
-	LevelInstance->SetShouldBeLoaded(true);
-	LevelInstance->SetShouldBeVisible(true);
-	LevelInstance->OnLevelLoaded.AddDynamic(this, &UMounteaAdvancedInventoryInteractableObjectWidget::OnLevelLoaded);
-}
-
-void UMounteaAdvancedInventoryInteractableObjectWidget::OnLevelLoaded()
-{
-	if (!LevelInstance)
-		return;
-
-	ULevel* loadedLevel = LevelInstance->GetLoadedLevel();
-	if (!loadedLevel)
-		return;
-
-	for (AActor* actor : loadedLevel->Actors)
-	{
-		if (AMounteaAdvancedInventoryItemPreviewRenderer* rend = Cast<AMounteaAdvancedInventoryItemPreviewRenderer>(actor))
-		{
-			RendererActor = rend;
-			break;
-		}
-	}
-	if (!RendererActor)
-		return;
-	
-	ClearPreview();
-}
-
-void UMounteaAdvancedInventoryInteractableObjectWidget::CleanupPreviewLevel()
-{
-	if (RendererActor)
-	{
-		RendererActor->Destroy();
+		PreviewScene->GetWorld()->DestroyActor( RendererActor );
 		RendererActor = nullptr;
 	}
-	if (LevelInstance)
+	PreviewScene.Reset();
+}
+
+bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWidget()
+{
+	PreviewScene = MakeUnique<FPreviewScene>( FPreviewScene::ConstructionValues() );
+	UWorld* PreviewWorld = PreviewScene->GetWorld();
+	RendererActor = PreviewWorld->SpawnActor<AMounteaAdvancedInventoryItemPreviewRenderer>(RendererActorClass);
+	if (!IsValid(RendererActor)) return false;
+
+	auto templateConfig = UMounteaInventoryStatics::GetTemplateConfig(TEXT("InteractivePreview"));
+	if (!templateConfig) return false;
+
+	auto interactiveConfig = Cast<UMounteaAdvancedInventoryInteractiveWidgetConfig>(templateConfig);
+	if (!interactiveConfig) return false;
+
+	PreviewRenderTarget = interactiveConfig->DefaultRenderTarget.LoadSynchronous();
+	if (!PreviewRenderTarget) return false;
+	
+	RendererActor->SetRenderTarget( PreviewRenderTarget );
+	if (PreviewImage && PreviewRenderTarget)
 	{
-		UGameplayStatics::UnloadStreamLevelBySoftObjectPtr(GetWorld(), PreviewWorld, FLatentActionInfo(), false);
-		LevelInstance->SetShouldBeLoaded(false);
-		LevelInstance->SetShouldBeVisible(false);
-		LevelInstance = nullptr;
+		FSlateBrush Brush = PreviewImage->Brush;
+		Brush.SetResourceObject( PreviewRenderTarget );
+		PreviewImage->SetBrush( Brush );
 	}
+	return true;
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::SetPreviewMesh(UStaticMesh* StaticMesh)
 {
 	if (RendererActor)
+	{
 		RendererActor->SetStaticMesh(StaticMesh);
+	}
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::SetPreviewSkeletalMesh(USkeletalMesh* SkeletalMesh)
@@ -119,57 +75,52 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ClearPreview()
 
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
 	const FGeometry& InGeometry,
-	const FPointerEvent& InMouseEvent
-)
+	const FPointerEvent& InMouseEvent)
 {
 	if (bIsMousePressed && RendererActor)
 	{
-		FVector2D currentPos = InMouseEvent.GetScreenSpacePosition();
-		FVector2D delta	  = currentPos - LastMousePosition;
-		float sensitivity	= 0.5f;
-		CurrentYaw   += delta.X * sensitivity;
-		CurrentPitch = FMath::Clamp(CurrentPitch - delta.Y * sensitivity, -80.0f, 80.0f);
+		const FVector2D mouseDelta = InMouseEvent.GetCursorDelta() * 0.5f;
+		CurrentYaw   += mouseDelta.X;
+		CurrentPitch = FMath::Clamp(CurrentPitch - mouseDelta.Y, -80.0f, 80.0f);
 		RendererActor->SetCameraRotation(CurrentYaw, CurrentPitch);
-		LastMousePosition = currentPos;
 		return FReply::Handled();
 	}
-	return FReply::Unhandled();
+	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
 
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseButtonDown(
 	const FGeometry& InGeometry,
-	const FPointerEvent& InMouseEvent
-)
+	const FPointerEvent& InMouseEvent)
 {
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-		bIsMousePressed	= true;
-		LastMousePosition = InMouseEvent.GetScreenSpacePosition();
+		bIsMousePressed = true;
 		return FReply::Handled().CaptureMouse(TakeWidget());
 	}
-	return FReply::Unhandled();
+	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseButtonUp(
 	const FGeometry& InGeometry,
-	const FPointerEvent& InMouseEvent
-)
+	const FPointerEvent& InMouseEvent)
 {
-	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton && bIsMousePressed)
+	if (bIsMousePressed && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
 		bIsMousePressed = false;
 		return FReply::Handled().ReleaseMouseCapture();
 	}
-	return FReply::Unhandled();
+	return Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
 }
 
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 	const FGeometry& InGeometry,
-	const FPointerEvent& InMouseEvent
-)
+	const FPointerEvent& InMouseEvent)
 {
-	CurrentZoom = FMath::Clamp(CurrentZoom - InMouseEvent.GetWheelDelta() * 20.0f, 50.0f, 1000.0f);
 	if (RendererActor)
+	{
+		CurrentZoom = FMath::Clamp(CurrentZoom - InMouseEvent.GetWheelDelta() * 20.0f, 50.0f, 1000.0f);
 		RendererActor->SetCameraDistance(CurrentZoom);
-	return FReply::Handled();
+		return FReply::Handled();
+	}
+	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
 }
