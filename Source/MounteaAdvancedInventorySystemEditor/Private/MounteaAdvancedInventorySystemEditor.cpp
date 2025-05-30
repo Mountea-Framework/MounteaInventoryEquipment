@@ -4,6 +4,7 @@
 
 #include "AssetToolsModule.h"
 #include "ISettingsModule.h"
+#include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "Commands/FMAISCommands.h"
@@ -69,6 +70,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryThemeConfig", MounteaAdvancedInventoryThemeConfigClassIcon);
 				}
 
+				FSlateImageBrush* MounteaAdvancedInventoryInteractiveWidgetConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InteractiveWidgetConfigIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedInventoryInteractiveWidgetConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InteractiveWidgetConfigIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedInventoryInteractiveWidgetConfigClassIcon && MounteaAdvancedInventoryInteractiveWidgetConfigClassThumb)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryInteractiveWidgetConfig", MounteaAdvancedInventoryInteractiveWidgetConfigClassThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryInteractiveWidgetConfig", MounteaAdvancedInventoryInteractiveWidgetConfigClassIcon);
+				}
+
 				//Register the created style
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
@@ -79,6 +88,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	{
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventorySettingsConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryThemeConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{

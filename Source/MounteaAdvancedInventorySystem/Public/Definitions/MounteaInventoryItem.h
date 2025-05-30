@@ -50,9 +50,9 @@ struct FInventoryItem : public FFastArraySerializerItem
 
 public:
 	
-/*************************************************************/
-/*********** CONSTRUCTOR & UTILS ******************/
-/*************************************************************/
+	/*************************************************************/
+	/************ CONSTRUCTOR & UTILS *******************/
+	/*************************************************************/
 
 public:
 	
@@ -62,9 +62,9 @@ public:
 							const float InDurability = 1.f,
 							TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory = nullptr);
 	
-/*************************************************************/
-/************** CORE FUNCTIONALITY *****************/
-/*************************************************************/
+	/*************************************************************/
+	/*************** CORE FUNCTIONALITY ******************/
+	/*************************************************************/
 	
 	/** Check if the item instance is valid */
 	bool IsItemValid() const;
@@ -75,9 +75,9 @@ public:
 	/** Returns a string representation of the item */
 	FString ToString() const;
 	
-/*************************************************************/
-/*********************** GETTERS ************************/
-/*************************************************************/
+	/*************************************************************/
+	/************************ GETTERS ************************/
+	/*************************************************************/
 	
 public:
 	/**
@@ -125,11 +125,36 @@ public:
 	 *
 	 * @return Owning Inventory of this Item. Could be null!
 	 */
-	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const { return OwningInventory; };
+	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const { return OwningInventory; }
 
-/*************************************************************/
-/************************ SETTERS ***********************/
-/*************************************************************/
+	/**
+	 * Retrieves the short description of the inventory item.
+	 * Returns a localized text based on the item's template, or a default text if the template is invalid.
+	 *
+	 * @return A localized text containing the item's short information if the template is valid, or a fallback invalid message otherwise.
+	 */
+	FText GetItemShortInfo() const;
+
+	/**
+	 * Retrieves the detailed long description of the inventory item.
+	 * This information is typically used for extended item descriptions.
+	 *
+	 * @return A localized text containing the item's long information if the template is valid, or a fallback invalid message otherwise.
+	 */
+	FText GetItemLongInfo() const;
+
+	/**
+	 * Retrieves the cover image associated with the inventory item.
+	 * If the item has a valid associated template, the cover image is loaded and returned.
+	 * Otherwise, returns nullptr.
+	 *
+	 * @return A pointer to the texture representing the item's cover, or nullptr if unavailable.
+	 */
+	UTexture2D* GetCover() const;
+	
+	/*************************************************************/
+	/************************* SETTERS ************************/
+	/*************************************************************/
 	
 public:
 	
@@ -198,9 +223,9 @@ public:
 	 */
 	bool SetOwningInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& InOwningInventory);
 
-/*************************************************************/
-/******************* OPERATORS ************************/
-/*************************************************************/
+	/*************************************************************/
+	/******************** OPERATORS *************************/
+	/*************************************************************/
 	
 public:
 	
@@ -224,9 +249,10 @@ public:
 		return !(*this == Other);
 	}
 	
-/*************************************************************/
-/*********** PROTECTED PROPERTIES ***************/
-/*************************************************************/
+
+	/*************************************************************/
+	/*********** PROTECTED PROPERTIES ***************/
+	/*************************************************************/
 	
 public:
 	
@@ -274,9 +300,9 @@ private:
 	}
 
 
-/*************************************************************/
-/******************* SERIALIZATION**********************/
-/*************************************************************/
+	/*************************************************************/
+	/******************* SERIALIZATION************************/
+	/*************************************************************/
 
 public:
 

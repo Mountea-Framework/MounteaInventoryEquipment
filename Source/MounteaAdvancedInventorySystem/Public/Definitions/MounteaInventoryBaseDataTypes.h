@@ -144,7 +144,7 @@ struct FInventoryTypeConfig
 	FText InventoryDisplayName = LOCTEXT("InventoryType_DisplayName", "");
 
 	/** Widget class to use for this inventory type */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="User Interface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="User Interface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
 	TSoftClassPtr<UUserWidget> WidgetClass;
 
 	/** Configuration flags for this inventory type */

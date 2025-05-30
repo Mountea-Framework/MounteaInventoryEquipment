@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interfaces/Widgets/MounteaInventoryNotificationWidgetInterface.h"
+#include "Interfaces/Widgets/Notification/MounteaInventoryNotificationWidgetInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryNotificationsStatics.generated.h"

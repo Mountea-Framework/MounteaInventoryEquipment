@@ -9,7 +9,7 @@
 
 class IMounteaInventoryNotificationContainerWidgetInterface;
 struct FInventoryNotificationData;
-// This class does not need to be modified.
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventoryNotificationWidgetInterface : public UInterface
 {
@@ -23,7 +23,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventoryNotificationWidgetInte
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Notification")

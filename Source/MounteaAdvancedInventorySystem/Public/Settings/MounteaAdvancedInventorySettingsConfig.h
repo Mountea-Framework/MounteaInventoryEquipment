@@ -51,6 +51,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="♾ Limits", meta=(NoResetToDefault))
 	float InventoryBaseWeightLimit = 150.f;
 
+	// --- Templates ------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🏗 Templates", meta=(NoResetToDefault))
+	TMap<FString,TSoftObjectPtr<UPrimaryDataAsset>> TemplatesConfig;
+
 	// --- User Interface ------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Theme")
@@ -58,6 +63,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Theme", meta=(UIMin=0.f,ClampMin=0.f))
 	FVector4 BaseBorderRadius = FVector4(6.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Visual", meta=(UIMin=0.f,ClampMin=0.f))
+	float BaseBorderWidth = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Visual")
 	float ItemSlotPadding = 5.f;
@@ -82,15 +90,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Settings", DisplayName="⚠ Always Stack Stackable Items")
 	uint8 bAlwaysStackStackableItems : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Wrapper", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryBaseWidgetInterface"))
-	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryWidgetInterface"))
-	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Config", meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;
 
+	// --- User Interface: Main UI
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Wrapper", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemBaseWidgetInterface"))
+	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
+
+	// --- User Interface: Inventory
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
+	
 	// --- User Interface: Items
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface"))
@@ -104,6 +116,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemsGridWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryItemsGridWidgetClass;
+
+	// --- User Interface: Item Panel
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|ItemPanel", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemPanelWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryItemPanelWidgetClass;
 
 	// --- User Interface: Categories
 

@@ -9,8 +9,8 @@
 #include "MounteaInventoryStatics.generated.h"
 
 class UMounteaAdvancedInventorySettings;
-enum class EInventoryNotificationCategory : uint8;
 class UMounteaAdvancedInventorySettingsConfig;
+enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
 
 UCLASS()
@@ -59,6 +59,18 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettings* GetInventorySettings();
+
+	/**
+	 * Retrieves the advanced configuration settings for the Mountea Inventory System.
+	 * Facilitates access to inventory-specific configurations like inventory types, rarities, and categories.
+	 *
+	 * @return - A pointer to the Mountea Advanced Inventory Settings configuration object
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventorySettingsConfig* GetInventorySettingsConfig();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static UPrimaryDataAsset* GetTemplateConfig(const FString& Key);
 
 	/**
 	 * Creates a new inventory item associated with the given unique identifier.
@@ -283,6 +295,46 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static FText GetInventoryItemName(const FInventoryItem& Item);
+
+	/**
+	 * Retrieves a short descriptive text for the specified inventory item.
+	 * This text provides a concise summary of the item's key information.
+	 *
+	 * @param Item - The inventory item for which the short information is to be retrieved.
+	 * @return - A localized text containing the short info of the specified inventory item.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FText GetInventoryItemShortInfo(const FInventoryItem& Item);
+
+	/**
+	 * Retrieves a detailed description of the specified inventory item.
+	 * Provides a comprehensive string representation of the item's attributes, suitable for display in UI or logs.
+	 *
+	 * @param Item - The inventory item for which detailed information is to be retrieved.
+	 * @return - A localized text representation containing the long description of the specified inventory item.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FText GetInventoryItemLongInfo(const FInventoryItem& Item);
+
+	/**
+	 * Retrieves the cover image associated with a specified inventory item.
+	 * This method provides access to the visual representation of the inventory item if a cover image is assigned.
+	 *
+	 * @param Item - The inventory item for which the cover image is to be retrieved.
+	 * @return - A pointer to the UTexture2D representing the cover image of the inventory item.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static UTexture2D* GetInventoryItemCover(const FInventoryItem& Item);
+	
+	/**
+	 * Determines whether the provided inventory item is valid.
+	 * Validity is based on the item's internal validation rules.
+	 *
+	 * @param Item - The inventory item to be evaluated for validity
+	 * @return - True if the inventory item is valid, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Validate"))
+	static bool IsInventoryItemValid(const FInventoryItem& Item);
 	
 	/*************************************************************/
 	/************************ INTERNAL ***********************/

@@ -24,6 +24,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemsGridWidge
 	GENERATED_BODY()
 
 public:
+	
 	/**
 	 * Adds an item to the first available (empty) slot in the grid.
 	 * 

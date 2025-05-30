@@ -3,10 +3,8 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
-#include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
-#include "Interfaces/Widgets/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
@@ -14,6 +12,21 @@
 UMounteaAdvancedInventorySettings* UMounteaInventoryStatics::GetInventorySettings()
 {
 	return GetMutableDefault<UMounteaAdvancedInventorySettings>();
+}
+
+UMounteaAdvancedInventorySettingsConfig* UMounteaInventoryStatics::GetInventorySettingsConfig()
+{
+	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!settings) return nullptr;
+	return settings->InventorySettingsConfig.LoadSynchronous();
+}
+
+UPrimaryDataAsset* UMounteaInventoryStatics::GetTemplateConfig(const FString& Key)
+{
+	const auto config = GetInventorySettingsConfig();
+	if (!config) return nullptr;
+	const auto templateConfig = config->TemplatesConfig.Find(Key);
+	return templateConfig ? templateConfig->LoadSynchronous() : nullptr;
 }
 
 FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
@@ -151,6 +164,26 @@ FString UMounteaInventoryStatics::GetInventoryRarityKey(const FInventoryItem& It
 FText UMounteaInventoryStatics::GetInventoryItemName(const FInventoryItem& Item)
 {
 	return Item.GetItemName();
+}
+
+FText UMounteaInventoryStatics::GetInventoryItemShortInfo(const FInventoryItem& Item)
+{
+	return Item.GetItemShortInfo();
+}
+
+FText UMounteaInventoryStatics::GetInventoryItemLongInfo(const FInventoryItem& Item)
+{
+	return Item.GetItemLongInfo();
+}
+
+UTexture2D* UMounteaInventoryStatics::GetInventoryItemCover(const FInventoryItem& Item)
+{
+	return Item.GetCover();
+}
+
+bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
+{
+	return Item.IsItemValid();
 }
 
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
