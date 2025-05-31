@@ -98,10 +98,10 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ClearPreview() const
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 {
-	LOG_INFO(TEXT("[InteractableObjectWidget] StartPreview"))
 	if (const UWorld* contextWorld = GetWorld())
 	{
-		LastInteractionTime = contextWorld->GetTimeSeconds();
+		if (FMath::IsNearlyZero(LastInteractionTime))
+			LastInteractionTime = GetWorld()->GetTimeSeconds();
 		
 		if (!contextWorld->GetTimerManager().IsTimerActive(TimerHandle_PreviewTick) && !FMath::IsNearlyEqual(PreviewTickFrequency, 0.f, 0.001f))
 		{
@@ -111,7 +111,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 				this,
 				&UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview,
 				Interval,
-				false
+				true
 			);
 		}
 	}
@@ -119,7 +119,6 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
 {
-	LOG_INFO(TEXT("[InteractableObjectWidget] PausePreview"))
 	if (const UWorld* contextWorld = GetWorld())
 		contextWorld->GetTimerManager().ClearTimer(TimerHandle_PreviewTick);
 }
@@ -202,6 +201,8 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 	if (RendererActor)
 	{
 		CurrentZoom = FMath::Clamp(CurrentZoom - InMouseEvent.GetWheelDelta() * 20.0f, 50.0f, 1000.0f);
+		LOG_WARNING(TEXT("CurrentZoom: %f | Mouse Delta: %f"), CurrentZoom, InMouseEvent.GetWheelDelta())
+		
 		RendererActor->SetCameraDistance(CurrentZoom);
 		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled();

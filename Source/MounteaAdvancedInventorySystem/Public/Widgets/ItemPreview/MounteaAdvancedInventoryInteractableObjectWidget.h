@@ -68,7 +68,7 @@ protected:
 	 * the more responsive the preview will be, yet the higher the performance cost.
 	 */
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
-	float PreviewTickFrequency = 20.f;
+	float PreviewTickFrequency = 30.f;
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
 	float IdleThreshold = 3.f;
