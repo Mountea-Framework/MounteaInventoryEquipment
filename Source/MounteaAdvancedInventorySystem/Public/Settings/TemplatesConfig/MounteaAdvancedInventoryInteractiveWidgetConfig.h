@@ -15,7 +15,7 @@ class UWorld;
  * UMounteaAdvancedInventoryInteractiveWidgetConfig is a UObject-based configuration class derived from UPrimaryDataAsset.
  * It is designed to manage and store assets related to interactive inventory widget previews in the Mountea Advanced Inventory System.
  */
-UCLASS()
+UCLASS(ClassGroup = (Mountea), meta = (DisplayName = "Interactive Widget Config"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryInteractiveWidgetConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

@@ -11,9 +11,9 @@
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryInteractiveWidgetConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
 
-void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
+void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct() : bIsMousePressed(true)
 {
-	Super::NativeConstruct();	
+	Super::NativeConstruct();
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()
@@ -30,13 +30,6 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 	CleanUpPreviewScene();
-}
-
-void UMounteaAdvancedInventoryInteractableObjectWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-	if (PreviewScene)
-		RendererActor->CaptureScene();
 }
 
 bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWidget()
@@ -79,6 +72,9 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 
 	PreviewImage->SetBrushFromMaterial(PreviewMaterialInstance);
 
+	if (bIsMousePressed)
+		StartPreview();
+	
 	return true;
 }
 
@@ -100,6 +96,29 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ClearPreview() const
 		RendererActor->ClearMesh();
 }
 
+void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
+{
+	// TODO: Use a timer to update the preview scene
+	// `TimerHandle_PreviewTick` and call function `TickPreview`
+	// `TickPreview` should not be in loop, we call `StartPreview` again from `TickPreview`
+}
+
+void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
+{
+	// TODO: Pause timer
+}
+
+void UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview()
+{
+	if (PreviewScene)
+		RendererActor->CaptureScene();
+
+	// TODO: clear timer and call StartPreview again
+}
+
+// TODO: in all inputs capture `LastInteractionTime` and make sure we don't render the scene
+// unless input has been captured for `IdleThreshold` period of time
+// basically only capture scenes as long as the user is interacting with the widget and 1 second after than
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
 	const FGeometry& InGeometry,
 	const FPointerEvent& InMouseEvent)
@@ -143,6 +162,7 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 	const FGeometry& InGeometry,
 	const FPointerEvent& InMouseEvent)
 {
+	// TODO: Fix non working zoom
 	LOG_WARNING(TEXT("WHEEEE"))
 	if (RendererActor)
 	{

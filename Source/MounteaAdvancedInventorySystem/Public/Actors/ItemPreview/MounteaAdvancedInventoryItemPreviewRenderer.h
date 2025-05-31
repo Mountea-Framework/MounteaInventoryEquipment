@@ -17,34 +17,37 @@ class UStaticMesh;
 class USkeletalMesh;
 
 /**
- * Renders a single mesh into a render target for UI preview.
+ * @class AMounteaAdvancedInventoryItemPreviewRenderer
+ *
+ * @brief A class responsible for rendering advanced previews of inventory items
+ * in the Mountea Inventory System.
+ *
+ * This class provides functionality to render detailed and customizable
+ * previews for inventory items, potentially including 3D models, detailed
+ * descriptions, animations, and other interactive elements.
+ *
+ * Key features include:
+ * - Customizable preview templates for inventory items.
+ * - Compatibility with advanced rendering systems and frameworks.
+ * - Ability to dynamically update the preview based on inventory changes.
+ *
+ * Intended for use within the Mountea Framework, this renderer enhances the
+ * user experience by providing visually engaging and detailed item previews.
  */
-UCLASS()
+UCLASS(ClassGroup=(Mountea))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API AMounteaAdvancedInventoryItemPreviewRenderer : public AActor
 {
 	GENERATED_BODY()
 
 public:
 	AMounteaAdvancedInventoryItemPreviewRenderer();
-
-	/** Assign the render target for capturing. */
+	
 	void SetRenderTarget(UTextureRenderTarget2D* NewRT);
-
-	/** Display a static mesh. */
 	void SetStaticMesh(UStaticMesh* Mesh);
-
-	/** Display a skeletal mesh. */
 	void SetSkeletalMesh(USkeletalMesh* Mesh);
-
-	/** Clear any displayed mesh. */
 	void ClearMesh() const;
-
-	/** Rotate the preview camera. */
 	void SetCameraRotation(float Yaw, float Pitch) const;
-
-	/** Zoom the preview camera. */
 	void SetCameraDistance(float Distance) const;
-
 	void CaptureScene() const;
 
 protected:
