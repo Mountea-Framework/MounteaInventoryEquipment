@@ -69,7 +69,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
 	SetCameraDistance(300.f);
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRT)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRT) const
 {
 	if (SceneCaptureComponent)
 	{
@@ -78,7 +78,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRende
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh) const
 {
 	ClearMesh();
 	if (Mesh)
@@ -89,7 +89,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Me
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh) const
 {
 	ClearMesh();
 	if (Mesh)

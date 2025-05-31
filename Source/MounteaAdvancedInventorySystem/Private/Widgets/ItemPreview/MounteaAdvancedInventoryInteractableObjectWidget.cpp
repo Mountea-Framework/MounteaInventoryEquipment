@@ -11,9 +11,10 @@
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryInteractiveWidgetConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
 
-void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct() : bIsMousePressed(true)
+void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	bAutoStartTick = true;
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()
@@ -98,14 +99,28 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ClearPreview() const
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 {
-	// TODO: Use a timer to update the preview scene
-	// `TimerHandle_PreviewTick` and call function `TickPreview`
-	// `TickPreview` should not be in loop, we call `StartPreview` again from `TickPreview`
+	if (const UWorld* contextWorld = GetWorld())
+	{
+		LastInteractionTime = contextWorld->GetTimeSeconds();
+		
+		if (!contextWorld->GetTimerManager().IsTimerActive(TimerHandle_PreviewTick) && !FMath::IsNearlyEqual(PreviewTickFrequency, 0.f, 0.001f))
+		{
+			const float Interval = 1.f / PreviewTickFrequency;
+			contextWorld->GetTimerManager().SetTimer(
+				TimerHandle_PreviewTick,
+				this,
+				&UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview,
+				Interval,
+				false
+			);
+		}
+	}
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
 {
-	// TODO: Pause timer
+	if (const UWorld* contextWorld = GetWorld())
+		contextWorld->GetTimerManager().ClearTimer(TimerHandle_PreviewTick);
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview()
@@ -113,12 +128,28 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview()
 	if (PreviewScene)
 		RendererActor->CaptureScene();
 
-	// TODO: clear timer and call StartPreview again
+	const float currentTime = GetWorld()->GetTimeSeconds();
+	if ((currentTime - LastInteractionTime) > IdleThreshold)
+	{
+		PausePreview();
+		return;
+	}
+
+	PreviewScene->UpdateCaptureContents();
+	RendererActor->CaptureScene();
+
+	StartPreview();
 }
 
-// TODO: in all inputs capture `LastInteractionTime` and make sure we don't render the scene
-// unless input has been captured for `IdleThreshold` period of time
-// basically only capture scenes as long as the user is interacting with the widget and 1 second after than
+void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateLastInteractionAndStartPreview()
+{
+	if (const UWorld* contextWorld = GetWorld())
+	{
+		LastInteractionTime = contextWorld->GetTimeSeconds();
+		StartPreview();
+	}
+}
+
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
 	const FGeometry& InGeometry,
 	const FPointerEvent& InMouseEvent)
@@ -129,6 +160,7 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
 		CurrentYaw   += mouseDelta.X;
 		CurrentPitch = FMath::Clamp(CurrentPitch - mouseDelta.Y, -80.0f, 80.0f);
 		RendererActor->SetCameraRotation(CurrentYaw, CurrentPitch);
+		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled();
 	}
 	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
@@ -141,6 +173,7 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseButtonDow
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
 		bIsMousePressed = true;
+		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled().CaptureMouse(TakeWidget());
 	}
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
@@ -153,6 +186,7 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseButtonUp(
 	if (bIsMousePressed && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
 		bIsMousePressed = false;
+		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled().ReleaseMouseCapture();
 	}
 	return Super::NativeOnMouseButtonUp(InGeometry, InMouseEvent);
@@ -168,6 +202,7 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 	{
 		CurrentZoom = FMath::Clamp(CurrentZoom - InMouseEvent.GetWheelDelta() * 20.0f, 50.0f, 1000.0f);
 		RendererActor->SetCameraDistance(CurrentZoom);
+		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled();
 	}
 	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);

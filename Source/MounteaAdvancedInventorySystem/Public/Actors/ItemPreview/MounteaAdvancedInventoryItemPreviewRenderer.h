@@ -42,9 +42,9 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API AMounteaAdvancedInventoryItemPreviewRen
 public:
 	AMounteaAdvancedInventoryItemPreviewRenderer();
 	
-	void SetRenderTarget(UTextureRenderTarget2D* NewRT);
-	void SetStaticMesh(UStaticMesh* Mesh);
-	void SetSkeletalMesh(USkeletalMesh* Mesh);
+	void SetRenderTarget(UTextureRenderTarget2D* NewRT) const;
+	void SetStaticMesh(UStaticMesh* Mesh) const;
+	void SetSkeletalMesh(USkeletalMesh* Mesh) const;
 	void ClearMesh() const;
 	void SetCameraRotation(float Yaw, float Pitch) const;
 	void SetCameraDistance(float Distance) const;

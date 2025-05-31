@@ -49,6 +49,7 @@ public:
 
 	UFUNCTION()
 	void TickPreview();
+	void UpdateLastInteractionAndStartPreview();
 
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -59,18 +60,18 @@ protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> PreviewImage;
 
-	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings")
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
 	uint8 bAutoStartTick : 1;
 
 	/**
 	 * How many times per second to update the preview. The higher the value,
 	 * the more responsive the preview will be, yet the higher the performance cost.
 	 */
-	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "10.0", ClampMax = "10.0"))
-	float TickFrequency = 6.f;
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
+	float PreviewTickFrequency = 20.f;
 
-	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "10.0", ClampMax = "10.0"))
-	float IdleThreshold = 6.f;
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
+	float IdleThreshold = 3.f;
 
 	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings")
 	TObjectPtr<UTextureRenderTarget2D> PreviewRenderTarget;
