@@ -61,7 +61,7 @@ protected:
 	TObjectPtr<UImage> PreviewImage;
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
-	uint8 bAutoStartTick : 1;
+	bool bAutoStartTick = true;
 
 	/**
 	 * How many times per second to update the preview. The higher the value,

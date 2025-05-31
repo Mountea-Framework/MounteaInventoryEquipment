@@ -14,7 +14,6 @@
 void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	bAutoStartTick = true;
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()
@@ -99,6 +98,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ClearPreview() const
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 {
+	LOG_INFO(TEXT("[InteractableObjectWidget] StartPreview"))
 	if (const UWorld* contextWorld = GetWorld())
 	{
 		LastInteractionTime = contextWorld->GetTimeSeconds();
@@ -119,6 +119,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
 {
+	LOG_INFO(TEXT("[InteractableObjectWidget] PausePreview"))
 	if (const UWorld* contextWorld = GetWorld())
 		contextWorld->GetTimerManager().ClearTimer(TimerHandle_PreviewTick);
 }
