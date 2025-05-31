@@ -146,19 +146,55 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateLastInteractionAnd
 	}
 }
 
+void UMounteaAdvancedInventoryInteractableObjectWidget::ResetCameraToDefaults()
+{
+	if (RendererActor)
+		RendererActor->ResetToDefaults();
+
+	CurrentYaw   = 0.0f;
+	CurrentPitch = 0.0f;
+	CurrentZoom  = 1.0f;
+	CurrentCameraHeight = 0.0f;
+}
+
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
 	const FGeometry& InGeometry,
 	const FPointerEvent& InMouseEvent)
 {
+	const FVector2D currentMousePos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	
 	if (bIsMousePressed && RendererActor)
 	{
-		const FVector2D mouseDelta = InMouseEvent.GetCursorDelta() * 0.5f;
+		FVector2D mouseDelta = currentMousePos - LastMousePosition;
+		mouseDelta = InMouseEvent.GetCursorDelta() * 0.5f;
+		
 		CurrentYaw   += mouseDelta.X;
 		CurrentPitch = FMath::Clamp(CurrentPitch - mouseDelta.Y, -80.0f, 80.0f);
 		RendererActor->SetCameraRotation(CurrentYaw, CurrentPitch);
 		UpdateLastInteractionAndStartPreview();
+		
+		LastMousePosition = currentMousePos;
 		return FReply::Handled();
 	}
+	else if (bIsMiddleMousePressed && RendererActor)
+	{
+		const FVector2D mouseDelta = currentMousePos - LastMousePosition;
+		const float heightSensitivity = CameraHeightSensitivity / FMath::Max(CurrentZoom, 0.01f);
+		LOG_WARNING(TEXT("mouseDeltaY: %f"), mouseDelta.Y)
+		const float heightIncrement = (mouseDelta.Y > 0) ? heightSensitivity : -heightSensitivity;
+		LOG_WARNING(TEXT("heightIncrement: %f"), heightIncrement)
+		CurrentCameraHeight += heightIncrement;
+		CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight, -10.0f, 10.0f);
+		LOG_WARNING(TEXT("CurrentCameraHeight: %f"), CurrentCameraHeight)
+		RendererActor->SetCameraHeight(CurrentCameraHeight);
+		
+		UpdateLastInteractionAndStartPreview();
+		
+		LastMousePosition = currentMousePos;
+		return FReply::Handled();
+	}
+	
+	LastMousePosition = currentMousePos;
 	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
 
@@ -172,6 +208,12 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseButtonDow
 		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled().CaptureMouse(TakeWidget());
 	}
+	else if (InMouseEvent.GetEffectingButton() == EKeys::MiddleMouseButton)
+	{
+		bIsMiddleMousePressed = true;
+		UpdateLastInteractionAndStartPreview();
+		return FReply::Handled().CaptureMouse(TakeWidget());
+	}
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
@@ -182,6 +224,12 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseButtonUp(
 	if (bIsMousePressed && InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
 		bIsMousePressed = false;
+		UpdateLastInteractionAndStartPreview();
+		return FReply::Handled().ReleaseMouseCapture();
+	}
+	else if (bIsMiddleMousePressed && InMouseEvent.GetEffectingButton() == EKeys::MiddleMouseButton)
+	{
+		bIsMiddleMousePressed = false;
 		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled().ReleaseMouseCapture();
 	}
@@ -202,5 +250,3 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 	}
 	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
 }
-
-

@@ -1417,3 +1417,9 @@ void UMounteaInventoryUIStatics::ItemPreview_ClearPreview(UMounteaAdvancedInvent
 	if (IsValid(Target))
 		Target->ClearPreview();
 }
+
+void UMounteaInventoryUIStatics::ItemPreview_ResetPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target)
+{
+	if (IsValid(Target))
+		Target->ResetCameraToDefaults();
+}

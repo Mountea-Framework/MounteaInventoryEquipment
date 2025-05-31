@@ -44,7 +44,7 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	SpringArmComponent->bEnableCameraLag = false;
 	SpringArmComponent->bDoCollisionTest = false;
 	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
-	SpringArmComponent->SetRelativeLocation(FVector(0, 0, 90));
+	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
 
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCaptureComponent->SetupAttachment(SpringArmComponent);
@@ -117,6 +117,20 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(const float Distance) const
 {
 	SpringArmComponent->SetRelativeScale3D(FVector(Distance));
+}
+
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraHeight(const float ZOffset) const
+{
+	FVector baseLocation = SpringArmComponent->GetRelativeLocation();
+	baseLocation.Z = InitialCameraHeight + ZOffset;
+	SpringArmComponent->SetRelativeLocation(baseLocation);
+}
+
+void AMounteaAdvancedInventoryItemPreviewRenderer::ResetToDefaults() const
+{
+	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
+	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
+	SpringArmComponent->SetRelativeScale3D(FVector(1));
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const

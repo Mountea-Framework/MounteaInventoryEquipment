@@ -48,6 +48,8 @@ public:
 	void ClearMesh() const;
 	void SetCameraRotation(const float Yaw, const float Pitch) const;
 	void SetCameraDistance(const float Distance) const;
+	void SetCameraHeight(const float ZOffset) const;
+	void ResetToDefaults() const;
 	void CaptureScene() const;
 
 protected:
@@ -81,6 +83,9 @@ public:
 	/** The render target to capture into. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rendering")
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
+
+private:
+	float InitialCameraHeight = 90.f;
 
 private:
 	void AutoFitMeshInView() const;

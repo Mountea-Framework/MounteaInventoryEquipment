@@ -1136,6 +1136,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Clear Preview")
 	static void ItemPreview_ClearPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Reset Preview")
+	static void ItemPreview_ResetPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
 	
 #pragma endregion
 };

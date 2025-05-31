@@ -51,6 +51,8 @@ public:
 	void TickPreview();
 	void UpdateLastInteractionAndStartPreview();
 
+	void ResetCameraToDefaults();
+
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -73,8 +75,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
 	float IdleThreshold = 3.f;
 
-	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "100.0", ClampMax = "100.0"))
 	FVector2D ScaleLimits = FVector2D(0.1f, 10.f);
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "10.0", ClampMax = "10.0"))
+	float CameraHeightSensitivity = 0.2f;
 
 	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings")
 	TObjectPtr<UTextureRenderTarget2D> PreviewRenderTarget;
@@ -94,9 +99,11 @@ private:
 	FTimerHandle TimerHandle_PreviewTick;
 
 	float LastInteractionTime = 0.0f;
-	
+	FVector2D LastMousePosition = FVector2D::ZeroVector;
+	bool bIsMiddleMousePressed = false;
 	bool bIsMousePressed = false;
 	float CurrentYaw   = 0.0f;
 	float CurrentPitch = 0.0f;
 	float CurrentZoom  = 1.0f;
+	float CurrentCameraHeight = 0.0f;
 };
