@@ -73,6 +73,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
 	float IdleThreshold = 3.f;
 
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
+	FVector2D ScaleLimits = FVector2D(0.1f, 10.f);
+
 	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings")
 	TObjectPtr<UTextureRenderTarget2D> PreviewRenderTarget;
 	
@@ -93,7 +96,7 @@ private:
 	float LastInteractionTime = 0.0f;
 	
 	bool bIsMousePressed = false;
-	float CurrentYaw   = 45.0f;
-	float CurrentPitch = -20.0f;
-	float CurrentZoom  = 200.0f;
+	float CurrentYaw   = 0.0f;
+	float CurrentPitch = 0.0f;
+	float CurrentZoom  = 1.0f;
 };

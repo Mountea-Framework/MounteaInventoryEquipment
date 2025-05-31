@@ -46,39 +46,40 @@ public:
 	void SetStaticMesh(UStaticMesh* Mesh) const;
 	void SetSkeletalMesh(USkeletalMesh* Mesh) const;
 	void ClearMesh() const;
-	void SetCameraRotation(float Yaw, float Pitch) const;
-	void SetCameraDistance(float Distance) const;
+	void SetCameraRotation(const float Yaw, const float Pitch) const;
+	void SetCameraDistance(const float Distance) const;
 	void CaptureScene() const;
 
 protected:
 	virtual void BeginPlay() override;
 
+public:
 	/** Scene root. */
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USceneComponent> RootSceneComponent;
 
 	/** Pivot for mesh rotation. */
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USceneComponent> PreviewPivotComponent;
 
 	/** Holds a static mesh. */
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
 	/** Holds a skeletal mesh. */
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
 	/** Arm to position the camera. */
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
 	/** Scene capture that writes into the RT. */
-	UPROPERTY(VisibleAnywhere, Category="Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
 
 	/** The render target to capture into. */
-	UPROPERTY(EditAnywhere, Category="Rendering")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rendering")
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 
 private:

@@ -8,6 +8,7 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryInteractiveWidgetConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
 
@@ -125,20 +126,15 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview()
 {
-	if (PreviewScene)
-		RendererActor->CaptureScene();
-
 	const float currentTime = GetWorld()->GetTimeSeconds();
 	if ((currentTime - LastInteractionTime) > IdleThreshold)
 	{
 		PausePreview();
 		return;
 	}
-
+	
 	PreviewScene->UpdateCaptureContents();
 	RendererActor->CaptureScene();
-
-	StartPreview();
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateLastInteractionAndStartPreview()
@@ -196,16 +192,15 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 	const FGeometry& InGeometry,
 	const FPointerEvent& InMouseEvent)
 {
-	// TODO: Fix non working zoom
-	LOG_WARNING(TEXT("WHEEEE"))
 	if (RendererActor)
 	{
-		CurrentZoom = FMath::Clamp(CurrentZoom - InMouseEvent.GetWheelDelta() * 20.0f, 50.0f, 1000.0f);
-		LOG_WARNING(TEXT("CurrentZoom: %f | Mouse Delta: %f"), CurrentZoom, InMouseEvent.GetWheelDelta())
-		
+		const float zoomFactor = 1.0f + InMouseEvent.GetWheelDelta() * 0.1f;
+		CurrentZoom = FMath::Clamp(CurrentZoom * zoomFactor, ScaleLimits.X, ScaleLimits.Y);
 		RendererActor->SetCameraDistance(CurrentZoom);
 		UpdateLastInteractionAndStartPreview();
 		return FReply::Handled();
 	}
 	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
 }
+
+

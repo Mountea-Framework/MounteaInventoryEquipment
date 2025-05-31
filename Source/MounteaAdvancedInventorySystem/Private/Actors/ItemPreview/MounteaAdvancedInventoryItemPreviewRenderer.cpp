@@ -116,8 +116,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(const float Distance) const
 {
-	const float clampedDistance = FMath::Clamp(Distance, 50.0f, 1000.0f);
-	SpringArmComponent->TargetArmLength = clampedDistance;
+	SpringArmComponent->SetRelativeScale3D(FVector(Distance));
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const
