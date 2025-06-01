@@ -52,6 +52,8 @@ public:
 	void ResetToDefaults() const;
 	void CaptureScene() const;
 
+	void GetCurrentValues(FVector4& ScaleHeightPitchYaw) const;
+
 protected:
 	virtual void BeginPlay() override;
 

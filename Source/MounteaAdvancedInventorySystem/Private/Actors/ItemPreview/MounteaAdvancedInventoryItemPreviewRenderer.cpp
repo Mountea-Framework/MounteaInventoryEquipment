@@ -143,6 +143,14 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const
  	SceneCaptureComponent->CaptureScene();
 }
 
+void AMounteaAdvancedInventoryItemPreviewRenderer::GetCurrentValues(FVector4& ScaleHeightPitchYaw) const
+{
+	ScaleHeightPitchYaw.X = SpringArmComponent->GetRelativeScale3D().Z;
+	ScaleHeightPitchYaw.Y = SpringArmComponent->GetRelativeLocation().Z;
+	ScaleHeightPitchYaw.Z = SpringArmComponent->GetRelativeRotation().Yaw;
+	ScaleHeightPitchYaw.W = SpringArmComponent->GetRelativeRotation().Pitch;
+}
+
 void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView() const
 {
 	UPrimitiveComponent* activeComp = GetActiveMeshComponent();
