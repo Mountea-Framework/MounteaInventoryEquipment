@@ -42,7 +42,8 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 	auto interactiveConfig = Cast<UMounteaAdvancedInventoryInteractiveWidgetConfig>(templateConfig);
 	if (!interactiveConfig) return false;
 
-	RendererActorClass = interactiveConfig->RendererActor.LoadSynchronous();
+	if (!RendererActorClass)
+		RendererActorClass = interactiveConfig->RendererActor.LoadSynchronous();
 	if (!RendererActorClass)
 		RendererActorClass = AMounteaAdvancedInventoryItemPreviewRenderer::StaticClass();
 
@@ -256,6 +257,13 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 		return FReply::Handled();
 	}
 	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
+}
+
+FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnFocusReceived(const FGeometry& InGeometry,
+	const FFocusEvent& InFocusEvent)
+{
+	StartPreview();
+	return Super::NativeOnFocusReceived(InGeometry, InFocusEvent);
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
