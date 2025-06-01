@@ -85,7 +85,8 @@ public:
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 
 private:
-	float InitialCameraHeight = 90.f;
+	float InitialCameraHeight = 0.f; //90.f;
+	float InitialCameraHeightSkeletalMesh = 90.f;
 
 private:
 	void AutoFitMeshInView() const;
