@@ -1137,9 +1137,109 @@ public:
 		DisplayName="Clear Preview")
 	static void ItemPreview_ClearPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
 
+	/**
+	 * Resets the item preview for the specified interactable object widget.
+	 *
+	 * @param Target The target widget representing an advanced inventory interactable object.
+	 * The camera for this widget will be reset to its default state if it is valid.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Reset Preview")
 	static void ItemPreview_ResetPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
+
+	/**
+	 * Updates camera rotation based on mouse delta input for the specified target widget.
+	 *
+	 * @param Target The target widget to update camera rotation on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param MouseDelta The mouse movement delta values for rotation calculation.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Update Camera Rotation (Mouse)")
+	static void ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta);
+
+	/**
+	 * Updates camera height based on mouse delta input for the specified target widget.
+	 *
+	 * @param Target The target widget to update camera height on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param MouseDelta The mouse movement delta values for height calculation.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Update Camera Height (Mouse)")
+	static void ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta);
+
+	/**
+	 * Updates camera zoom based on mouse wheel input for the specified target widget.
+	 *
+	 * @param Target The target widget to update camera zoom on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param WheelDelta The mouse wheel delta value for zoom calculation.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Update Camera Zoom (Mouse Wheel)")
+	static void ItemPreview_UpdateCameraZoom(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float WheelDelta);
+
+	/**
+	 * Sets camera rotation to absolute values for the specified target widget.
+	 *
+	 * @param Target The target widget to set camera rotation on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param YawNormalized The normalized yaw value (0.0 to 1.0) representing the full rotation range.
+	 * @param PitchNormalized The normalized pitch value (0.0 to 1.0) representing the full rotation range.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Camera Rotation Absolute (Slider)")
+	static void ItemPreview_SetCameraRotationAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float YawNormalized, const float PitchNormalized);
+
+	/**
+	 * Sets camera height to absolute value for the specified target widget.
+	 *
+	 * @param Target The target widget to set camera height on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param HeightNormalized The normalized height value (0.0 to 1.0) representing the full height range.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Camera Height Absolute (Slider)")
+	static void ItemPreview_SetCameraHeightAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float HeightNormalized);
+
+	/**
+	 * Sets camera zoom to absolute value for the specified target widget.
+	 *
+	 * @param Target The target widget to set camera zoom on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param ZoomNormalized The normalized zoom value (0.0 to 1.0) representing the full zoom range.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Camera Zoom Absolute (Slider)")
+	static void ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized);
+
+	/**
+	 * Updates camera rotation based on analog gamepad input for the specified target widget.
+	 *
+	 * @param Target The target widget to update camera rotation on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param AnalogInput The analog input values (-1.0 to 1.0) from gamepad stick for rotation calculation.
+	 * @param DeltaTime The time elapsed since the last frame for frame-rate independent movement.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Update Camera Rotation Analog (Gamepad)")
+	static void ItemPreview_UpdateCameraRotationAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& AnalogInput, const float DeltaTime);
+
+	/**
+	 * Updates camera height based on analog gamepad input for the specified target widget.
+	 *
+	 * @param Target The target widget to update camera height on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param AnalogInput The analog input value (-1.0 to 1.0) from gamepad for height calculation.
+	 * @param DeltaTime The time elapsed since the last frame for frame-rate independent movement.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Update Camera Height Analog (Gamepad)")
+	static void ItemPreview_UpdateCameraHeightAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime);
+
+	/**
+	 * Updates camera zoom based on analog gamepad input for the specified target widget.
+	 *
+	 * @param Target The target widget to update camera zoom on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
+	 * @param AnalogInput The analog input value (-1.0 to 1.0) from gamepad for zoom calculation.
+	 * @param DeltaTime The time elapsed since the last frame for frame-rate independent movement.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Update Camera Zoom Analog (Gamepad)")
+	static void ItemPreview_UpdateCameraZoomAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime);
 	
 #pragma endregion
 };

@@ -52,7 +52,24 @@ public:
 	void UpdateLastInteractionAndStartPreview();
 
 	void ResetCameraToDefaults();
+	
+public:
+	// Mouse delta-based functions
+	void UpdateCameraRotation(const FVector2D& MouseDelta);
+	void UpdateCameraHeight(const FVector2D& MouseDelta);
+	void UpdateCameraZoom(const float WheelDelta);
+    
+	// Absolute value functions for sliders (0.0 to 1.0 range)
+	void SetCameraRotationAbsolute(const float YawNormalized, const float PitchNormalized);
+	void SetCameraHeightAbsolute(const float HeightNormalized);
+	void SetCameraZoomAbsolute(const float ZoomNormalized);
+    
+	// Analog input functions for gamepad (per-frame updates with -1.0 to 1.0 range)
+	void UpdateCameraRotationAnalog(const FVector2D& AnalogInput, const float DeltaTime);
+	void UpdateCameraHeightAnalog(const float AnalogInput, const float DeltaTime);
+	void UpdateCameraZoomAnalog(const float AnalogInput, const float DeltaTime);
 
+protected:
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
@@ -61,12 +78,24 @@ public:
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
 
+	/**
+	 * @brief Resets the preview to its initial state.
+	 *
+	 * This method is called to restore the preview scene or object to its default parameters,
+	 * clearing any modifications or changes that may have occurred during interaction.
+	 *
+	 * Intended for use in scenarios where the preview needs to be refreshed or reverted
+	 * to its original configuration.
+	 */
+	UFUNCTION(BlueprintImplementableEvent, Category="Mountea|Event")
+	void OnPreviewReset();
+
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> PreviewImage;
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
-	bool bAutoStartTick = true;
+	bool bAutoStartTick = false;
 
 	/**
 	 * How many times per second to update the preview. The higher the value,
@@ -86,6 +115,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "100.0", ClampMax = "100.0"))
 	float HeightLimit = 100.f;
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "10.0", ClampMax = "10.0"))
+	float CameraRotationSensitivity = 0.2f;
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "10.0", ClampMax = "10.0"))
 	float CameraHeightSensitivity = 0.2f;
@@ -111,8 +143,13 @@ private:
 	FVector2D LastMousePosition = FVector2D::ZeroVector;
 	bool bIsMiddleMousePressed = false;
 	bool bIsMousePressed = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentYaw   = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentPitch = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentZoom  = 1.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentCameraHeight = 0.0f;
 };
