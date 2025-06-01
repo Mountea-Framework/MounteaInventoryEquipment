@@ -237,6 +237,8 @@ bool UMounteaAdvancedInventoryItemsGridWidget::IsItemInGrid_Implementation(const
 FMounteaInventoryGridSlot UMounteaAdvancedInventoryItemsGridWidget::GetGridSlotData_Implementation(
 	const int32 SlotIndex) const
 {
+	if (GridSlots.Array().IsValidIndex(SlotIndex) == false)
+		return FMounteaInventoryGridSlot();
 	return GridSlots.Array()[SlotIndex];
 }
 
