@@ -290,7 +290,7 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 {
 	if (ActiveCategoryId.Equals(SelectedCategoryId, ESearchCase::IgnoreCase)) return;
 	ActiveCategoryId = SelectedCategoryId;
-	ActiveItemGuid = FGuid();
+	ActiveItemGuid = FGuid();	
 	ActiveItemWidget = nullptr;
 	
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())

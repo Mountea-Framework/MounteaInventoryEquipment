@@ -44,7 +44,7 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	SpringArmComponent->bEnableCameraLag = false;
 	SpringArmComponent->bDoCollisionTest = false;
 	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
-	SpringArmComponent->SetRelativeLocation(FVector(0, 0, 90));
+	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
 
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCaptureComponent->SetupAttachment(SpringArmComponent);
@@ -69,7 +69,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
 	SetCameraDistance(300.f);
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRT)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRT) const
 {
 	if (SceneCaptureComponent)
 	{
@@ -78,7 +78,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRende
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh) const
 {
 	ClearMesh();
 	if (Mesh)
@@ -89,7 +89,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Me
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh)
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh) const
 {
 	ClearMesh();
 	if (Mesh)
@@ -116,8 +116,21 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(const float Distance) const
 {
-	const float clampedDistance = FMath::Clamp(Distance, 50.0f, 1000.0f);
-	SpringArmComponent->TargetArmLength = clampedDistance;
+	SpringArmComponent->SetRelativeScale3D(FVector(Distance));
+}
+
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraHeight(const float ZOffset) const
+{
+	FVector baseLocation = SpringArmComponent->GetRelativeLocation();
+	baseLocation.Z = InitialCameraHeight + ZOffset;
+	SpringArmComponent->SetRelativeLocation(baseLocation);
+}
+
+void AMounteaAdvancedInventoryItemPreviewRenderer::ResetToDefaults() const
+{
+	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
+	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
+	SpringArmComponent->SetRelativeScale3D(FVector(1));
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const

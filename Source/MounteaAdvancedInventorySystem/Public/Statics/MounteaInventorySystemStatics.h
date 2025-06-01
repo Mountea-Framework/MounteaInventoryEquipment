@@ -81,6 +81,17 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags",
 		meta=(CustomTag="MounteaK2Getter"))
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
+
+	/**
+	 * Retrieves an invalid FGuid.
+	 *
+	 * This function provides a static method to return an invalid/uninitialized FGuid.
+	 *
+	 * @return An invalid FGuid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Guid",
+		meta=(CustomTag="MounteaK2Getter"))
+	static FGuid GetInvalidGuid() { return FGuid(); };
 	
 	template<typename TEnum>
 	static constexpr bool HasFlag(uint8 value, TEnum flag)

@@ -1417,3 +1417,68 @@ void UMounteaInventoryUIStatics::ItemPreview_ClearPreview(UMounteaAdvancedInvent
 	if (IsValid(Target))
 		Target->ClearPreview();
 }
+
+void UMounteaInventoryUIStatics::ItemPreview_ResetPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target)
+{
+	if (IsValid(Target))
+		Target->ResetCameraToDefaults();
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta)
+{
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta)
+{
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoom(UMounteaAdvancedInventoryInteractableObjectWidget* Target,
+	const float WheelDelta)
+{
+	if (IsValid(Target))
+		Target->UpdateCameraZoom(WheelDelta);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraRotationAbsolute(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float YawNormalized, const float PitchNormalized)
+{
+	if (IsValid(Target))
+		Target->SetCameraRotationAbsolute(YawNormalized, PitchNormalized);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraHeightAbsolute(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float HeightNormalized)
+{
+	if (IsValid(Target))
+		Target->SetCameraHeightAbsolute(HeightNormalized);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized)
+{
+	if (IsValid(Target))
+		Target->SetCameraZoomAbsolute(ZoomNormalized);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotationAnalog(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& AnalogInput, const float DeltaTime)
+{
+	if (IsValid(Target))
+		Target->UpdateCameraRotationAnalog(AnalogInput, DeltaTime);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeightAnalog(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
+{
+	if (IsValid(Target))
+		Target->UpdateCameraHeightAnalog(AnalogInput, DeltaTime);
+}
+
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoomAnalog(
+	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
+{
+	if (IsValid(Target))
+		Target->UpdateCameraZoomAnalog(AnalogInput, DeltaTime);
+}

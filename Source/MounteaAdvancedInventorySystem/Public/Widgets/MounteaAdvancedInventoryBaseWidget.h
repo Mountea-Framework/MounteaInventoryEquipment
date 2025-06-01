@@ -35,6 +35,6 @@ public:
 protected:
 	
 	/** Reference to the owning inventory UI interface.*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data", meta=(AllowPrivateAccess))
 	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent = nullptr;
 };
