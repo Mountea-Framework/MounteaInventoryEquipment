@@ -15,6 +15,7 @@
 void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	bIsFocusable = true;
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()
@@ -99,6 +100,12 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ClearPreview() const
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 {
+	if (!PreviewScene.IsValid() || !IsValid(RendererActor))
+	{
+		LOG_ERROR(TEXT("Preview scene or renderer actor is invalid!"));
+		return;
+	}
+	
 	if (const UWorld* contextWorld = GetWorld())
 	{
 		if (FMath::IsNearlyZero(LastInteractionTime))
@@ -148,13 +155,16 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateLastInteractionAnd
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::ResetCameraToDefaults()
 {
-	if (RendererActor)
-		RendererActor->ResetToDefaults();
-
 	CurrentYaw   = 0.0f;
 	CurrentPitch = 0.0f;
 	CurrentZoom  = 1.0f;
 	CurrentCameraHeight = 0.0f;
+
+	if (RendererActor)
+	{
+		RendererActor->ResetToDefaults();
+		RendererActor->CaptureScene();
+	}
 }
 
 FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
@@ -162,38 +172,35 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
 	const FPointerEvent& InMouseEvent)
 {
 	const FVector2D currentMousePos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	
+	const FVector2D mouseDelta = currentMousePos - LastMousePosition;
+    
 	if (bIsMousePressed && RendererActor)
 	{
-		FVector2D mouseDelta = currentMousePos - LastMousePosition;
-		mouseDelta = InMouseEvent.GetCursorDelta() * 0.5f;
-		
-		CurrentYaw   += mouseDelta.X;
-		CurrentPitch = FMath::Clamp(CurrentPitch - mouseDelta.Y, -80.0f, 80.0f);
+		const float rotationSensitivity = 0.5f * CurrentZoom;
+        
+		CurrentYaw += mouseDelta.X * rotationSensitivity;
+		CurrentPitch = FMath::Clamp(CurrentPitch - mouseDelta.Y * rotationSensitivity, -YawLimits, YawLimits);
+        
 		RendererActor->SetCameraRotation(CurrentYaw, CurrentPitch);
 		UpdateLastInteractionAndStartPreview();
-		
+        
 		LastMousePosition = currentMousePos;
 		return FReply::Handled();
 	}
 	else if (bIsMiddleMousePressed && RendererActor)
 	{
-		const FVector2D mouseDelta = currentMousePos - LastMousePosition;
-		const float heightSensitivity = CameraHeightSensitivity / FMath::Max(CurrentZoom, 0.01f);
-		LOG_WARNING(TEXT("mouseDeltaY: %f"), mouseDelta.Y)
+		const float heightSensitivity = CameraHeightSensitivity * CurrentZoom;
 		const float heightIncrement = (mouseDelta.Y > 0) ? heightSensitivity : -heightSensitivity;
-		LOG_WARNING(TEXT("heightIncrement: %f"), heightIncrement)
-		CurrentCameraHeight += heightIncrement;
-		CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight, -10.0f, 10.0f);
-		LOG_WARNING(TEXT("CurrentCameraHeight: %f"), CurrentCameraHeight)
+        
+		CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight + heightIncrement, -HeightLimit, HeightLimit);
 		RendererActor->SetCameraHeight(CurrentCameraHeight);
-		
+        
 		UpdateLastInteractionAndStartPreview();
-		
+        
 		LastMousePosition = currentMousePos;
 		return FReply::Handled();
 	}
-	
+    
 	LastMousePosition = currentMousePos;
 	return Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 }
@@ -249,4 +256,10 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseWheel(
 		return FReply::Handled();
 	}
 	return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
+}
+
+void UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnFocusLost(const FFocusEvent& InFocusEvent)
+{
+	Super::NativeOnFocusLost(InFocusEvent);
+	PausePreview();
 }

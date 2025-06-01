@@ -58,6 +58,8 @@ public:
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
+	virtual void NativeOnFocusLost(const FFocusEvent& InFocusEvent) override;
+
 protected:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> PreviewImage;
@@ -77,6 +79,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "100.0", ClampMax = "100.0"))
 	FVector2D ScaleLimits = FVector2D(0.1f, 10.f);
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "180.0", ClampMax = "180.0"))
+	float YawLimits = 180.f;
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "100.0", ClampMax = "100.0"))
+	float HeightLimit = 100.f;
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "10.0", ClampMax = "10.0"))
 	float CameraHeightSensitivity = 0.2f;
