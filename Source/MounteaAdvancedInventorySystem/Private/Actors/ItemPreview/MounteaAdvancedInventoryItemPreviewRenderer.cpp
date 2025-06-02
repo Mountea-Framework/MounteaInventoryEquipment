@@ -131,6 +131,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::ResetToDefaults() const
 	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
 	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
 	SpringArmComponent->SetRelativeScale3D(FVector(1));
+	AutoFitMeshInView();
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const
@@ -142,16 +143,34 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const
  	SceneCaptureComponent->CaptureScene();
 }
 
+void AMounteaAdvancedInventoryItemPreviewRenderer::GetCurrentValues(FVector4& ScaleHeightPitchYaw) const
+{
+	ScaleHeightPitchYaw.X = SpringArmComponent->GetRelativeScale3D().Z;
+	ScaleHeightPitchYaw.Y = SpringArmComponent->GetRelativeLocation().Z;
+	ScaleHeightPitchYaw.Z = SpringArmComponent->GetRelativeRotation().Yaw;
+	ScaleHeightPitchYaw.W = SpringArmComponent->GetRelativeRotation().Pitch;
+}
+
 void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView() const
 {
 	UPrimitiveComponent* activeComp = GetActiveMeshComponent();
 	if (!activeComp)
 		return;
-	const auto localBounds = activeComp->GetLocalBounds();
 
-	const float maxExtent = FMath::Max3(localBounds.BoxExtent.X, localBounds.BoxExtent.Y, localBounds.BoxExtent.Z);
-	const float desiredDistance = maxExtent * 2.5f;
-	SpringArmComponent->TargetArmLength = FMath::Clamp(desiredDistance, 100.0f, 800.0f);
+	const float meshRadius = activeComp->GetLocalBounds().SphereRadius;
+	PreviewPivotComponent->SetRelativeScale3D(FVector::OneVector);
+	const float halfFOV = FMath::DegreesToRadians(SceneCaptureComponent->FOVAngle * 0.5f);
+	const float baseDistance = SpringArmComponent->TargetArmLength;
+	const float viewRadius = baseDistance * FMath::Tan(halfFOV);
+    
+	const float desiredScreenRatio = 0.8f;
+	const float targetViewRadius = viewRadius * desiredScreenRatio;
+	const float requiredScale = meshRadius / targetViewRadius;
+	const float clampedScale = FMath::Clamp(requiredScale, 0.1f, 10.0f);
+
+	SetCameraDistance(clampedScale);
+	const FBoxSphereBounds meshBounds = activeComp->GetLocalBounds();
+	SetCameraHeight(meshBounds.Origin.Z);
 }
 
 UPrimitiveComponent* AMounteaAdvancedInventoryItemPreviewRenderer::GetActiveMeshComponent() const

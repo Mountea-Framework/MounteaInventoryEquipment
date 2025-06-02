@@ -103,23 +103,29 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 		LOG_ERROR(TEXT("Preview scene or renderer actor is invalid!"));
 		return;
 	}
+	const UWorld* contextWorld = GetWorld();
+	if (!contextWorld) return;
 	
-	if (const UWorld* contextWorld = GetWorld())
-	{
-		if (FMath::IsNearlyZero(LastInteractionTime))
-			LastInteractionTime = GetWorld()->GetTimeSeconds();
+	if (FMath::IsNearlyZero(LastInteractionTime))
+		LastInteractionTime = GetWorld()->GetTimeSeconds();
 		
-		if (!contextWorld->GetTimerManager().IsTimerActive(TimerHandle_PreviewTick) && !FMath::IsNearlyEqual(PreviewTickFrequency, 0.f, KINDA_SMALL_NUMBER))
-		{
-			const float interval = 1.f / PreviewTickFrequency;
-			contextWorld->GetTimerManager().SetTimer(
-				TimerHandle_PreviewTick,
-				this,
-				&UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview,
-				interval,
-				true
-			);
-		}
+	if (!contextWorld->GetTimerManager().IsTimerActive(TimerHandle_PreviewTick) && !FMath::IsNearlyEqual(PreviewTickFrequency, 0.f, KINDA_SMALL_NUMBER))
+	{
+		const float interval = 1.f / PreviewTickFrequency;
+		contextWorld->GetTimerManager().SetTimer(
+			TimerHandle_PreviewTick,
+			this,
+			&UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview,
+			interval,
+			true
+		);
+
+		FVector4 currentValues;
+		RendererActor->GetCurrentValues(currentValues);
+		CurrentZoom = currentValues.X;
+		CurrentCameraHeight = currentValues.Y;
+		CurrentPitch = currentValues.Z;
+		CurrentYaw = currentValues.W;
 	}
 }
 
@@ -153,16 +159,18 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateLastInteractionAnd
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::ResetCameraToDefaults()
 {
-	CurrentYaw = 0.0f;
-	CurrentPitch = 0.0f;
-	CurrentZoom = 1.0f;
-	CurrentCameraHeight = 0.0f;
-
 	if (RendererActor)
 	{
 		RendererActor->ResetToDefaults();
 		RendererActor->CaptureScene();
 	}
+
+	FVector4 currentValues;
+	RendererActor->GetCurrentValues(currentValues);
+	CurrentZoom = currentValues.X;
+	CurrentCameraHeight = currentValues.Y;
+	CurrentPitch = currentValues.Z;
+	CurrentYaw = currentValues.W;
 
 	OnPreviewReset();
 }
@@ -171,7 +179,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraRotation(con
 {
 	if (!RendererActor) return;
 	
-	const float rotationSensitivity = CameraRotationSensitivity * CurrentZoom;
+	const float rotationSensitivity = CameraRotationSensitivity; // * CurrentZoom;
 	
 	CurrentYaw += MouseDelta.X * rotationSensitivity;
 	CurrentPitch = FMath::Clamp(CurrentPitch - MouseDelta.Y * rotationSensitivity, -YawLimits, YawLimits);
@@ -184,7 +192,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraHeight(const
 {
 	if (!RendererActor) return;
 	
-	const float heightSensitivity = CameraHeightSensitivity * CurrentZoom;
+	const float heightSensitivity = CameraHeightSensitivity; // * CurrentZoom;
 	const float heightIncrement = (MouseDelta.Y > 0) ? heightSensitivity : -heightSensitivity;
 	
 	CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight + heightIncrement, -HeightLimit, HeightLimit);
