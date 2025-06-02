@@ -144,6 +144,8 @@ private:
 	bool bIsMiddleMousePressed = false;
 	bool bIsMousePressed = false;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	FGuid ActivePreviewItemGuid = FGuid();
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentYaw   = 0.0f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
