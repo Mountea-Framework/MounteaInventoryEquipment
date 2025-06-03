@@ -23,6 +23,7 @@
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemsGridWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
+#include "Interfaces/Widgets/Tooltip/MounteaAdvancedInventoryTooltipWidgetInterface.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
@@ -646,12 +647,15 @@ FTextBlockStyle UMounteaInventoryUIStatics::ApplyTextBlockStyle(const FTextBlock
 	{
 		case EMounteaThemeLevel::Primary:
 			textColor = theme->PrimaryText;
+			returnValue.Font.Size = theme->PrimaryTextSize;
 			break;
 		case EMounteaThemeLevel::Secondary:
 			textColor = theme->SecondaryText;
+			returnValue.Font.Size = theme->SecondaryTextSize;
 			break;
 		case EMounteaThemeLevel::Tertiary:
 			textColor = theme->TertiaryText;
+			returnValue.Font.Size = theme->TertiaryTextSize;
 			break;
 		default:
 			textColor = theme->PrimaryText;
@@ -694,9 +698,30 @@ void UMounteaInventoryUIStatics::ApplyTextBlockTheme(UTextBlock* TextBlock, cons
 		LOG_WARNING(TEXT("[ApplyTextBlockTheme] Invalid TextBlock provided!"))
 		return;
 	}
+
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return;
+
+	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return;
+
+	auto theme = config->BaseTheme.LoadSynchronous();
+	if (!IsValid(theme)) return;
 	
 	FSlateFontInfo currentFont = TextBlock->GetFont();
 	FSlateFontInfo themedFont = ApplySlateFontInfo(currentFont, Level, State);
+	switch (Level)
+	{
+		case EMounteaThemeLevel::Primary:
+			themedFont.Size = theme->PrimaryTextSize;
+			break;
+		case EMounteaThemeLevel::Secondary:
+			themedFont.Size = theme->SecondaryTextSize;
+			break;
+		case EMounteaThemeLevel::Tertiary:
+			themedFont.Size = theme->TertiaryTextSize;
+			break;
+	}
 	TextBlock->SetFont(themedFont);
 
 	FTextBlockStyle currentStyle;
@@ -833,6 +858,12 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_HighlightItem(Target, bIsSelected);
+}
+
+void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, const FGuid& ItemId)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryTooltipWidgetInterface>())
+		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipItem(Target, ItemId);
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UWidget* Target,

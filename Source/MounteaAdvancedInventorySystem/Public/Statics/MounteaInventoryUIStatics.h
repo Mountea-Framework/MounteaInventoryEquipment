@@ -780,6 +780,27 @@ public:
 	
 #pragma endregion
 
+	// --- Item Tooltip ------------------------------
+#pragma region ItemTooltip
+
+	/**
+	 * Blueprint implementable event allowing customization of a tooltip to display information
+	 * about a specific inventory item.
+	 *
+	 * This function is designed to be implemented in Blueprints to update the tooltip's
+	 * content based on the provided Item ID. The implementation can be tailored to show
+	 * relevant information about the item tied to the given ID.
+	 *
+	 * @param Target The target widget that implements the UMounteaAdvancedInventoryItemTooltipWidgetInterface.
+	 * @param ItemId A unique identifier (GUID) representing the inventory item to display in the tooltip.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemTooltip",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Item Tooltip - Set Tooltip Item")
+	static void ItemTooltip_SetTooltipItem(UWidget* Target, const FGuid& ItemId);
+	
+#pragma endregion
+	
 	// --- Item Slot Widget ------------------------------
 #pragma region ItemSlot
 
@@ -800,7 +821,8 @@ public:
 	 * @param ItemId The unique identifier of the item to add to the specified slot.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
-		meta=(CustomTag="MounteaK2Setter"), DisplayName="Item Slot - Add Item To Slot")
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Item Slot - Add Item To Slot")
 	static void ItemSlot_AddItemToSlot(UWidget* Target, const FGuid& ItemId);
 
 	/**
