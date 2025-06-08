@@ -59,6 +59,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
 		meta=(CustomTag="MounteaK2Getter"))
 	static FText ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText);
+	static FString EscapeRegexSpecialChars(const FString& Input);
 
 	/**
 	 * Replaces string in a source string using a regular expression.
