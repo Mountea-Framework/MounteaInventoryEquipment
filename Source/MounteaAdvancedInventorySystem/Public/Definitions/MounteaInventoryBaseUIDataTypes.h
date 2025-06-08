@@ -98,6 +98,16 @@ public:
 
 		return FString::Printf(TEXT("Item: %s | Qty: %s"), *ItemIDString, *QtyString);
 	}
+
+	bool operator==(const FInventorySlot& Other) const
+	{
+		return OccupiedItemId == Other.OccupiedItemId;
+	}
+
+	bool operator!=(const FInventorySlot& Other) const
+	{
+		return !(*this == Other);
+	}
 };
 
 /**
@@ -147,4 +157,9 @@ FORCEINLINE uint32 GetTypeHash(const FInventorySlot& Slot)
 FORCEINLINE uint32 GetTypeHash(const FMounteaInventoryGridSlot& Slot)
 {
 	return GetTypeHash(Slot.SlotPosition);
+}
+
+FORCEINLINE bool operator==(const FInventorySlot& LHS, const FMounteaInventoryGridSlot& RHS)
+{
+	return LHS.OccupiedItemId == RHS.OccupiedItemId;
 }
