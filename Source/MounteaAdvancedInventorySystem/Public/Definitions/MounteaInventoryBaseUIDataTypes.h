@@ -12,7 +12,8 @@
  * This struct serves as a parent/base for more specialized slot types (like grid slots,
  * list slots, etc.), allowing you to keep common logic and data in one place.
  */
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType,
+	meta=(HasNativeMake="/Script/MounteaAdvancedInventorySystem.MounteaInventoryUIStatics.MakeInventorySlot"))
 struct FInventorySlot
 {
 	GENERATED_BODY()
@@ -50,7 +51,7 @@ public:
 public:
 
 	FInventorySlot()
-		: OccupiedItemId()
+		: OccupiedItemId(FGuid::NewGuid())
 		, SlotQuantity(INDEX_NONE)
 		, SlotWidget(nullptr)
 	{}
@@ -122,6 +123,10 @@ struct FMounteaInventoryGridSlot : public FInventorySlot
 	GENERATED_BODY()
 
 public:
+	FMounteaInventoryGridSlot();
+	FMounteaInventoryGridSlot(const FInventorySlot& SourceSlot);
+
+public:
 	
 	/**
 	 * Defines the position of the slot in a grid.
@@ -148,6 +153,24 @@ public:
 
 	virtual FString ToString() const override;
 };
+
+FORCEINLINE FInventorySlot operator =(const FMounteaInventoryGridSlot& GridSlot)
+{
+	FInventorySlot Slot;
+	Slot.OccupiedItemId = GridSlot.OccupiedItemId;
+	Slot.SlotQuantity = GridSlot.SlotQuantity;
+	Slot.SlotWidget = GridSlot.SlotWidget;
+	return Slot;
+}
+
+FORCEINLINE FMounteaInventoryGridSlot operator =(const FInventorySlot& Slot)
+{
+	FMounteaInventoryGridSlot GridSlot;
+	GridSlot.OccupiedItemId = Slot.OccupiedItemId;
+	GridSlot.SlotQuantity = Slot.SlotQuantity;
+	GridSlot.SlotWidget = Slot.SlotWidget;
+	return GridSlot;
+}
 
 FORCEINLINE uint32 GetTypeHash(const FInventorySlot& Slot)
 {

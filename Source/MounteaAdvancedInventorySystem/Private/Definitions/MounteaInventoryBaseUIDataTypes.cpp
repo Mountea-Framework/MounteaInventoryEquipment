@@ -6,6 +6,17 @@
 #include "Blueprint/UserWidget.h"
 
 
+FMounteaInventoryGridSlot::FMounteaInventoryGridSlot() : FInventorySlot()
+{
+}
+
+FMounteaInventoryGridSlot::FMounteaInventoryGridSlot(const FInventorySlot& SourceSlot)
+{
+	OccupiedItemId = SourceSlot.OccupiedItemId;
+	SlotQuantity = SourceSlot.SlotQuantity;
+	SlotWidget = SourceSlot.SlotWidget;
+}
+
 FString FMounteaInventoryGridSlot::ToString() const
 {
 	FString returnString = TEXT("Slot: ");

@@ -804,13 +804,50 @@ public:
 	// --- Item Slot Widget ------------------------------
 #pragma region ItemSlot
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
-		meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Slot Tooltip (Item Slot)")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Make New Inventory Slot Data",
+		meta=(NativeMakeFunc))
+	static FInventorySlot MakeInventoryGridSlotData(const FInventorySlot& SlotData);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Make New Inventory Slot Data",
+		meta=(NativeMakeFunc))
+	static FInventorySlot MakeInventorySlotData(const FMounteaInventoryGridSlot& GridSlotData);
+
+	/**
+	 * Create new inventory slot widget with the specified parameters.
+	 * @param UserWidget The user widget that will contain the inventory slot.
+	 * @param ItemId The unique identifier of the item to be displayed in the slot.
+	 * @param Quantity The quantity of the item to be displayed in the slot.
+	 * @return A new FInventorySlot instance containing the item ID and quantity.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Make New Inventory Slot Data",
+		meta=(NativeMakeFunc))
+	static FInventorySlot MakeInventorySlot(UUserWidget* UserWidget, const FGuid& ItemId, const int32 Quantity);
+
+	/**
+	 * Retrieves the tooltip text for a given item slot widget.
+	 * @param Target The target widget from which to retrieve the tooltip text. Must implement the UMounteaAdvancedInventoryItemSlotWidgetInterface.
+	 * @return The tooltip text for the item slot, or an empty string if the widget is invalid or does not implement the required interface.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Slot Tooltip (Item Slot)")
 	static FString ItemSlot_GetSlotTooltip(UUserWidget* Target);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
-			meta=(CustomTag="MounteaK2Getter"), DisplayName="Generate Slot Tooltip (Item Slot)")
-	FString ItemSlot_GenerateSlotTooltup(UWidget* Target);
+	/**
+	 * Generates a tooltip for the specified item slot widget.
+	 * @param Target The target widget for which the tooltip will be generated. Must implement the UMounteaAdvancedInventoryItemSlotWidgetInterface.
+	 * @return A string containing the generated tooltip text for the item slot.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+			meta=(CustomTag="MounteaK2Getter"),
+			DisplayName="Generate Slot Tooltip (Item Slot)")
+	static FString ItemSlot_GenerateSlotTooltip(UWidget* Target);
 
 	/**
 	 * Sets the owning inventory UI for a given item slot widget.

@@ -866,12 +866,34 @@ void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, con
 		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipItem(Target, SourceSlot);
 }
 
+FInventorySlot UMounteaInventoryUIStatics::MakeInventoryGridSlotData(const FInventorySlot& SlotData)
+{
+	return FMounteaInventoryGridSlot(SlotData);
+}
+
+FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlotData(const FMounteaInventoryGridSlot& GridSlotData)
+{
+	return FInventorySlot(GridSlotData);
+}
+
+FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlot(UUserWidget* UserWidget, const FGuid& ItemId,
+															 const int32 Quantity)
+{
+	FInventorySlot returnValue;
+	{
+		returnValue.OccupiedItemId = ItemId;
+		returnValue.SlotQuantity = Quantity;
+		returnValue.SlotWidget = UserWidget;
+	}
+	return returnValue;
+}
+
 FString UMounteaInventoryUIStatics::ItemSlot_GetSlotTooltip(UUserWidget* Target)
 {
 	return IsValid(Target) ? IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotTooltip(Target) : TEXT("none");
 }
 
-FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltup(UWidget* Target)
+FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltip(UWidget* Target)
 {
 	if (!IsValid(Target)) return TEXT("none");
 	if (!Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) return TEXT("none");
@@ -894,7 +916,7 @@ FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltup(UWidget* Target
 	const auto itemTemplate = slotItem.GetTemplate();
 	if (!IsValid(itemTemplate)) return TEXT("none");
 
-	return FString::Printf(TEXT("Quantity: %d | Rarity: %s"), slotQuantity, *itemTemplate->ItemRarity);
+	return FString::Printf(TEXT("${quantityText}: %d | ${rarityText}: %s"), slotQuantity, *itemTemplate->ItemRarity);
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UWidget* Target,

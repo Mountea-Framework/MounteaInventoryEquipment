@@ -31,7 +31,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
 	FString GetSlotTooltip() const;
-	virtual FString GetSlotTooltipText_Implementation() const;
+	virtual FString GetSlotTooltipText_Implementation() const = 0;
 
 	/**
 	 * Sets the parent widget that contains the slot.
