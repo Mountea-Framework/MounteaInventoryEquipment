@@ -860,10 +860,41 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_HighlightItem(Target, bIsSelected);
 }
 
-void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, const FGuid& ItemId)
+void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, const FInventorySlot& SourceSlot)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryTooltipWidgetInterface>())
-		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipItem(Target, ItemId);
+		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipItem(Target, SourceSlot);
+}
+
+FString UMounteaInventoryUIStatics::ItemSlot_GetSlotTooltip(UUserWidget* Target)
+{
+	return IsValid(Target) ? IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotTooltip(Target) : TEXT("none");
+}
+
+FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltup(UWidget* Target)
+{
+	if (!IsValid(Target)) return TEXT("none");
+	if (!Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) return TEXT("none");
+	if (!Target->Implements<UMounteaInventorySystemBaseWidgetInterface>()) return TEXT("none");
+	
+	const auto slotInventory = IMounteaInventorySystemBaseWidgetInterface::Execute_GetSourceInventory(Target);
+	if (!IsValid(slotInventory.GetObject())) return TEXT("none");
+
+	const auto ownerInventory = slotInventory->Execute_GetParentInventory(slotInventory.GetObject());
+	if (!IsValid(ownerInventory.GetObject())) return TEXT("none");
+	
+	const auto slotData = IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(Target);
+	if (!slotData.IsValid()) return TEXT("none");
+	const int slotQuantity =slotData.SlotQuantity;
+	const FGuid itemGuid = slotData.OccupiedItemId;
+
+	const auto slotItem = ownerInventory->Execute_FindItem(ownerInventory.GetObject(), FInventoryItemSearchParams(itemGuid));
+	if (!slotItem.IsItemValid()) return TEXT("none");
+
+	const auto itemTemplate = slotItem.GetTemplate();
+	if (!IsValid(itemTemplate)) return TEXT("none");
+
+	return FString::Printf(TEXT("Quantity: %d | Rarity: %s"), slotQuantity, *itemTemplate->ItemRarity);
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UWidget* Target,
@@ -893,7 +924,7 @@ void UMounteaInventoryUIStatics::StoreGridSlotData(UWidget* Target, const FMount
 FMounteaInventoryGridSlot UMounteaInventoryUIStatics::GetGridSlotData(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
-		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(Target);
+		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetGridSlotData(Target);
 	return FMounteaInventoryGridSlot();
 }
 

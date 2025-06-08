@@ -41,8 +41,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	void RemoveMainUI();
 	virtual void RemoveMainUI_Implementation() = 0;
-
-	// TODO: Do I need this?
+	
 	/**
 	 * 
 	 * @param ParentInventory 
@@ -51,6 +50,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	bool SetSourceInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 	virtual bool SetSourceInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory) = 0;
+
+	/**
+	 * 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetSourceInventory() const;
+	virtual TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetSourceInventory_Implementation() const = 0;
 
 	/**
 	 * Retrieves the visibility state of the main inventory UI.

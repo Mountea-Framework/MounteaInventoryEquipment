@@ -792,17 +792,25 @@ public:
 	 * relevant information about the item tied to the given ID.
 	 *
 	 * @param Target The target widget that implements the UMounteaAdvancedInventoryItemTooltipWidgetInterface.
-	 * @param ItemId A unique identifier (GUID) representing the inventory item to display in the tooltip.
+	 * @param SourceSlot Slot that contains the item information to be displayed in the tooltip.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemTooltip",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Tooltip - Set Tooltip Item")
-	static void ItemTooltip_SetTooltipItem(UWidget* Target, const FGuid& ItemId);
+	static void ItemTooltip_SetTooltipItem(UWidget* Target, const FInventorySlot& SourceSlot);
 	
 #pragma endregion
 	
 	// --- Item Slot Widget ------------------------------
 #pragma region ItemSlot
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+		meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Slot Tooltip (Item Slot)")
+	static FString ItemSlot_GetSlotTooltip(UUserWidget* Target);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+			meta=(CustomTag="MounteaK2Getter"), DisplayName="Generate Slot Tooltip (Item Slot)")
+	FString ItemSlot_GenerateSlotTooltup(UWidget* Target);
 
 	/**
 	 * Sets the owning inventory UI for a given item slot widget.

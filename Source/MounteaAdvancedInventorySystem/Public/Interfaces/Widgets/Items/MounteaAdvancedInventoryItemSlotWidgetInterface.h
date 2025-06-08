@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemSlotWidgetInterface.generated.h"
 
+struct FInventorySlot;
 struct FMounteaInventoryGridSlot;
 class IMounteaAdvancedInventoryUIInterface;
 
@@ -23,6 +24,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemSlotWidget
 	GENERATED_BODY()
 
 public:
+	/**
+	 *	Gets the tooltip text from the Slot based on the item it contains.
+	 * 
+	 * @return String tooltip of the Slot.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	FString GetSlotTooltip() const;
+	virtual FString GetSlotTooltipText_Implementation() const;
 
 	/**
 	 * Sets the parent widget that contains the slot.
@@ -32,6 +41,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
 	void SetParentSlotsWrapper(UUserWidget* ParentSlotsWrapper);
 	virtual void SetParentSlotsWrapper_Implementation(UUserWidget* ParentSlotsWrapper) = 0;
+
+	/**
+	 * Stores the slot data for inventory purposes.
+	 * 
+	 * @param SlotData The slot data to be stored.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	void StoreBasicSlotData(const FInventorySlot& SlotData);
+	virtual void StoreBasicSlotData_Implementation(const FInventorySlot& SlotData) = 0;
 
 	/**
 	 * Stores the grid slot data for inventory purposes.
@@ -45,6 +63,15 @@ public:
 	virtual void StoreGridSlotData_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 	
 	/**
+	 * Retrieves the data associated with the inventory slot.
+	 *
+	 * @return The inventory slot data.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	FInventorySlot GetSlotData() const;
+	virtual FInventorySlot GetSlotData_Implementation() const = 0;
+
+	/**
 	 * Retrieves the data associated with the inventory grid slot.
 	 * This is optional information not all Slots need have (non-grid
 	 * based inventory layouts won't have any grid slot data).
@@ -52,8 +79,8 @@ public:
 	 * @return The inventory grid slot data.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
-	FMounteaInventoryGridSlot GetSlotData() const;
-	virtual FMounteaInventoryGridSlot GetSlotData_Implementation() const = 0;
+	FMounteaInventoryGridSlot GetGridSlotData() const;
+	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation() const = 0;
 
 	/**
 	 * Adds an item to the slot using the provided item ID.

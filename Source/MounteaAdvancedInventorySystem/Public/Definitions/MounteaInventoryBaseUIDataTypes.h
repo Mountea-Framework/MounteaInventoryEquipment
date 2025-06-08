@@ -96,7 +96,7 @@ public:
 			? FString::FromInt(SlotQuantity)
 			: TEXT("None");
 
-		return FString::Printf(TEXT("Item: %s | Qty: %s"), *ItemIDString, *QtyString);
+		return FString::Printf(TEXT("Quantity: %d | Qty: %s"), SlotQuantity, *QtyString);
 	}
 
 	bool operator==(const FInventorySlot& Other) const

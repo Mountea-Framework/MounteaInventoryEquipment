@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 
+
 FString FMounteaInventoryGridSlot::ToString() const
 {
 	FString returnString = TEXT("Slot: ");
