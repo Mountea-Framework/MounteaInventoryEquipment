@@ -6,6 +6,13 @@
 #include "Blueprint/UserWidget.h"
 
 
+FInventorySlot::FInventorySlot(const struct FMounteaInventoryGridSlot& GridSlot)
+{
+	OccupiedItemId = GridSlot.OccupiedItemId;
+	SlotQuantity = GridSlot.SlotQuantity;
+	SlotWidget = GridSlot.SlotWidget;
+}
+
 FMounteaInventoryGridSlot::FMounteaInventoryGridSlot() : FInventorySlot()
 {
 }

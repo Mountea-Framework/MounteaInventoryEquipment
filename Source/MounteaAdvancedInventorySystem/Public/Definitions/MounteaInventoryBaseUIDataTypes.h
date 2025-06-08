@@ -51,11 +51,13 @@ public:
 public:
 
 	FInventorySlot()
-		: OccupiedItemId(FGuid::NewGuid())
+		: OccupiedItemId(FGuid())
 		, SlotQuantity(INDEX_NONE)
 		, SlotWidget(nullptr)
 	{}
-
+	
+	FInventorySlot(const struct FMounteaInventoryGridSlot& GridSlot);
+	
 	/**
 	 * Returns true if this slot currently holds no valid item (i.e., OccupiedItemId is invalid).
 	 */
@@ -153,24 +155,6 @@ public:
 
 	virtual FString ToString() const override;
 };
-
-FORCEINLINE FInventorySlot operator =(const FMounteaInventoryGridSlot& GridSlot)
-{
-	FInventorySlot Slot;
-	Slot.OccupiedItemId = GridSlot.OccupiedItemId;
-	Slot.SlotQuantity = GridSlot.SlotQuantity;
-	Slot.SlotWidget = GridSlot.SlotWidget;
-	return Slot;
-}
-
-FORCEINLINE FMounteaInventoryGridSlot operator =(const FInventorySlot& Slot)
-{
-	FMounteaInventoryGridSlot GridSlot;
-	GridSlot.OccupiedItemId = Slot.OccupiedItemId;
-	GridSlot.SlotQuantity = Slot.SlotQuantity;
-	GridSlot.SlotWidget = Slot.SlotWidget;
-	return GridSlot;
-}
 
 FORCEINLINE uint32 GetTypeHash(const FInventorySlot& Slot)
 {
