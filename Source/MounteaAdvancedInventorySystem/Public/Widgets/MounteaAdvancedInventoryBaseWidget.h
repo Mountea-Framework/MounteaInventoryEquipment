@@ -32,6 +32,9 @@ public:
 			ParentUIComponent = NewOwningInventoryUI;
 	};
 
+	virtual TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI_Implementation() const override
+	{ return ParentUIComponent; };
+
 protected:
 	
 	/** Reference to the owning inventory UI interface.*/

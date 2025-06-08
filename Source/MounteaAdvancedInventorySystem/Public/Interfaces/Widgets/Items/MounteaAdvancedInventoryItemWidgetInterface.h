@@ -6,6 +6,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemWidgetInterface.generated.h"
 
+struct FInventorySlot;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemWidgetInterface : public UInterface
 {
@@ -44,6 +46,14 @@ public:
 	void RefreshItemWidget(const int32 Quantity);
 	virtual void RefreshItemWidget_Implementation(const int32 Quantity) = 0;
 
+	/**
+	 * Retrieves the data associated with the inventory slot.
+	 * @return The inventory slot data.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	FInventorySlot GetSlotData() const;
+	virtual FInventorySlot GetSlotData_Implementation() const = 0;
+	
 	/**
 	 *
 	 * @param ParentSlot The parent slot to be assigned to the inventory item widget.

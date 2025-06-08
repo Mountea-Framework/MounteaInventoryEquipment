@@ -32,4 +32,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Base")
 	void SetOwningInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
 	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI) = 0;
+
+	/**
+	 * 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI() const;
+	virtual TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI_Implementation() const = 0;
 };

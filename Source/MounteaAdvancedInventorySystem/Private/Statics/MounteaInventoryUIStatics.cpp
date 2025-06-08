@@ -896,16 +896,16 @@ FString UMounteaInventoryUIStatics::ItemSlot_GetSlotTooltip(UUserWidget* Target)
 FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltip(UWidget* Target)
 {
 	if (!IsValid(Target)) return TEXT("none");
-	if (!Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) return TEXT("none");
-	if (!Target->Implements<UMounteaInventorySystemBaseWidgetInterface>()) return TEXT("none");
+	if (!Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()) return TEXT("none");
+	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>()) return TEXT("none");
 	
-	const auto slotInventory = IMounteaInventorySystemBaseWidgetInterface::Execute_GetSourceInventory(Target);
+	const auto slotInventory = IMounteaAdvancedBaseInventoryWidgetInterface::Execute_GetOwningInventoryUI(Target);
 	if (!IsValid(slotInventory.GetObject())) return TEXT("none");
 
 	const auto ownerInventory = slotInventory->Execute_GetParentInventory(slotInventory.GetObject());
 	if (!IsValid(ownerInventory.GetObject())) return TEXT("none");
 	
-	const auto slotData = IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(Target);
+	const auto slotData = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetSlotData(Target);
 	if (!slotData.IsValid()) return TEXT("none");
 	const int slotQuantity =slotData.SlotQuantity;
 	const FGuid itemGuid = slotData.OccupiedItemId;
