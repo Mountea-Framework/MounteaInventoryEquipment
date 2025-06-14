@@ -46,6 +46,7 @@ bool UMounteaEquipItemAction::IsAllowed_Implementation(const FInventoryItem& Tar
 	return true;
 }
 
+// TODO: Do not spawn actor unless needed (might already exist in different slot)
 bool UMounteaEquipItemAction::ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem)
 {
 	const UMounteaInventoryItemTemplate* itemTemplate = TargetItem.GetTemplate();
