@@ -21,18 +21,45 @@ UMounteaInventoryItemAction::UMounteaInventoryItemAction()
 	bRequiresConfirmation = false;
 }
 
+bool UMounteaInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
+{
+	if (!TargetItem.IsItemValid())
+		return false;
+
+	return bIsVisibleByDefault;
+}
+
+bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
+{
+	if (!TargetItem.IsItemValid())
+		return false;
+
+	if (!IsActionVisible(TargetItem))
+		return false;
+
+	return true;
+}
+
+FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
+{
+	if (!TargetItem.IsItemValid())
+		return FText::FromString(TEXT("Invalid target item"));
+
+	return FText::FromString(TEXT("Action is not currently available"));
+}
+
 bool UMounteaInventoryItemAction::ExecuteInventoryAction(const FInventoryItem& TargetItem)
 {
 	UAbilitySystemComponent* asc = GetAbilitySystemComponentFromActorInfo();
 	if (!asc)
 	{
-		LOG_ERROR(TEXT("[%s] No AbilitySystemComponent found"), *GetName());
+		LOG_ERROR(TEXT("[%s] No AbilitySystemComponent found"), *GetName())
 		return false;
 	}
 
 	if (!TargetItem.IsItemValid())
 	{
-		LOG_ERROR(TEXT("[%s] Invalid target item"), *GetName());
+		LOG_ERROR(TEXT("[%s] Invalid target item"), *GetName())
 		return false;
 	}
 
@@ -44,7 +71,9 @@ bool UMounteaInventoryItemAction::ExecuteInventoryAction(const FInventoryItem& T
 	
 	eventData.ContextHandle = FGameplayEffectContextHandle();
 	if (eventData.ContextHandle.IsValid())
+	{
 		eventData.ContextHandle.Get()->AddInstigator(GetAvatarActorFromActorInfo(), GetAvatarActorFromActorInfo());
+	}
 
 	FGameplayTag eventTag = FGameplayTag::RequestGameplayTag("Ability.Event.InventoryAction");
 
@@ -83,10 +112,18 @@ void UMounteaInventoryItemAction::ActivateAbility(const FGameplayAbilitySpecHand
 	LOG_INFO(TEXT("[%s] Executing action on item %s"), *GetName(), *CurrentTargetItem.GetGuid().ToString());
 
 	ReceiveExecuteAction(CurrentTargetItem);
-	ApplyActionEffects();
-	ReceiveActionCompleted(CurrentTargetItem);
 	
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+	const bool success = ProcessAction(GetAvatarActorFromActorInfo(), CurrentTargetItem);
+	
+	if (success)
+	{
+		ApplyActionEffects();
+		ReceiveActionCompleted(CurrentTargetItem);
+	}
+	else
+		ReceiveActionFailed(CurrentTargetItem, FText::FromString(TEXT("Action processing failed")));
+	
+	EndAbility(Handle, ActorInfo, ActivationInfo, true, !success);
 }
 
 void UMounteaInventoryItemAction::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
@@ -94,42 +131,17 @@ void UMounteaInventoryItemAction::EndAbility(const FGameplayAbilitySpecHandle Ha
 	if (bWasCancelled)
 	{
 		ReceiveActionFailed(CurrentTargetItem, FText::FromString(TEXT("Action was cancelled")));
-		LOG_WARNING(TEXT("[%s] Action was cancelled"), *GetName());
+		LOG_WARNING(TEXT("[%s] Action was cancelled"), *GetName())
 	}
 
 	CurrentTargetItem = FInventoryItem();
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-bool UMounteaInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
+bool UMounteaInventoryItemAction::ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem)
 {
-	if (!TargetItem.IsItemValid())
-		return false;
-
-	return bIsVisibleByDefault;
-}
-
-FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
-{
-	UAbilitySystemComponent* asc = GetAbilitySystemComponentFromActorInfo();
-	if (!asc)
-		return FText::FromString(TEXT("No ability system available"));
-
-	if (!TargetItem.IsItemValid())
-		return FText::FromString(TEXT("Invalid target item"));
-
-	FGameplayTagContainer failureTags;
-	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), nullptr, nullptr, &failureTags))
-	{
-		if (failureTags.HasTag(FGameplayTag::RequestGameplayTag("Ability.ActivateFail.Cost")))
-			return FText::FromString(TEXT("Insufficient resources"));
-		else if (failureTags.HasTag(FGameplayTag::RequestGameplayTag("Ability.ActivateFail.Cooldown")))
-			return FText::FromString(TEXT("Action is on cooldown"));
-		else if (failureTags.HasTag(FGameplayTag::RequestGameplayTag("Ability.ActivateFail.BlockedByTags")))
-			return FText::FromString(TEXT("Action is blocked"));
-	}
-
-	return FText::FromString(TEXT("Action is not currently available"));
+	LOG_WARNING(TEXT("[%s] ProcessAction_Implementation called on base class"), *GetName())
+	return false;
 }
 
 void UMounteaInventoryItemAction::ApplyActionEffects()
@@ -137,7 +149,7 @@ void UMounteaInventoryItemAction::ApplyActionEffects()
 	UAbilitySystemComponent* asc = GetAbilitySystemComponentFromActorInfo();
 	if (!asc)
 	{
-		LOG_WARNING(TEXT("[%s] No AbilitySystemComponent found"), *GetName());
+		LOG_WARNING(TEXT("[%s] No AbilitySystemComponent found"), *GetName())
 		return;
 	}
 
@@ -166,11 +178,4 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction
 		return CurrentTargetItem.GetOwningInventory();
 
 	return nullptr;
-}
-
-UInventoryActionEventData* UInventoryActionEventData::CreateEventData(const FInventoryItem& Item)
-{
-	UInventoryActionEventData* EventData = NewObject<UInventoryActionEventData>();
-	EventData->TargetItem = Item;
-	return EventData;
 }
