@@ -203,8 +203,8 @@ FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	/* if (!inventoryItem.IsItemValid()) return FInventoryNotificationData();*/ // TODO: How to process failed Item?
 
 	FText notificationText = NotifConfig->MessageTemplate;
-	notificationText = UMounteaInventorySystemStatics::ReplaceRegexInText(TEXT("\\$\\{quantity\\}"), FText::AsNumber(FMath::Abs(QuantityDelta)), notificationText);
-	notificationText = UMounteaInventorySystemStatics::ReplaceRegexInText(TEXT("\\$\\{itemName\\}"), inventoryItem.GetItemName(), notificationText);
+	notificationText = UMounteaInventorySystemStatics::ReplaceRegexInText(TEXT("${quantity}"), FText::AsNumber(FMath::Abs(QuantityDelta)), notificationText);
+	notificationText = UMounteaInventorySystemStatics::ReplaceRegexInText(TEXT("${itemName}"), inventoryItem.GetItemName(), notificationText);
 
 	
 	return FInventoryNotificationData(

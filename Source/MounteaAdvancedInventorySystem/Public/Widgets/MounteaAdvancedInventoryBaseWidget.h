@@ -32,9 +32,12 @@ public:
 			ParentUIComponent = NewOwningInventoryUI;
 	};
 
+	virtual TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI_Implementation() const override
+	{ return ParentUIComponent; };
+
 protected:
 	
 	/** Reference to the owning inventory UI interface.*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data")
 	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent = nullptr;
 };

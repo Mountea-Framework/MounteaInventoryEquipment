@@ -23,6 +23,7 @@
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemsGridWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
+#include "Interfaces/Widgets/Tooltip/MounteaAdvancedInventoryTooltipWidgetInterface.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
@@ -646,12 +647,15 @@ FTextBlockStyle UMounteaInventoryUIStatics::ApplyTextBlockStyle(const FTextBlock
 	{
 		case EMounteaThemeLevel::Primary:
 			textColor = theme->PrimaryText;
+			returnValue.Font.Size = theme->PrimaryTextSize;
 			break;
 		case EMounteaThemeLevel::Secondary:
 			textColor = theme->SecondaryText;
+			returnValue.Font.Size = theme->SecondaryTextSize;
 			break;
 		case EMounteaThemeLevel::Tertiary:
 			textColor = theme->TertiaryText;
+			returnValue.Font.Size = theme->TertiaryTextSize;
 			break;
 		default:
 			textColor = theme->PrimaryText;
@@ -694,9 +698,30 @@ void UMounteaInventoryUIStatics::ApplyTextBlockTheme(UTextBlock* TextBlock, cons
 		LOG_WARNING(TEXT("[ApplyTextBlockTheme] Invalid TextBlock provided!"))
 		return;
 	}
+
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings)) return;
+
+	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(config)) return;
+
+	auto theme = config->BaseTheme.LoadSynchronous();
+	if (!IsValid(theme)) return;
 	
 	FSlateFontInfo currentFont = TextBlock->GetFont();
 	FSlateFontInfo themedFont = ApplySlateFontInfo(currentFont, Level, State);
+	switch (Level)
+	{
+		case EMounteaThemeLevel::Primary:
+			themedFont.Size = theme->PrimaryTextSize;
+			break;
+		case EMounteaThemeLevel::Secondary:
+			themedFont.Size = theme->SecondaryTextSize;
+			break;
+		case EMounteaThemeLevel::Tertiary:
+			themedFont.Size = theme->TertiaryTextSize;
+			break;
+	}
 	TextBlock->SetFont(themedFont);
 
 	FTextBlockStyle currentStyle;
@@ -835,6 +860,65 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_HighlightItem(Target, bIsSelected);
 }
 
+void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, const FInventorySlot& SourceSlot)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryTooltipWidgetInterface>())
+		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipItem(Target, SourceSlot);
+}
+
+FInventorySlot UMounteaInventoryUIStatics::MakeInventoryGridSlotData(const FInventorySlot& SlotData)
+{
+	return FMounteaInventoryGridSlot(SlotData);
+}
+
+FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlotData(const FMounteaInventoryGridSlot& GridSlotData)
+{
+	return FInventorySlot(GridSlotData);
+}
+
+FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlot(UUserWidget* UserWidget, const FGuid& ItemId,
+															 const int32 Quantity)
+{
+	FInventorySlot returnValue;
+	{
+		returnValue.OccupiedItemId = ItemId;
+		returnValue.SlotQuantity = Quantity;
+		returnValue.SlotWidget = UserWidget;
+	}
+	return returnValue;
+}
+
+FString UMounteaInventoryUIStatics::ItemSlot_GetSlotTooltip(UUserWidget* Target)
+{
+	return IsValid(Target) ? IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotTooltip(Target) : TEXT("none");
+}
+
+FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltip(UWidget* Target)
+{
+	if (!IsValid(Target)) return TEXT("none");
+	if (!Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()) return TEXT("none");
+	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>()) return TEXT("none");
+	
+	const auto slotInventory = IMounteaAdvancedBaseInventoryWidgetInterface::Execute_GetOwningInventoryUI(Target);
+	if (!IsValid(slotInventory.GetObject())) return TEXT("none");
+
+	const auto ownerInventory = slotInventory->Execute_GetParentInventory(slotInventory.GetObject());
+	if (!IsValid(ownerInventory.GetObject())) return TEXT("none");
+	
+	const auto slotData = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetSlotData(Target);
+	if (!slotData.IsValid()) return TEXT("none");
+	const int slotQuantity =slotData.SlotQuantity;
+	const FGuid itemGuid = slotData.OccupiedItemId;
+
+	const auto slotItem = ownerInventory->Execute_FindItem(ownerInventory.GetObject(), FInventoryItemSearchParams(itemGuid));
+	if (!slotItem.IsItemValid()) return TEXT("none");
+
+	const auto itemTemplate = slotItem.GetTemplate();
+	if (!IsValid(itemTemplate)) return TEXT("none");
+
+	return FString::Printf(TEXT("${quantityText}: %d | ${rarityText}: %s"), slotQuantity, *itemTemplate->ItemRarity);
+}
+
 void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UWidget* Target,
 															  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
@@ -862,7 +946,7 @@ void UMounteaInventoryUIStatics::StoreGridSlotData(UWidget* Target, const FMount
 FMounteaInventoryGridSlot UMounteaInventoryUIStatics::GetGridSlotData(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
-		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotData(Target);
+		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetGridSlotData(Target);
 	return FMounteaInventoryGridSlot();
 }
 

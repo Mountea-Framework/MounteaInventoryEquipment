@@ -16,6 +16,7 @@ public:
 
 private:
 
+	void InventoryManagerButtonClicked() const;
 	void LauncherButtonClicked() const;
 	void DialoguerButtonClicked() const;
 	void YoutubeButtonClicked() const;

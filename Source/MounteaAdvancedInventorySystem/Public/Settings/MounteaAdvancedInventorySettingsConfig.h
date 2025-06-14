@@ -117,6 +117,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Items", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemsGridWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryItemsGridWidgetClass;
 
+	// --- User Interface: Item Thumbnail
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Thumbnails", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryTooltipWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryItemThumbnailWidgetClass;
+
 	// --- User Interface: Item Panel
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|ItemPanel", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemPanelWidgetInterface"))

@@ -160,6 +160,14 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 	}
 }
 
+void FMounteaAdvancedInventorySystemEditor::InventoryManagerButtonClicked() const
+{
+	const FString URL = "https://mountea-framework.github.io/InventoryManager/";
+
+	if (!URL.IsEmpty())
+		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
+}
+
 void FMounteaAdvancedInventorySystemEditor::LauncherButtonClicked() const
 {
 	const FString URL = "https://github.com/Mountea-Framework/MounteaProjectLauncher";
@@ -342,6 +350,16 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 
 	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Tools", "Mountea Tools"));
 	{
+		MenuBuilder.AddMenuEntry(
+		LOCTEXT("MounteaSystemEditor_InventoryManagerButton_Label", "Mountea Inventory Manager"),
+		LOCTEXT("MounteaSystemEditor_InventoryManagerButton_ToolTip", "💼 Open Mountea Inventory Manager Tool\n\n❔ A browser-based Inventory Template Editor for Unreal Engine projects — manage item templates online from any device. Simple, fast, and accessible.\n\n💡 Features include:\n- Create and edit item templates\n- Manage item properties and categories\n- Export templates for use in Unreal Engine projects"),
+		FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventoryManager"),
+		FUIAction(
+			FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::InventoryManagerButtonClicked)
+		)
+	);
+		MenuBuilder.EndSection();
+		
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_DialoguerButton_Label", "Mountea Dialoguer"),
 			LOCTEXT("MounteaSystemEditor_DialoguerButton_ToolTip", "⛰ Open Mountea Dialoguer Standalone Tool\n\n❔ A powerful standalone Advanced Inventory crafting tool designed for narrative designers and writers. Create, edit, and manage complex Advanced Inventory trees with an intuitive interface. Seamlessly import your `.mnteadlg` files directly into the Mountea Advanced Inventory System.\n\n💡 Perfect for teams wanting to separate Advanced Inventory content creation from engine implementation."),

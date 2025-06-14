@@ -102,6 +102,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
 	FLinearColor TertiaryText = FColor::FromHex("#8F7443FF");
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	int PrimaryTextSize = 16;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	int SecondaryTextSize = 14;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
+	int TertiaryTextSize = 12;
+
 	// Accent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Highlight")
 	FLinearColor Accent = FColor::FromHex("#9C7E4AFF");

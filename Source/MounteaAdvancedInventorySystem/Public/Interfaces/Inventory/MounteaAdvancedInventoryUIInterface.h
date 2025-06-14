@@ -128,15 +128,16 @@ public:
 	// --- Categories
 	
 	/**
-	 * 
+	 * Handles the selection of a category in the inventory UI.
+	 * @param SelectedCategoryId The ID of the selected category.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Category")
 	void CategorySelected(const FString& SelectedCategoryId);
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
 
 	/**
-	 * 
-	 * @return 
+	 * Retrieves the currently selected category ID.
+	 * @return The ID of the currently selected category.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Category")
 	FString GetSelectedCategoryId() const;
@@ -163,40 +164,40 @@ public:
 	virtual void SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget) = 0;
 
 	/**
-	 * 
-	 * @param AddedItem 
+	 * Processes an item that has been added to the inventory.
+	 * @param AddedItem The item that has been added to the inventory.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ProcessItemAdded(const FInventoryItem& AddedItem);
 	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) = 0;
 
 	/**
-	 * 
-	 * @param RemovedItem 
+	 * Processes an item that has been removed from the inventory.
+	 * @param RemovedItem The item that has been removed from the inventory.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ProcessItemRemoved(const FInventoryItem& RemovedItem);
 	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) = 0;
 
 	/**
-	 * 
-	 * @param ModifiedItem 
+	 * Processes an item that has been modified in the inventory.
+	 * @param ModifiedItem The item that has been modified in the inventory.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ProcessItemModified(const FInventoryItem& ModifiedItem);
 	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) = 0;
 	
 	/**
-	 * 
-	 * @param SelectedItem 
+	 * Handles the selection of an item in the inventory UI.
+	 * @param SelectedItem The GUID of the selected item.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void ItemSelected(const FGuid& SelectedItem);
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
 
 	/**
-	 * 
-	 * @return 
+	 * Retrieves the currently active item GUID.
+	 * @return The GUID of the currently active item.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	FGuid GetActiveItemGuid() const;

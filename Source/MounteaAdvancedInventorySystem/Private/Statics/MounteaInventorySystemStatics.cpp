@@ -32,31 +32,61 @@ UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMoun
 
 FText UMounteaInventorySystemStatics::ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText)
 {
-	const FString SourceString = SourceText.ToString();
-	const FRegexPattern RegexPattern(Regex);
-	FRegexMatcher RegexMatcher(RegexPattern, SourceString);
+	const FString sourceString = SourceText.ToString();
 
-	if (!RegexMatcher.FindNext()) 
-	{
+	const FString escapedRegex = EscapeRegexSpecialChars(Regex);
+
+	const FRegexPattern regexPattern(escapedRegex);
+	FRegexMatcher regexMatcher(regexPattern, sourceString);
+
+	if (!regexMatcher.FindNext()) 
 		return SourceText;
+
+	FString formattedString;
+	int32 previousPosition = 0;
+	FString replacementText = Replacement.ToString();
+
+	formattedString += sourceString.Mid(previousPosition, regexMatcher.GetMatchBeginning() - previousPosition);
+	formattedString += replacementText;
+	previousPosition = regexMatcher.GetMatchEnding();
+	formattedString += sourceString.Mid(previousPosition);
+
+	return FText::FromString(formattedString);
+}
+
+FString UMounteaInventorySystemStatics::EscapeRegexSpecialChars(const FString& Input)
+{
+	FString escapedString = Input;
+
+	// Escape special characters in regex
+	// These are the regex special characters: . ^ $ * + ? ( ) [ ] { } | \ /
+
+	const TArray<TPair<FString, FString>> escapePairs = {
+		{TEXT("\\"), TEXT("\\\\")},
+		{TEXT("$"), TEXT("\\$")},
+		{TEXT("{"), TEXT("\\{")},
+		{TEXT("}"), TEXT("\\}")},
+		{TEXT("["), TEXT("\\[")},
+		{TEXT("]"), TEXT("\\]")},
+		{TEXT("("), TEXT("\\(")},
+		{TEXT(")"), TEXT("\\)")},
+		{TEXT("."), TEXT("\\.")},
+		{TEXT("^"), TEXT("\\^")},
+		{TEXT("|"), TEXT("\\|")},
+		{TEXT("?"), TEXT("\\?")},
+		{TEXT("+"), TEXT("\\+")},
+		{TEXT("*"), TEXT("\\*")},
+		{TEXT("/"), TEXT("\\/")}
+	};
+	
+	for (const auto& Pair : escapePairs)
+	{
+		escapedString = escapedString.Replace(*Pair.Key, *Pair.Value);
 	}
 
-	FString FormattedString;
-	int32 PreviousPosition = 0;
-	FString ReplacementText = Replacement.ToString();
-
-	do
-	{
-		FormattedString += SourceString.Mid(PreviousPosition, RegexMatcher.GetMatchBeginning() - PreviousPosition);
-		FormattedString += ReplacementText;
-		PreviousPosition = RegexMatcher.GetMatchEnding();
-	} 
-	while (RegexMatcher.FindNext());
-
-	FormattedString += SourceString.Mid(PreviousPosition);
-
-	return FText::FromString(FormattedString);
+	return escapedString;
 }
+
 
 FString UMounteaInventorySystemStatics::ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText)
 {
