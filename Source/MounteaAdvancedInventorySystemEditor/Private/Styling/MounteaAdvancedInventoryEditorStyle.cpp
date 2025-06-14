@@ -45,6 +45,7 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Dialoguer.large", new IMAGE_BRUSH(TEXT("Dialoguer_Icon"), Icon64x64));
 
 	StyleSet->Set("MAISStyleSet.Launcher", new IMAGE_BRUSH(TEXT("MPLIcon"), Icon40x40));
+	StyleSet->Set("MAISStyleSet.InventoryManager", new IMAGE_BRUSH(TEXT("MounteaInventoryManager_Icon"), Icon40x40));
 
 	StyleSet->Set("MAISStyleSet.Wiki", new IMAGE_BRUSH(TEXT("Wiki_Icon"), Icon40x40));
 	StyleSet->Set("MAISStyleSet.Wiki.Small", new IMAGE_BRUSH(TEXT("Wiki_Icon"), Icon16x16));
