@@ -25,7 +25,9 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 			{
 				"Core", 
 				"GameplayTags", 
-				"CommonUI",
+				"CommonUI", 
+				"GameplayAbilities",
+				"GameplayTasks"
 			}
 			);
 			
