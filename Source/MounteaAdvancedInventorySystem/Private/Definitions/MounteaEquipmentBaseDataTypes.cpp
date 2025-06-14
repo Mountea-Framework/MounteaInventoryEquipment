@@ -3,3 +3,5 @@
 
 #include "Definitions/MounteaEquipmentBaseDataTypes.h"
 
+#include "Definitions/MounteaEquipmentBaseEnums.h"
+

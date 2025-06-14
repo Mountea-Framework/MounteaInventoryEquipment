@@ -4,14 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-//#include "MounteaEquipmentBaseDataTypes.generated.h"
+#include "MounteaEquipmentBaseEnums.h"
+#include "MounteaEquipmentBaseDataTypes.generated.h"
 
 enum class EAttachmentSlotType : uint8;
 enum class EAttachmentSlotState : uint8;
+class UMounteaAttachableComponent;
 
 /**
  * Represents a single attachment slot in an equipment system.
- * This structure defines the properties of an attachment slot, including its ID, tags, display name, state, type, and target name.
+ * This structure defines the properties of an attachment slot, including its ID, tags, display name, State, type, and target name.
  */
 USTRUCT(BlueprintType)
 struct FAttachmentSlot
@@ -20,11 +22,8 @@ struct FAttachmentSlot
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
-	TObjectPtr<UObject> Attachment;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
-	FName Id;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Attachment")
+	TObjectPtr<UMounteaAttachableComponent> Attachment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	FGameplayTagContainer SlotTags;
@@ -32,7 +31,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	FText DisplayName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Attachment")
 	EAttachmentSlotState State;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
@@ -40,24 +39,68 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	FName TargetName;
-};
 
-/**
- * Container for attachment slots used in equipment systems.
- * This structure holds multiple attachment slots, each with its own state and properties.
- * It allows for flexible attachment management, enabling items to be equipped, unequipped, or locked in place.
- */
-USTRUCT(BlueprintType)
-struct FAttachmentContainer
-{
-	GENERATED_BODY()
+public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
-	FName DefaultAttachmentTarget;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
-	EAttachmentSlotState State;
+	FORCEINLINE bool IsValid() const
+	{
+		return !DisplayName.IsEmpty();
+	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
-	TMap<FName, FAttachmentSlot> AttachmentSlots;
+	FORCEINLINE bool IsEmpty() const
+	{
+		return State == EAttachmentSlotState::EASS_Empty && Attachment == nullptr;
+	}
+
+	FORCEINLINE bool IsOccupied() const
+	{
+		return State == EAttachmentSlotState::EASS_Occupied && Attachment != nullptr;
+	}
+
+	FORCEINLINE void DisableSlot()
+	{
+		if (!IsEmpty())
+			Detach();
+		State = EAttachmentSlotState::EASS_Locked;
+	}
+
+	FORCEINLINE bool IsLocked() const
+	{
+		return State == EAttachmentSlotState::EASS_Locked;
+	}
+
+	FORCEINLINE bool CanAttach() const
+	{
+		return IsValid() && IsEmpty() && !IsLocked();
+	}
+
+	FORCEINLINE bool Attach(UMounteaAttachableComponent* NewAttachment)
+	{
+		if (!CanAttach() || !NewAttachment)
+			return false;
+
+		Attachment = NewAttachment;
+		State = EAttachmentSlotState::EASS_Occupied;
+		return true;
+	}
+
+	FORCEINLINE bool Detach()
+	{
+		if (!IsOccupied())
+			return false;
+
+		Attachment = nullptr;
+		State = EAttachmentSlotState::EASS_Empty;
+		return true;
+	}
+
+	FORCEINLINE bool HasTag(const FGameplayTag& Tag) const
+	{
+		return SlotTags.HasTag(Tag);
+	}
+
+	FORCEINLINE bool MatchesTags(const FGameplayTagContainer& Tags, bool bRequireAll) const
+	{
+		return bRequireAll ? SlotTags.HasAll(Tags) : SlotTags.HasAny(Tags);
+	}
 };
