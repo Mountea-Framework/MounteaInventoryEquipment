@@ -45,7 +45,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 			// Advanced Inventory specific icons
 			{
 				AdvancedInventorySet->SetContentRoot(ContentDir);
-				
+
 				FSlateImageBrush* MounteaInventoryItemTemplateThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaInventoryItemTemplate"), TEXT(".png")), FVector2D(128.f, 128.f));
 				FSlateImageBrush* MounteaInventoryItemTemplateClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaInventoryItemTemplate"), TEXT(".png")), FVector2D(16.f, 16.f));
 				if (MounteaInventoryItemTemplateThumb && MounteaInventoryItemTemplateClassIcon)
@@ -53,7 +53,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaInventoryItemTemplate", MounteaInventoryItemTemplateThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryItemTemplate", MounteaInventoryItemTemplateClassIcon);
 				}
-				
+
 				FSlateImageBrush* MounteaAdvancedInventorySettingsConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventorySettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
 				FSlateImageBrush* MounteaAdvancedInventorySettingsConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventorySettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
 				if (MounteaAdvancedInventorySettingsConfigClassIcon && MounteaAdvancedInventorySettingsConfigClassThumb)
@@ -78,9 +78,41 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryInteractiveWidgetConfig", MounteaAdvancedInventoryInteractiveWidgetConfigClassIcon);
 				}
 
-				//Register the created style
+				FSlateImageBrush* AttachmentContainerThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentContainerIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* AttachmentContainerIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentContainerIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (AttachmentContainerThumb && AttachmentContainerIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAttachmentContainerComponent", AttachmentContainerThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAttachmentContainerComponent", AttachmentContainerIcon);
+				}
+
+				FSlateImageBrush* EquipmentComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/EquipmentComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* EquipmentComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/EquipmentComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (EquipmentComponentThumb && EquipmentComponentIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaEquipmentComponent", EquipmentComponentThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaEquipmentComponent", EquipmentComponentIcon);
+				}
+
+				FSlateImageBrush* InventoryComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InventoryComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (InventoryComponentThumb && InventoryComponentIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaInventoryComponent", InventoryComponentThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryComponent", InventoryComponentIcon);
+				}
+
+				FSlateImageBrush* AttachableComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachableComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* AttachableComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachableComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (AttachableComponentThumb && AttachableComponentIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAttachableComponent", AttachableComponentThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAttachableComponent", AttachableComponentIcon);
+				}
+
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
+
 		}
 	}
 

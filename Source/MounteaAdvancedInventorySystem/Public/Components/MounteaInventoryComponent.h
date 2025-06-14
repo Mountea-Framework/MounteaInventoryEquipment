@@ -17,7 +17,10 @@ enum class EInventoryType : uint8;
  *  Mountea Inventory Component
  * 
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable,  AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory Component"))
+UCLASS(ClassGroup=(Mountea), Blueprintable,
+	AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"),
+	HideCategories=("Cooking","Collision"),
+	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryComponent : public UActorComponent, public IMounteaAdvancedInventoryInterface
 {
 	GENERATED_BODY()
