@@ -1,0 +1,52 @@
+﻿// All rights reserved Dominik Morse 2024
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
+#include "MounteaAttachmentContainerComponent.generated.h"
+
+/**
+ * Component that holds an attachment container for equipment systems.
+ * This component allows actors to manage attachments dynamically at runtime.
+ * It can be used to equip, unequip, and manage attachments on actors.
+ */
+UCLASS(ClassGroup=(Mountea), Blueprintable,
+	AutoExpandCategories=("Mountea","AttachableContainer","Mountea|AttachableContainer"),
+	HideCategories=("Cooking","Collision"),
+	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachment Container Component"))
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachmentContainerComponent : public UActorComponent, public IMounteaAdvancedAttachmentContainerInterface
+{
+	GENERATED_BODY()
+
+public:
+
+	UMounteaAttachmentContainerComponent();
+
+public:
+
+	virtual bool IsValidSlot_Implementation(const FName& SlotId) const override;
+	virtual FAttachmentSlot GetSlot_Implementation(const FName& SlotId) const override;
+	virtual bool IsSlotOccupied_Implementation(const FName& SlotId) const override;
+	virtual bool DisableSlot_Implementation(const FName& SlotId) override;
+	virtual bool TryAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) override;
+	virtual bool TryDetach_Implementation(const FName& SlotId) override;
+	virtual bool ForceAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) override;
+	virtual bool ForceDetach_Implementation(const FName& SlotId) override;
+	virtual FName FindFirstFreeSlotWithTags_Implementation(const FGameplayTagContainer& RequiredTags) const override;
+	virtual FName GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const override;
+	virtual void ClearAll_Implementation() override;
+
+public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	FName DefaultAttachmentTarget;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	EAttachmentSlotState State;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	TMap<FName, FAttachmentSlot> AttachmentSlots;
+};
