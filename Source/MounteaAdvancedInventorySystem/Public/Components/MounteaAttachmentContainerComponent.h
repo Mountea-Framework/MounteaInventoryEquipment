@@ -8,6 +8,7 @@
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "MounteaAttachmentContainerComponent.generated.h"
 
+enum class EAttachmentSlotState : uint8;
 class UMounteaAdvancedAttachmentSlot;
 
 /**
@@ -56,6 +57,11 @@ public:
 		Instanced,
 		meta=(ForceInlineRow), meta=(TitleProperty="DisplayName"), meta=(ShowInnerProperties))
 	TMap<FName, TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
+
+protected:
+
+	UFUNCTION()
+	TArray<FName> GetAvailableTargetNames() const;
 
 protected:
 

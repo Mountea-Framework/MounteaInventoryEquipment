@@ -8,6 +8,8 @@
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "Commands/FMAISCommands.h"
+#include "Components/MounteaAttachmentContainerComponent.h"
+#include "DetailsCustomizations/MounteaAttachmentContainerDetailsCustomization.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
@@ -155,6 +157,22 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 				NSLOCTEXT("MounteaSupport", "TooltipText", "Opens Mountea Framework Support channel"),
 				FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Help")
 			);
+		}
+	}
+
+	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	{
+		TArray<FOnGetDetailCustomizationInstance> CustomClassLayouts =
+		{
+			FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaAttachmentContainerDetailsCustomization::MakeInstance),
+		};
+		RegisteredCustomClassLayouts =
+		{
+			UMounteaAttachmentContainerComponent::StaticClass()->GetFName(),
+		};
+		for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)
+		{
+			PropertyModule.RegisterCustomClassLayout(RegisteredCustomClassLayouts[i], CustomClassLayouts[i]);
 		}
 	}
 }

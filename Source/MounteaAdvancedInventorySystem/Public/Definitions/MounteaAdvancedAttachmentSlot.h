@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "MounteaEquipmentBaseDataTypes.h"
+#include "MounteaEquipmentBaseEnums.h"
 #include "UObject/Object.h"
 #include "MounteaAdvancedAttachmentSlot.generated.h"
 
@@ -47,8 +48,7 @@ public:
 	FName TargetComponentOverride;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableTargetNames"),
-		meta=(EditCondition="SlotType=EAttachmentSlotType::EAST_Socket"))
+		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket"))
 	FName TargetName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",

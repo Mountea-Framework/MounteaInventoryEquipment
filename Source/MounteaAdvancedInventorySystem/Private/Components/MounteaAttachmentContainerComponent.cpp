@@ -5,6 +5,7 @@
 
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 
 UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 {
@@ -124,8 +125,6 @@ void UMounteaAttachmentContainerComponent::ClearAll_Implementation()
 	}
 }
 
-#if WITH_EDITOR
-
 void UMounteaAttachmentContainerComponent::ApplyParentContainer()
 {
 	for (auto& pair : AttachmentSlots)
@@ -134,6 +133,37 @@ void UMounteaAttachmentContainerComponent::ApplyParentContainer()
 		pair.Value->ParentContainer = this;
 	}
 }
+
+TArray<FName> UMounteaAttachmentContainerComponent::GetAvailableTargetNames() const
+{
+	if (HasAnyFlags(RF_ClassDefaultObject))
+		return TArray<FName>();
+	AActor* ownerActor = GetOwner();
+
+	if (!IsValid(ownerActor))
+		ownerActor = Cast<AActor>(GetOuter());
+	if (!IsValid(ownerActor))
+		ownerActor = GetTypedOuter<AActor>();
+
+	if (!IsValid(ownerActor))
+	{
+		LOG_ERROR(TEXT("[%s] No valid owner actor"), *GetName());
+		return TArray<FName>();
+	}
+	TArray<FName> names;
+	TArray<USceneComponent*> sceneComponents;
+	ownerActor->GetComponents<USceneComponent>(sceneComponents);
+
+	for (USceneComponent* sceneComponent : sceneComponents)
+	{
+		if (IsValid(sceneComponent))
+			names.Add(sceneComponent->GetFName());
+	}
+
+	return names;
+}
+
+#if WITH_EDITOR
 
 void UMounteaAttachmentContainerComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {

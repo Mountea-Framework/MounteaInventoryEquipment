@@ -32,6 +32,6 @@ private:
 
 	TSharedPtr<FSlateStyleSet> AdvancedInventorySet;
 	TArray<TSharedPtr<class FAssetTypeActions_Base>> AssetActions;
-
+	TArray<FName> RegisteredCustomClassLayouts;
 	TSharedPtr<class FUICommandList> PluginCommands;
 };

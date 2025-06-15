@@ -13,12 +13,21 @@ UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot():
 
 UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot(
 	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& NewParentContainer) :
-	ParentContainer(NewParentContainer), State(EAttachmentSlotState::EASS_Empty), SlotType(EAttachmentSlotType::EAST_Socket)
+	State(EAttachmentSlotState::EASS_Empty), SlotType(EAttachmentSlotType::EAST_Socket), ParentContainer(NewParentContainer)
 {
 }
 
 TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 {
+	switch (SlotType)
+	{		
+		case EAttachmentSlotType::EAST_Socket:
+			break;
+		case EAttachmentSlotType::EAST_Component:
+		case EAttachmentSlotType::Default:
+			return TArray<FName>();
+	}
+	
 	if (!IsValid(ParentContainer.GetObject()))
 		return TArray<FName>();
 
@@ -26,9 +35,9 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 	if (!IsValid(parentActor))
 		return TArray<FName>();
 
-	TArray<UActorComponent*> parentComponents;
-	parentActor->GetComponents(parentComponents);
-	const UActorComponent* defaultComponent = nullptr;
+	TArray<UMeshComponent*> parentComponents;
+	parentActor->GetComponents<UMeshComponent>(parentComponents);
+	const UMeshComponent* defaultComponent = nullptr;
 	for (const auto& potentialComponent : parentComponents)
 	{
 		if (IsValid(potentialComponent)
@@ -38,17 +47,8 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 			break;
 		}
 	}
-	
-	switch (SlotType)
-	{		
-		case EAttachmentSlotType::EAST_Socket:
-			break;
-		case EAttachmentSlotType::EAST_Component:
-			break;
-		case EAttachmentSlotType::Default:
-			break;
-		}
-	return TArray<FName>();
+
+	return defaultComponent->GetAllSocketNames();
 }
 
 bool UMounteaAdvancedAttachmentSlot::IsEmpty() const
