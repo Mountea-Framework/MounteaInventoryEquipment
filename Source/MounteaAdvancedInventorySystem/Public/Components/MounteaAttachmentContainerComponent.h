@@ -30,7 +30,7 @@ public:
 
 public:
 
-	virtual AActor* GetOwningActor_Implementation() const override { return GetOwner(); };
+	virtual AActor* GetOwningActor_Implementation() const override;
 	virtual FName GetDefaultAttachmentTarget_Implementation() const override { return DefaultAttachmentTarget; }
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const override;
 	virtual UMounteaAdvancedAttachmentSlot* GetSlot_Implementation(const FName& SlotId) const override;

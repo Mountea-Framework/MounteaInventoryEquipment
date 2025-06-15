@@ -24,6 +24,25 @@ UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 	ApplyParentContainer();
 }
 
+AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() const
+{
+	AActor* ownerActor = GetOwner();
+
+	if (IsValid(ownerActor))
+		return ownerActor;
+	ownerActor = Cast<AActor>(GetOuter());
+	if (IsValid(ownerActor))
+		return ownerActor;
+	ownerActor = GetTypedOuter<AActor>();
+	if (IsValid(ownerActor))
+		return ownerActor;
+#if WITH_EDITOR
+	if (UBlueprintGeneratedClass* bpClass = Cast<UBlueprintGeneratedClass>(GetOuter()))
+		ownerActor = Cast<AActor>(bpClass->GetDefaultObject());
+#endif
+	return ownerActor;
+}
+
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const
 {
 	const auto foundSlot = AttachmentSlots.FindRef(SlotId);

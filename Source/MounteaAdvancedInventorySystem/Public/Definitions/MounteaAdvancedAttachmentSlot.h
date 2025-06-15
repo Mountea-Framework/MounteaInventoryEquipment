@@ -48,6 +48,7 @@ public:
 	FName TargetComponentOverride;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(GetOptions="GetAvailableTargetNames"),
 		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket"))
 	FName TargetName;
 
