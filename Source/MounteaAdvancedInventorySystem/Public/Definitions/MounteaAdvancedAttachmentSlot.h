@@ -29,39 +29,42 @@ public:
 	UMounteaAdvancedAttachmentSlot();
 	explicit UMounteaAdvancedAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& NewParentContainer);
 
-public:
+public:	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug")
-	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug")
-	TObjectPtr<UMounteaAttachableComponent> Attachment;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	FGameplayTagContainer SlotTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	FText DisplayName;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings")
 	EAttachmentSlotState State;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	EAttachmentSlotType SlotType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	FName TargetComponentOverride;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,
-		meta=(GetOptions="GetAvailableTargetNames"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(GetOptions="GetAvailableTargetNames"),
+		meta=(EditCondition="SlotType=EAttachmentSlotType::EAST_Socket"))
 	FName TargetName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
+		meta=(DisplayThumbnail=false))
+	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
+		meta=(DisplayThumbnail=false))
+	TObjectPtr<UMounteaAttachableComponent> Attachment;
 
 public:
 
 	UFUNCTION()
 	TArray<FName> GetAvailableTargetNames() const;
 
-	FORCEINLINE bool IsValid() const
+	FORCEINLINE bool IsSlotValid() const
 	{
 		return !DisplayName.IsEmpty();
 	}
@@ -77,7 +80,7 @@ public:
 
 	FORCEINLINE bool CanAttach() const
 	{
-		return IsValid() && IsEmpty() && !IsLocked();
+		return IsSlotValid() && IsEmpty() && !IsLocked();
 	}
 
 	bool Attach(UMounteaAttachableComponent* NewAttachment);

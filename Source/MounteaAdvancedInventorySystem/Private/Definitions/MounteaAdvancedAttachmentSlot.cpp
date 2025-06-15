@@ -4,6 +4,7 @@
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 
 UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot():
 	State(EAttachmentSlotState::EASS_Empty), SlotType(EAttachmentSlotType::EAST_Socket)
@@ -18,6 +19,26 @@ UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot(
 
 TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 {
+	if (!IsValid(ParentContainer.GetObject()))
+		return TArray<FName>();
+
+	auto parentActor = ParentContainer->Execute_GetOwningActor(ParentContainer.GetObject());
+	if (!IsValid(parentActor))
+		return TArray<FName>();
+
+	TArray<UActorComponent*> parentComponents;
+	parentActor->GetComponents(parentComponents);
+	const UActorComponent* defaultComponent = nullptr;
+	for (const auto& potentialComponent : parentComponents)
+	{
+		if (IsValid(potentialComponent)
+			&& potentialComponent->GetFName() == ParentContainer->Execute_GetDefaultAttachmentTarget(ParentContainer.GetObject()))
+		{
+			defaultComponent = potentialComponent;
+			break;
+		}
+	}
+	
 	switch (SlotType)
 	{		
 		case EAttachmentSlotType::EAST_Socket:

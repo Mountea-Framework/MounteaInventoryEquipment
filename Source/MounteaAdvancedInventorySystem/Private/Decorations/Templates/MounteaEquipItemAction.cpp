@@ -49,6 +49,8 @@ bool UMounteaEquipItemAction::IsAllowed_Implementation(const FInventoryItem& Tar
 // TODO: Do not spawn actor unless needed (might already exist in different slot)
 bool UMounteaEquipItemAction::ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem)
 {
+	return false;
+	/*
 	const UMounteaInventoryItemTemplate* itemTemplate = TargetItem.GetTemplate();
 	if (!itemTemplate)
 		return false;
@@ -108,6 +110,7 @@ bool UMounteaEquipItemAction::ProcessAction_Implementation(UObject* ActionInitia
 
 	LOG_INFO(TEXT("[EquipItemAction] Successfully equipped item %s"), *TargetItem.GetGuid().ToString())
 	return true;
+	*/
 }
 
 FText UMounteaEquipItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const

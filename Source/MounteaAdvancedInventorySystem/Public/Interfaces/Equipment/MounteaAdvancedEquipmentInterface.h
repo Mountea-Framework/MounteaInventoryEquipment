@@ -22,9 +22,5 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedEquipmentInterface
 	GENERATED_BODY()
 
 public:
-
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	AActor* GetOwningActor() const;
-	virtual AActor* GetOwningActor_Implementation() const = 0;
 };
 

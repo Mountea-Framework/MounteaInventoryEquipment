@@ -23,6 +23,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedAttachmentContainerInte
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	AActor* GetOwningActor() const;
+	virtual AActor* GetOwningActor_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	FName GetDefaultAttachmentTarget() const;
+	virtual FName GetDefaultAttachmentTarget_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	bool IsValidSlot(const FName& SlotId) const;
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const = 0;
 

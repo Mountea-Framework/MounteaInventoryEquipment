@@ -29,6 +29,8 @@ public:
 
 public:
 
+	virtual AActor* GetOwningActor_Implementation() const override { return GetOwner(); };
+	virtual FName GetDefaultAttachmentTarget_Implementation() const override { return DefaultAttachmentTarget; }
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const override;
 	virtual UMounteaAdvancedAttachmentSlot* GetSlot_Implementation(const FName& SlotId) const override;
 	virtual bool IsSlotOccupied_Implementation(const FName& SlotId) const override;
@@ -40,6 +42,7 @@ public:
 	virtual FName FindFirstFreeSlotWithTags_Implementation(const FGameplayTagContainer& RequiredTags) const override;
 	virtual FName GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const override;
 	virtual void ClearAll_Implementation() override;
+	void ApplyParentContainer();
 
 public:
 	

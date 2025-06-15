@@ -19,12 +19,14 @@ UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 	SetActiveFlag(true);
 
 	ComponentTags.Append( { TEXT("Mountea"), TEXT("Attachment") } );
+
+	ApplyParentContainer();
 }
 
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const
 {
 	const auto foundSlot = AttachmentSlots.FindRef(SlotId);
-	return foundSlot && foundSlot->IsValid();
+	return foundSlot && foundSlot->IsSlotValid();
 }
 
 UMounteaAdvancedAttachmentSlot* UMounteaAttachmentContainerComponent::GetSlot_Implementation(const FName& SlotId) const
@@ -124,9 +126,24 @@ void UMounteaAttachmentContainerComponent::ClearAll_Implementation()
 
 #if WITH_EDITOR
 
+void UMounteaAttachmentContainerComponent::ApplyParentContainer()
+{
+	for (auto& pair : AttachmentSlots)
+	{
+		if (!pair.Value) continue;
+		pair.Value->ParentContainer = this;
+	}
+}
+
 void UMounteaAttachmentContainerComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaAttachmentContainerComponent, AttachmentSlots))
+	{
+		ApplyParentContainer();
+	}
 }
 
 #endif
