@@ -160,6 +160,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		}
 	}
 
+	/*
 	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	{
 		TArray<FOnGetDetailCustomizationInstance> CustomClassLayouts =
@@ -175,6 +176,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 			PropertyModule.RegisterCustomClassLayout(RegisteredCustomClassLayouts[i], CustomClassLayouts[i]);
 		}
 	}
+	*/
 }
 
 void FMounteaAdvancedInventorySystemEditor::ShutdownModule()

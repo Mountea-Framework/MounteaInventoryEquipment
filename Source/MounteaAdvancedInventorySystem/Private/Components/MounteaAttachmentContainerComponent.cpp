@@ -144,6 +144,11 @@ TArray<FName> UMounteaAttachmentContainerComponent::GetAvailableTargetNames() co
 		ownerActor = Cast<AActor>(GetOuter());
 	if (!IsValid(ownerActor))
 		ownerActor = GetTypedOuter<AActor>();
+#if WITH_EDITOR
+	if (!IsValid(ownerActor))
+		if (UBlueprintGeneratedClass* bpClass = Cast<UBlueprintGeneratedClass>(GetOuter()))
+			ownerActor = Cast<AActor>(bpClass->GetDefaultObject());
+#endif	
 
 	if (!IsValid(ownerActor))
 	{

@@ -47,7 +47,8 @@ public:
 
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment",
+		meta=(GetOptions="GetAvailableTargetNames"))
 	FName DefaultAttachmentTarget;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
