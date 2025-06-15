@@ -44,13 +44,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	EAttachmentSlotType SlotType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	FName TargetComponentOverride;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(GetOptions="GetAvailableTargetNames"))
+	FName AttachmentTargetOverride;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableTargetNames"),
-		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket"))
-	FName TargetName;
+		meta=(GetOptions="GetAvailableSocketNames"),
+		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket"),
+		meta=(EditConditionHides))
+	FName SocketName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
 		meta=(DisplayThumbnail=false))
@@ -62,6 +64,8 @@ public:
 
 public:
 
+	UFUNCTION()
+	TArray<FName> GetAvailableSocketNames() const;
 	UFUNCTION()
 	TArray<FName> GetAvailableTargetNames() const;
 

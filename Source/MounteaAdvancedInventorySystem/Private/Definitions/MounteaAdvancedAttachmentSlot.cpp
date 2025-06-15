@@ -5,6 +5,8 @@
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
+#include "Statics/MounteaAttachmentsStatics.h"
+#include "Statics/MounteaInventorySystemStatics.h"
 
 UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot():
 	State(EAttachmentSlotState::EASS_Empty), SlotType(EAttachmentSlotType::EAST_Socket)
@@ -17,7 +19,7 @@ UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot(
 {
 }
 
-TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
+TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableSocketNames() const
 {
 	switch (SlotType)
 	{		
@@ -35,20 +37,22 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 	if (!IsValid(parentActor))
 		return TArray<FName>();
 
-	TArray<UMeshComponent*> parentComponents;
-	parentActor->GetComponents<UMeshComponent>(parentComponents);
-	const UMeshComponent* defaultComponent = nullptr;
-	for (const auto& potentialComponent : parentComponents)
-	{
-		if (IsValid(potentialComponent)
-			&& potentialComponent->GetFName() == ParentContainer->Execute_GetDefaultAttachmentTarget(ParentContainer.GetObject()))
-		{
-			defaultComponent = potentialComponent;
-			break;
-		}
-	}
+	return UMounteaAttachmentsStatics::GetAvailableSocketNames(parentActor,
+		AttachmentTargetOverride.IsNone() ?
+		ParentContainer->Execute_GetDefaultAttachmentTarget(ParentContainer.GetObject()) :
+		AttachmentTargetOverride);
+}
 
-	return defaultComponent->GetAllSocketNames();
+TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
+{
+	if (!IsValid(ParentContainer.GetObject()))
+		return TArray<FName>();
+
+	auto parentActor = ParentContainer->Execute_GetOwningActor(ParentContainer.GetObject());
+	if (!IsValid(parentActor))
+		return TArray<FName>();
+
+	return UMounteaAttachmentsStatics::GetAvailableComponentNames(parentActor);
 }
 
 bool UMounteaAdvancedAttachmentSlot::IsEmpty() const

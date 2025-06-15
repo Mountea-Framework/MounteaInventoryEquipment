@@ -6,6 +6,8 @@
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Statics/MounteaAttachmentsStatics.h"
+#include "Statics/MounteaInventorySystemStatics.h"
 
 UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 {
@@ -26,21 +28,7 @@ UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 
 AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() const
 {
-	AActor* ownerActor = GetOwner();
-
-	if (IsValid(ownerActor))
-		return ownerActor;
-	ownerActor = Cast<AActor>(GetOuter());
-	if (IsValid(ownerActor))
-		return ownerActor;
-	ownerActor = GetTypedOuter<AActor>();
-	if (IsValid(ownerActor))
-		return ownerActor;
-#if WITH_EDITOR
-	if (UBlueprintGeneratedClass* bpClass = Cast<UBlueprintGeneratedClass>(GetOuter()))
-		ownerActor = Cast<AActor>(bpClass->GetDefaultObject());
-#endif
-	return ownerActor;
+	return UMounteaInventorySystemStatics::GetOwningActor(this);
 }
 
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const
@@ -148,43 +136,21 @@ void UMounteaAttachmentContainerComponent::ApplyParentContainer()
 {
 	for (auto& pair : AttachmentSlots)
 	{
-		if (!pair.Value) continue;
+		if (!pair.Value || pair.Value->ParentContainer.GetObject()) continue;
 		pair.Value->ParentContainer = this;
 	}
 }
 
 TArray<FName> UMounteaAttachmentContainerComponent::GetAvailableTargetNames() const
 {
-	if (HasAnyFlags(RF_ClassDefaultObject))
-		return TArray<FName>();
-	AActor* ownerActor = GetOwner();
-
-	if (!IsValid(ownerActor))
-		ownerActor = Cast<AActor>(GetOuter());
-	if (!IsValid(ownerActor))
-		ownerActor = GetTypedOuter<AActor>();
-#if WITH_EDITOR
-	if (!IsValid(ownerActor))
-		if (UBlueprintGeneratedClass* bpClass = Cast<UBlueprintGeneratedClass>(GetOuter()))
-			ownerActor = Cast<AActor>(bpClass->GetDefaultObject());
-#endif	
+	const AActor* ownerActor = UMounteaInventorySystemStatics::GetOwningActor(this);
 
 	if (!IsValid(ownerActor))
 	{
 		LOG_ERROR(TEXT("[%s] No valid owner actor"), *GetName());
 		return TArray<FName>();
 	}
-	TArray<FName> names;
-	TArray<USceneComponent*> sceneComponents;
-	ownerActor->GetComponents<USceneComponent>(sceneComponents);
-
-	for (USceneComponent* sceneComponent : sceneComponents)
-	{
-		if (IsValid(sceneComponent))
-			names.Add(sceneComponent->GetFName());
-	}
-
-	return names;
+	return UMounteaAttachmentsStatics::GetAvailableComponentNames(ownerActor);
 }
 
 #if WITH_EDITOR

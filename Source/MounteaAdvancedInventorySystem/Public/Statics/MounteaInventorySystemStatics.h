@@ -93,6 +93,18 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Guid",
 		meta=(CustomTag="MounteaK2Getter"))
 	static FGuid GetInvalidGuid() { return FGuid(); };
+
+	/**
+	 * Retrieves the owning actor of a given component.
+	 *
+	 * This function returns the actor that owns the specified component.
+	 * If the component is valid, it retrieves the actor from the component's GetOwner method.
+	 *
+	 * @param Target The object for which to retrieve the owning actor.
+	 * @return The actor that owns the specified component, or nullptr if the component is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Owner")
+	static AActor* GetOwningActor(const UObject* Target);
 	
 	template<typename TEnum>
 	static constexpr bool HasFlag(uint8 value, TEnum flag)

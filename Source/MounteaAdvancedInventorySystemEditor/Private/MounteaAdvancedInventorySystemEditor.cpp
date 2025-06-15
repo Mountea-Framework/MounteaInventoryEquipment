@@ -112,6 +112,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassIcon.MounteaAttachableComponent", AttachableComponentIcon);
 				}
 
+				FSlateImageBrush* AttachableSlotThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentSlotIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* AttachableSlotIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentSlotIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (AttachableSlotThumb && AttachableSlotIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedAttachmentSlot", AttachableSlotThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedAttachmentSlot", AttachableSlotIcon);
+				}
+
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
 

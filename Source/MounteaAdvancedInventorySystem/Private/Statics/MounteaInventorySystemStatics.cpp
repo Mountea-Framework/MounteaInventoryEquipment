@@ -97,3 +97,31 @@ FGameplayTag UMounteaInventorySystemStatics::GetGameplayTag(const FGameplayTagCo
 {
 	return Source.IsValidIndex(TagIndex) ? Source.GetByIndex(TagIndex) : Source.First(); 
 }
+
+AActor* UMounteaInventorySystemStatics::GetOwningActor(const UObject* Target)
+{
+	if (!IsValid(Target))
+		return nullptr;
+
+	auto resolveOwner = [&](AActor* InActor) {
+		AActor* actorToReturn = InActor;
+		if (!IsValid(actorToReturn))
+			actorToReturn = Cast<AActor>(Target->GetOuter());
+		if (!IsValid(actorToReturn))
+			actorToReturn = Target->GetTypedOuter<AActor>();
+#if WITH_EDITOR
+		if (!IsValid(actorToReturn))
+			if (const UBlueprintGeneratedClass* bpClass = Cast<UBlueprintGeneratedClass>(Target->GetOuter()))
+				actorToReturn = Cast<AActor>(bpClass->GetDefaultObject());
+#endif
+		return actorToReturn;
+	};
+
+	if (const UActorComponent* component = Cast<UActorComponent>(Target))
+		return resolveOwner(component->GetOwner());
+
+	if (const AActor* actor = Cast<AActor>(Target))
+		return resolveOwner(actor->GetOwner());
+
+	return resolveOwner(nullptr);
+}
