@@ -8,7 +8,7 @@
 #include "MounteaAdvancedAttachmentContainerInterface.generated.h"
 
 class UMounteaAttachableComponent;
-struct FAttachmentSlot;
+class UMounteaAdvancedAttachmentSlot;
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedAttachmentContainerInterface : public UInterface
@@ -27,8 +27,8 @@ public:
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
-	FAttachmentSlot GetSlot(const FName& SlotId) const;
-	virtual FAttachmentSlot GetSlot_Implementation(const FName& SlotId) const = 0;
+	UMounteaAdvancedAttachmentSlot* GetSlot(const FName& SlotId) const;
+	virtual UMounteaAdvancedAttachmentSlot* GetSlot_Implementation(const FName& SlotId) const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	bool IsSlotOccupied(const FName& SlotId) const;

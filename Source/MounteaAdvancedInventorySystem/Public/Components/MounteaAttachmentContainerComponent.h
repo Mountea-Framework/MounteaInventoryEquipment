@@ -8,6 +8,8 @@
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "MounteaAttachmentContainerComponent.generated.h"
 
+class UMounteaAdvancedAttachmentSlot;
+
 /**
  * Component that holds an attachment container for equipment systems.
  * This component allows actors to manage attachments dynamically at runtime.
@@ -28,7 +30,7 @@ public:
 public:
 
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const override;
-	virtual FAttachmentSlot GetSlot_Implementation(const FName& SlotId) const override;
+	virtual UMounteaAdvancedAttachmentSlot* GetSlot_Implementation(const FName& SlotId) const override;
 	virtual bool IsSlotOccupied_Implementation(const FName& SlotId) const override;
 	virtual bool DisableSlot_Implementation(const FName& SlotId) override;
 	virtual bool TryAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) override;
@@ -47,6 +49,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	EAttachmentSlotState State;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
-	TMap<FName, FAttachmentSlot> AttachmentSlots;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment",
+		Instanced,
+		meta=(ForceInlineRow), meta=(TitleProperty="DisplayName"), meta=(ShowInnerProperties))
+	TMap<FName, TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 };
