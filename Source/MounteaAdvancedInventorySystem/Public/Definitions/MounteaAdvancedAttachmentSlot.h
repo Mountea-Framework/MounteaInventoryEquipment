@@ -8,7 +8,10 @@
 #include "UObject/Object.h"
 #include "MounteaAdvancedAttachmentSlot.generated.h"
 
+class IMounteaAdvancedAttachmentContainerInterface;
 class UMounteaAttachableComponent;
+enum class EAttachmentSlotState : uint8;
+enum class EAttachmentSlotType : uint8;
 
 /**
  * Represents a single attachment slot in an equipment system.
@@ -23,25 +26,33 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlot : public
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Monutea|Attachment")
+	UMounteaAdvancedAttachmentSlot();
+	explicit UMounteaAdvancedAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& NewParentContainer);
+
+public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug")
+	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug")
 	TObjectPtr<UMounteaAttachableComponent> Attachment;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Monutea|Attachment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTagContainer SlotTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Monutea|Attachment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText DisplayName;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Monutea|Attachment")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	EAttachmentSlotState State;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Monutea|Attachment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EAttachmentSlotType SlotType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Monutea|Attachment")
-	FText TargetComponentOverride;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName TargetComponentOverride;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Monutea|Attachment",
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName TargetName;
 
@@ -55,59 +66,30 @@ public:
 		return !DisplayName.IsEmpty();
 	}
 
-	FORCEINLINE bool IsEmpty() const
-	{
-		return State == EAttachmentSlotState::EASS_Empty && Attachment == nullptr;
-	}
+	bool IsEmpty() const;
 
-	FORCEINLINE bool IsOccupied() const
-	{
-		return State == EAttachmentSlotState::EASS_Occupied && Attachment != nullptr;
-	}
+	bool IsOccupied() const;
 
-	FORCEINLINE void DisableSlot()
-	{
-		if (!IsEmpty())
-			Detach();
-		State = EAttachmentSlotState::EASS_Locked;
-	}
+	void DisableSlot();
 
-	FORCEINLINE bool IsLocked() const
-	{
-		return State == EAttachmentSlotState::EASS_Locked;
-	}
+	bool IsLocked() const;
+	
 
 	FORCEINLINE bool CanAttach() const
 	{
 		return IsValid() && IsEmpty() && !IsLocked();
 	}
 
-	FORCEINLINE bool Attach(UMounteaAttachableComponent* NewAttachment)
-	{
-		if (!CanAttach() || !NewAttachment)
-			return false;
+	bool Attach(UMounteaAttachableComponent* NewAttachment);
 
-		Attachment = NewAttachment;
-		State = EAttachmentSlotState::EASS_Occupied;
-		return true;
-	}
-
-	FORCEINLINE bool Detach()
-	{
-		if (!IsOccupied())
-			return false;
-
-		Attachment = nullptr;
-		State = EAttachmentSlotState::EASS_Empty;
-		return true;
-	}
+	bool Detach();
 
 	FORCEINLINE bool HasTag(const FGameplayTag& Tag) const
 	{
 		return SlotTags.HasTag(Tag);
 	}
 
-	FORCEINLINE bool MatchesTags(const FGameplayTagContainer& Tags, bool bRequireAll) const
+	FORCEINLINE bool MatchesTags(const FGameplayTagContainer& Tags, const bool bRequireAll) const
 	{
 		return bRequireAll ? SlotTags.HasAll(Tags) : SlotTags.HasAny(Tags);
 	}

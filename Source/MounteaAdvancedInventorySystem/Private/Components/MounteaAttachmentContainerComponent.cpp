@@ -4,6 +4,7 @@
 #include "Components/MounteaAttachmentContainerComponent.h"
 
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
+#include "Definitions/MounteaEquipmentBaseEnums.h"
 
 UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 {
@@ -121,4 +122,11 @@ void UMounteaAttachmentContainerComponent::ClearAll_Implementation()
 	}
 }
 
+#if WITH_EDITOR
 
+void UMounteaAttachmentContainerComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
+#endif

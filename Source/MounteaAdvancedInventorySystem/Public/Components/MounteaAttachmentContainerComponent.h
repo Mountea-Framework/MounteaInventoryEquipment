@@ -53,4 +53,12 @@ public:
 		Instanced,
 		meta=(ForceInlineRow), meta=(TitleProperty="DisplayName"), meta=(ShowInnerProperties))
 	TMap<FName, TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
+
+protected:
+
+#if WITH_EDITOR
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	
+#endif
 };
