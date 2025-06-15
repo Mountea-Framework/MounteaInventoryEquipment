@@ -23,7 +23,7 @@ public:
 	 * @return  Array of mesh components available on the target actor.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Helpers", meta=(CustomTag="MounteaK2Getter"))
-	static TArray<UMeshComponent*> GetAvailableComponents(const AActor* Target);
+	static TArray<USceneComponent*> GetAvailableComponents(const AActor* Target);
 
 	/**
 	 * Returns an array of names of mesh components available on the target actor.

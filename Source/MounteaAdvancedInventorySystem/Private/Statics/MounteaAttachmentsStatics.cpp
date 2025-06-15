@@ -3,22 +3,22 @@
 
 #include "Statics/MounteaAttachmentsStatics.h"
 
-TArray<UMeshComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(const AActor* Target)
+TArray<USceneComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(const AActor* Target)
 {
 	if (!IsValid(Target))
 		return {};
 
-	TArray<UMeshComponent*> components;
-	Target->GetComponents<UMeshComponent>(components);
+	TArray<USceneComponent*> components;
+	Target->GetComponents<USceneComponent>(components);
 	return components;
 }
 
 TArray<FName> UMounteaAttachmentsStatics::GetAvailableComponentNames(const AActor* Target)
 {
 	TArray<FName> names;
-	TArray<UMeshComponent*> components = GetAvailableComponents(Target);
+	TArray<USceneComponent*> components = GetAvailableComponents(Target);
 
-	for (UMeshComponent* comp : components)
+	for (USceneComponent* comp : components)
 	{
 		if (IsValid(comp))
 			names.Add(comp->GetFName());
@@ -32,8 +32,8 @@ TArray<FName> UMounteaAttachmentsStatics::GetAvailableSocketNames(const AActor* 
 	if (!IsValid(Target))
 		return {};
 
-	TArray<UMeshComponent*> components = GetAvailableComponents(Target);
-	for (UMeshComponent* comp : components)
+	TArray<USceneComponent*> components = GetAvailableComponents(Target);
+	for (USceneComponent* comp : components)
 	{
 		if (IsValid(comp) && comp->GetFName() == ComponentName)
 		{
