@@ -24,9 +24,4 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaEquipmentComponent : public UMo
 public:
 
 	UMounteaEquipmentComponent();
-
-public:
-
-	virtual AActor* GetOwningActor_Implementation() const override
-	{ return GetOwningActor(); };
 };

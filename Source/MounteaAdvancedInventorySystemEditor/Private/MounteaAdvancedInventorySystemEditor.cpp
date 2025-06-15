@@ -8,6 +8,8 @@
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "Commands/FMAISCommands.h"
+#include "Components/MounteaAttachmentContainerComponent.h"
+#include "DetailsCustomizations/MounteaAttachmentContainerDetailsCustomization.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
@@ -110,6 +112,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassIcon.MounteaAttachableComponent", AttachableComponentIcon);
 				}
 
+				FSlateImageBrush* AttachableSlotThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentSlotIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* AttachableSlotIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentSlotIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (AttachableSlotThumb && AttachableSlotIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedAttachmentSlot", AttachableSlotThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedAttachmentSlot", AttachableSlotIcon);
+				}
+
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
 
@@ -157,6 +167,24 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 			);
 		}
 	}
+
+	/*
+	FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+	{
+		TArray<FOnGetDetailCustomizationInstance> CustomClassLayouts =
+		{
+			FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaAttachmentContainerDetailsCustomization::MakeInstance),
+		};
+		RegisteredCustomClassLayouts =
+		{
+			UMounteaAttachmentContainerComponent::StaticClass()->GetFName(),
+		};
+		for (int32 i = 0; i < RegisteredCustomClassLayouts.Num(); i++)
+		{
+			PropertyModule.RegisterCustomClassLayout(RegisteredCustomClassLayouts[i], CustomClassLayouts[i]);
+		}
+	}
+	*/
 }
 
 void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
