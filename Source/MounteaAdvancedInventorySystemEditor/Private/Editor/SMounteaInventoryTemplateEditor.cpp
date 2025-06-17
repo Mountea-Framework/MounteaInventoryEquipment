@@ -26,6 +26,7 @@
 #include "Misc/Guid.h"
 #include "SGameplayTagWidget.h"
 #include "Decorations/MounteaInventoryItemAction.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
 
@@ -34,6 +35,8 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 	OnTemplateChanged = InArgs._OnTemplateChanged;
 	ThumbnailPool = MakeShareable(new FAssetThumbnailPool(16));
 	LoadAllTemplates();
+	CreateTransientTemplate();
+	bIsEditingTransient = true;
 	
 	ChildSlot
 	[
@@ -83,12 +86,64 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 	];
 }
 
-void SMounteaInventoryTemplateEditor::CreateNewTemplate()
+SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 {
+	CleanupTransientTemplate();
 }
 
-void SMounteaInventoryTemplateEditor::SaveTemplate()
+void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 {
+	if (TemplateListView.IsValid())
+		TemplateListView->ClearSelection();
+	
+	CleanupTransientTemplate();
+	CreateTransientTemplate();
+	bIsEditingTransient = true;
+	CurrentTemplate = TransientTemplate;
+}
+
+FReply SMounteaInventoryTemplateEditor::SaveTemplate()
+{
+	if (!TransientTemplate || !bIsEditingTransient)
+		return FReply::Unhandled();
+
+	// TODO: Spawn a window to select location!
+	FString PackageName = FString::Printf(TEXT("/Game/Inventory/Templates/%s"), *TransientTemplate->DisplayName.ToString());
+	if (TransientTemplate->DisplayName.IsEmpty())
+		PackageName = FString::Printf(TEXT("/Game/Inventory/Templates/NewTemplate_%s"), *FGuid::NewGuid().ToString());
+
+	UPackage* Package = CreatePackage(*PackageName);
+	if (!Package)
+		return FReply::Unhandled();
+
+	UMounteaInventoryItemTemplate* NewTemplate = DuplicateObject<UMounteaInventoryItemTemplate>(TransientTemplate, Package);
+	if (!NewTemplate)
+		return FReply::Unhandled();
+
+	NewTemplate->SetFlags(RF_Public | RF_Standalone);
+	NewTemplate->ClearFlags(RF_Transient);
+
+	FAssetRegistryModule::AssetCreated(NewTemplate);
+	Package->MarkPackageDirty();
+
+	RefreshTemplateList();
+	
+	if (TemplateListView.IsValid())
+	{
+		for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template : AvailableTemplates)
+		{
+			if (Template.IsValid() && Template.Get() == NewTemplate)
+			{
+				TemplateListView->SetSelection(Template);
+				break;
+			}
+		}
+	}
+
+	bIsEditingTransient = false;
+	CurrentTemplate = NewTemplate;
+
+	return FReply::Handled();
 }
 
 void SMounteaInventoryTemplateEditor::ImportTemplate()
@@ -162,6 +217,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		[
 			SNew(SButton)
 			.Text(LOCTEXT("SaveTemplate", "Save Template"))
+			.OnClicked(FOnClicked::CreateSP(this, &SMounteaInventoryTemplateEditor::SaveTemplate))
 		]
 		
 		// Import Template
@@ -227,6 +283,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateTemplateListPanel()
 				.ListItemsSource(&AvailableTemplates)
 				.OnGenerateRow(this, &SMounteaInventoryTemplateEditor::GenerateTemplateListRow)
 				.SelectionMode(ESelectionMode::Single)
+				.OnSelectionChanged(this, &SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged)
 			]
 		];
 }
@@ -1417,6 +1474,94 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 			]
 		]
 	];
+}
+
+void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
+{
+	TransientTemplate = NewObject<UMounteaInventoryItemTemplate>(
+			GetTransientPackage(), UMounteaInventoryItemTemplate::StaticClass(),
+			NAME_None, RF_Transient
+		);
+
+	// TODO: have a definition of template like in the web app
+	if (TransientTemplate)
+	{
+		TransientTemplate->Guid = FGuid::NewGuid();
+		TransientTemplate->DisplayName = FText::FromString(TEXT("New Template"));
+		TransientTemplate->MaxQuantity = 1;
+		TransientTemplate->MaxStackSize = 1;
+		TransientTemplate->ItemCategory = TEXT("Default");
+		TransientTemplate->ItemRarity = TEXT("Common");
+	}
+	
+	CurrentTemplate = TransientTemplate;
+}
+
+void SMounteaInventoryTemplateEditor::CleanupTransientTemplate()
+{
+	if (TransientTemplate)
+	{
+		TransientTemplate->MarkAsGarbage();
+		TransientTemplate = nullptr;
+	}
+}
+
+void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(
+	TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo)
+{
+	if (SelectInfo == ESelectInfo::Direct)
+		return;
+
+	if (SelectedTemplate.IsValid())
+	{
+		LoadTemplateData(SelectedTemplate.Get());
+		bIsEditingTransient = false;
+	}
+	else
+		CreateNewTemplate();
+}
+
+void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemplate* Template)
+{
+	if (!Template)
+		return;
+
+	CleanupTransientTemplate();
+	CreateTransientTemplate();
+	
+	if (TransientTemplate)
+	{
+		TransientTemplate->Guid = Template->Guid;
+		TransientTemplate->DisplayName = Template->DisplayName;
+		TransientTemplate->ItemCategory = Template->ItemCategory;
+		TransientTemplate->ItemSubCategory = Template->ItemSubCategory;
+		TransientTemplate->ItemRarity = Template->ItemRarity;
+		TransientTemplate->ItemFlags = Template->ItemFlags;
+		TransientTemplate->MaxQuantity = Template->MaxQuantity;
+		TransientTemplate->MaxStackSize = Template->MaxStackSize;
+		TransientTemplate->Tags = Template->Tags;
+		TransientTemplate->SpawnActor = Template->SpawnActor;
+		TransientTemplate->ItemShortInfo = Template->ItemShortInfo;
+		TransientTemplate->ItemLongInfo = Template->ItemLongInfo;
+		TransientTemplate->ItemThumbnail = Template->ItemThumbnail;
+		TransientTemplate->ItemCover = Template->ItemCover;
+		TransientTemplate->ItemMesh = Template->ItemMesh;
+		TransientTemplate->bHasDurability = Template->bHasDurability;
+		TransientTemplate->MaxDurability = Template->MaxDurability;
+		TransientTemplate->BaseDurability = Template->BaseDurability;
+		TransientTemplate->DurabilityPenalization = Template->DurabilityPenalization;
+		TransientTemplate->DurabilityToPriceCoefficient = Template->DurabilityToPriceCoefficient;
+		TransientTemplate->bHasPrice = Template->bHasPrice;
+		TransientTemplate->BasePrice = Template->BasePrice;
+		TransientTemplate->SellPriceCoefficient = Template->SellPriceCoefficient;
+		TransientTemplate->bHasWeight = Template->bHasWeight;
+		TransientTemplate->Weight = Template->Weight;
+		TransientTemplate->AffectorSlots = Template->AffectorSlots;
+		TransientTemplate->ItemSpecialAffect = Template->ItemSpecialAffect;
+	}
+	
+	CurrentTemplate = Template;
+	bIsEditingTransient = true;
 }
 
 bool SMounteaInventoryTemplateEditor::OnFilterMeshAssets(const FAssetData& AssetData) const
