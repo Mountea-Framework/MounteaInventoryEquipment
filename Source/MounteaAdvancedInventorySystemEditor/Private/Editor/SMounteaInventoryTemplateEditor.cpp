@@ -107,7 +107,6 @@ void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 	CurrentTemplate = TransientTemplate;
 }
 
-// TODO: provide error messages for failure!
 FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 {
 	if (!TransientTemplate || !bIsEditingTransient)
@@ -126,9 +125,11 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 	
 	// Determine default asset name
 	FString defaultAssetName = ItemNameTextBox.IsValid() ? ItemNameTextBox->GetText().ToString() : TEXT("");
-
 	if (defaultAssetName.IsEmpty())
-		defaultAssetName = FString::Printf(TEXT("NewTemplate_%s"), *FGuid::NewGuid().ToString());
+	{
+		ShowTemplateEditorNotification(TEXT("Failed to create a package with invalid name."), false);
+		return FReply::Unhandled();
+	}
 
 	// Configure Save Asset Dialog
 	FSaveAssetDialogConfig saveAssetDialogConfig;
@@ -140,7 +141,7 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 
 	// Show the Save Asset Dialog
 	FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
-	FString saveObjectPath = contentBrowserModule.Get().CreateModalSaveAssetDialog(saveAssetDialogConfig);
+	const FString saveObjectPath = contentBrowserModule.Get().CreateModalSaveAssetDialog(saveAssetDialogConfig);
 
 	// Handle user canceling the dialog
 	if (saveObjectPath.IsEmpty())
