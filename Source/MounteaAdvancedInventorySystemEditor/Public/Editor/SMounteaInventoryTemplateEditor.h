@@ -71,6 +71,9 @@ private:
 	/** Template list widgets */
 	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;
 
+	/** Thumbnail Pool*/
+	TSharedPtr<FAssetThumbnailPool> ThumbnailPool;
+
 	/** Widget creation methods */
 	TSharedRef<SWidget> CreateToolbar();
 	TSharedRef<SWidget> CreateTemplateListPanel();
@@ -88,6 +91,9 @@ private:
 	TSharedRef<SWidget> CreateVisualAssetsSection();
 	TSharedRef<SWidget> CreateMaterialsSection();
 	TSharedRef<SWidget> CreateCustomPropertiesSection();
+
+	/** Filtering */
+	bool OnFilterMeshAssets(const FAssetData& AssetData) const;
 
 	/** Template management */
 	void LoadAllTemplates();

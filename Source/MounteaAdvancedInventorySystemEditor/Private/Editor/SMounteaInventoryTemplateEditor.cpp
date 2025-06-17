@@ -32,6 +32,7 @@
 void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 {
 	OnTemplateChanged = InArgs._OnTemplateChanged;
+	ThumbnailPool = MakeShareable(new FAssetThumbnailPool(16));
 	LoadAllTemplates();
 	
 	ChildSlot
@@ -1124,6 +1125,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 				.AllowedClass(UMounteaInventoryItemAction::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
+				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 			]
 		]
 	];
@@ -1167,6 +1169,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.AllowedClass(UTexture2D::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
+				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 			]
 		]
 		
@@ -1194,6 +1197,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.AllowedClass(UTexture2D::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
+				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 			]
 		]
 		
@@ -1221,6 +1225,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.AllowedClass(UStreamableRenderAsset::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
+				.ThumbnailPool(ThumbnailPool.ToSharedRef())
+				.AllowCreate(false)
+				.OnShouldFilterAsset(FOnShouldFilterAsset::CreateRaw(this, &SMounteaInventoryTemplateEditor::OnFilterMeshAssets))
 			]
 		]
 	];
@@ -1294,6 +1301,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateMaterialsSection()
 							.AllowedClass(UMaterialInterface::StaticClass())
 							.AllowClear(true)
 							.DisplayThumbnail(true)
+							.ThumbnailPool(ThumbnailPool.ToSharedRef())
 						]
 						+ SHorizontalBox::Slot()
 						.AutoWidth()
@@ -1409,6 +1417,22 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 			]
 		]
 	];
+}
+
+bool SMounteaInventoryTemplateEditor::OnFilterMeshAssets(const FAssetData& AssetData) const
+{
+	const auto potentialAsset = AssetData.GetAsset();
+
+	if (!IsValid(potentialAsset))
+		return true;
+
+	if (potentialAsset->IsA(UStaticMesh::StaticClass()))
+		return false;
+
+	if (potentialAsset->IsA(USkeletalMesh::StaticClass()))
+		return false;
+	
+	return true;
 }
 
 void SMounteaInventoryTemplateEditor::LoadAllTemplates()
