@@ -20,9 +20,12 @@
 #include "EditorStyleSet.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
+#include "PropertyCustomizationHelpers.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Guid.h"
+#include "SGameplayTagWidget.h"
+#include "Decorations/MounteaInventoryItemAction.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
 
@@ -1030,6 +1033,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 			.Text(LOCTEXT("EquipmentProperties", "Equipment Properties"))
 		]
 		
+		// Affector Slots (TSet<FGameplayTag>)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1043,63 +1047,83 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 				.WidthOverride(150.0f)
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("EquipmentSlot", "Equipment Slot"))
+					.Text(LOCTEXT("AffectorSlots", "Affector Slots"))
 				]
 			]
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SComboBox<TSharedPtr<FString>>)
-			]
-		]
-		
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(0.0f, 5.0f)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			.AutoWidth()
-			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
-			[
-				SNew(SBox)
-				.WidthOverride(150.0f)
-				[
-					SNew(STextBlock)
-					.Text(LOCTEXT("AttachmentSlots", "Attachment Slots"))
-				]
-			]
-			+ SHorizontalBox::Slot()
-			.FillWidth(1.0f)
-			[
-				SNew(SSpinBox<int32>)
-				.MinValue(0)
-				.MaxValue(10)
-				.Value(0)
-			]
-		]
-		
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(0.0f, 5.0f)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			.AutoWidth()
-			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
-			[
-				SNew(SBox)
-				.WidthOverride(150.0f)
-				[
-					SNew(STextBlock)
-					.Text(LOCTEXT("SocketName", "Socket Name"))
-				]
-			]
-			+ SHorizontalBox::Slot()
-			.FillWidth(1.0f)
-			[
+				// TODO: Replace with a GameplayTag widget
 				SNew(SEditableTextBox)
-				.HintText(LOCTEXT("SocketNameHint", "Enter socket name for attachment"))
+				.Text_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? 
+						FText::FromString(CurrentTemplate->Tags.ToString()) : 
+						FText::GetEmpty();
+				})
+				.HintText(LOCTEXT("TagsHint", "GameplayTags"))
+			]
+		]
+		
+		// Spawn Actor (TSoftClassPtr<AActor>)
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
+			[
+				SNew(SBox)
+				.WidthOverride(150.0f)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SpawnActor", "Spawn Actor"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.0f)
+			[
+				SNew(SClassPropertyEntryBox)
+				.MetaClass(AActor::StaticClass())
+				.AllowNone(true)
+				.SelectedClass_Lambda([this]() -> const UClass*
+				{
+					return nullptr;
+				})
+				.OnSetClass_Lambda([this](const UClass* NewClass)
+				{
+					// Handle class selection change
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->SpawnActor = NewClass;
+				})
+			]
+		]
+		
+		// Item Special Affect (UObject)
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
+			[
+				SNew(SBox)
+				.WidthOverride(150.0f)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("ItemSpecialAffect", "Special Affect"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.0f)
+			[
+				SNew(SObjectPropertyEntryBox)
+				.AllowedClass(UMounteaInventoryItemAction::StaticClass())
+				.AllowClear(true)
+				.DisplayThumbnail(true)
 			]
 		]
 	];
@@ -1119,6 +1143,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 			.Text(LOCTEXT("VisualAssets", "Visual Assets"))
 		]
 		
+		// Item Thumbnail (UTexture2D)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1132,29 +1157,20 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.WidthOverride(150.0f)
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("Icon", "Icon"))
+					.Text(LOCTEXT("ItemThumbnail", "Item Thumbnail"))
 				]
 			]
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.FillWidth(1.0f)
-				[
-					SNew(SEditableTextBox)
-					.HintText(LOCTEXT("IconPath", "Path to icon texture"))
-				]
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.Padding(5.0f, 0.0f, 0.0f, 0.0f)
-				[
-					SNew(SButton)
-					.Text(LOCTEXT("Browse", "Browse"))
-				]
+				SNew(SObjectPropertyEntryBox)
+				.AllowedClass(UTexture2D::StaticClass())
+				.AllowClear(true)
+				.DisplayThumbnail(true)
 			]
 		]
 		
+		// Item Cover (UTexture2D)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1168,29 +1184,20 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.WidthOverride(150.0f)
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("StaticMesh", "Static Mesh"))
+					.Text(LOCTEXT("ItemCover", "Item Cover"))
 				]
 			]
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.FillWidth(1.0f)
-				[
-					SNew(SEditableTextBox)
-					.HintText(LOCTEXT("MeshPath", "Path to static mesh"))
-				]
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.Padding(5.0f, 0.0f, 0.0f, 0.0f)
-				[
-					SNew(SButton)
-					.Text(LOCTEXT("Browse", "Browse"))
-				]
+				SNew(SObjectPropertyEntryBox)
+				.AllowedClass(UTexture2D::StaticClass())
+				.AllowClear(true)
+				.DisplayThumbnail(true)
 			]
 		]
 		
+		// Item Mesh (UStreamableRenderAsset - supports both Static and Skeletal meshes)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1204,62 +1211,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.WidthOverride(150.0f)
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SkeletalMesh", "Skeletal Mesh"))
+					.Text(LOCTEXT("ItemMesh", "Item Mesh"))
 				]
 			]
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.FillWidth(1.0f)
-				[
-					SNew(SEditableTextBox)
-					.HintText(LOCTEXT("SkeletalMeshPath", "Path to skeletal mesh"))
-				]
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.Padding(5.0f, 0.0f, 0.0f, 0.0f)
-				[
-					SNew(SButton)
-					.Text(LOCTEXT("Browse", "Browse"))
-				]
-			]
-		]
-		
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(0.0f, 5.0f)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			.AutoWidth()
-			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
-			[
-				SNew(SBox)
-				.WidthOverride(150.0f)
-				[
-					SNew(STextBlock)
-					.Text(LOCTEXT("WorldMesh", "World Mesh"))
-				]
-			]
-			+ SHorizontalBox::Slot()
-			.FillWidth(1.0f)
-			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.FillWidth(1.0f)
-				[
-					SNew(SEditableTextBox)
-					.HintText(LOCTEXT("WorldMeshPath", "Path to world mesh"))
-				]
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.Padding(5.0f, 0.0f, 0.0f, 0.0f)
-				[
-					SNew(SButton)
-					.Text(LOCTEXT("Browse", "Browse"))
-				]
+				SNew(SObjectPropertyEntryBox)
+				.AllowedClass(UStreamableRenderAsset::StaticClass())
+				.AllowClear(true)
+				.DisplayThumbnail(true)
 			]
 		]
 	];
@@ -1309,7 +1270,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateMaterialsSection()
 				[
 					SNew(SVerticalBox)
 					
-					// Example material entry - in real implementation this would be dynamic
+					// Example material entry - using native UMaterialInterface reference
 					+ SVerticalBox::Slot()
 					.AutoHeight()
 					.Padding(0.0f, 2.0f)
@@ -1329,15 +1290,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateMaterialsSection()
 						+ SHorizontalBox::Slot()
 						.FillWidth(1.0f)
 						[
-							SNew(SEditableTextBox)
-							.HintText(LOCTEXT("MaterialPath", "Path to material"))
-						]
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						.Padding(5.0f, 0.0f, 0.0f, 0.0f)
-						[
-							SNew(SButton)
-							.Text(LOCTEXT("Browse", "Browse"))
+							SNew(SObjectPropertyEntryBox)
+							.AllowedClass(UMaterialInterface::StaticClass())
+							.AllowClear(true)
+							.DisplayThumbnail(true)
 						]
 						+ SHorizontalBox::Slot()
 						.AutoWidth()
@@ -1394,6 +1350,37 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 			]
 		]
 		
+		// Tags (FGameplayTagContainer)
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
+			[
+				SNew(SBox)
+				.WidthOverride(150.0f)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("Tags", "Tags"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.0f)
+			[
+				// TODO: Replace with a GameplayTag widget
+				SNew(SEditableTextBox)
+				.Text_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? 
+						FText::FromString(CurrentTemplate->Tags.ToString()) : 
+						FText::GetEmpty();
+				})
+				.HintText(LOCTEXT("TagsHint", "GameplayTags"))
+			]
+		]
+		
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1408,52 +1395,14 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 				[
 					SNew(SVerticalBox)
 					
-					// Example custom property entry - in real implementation this would be dynamic
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					.Padding(0.0f, 2.0f)
-					[
-						SNew(SHorizontalBox)
-						+ SHorizontalBox::Slot()
-						.FillWidth(0.3f)
-						.Padding(0.0f, 0.0f, 5.0f, 0.0f)
-						[
-							SNew(SEditableTextBox)
-							.Text(LOCTEXT("ExampleKey", "Damage"))
-						]
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						.Padding(0.0f, 0.0f, 5.0f, 0.0f)
-						[
-							SNew(SComboBox<TSharedPtr<FString>>)
-							[
-								SNew(STextBlock)
-								.Text(LOCTEXT("FloatType", "Float"))
-							]
-						]
-						+ SHorizontalBox::Slot()
-						.FillWidth(0.5f)
-						.Padding(0.0f, 0.0f, 5.0f, 0.0f)
-						[
-							SNew(SEditableTextBox)
-							.Text(LOCTEXT("ExampleValue", "25.0"))
-						]
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						[
-							SNew(SButton)
-							.Text(LOCTEXT("Remove", "Remove"))
-						]
-					]
-					
-					// Placeholder when no properties
+					// Placeholder for future custom properties system
 					+ SVerticalBox::Slot()
 					.AutoHeight()
 					.HAlign(HAlign_Center)
 					.Padding(0.0f, 10.0f)
 					[
 						SNew(STextBlock)
-						.Text(LOCTEXT("NoCustomProperties", "No custom properties added. Click 'Add Property' to add one."))
+						.Text(LOCTEXT("NoCustomProperties", "Custom properties can be added via GameplayTags above."))
 						.ColorAndOpacity(FSlateColor::UseSubduedForeground())
 					]
 				]

@@ -37,7 +37,8 @@ public:
 	void Construct(const FArguments& InArgs);
 
 	/** Sets the template being edited */
-	void SetTemplate(UMounteaInventoryItemTemplate* InTemplate);
+	void SetTemplate(UMounteaInventoryItemTemplate* InTemplate)
+	{ CurrentTemplate = InTemplate; };
 
 	/** Gets the current template */
 	UMounteaInventoryItemTemplate* GetTemplate() const { return CurrentTemplate; }
