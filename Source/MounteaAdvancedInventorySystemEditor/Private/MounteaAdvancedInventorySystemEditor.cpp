@@ -9,7 +9,9 @@
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "Commands/FMAISCommands.h"
 #include "Components/MounteaAttachmentContainerComponent.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
 #include "DetailsCustomizations/MounteaAttachmentContainerDetailsCustomization.h"
+#include "Editor/SMounteaInventoryTemplateEditor.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
@@ -17,10 +19,13 @@
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
+#include "Framework/Docking/TabManager.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
 static const FName MenuName("LevelEditor.LevelEditorToolBar.PlayToolBar");
+const FName FMounteaAdvancedInventorySystemEditor::InventoryTemplateEditorTabId = TEXT("MounteaInventoryTemplateEditor");
+TSharedPtr<SMounteaInventoryTemplateEditor> CurrentEditor;
 
 void FMounteaAdvancedInventorySystemEditor::StartupModule()
 {
@@ -185,6 +190,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		}
 	}
 	*/
+	// Register Tab Spawners
+	{
+		RegisterTabSpawners();
+	}
 }
 
 void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
@@ -218,6 +227,59 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 
 		FMAISCommands::Unregister();
 	}
+
+	// Tab Spawners Cleanup
+	{
+		UnregisterTabSpawners();
+	}
+}
+
+void FMounteaAdvancedInventorySystemEditor::RegisterTabSpawners()
+{
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
+		InventoryTemplateEditorTabId,
+		FOnSpawnTab::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::SpawnInventoryTemplateEditorTab)
+	)
+	.SetDisplayName(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
+	.SetTooltipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Open the Mountea Inventory Template Editor"))
+	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon"));
+}
+
+void FMounteaAdvancedInventorySystemEditor::UnregisterTabSpawners()
+{
+	if (FSlateApplication::IsInitialized())
+		FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(InventoryTemplateEditorTabId);
+}
+
+void FMounteaAdvancedInventorySystemEditor::OpenInventoryTemplateEditor()
+{
+	FGlobalTabmanager::Get()->TryInvokeTab(InventoryTemplateEditorTabId);
+}
+
+TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTemplateEditorTab(const FSpawnTabArgs& Args)
+{
+	TSharedRef<SMounteaInventoryTemplateEditor> NewEditor = SNew(SMounteaInventoryTemplateEditor)
+		.OnTemplateChanged_Lambda([](UMounteaInventoryItemTemplate* Template)
+		{
+			// Handle template changes if needed
+			if (Template)
+			{
+				// Mark package as dirty
+				Template->MarkPackageDirty();
+			}
+		});
+
+	CurrentTemplateEditor = NewEditor;
+
+	TSharedRef<SDockTab> NewTab = SNew(SDockTab)
+		.TabRole(ETabRole::NomadTab)
+		.Label(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
+		.ToolTipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Create and edit Mountea Inventory Item Templates"))
+		[
+			NewEditor
+		];
+
+	return NewTab;
 }
 
 void FMounteaAdvancedInventorySystemEditor::InventoryManagerButtonClicked() const
@@ -344,9 +406,22 @@ void FMounteaAdvancedInventorySystemEditor::EditorSettingsButtonClicked() const
 	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
 }
 
-TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget() const
+TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget()
 {
 	FMenuBuilder MenuBuilder(true, PluginCommands);
+
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Editor", "🎨 Mountea Item Templates Editor"));
+	{
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("MounteaSystemEditor_TemplateEditorButton_Label", "Mountea Inventory Template Editor"),
+			LOCTEXT("MounteaSystemEditor_TemplateEditorButton_ToolTip", "🎨 Open Mountea Inventory Template Editor\n\n❔ Create and edit Mountea Inventory Item Templates with a comprehensive visual editor. Design items with properties, assets, materials, and custom attributes.\n\n💡 Features include:\n- Visual template creation\n- Asset management\n- Property validation\n- Items import/export"),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon"),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::OpenInventoryTemplateEditor)
+			)
+		);
+	}
+	MenuBuilder.EndSection();
 
 	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "Mountea Advanced Inventory Settings"));
 	{

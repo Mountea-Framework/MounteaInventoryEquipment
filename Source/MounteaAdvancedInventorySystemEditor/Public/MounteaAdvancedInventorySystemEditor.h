@@ -4,6 +4,8 @@
 
 #include "Modules/ModuleManager.h"
 
+class SMounteaInventoryTemplateEditor;
+
 class FMounteaAdvancedInventorySystemEditor : public IModuleInterface
 {
 public:
@@ -16,6 +18,14 @@ public:
 
 private:
 
+	void RegisterTabSpawners();
+	void UnregisterTabSpawners();
+
+	void OpenInventoryTemplateEditor();
+	TSharedRef<SDockTab> SpawnInventoryTemplateEditorTab(const FSpawnTabArgs& Args);
+
+	static const FName InventoryTemplateEditorTabId;
+
 	void InventoryManagerButtonClicked() const;
 	void LauncherButtonClicked() const;
 	void DialoguerButtonClicked() const;
@@ -26,7 +36,7 @@ private:
 	void SettingsButtonClicked() const;
 	void ConfigButtonClicked() const;
 	void EditorSettingsButtonClicked() const;
-	TSharedRef<SWidget> MakeMounteaMenuWidget() const;
+	TSharedRef<SWidget> MakeMounteaMenuWidget();
 
 private:
 
@@ -34,4 +44,5 @@ private:
 	TArray<TSharedPtr<class FAssetTypeActions_Base>> AssetActions;
 	TArray<FName> RegisteredCustomClassLayouts;
 	TSharedPtr<class FUICommandList> PluginCommands;
+	TWeakPtr<SMounteaInventoryTemplateEditor> CurrentTemplateEditor;
 };
