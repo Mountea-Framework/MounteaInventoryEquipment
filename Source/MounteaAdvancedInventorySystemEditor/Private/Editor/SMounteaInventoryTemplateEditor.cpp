@@ -20,6 +20,8 @@
 #include "EditorStyleSet.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
+#include "ContentBrowserModule.h"
+#include "IContentBrowserSingleton.h"
 #include "PropertyCustomizationHelpers.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
@@ -102,37 +104,62 @@ void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 	CurrentTemplate = TransientTemplate;
 }
 
+// TODO: provide error messages for failure!
 FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 {
 	if (!TransientTemplate || !bIsEditingTransient)
 		return FReply::Unhandled();
 
-	// TODO: Spawn a window to select location!
-	FString PackageName = FString::Printf(TEXT("/Game/Inventory/Templates/%s"), *TransientTemplate->DisplayName.ToString());
-	if (TransientTemplate->DisplayName.IsEmpty())
-		PackageName = FString::Printf(TEXT("/Game/Inventory/Templates/NewTemplate_%s"), *FGuid::NewGuid().ToString());
-
-	UPackage* Package = CreatePackage(*PackageName);
-	if (!Package)
-		return FReply::Unhandled();
-
-	UMounteaInventoryItemTemplate* NewTemplate = DuplicateObject<UMounteaInventoryItemTemplate>(TransientTemplate, Package);
-	if (!NewTemplate)
-		return FReply::Unhandled();
-
-	NewTemplate->SetFlags(RF_Public | RF_Standalone);
-	NewTemplate->ClearFlags(RF_Transient);
-
-	FAssetRegistryModule::AssetCreated(NewTemplate);
-	Package->MarkPackageDirty();
-
-	RefreshTemplateList();
+	// TODO: run validation before saving!
 	
+	// Determine default asset name
+	// TODO: Read the new name from Editor's `ItemName`
+	FString defaultAssetName = TransientTemplate->DisplayName.IsEmpty()
+		? FString::Printf(TEXT("NewTemplate_%s"), *FGuid::NewGuid().ToString())
+		: TransientTemplate->DisplayName.ToString();
+
+	// Configure Save Asset Dialog
+	FSaveAssetDialogConfig saveAssetDialogConfig;
+	saveAssetDialogConfig.DefaultPath = TEXT("/Game/Inventory/Templates");
+	saveAssetDialogConfig.DefaultAssetName = defaultAssetName;
+	saveAssetDialogConfig.AssetClassNames.Add(UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName());
+	saveAssetDialogConfig.DialogTitleOverride = FText::FromString(TEXT("Save Inventory Template As"));
+	saveAssetDialogConfig.ExistingAssetPolicy = ESaveAssetDialogExistingAssetPolicy::AllowButWarn;
+
+	// Show the Save Asset Dialog
+	FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+	FString saveObjectPath = contentBrowserModule.Get().CreateModalSaveAssetDialog(saveAssetDialogConfig);
+
+	// Handle user canceling the dialog
+	if (saveObjectPath.IsEmpty())
+		return FReply::Unhandled();
+
+	// Create or load the package from the selected path
+	UPackage* newPackage = CreatePackage(*saveObjectPath);
+	if (!newPackage)
+		return FReply::Unhandled();
+
+	// Duplicate the transient template into the new package
+	UMounteaInventoryItemTemplate* newTemplate = DuplicateObject<UMounteaInventoryItemTemplate>(TransientTemplate, newPackage);
+	if (!newTemplate)
+		return FReply::Unhandled();
+
+	// Set asset flags
+	newTemplate->SetFlags(RF_Public | RF_Standalone);
+	newTemplate->ClearFlags(RF_Transient);
+
+	// Register the asset
+	FAssetRegistryModule::AssetCreated(newTemplate);
+	newPackage->MarkPackageDirty();
+
+	// Refresh UI and selection
+	RefreshTemplateList();
+
 	if (TemplateListView.IsValid())
 	{
 		for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template : AvailableTemplates)
 		{
-			if (Template.IsValid() && Template.Get() == NewTemplate)
+			if (Template.IsValid() && Template.Get() == newTemplate)
 			{
 				TemplateListView->SetSelection(Template);
 				break;
@@ -140,8 +167,9 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 		}
 	}
 
+	// Clear editing state
 	bIsEditingTransient = false;
-	CurrentTemplate = NewTemplate;
+	CurrentTemplate = newTemplate;
 
 	return FReply::Handled();
 }
