@@ -29,6 +29,8 @@
 #include "SGameplayTagWidget.h"
 #include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
 
@@ -109,11 +111,18 @@ void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 {
 	if (!TransientTemplate || !bIsEditingTransient)
+	{
+		ShowTemplateEditorNotification(TEXT("Cannot save: No template is being edited."), false);
 		return FReply::Unhandled();
+	}
 
 	// TODO: run validation before saving!
-	if (!ValidateTemplateData())
+	FString validationError;
+	if (!ValidateTemplateData(validationError))
+	{
+		ShowTemplateEditorNotification(FString::Printf(TEXT("Cannot save: %s."), *validationError), false);
 		return FReply::Unhandled();
+	}
 	
 	// Determine default asset name
 	FString defaultAssetName = ItemNameTextBox.IsValid() ? ItemNameTextBox->GetText().ToString() : TEXT("");
@@ -135,17 +144,26 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 
 	// Handle user canceling the dialog
 	if (saveObjectPath.IsEmpty())
+	{
+		ShowTemplateEditorNotification(TEXT("Save cancelled."), false);
 		return FReply::Unhandled();
+	}
 
 	// Create or load the package from the selected path
 	UPackage* newPackage = CreatePackage(*saveObjectPath);
 	if (!newPackage)
+	{
+		ShowTemplateEditorNotification(TEXT("Failed to create a package at the selected location."), false);
 		return FReply::Unhandled();
+	}
 
 	// Duplicate the transient template into the new package
 	UMounteaInventoryItemTemplate* newTemplate = DuplicateObject<UMounteaInventoryItemTemplate>(TransientTemplate, newPackage);
 	if (!newTemplate)
+	{
+		ShowTemplateEditorNotification(TEXT("Failed to create new Template at the selected location."), false);
 		return FReply::Unhandled();
+	}
 
 	// Set asset flags
 	newTemplate->SetFlags(RF_Public | RF_Standalone);
@@ -175,6 +193,7 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 	CurrentTemplate = newTemplate;
 	ItemNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
 
+	ShowTemplateEditorNotification(TEXT("Item Template created."), true);
 	return FReply::Handled();
 }
 
@@ -1596,13 +1615,35 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 	bIsEditingTransient = true;
 }
 
-bool SMounteaInventoryTemplateEditor::ValidateTemplateData() const
+bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage) const
 {
 	if (!ItemNameTextBox.IsValid())
+	{
+		ErrorMessage = TEXT("Item name text box is not valid.");
 		return false;
+	}
 	if (ItemNameTextBox.Get()->GetText().IsEmpty())
+	{
+		ErrorMessage = TEXT("Item name is empty.");
 		return false;
+	}
 	return true;
+}
+
+// TODO: provide link to click to navigate to the template in the content browser
+void SMounteaInventoryTemplateEditor::ShowTemplateEditorNotification(const FString& Message, const bool bSuccess) const
+{
+	FNotificationInfo notifInfo(FText::FromString(Message));
+	notifInfo.bFireAndForget = true;
+	notifInfo.ExpireDuration = 4.0f;
+	notifInfo.bUseThrobber = false;
+	notifInfo.bUseSuccessFailIcons = true;
+	notifInfo.bUseLargeFont = false;
+	notifInfo.WidthOverride = FOptionalSize();
+
+	TSharedPtr<SNotificationItem> notificationItem = FSlateNotificationManager::Get().AddNotification(notifInfo);
+	if (notificationItem.IsValid())
+		notificationItem->SetCompletionState(bSuccess ? SNotificationItem::CS_Success : SNotificationItem::CS_Fail);
 }
 
 bool SMounteaInventoryTemplateEditor::OnFilterMeshAssets(const FAssetData& AssetData) const

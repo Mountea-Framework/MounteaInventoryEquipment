@@ -8,6 +8,7 @@
 #include "AssetThumbnail.h"
 
 class UMounteaInventoryItemTemplate;
+class SNotificationItem;
 
 DECLARE_DELEGATE_OneParam(FOnTemplateChanged, UMounteaInventoryItemTemplate*);
 
@@ -51,7 +52,9 @@ private:
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
 	void LoadTemplateData(UMounteaInventoryItemTemplate* Template);
 
-	bool ValidateTemplateData() const;
+	bool ValidateTemplateData(FString& ErrorMessage) const;
+
+	void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true) const;
 
 private:
 	FOnTemplateChanged OnTemplateChanged;
