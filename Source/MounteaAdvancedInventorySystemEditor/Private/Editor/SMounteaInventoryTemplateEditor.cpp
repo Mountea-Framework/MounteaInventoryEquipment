@@ -65,7 +65,7 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 			.Padding(5.0f)
 			[
 				SNew(SBox)
-				.WidthOverride(300.0f)
+				.WidthOverride(500.0f)
 				[
 					CreateTemplateListPanel()
 				]
@@ -102,7 +102,7 @@ void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 	
 	CleanupTransientTemplate();
 	CreateTransientTemplate();
-	ItemNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
+	DisplayNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
 	bIsEditingTransient = true;
 	CurrentTemplate = TransientTemplate;
 }
@@ -124,7 +124,7 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 	}
 	
 	// Determine default asset name
-	FString defaultAssetName = ItemNameTextBox.IsValid() ? ItemNameTextBox->GetText().ToString() : TEXT("");
+	FString defaultAssetName = DisplayNameTextBox.IsValid() ? DisplayNameTextBox->GetText().ToString() : TEXT("");
 	if (defaultAssetName.IsEmpty())
 	{
 		ShowTemplateEditorNotification(TEXT("Failed to create a package with invalid name."), false);
@@ -192,7 +192,7 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 	// Clear editing state
 	bIsEditingTransient = false;
 	CurrentTemplate = newTemplate;
-	ItemNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
+	DisplayNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
 
 	ShowTemplateEditorNotification(TEXT("Item Template created."), true);
 	return FReply::Handled();
@@ -431,11 +431,153 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEditorPanel()
 
 TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable)
 {
+	FText displayText = LOCTEXT("InvalidTemplate", "Invalid Template");
+	FText fullText = displayText;
+	FString assetPath = TEXT("Unknown Path");
+	FText tooltipText = LOCTEXT("InvalidTemplateTooltip", "Invalid Template");
+	
+	if (Template.IsValid())
+	{
+		if (UMounteaInventoryItemTemplate* templatePtr = Template.Get())
+		{
+			fullText = templatePtr->DisplayName.IsEmpty() ? FText::FromString(templatePtr->GetName()) : templatePtr->DisplayName;
+			displayText = FText::FromString(fullText.ToString().Len() > 32 ? fullText.ToString().Left(32) + TEXT("...") : fullText.ToString());
+			if (UPackage* package = templatePtr->GetPackage())
+				assetPath = package->GetName();
+
+			tooltipText = FText::Format(
+				LOCTEXT("TemplateTooltip", "Name: {0}\nPath: {1}\nCategory: {2}\nRarity: {3}"),
+				fullText,
+				FText::FromString(assetPath),
+				FText::FromString(templatePtr->ItemCategory),
+				FText::FromString(templatePtr->ItemRarity)
+			);
+		}
+	}
+	
 	return SNew(STableRow<TWeakObjectPtr<UMounteaInventoryItemTemplate>>, OwnerTable)
+	[
+		SNew(SVerticalBox)
+		
+		// Row 1: Title + Icons
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(5.0f, 2.0f)
+		[
+			SNew(SHorizontalBox)
+			// Title
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.0f)
+			[
+				SNew(STextBlock)
+				.Text(displayText)
+				.Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
+				.ToolTipText(tooltipText)
+			]
+			// Navigation Icon
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(2.0f, 0.0f)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SButton)
+				.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+				.ContentPadding(FMargin(2.0f))
+				.ToolTipText(LOCTEXT("NavigateToFolderTooltip", "Navigate to folder in Content Browser"))
+				.OnClicked_Lambda([Template]()
+				{
+					if (Template.IsValid())
+					{
+						TArray<FAssetData> AssetDataList;
+						AssetDataList.Add(FAssetData(Template.Get()));
+						
+						FContentBrowserModule& ContentBrowserModule = FModuleManager::Get().LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+						ContentBrowserModule.Get().SyncBrowserToAssets(AssetDataList);
+					}
+					return FReply::Handled();
+				})
+				[
+					SNew(SBox)
+					.MaxAspectRatio(1.f)
+					.WidthOverride(16)
+					.HeightOverride(16)
+					[
+						SNew(SImage)
+						.Image(FAppStyle::GetBrush("Icons.FolderOpen"))
+						.ColorAndOpacity(FSlateColor::UseForeground())
+					]
+				]
+			]
+			// Duplicate Icon
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(2.0f, 0.0f)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SButton)
+				.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+				.ContentPadding(FMargin(2.0f))
+				.ToolTipText(LOCTEXT("DuplicateTemplateTooltip", "Duplicate this template"))
+				.OnClicked_Lambda([this, Template]()
+				{
+					// TODO: Implement duplicate functionality
+					ShowTemplateEditorNotification(TEXT("Duplicate functionality not yet implemented."), false);
+					return FReply::Handled();
+				})
+				[
+					SNew(SBox)
+					.MaxAspectRatio(1.f)
+					.WidthOverride(16)
+					.HeightOverride(16)
+					[
+						SNew(SImage)
+						.Image(FAppStyle::GetBrush("Icons.Duplicate"))
+						.ColorAndOpacity(FSlateColor::UseForeground())
+					]
+				]
+			]
+			// Delete Icon
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(2.0f, 0.0f)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SButton)
+				.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+				.ContentPadding(FMargin(2.0f))
+				.ToolTipText(LOCTEXT("DeleteTemplateTooltip", "Delete this template"))
+				.OnClicked_Lambda([this, Template]()
+				{
+					// TODO: Implement delete functionality
+					ShowTemplateEditorNotification(TEXT("Delete functionality not yet implemented."), false);
+					return FReply::Handled();
+				})
+				[
+					SNew(SBox)
+					.MaxAspectRatio(1.f)
+					.WidthOverride(16)
+					.HeightOverride(16)
+					[
+						SNew(SImage)
+						.Image(FAppStyle::GetBrush("Icons.Delete"))
+						.ColorAndOpacity(FSlateColor::UseForeground())
+					]
+				]
+			]
+		]
+		
+		// Row 2: Asset Path
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(5.0f, 0.0f, 5.0f, 2.0f)
 		[
 			SNew(STextBlock)
-			.Text(LOCTEXT("TemplateName", "Template Item"))
-		];
+			.Text(FText::FromString(assetPath))
+			.Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
+			.ColorAndOpacity(FSlateColor::UseSubduedForeground())
+			.IsEnabled(false)
+		]
+	];
 }
 
 TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
@@ -471,7 +613,12 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SAssignNew(ItemNameTextBox, SEditableTextBox)
+				SAssignNew(DisplayNameTextBox, SEditableTextBox)
+				.Text_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? 
+						FText::FromString(CurrentTemplate->GetName()) : 
+						FText::GetEmpty();
+				})
 			]
 		]
 		
@@ -494,7 +641,17 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SEditableTextBox)
+				SAssignNew(DisplayNameTextBox, SEditableTextBox)
+				.Text_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? 
+						CurrentTemplate->DisplayName : 
+						FText::GetEmpty();
+				})
+				.OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type)
+				{
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->DisplayName = NewText;
+				})
 			]
 		]
 		
@@ -521,7 +678,13 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 				+ SHorizontalBox::Slot()
 				.FillWidth(1.0f)
 				[
-					SNew(SEditableTextBox)
+					SAssignNew(ItemIDTextBox, SEditableTextBox)
+					.Text_Lambda([this]() {
+						return IsValid(CurrentTemplate) ? 
+							FText::FromString(CurrentTemplate->Guid.ToString()) : 
+							FText::GetEmpty();
+					})
+					.IsReadOnly(true)
 				]
 				+ SHorizontalBox::Slot()
 				.AutoWidth()
@@ -529,6 +692,14 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 				[
 					SNew(SButton)
 					.Text(LOCTEXT("GenerateGUID", "Generate New GUID"))
+					.OnClicked_Lambda([this]()
+					{
+						if (IsValid(CurrentTemplate))
+						{
+							CurrentTemplate->Guid = FGuid::NewGuid();
+						}
+						return FReply::Handled();
+					})
 				]
 			]
 		]
@@ -552,7 +723,17 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SEditableTextBox)
+				SAssignNew(ThumbnailDescriptionTextBox, SEditableTextBox)
+				.Text_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? 
+						CurrentTemplate->ItemShortInfo : 
+						FText::GetEmpty();
+				})
+				.OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type)
+				{
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->ItemShortInfo = NewText;
+				})
 			]
 		]
 		
@@ -575,7 +756,30 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SMultiLineEditableTextBox)
+				SNew(SBox)
+				.HeightOverride(100.0f)
+				[
+					SNew(SBorder)
+					.Padding(0.0f)
+					[
+						SAssignNew(DescriptionTextBox, SMultiLineEditableTextBox)
+						.AllowMultiLine(true)
+						.WrappingPolicy(ETextWrappingPolicy::DefaultWrapping)
+						.AutoWrapText(true)
+						.Text_Lambda([this]() {
+							return IsValid(CurrentTemplate)
+								? CurrentTemplate->ItemLongInfo
+								: FText::GetEmpty();
+						})
+						.OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type)
+						{
+							if (IsValid(CurrentTemplate))
+							{
+								CurrentTemplate->ItemLongInfo = NewText;
+							}
+						})
+					]
+				]
 			]
 		]
 	];
@@ -1551,7 +1755,7 @@ void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
 
 void SMounteaInventoryTemplateEditor::CleanupTransientTemplate()
 {
-	if (TransientTemplate)
+	if (IsValid(TransientTemplate))
 	{
 		TransientTemplate->MarkAsGarbage();
 		TransientTemplate = nullptr;
@@ -1612,18 +1816,30 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		TransientTemplate->ItemSpecialAffect = Template->ItemSpecialAffect;
 	}
 	
-	CurrentTemplate = Template;
+	CurrentTemplate = TransientTemplate;
 	bIsEditingTransient = true;
+	
+	// Force UI refresh for all bound widgets
+	if (DisplayNameTextBox.IsValid())
+		DisplayNameTextBox->Invalidate(EInvalidateWidget::Layout);
+	if (DisplayNameTextBox.IsValid())
+		DisplayNameTextBox->Invalidate(EInvalidateWidget::Layout);
+	if (ItemIDTextBox.IsValid())
+		ItemIDTextBox->Invalidate(EInvalidateWidget::Layout);
+	if (ThumbnailDescriptionTextBox.IsValid())
+		ThumbnailDescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
+	if (DescriptionTextBox.IsValid())
+		DescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
 }
 
 bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage) const
 {
-	if (!ItemNameTextBox.IsValid())
+	if (!DisplayNameTextBox.IsValid())
 	{
 		ErrorMessage = TEXT("Item name text box is not valid.");
 		return false;
 	}
-	if (ItemNameTextBox.Get()->GetText().IsEmpty())
+	if (DisplayNameTextBox.Get()->GetText().IsEmpty())
 	{
 		ErrorMessage = TEXT("Item name is empty.");
 		return false;

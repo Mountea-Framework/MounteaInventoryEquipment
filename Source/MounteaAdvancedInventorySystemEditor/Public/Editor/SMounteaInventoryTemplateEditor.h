@@ -9,6 +9,7 @@
 
 class UMounteaInventoryItemTemplate;
 class SNotificationItem;
+class SMultiLineEditableTextBox;
 
 DECLARE_DELEGATE_OneParam(FOnTemplateChanged, UMounteaInventoryItemTemplate*);
 
@@ -65,6 +66,10 @@ private:
 	TObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
 	TObjectPtr<UMounteaInventoryItemTemplate> TransientTemplate;
 
-	TSharedPtr<SEditableTextBox> ItemNameTextBox;
+	TSharedPtr<SEditableTextBox> DisplayNameTextBox;
+	TSharedPtr<SEditableTextBox> ItemIDTextBox;
+	TSharedPtr<SEditableTextBox> ThumbnailDescriptionTextBox;
+	TSharedPtr<SMultiLineEditableTextBox> DescriptionTextBox;
+	
 	bool bIsEditingTransient = true;
 };
