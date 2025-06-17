@@ -51,6 +51,8 @@ private:
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
 	void LoadTemplateData(UMounteaInventoryItemTemplate* Template);
 
+	bool ValidateTemplateData() const;
+
 private:
 	FOnTemplateChanged OnTemplateChanged;
 	TSharedPtr<FAssetThumbnailPool> ThumbnailPool;
@@ -59,5 +61,7 @@ private:
 	
 	TObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
 	TObjectPtr<UMounteaInventoryItemTemplate> TransientTemplate;
-	bool bIsEditingTransient;
+
+	TSharedPtr<SEditableTextBox> ItemNameTextBox;
+	bool bIsEditingTransient = true;
 };

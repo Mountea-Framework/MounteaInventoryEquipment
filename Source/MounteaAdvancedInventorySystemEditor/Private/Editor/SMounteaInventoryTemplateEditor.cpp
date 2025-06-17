@@ -100,6 +100,7 @@ void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 	
 	CleanupTransientTemplate();
 	CreateTransientTemplate();
+	ItemNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
 	bIsEditingTransient = true;
 	CurrentTemplate = TransientTemplate;
 }
@@ -111,12 +112,14 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 		return FReply::Unhandled();
 
 	// TODO: run validation before saving!
+	if (!ValidateTemplateData())
+		return FReply::Unhandled();
 	
 	// Determine default asset name
-	// TODO: Read the new name from Editor's `ItemName`
-	FString defaultAssetName = TransientTemplate->DisplayName.IsEmpty()
-		? FString::Printf(TEXT("NewTemplate_%s"), *FGuid::NewGuid().ToString())
-		: TransientTemplate->DisplayName.ToString();
+	FString defaultAssetName = ItemNameTextBox.IsValid() ? ItemNameTextBox->GetText().ToString() : TEXT("");
+
+	if (defaultAssetName.IsEmpty())
+		defaultAssetName = FString::Printf(TEXT("NewTemplate_%s"), *FGuid::NewGuid().ToString());
 
 	// Configure Save Asset Dialog
 	FSaveAssetDialogConfig saveAssetDialogConfig;
@@ -170,6 +173,7 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 	// Clear editing state
 	bIsEditingTransient = false;
 	CurrentTemplate = newTemplate;
+	ItemNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
 
 	return FReply::Handled();
 }
@@ -447,7 +451,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SEditableTextBox)
+				SAssignNew(ItemNameTextBox, SEditableTextBox)
 			]
 		]
 		
@@ -1590,6 +1594,15 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 	
 	CurrentTemplate = Template;
 	bIsEditingTransient = true;
+}
+
+bool SMounteaInventoryTemplateEditor::ValidateTemplateData() const
+{
+	if (!ItemNameTextBox.IsValid())
+		return false;
+	if (ItemNameTextBox.Get()->GetText().IsEmpty())
+		return false;
+	return true;
 }
 
 bool SMounteaInventoryTemplateEditor::OnFilterMeshAssets(const FAssetData& AssetData) const
