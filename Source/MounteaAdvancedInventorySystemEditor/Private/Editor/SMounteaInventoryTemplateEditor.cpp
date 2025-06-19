@@ -643,13 +643,13 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			[
 				SAssignNew(DisplayNameTextBox, SEditableTextBox)
 				.Text_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? 
+					return CurrentTemplate != nullptr ? 
 						CurrentTemplate->DisplayName : 
 						FText::GetEmpty();
 				})
 				.OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type)
 				{
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate != nullptr)
 						CurrentTemplate->DisplayName = NewText;
 				})
 			]
@@ -1753,6 +1753,7 @@ void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
 	CurrentTemplate = TransientTemplate;
 }
 
+// TODO: Crashes engine when closing engine with the window open!
 void SMounteaInventoryTemplateEditor::CleanupTransientTemplate()
 {
 	if (IsValid(TransientTemplate))
