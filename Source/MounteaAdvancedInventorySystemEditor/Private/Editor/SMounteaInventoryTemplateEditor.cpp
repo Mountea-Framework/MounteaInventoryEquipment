@@ -96,6 +96,9 @@ void SMounteaInventoryTemplateEditor::NotifyPostChange(const FPropertyChangedEve
 			}
 			else
 				TrackDirtyAsset(itemTemplate);
+
+			if (TemplateListView.IsValid())
+				TemplateListView->RequestListRefresh();
 		}
 	}
 }
@@ -680,12 +683,18 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 				.Text(displayText)
 				.Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
 				.ToolTipText(tooltipText)
-				.ColorAndOpacity_Lambda([bIsTransient, bIsDirty]() 
+				.ColorAndOpacity(TAttribute<FSlateColor>::Create(TAttribute<FSlateColor>::FGetter::CreateLambda([this, Template]() 
 				{
-					if (bIsTransient) return FSlateColor(FLinearColor(0.8f, 0.8f, 0.2f)); // Yellow for transient
-					if (bIsDirty) return FSlateColor(FLinearColor(0.8f, 0.3f, 0.3f)); // Red for dirty
+					if (Template.IsValid())
+					{
+						UMounteaInventoryItemTemplate* templatePtr = Template.Get();
+						if (templatePtr->HasAnyFlags(RF_Transient)) 
+							return FSlateColor(FLinearColor(0.8f, 0.8f, 0.2f));
+						if (DirtyTemplates.Contains(Template)) 
+							return FSlateColor(FLinearColor(0.8f, 0.3f, 0.3f));
+					}
 					return FSlateColor::UseForeground();
-				})
+				})))
 			]
 			// Navigation Icon (hidden for transient)
 			+ SHorizontalBox::Slot()
