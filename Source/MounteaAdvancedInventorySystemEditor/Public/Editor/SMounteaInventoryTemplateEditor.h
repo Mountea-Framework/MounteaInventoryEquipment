@@ -8,6 +8,7 @@
 #include "AssetThumbnail.h"
 #include "Widgets/Input/SSpinBox.h"
 
+class SClassPropertyEntryBox;
 class SGameplayTagContainerCombo;
 class SObjectPropertyEntryBox;
 class UMounteaInventoryItemTemplate;
@@ -83,7 +84,6 @@ private:
 	TSharedPtr<SMultiLineEditableTextBox> DescriptionTextBox;
 	
 	TSharedPtr<SGameplayTagContainerCombo> TagsCombo;
-	TSharedPtr<SGameplayTagContainerCombo> AffectorsTagsCombo;
 	
 	TSharedPtr<STextComboBox> CategoryCombo;
 	TSharedPtr<STextComboBox> SubCategoryCombo;
@@ -92,6 +92,8 @@ private:
 
 	// Price
 	TSharedPtr<SCheckBox> PriceCheckBox;
+	TSharedPtr<SSpinBox<float>> BasePriceSpinBox;
+	TSharedPtr<SSpinBox<float>> SellPriceCoefficientSpinBox;
 
 	// Quantity
 	TSharedPtr<SSpinBox<int32>> MaxQuantitySpinBox;
@@ -104,10 +106,24 @@ private:
 	TSharedPtr<SSpinBox<float>> DurabilityPenaltySpinBox;
 	TSharedPtr<SSpinBox<float>> DurabilityToPriceSpinBox;
 
+	// Flags
+	TSharedPtr<SCheckBox> TradeableCheckBox;
+	TSharedPtr<SCheckBox> StackableCheckBox;
+	TSharedPtr<SCheckBox> CraftableCheckBox;
+	TSharedPtr<SCheckBox> DroppableCheckBox;
+	TSharedPtr<SCheckBox> ConsumableCheckBox;
+	TSharedPtr<SCheckBox> QuestItemCheckBox;
+	TSharedPtr<SCheckBox> UniqueCheckBox;
+	TSharedPtr<SCheckBox> DurableCheckBox;
+
 	// Weight
 	TSharedPtr<SCheckBox> WeightCheckBox;
+
+	// Equipment
+	TSharedPtr<SGameplayTagContainerCombo> AffectorsTagsCombo;
+	TSharedPtr<SClassPropertyEntryBox> SpawnActorPicker;
+	TSharedPtr<SObjectPropertyEntryBox> SpecialAffectPicker;
 	
-	TSharedPtr<SObjectPropertyEntryBox> SpawnActorPicker;
 	TSharedPtr<SObjectPropertyEntryBox> ThumbnailPicker;
 	TSharedPtr<SObjectPropertyEntryBox> CoverPicker;
 	TSharedPtr<SObjectPropertyEntryBox> MeshPicker;

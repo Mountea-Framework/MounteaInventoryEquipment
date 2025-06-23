@@ -1102,7 +1102,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePriceSystemSection()
 			.Padding(5.0f, 0.0f)
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("PriceSystem", "Price System"))
+				.Text(LOCTEXT("PriceSystem", "Has Price"))
 			]
 		]
 		
@@ -1125,7 +1125,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePriceSystemSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<float>)
+				SAssignNew(BasePriceSpinBox, SSpinBox<float>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->BasePrice : 0.0f;
+				})
+				.OnValueChanged_Lambda([this](float newValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->BasePrice = newValue;
+				})
+				.MinValue(0.0f)
+				.MaxValue(999999.0f)
 			]
 		]
 		
@@ -1148,7 +1157,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePriceSystemSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<float>)
+				SAssignNew(SellPriceCoefficientSpinBox, SSpinBox<float>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->SellPriceCoefficient : 1.0f;
+				})
+				.OnValueChanged_Lambda([this](float newValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->SellPriceCoefficient = newValue;
+				})
+				.MinValue(0.0f)
+				.MaxValue(10.0f)
 			]
 		]
 	];
@@ -1341,7 +1359,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 		[
 			SNew(SHorizontalBox)
 			
-			// Left column
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
@@ -1355,7 +1372,50 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					[
-						SNew(SCheckBox)
+						SAssignNew(TradeableCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Tradeable)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Tradeable);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_Tradeable);
+							}
+						})
+					]
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.Padding(5.0f, 0.0f)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("Tradeable", "Tradeable"))
+					]
+				]
+				
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.0f, 2.0f)
+				[
+					SNew(SHorizontalBox)
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					[
+						SAssignNew(StackableCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Stackable)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Stackable);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_Stackable);
+							}
+						})
 					]
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
@@ -1374,14 +1434,26 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					[
-						SNew(SCheckBox)
+						SAssignNew(CraftableCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable);
+							}
+						})
 					]
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					.Padding(5.0f, 0.0f)
 					[
 						SNew(STextBlock)
-						.Text(LOCTEXT("Usable", "Usable"))
+						.Text(LOCTEXT("Craftable", "Craftable"))
 					]
 				]
 				
@@ -1393,19 +1465,30 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					[
-						SNew(SCheckBox)
+						SAssignNew(DroppableCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Dropable)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Dropable);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_Dropable);
+							}
+						})
 					]
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					.Padding(5.0f, 0.0f)
 					[
 						SNew(STextBlock)
-						.Text(LOCTEXT("Tradeable", "Tradeable"))
+						.Text(LOCTEXT("Droppable", "Droppable"))
 					]
 				]
 			]
 			
-			// Right column
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
@@ -1419,14 +1502,26 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					[
-						SNew(SCheckBox)
+						SAssignNew(ConsumableCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable);
+							}
+						})
 					]
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					.Padding(5.0f, 0.0f)
 					[
 						SNew(STextBlock)
-						.Text(LOCTEXT("Droppable", "Droppable"))
+						.Text(LOCTEXT("Consumable", "Consumable"))
 					]
 				]
 				
@@ -1438,26 +1533,19 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
 					[
-						SNew(SCheckBox)
-					]
-					+ SHorizontalBox::Slot()
-					.AutoWidth()
-					.Padding(5.0f, 0.0f)
-					[
-						SNew(STextBlock)
-						.Text(LOCTEXT("Equippable", "Equippable"))
-					]
-				]
-				
-				+ SVerticalBox::Slot()
-				.AutoHeight()
-				.Padding(0.0f, 2.0f)
-				[
-					SNew(SHorizontalBox)
-					+ SHorizontalBox::Slot()
-					.AutoWidth()
-					[
-						SNew(SCheckBox)
+						SAssignNew(QuestItemCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
+							}
+						})
 					]
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
@@ -1465,6 +1553,68 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SNew(STextBlock)
 						.Text(LOCTEXT("QuestItem", "Quest Item"))
+					]
+				]
+				
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.0f, 2.0f)
+				[
+					SNew(SHorizontalBox)
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					[
+						SAssignNew(UniqueCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Unique)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Unique);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_Unique);
+							}
+						})
+					]
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.Padding(5.0f, 0.0f)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("Unique", "Unique"))
+					]
+				]
+				
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(0.0f, 2.0f)
+				[
+					SNew(SHorizontalBox)
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					[
+						SAssignNew(DurableCheckBox, SCheckBox)
+						.IsChecked_Lambda([this]() {
+							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Durable)) != 0 ? 
+								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+						})
+						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
+							if (IsValid(CurrentTemplate)) {
+								if (NewState == ECheckBoxState::Checked)
+									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Durable);
+								else
+									CurrentTemplate->ItemFlags &= ~static_cast<uint8>(EInventoryItemFlags::EIIF_Durable);
+							}
+						})
+					]
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.Padding(5.0f, 0.0f)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("Durable", "Durable"))
 					]
 				]
 			]
@@ -1509,15 +1659,14 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
 					return IsValid(CurrentTemplate) ? CurrentTemplate->AffectorSlots : FGameplayTagContainer();
 				})
-				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& NewContainer) {
+				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& newContainer) {
 					if (IsValid(CurrentTemplate))
-						CurrentTemplate->AffectorSlots = NewContainer;
+						CurrentTemplate->AffectorSlots = newContainer;
 				})
 				.Filter(TEXT(""))
 			]
 		]
 		
-		// Spawn Actor (TSoftClassPtr<AActor>)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1537,23 +1686,19 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SClassPropertyEntryBox)
+				SAssignNew(SpawnActorPicker, SClassPropertyEntryBox)
 				.MetaClass(AActor::StaticClass())
 				.AllowNone(true)
-				.SelectedClass_Lambda([this]() -> const UClass*
-				{
-					return nullptr;
+				.SelectedClass_Lambda([this]() -> const UClass* {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->SpawnActor.Get() : nullptr;
 				})
-				.OnSetClass_Lambda([this](const UClass* NewClass)
-				{
-					// Handle class selection change
+				.OnSetClass_Lambda([this](const UClass* newClass) {
 					if (IsValid(CurrentTemplate))
-						CurrentTemplate->SpawnActor = NewClass;
+						CurrentTemplate->SpawnActor = newClass;
 				})
 			]
 		]
 		
-		// Item Special Affect (UObject)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1573,11 +1718,19 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SObjectPropertyEntryBox)
+				SAssignNew(SpecialAffectPicker, SObjectPropertyEntryBox)
 				.AllowedClass(UMounteaInventoryItemAction::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
+				.ObjectPath_Lambda([this]() -> FString {
+					return IsValid(CurrentTemplate) && CurrentTemplate->ItemSpecialAffect ? 
+						CurrentTemplate->ItemSpecialAffect->GetPathName() : FString();
+				})
+				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->ItemSpecialAffect = assetData.GetAsset();
+				})
 			]
 		]
 	];
@@ -1985,6 +2138,23 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		CoverPicker->Invalidate(EInvalidateWidget::Layout);
 	if (MeshPicker.IsValid())
 		MeshPicker->Invalidate(EInvalidateWidget::Layout);
+
+	if (TradeableCheckBox.IsValid())
+		TradeableCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (StackableCheckBox.IsValid())
+		StackableCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (CraftableCheckBox.IsValid())
+		CraftableCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (DroppableCheckBox.IsValid())
+		DroppableCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (ConsumableCheckBox.IsValid())
+		ConsumableCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (QuestItemCheckBox.IsValid())
+		QuestItemCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (UniqueCheckBox.IsValid())
+		UniqueCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (DurableCheckBox.IsValid())
+		DurableCheckBox->Invalidate(EInvalidateWidget::Layout);
 }
 
 bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage) const
