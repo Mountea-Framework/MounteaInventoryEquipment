@@ -123,11 +123,13 @@ private:
 	TSharedPtr<SGameplayTagContainerCombo> AffectorsTagsCombo;
 	TSharedPtr<SClassPropertyEntryBox> SpawnActorPicker;
 	TSharedPtr<SObjectPropertyEntryBox> SpecialAffectPicker;
-	
-	TSharedPtr<SObjectPropertyEntryBox> ThumbnailPicker;
-	TSharedPtr<SObjectPropertyEntryBox> CoverPicker;
-	TSharedPtr<SObjectPropertyEntryBox> MeshPicker;
 
+	// Visuals
+	TSharedPtr<SObjectPropertyEntryBox> ItemThumbnailPicker;
+	TSharedPtr<SObjectPropertyEntryBox> ItemCoverPicker;
+	TSharedPtr<SObjectPropertyEntryBox> ItemMeshPicker;
+
+	// Cache
 	TArray<TSharedPtr<FString>> CachedCategoryOptions;
 	TArray<TSharedPtr<FString>> CachedSubCategoryOptions;
 	TArray<TSharedPtr<FString>> CachedRarityOptions;

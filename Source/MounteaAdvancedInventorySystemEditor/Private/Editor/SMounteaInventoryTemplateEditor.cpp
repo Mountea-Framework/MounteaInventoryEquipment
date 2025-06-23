@@ -889,36 +889,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 				})
 			]
 		]
-		
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(0.0f, 5.0f)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			.AutoWidth()
-			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
-			[
-				SNew(SBox)
-				.WidthOverride(150.0f)
-				[
-					SNew(STextBlock)
-					.Text(LOCTEXT("ItemFlags", "Item Flags"))
-				]
-			]
-			+ SHorizontalBox::Slot()
-			.FillWidth(1.0f)
-			[
-				SAssignNew(FlagsCombo, STextComboBox)
-				.OptionsSource(&CachedFlagOptions)
-				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
-					if (IsValid(CurrentTemplate) && Selection.IsValid()) {
-						// Handle bitmask conversion
-					}
-				})
-			]
-		]
-		
+
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1750,7 +1721,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 			.Text(LOCTEXT("VisualAssets", "Visual Assets"))
 		]
 		
-		// Item Thumbnail (UTexture2D)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1770,15 +1740,22 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SObjectPropertyEntryBox)
+				SAssignNew(ItemThumbnailPicker, SObjectPropertyEntryBox)
 				.AllowedClass(UTexture2D::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
+				.ObjectPath_Lambda([this]() -> FString {
+					return IsValid(CurrentTemplate) && CurrentTemplate->ItemThumbnail ? 
+						CurrentTemplate->ItemThumbnail->GetPathName() : FString();
+				})
+				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->ItemThumbnail = Cast<UTexture2D>(assetData.GetAsset());
+				})
 			]
 		]
 		
-		// Item Cover (UTexture2D)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1798,15 +1775,22 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SObjectPropertyEntryBox)
+				SAssignNew(ItemCoverPicker, SObjectPropertyEntryBox)
 				.AllowedClass(UTexture2D::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
+				.ObjectPath_Lambda([this]() -> FString {
+					return IsValid(CurrentTemplate) && CurrentTemplate->ItemCover ? 
+						CurrentTemplate->ItemCover->GetPathName() : FString();
+				})
+				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->ItemCover = Cast<UTexture2D>(assetData.GetAsset());
+				})
 			]
 		]
 		
-		// Item Mesh (UStreamableRenderAsset - supports both Static and Skeletal meshes)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1826,13 +1810,21 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SObjectPropertyEntryBox)
+				SAssignNew(ItemMeshPicker, SObjectPropertyEntryBox)
 				.AllowedClass(UStreamableRenderAsset::StaticClass())
 				.AllowClear(true)
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 				.AllowCreate(false)
 				.OnShouldFilterAsset(FOnShouldFilterAsset::CreateRaw(this, &SMounteaInventoryTemplateEditor::OnFilterMeshAssets))
+				.ObjectPath_Lambda([this]() -> FString {
+					return IsValid(CurrentTemplate) && CurrentTemplate->ItemMesh ? 
+						CurrentTemplate->ItemMesh->GetPathName() : FString();
+				})
+				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->ItemMesh = Cast<UStreamableRenderAsset>(assetData.GetAsset());
+				})
 			]
 		]
 	];
@@ -2118,8 +2110,6 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		SubCategoryCombo->Invalidate(EInvalidateWidget::Layout);
 	if (RarityCombo.IsValid())
 		RarityCombo->Invalidate(EInvalidateWidget::Layout);
-	if (FlagsCombo.IsValid())
-		FlagsCombo->Invalidate(EInvalidateWidget::Layout);
 	if (DurabilityCheckBox.IsValid())
 		DurabilityCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (WeightCheckBox.IsValid())
@@ -2132,12 +2122,12 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		DurabilityCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (SpawnActorPicker.IsValid())
 		SpawnActorPicker->Invalidate(EInvalidateWidget::Layout);
-	if (ThumbnailPicker.IsValid())
-		ThumbnailPicker->Invalidate(EInvalidateWidget::Layout);
-	if (CoverPicker.IsValid())
-		CoverPicker->Invalidate(EInvalidateWidget::Layout);
-	if (MeshPicker.IsValid())
-		MeshPicker->Invalidate(EInvalidateWidget::Layout);
+	if (ItemThumbnailPicker.IsValid())
+		ItemThumbnailPicker->Invalidate(EInvalidateWidget::Layout);
+	if (ItemCoverPicker.IsValid())
+		ItemCoverPicker->Invalidate(EInvalidateWidget::Layout);
+	if (ItemMeshPicker.IsValid())
+		ItemMeshPicker->Invalidate(EInvalidateWidget::Layout);
 
 	if (TradeableCheckBox.IsValid())
 		TradeableCheckBox->Invalidate(EInvalidateWidget::Layout);
