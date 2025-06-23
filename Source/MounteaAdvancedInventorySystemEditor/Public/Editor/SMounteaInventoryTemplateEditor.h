@@ -89,11 +89,19 @@ private:
 	TSharedPtr<STextComboBox> SubCategoryCombo;
 	TSharedPtr<STextComboBox> RarityCombo;
 	TSharedPtr<STextComboBox> FlagsCombo;
-	
+
+	// Quantity
 	TSharedPtr<SSpinBox<int32>> MaxQuantitySpinBox;
 	TSharedPtr<SSpinBox<int32>> MaxStackSizeSpinBox;
-	
+
+	// Durability
 	TSharedPtr<SCheckBox> DurabilityCheckBox;
+	TSharedPtr<SSpinBox<float>> MaxDurabilitySpinBox;
+	TSharedPtr<SSpinBox<float>> BaseDurabilitySpinBox;
+	TSharedPtr<SSpinBox<float>> DurabilityPenaltySpinBox;
+	TSharedPtr<SSpinBox<float>> DurabilityToPriceSpinBox;
+
+	// Weight
 	TSharedPtr<SCheckBox> WeightCheckBox;
 	
 	TSharedPtr<SObjectPropertyEntryBox> SpawnActorPicker;

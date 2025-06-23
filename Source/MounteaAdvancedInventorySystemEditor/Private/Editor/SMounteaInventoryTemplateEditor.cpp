@@ -942,9 +942,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 				.Value_Lambda([this]() {
 					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxStackSize : 1;
 				})
-				.OnValueChanged_Lambda([this](int32 NewValue) {
+				.OnValueChanged_Lambda([this](int32 newValue) {
 					if (IsValid(CurrentTemplate))
-						CurrentTemplate->MaxStackSize = NewValue;
+						CurrentTemplate->MaxStackSize = newValue;
 				})
 				.MinValue(1)
 				.MaxValue(999)
@@ -974,9 +974,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 				.Value_Lambda([this]() {
 					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxQuantity : 1;
 				})
-				.OnValueChanged_Lambda([this](int32 NewValue) {
+				.OnValueChanged_Lambda([this](int32 newValue) {
 					if (IsValid(CurrentTemplate))
-						CurrentTemplate->MaxQuantity = NewValue;
+						CurrentTemplate->MaxQuantity = newValue;
 				})
 				.MinValue(1)
 				.MaxValue(999)
@@ -1175,7 +1175,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			.Padding(5.0f, 0.0f)
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("DurabilitySystem", "Durability System"))
+				.Text(LOCTEXT("DurabilitySystem", "Has Durability"))
 			]
 		]
 		
@@ -1198,7 +1198,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<float>)
+				SAssignNew(MaxDurabilitySpinBox, SSpinBox<float>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxDurability : 100.0f;
+				})
+				.OnValueChanged_Lambda([this](float newValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->MaxDurability = newValue;
+				})
+				.MinValue(0.0f)
+				.MaxValue(9999.0f)
 			]
 		]
 		
@@ -1221,7 +1230,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<float>)
+				SAssignNew(BaseDurabilitySpinBox, SSpinBox<float>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->BaseDurability : 100.0f;
+				})
+				.OnValueChanged_Lambda([this](float newValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->BaseDurability = newValue;
+				})
+				.MinValue(0.0f)
+				.MaxValue(9999.0f)
 			]
 		]
 		
@@ -1244,7 +1262,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<float>)
+				SAssignNew(DurabilityPenaltySpinBox, SSpinBox<float>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->DurabilityPenalization : 1.0f;
+				})
+				.OnValueChanged_Lambda([this](float newValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->DurabilityPenalization = newValue;
+				})
+				.MinValue(0.0f)
+				.MaxValue(100.0f)
 			]
 		]
 		
@@ -1267,7 +1294,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<float>)
+				SAssignNew(DurabilityToPriceSpinBox, SSpinBox<float>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->DurabilityToPriceCoefficient : 1.0f;
+				})
+				.OnValueChanged_Lambda([this](float newValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->DurabilityToPriceCoefficient = newValue;
+				})
+				.MinValue(0.0f)
+				.MaxValue(10.0f)
 			]
 		]
 	];
