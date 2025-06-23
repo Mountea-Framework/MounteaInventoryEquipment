@@ -8,6 +8,7 @@
 #include "AssetThumbnail.h"
 #include "Widgets/Input/SSpinBox.h"
 
+class STextPropertyEditableTextBox;
 class SClassPropertyEntryBox;
 class SGameplayTagContainerCombo;
 class SObjectPropertyEntryBox;
@@ -17,6 +18,12 @@ class SMultiLineEditableTextBox;
 
 
 DECLARE_DELEGATE_OneParam(FOnTemplateChanged, UMounteaInventoryItemTemplate*);
+
+struct FAvailableStringTable
+{
+	FName TableId;
+	FText DisplayName;
+};
 
 class SMounteaInventoryTemplateEditor : public SCompoundWidget
 {
@@ -34,6 +41,8 @@ protected:
 private:
 	void CreateNewTemplate();
 	FReply SaveTemplate();
+	FReply SaveNewTemplate();
+	FReply SaveExistingTemplate();
 	void ImportTemplate();
 	void ExportTemplate();
 	void RefreshTemplateList();
@@ -66,11 +75,12 @@ private:
 	void CleanupTransientTemplate();
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
 	void LoadTemplateData(UMounteaInventoryItemTemplate* Template);
+	void CopyTemplateData(UMounteaInventoryItemTemplate* Source, UMounteaInventoryItemTemplate* Target);
 
 	bool ValidateTemplateData(FString& ErrorMessage) const;
 
 	void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true) const;
-
+	
 	void RefreshOptions();
 	TArray<TSharedPtr<FString>> GetCategoryOptions() const;
 	TArray<TSharedPtr<FString>> GetSubCategoryOptions() const;
@@ -82,10 +92,12 @@ private:
 	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;
 	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> AvailableTemplates;
 	
-	TObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
-	TObjectPtr<UMounteaInventoryItemTemplate> TransientTemplate;
+	TWeakObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
+	TWeakObjectPtr<UMounteaInventoryItemTemplate> OriginalTemplate;
+	bool bIsEditingExisting = false;
 
 	// Texts
+	TSharedPtr<STextPropertyEditableTextBox> DisplayNameWidget;
 	TSharedPtr<SEditableTextBox> DisplayNameTextBox;
 	TSharedPtr<SEditableTextBox> ItemIDTextBox;
 	TSharedPtr<SEditableTextBox> ThumbnailDescriptionTextBox;
@@ -142,6 +154,6 @@ private:
 	TArray<TSharedPtr<FString>> CachedCategoryOptions;
 	TArray<TSharedPtr<FString>> CachedSubCategoryOptions;
 	TArray<TSharedPtr<FString>> CachedRarityOptions;
-	
+
 	bool bIsEditingTransient = true;
 };

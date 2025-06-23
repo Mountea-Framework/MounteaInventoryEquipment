@@ -13,7 +13,7 @@
 void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	bIsFocusable = true;
+	SetIsFocusable(true);
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()

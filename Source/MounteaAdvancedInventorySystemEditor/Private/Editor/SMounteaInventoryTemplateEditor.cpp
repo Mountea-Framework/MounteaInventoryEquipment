@@ -15,28 +15,30 @@
 #include "Widgets/Views/SListView.h"
 #include "Widgets/Views/STableViewBase.h"
 #include "Widgets/Views/STableRow.h"
+#include "Widgets/Input/STextComboBox.h"
+#include "Widgets/Notifications/SNotificationList.h"
+
 #include "Framework/Docking/TabManager.h"
 #include "Framework/Application/SlateApplication.h"
-#include "EditorStyleSet.h"
+#include "Framework/Notifications/NotificationManager.h"
+
 #include "AssetRegistry/AssetRegistryModule.h"
-#include "AssetToolsModule.h"
+
 #include "ContentBrowserModule.h"
+#include "EditorAssetLibrary.h"
 #include "IContentBrowserSingleton.h"
 #include "PropertyCustomizationHelpers.h"
-#include "SGameplayTagCombo.h"
 #include "SGameplayTagContainerCombo.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Guid.h"
-#include "SGameplayTagWidget.h"
 #include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
-#include "Framework/Notifications/NotificationManager.h"
+
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+
 #include "Subsystems/UMounteaInventoryTemplateEditorSubsystem.h"
-#include "Widgets/Input/STextComboBox.h"
-#include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
 
@@ -120,28 +122,60 @@ void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 	
 	CleanupTransientTemplate();
 	CreateTransientTemplate();
-	DisplayNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
-	bIsEditingTransient = true;
-	CurrentTemplate = TransientTemplate;
+	
+	OriginalTemplate = nullptr;
+	bIsEditingExisting = false;
+	
+	LoadTemplateData(CurrentTemplate.Get());
 }
 
 FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 {
-	if (!TransientTemplate || !bIsEditingTransient)
+	if (!CurrentTemplate.IsValid())
 	{
 		ShowTemplateEditorNotification(TEXT("Cannot save: No template is being edited."), false);
 		return FReply::Unhandled();
 	}
 
-	// TODO: run validation before saving!
 	FString validationError;
 	if (!ValidateTemplateData(validationError))
 	{
 		ShowTemplateEditorNotification(FString::Printf(TEXT("Cannot save: %s."), *validationError), false);
 		return FReply::Unhandled();
 	}
+
+	if (bIsEditingExisting && OriginalTemplate.IsValid())
+		return SaveExistingTemplate();
+	else
+		return SaveNewTemplate();
+}
+
+FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
+{
+	UMounteaInventoryItemTemplate* originalTemplate = OriginalTemplate.Get();
+	if (!originalTemplate)
+	{
+		ShowTemplateEditorNotification(TEXT("Original template no longer valid."), false);
+		return FReply::Unhandled();
+	}
+
+	CopyTemplateData(CurrentTemplate.Get(), originalTemplate);
+	originalTemplate->GetPackage()->MarkPackageDirty();
+
+	if (!UEditorAssetLibrary::SaveAsset(originalTemplate->GetPathName()))
+	{
+		ShowTemplateEditorNotification(TEXT("Failed to save template to disk."), false);
+		return FReply::Unhandled();
+	}
 	
-	// Determine default asset name
+	LoadTemplateData(originalTemplate);
+	
+	ShowTemplateEditorNotification(TEXT("Template updated successfully."), true);
+	return FReply::Handled();
+}
+
+FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
+{
 	FString defaultAssetName = DisplayNameTextBox.IsValid() ? DisplayNameTextBox->GetText().ToString() : TEXT("");
 	if (defaultAssetName.IsEmpty())
 	{
@@ -149,7 +183,6 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 		return FReply::Unhandled();
 	}
 
-	// Configure Save Asset Dialog
 	FSaveAssetDialogConfig saveAssetDialogConfig;
 	saveAssetDialogConfig.DefaultPath = TEXT("/Game/Inventory/Templates");
 	saveAssetDialogConfig.DefaultAssetName = defaultAssetName;
@@ -157,18 +190,15 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 	saveAssetDialogConfig.DialogTitleOverride = FText::FromString(TEXT("Save Inventory Template As"));
 	saveAssetDialogConfig.ExistingAssetPolicy = ESaveAssetDialogExistingAssetPolicy::AllowButWarn;
 
-	// Show the Save Asset Dialog
 	FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
 	const FString saveObjectPath = contentBrowserModule.Get().CreateModalSaveAssetDialog(saveAssetDialogConfig);
 
-	// Handle user canceling the dialog
 	if (saveObjectPath.IsEmpty())
 	{
 		ShowTemplateEditorNotification(TEXT("Save cancelled."), false);
 		return FReply::Unhandled();
 	}
 
-	// Create or load the package from the selected path
 	UPackage* newPackage = CreatePackage(*saveObjectPath);
 	if (!newPackage)
 	{
@@ -176,41 +206,19 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 		return FReply::Unhandled();
 	}
 
-	// Duplicate the transient template into the new package
-	UMounteaInventoryItemTemplate* newTemplate = DuplicateObject<UMounteaInventoryItemTemplate>(TransientTemplate, newPackage);
+	UMounteaInventoryItemTemplate* newTemplate = DuplicateObject<UMounteaInventoryItemTemplate>(CurrentTemplate.Get(), newPackage);
 	if (!newTemplate)
 	{
 		ShowTemplateEditorNotification(TEXT("Failed to create new Template at the selected location."), false);
 		return FReply::Unhandled();
 	}
 
-	// Set asset flags
 	newTemplate->SetFlags(RF_Public | RF_Standalone);
 	newTemplate->ClearFlags(RF_Transient);
-
-	// Register the asset
 	FAssetRegistryModule::AssetCreated(newTemplate);
 	newPackage->MarkPackageDirty();
 
-	// Refresh UI and selection
-	RefreshTemplateList();
-
-	if (TemplateListView.IsValid())
-	{
-		for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template : AvailableTemplates)
-		{
-			if (Template.IsValid() && Template.Get() == newTemplate)
-			{
-				TemplateListView->SetSelection(Template);
-				break;
-			}
-		}
-	}
-
-	// Clear editing state
-	bIsEditingTransient = false;
-	CurrentTemplate = newTemplate;
-	DisplayNameTextBox.Get()->SetText(FText::FromString(TEXT("")));
+	LoadTemplateData(newTemplate);
 
 	ShowTemplateEditorNotification(TEXT("Item Template created."), true);
 	return FReply::Handled();
@@ -316,8 +324,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			SNew(SButton)
 			.Text(LOCTEXT("CloseTemplate", "Close Template"))
 			.OnClicked_Lambda([this]() {
-				CloseTemplate();
-				return FReply::Handled();
+				return CloseTemplate() ? FReply::Handled() : FReply::Unhandled();
 			})
 		]
 		
@@ -641,34 +648,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 				.WidthOverride(150.0f)
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("ItemName", "Item Name"))
-				]
-			]
-			+ SHorizontalBox::Slot()
-			.FillWidth(1.0f)
-			[
-				SAssignNew(DisplayNameTextBox, SEditableTextBox)
-				.Text_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? 
-						FText::FromString(CurrentTemplate->GetName()) : 
-						FText::GetEmpty();
-				})
-			]
-		]
-		
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(0.0f, 5.0f)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			.AutoWidth()
-			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
-			[
-				SNew(SBox)
-				.WidthOverride(150.0f)
-				[
-					SNew(STextBlock)
 					.Text(LOCTEXT("DisplayName", "Display Name"))
 				]
 			]
@@ -677,13 +656,13 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			[
 				SAssignNew(DisplayNameTextBox, SEditableTextBox)
 				.Text_Lambda([this]() {
-					return CurrentTemplate != nullptr ? 
+					return CurrentTemplate.IsValid() ? 
 						CurrentTemplate->DisplayName : 
 						FText::GetEmpty();
 				})
 				.OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type)
 				{
-					if (CurrentTemplate != nullptr)
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->DisplayName = NewText;
 				})
 			]
@@ -714,7 +693,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 				[
 					SAssignNew(ItemIDTextBox, SEditableTextBox)
 					.Text_Lambda([this]() {
-						return IsValid(CurrentTemplate) ? 
+						return CurrentTemplate.IsValid() ? 
 							FText::FromString(CurrentTemplate->Guid.ToString()) : 
 							FText::GetEmpty();
 					})
@@ -728,10 +707,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 					.Text(LOCTEXT("GenerateGUID", "Generate New GUID"))
 					.OnClicked_Lambda([this]()
 					{
-						if (IsValid(CurrentTemplate))
-						{
+						if (CurrentTemplate.IsValid())
 							CurrentTemplate->Guid = FGuid::NewGuid();
-						}
 						return FReply::Handled();
 					})
 				]
@@ -759,13 +736,13 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 			[
 				SAssignNew(ThumbnailDescriptionTextBox, SEditableTextBox)
 				.Text_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? 
+					return CurrentTemplate.IsValid() ? 
 						CurrentTemplate->ItemShortInfo : 
 						FText::GetEmpty();
 				})
 				.OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type)
 				{
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->ItemShortInfo = NewText;
 				})
 			]
@@ -801,16 +778,14 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateBasicInfoSection()
 						.WrappingPolicy(ETextWrappingPolicy::DefaultWrapping)
 						.AutoWrapText(true)
 						.Text_Lambda([this]() {
-							return IsValid(CurrentTemplate)
-								? CurrentTemplate->ItemLongInfo
-								: FText::GetEmpty();
+							return CurrentTemplate.IsValid() ? 
+								CurrentTemplate->ItemLongInfo : 
+								FText::GetEmpty();
 						})
 						.OnTextCommitted_Lambda([this](const FText& NewText, ETextCommit::Type)
 						{
-							if (IsValid(CurrentTemplate))
-							{
+							if (CurrentTemplate.IsValid())
 								CurrentTemplate->ItemLongInfo = NewText;
-							}
 						})
 					]
 				]
@@ -856,7 +831,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 				.OptionsSource(&CachedCategoryOptions)
 				.InitiallySelectedItem(GetSelectedCategoryOption())
 				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
-					if (IsValid(CurrentTemplate) && Selection.IsValid())
+					if (CurrentTemplate.IsValid() && Selection.IsValid())
 						CurrentTemplate->ItemCategory = *Selection;
 				})
 			]
@@ -885,7 +860,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 				.OptionsSource(&CachedSubCategoryOptions)
 				.InitiallySelectedItem(GetSelectedSubCategoryOption())
 				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> NewSelection, ESelectInfo::Type SelectInfo) {
-					if (IsValid(CurrentTemplate) && NewSelection.IsValid())
+					if (CurrentTemplate.IsValid() && NewSelection.IsValid())
 						CurrentTemplate->ItemSubCategory = *NewSelection;
 				})
 			]
@@ -914,7 +889,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 				.OptionsSource(&CachedRarityOptions)
 				.InitiallySelectedItem(GetSelectedRarityOption())
 				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
-					if (IsValid(CurrentTemplate) && Selection.IsValid())
+					if (CurrentTemplate.IsValid() && Selection.IsValid())
 						CurrentTemplate->ItemRarity = *Selection;
 				})
 			]
@@ -941,10 +916,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			[
 				SAssignNew(MaxStackSizeSpinBox, SSpinBox<int32>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxStackSize : 1;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->MaxStackSize : 1;
 				})
 				.OnValueChanged_Lambda([this](int32 newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->MaxStackSize = newValue;
 				})
 				.MinValue(1)
@@ -973,10 +948,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			[
 				SAssignNew(MaxQuantitySpinBox, SSpinBox<int32>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxQuantity : 1;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->MaxQuantity : 1;
 				})
 				.OnValueChanged_Lambda([this](int32 newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->MaxQuantity = newValue;
 				})
 				.MinValue(1)
@@ -1005,10 +980,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			[
 				SAssignNew(TagsCombo, SGameplayTagContainerCombo)
 				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->Tags : FGameplayTagContainer();
+					return CurrentTemplate.IsValid() ? CurrentTemplate->Tags : FGameplayTagContainer();
 				})
 				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& NewContainer) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->Tags = NewContainer;
 				})
 			]
@@ -1032,11 +1007,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateWeightSystemSection()
 			[
 				SAssignNew(WeightCheckBox, SCheckBox)
 				.IsChecked_Lambda([this]() {
-					return IsValid(CurrentTemplate) && CurrentTemplate->bHasWeight ? 
+					return CurrentTemplate.IsValid() && CurrentTemplate->bHasWeight ? 
 						ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 				})
 				.OnCheckStateChanged_Lambda([this](ECheckBoxState newState) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->bHasWeight = (newState == ECheckBoxState::Checked);
 				})
 			]
@@ -1090,11 +1065,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePriceSystemSection()
 			[
 				SAssignNew(PriceCheckBox, SCheckBox)
 				.IsChecked_Lambda([this]() {
-					return IsValid(CurrentTemplate) && CurrentTemplate->bHasPrice ? 
+					return CurrentTemplate.IsValid() && CurrentTemplate->bHasPrice ? 
 						ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 				})
 				.OnCheckStateChanged_Lambda([this](ECheckBoxState newState) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->bHasPrice = (newState == ECheckBoxState::Checked);
 				})
 			]
@@ -1128,10 +1103,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePriceSystemSection()
 			[
 				SAssignNew(BasePriceSpinBox, SSpinBox<float>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->BasePrice : 0.0f;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->BasePrice : 0.0f;
 				})
 				.OnValueChanged_Lambda([this](float newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->BasePrice = newValue;
 				})
 				.MinValue(0.0f)
@@ -1160,10 +1135,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePriceSystemSection()
 			[
 				SAssignNew(SellPriceCoefficientSpinBox, SSpinBox<float>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->SellPriceCoefficient : 1.0f;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->SellPriceCoefficient : 1.0f;
 				})
 				.OnValueChanged_Lambda([this](float newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->SellPriceCoefficient = newValue;
 				})
 				.MinValue(0.0f)
@@ -1189,11 +1164,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			[
 				SAssignNew(DurabilityCheckBox, SCheckBox)
 				.IsChecked_Lambda([this]() {
-					return IsValid(CurrentTemplate) && CurrentTemplate->bHasDurability ? 
+					return CurrentTemplate.IsValid() && CurrentTemplate->bHasDurability ? 
 						ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 				})
 				.OnCheckStateChanged_Lambda([this](ECheckBoxState newState) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->bHasDurability = (newState == ECheckBoxState::Checked);
 				})
 			]
@@ -1228,10 +1203,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			[
 				SAssignNew(MaxDurabilitySpinBox, SSpinBox<float>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxDurability : 100.0f;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->MaxDurability : 100.0f;
 				})
 				.OnValueChanged_Lambda([this](float newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->MaxDurability = newValue;
 				})
 				.MinValue(0.0f)
@@ -1261,10 +1236,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			[
 				SAssignNew(BaseDurabilitySpinBox, SSpinBox<float>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->BaseDurability : 100.0f;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->BaseDurability : 100.0f;
 				})
 				.OnValueChanged_Lambda([this](float newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->BaseDurability = newValue;
 				})
 				.MinValue(0.0f)
@@ -1294,10 +1269,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			[
 				SAssignNew(DurabilityPenaltySpinBox, SSpinBox<float>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->DurabilityPenalization : 1.0f;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->DurabilityPenalization : 1.0f;
 				})
 				.OnValueChanged_Lambda([this](float newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->DurabilityPenalization = newValue;
 				})
 				.MinValue(0.0f)
@@ -1327,10 +1302,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			[
 				SAssignNew(DurabilityToPriceSpinBox, SSpinBox<float>)
 				.Value_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->DurabilityToPriceCoefficient : 1.0f;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->DurabilityToPriceCoefficient : 1.0f;
 				})
 				.OnValueChanged_Lambda([this](float newValue) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->DurabilityToPriceCoefficient = newValue;
 				})
 				.MinValue(0.0f)
@@ -1375,11 +1350,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(TradeableCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Tradeable)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Tradeable)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Tradeable);
 								else
@@ -1406,11 +1381,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(StackableCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Stackable)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Stackable)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Stackable);
 								else
@@ -1437,11 +1412,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(CraftableCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Craftable);
 								else
@@ -1468,11 +1443,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(DroppableCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Dropable)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Dropable)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Dropable);
 								else
@@ -1505,11 +1480,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(ConsumableCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable);
 								else
@@ -1536,11 +1511,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(QuestItemCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
 								else
@@ -1567,11 +1542,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(UniqueCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Unique)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Unique)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Unique);
 								else
@@ -1598,11 +1573,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemFlagsSection()
 					[
 						SAssignNew(DurableCheckBox, SCheckBox)
 						.IsChecked_Lambda([this]() {
-							return IsValid(CurrentTemplate) && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Durable)) != 0 ? 
+							return CurrentTemplate.IsValid() && (CurrentTemplate->ItemFlags & static_cast<uint8>(EInventoryItemFlags::EIIF_Durable)) != 0 ? 
 								ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 						})
 						.OnCheckStateChanged_Lambda([this](ECheckBoxState NewState) {
-							if (IsValid(CurrentTemplate)) {
+							if (CurrentTemplate.IsValid()) {
 								if (NewState == ECheckBoxState::Checked)
 									CurrentTemplate->ItemFlags |= static_cast<uint8>(EInventoryItemFlags::EIIF_Durable);
 								else
@@ -1650,7 +1625,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 				.WidthOverride(150.0f)
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("AffectorSlots", "Affector Slots"))
+					.Text(LOCTEXT("AttachmentSlots", "Attachment Slots"))
 				]
 			]
 			+ SHorizontalBox::Slot()
@@ -1658,13 +1633,13 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 			[
 				SAssignNew(AffectorsTagsCombo, SGameplayTagContainerCombo)
 				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->AffectorSlots : FGameplayTagContainer();
+					return CurrentTemplate.IsValid() ? CurrentTemplate->AttachmentSlots : FGameplayTagContainer();
 				})
 				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& newContainer) {
-					if (IsValid(CurrentTemplate))
-						CurrentTemplate->AffectorSlots = newContainer;
+					if (CurrentTemplate.IsValid())
+						CurrentTemplate->AttachmentSlots = newContainer;
 				})
-				.Filter(TEXT(""))
+				.Filter(TEXT("Attach"))
 			]
 		]
 		
@@ -1691,10 +1666,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 				.MetaClass(AActor::StaticClass())
 				.AllowNone(true)
 				.SelectedClass_Lambda([this]() -> const UClass* {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->SpawnActor.Get() : nullptr;
+					return CurrentTemplate.IsValid() ? CurrentTemplate->SpawnActor.Get() : nullptr;
 				})
 				.OnSetClass_Lambda([this](const UClass* newClass) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->SpawnActor = newClass;
 				})
 			]
@@ -1725,11 +1700,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 				.ObjectPath_Lambda([this]() -> FString {
-					return IsValid(CurrentTemplate) && CurrentTemplate->ItemSpecialAffect ? 
+					return CurrentTemplate.IsValid() && CurrentTemplate->ItemSpecialAffect ? 
 						CurrentTemplate->ItemSpecialAffect->GetPathName() : FString();
 				})
 				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->ItemSpecialAffect = assetData.GetAsset();
 				})
 			]
@@ -1776,11 +1751,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 				.ObjectPath_Lambda([this]() -> FString {
-					return IsValid(CurrentTemplate) && !CurrentTemplate->ItemThumbnail.IsNull() ? 
+					return CurrentTemplate.IsValid() && !CurrentTemplate->ItemThumbnail.IsNull() ? 
 						CurrentTemplate->ItemThumbnail.ToSoftObjectPath().ToString() : FString();
 				})
 				.OnObjectChanged_Lambda([this](const FAssetData& AssetData) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->ItemThumbnail = TSoftObjectPtr<UTexture2D>(AssetData.ToSoftObjectPath());
 				})
 			]
@@ -1811,11 +1786,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 				.ObjectPath_Lambda([this]() -> FString {
-					return IsValid(CurrentTemplate) && !CurrentTemplate->ItemCover.IsNull() ? 
+					return CurrentTemplate.IsValid() && !CurrentTemplate->ItemCover.IsNull() ? 
 						CurrentTemplate->ItemCover.ToSoftObjectPath().ToString() : FString();
 				})
 				.OnObjectChanged_Lambda([this](const FAssetData& AssetData) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->ItemCover = TSoftObjectPtr<UTexture2D>(AssetData.ToSoftObjectPath());
 				})
 			]
@@ -1848,11 +1823,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.AllowCreate(false)
 				.OnShouldFilterAsset(FOnShouldFilterAsset::CreateRaw(this, &SMounteaInventoryTemplateEditor::OnFilterMeshAssets))
 				.ObjectPath_Lambda([this]() -> FString {
-					return IsValid(CurrentTemplate) && CurrentTemplate->ItemMesh ? 
+					return CurrentTemplate.IsValid() && CurrentTemplate->ItemMesh ? 
 						CurrentTemplate->ItemMesh->GetPathName() : FString();
 				})
 				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->ItemMesh = Cast<UStreamableRenderAsset>(assetData.GetAsset());
 				})
 			]
@@ -2006,10 +1981,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 			[
 				SAssignNew(TagsCombo, SGameplayTagContainerCombo)
 				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
-					return IsValid(CurrentTemplate) ? CurrentTemplate->Tags : FGameplayTagContainer();
+					return CurrentTemplate.IsValid() ? CurrentTemplate->Tags : FGameplayTagContainer();
 				})
 				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& NewContainer) {
-					if (IsValid(CurrentTemplate))
+					if (CurrentTemplate.IsValid())
 						CurrentTemplate->Tags = NewContainer;
 				})
 				.Filter(TEXT(""))
@@ -2048,7 +2023,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 
 TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedCategoryOption()
 {
-	if (IsValid(CurrentTemplate) && !CurrentTemplate->ItemCategory.IsEmpty())
+	if (CurrentTemplate.IsValid() && !CurrentTemplate->ItemCategory.IsEmpty())
 	{
 		for (auto& validOption : CachedCategoryOptions)
 		{
@@ -2061,7 +2036,7 @@ TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedCategoryOption()
 
 TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedSubCategoryOption()
 {
-	if (IsValid(CurrentTemplate) && !CurrentTemplate->ItemSubCategory.IsEmpty())
+	if (CurrentTemplate.IsValid() && !CurrentTemplate->ItemSubCategory.IsEmpty())
 	{
 		for (auto& validOption : CachedSubCategoryOptions)
 		{
@@ -2074,7 +2049,7 @@ TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedSubCategoryOptio
 
 TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedRarityOption()
 {
-	if (IsValid(CurrentTemplate) && !CurrentTemplate->ItemRarity.IsEmpty())
+	if (CurrentTemplate.IsValid() && !CurrentTemplate->ItemRarity.IsEmpty())
 	{
 		for (auto& validOption : CachedRarityOptions)
 		{
@@ -2098,15 +2073,14 @@ bool SMounteaInventoryTemplateEditor::CloseTemplate()
 void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
 {
 	UUMounteaInventoryTemplateEditorSubsystem* templateEditorSubsystem = GEditor->GetEditorSubsystem<UUMounteaInventoryTemplateEditorSubsystem>();
-	TransientTemplate = templateEditorSubsystem->GetOrCreateTempTemplate();
-	CurrentTemplate = TransientTemplate;
+	CurrentTemplate = templateEditorSubsystem->GetOrCreateTempTemplate();
 }
 
 void SMounteaInventoryTemplateEditor::CleanupTransientTemplate()
 {
 	if (UUMounteaInventoryTemplateEditorSubsystem* templateEditorSubsystem = GEditor->GetEditorSubsystem<UUMounteaInventoryTemplateEditorSubsystem>())
 		templateEditorSubsystem->ClearTempTemplate();
-	TransientTemplate = nullptr;
+	CurrentTemplate = nullptr;
 }
 
 void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(
@@ -2131,65 +2105,25 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 	if (!Template)
 		return;
 
-	CleanupTransientTemplate();
-	CreateTransientTemplate();
-	
-	if (TransientTemplate)
+	if (Template->HasAnyFlags(RF_Transient))
 	{
-		// Texts
-		TransientTemplate->DisplayName = Template->DisplayName;
-		TransientTemplate->Guid = Template->Guid;
-		TransientTemplate->ItemShortInfo = Template->ItemShortInfo;
-		TransientTemplate->ItemLongInfo = Template->ItemLongInfo;
-
-		// Tags
-		TransientTemplate->Tags = Template->Tags;
-
-		// Selections
-		TransientTemplate->ItemCategory = Template->ItemCategory;
-		TransientTemplate->ItemSubCategory = Template->ItemSubCategory;
-		TransientTemplate->ItemRarity = Template->ItemRarity;
-
-		// Price
-		TransientTemplate->bHasPrice = Template->bHasPrice;
-		TransientTemplate->BasePrice = Template->BasePrice;
-		TransientTemplate->SellPriceCoefficient = Template->SellPriceCoefficient;
-
-		// Quantity
-		TransientTemplate->MaxQuantity = Template->MaxQuantity;
-		TransientTemplate->MaxStackSize = Template->MaxStackSize;
-
-		// Durability
-		TransientTemplate->bHasDurability = Template->bHasDurability;
-		TransientTemplate->MaxDurability = Template->MaxDurability;
-		TransientTemplate->BaseDurability = Template->BaseDurability;
-		TransientTemplate->DurabilityPenalization = Template->DurabilityPenalization;
-		TransientTemplate->DurabilityToPriceCoefficient = Template->DurabilityToPriceCoefficient;
-
-		// Flags
-		TransientTemplate->ItemFlags = Template->ItemFlags;
-
-		// Weight
-		TransientTemplate->bHasWeight = Template->bHasWeight;
-		TransientTemplate->Weight = Template->Weight;
-
-		// Equipment
-		TransientTemplate->AffectorSlots = Template->AffectorSlots;
-		TransientTemplate->SpawnActor = Template->SpawnActor;
-		TransientTemplate->ItemSpecialAffect = Template->ItemSpecialAffect;
-
-		// Visuals
-		TransientTemplate->ItemThumbnail = Template->ItemThumbnail;
-		TransientTemplate->ItemCover = Template->ItemCover;
-		TransientTemplate->ItemMesh = Template->ItemMesh;
+		// This is a transient template (new)
+		CurrentTemplate = Template;
+		OriginalTemplate = nullptr;
+		bIsEditingExisting = false;
+	}
+	else
+	{
+		// This is an existing template, create a working copy
+		CleanupTransientTemplate();
+		CreateTransientTemplate();
+		CopyTemplateData(Template, CurrentTemplate.Get());
+		OriginalTemplate = Template;
+		bIsEditingExisting = true;
 	}
 	
-	CurrentTemplate = TransientTemplate;
-	bIsEditingTransient = true;
-	
 	RefreshOptions();
-	
-	// Texts
+
 	if (DisplayNameTextBox.IsValid())
 		DisplayNameTextBox->Invalidate(EInvalidateWidget::Layout);
 	if (ItemIDTextBox.IsValid())
@@ -2198,34 +2132,24 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		ThumbnailDescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
 	if (DescriptionTextBox.IsValid())
 		DescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
-
-	// Tags
 	if (TagsCombo.IsValid())
 		TagsCombo->Invalidate(EInvalidateWidget::Layout);
-
-	// Selections
 	if (CategoryCombo.IsValid())
 		CategoryCombo->SetSelectedItem(GetSelectedCategoryOption());
 	if (SubCategoryCombo.IsValid())
 		SubCategoryCombo->SetSelectedItem(GetSelectedSubCategoryOption());
 	if (RarityCombo.IsValid())
 		RarityCombo->SetSelectedItem(GetSelectedRarityOption());
-
-	// Price
 	if (PriceCheckBox.IsValid())
 		PriceCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (BasePriceSpinBox.IsValid())
 		BasePriceSpinBox->Invalidate(EInvalidateWidget::Layout);
 	if (SellPriceCoefficientSpinBox.IsValid())
 		SellPriceCoefficientSpinBox->Invalidate(EInvalidateWidget::Layout);
-
-	// Quantity
 	if (MaxQuantitySpinBox.IsValid())
 		MaxQuantitySpinBox->Invalidate(EInvalidateWidget::Layout);
 	if (MaxStackSizeSpinBox.IsValid())
 		MaxStackSizeSpinBox->Invalidate(EInvalidateWidget::Layout);
-
-	// Durability
 	if (DurabilityCheckBox.IsValid())
 		DurabilityCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (MaxDurabilitySpinBox.IsValid())
@@ -2236,8 +2160,6 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		DurabilityPenaltySpinBox->Invalidate(EInvalidateWidget::Layout);
 	if (DurabilityToPriceSpinBox.IsValid())
 		DurabilityToPriceSpinBox->Invalidate(EInvalidateWidget::Layout);
-
-	// Flags
 	if (TradeableCheckBox.IsValid())
 		TradeableCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (StackableCheckBox.IsValid())
@@ -2254,26 +2176,53 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		UniqueCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (DurableCheckBox.IsValid())
 		DurableCheckBox->Invalidate(EInvalidateWidget::Layout);
-
-	// Weight
 	if (WeightCheckBox.IsValid())
 		WeightCheckBox->Invalidate(EInvalidateWidget::Layout);
-
-	// Equipment
 	if (AffectorsTagsCombo.IsValid())
 		AffectorsTagsCombo->Invalidate(EInvalidateWidget::Layout);
 	if (SpawnActorPicker.IsValid())
 		SpawnActorPicker->Invalidate(EInvalidateWidget::Layout);
 	if (SpecialAffectPicker.IsValid())
 		SpecialAffectPicker->Invalidate(EInvalidateWidget::Layout);
-
-	// Visuals
 	if (ItemThumbnailPicker.IsValid())
 		ItemThumbnailPicker->Invalidate(EInvalidateWidget::Layout);
 	if (ItemCoverPicker.IsValid())
 		ItemCoverPicker->Invalidate(EInvalidateWidget::Layout);
 	if (ItemMeshPicker.IsValid())
 		ItemMeshPicker->Invalidate(EInvalidateWidget::Layout);
+}
+
+void SMounteaInventoryTemplateEditor::CopyTemplateData(UMounteaInventoryItemTemplate* Source, UMounteaInventoryItemTemplate* Target)
+{
+	if (!Source || !Target) return;
+
+	Target->DisplayName = Source->DisplayName;
+	Target->Guid = Source->Guid;
+	Target->ItemShortInfo = Source->ItemShortInfo;
+	Target->ItemLongInfo = Source->ItemLongInfo;
+	Target->Tags = Source->Tags;
+	Target->ItemCategory = Source->ItemCategory;
+	Target->ItemSubCategory = Source->ItemSubCategory;
+	Target->ItemRarity = Source->ItemRarity;
+	Target->bHasPrice = Source->bHasPrice;
+	Target->BasePrice = Source->BasePrice;
+	Target->SellPriceCoefficient = Source->SellPriceCoefficient;
+	Target->MaxQuantity = Source->MaxQuantity;
+	Target->MaxStackSize = Source->MaxStackSize;
+	Target->bHasDurability = Source->bHasDurability;
+	Target->MaxDurability = Source->MaxDurability;
+	Target->BaseDurability = Source->BaseDurability;
+	Target->DurabilityPenalization = Source->DurabilityPenalization;
+	Target->DurabilityToPriceCoefficient = Source->DurabilityToPriceCoefficient;
+	Target->ItemFlags = Source->ItemFlags;
+	Target->bHasWeight = Source->bHasWeight;
+	Target->Weight = Source->Weight;
+	Target->AttachmentSlots = Source->AttachmentSlots;
+	Target->SpawnActor = Source->SpawnActor;
+	Target->ItemSpecialAffect = Source->ItemSpecialAffect;
+	Target->ItemThumbnail = Source->ItemThumbnail;
+	Target->ItemCover = Source->ItemCover;
+	Target->ItemMesh = Source->ItemMesh;
 }
 
 bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage) const
@@ -2431,5 +2380,6 @@ TArray<TSharedPtr<FString>> SMounteaInventoryTemplateEditor::GetRarityOptions() 
 	}
 	return Options;
 }
+
 
 #undef LOCTEXT_NAMESPACE

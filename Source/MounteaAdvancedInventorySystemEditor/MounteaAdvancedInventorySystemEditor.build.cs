@@ -62,7 +62,8 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				
 				"DesktopPlatform", 
 				
-				"EditorSubsystem",
+				"EditorSubsystem", 
+				"EditorScriptingUtilities",
 			}
 		);
 
