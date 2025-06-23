@@ -28,6 +28,9 @@ public:
 	void Construct(const FArguments& InArgs);
 	virtual ~SMounteaInventoryTemplateEditor();
 
+protected:
+	virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent) override;
+
 private:
 	void CreateNewTemplate();
 	FReply SaveTemplate();
@@ -57,6 +60,8 @@ private:
 	TSharedPtr<FString> GetSelectedSubCategoryOption();
 	TSharedPtr<FString> GetSelectedRarityOption();
 
+	bool CloseTemplate();
+	
 	void CreateTransientTemplate();
 	void CleanupTransientTemplate();
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);

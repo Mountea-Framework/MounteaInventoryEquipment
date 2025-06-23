@@ -102,6 +102,17 @@ SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 	CleanupTransientTemplate();
 }
 
+FReply SMounteaInventoryTemplateEditor::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& InKeyEvent)
+{
+	if (InKeyEvent.GetKey() == EKeys::Escape)
+	{
+		CloseTemplate();
+		return FReply::Handled();
+	}
+	
+	return SCompoundWidget::OnKeyDown(MyGeometry, InKeyEvent);
+}
+
 void SMounteaInventoryTemplateEditor::CreateNewTemplate()
 {
 	if (TemplateListView.IsValid())
@@ -296,6 +307,19 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			SNew(SButton)
 			.Text(LOCTEXT("ExportTemplate", "Export Items"))
 		]
+
+		// Close Template
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(5.0f)
+		[
+			SNew(SButton)
+			.Text(LOCTEXT("CloseTemplate", "Close Template"))
+			.OnClicked_Lambda([this]() {
+				CloseTemplate();
+				return FReply::Handled();
+			})
+		]
 		
 		// Spacer
 		+ SHorizontalBox::Slot()
@@ -417,8 +441,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEditorPanel()
 			[
 				CreateVisualAssetsSection()
 			]
-			
+
+			// TODO: Maybe add this in future
 			// Materials Section
+			/*
 			+ SVerticalBox::Slot()
 			.AutoHeight()
 			.Padding(0.0f, 5.0f)
@@ -433,6 +459,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEditorPanel()
 			[
 				CreateCustomPropertiesSection()
 			]
+			*/
 		];
 }
 
@@ -1018,7 +1045,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateWeightSystemSection()
 			.Padding(5.0f, 0.0f)
 			[
 				SNew(STextBlock)
-				.Text(LOCTEXT("WeightSystem", "Weight System"))
+				.Text(LOCTEXT("WeightSystem", "Has Weight"))
 			]
 		]
 		
@@ -2058,6 +2085,16 @@ TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedRarityOption()
 	return CachedRarityOptions.Num() > 0 ? CachedRarityOptions[0] : nullptr;
 }
 
+// TODO: If any change is captured, as user if they want to save changes or discard them
+bool SMounteaInventoryTemplateEditor::CloseTemplate()
+{
+	if (TemplateListView.IsValid())
+		TemplateListView->ClearSelection();
+	
+	CreateNewTemplate();
+	return true;
+}
+
 void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
 {
 	UUMounteaInventoryTemplateEditorSubsystem* templateEditorSubsystem = GEditor->GetEditorSubsystem<UUMounteaInventoryTemplateEditorSubsystem>();
@@ -2248,7 +2285,7 @@ bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage
 	}
 	if (DisplayNameTextBox.Get()->GetText().IsEmpty())
 	{
-		ErrorMessage = TEXT("Item name is empty.");
+		ErrorMessage = TEXT("Item name is empty");
 		return false;
 	}
 	return true;
