@@ -53,6 +53,10 @@ private:
 	TSharedRef<SWidget> CreateMaterialsSection();
 	TSharedRef<SWidget> CreateCustomPropertiesSection();
 
+	TSharedPtr<FString> GetSelectedCategoryOption();
+	TSharedPtr<FString> GetSelectedSubCategoryOption();
+	TSharedPtr<FString> GetSelectedRarityOption();
+
 	void CreateTransientTemplate();
 	void CleanupTransientTemplate();
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
@@ -66,7 +70,6 @@ private:
 	TArray<TSharedPtr<FString>> GetCategoryOptions() const;
 	TArray<TSharedPtr<FString>> GetSubCategoryOptions() const;
 	TArray<TSharedPtr<FString>> GetRarityOptions() const;
-	TArray<TSharedPtr<FString>> GetFlagOptions() const;
 
 private:
 	FOnTemplateChanged OnTemplateChanged;
@@ -134,7 +137,6 @@ private:
 	TArray<TSharedPtr<FString>> CachedCategoryOptions;
 	TArray<TSharedPtr<FString>> CachedSubCategoryOptions;
 	TArray<TSharedPtr<FString>> CachedRarityOptions;
-	TArray<TSharedPtr<FString>> CachedFlagOptions;
 	
 	bool bIsEditingTransient = true;
 };

@@ -827,6 +827,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			[
 				SAssignNew(CategoryCombo, STextComboBox)
 				.OptionsSource(&CachedCategoryOptions)
+				.InitiallySelectedItem(GetSelectedCategoryOption())
 				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
 					if (IsValid(CurrentTemplate) && Selection.IsValid())
 						CurrentTemplate->ItemCategory = *Selection;
@@ -855,9 +856,10 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			[
 				SAssignNew(SubCategoryCombo, STextComboBox)
 				.OptionsSource(&CachedSubCategoryOptions)
-				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
-					if (IsValid(CurrentTemplate) && Selection.IsValid())
-						CurrentTemplate->ItemSubCategory = *Selection;
+				.InitiallySelectedItem(GetSelectedSubCategoryOption())
+				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> NewSelection, ESelectInfo::Type SelectInfo) {
+					if (IsValid(CurrentTemplate) && NewSelection.IsValid())
+						CurrentTemplate->ItemSubCategory = *NewSelection;
 				})
 			]
 		]
@@ -883,6 +885,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			[
 				SAssignNew(RarityCombo, STextComboBox)
 				.OptionsSource(&CachedRarityOptions)
+				.InitiallySelectedItem(GetSelectedRarityOption())
 				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
 					if (IsValid(CurrentTemplate) && Selection.IsValid())
 						CurrentTemplate->ItemRarity = *Selection;
@@ -1746,12 +1749,12 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 				.ObjectPath_Lambda([this]() -> FString {
-					return IsValid(CurrentTemplate) && CurrentTemplate->ItemThumbnail ? 
-						CurrentTemplate->ItemThumbnail->GetPathName() : FString();
+					return IsValid(CurrentTemplate) && !CurrentTemplate->ItemThumbnail.IsNull() ? 
+						CurrentTemplate->ItemThumbnail.ToSoftObjectPath().ToString() : FString();
 				})
-				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
+				.OnObjectChanged_Lambda([this](const FAssetData& AssetData) {
 					if (IsValid(CurrentTemplate))
-						CurrentTemplate->ItemThumbnail = Cast<UTexture2D>(assetData.GetAsset());
+						CurrentTemplate->ItemThumbnail = TSoftObjectPtr<UTexture2D>(AssetData.ToSoftObjectPath());
 				})
 			]
 		]
@@ -1781,12 +1784,12 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateVisualAssetsSection()
 				.DisplayThumbnail(true)
 				.ThumbnailPool(ThumbnailPool.ToSharedRef())
 				.ObjectPath_Lambda([this]() -> FString {
-					return IsValid(CurrentTemplate) && CurrentTemplate->ItemCover ? 
-						CurrentTemplate->ItemCover->GetPathName() : FString();
+					return IsValid(CurrentTemplate) && !CurrentTemplate->ItemCover.IsNull() ? 
+						CurrentTemplate->ItemCover.ToSoftObjectPath().ToString() : FString();
 				})
-				.OnObjectChanged_Lambda([this](const FAssetData& assetData) {
+				.OnObjectChanged_Lambda([this](const FAssetData& AssetData) {
 					if (IsValid(CurrentTemplate))
-						CurrentTemplate->ItemCover = Cast<UTexture2D>(assetData.GetAsset());
+						CurrentTemplate->ItemCover = TSoftObjectPtr<UTexture2D>(AssetData.ToSoftObjectPath());
 				})
 			]
 		]
@@ -2016,6 +2019,45 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 	];
 }
 
+TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedCategoryOption()
+{
+	if (IsValid(CurrentTemplate) && !CurrentTemplate->ItemCategory.IsEmpty())
+	{
+		for (auto& validOption : CachedCategoryOptions)
+		{
+			if (validOption.IsValid() && *validOption == CurrentTemplate->ItemCategory)
+				return validOption;
+		}
+	}
+	return CachedCategoryOptions.Num() > 0 ? CachedCategoryOptions[0] : nullptr;
+}
+
+TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedSubCategoryOption()
+{
+	if (IsValid(CurrentTemplate) && !CurrentTemplate->ItemSubCategory.IsEmpty())
+	{
+		for (auto& validOption : CachedSubCategoryOptions)
+		{
+			if (validOption.IsValid() && *validOption == CurrentTemplate->ItemSubCategory)
+				return validOption;
+		}
+	}
+	return CachedSubCategoryOptions.Num() > 0 ? CachedSubCategoryOptions[0] : nullptr;
+}
+
+TSharedPtr<FString> SMounteaInventoryTemplateEditor::GetSelectedRarityOption()
+{
+	if (IsValid(CurrentTemplate) && !CurrentTemplate->ItemRarity.IsEmpty())
+	{
+		for (auto& validOption : CachedRarityOptions)
+		{
+			if (validOption.IsValid() && *validOption == CurrentTemplate->ItemRarity)
+				return validOption;
+		}
+	}
+	return CachedRarityOptions.Num() > 0 ? CachedRarityOptions[0] : nullptr;
+}
+
 void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
 {
 	UUMounteaInventoryTemplateEditorSubsystem* templateEditorSubsystem = GEditor->GetEditorSubsystem<UUMounteaInventoryTemplateEditorSubsystem>();
@@ -2126,11 +2168,11 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 
 	// Selections
 	if (CategoryCombo.IsValid())
-		CategoryCombo->Invalidate(EInvalidateWidget::Layout);
+		CategoryCombo->SetSelectedItem(GetSelectedCategoryOption());
 	if (SubCategoryCombo.IsValid())
-		SubCategoryCombo->Invalidate(EInvalidateWidget::Layout);
+		SubCategoryCombo->SetSelectedItem(GetSelectedSubCategoryOption());
 	if (RarityCombo.IsValid())
-		RarityCombo->Invalidate(EInvalidateWidget::Layout);
+		RarityCombo->SetSelectedItem(GetSelectedRarityOption());
 
 	// Price
 	if (PriceCheckBox.IsValid())
@@ -2232,7 +2274,6 @@ void SMounteaInventoryTemplateEditor::RefreshOptions()
 	CachedCategoryOptions = GetCategoryOptions();
 	CachedSubCategoryOptions = GetSubCategoryOptions();
 	CachedRarityOptions = GetRarityOptions();
-	CachedFlagOptions = GetFlagOptions();
 }
 
 bool SMounteaInventoryTemplateEditor::OnFilterMeshAssets(const FAssetData& AssetData) const
@@ -2352,21 +2393,6 @@ TArray<TSharedPtr<FString>> SMounteaInventoryTemplateEditor::GetRarityOptions() 
 		}
 	}
 	return Options;
-}
-
-TArray<TSharedPtr<FString>> SMounteaInventoryTemplateEditor::GetFlagOptions() const
-{
-	TArray<TSharedPtr<FString>> flagOptions;
-	UEnum* flagsEnum = StaticEnum<EInventoryItemFlags>();
-	if (flagsEnum)
-	{
-		for (int32 i = 0; i < flagsEnum->NumEnums() - 1; ++i)
-		{
-			FString enumName = flagsEnum->GetNameStringByIndex(i);
-			flagOptions.Add(MakeShareable(new FString(enumName)));
-		}
-	}
-	return flagOptions;
 }
 
 #undef LOCTEXT_NAMESPACE
