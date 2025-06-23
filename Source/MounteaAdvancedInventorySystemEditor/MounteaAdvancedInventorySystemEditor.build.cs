@@ -55,9 +55,14 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 
 				"InputCore",
 				"GameplayTags",
+				"GameplayTagsEditor",
 				"UMGEditor",
+				
 				"Blutility",
-				"DesktopPlatform", "GameplayTagsEditor"
+				
+				"DesktopPlatform", 
+				
+				"EditorSubsystem",
 			}
 		);
 

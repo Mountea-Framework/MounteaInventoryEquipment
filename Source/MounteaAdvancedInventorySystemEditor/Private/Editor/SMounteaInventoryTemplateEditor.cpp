@@ -30,6 +30,7 @@
 #include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Framework/Notifications/NotificationManager.h"
+#include "Subsystems/UMounteaInventoryTemplateEditorSubsystem.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
@@ -1734,33 +1735,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 
 void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
 {
-	TransientTemplate = NewObject<UMounteaInventoryItemTemplate>(
-			GetTransientPackage(), UMounteaInventoryItemTemplate::StaticClass(),
-			NAME_None, RF_Transient
-		);
-
-	// TODO: have a definition of template like in the web app
-	if (TransientTemplate)
-	{
-		TransientTemplate->Guid = FGuid::NewGuid();
-		TransientTemplate->DisplayName = FText::FromString(TEXT("New Template"));
-		TransientTemplate->MaxQuantity = 1;
-		TransientTemplate->MaxStackSize = 1;
-		TransientTemplate->ItemCategory = TEXT("Default");
-		TransientTemplate->ItemRarity = TEXT("Common");
-	}
-	
+	UUMounteaInventoryTemplateEditorSubsystem* templateEditorSubsystem = GEditor->GetEditorSubsystem<UUMounteaInventoryTemplateEditorSubsystem>();
+	TransientTemplate = templateEditorSubsystem->GetOrCreateTempTemplate();
 	CurrentTemplate = TransientTemplate;
 }
 
-// TODO: Crashes engine when closing engine with the window open!
 void SMounteaInventoryTemplateEditor::CleanupTransientTemplate()
 {
-	if (IsValid(TransientTemplate))
-	{
-		TransientTemplate->MarkAsGarbage();
-		TransientTemplate = nullptr;
-	}
+	if (UUMounteaInventoryTemplateEditorSubsystem* templateEditorSubsystem = GEditor->GetEditorSubsystem<UUMounteaInventoryTemplateEditorSubsystem>())
+		templateEditorSubsystem->ClearTempTemplate();
+	TransientTemplate = nullptr;
 }
 
 void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(
