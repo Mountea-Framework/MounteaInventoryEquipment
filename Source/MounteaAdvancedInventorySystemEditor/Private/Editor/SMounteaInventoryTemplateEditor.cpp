@@ -23,6 +23,7 @@
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
 #include "PropertyCustomizationHelpers.h"
+#include "SGameplayTagContainerCombo.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Guid.h"
@@ -1692,14 +1693,15 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				// TODO: Replace with a GameplayTag widget
-				SNew(SEditableTextBox)
-				.Text_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? 
-						FText::FromString(CurrentTemplate->Tags.ToString()) : 
-						FText::GetEmpty();
+				SNew(SGameplayTagContainerCombo)
+				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->Tags : FGameplayTagContainer();
 				})
-				.HintText(LOCTEXT("TagsHint", "GameplayTags"))
+				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& NewContainer) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->Tags = NewContainer;
+				})
+				.Filter(TEXT(""))
 			]
 		]
 		
