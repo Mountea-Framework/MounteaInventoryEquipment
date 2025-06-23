@@ -237,12 +237,14 @@ void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(TWeakObjectPtr<
 		{
 			selectedObjects.Add(itemTemplate);
 			if (itemTemplate->HasAnyFlags(RF_Transient))
-			{
 				bIsShowingTransient = true;
-				CurrentTemplate = itemTemplate;
-			}
 		}
 	}
+
+	if (selectedTemplates.Num() == 1)
+		CurrentTemplate = selectedTemplates[0];
+	else
+		CurrentTemplate = nullptr;
 	
 	PropertyDetailsView->SetObjects(selectedObjects);
 }
@@ -376,17 +378,22 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 	FString selectedPath = ShowSaveAssetDialog();
 	if (selectedPath.IsEmpty())
 		return FReply::Unhandled();
-	
+
 	if (!CurrentTemplate.IsValid())
 		return FReply::Unhandled();
-	
+
 	UMounteaInventoryItemTemplate* transientTemplate = CurrentTemplate.Get();
-	
+
 	FAssetToolsModule& assetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
-	
-	FString packagePath = FPackageName::GetLongPackagePath(selectedPath);
-	FString assetName = FPackageName::GetShortName(selectedPath);
-	
+
+	FString packageName;
+	FString assetName;
+	FString className;
+	FString subObjectName;
+	FPackageName::SplitFullObjectPath(selectedPath, className, packageName, assetName, subObjectName);
+
+	FString packagePath = FPackageName::GetLongPackagePath(packageName);
+
 	UObject* newAsset = assetToolsModule.Get().CreateAsset(
 		assetName,
 		packagePath,
@@ -445,18 +452,14 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 FString SMounteaInventoryTemplateEditor::ShowSaveAssetDialog()
 {
 	FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
-	
-	FString defaultPath = TEXT("/Game");
-	FString outPackageName;
-	FString outAssetName;
-	
+    
 	FSaveAssetDialogConfig config;
 	config.DialogTitleOverride = LOCTEXT("SaveInventoryTemplateDialogTitle", "Save Inventory Template");
-	config.DefaultPath = defaultPath;
+	config.DefaultPath = TEXT("/Game");
 	config.DefaultAssetName = TEXT("NewInventoryTemplate");
 	config.AssetClassNames.Add(UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName());
 	config.ExistingAssetPolicy = ESaveAssetDialogExistingAssetPolicy::AllowButWarn;
-	
+    
 	return contentBrowserModule.Get().CreateModalSaveAssetDialog(config);
 }
 
