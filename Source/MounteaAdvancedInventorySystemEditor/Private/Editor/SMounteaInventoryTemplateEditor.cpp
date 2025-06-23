@@ -1087,7 +1087,15 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePriceSystemSection()
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			[
-				SNew(SCheckBox)
+				SAssignNew(PriceCheckBox, SCheckBox)
+				.IsChecked_Lambda([this]() {
+					return IsValid(CurrentTemplate) && CurrentTemplate->bHasPrice ? 
+						ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+				})
+				.OnCheckStateChanged_Lambda([this](ECheckBoxState newState) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->bHasPrice = (newState == ECheckBoxState::Checked);
+				})
 			]
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
@@ -1178,7 +1186,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 				.Text(LOCTEXT("DurabilitySystem", "Has Durability"))
 			]
 		]
-		
+
+		// MaxDurability
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(20.0f, 10.0f, 0.0f, 0.0f)
@@ -1210,7 +1219,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 				.MaxValue(9999.0f)
 			]
 		]
-		
+
+		// BaseDurability
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(20.0f, 5.0f, 0.0f, 0.0f)
@@ -1242,7 +1252,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 				.MaxValue(9999.0f)
 			]
 		]
-		
+
+		// DurabilityPenalty
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(20.0f, 5.0f, 0.0f, 0.0f)
@@ -1274,7 +1285,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 				.MaxValue(100.0f)
 			]
 		]
-		
+
+		// DurabilityToPriceCoefficient
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(20.0f, 5.0f, 0.0f, 0.0f)

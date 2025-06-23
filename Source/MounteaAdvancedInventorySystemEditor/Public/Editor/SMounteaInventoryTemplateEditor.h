@@ -90,6 +90,9 @@ private:
 	TSharedPtr<STextComboBox> RarityCombo;
 	TSharedPtr<STextComboBox> FlagsCombo;
 
+	// Price
+	TSharedPtr<SCheckBox> PriceCheckBox;
+
 	// Quantity
 	TSharedPtr<SSpinBox<int32>> MaxQuantitySpinBox;
 	TSharedPtr<SSpinBox<int32>> MaxStackSizeSpinBox;
