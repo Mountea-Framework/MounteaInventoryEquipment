@@ -17,9 +17,10 @@ class SMounteaInventoryTemplateEditor : public SCompoundWidget, public FNotifyHo
 public:
 	SLATE_BEGIN_ARGS(SMounteaInventoryTemplateEditor) {}
 	SLATE_EVENT(FOnTemplateChanged, OnTemplateChanged)
-SLATE_END_ARGS()
+	SLATE_END_ARGS()
 
-void Construct(const FArguments& InArgs);
+	void Construct(const FArguments& InArgs);
+	virtual ~SMounteaInventoryTemplateEditor();
 
 protected:
 	virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged) override;
@@ -30,13 +31,17 @@ private:
 	TSharedRef<ITableRow> GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable);
 	
 	TArray<UObject*> LoadAllTemplatesForMatrix();
+	void RefreshTemplateList();
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
 	
 	FReply OnCreateNewTemplate();
 	FReply SaveTemplate();
+	FReply SaveAllDirtyTemplates();
 	FReply CloseTemplate();
 	FReply SaveNewTemplate();
 	FReply SaveExistingTemplate();
+	FReply DeleteTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template);
+	FReply DuplicateTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template);
 
 	void ImportTemplate();
 	void ExportTemplate();
@@ -45,6 +50,16 @@ private:
 	void CleanupTransientTemplate();
 	bool ValidateTemplateData(FString& ErrorMessage) const;
 	void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true) const;
+	
+	// New functions for tracking dirty assets
+	void TrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
+	void UntrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
+	bool HasUnsavedChanges() const;
+	bool CheckForUnsavedChanges();
+	void SelectTransientTemplateInList();
+	
+	// Asset creation dialog
+	FString ShowSaveAssetDialog();
 
 private:
 	FOnTemplateChanged OnTemplateChanged;
@@ -53,7 +68,12 @@ private:
 	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;
 	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> AvailableTemplates;
 	
+	// Track selected and dirty templates
+	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> SelectedTemplates;
+	TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>> DirtyTemplates;
+	
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> OriginalTemplate;
 	bool bIsEditingExisting = false;
+	bool bIsShowingTransient = false;
 };

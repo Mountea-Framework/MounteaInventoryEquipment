@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
-#include "UMounteaInventoryTemplateEditorSubsystem.generated.h"
+#include "MounteaInventoryTemplateEditorSubsystem.generated.h"
 
 class UMounteaInventoryItemTemplate;
 
@@ -12,7 +12,7 @@ class UMounteaInventoryItemTemplate;
  * 
  */
 UCLASS()
-class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UUMounteaInventoryTemplateEditorSubsystem : public UEditorSubsystem
+class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UMounteaInventoryTemplateEditorSubsystem : public UEditorSubsystem
 {
 	GENERATED_BODY()
 
