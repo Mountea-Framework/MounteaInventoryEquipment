@@ -138,7 +138,7 @@ public:
 
 	/** Defines the compatible slots or affector types for this item template. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")
-	TSet<FGameplayTag> AffectorSlots;
+	FGameplayTagContainer AffectorSlots;
 
 	/** A reference to a special gameplay ability or effect triggered by this item. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")

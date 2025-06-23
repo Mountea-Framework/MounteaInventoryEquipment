@@ -6,10 +6,14 @@
 #include "Widgets/SCompoundWidget.h"
 #include "Widgets/Views/SListView.h"
 #include "AssetThumbnail.h"
+#include "Widgets/Input/SSpinBox.h"
 
+class SGameplayTagContainerCombo;
+class SObjectPropertyEntryBox;
 class UMounteaInventoryItemTemplate;
 class SNotificationItem;
 class SMultiLineEditableTextBox;
+
 
 DECLARE_DELEGATE_OneParam(FOnTemplateChanged, UMounteaInventoryItemTemplate*);
 
@@ -57,6 +61,12 @@ private:
 
 	void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true) const;
 
+	void RefreshOptions();
+	TArray<TSharedPtr<FString>> GetCategoryOptions() const;
+	TArray<TSharedPtr<FString>> GetSubCategoryOptions() const;
+	TArray<TSharedPtr<FString>> GetRarityOptions() const;
+	TArray<TSharedPtr<FString>> GetFlagOptions() const;
+
 private:
 	FOnTemplateChanged OnTemplateChanged;
 	TSharedPtr<FAssetThumbnailPool> ThumbnailPool;
@@ -69,7 +79,32 @@ private:
 	TSharedPtr<SEditableTextBox> DisplayNameTextBox;
 	TSharedPtr<SEditableTextBox> ItemIDTextBox;
 	TSharedPtr<SEditableTextBox> ThumbnailDescriptionTextBox;
+	
 	TSharedPtr<SMultiLineEditableTextBox> DescriptionTextBox;
+	
+	TSharedPtr<SGameplayTagContainerCombo> TagsCombo;
+	TSharedPtr<SGameplayTagContainerCombo> AffectorsTagsCombo;
+	
+	TSharedPtr<STextComboBox> CategoryCombo;
+	TSharedPtr<STextComboBox> SubCategoryCombo;
+	TSharedPtr<STextComboBox> RarityCombo;
+	TSharedPtr<STextComboBox> FlagsCombo;
+	
+	TSharedPtr<SSpinBox<int32>> MaxQuantitySpinBox;
+	TSharedPtr<SSpinBox<int32>> MaxStackSizeSpinBox;
+	
+	TSharedPtr<SCheckBox> DurabilityCheckBox;
+	TSharedPtr<SCheckBox> WeightCheckBox;
+	
+	TSharedPtr<SObjectPropertyEntryBox> SpawnActorPicker;
+	TSharedPtr<SObjectPropertyEntryBox> ThumbnailPicker;
+	TSharedPtr<SObjectPropertyEntryBox> CoverPicker;
+	TSharedPtr<SObjectPropertyEntryBox> MeshPicker;
+
+	TArray<TSharedPtr<FString>> CachedCategoryOptions;
+	TArray<TSharedPtr<FString>> CachedSubCategoryOptions;
+	TArray<TSharedPtr<FString>> CachedRarityOptions;
+	TArray<TSharedPtr<FString>> CachedFlagOptions;
 	
 	bool bIsEditingTransient = true;
 };

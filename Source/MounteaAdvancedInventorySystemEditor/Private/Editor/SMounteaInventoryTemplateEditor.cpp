@@ -23,6 +23,7 @@
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
 #include "PropertyCustomizationHelpers.h"
+#include "SGameplayTagCombo.h"
 #include "SGameplayTagContainerCombo.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
@@ -31,7 +32,10 @@
 #include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Framework/Notifications/NotificationManager.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Subsystems/UMounteaInventoryTemplateEditorSubsystem.h"
+#include "Widgets/Input/STextComboBox.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
@@ -43,6 +47,7 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 	LoadAllTemplates();
 	CreateTransientTemplate();
 	bIsEditingTransient = true;
+	RefreshOptions();
 	
 	ChildSlot
 	[
@@ -820,7 +825,12 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SComboBox<TSharedPtr<FString>>)
+				SAssignNew(CategoryCombo, STextComboBox)
+				.OptionsSource(&CachedCategoryOptions)
+				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
+					if (IsValid(CurrentTemplate) && Selection.IsValid())
+						CurrentTemplate->ItemCategory = *Selection;
+				})
 			]
 		]
 		
@@ -843,7 +853,12 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SComboBox<TSharedPtr<FString>>)
+				SAssignNew(SubCategoryCombo, STextComboBox)
+				.OptionsSource(&CachedSubCategoryOptions)
+				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
+					if (IsValid(CurrentTemplate) && Selection.IsValid())
+						CurrentTemplate->ItemSubCategory = *Selection;
+				})
 			]
 		]
 		
@@ -866,7 +881,41 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SComboBox<TSharedPtr<FString>>)
+				SAssignNew(RarityCombo, STextComboBox)
+				.OptionsSource(&CachedRarityOptions)
+				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
+					if (IsValid(CurrentTemplate) && Selection.IsValid())
+						CurrentTemplate->ItemRarity = *Selection;
+				})
+			]
+		]
+		
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(0.0f, 0.0f, 10.0f, 0.0f)
+			[
+				SNew(SBox)
+				.WidthOverride(150.0f)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("ItemFlags", "Item Flags"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.0f)
+			[
+				SAssignNew(FlagsCombo, STextComboBox)
+				.OptionsSource(&CachedFlagOptions)
+				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type) {
+					if (IsValid(CurrentTemplate) && Selection.IsValid()) {
+						// Handle bitmask conversion
+					}
+				})
 			]
 		]
 		
@@ -889,7 +938,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<int32>)
+				SAssignNew(MaxStackSizeSpinBox, SSpinBox<int32>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxStackSize : 1;
+				})
+				.OnValueChanged_Lambda([this](int32 NewValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->MaxStackSize = NewValue;
+				})
+				.MinValue(1)
+				.MaxValue(999)
 			]
 		]
 		
@@ -912,7 +970,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SSpinBox<int32>)
+				SAssignNew(MaxQuantitySpinBox, SSpinBox<int32>)
+				.Value_Lambda([this]() {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->MaxQuantity : 1;
+				})
+				.OnValueChanged_Lambda([this](int32 NewValue) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->MaxQuantity = NewValue;
+				})
+				.MinValue(1)
+				.MaxValue(999)
 			]
 		]
 		
@@ -935,8 +1002,14 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateItemPropertiesSection
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SEditableTextBox)
-				.HintText(LOCTEXT("TagsHint", "Type to add tags"))
+				SAssignNew(TagsCombo, SGameplayTagContainerCombo)
+				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->Tags : FGameplayTagContainer();
+				})
+				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& NewContainer) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->Tags = NewContainer;
+				})
 			]
 		]
 	];
@@ -956,7 +1029,15 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateWeightSystemSection()
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			[
-				SNew(SCheckBox)
+				SAssignNew(WeightCheckBox, SCheckBox)
+				.IsChecked_Lambda([this]() {
+					return IsValid(CurrentTemplate) && CurrentTemplate->bHasWeight ? 
+						ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+				})
+				.OnCheckStateChanged_Lambda([this](ECheckBoxState newState) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->bHasWeight = (newState == ECheckBoxState::Checked);
+				})
 			]
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
@@ -1079,7 +1160,15 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateDurabilitySystemSecti
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			[
-				SNew(SCheckBox)
+				SAssignNew(DurabilityCheckBox, SCheckBox)
+				.IsChecked_Lambda([this]() {
+					return IsValid(CurrentTemplate) && CurrentTemplate->bHasDurability ? 
+						ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+				})
+				.OnCheckStateChanged_Lambda([this](ECheckBoxState newState) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->bHasDurability = (newState == ECheckBoxState::Checked);
+				})
 			]
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
@@ -1349,7 +1438,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 			.Text(LOCTEXT("EquipmentProperties", "Equipment Properties"))
 		]
 		
-		// Affector Slots (TSet<FGameplayTag>)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1369,14 +1457,15 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateEquipmentSection()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				// TODO: Replace with a GameplayTag widget
-				SNew(SEditableTextBox)
-				.Text_Lambda([this]() {
-					return IsValid(CurrentTemplate) ? 
-						FText::FromString(CurrentTemplate->Tags.ToString()) : 
-						FText::GetEmpty();
+				SAssignNew(AffectorsTagsCombo, SGameplayTagContainerCombo)
+				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
+					return IsValid(CurrentTemplate) ? CurrentTemplate->AffectorSlots : FGameplayTagContainer();
 				})
-				.HintText(LOCTEXT("TagsHint", "GameplayTags"))
+				.OnTagContainerChanged_Lambda([this](const FGameplayTagContainer& NewContainer) {
+					if (IsValid(CurrentTemplate))
+						CurrentTemplate->AffectorSlots = NewContainer;
+				})
+				.Filter(TEXT(""))
 			]
 		]
 		
@@ -1673,7 +1762,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 			]
 		]
 		
-		// Tags (FGameplayTagContainer)
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(0.0f, 5.0f)
@@ -1693,7 +1781,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateCustomPropertiesSecti
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SGameplayTagContainerCombo)
+				SAssignNew(TagsCombo, SGameplayTagContainerCombo)
 				.TagContainer_Lambda([this]() -> FGameplayTagContainer {
 					return IsValid(CurrentTemplate) ? CurrentTemplate->Tags : FGameplayTagContainer();
 				})
@@ -1750,7 +1838,7 @@ void SMounteaInventoryTemplateEditor::CleanupTransientTemplate()
 }
 
 void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(
-	TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo)
+	const TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, const ESelectInfo::Type SelectInfo)
 {
 	if (SelectInfo == ESelectInfo::Direct)
 		return;
@@ -1762,6 +1850,8 @@ void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(
 	}
 	else
 		CreateNewTemplate();
+
+	RefreshOptions();
 }
 
 void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemplate* Template)
@@ -1806,9 +1896,9 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 	CurrentTemplate = TransientTemplate;
 	bIsEditingTransient = true;
 	
+	RefreshOptions();
+	
 	// Force UI refresh for all bound widgets
-	if (DisplayNameTextBox.IsValid())
-		DisplayNameTextBox->Invalidate(EInvalidateWidget::Layout);
 	if (DisplayNameTextBox.IsValid())
 		DisplayNameTextBox->Invalidate(EInvalidateWidget::Layout);
 	if (ItemIDTextBox.IsValid())
@@ -1817,6 +1907,36 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		ThumbnailDescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
 	if (DescriptionTextBox.IsValid())
 		DescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
+	if (TagsCombo.IsValid())
+		TagsCombo->Invalidate(EInvalidateWidget::Layout);
+	if (AffectorsTagsCombo.IsValid())
+		AffectorsTagsCombo->Invalidate(EInvalidateWidget::Layout);
+	if (CategoryCombo.IsValid())
+		CategoryCombo->Invalidate(EInvalidateWidget::Layout);
+	if (SubCategoryCombo.IsValid())
+		SubCategoryCombo->Invalidate(EInvalidateWidget::Layout);
+	if (RarityCombo.IsValid())
+		RarityCombo->Invalidate(EInvalidateWidget::Layout);
+	if (FlagsCombo.IsValid())
+		FlagsCombo->Invalidate(EInvalidateWidget::Layout);
+	if (DurabilityCheckBox.IsValid())
+		DurabilityCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (WeightCheckBox.IsValid())
+		WeightCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (MaxQuantitySpinBox.IsValid())
+		MaxQuantitySpinBox->Invalidate(EInvalidateWidget::Layout);
+	if (MaxStackSizeSpinBox.IsValid())
+		MaxStackSizeSpinBox->Invalidate(EInvalidateWidget::Layout);
+	if (DurabilityCheckBox.IsValid())
+		DurabilityCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (SpawnActorPicker.IsValid())
+		SpawnActorPicker->Invalidate(EInvalidateWidget::Layout);
+	if (ThumbnailPicker.IsValid())
+		ThumbnailPicker->Invalidate(EInvalidateWidget::Layout);
+	if (CoverPicker.IsValid())
+		CoverPicker->Invalidate(EInvalidateWidget::Layout);
+	if (MeshPicker.IsValid())
+		MeshPicker->Invalidate(EInvalidateWidget::Layout);
 }
 
 bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage) const
@@ -1834,7 +1954,6 @@ bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage
 	return true;
 }
 
-// TODO: provide link to click to navigate to the template in the content browser
 void SMounteaInventoryTemplateEditor::ShowTemplateEditorNotification(const FString& Message, const bool bSuccess) const
 {
 	FNotificationInfo notifInfo(FText::FromString(Message));
@@ -1848,6 +1967,14 @@ void SMounteaInventoryTemplateEditor::ShowTemplateEditorNotification(const FStri
 	TSharedPtr<SNotificationItem> notificationItem = FSlateNotificationManager::Get().AddNotification(notifInfo);
 	if (notificationItem.IsValid())
 		notificationItem->SetCompletionState(bSuccess ? SNotificationItem::CS_Success : SNotificationItem::CS_Fail);
+}
+
+void SMounteaInventoryTemplateEditor::RefreshOptions()
+{
+	CachedCategoryOptions = GetCategoryOptions();
+	CachedSubCategoryOptions = GetSubCategoryOptions();
+	CachedRarityOptions = GetRarityOptions();
+	CachedFlagOptions = GetFlagOptions();
 }
 
 bool SMounteaInventoryTemplateEditor::OnFilterMeshAssets(const FAssetData& AssetData) const
@@ -1897,6 +2024,91 @@ void SMounteaInventoryTemplateEditor::LoadAllTemplates()
 	// Refresh the list view if it exists
 	if (TemplateListView.IsValid())
 		TemplateListView->RequestListRefresh();
+}
+
+TArray<TSharedPtr<FString>> SMounteaInventoryTemplateEditor::GetCategoryOptions() const
+{
+	TArray<TSharedPtr<FString>> Options;
+	const auto inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (inventorySettings)
+	{
+		const auto inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+		if (inventoryConfig)
+		{
+			TArray<FString> categoryKeys;
+			inventoryConfig->AllowedCategories.GetKeys(categoryKeys);
+			for (const FString& Key : categoryKeys)
+			{
+				Options.Add(MakeShareable(new FString(Key)));
+			}
+		}
+	}
+	return Options;
+}
+
+TArray<TSharedPtr<FString>> SMounteaInventoryTemplateEditor::GetSubCategoryOptions() const
+{
+	TArray<TSharedPtr<FString>> Options;
+	const auto inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (inventorySettings)
+	{
+		const auto inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+		if (inventoryConfig)
+		{
+			for (const auto& categoryPair : inventoryConfig->AllowedCategories)
+			{
+				const FInventoryCategory& currentCategory = categoryPair.Value;
+				TArray<FString> subCategoryKeys;
+				currentCategory.SubCategories.GetKeys(subCategoryKeys);
+                
+				for (const FString& subCategoryKey : subCategoryKeys)
+				{
+					if (!Options.ContainsByPredicate([&subCategoryKey](const TSharedPtr<FString>& Option) {
+						return *Option == subCategoryKey;
+					}))
+					{
+						Options.Add(MakeShareable(new FString(subCategoryKey)));
+					}
+				}
+			}
+		}
+	}
+	return Options;
+}
+
+TArray<TSharedPtr<FString>> SMounteaInventoryTemplateEditor::GetRarityOptions() const
+{
+	TArray<TSharedPtr<FString>> Options;
+	const auto inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (inventorySettings)
+	{
+		const auto inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+		if (inventoryConfig)
+		{
+			TArray<FString> rarityKeys;
+			inventoryConfig->AllowedRarities.GetKeys(rarityKeys);
+			for (const FString& Key : rarityKeys)
+			{
+				Options.Add(MakeShareable(new FString(Key)));
+			}
+		}
+	}
+	return Options;
+}
+
+TArray<TSharedPtr<FString>> SMounteaInventoryTemplateEditor::GetFlagOptions() const
+{
+	TArray<TSharedPtr<FString>> flagOptions;
+	UEnum* flagsEnum = StaticEnum<EInventoryItemFlags>();
+	if (flagsEnum)
+	{
+		for (int32 i = 0; i < flagsEnum->NumEnums() - 1; ++i)
+		{
+			FString enumName = flagsEnum->GetNameStringByIndex(i);
+			flagOptions.Add(MakeShareable(new FString(enumName)));
+		}
+	}
+	return flagOptions;
 }
 
 #undef LOCTEXT_NAMESPACE

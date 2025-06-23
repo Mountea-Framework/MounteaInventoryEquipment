@@ -46,14 +46,14 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
 {
 	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
 	if (!IsValid(inventorySettings))
-	{
-		TArray<FString> returnValues;
-		returnValues.Add(TEXT(""));
-		return returnValues;
-	}
+		return TArray<FString>();
+	
 	auto inventorySettingsConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
 	if (!IsValid(inventorySettingsConfig))
-		TArray<FString> returnValues;
+		return TArray<FString>();
+
+	if (inventorySettingsConfig->AllowedCategories.Num() <= 0)
+		return TArray<FString>();
 
 	TArray<FString> returnValues;
 	if (const auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory))
