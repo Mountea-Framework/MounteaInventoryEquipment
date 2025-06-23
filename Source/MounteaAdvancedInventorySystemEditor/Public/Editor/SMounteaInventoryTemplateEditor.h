@@ -77,18 +77,19 @@ private:
 	TObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
 	TObjectPtr<UMounteaInventoryItemTemplate> TransientTemplate;
 
+	// Texts
 	TSharedPtr<SEditableTextBox> DisplayNameTextBox;
 	TSharedPtr<SEditableTextBox> ItemIDTextBox;
 	TSharedPtr<SEditableTextBox> ThumbnailDescriptionTextBox;
-	
 	TSharedPtr<SMultiLineEditableTextBox> DescriptionTextBox;
-	
+
+	// Tags
 	TSharedPtr<SGameplayTagContainerCombo> TagsCombo;
-	
+
+	// Selections
 	TSharedPtr<STextComboBox> CategoryCombo;
 	TSharedPtr<STextComboBox> SubCategoryCombo;
 	TSharedPtr<STextComboBox> RarityCombo;
-	TSharedPtr<STextComboBox> FlagsCombo;
 
 	// Price
 	TSharedPtr<SCheckBox> PriceCheckBox;

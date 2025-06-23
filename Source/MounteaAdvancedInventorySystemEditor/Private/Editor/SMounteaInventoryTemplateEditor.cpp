@@ -2057,33 +2057,52 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 	
 	if (TransientTemplate)
 	{
-		TransientTemplate->Guid = Template->Guid;
+		// Texts
 		TransientTemplate->DisplayName = Template->DisplayName;
+		TransientTemplate->Guid = Template->Guid;
+		TransientTemplate->ItemShortInfo = Template->ItemShortInfo;
+		TransientTemplate->ItemLongInfo = Template->ItemLongInfo;
+
+		// Tags
+		TransientTemplate->Tags = Template->Tags;
+
+		// Selections
 		TransientTemplate->ItemCategory = Template->ItemCategory;
 		TransientTemplate->ItemSubCategory = Template->ItemSubCategory;
 		TransientTemplate->ItemRarity = Template->ItemRarity;
-		TransientTemplate->ItemFlags = Template->ItemFlags;
+
+		// Price
+		TransientTemplate->bHasPrice = Template->bHasPrice;
+		TransientTemplate->BasePrice = Template->BasePrice;
+		TransientTemplate->SellPriceCoefficient = Template->SellPriceCoefficient;
+
+		// Quantity
 		TransientTemplate->MaxQuantity = Template->MaxQuantity;
 		TransientTemplate->MaxStackSize = Template->MaxStackSize;
-		TransientTemplate->Tags = Template->Tags;
-		TransientTemplate->SpawnActor = Template->SpawnActor;
-		TransientTemplate->ItemShortInfo = Template->ItemShortInfo;
-		TransientTemplate->ItemLongInfo = Template->ItemLongInfo;
-		TransientTemplate->ItemThumbnail = Template->ItemThumbnail;
-		TransientTemplate->ItemCover = Template->ItemCover;
-		TransientTemplate->ItemMesh = Template->ItemMesh;
+
+		// Durability
 		TransientTemplate->bHasDurability = Template->bHasDurability;
 		TransientTemplate->MaxDurability = Template->MaxDurability;
 		TransientTemplate->BaseDurability = Template->BaseDurability;
 		TransientTemplate->DurabilityPenalization = Template->DurabilityPenalization;
 		TransientTemplate->DurabilityToPriceCoefficient = Template->DurabilityToPriceCoefficient;
-		TransientTemplate->bHasPrice = Template->bHasPrice;
-		TransientTemplate->BasePrice = Template->BasePrice;
-		TransientTemplate->SellPriceCoefficient = Template->SellPriceCoefficient;
+
+		// Flags
+		TransientTemplate->ItemFlags = Template->ItemFlags;
+
+		// Weight
 		TransientTemplate->bHasWeight = Template->bHasWeight;
 		TransientTemplate->Weight = Template->Weight;
+
+		// Equipment
 		TransientTemplate->AffectorSlots = Template->AffectorSlots;
+		TransientTemplate->SpawnActor = Template->SpawnActor;
 		TransientTemplate->ItemSpecialAffect = Template->ItemSpecialAffect;
+
+		// Visuals
+		TransientTemplate->ItemThumbnail = Template->ItemThumbnail;
+		TransientTemplate->ItemCover = Template->ItemCover;
+		TransientTemplate->ItemMesh = Template->ItemMesh;
 	}
 	
 	CurrentTemplate = TransientTemplate;
@@ -2091,7 +2110,7 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 	
 	RefreshOptions();
 	
-	// Force UI refresh for all bound widgets
+	// Texts
 	if (DisplayNameTextBox.IsValid())
 		DisplayNameTextBox->Invalidate(EInvalidateWidget::Layout);
 	if (ItemIDTextBox.IsValid())
@@ -2100,35 +2119,46 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		ThumbnailDescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
 	if (DescriptionTextBox.IsValid())
 		DescriptionTextBox->Invalidate(EInvalidateWidget::Layout);
+
+	// Tags
 	if (TagsCombo.IsValid())
 		TagsCombo->Invalidate(EInvalidateWidget::Layout);
-	if (AffectorsTagsCombo.IsValid())
-		AffectorsTagsCombo->Invalidate(EInvalidateWidget::Layout);
+
+	// Selections
 	if (CategoryCombo.IsValid())
 		CategoryCombo->Invalidate(EInvalidateWidget::Layout);
 	if (SubCategoryCombo.IsValid())
 		SubCategoryCombo->Invalidate(EInvalidateWidget::Layout);
 	if (RarityCombo.IsValid())
 		RarityCombo->Invalidate(EInvalidateWidget::Layout);
-	if (DurabilityCheckBox.IsValid())
-		DurabilityCheckBox->Invalidate(EInvalidateWidget::Layout);
-	if (WeightCheckBox.IsValid())
-		WeightCheckBox->Invalidate(EInvalidateWidget::Layout);
+
+	// Price
+	if (PriceCheckBox.IsValid())
+		PriceCheckBox->Invalidate(EInvalidateWidget::Layout);
+	if (BasePriceSpinBox.IsValid())
+		BasePriceSpinBox->Invalidate(EInvalidateWidget::Layout);
+	if (SellPriceCoefficientSpinBox.IsValid())
+		SellPriceCoefficientSpinBox->Invalidate(EInvalidateWidget::Layout);
+
+	// Quantity
 	if (MaxQuantitySpinBox.IsValid())
 		MaxQuantitySpinBox->Invalidate(EInvalidateWidget::Layout);
 	if (MaxStackSizeSpinBox.IsValid())
 		MaxStackSizeSpinBox->Invalidate(EInvalidateWidget::Layout);
+
+	// Durability
 	if (DurabilityCheckBox.IsValid())
 		DurabilityCheckBox->Invalidate(EInvalidateWidget::Layout);
-	if (SpawnActorPicker.IsValid())
-		SpawnActorPicker->Invalidate(EInvalidateWidget::Layout);
-	if (ItemThumbnailPicker.IsValid())
-		ItemThumbnailPicker->Invalidate(EInvalidateWidget::Layout);
-	if (ItemCoverPicker.IsValid())
-		ItemCoverPicker->Invalidate(EInvalidateWidget::Layout);
-	if (ItemMeshPicker.IsValid())
-		ItemMeshPicker->Invalidate(EInvalidateWidget::Layout);
+	if (MaxDurabilitySpinBox.IsValid())
+		MaxDurabilitySpinBox->Invalidate(EInvalidateWidget::Layout);
+	if (BaseDurabilitySpinBox.IsValid())
+		BaseDurabilitySpinBox->Invalidate(EInvalidateWidget::Layout);
+	if (DurabilityPenaltySpinBox.IsValid())
+		DurabilityPenaltySpinBox->Invalidate(EInvalidateWidget::Layout);
+	if (DurabilityToPriceSpinBox.IsValid())
+		DurabilityToPriceSpinBox->Invalidate(EInvalidateWidget::Layout);
 
+	// Flags
 	if (TradeableCheckBox.IsValid())
 		TradeableCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (StackableCheckBox.IsValid())
@@ -2145,6 +2175,26 @@ void SMounteaInventoryTemplateEditor::LoadTemplateData(UMounteaInventoryItemTemp
 		UniqueCheckBox->Invalidate(EInvalidateWidget::Layout);
 	if (DurableCheckBox.IsValid())
 		DurableCheckBox->Invalidate(EInvalidateWidget::Layout);
+
+	// Weight
+	if (WeightCheckBox.IsValid())
+		WeightCheckBox->Invalidate(EInvalidateWidget::Layout);
+
+	// Equipment
+	if (AffectorsTagsCombo.IsValid())
+		AffectorsTagsCombo->Invalidate(EInvalidateWidget::Layout);
+	if (SpawnActorPicker.IsValid())
+		SpawnActorPicker->Invalidate(EInvalidateWidget::Layout);
+	if (SpecialAffectPicker.IsValid())
+		SpecialAffectPicker->Invalidate(EInvalidateWidget::Layout);
+
+	// Visuals
+	if (ItemThumbnailPicker.IsValid())
+		ItemThumbnailPicker->Invalidate(EInvalidateWidget::Layout);
+	if (ItemCoverPicker.IsValid())
+		ItemCoverPicker->Invalidate(EInvalidateWidget::Layout);
+	if (ItemMeshPicker.IsValid())
+		ItemMeshPicker->Invalidate(EInvalidateWidget::Layout);
 }
 
 bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage) const
