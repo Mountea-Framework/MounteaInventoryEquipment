@@ -38,7 +38,7 @@ public:
 	SLATE_EVENT(FOnTemplateChanged, OnTemplateChanged)
 	SLATE_END_ARGS()
 
-	void Construct(const FArguments& InArgs);
+	void Construct(const FArguments& InArgs);	
 	virtual ~SMounteaInventoryTemplateEditor();
 
 protected:

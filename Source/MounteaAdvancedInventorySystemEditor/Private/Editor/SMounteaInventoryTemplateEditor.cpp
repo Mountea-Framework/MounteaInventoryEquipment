@@ -4,10 +4,8 @@
 
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Input/SEditableTextBox.h"
-#include "Widgets/Input/SMultiLineEditableTextBox.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Input/SCheckBox.h"
-#include "Widgets/Input/SSpinBox.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Layout/SSeparator.h"
@@ -15,7 +13,6 @@
 #include "Widgets/Views/SListView.h"
 #include "Widgets/Views/STableViewBase.h"
 #include "Widgets/Views/STableRow.h"
-#include "Widgets/Input/STextComboBox.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 #include "Framework/Docking/TabManager.h"
@@ -27,8 +24,6 @@
 #include "ContentBrowserModule.h"
 #include "EditorAssetLibrary.h"
 #include "IContentBrowserSingleton.h"
-#include "PropertyCustomizationHelpers.h"
-#include "SGameplayTagContainerCombo.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Guid.h"
@@ -41,9 +36,6 @@
 #include "Subsystems/MounteaInventoryTemplateEditorSubsystem.h"
 
 #include "AssetToolsModule.h"
-#include "AssetRegistry/AssetRegistryModule.h"
-#include "Dialogs/Dialogs.h"
-#include "Dialogs/DlgPickAssetPath.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
@@ -75,12 +67,12 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 		]
 	];
 	
-	// Show transient template by default if no templates exist
 	if (AvailableTemplates.Num() == 0 || !SelectedTemplates.Num())
 	{
 		CreateTransientTemplate();
 		RefreshTemplateList();
-		SelectTransientTemplateInList();
+
+		OnTemplateSelectionChanged(nullptr, ESelectInfo::Direct);
 	}
 }
 
@@ -119,7 +111,8 @@ TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 	for (const FAssetData& assetData : assetDataList)
 	{
 		if (UMounteaInventoryItemTemplate* itemTemplate = Cast<UMounteaInventoryItemTemplate>(assetData.GetAsset()))
-			allTemplates.Add(itemTemplate);
+			if (!itemTemplate->HasAnyFlags(RF_Transient))
+				allTemplates.Add(itemTemplate);
 	}
 	
 	allTemplates.Sort([](const UObject& A, const UObject& B)
@@ -154,7 +147,8 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 	for (UObject* obj : allTemplates)
 	{
 		if (UMounteaInventoryItemTemplate* itemTemplate = Cast<UMounteaInventoryItemTemplate>(obj))
-			AvailableTemplates.Add(itemTemplate);
+			if (!itemTemplate->HasAnyFlags(RF_Transient))
+				AvailableTemplates.Add(itemTemplate);
 	}
 	
 	if (TemplateListView.IsValid())
@@ -188,6 +182,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 	
 	return SNew(SSplitter)
 		.Orientation(Orient_Horizontal)
+		.PhysicalSplitterHandleSize(1.f)
 		
 		+ SSplitter::Slot()
 		.Value(0.3f)
@@ -248,6 +243,16 @@ void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(TWeakObjectPtr<
 
 	if (selectedTemplates.Num() == 1)
 		CurrentTemplate = selectedTemplates[0];
+	if (selectedObjects.Num() == 0)
+	{
+		UMounteaInventoryTemplateEditorSubsystem* subsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>();
+		if (subsystem && subsystem->HasTempTemplate())
+		{
+			selectedObjects.Add(subsystem->GetOrCreateTempTemplate());
+			CurrentTemplate = subsystem->GetOrCreateTempTemplate();
+			bIsShowingTransient = true;
+		}
+	}
 	else
 		CurrentTemplate = nullptr;
 	
@@ -265,8 +270,9 @@ FReply SMounteaInventoryTemplateEditor::OnCreateNewTemplate()
 	
 	CreateTransientTemplate();
 	RefreshTemplateList();
-	SelectTransientTemplateInList();
-	
+	//SelectTransientTemplateInList();
+
+	TemplateListView->ClearSelection();
 	return FReply::Handled();
 }
 
@@ -351,7 +357,8 @@ FReply SMounteaInventoryTemplateEditor::CloseTemplate()
 		if (!CheckForUnsavedChanges())
 			return FReply::Unhandled();
 	}
-	
+
+	TemplateListView->ClearSelection();
 	return FReply::Handled();
 }
 
@@ -614,7 +621,14 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			SNew(SButton)
 			.Text(LOCTEXT("SaveTemplate", "Save Template"))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveTemplate)
-			.IsEnabled_Lambda([this]() { return CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate); })
+			.IsEnabled_Lambda([this]() { 
+				if (bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate.Get()->HasAnyFlags(RF_Transient))
+					return true;
+				if (CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate))
+					return true;
+				UMounteaInventoryTemplateEditorSubsystem* subsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>();
+				return subsystem && subsystem->HasTempTemplate() && DirtyTemplates.Contains(subsystem->GetOrCreateTempTemplate());
+			})
 		]
 		
 		// Save All
@@ -693,6 +707,8 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 	const auto foregroundColor = FSlateColor::UseForeground();
 	
 	return SNew(STableRow<TWeakObjectPtr<UMounteaInventoryItemTemplate>>, OwnerTable)
+		.Padding(2.f)
+	//.Style(&FMounteaAdvancedInventoryEditorStyle::Get().GetWidgetStyle<FTableRowStyle>("MAISStyleSet.TemplateTableRow"))
 	[
 		SNew(SVerticalBox)
 		
@@ -735,6 +751,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 					return foregroundColor;
 				})))
 			]
+
 			// Navigation Icon (hidden for transient)
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
@@ -770,6 +787,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 					]
 				]
 			]
+
 			// Duplicate Icon (hidden for transient)
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
@@ -794,6 +812,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 					]
 				]
 			]
+
 			// Delete Icon (hidden for transient)
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
@@ -930,7 +949,8 @@ bool SMounteaInventoryTemplateEditor::CheckForUnsavedChanges()
 	{
 		// Discard changes
 		DirtyTemplates.Empty();
-		CleanupTransientTemplate();
+		CreateTransientTemplate();
+		TemplateListView->ClearSelection();
 		return true;
 	}
 	

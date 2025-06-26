@@ -65,16 +65,65 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 
 	StyleSet->Set("MAISStyleSet.InventorySystemIcon", new IMAGE_BRUSH(TEXT("InventorySystem_Icon"), Icon16x16));
 
+	const FLinearColor RowBackgroundColor	= FLinearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	const FLinearColor RowHoverColor	= FLinearColor(0.25f, 0.25f, 0.25f, 1.0f);
+	const FLinearColor ActiveColor	= FLinearColor(0.10f, 0.35f, 0.65f, 1.f);
+	const FLinearColor InactiveColor	= FLinearColor(0.10f, 0.1f, 0.1f, 0.2f);
+	const FLinearColor DropIndicatorColor = FLinearColor(0.5f, 0.6f, 1.0f, 1.0f);
+
+	constexpr float CornerRadiusMd = 6.0f;
+	constexpr float CornerRadiusSm = 4.0f;
+	
 	FSlateRoundedBoxBrush* RoundedBrush = new FSlateRoundedBoxBrush(
 		FLinearColor::Transparent,
-		4.0f
+		CornerRadiusSm
 	);
+	{
+		RoundedBrush->DrawAs = ESlateBrushDrawType::RoundedBox;
+		RoundedBrush->OutlineSettings.Width = 1.0f;
+		RoundedBrush->OutlineSettings.Color = FLinearColor(1,1,1,0.3f);
+		StyleSet->Set("MAISStyleSet.RoundedBorder", RoundedBrush);
+	}
 
-	RoundedBrush->DrawAs = ESlateBrushDrawType::RoundedBox;
-	RoundedBrush->OutlineSettings.Width = 1.0f;
-	RoundedBrush->OutlineSettings.Color = FLinearColor(1,1,1,0.3f);
+	FTableRowStyle TemplatesRowStyle = FAppStyle::Get().GetWidgetStyle<FTableRowStyle>("TableView.Row");
+	{
+		TemplatesRowStyle.SetEvenRowBackgroundBrush(FSlateRoundedBoxBrush(RowBackgroundColor, CornerRadiusSm));
+		TemplatesRowStyle.SetEvenRowBackgroundHoveredBrush(FSlateRoundedBoxBrush(RowHoverColor, CornerRadiusSm));
 
-	StyleSet->Set("MAISStyleSet.RoundedBorder", RoundedBrush);
+		TemplatesRowStyle.SetOddRowBackgroundBrush(FSlateRoundedBoxBrush(RowBackgroundColor, CornerRadiusSm));
+		TemplatesRowStyle.SetOddRowBackgroundHoveredBrush(FSlateRoundedBoxBrush(RowHoverColor, CornerRadiusSm));
+
+		TemplatesRowStyle.SetSelectorFocusedBrush(FSlateRoundedBoxBrush(RowHoverColor, CornerRadiusSm));
+		
+		TemplatesRowStyle.SetActiveBrush(FSlateRoundedBoxBrush(ActiveColor, CornerRadiusSm));
+		TemplatesRowStyle.SetInactiveBrush(FSlateRoundedBoxBrush(InactiveColor, CornerRadiusSm));
+		TemplatesRowStyle.SetActiveHoveredBrush(FSlateRoundedBoxBrush(ActiveColor, CornerRadiusSm));
+		TemplatesRowStyle.SetInactiveHoveredBrush(FSlateRoundedBoxBrush(InactiveColor, CornerRadiusSm));
+		
+		TemplatesRowStyle.SetUseParentRowBrush(false);
+		
+		TemplatesRowStyle.SetParentRowBackgroundBrush(FSlateRoundedBoxBrush(RowBackgroundColor, CornerRadiusSm));
+		TemplatesRowStyle.SetParentRowBackgroundHoveredBrush(FSlateRoundedBoxBrush(RowHoverColor, CornerRadiusSm));
+		
+		TemplatesRowStyle.SetTextColor(FSlateColor::UseForeground());
+		TemplatesRowStyle.SetSelectedTextColor(FSlateColor::UseForeground());
+		
+		TemplatesRowStyle.SetDropIndicator_Above(FSlateRoundedBoxBrush(DropIndicatorColor, 0.f));
+		TemplatesRowStyle.SetDropIndicator_Onto(FSlateRoundedBoxBrush(DropIndicatorColor, 0.f));
+		TemplatesRowStyle.SetDropIndicator_Below(FSlateRoundedBoxBrush(DropIndicatorColor, 0.f));
+		
+		TemplatesRowStyle.SetActiveHighlightedBrush(FSlateRoundedBoxBrush(ActiveColor, CornerRadiusSm));
+		TemplatesRowStyle.SetInactiveHighlightedBrush(FSlateRoundedBoxBrush(InactiveColor, CornerRadiusSm));
+
+		StyleSet->Set("MAISStyleSet.TemplateTableRow", TemplatesRowStyle);
+	}
+
+	FTableViewStyle TemplatesViewStyle = FAppStyle::Get().GetWidgetStyle<FTableViewStyle>("TableView");
+	{
+		TemplatesViewStyle.SetBackgroundBrush(FSlateRoundedBoxBrush(RowBackgroundColor, CornerRadiusSm));
+	
+		StyleSet->Set("MAISStyleSet.TemplateTableView", TemplatesViewStyle);
+	}
 
 }
 
