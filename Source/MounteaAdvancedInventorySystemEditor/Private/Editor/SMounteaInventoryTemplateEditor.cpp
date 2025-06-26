@@ -276,15 +276,6 @@ FReply SMounteaInventoryTemplateEditor::OnCreateNewTemplate()
 	return FReply::Handled();
 }
 
-void SMounteaInventoryTemplateEditor::SelectTransientTemplateInList()
-{
-	if (TemplateListView.IsValid() && CurrentTemplate.IsValid())
-	{
-		TemplateListView->SetSelection(CurrentTemplate, ESelectInfo::Direct);
-		TemplateListView->RequestScrollIntoView(CurrentTemplate);
-	}
-}
-
 FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 {
 	if (!CurrentTemplate.IsValid())

@@ -75,7 +75,6 @@ private:
 	void UntrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
 	bool HasUnsavedChanges() const;
 	bool CheckForUnsavedChanges();
-	void SelectTransientTemplateInList();
 	
 	// Asset creation dialog
 	FString ShowSaveAssetDialog();
