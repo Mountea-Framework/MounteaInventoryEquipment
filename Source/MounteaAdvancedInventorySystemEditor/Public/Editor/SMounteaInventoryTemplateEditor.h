@@ -12,6 +12,25 @@ class UMounteaInventoryItemTemplate;
 
 DECLARE_DELEGATE_OneParam(FOnTemplateChanged, UMounteaInventoryItemTemplate*);
 
+#define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
+
+struct FTemplateDisplayInfo
+{
+	FText DisplayText;
+	FText TooltipText;
+	FText FullText;
+	FString AssetPath;
+	bool bIsTransient = false;
+	bool bIsDirty = false;
+
+	FTemplateDisplayInfo()
+		: DisplayText(LOCTEXT("InvalidTemplate", "Invalid Template"))
+		, TooltipText(LOCTEXT("InvalidTemplateTooltip", "Invalid Template"))
+		, FullText(DisplayText)
+		, AssetPath(TEXT("Unknown Path"))
+	{}
+};
+
 class SMounteaInventoryTemplateEditor : public SCompoundWidget, public FNotifyHook
 {
 public:
@@ -61,6 +80,9 @@ private:
 	// Asset creation dialog
 	FString ShowSaveAssetDialog();
 
+	FTemplateDisplayInfo  GenerateTemplateDisplayInfo(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
+	const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates);
+
 private:
 	FOnTemplateChanged OnTemplateChanged;
 	
@@ -77,3 +99,5 @@ private:
 	bool bIsEditingExisting = false;
 	bool bIsShowingTransient = false;
 };
+
+#undef LOCTEXT_NAMESPACE

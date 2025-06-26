@@ -64,6 +64,18 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Config.large", new IMAGE_BRUSH(TEXT("configIcon"), Icon64x64));
 
 	StyleSet->Set("MAISStyleSet.InventorySystemIcon", new IMAGE_BRUSH(TEXT("InventorySystem_Icon"), Icon16x16));
+
+	FSlateRoundedBoxBrush* RoundedBrush = new FSlateRoundedBoxBrush(
+		FLinearColor::Transparent,
+		4.0f
+	);
+
+	RoundedBrush->DrawAs = ESlateBrushDrawType::RoundedBox;
+	RoundedBrush->OutlineSettings.Width = 1.0f;
+	RoundedBrush->OutlineSettings.Color = FLinearColor(1,1,1,0.3f);
+
+	StyleSet->Set("MAISStyleSet.RoundedBorder", RoundedBrush);
+
 }
 
 void FMounteaAdvancedInventoryEditorStyle::Initialize()

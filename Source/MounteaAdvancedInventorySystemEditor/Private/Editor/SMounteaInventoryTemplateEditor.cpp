@@ -44,6 +44,7 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/DlgPickAssetPath.h"
+#include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
 
@@ -193,6 +194,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 		[
 			SNew(SBorder)
 			.Padding(4.0f)
+			.BorderImage(FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.RoundedBorder"))
 			[
 				SAssignNew(TemplateListView, SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>)
 				.ListItemsSource(&AvailableTemplates)
@@ -466,6 +468,57 @@ FString SMounteaInventoryTemplateEditor::ShowSaveAssetDialog()
 	return contentBrowserModule.Get().CreateModalSaveAssetDialog(config);
 }
 
+FTemplateDisplayInfo SMounteaInventoryTemplateEditor::GenerateTemplateDisplayInfo(
+	TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
+	const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates)
+{
+	FTemplateDisplayInfo returnInfo;
+
+	if (!Template.IsValid())
+		return returnInfo;
+
+	if (UMounteaInventoryItemTemplate* TemplatePtr = Template.Get())
+	{
+		returnInfo.bIsTransient = TemplatePtr->HasAnyFlags(RF_Transient);
+		returnInfo.bIsDirty = AllDirtyTemplates.Contains(TemplatePtr);
+
+		const FText baseName = TemplatePtr->DisplayName.IsEmpty()
+			? FText::FromString(TemplatePtr->GetName())
+			: TemplatePtr->DisplayName;
+
+		returnInfo.FullText = baseName;
+
+		FText displayName = baseName;
+		if (returnInfo.bIsTransient)
+			displayName = FText::Format(LOCTEXT("TransientTemplate", "{0} *"), baseName);
+		else if (returnInfo.bIsDirty)
+			displayName = FText::Format(LOCTEXT("DirtyTemplate", "{0} *"), baseName);
+
+		const FString truncatedName = displayName.ToString();
+		returnInfo.DisplayText = FText::FromString(
+			truncatedName.Len() > 32 ? truncatedName.Left(32) + TEXT("...") : truncatedName
+		);
+
+		if (UPackage* assetPackage = TemplatePtr->GetPackage())
+			returnInfo.AssetPath = returnInfo.bIsTransient ? TEXT("Unsaved") : assetPackage->GetName();
+
+		returnInfo.TooltipText = FText::Format(
+			LOCTEXT("TemplateTooltip", "Name: {0}\nPath: {1}\nCategory: {2}\nRarity: {3}\nStatus: {4}"),
+			baseName,
+			FText::FromString(returnInfo.AssetPath),
+			FText::FromString(TemplatePtr->ItemCategory),
+			FText::FromString(TemplatePtr->ItemRarity),
+			returnInfo.bIsTransient
+				? LOCTEXT("UnsavedStatus", "Unsaved")
+				: (returnInfo.bIsDirty
+					? LOCTEXT("ModifiedStatus", "Modified")
+					: LOCTEXT("SavedStatus", "Saved"))
+		);
+	}
+
+	return returnInfo;
+}
+
 FReply SMounteaInventoryTemplateEditor::DeleteTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)
 {
 	if (!Template.IsValid())
@@ -628,42 +681,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 
 TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable)
 {
-	FText displayText = LOCTEXT("InvalidTemplate", "Invalid Template");
-	FText fullText = displayText;
-	FString assetPath = TEXT("Unknown Path");
-	FText tooltipText = LOCTEXT("InvalidTemplateTooltip", "Invalid Template");
-	bool bIsTransient = false;
-	bool bIsDirty = false;
-	
-	if (Template.IsValid())
-	{
-		if (UMounteaInventoryItemTemplate* templatePtr = Template.Get())
-		{
-			bIsTransient = templatePtr->HasAnyFlags(RF_Transient);
-			bIsDirty = DirtyTemplates.Contains(Template);
-			
-			fullText = templatePtr->DisplayName.IsEmpty() ? FText::FromString(templatePtr->GetName()) : templatePtr->DisplayName;
-			
-			if (bIsTransient)
-				fullText = FText::Format(LOCTEXT("TransientTemplate", "{0} *"), fullText);
-			else if (bIsDirty)
-				fullText = FText::Format(LOCTEXT("DirtyTemplate", "{0} *"), fullText);
-			
-			displayText = FText::FromString(fullText.ToString().Len() > 32 ? fullText.ToString().Left(32) + TEXT("...") : fullText.ToString());
-			
-			if (UPackage* package = templatePtr->GetPackage())
-				assetPath = bIsTransient ? TEXT("Unsaved") : package->GetName();
+	const FTemplateDisplayInfo Info = GenerateTemplateDisplayInfo(Template, DirtyTemplates);
 
-			tooltipText = FText::Format(
-				LOCTEXT("TemplateTooltip", "Name: {0}\nPath: {1}\nCategory: {2}\nRarity: {3}\nStatus: {4}"),
-				fullText,
-				FText::FromString(assetPath),
-				FText::FromString(templatePtr->ItemCategory),
-				FText::FromString(templatePtr->ItemRarity),
-				bIsTransient ? LOCTEXT("UnsavedStatus", "Unsaved") : (bIsDirty ? LOCTEXT("ModifiedStatus", "Modified") : LOCTEXT("SavedStatus", "Saved"))
-			);
-		}
-	}
+	FText displayText = Info.DisplayText;
+	FText fullText = Info.FullText;
+	FString assetPath = Info.AssetPath;
+	FText tooltipText = Info.TooltipText;
+	bool bIsTransient = Info.bIsTransient;
+	bool bIsDirty = Info.bIsDirty;
+
+	const auto foregroundColor = FSlateColor::UseForeground();
 	
 	return SNew(STableRow<TWeakObjectPtr<UMounteaInventoryItemTemplate>>, OwnerTable)
 	[
@@ -680,20 +707,32 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 			.FillWidth(1.0f)
 			[
 				SNew(STextBlock)
-				.Text(displayText)
+				.Text(TAttribute<FText>::Create(
+					TAttribute<FText>::FGetter::CreateLambda([this, Template]() -> FText
+					{
+						const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(Template, DirtyTemplates);
+						return displayInfo.DisplayText;
+					})
+				))
 				.Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
-				.ToolTipText(tooltipText)
-				.ColorAndOpacity(TAttribute<FSlateColor>::Create(TAttribute<FSlateColor>::FGetter::CreateLambda([this, Template]() 
+				.ToolTipText(TAttribute<FText>::Create(
+					TAttribute<FText>::FGetter::CreateLambda([this, Template]() -> FText
+					{
+						const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(Template, DirtyTemplates);
+						return displayInfo.TooltipText;
+					})
+				))
+				.ColorAndOpacity(TAttribute<FSlateColor>::Create(TAttribute<FSlateColor>::FGetter::CreateLambda([this, Template, foregroundColor]() 
 				{
 					if (Template.IsValid())
 					{
 						UMounteaInventoryItemTemplate* templatePtr = Template.Get();
 						if (templatePtr->HasAnyFlags(RF_Transient)) 
-							return FSlateColor(FLinearColor(0.8f, 0.8f, 0.2f));
+							return FSlateColor(FLinearColor(1.f, 1.f, 0.5f));
 						if (DirtyTemplates.Contains(Template)) 
-							return FSlateColor(FLinearColor(0.8f, 0.3f, 0.3f));
+							return FSlateColor(FLinearColor(1.f, 0.7f, 0.7f));
 					}
-					return FSlateColor::UseForeground();
+					return foregroundColor;
 				})))
 			]
 			// Navigation Icon (hidden for transient)
