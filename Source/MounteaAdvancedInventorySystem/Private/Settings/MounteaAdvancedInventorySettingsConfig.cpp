@@ -11,6 +11,7 @@
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()
 	: Super()
 	, bAlwaysStackStackableItems(true)
+	, bAllowDragAndDrop(true)
 {
 	SetupWidgetCommands();
 	ValidateInventoryTypes();
@@ -30,9 +31,7 @@ void UMounteaAdvancedInventorySettingsConfig::ValidateInventoryTypes()
 	for (const EInventoryType Type : RequiredTypes)
 	{
 		if (!AllowedInventoryTypes.Contains(Type))
-		{
 			AllowedInventoryTypes.Add(Type, GetDefaultConfigForType(Type));
-		}
 	}
 }
 
