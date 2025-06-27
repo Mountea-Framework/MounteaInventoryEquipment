@@ -30,7 +30,10 @@ public:
 	UMounteaAdvancedAttachmentSlot();
 	explicit UMounteaAdvancedAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& NewParentContainer);
 
-public:	
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	FName SlotName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	FGameplayTagContainer SlotTags;
@@ -71,7 +74,7 @@ public:
 
 	FORCEINLINE bool IsSlotValid() const
 	{
-		return !DisplayName.IsEmpty();
+		return !DisplayName.IsEmpty() && !SlotTags.IsEmpty();
 	}
 
 	bool IsEmpty() const;
@@ -101,4 +104,11 @@ public:
 	{
 		return bRequireAll ? SlotTags.HasAll(Tags) : SlotTags.HasAny(Tags);
 	}
+
+#if WITH_EDITOR
+
+	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
+	
+#endif
+	
 };
