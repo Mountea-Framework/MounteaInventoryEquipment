@@ -3,6 +3,9 @@
 #include "MounteaAdvancedInventorySystemEditor.h"
 
 #include "AssetToolsModule.h"
+#include "ContentBrowserModule.h"
+#include "FileHelpers.h"
+#include "IContentBrowserSingleton.h"
 #include "ISettingsModule.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
@@ -20,6 +23,8 @@
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Docking/TabManager.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -423,6 +428,47 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Content", "📦 Mountea Plugin Content"));
+	MenuBuilder.AddMenuEntry(
+				LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Label", "Open Example Level"),
+				LOCTEXT("MounteaSystemEditor_OpenExampleLevel_ToolTip", "🌄 Opens an example level demonstrating Mountea Advanced Inventory & Equipment System"),
+				FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Level"),
+				FUIAction(
+					FExecuteAction::CreateLambda([]()
+					{
+						const FString mapPath = TEXT("/MounteaAdvancedInventorySystem/ExampleLevel/M_InventoryWorld");
+						if (FPackageName::DoesPackageExist(mapPath))
+							FEditorFileUtils::LoadMap(mapPath, false, true);
+						else
+						{
+							FNotificationInfo notifInfo(LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Notification", "Unable to open example level!"));
+							notifInfo.bUseSuccessFailIcons = true;
+							notifInfo.SubText = LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Notification_SubText",
+								"The example level is missing. Please, verify that the Mountea Advanced Inventory & Equipment plugin is installed correctly!");
+							TSharedPtr<SNotificationItem> notificationItem = FSlateNotificationManager::Get().AddNotification(notifInfo);
+							if (notificationItem.IsValid())
+								notificationItem->SetCompletionState(SNotificationItem::CS_Fail);
+						}
+					})
+				)
+			);
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("MounteaSystemEditor_OpenPluginFolder_Label", "Open Plugin Folder"),
+		LOCTEXT("MounteaSystemEditor_OpenPluginFolder_ToolTip", "📂 Open the Mountea Advanced Inventory & Equipment plugin's folder"),
+		FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Folder"),
+		FUIAction(
+			FExecuteAction::CreateLambda([]()
+			{
+				const FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+				TArray<FString> folderPaths;
+				folderPaths.Add(TEXT("/MounteaDialogueSystem"));
+				contentBrowserModule.Get().SetSelectedPaths(folderPaths, true);
+			})
+		)
+	);
+	MenuBuilder.EndSection();
+	
 	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "Mountea Advanced Inventory Settings"));
 	{
 		MenuBuilder.AddMenuEntry(

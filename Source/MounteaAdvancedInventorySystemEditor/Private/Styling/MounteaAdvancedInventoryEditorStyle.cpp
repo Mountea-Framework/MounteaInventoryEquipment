@@ -63,6 +63,9 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Config.Small", new IMAGE_BRUSH(TEXT("configIcon"), Icon16x16));
 	StyleSet->Set("MAISStyleSet.Config.large", new IMAGE_BRUSH(TEXT("configIcon"), Icon64x64));
 
+	StyleSet->Set("MAISStyleSet.Level", new IMAGE_BRUSH(TEXT("LevelIcon"), Icon40x40));
+	StyleSet->Set("MAISStyleSet.Folder", new IMAGE_BRUSH(TEXT("FolderIcon"), Icon40x40));
+
 	StyleSet->Set("MAISStyleSet.InventorySystemIcon", new IMAGE_BRUSH(TEXT("InventorySystem_Icon"), Icon16x16));
 
 	const FLinearColor RowBackgroundColor	= FLinearColor(0.1f, 0.1f, 0.1f, 1.0f);
