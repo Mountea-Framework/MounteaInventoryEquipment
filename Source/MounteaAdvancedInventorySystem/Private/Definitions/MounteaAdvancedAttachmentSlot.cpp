@@ -5,12 +5,14 @@
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
+#include "Misc/DataValidation.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
 UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot():
 	State(EAttachmentSlotState::EASS_Empty), SlotType(EAttachmentSlotType::EAST_Socket)
 {
+	SlotName = "NewEmptySlot";
 }
 
 UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot(
@@ -96,3 +98,15 @@ bool UMounteaAdvancedAttachmentSlot::Detach()
 	State = EAttachmentSlotState::EASS_Empty;
 	return true;
 }
+
+#if WITH_EDITOR
+EDataValidationResult UMounteaAdvancedAttachmentSlot::IsDataValid(class FDataValidationContext& Context) const
+{
+	if (!IsSlotValid())
+	{
+		Context.AddError(NSLOCTEXT("AttachmentSlot", "AttachmentSlot_SlotInvalid", "Slot is invalid! It must have a valid name and tags."));
+	}
+	UObject::IsDataValid(Context);
+	return Context.GetNumErrors() > 0 ? EDataValidationResult::Invalid : EDataValidationResult::Valid;
+}
+#endif

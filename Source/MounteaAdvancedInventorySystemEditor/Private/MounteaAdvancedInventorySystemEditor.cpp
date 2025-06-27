@@ -3,7 +3,11 @@
 #include "MounteaAdvancedInventorySystemEditor.h"
 
 #include "AssetToolsModule.h"
+#include "ContentBrowserModule.h"
+#include "FileHelpers.h"
+#include "IContentBrowserSingleton.h"
 #include "ISettingsModule.h"
+#include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
@@ -20,6 +24,8 @@
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Docking/TabManager.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -67,6 +73,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 				{
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventorySettingsConfig", MounteaAdvancedInventorySettingsConfigClassThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventorySettingsConfig", MounteaAdvancedInventorySettingsConfigClassIcon);
+				}
+
+				FSlateImageBrush* MounteaAdvancedEquipmentSettingsConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedEquipmentSettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedEquipmentSettingsConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedEquipmentSettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedEquipmentSettingsConfigClassIcon && MounteaAdvancedEquipmentSettingsConfigClassThumb)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedEquipmentSettingsConfig", MounteaAdvancedEquipmentSettingsConfigClassThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedEquipmentSettingsConfig", MounteaAdvancedEquipmentSettingsConfigClassIcon);
 				}
 
 				FSlateImageBrush* MounteaAdvancedInventoryThemeConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ThemeConfigClassIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
@@ -136,6 +150,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventorySettingsConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryThemeConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentSettingsConfig_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{
@@ -242,7 +257,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterTabSpawners()
 	)
 	.SetDisplayName(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
 	.SetTooltipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Open the Mountea Inventory Template Editor"))
-	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon"));
+	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon")); 
 }
 
 void FMounteaAdvancedInventorySystemEditor::UnregisterTabSpawners()
@@ -258,7 +273,7 @@ void FMounteaAdvancedInventorySystemEditor::OpenInventoryTemplateEditor()
 
 TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTemplateEditorTab(const FSpawnTabArgs& Args)
 {
-	TSharedRef<SMounteaInventoryTemplateEditor> NewEditor = SNew(SMounteaInventoryTemplateEditor)
+	TSharedRef<SMounteaInventoryTemplateEditor> newEditor = SNew(SMounteaInventoryTemplateEditor)
 		.OnTemplateChanged_Lambda([](UMounteaInventoryItemTemplate* Template)
 		{
 			// Handle template changes if needed
@@ -269,17 +284,17 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 			}
 		});
 
-	CurrentTemplateEditor = NewEditor;
+	CurrentTemplateEditor = newEditor;
 
-	TSharedRef<SDockTab> NewTab = SNew(SDockTab)
+	TSharedRef<SDockTab> newTab = SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
 		.Label(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
 		.ToolTipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Create and edit Mountea Inventory Item Templates"))
 		[
-			NewEditor
+			newEditor
 		];
 
-	return NewTab;
+	return newTab;
 }
 
 void FMounteaAdvancedInventorySystemEditor::InventoryManagerButtonClicked() const
@@ -423,6 +438,47 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Content", "📦 Mountea Plugin Content"));
+	MenuBuilder.AddMenuEntry(
+				LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Label", "Open Example Level"),
+				LOCTEXT("MounteaSystemEditor_OpenExampleLevel_ToolTip", "🌄 Opens an example level demonstrating Mountea Advanced Inventory & Equipment System"),
+				FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Level"),
+				FUIAction(
+					FExecuteAction::CreateLambda([]()
+					{
+						const FString mapPath = TEXT("/MounteaAdvancedInventorySystem/ExampleLevel/M_InventoryWorld");
+						if (FPackageName::DoesPackageExist(mapPath))
+							FEditorFileUtils::LoadMap(mapPath, false, true);
+						else
+						{
+							FNotificationInfo notifInfo(LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Notification", "Unable to open example level!"));
+							notifInfo.bUseSuccessFailIcons = true;
+							notifInfo.SubText = LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Notification_SubText",
+								"The example level is missing. Please, verify that the Mountea Advanced Inventory & Equipment plugin is installed correctly!");
+							TSharedPtr<SNotificationItem> notificationItem = FSlateNotificationManager::Get().AddNotification(notifInfo);
+							if (notificationItem.IsValid())
+								notificationItem->SetCompletionState(SNotificationItem::CS_Fail);
+						}
+					})
+				)
+			);
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("MounteaSystemEditor_OpenPluginFolder_Label", "Open Plugin Folder"),
+		LOCTEXT("MounteaSystemEditor_OpenPluginFolder_ToolTip", "📂 Open the Mountea Advanced Inventory & Equipment plugin's folder"),
+		FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Folder"),
+		FUIAction(
+			FExecuteAction::CreateLambda([]()
+			{
+				const FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+				TArray<FString> folderPaths;
+				folderPaths.Add(TEXT("/MounteaAdvancedInventorySystem"));
+				contentBrowserModule.Get().SetSelectedPaths(folderPaths, true);
+			})
+		)
+	);
+	MenuBuilder.EndSection();
+	
 	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "Mountea Advanced Inventory Settings"));
 	{
 		MenuBuilder.AddMenuEntry(

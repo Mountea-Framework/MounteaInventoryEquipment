@@ -51,24 +51,28 @@ public:
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName DefaultAttachmentTarget;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	EAttachmentSlotState State;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	
+	// Does not support runtime addition/removal of slots.
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment",
 		Instanced,
 		meta=(ForceInlineRow), meta=(TitleProperty="DisplayName"), meta=(ShowInnerProperties))
-	TMap<FName, TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
+	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 
 protected:
 
 	UFUNCTION()
 	TArray<FName> GetAvailableTargetNames() const;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 
 #if WITH_EDITOR
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
 	
 #endif
 };

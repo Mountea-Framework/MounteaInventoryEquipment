@@ -90,6 +90,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Settings", DisplayName="⚠ Always Stack Stackable Items")
 	uint8 bAlwaysStackStackableItems : 1;
 
+	/** Determines if the inventory system allows drag-and-drop operations for items. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Settings")
+	uint8 bAllowDragAndDrop : 1;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Config", meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;
 

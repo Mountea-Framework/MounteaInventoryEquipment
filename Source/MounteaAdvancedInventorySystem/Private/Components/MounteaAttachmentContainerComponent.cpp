@@ -6,8 +6,11 @@
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Misc/DataValidation.h"
+#include "Net/UnrealNetwork.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
+#include "UObject/ObjectSaveContext.h"
 
 UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 {
@@ -33,25 +36,33 @@ AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() co
 
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const
 {
-	const auto foundSlot = AttachmentSlots.FindRef(SlotId);
+	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot->SlotName == SlotId;
+	});
 	return foundSlot && foundSlot->IsSlotValid();
 }
 
 UMounteaAdvancedAttachmentSlot* UMounteaAttachmentContainerComponent::GetSlot_Implementation(const FName& SlotId) const
 {
-	const auto foundSlot = AttachmentSlots.FindRef(SlotId);
+	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot->SlotName == SlotId;
+	});
 	return foundSlot ? foundSlot : nullptr;
 }
 
 bool UMounteaAttachmentContainerComponent::IsSlotOccupied_Implementation(const FName& SlotId) const
 {
-	const auto foundSlot = AttachmentSlots.FindRef(SlotId);
+	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot->SlotName == SlotId;
+	});
 	return foundSlot && foundSlot->IsOccupied();
 }
 
 bool UMounteaAttachmentContainerComponent::DisableSlot_Implementation(const FName& SlotId)
 {
-	auto foundSlot = AttachmentSlots.FindRef(SlotId);
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot->SlotName == SlotId;
+	});
 	if (!foundSlot)
 		return false;
 
@@ -63,14 +74,21 @@ bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName&
 	if (!Attachment)
 		return false;
 
-	auto foundSlot = AttachmentSlots.FindRef(SlotId);
-	return foundSlot && foundSlot->Attach(Attachment);
+	auto foundSlot = AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot && Slot->SlotName == SlotId;
+	});
+	return foundSlot && (*foundSlot)->Attach(Attachment);
 }
 
 bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName& SlotId)
 {
-	auto foundSlot = AttachmentSlots.FindRef(SlotId);
-	return foundSlot && foundSlot->Detach();
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot->SlotName == SlotId;
+	});
+	if (!foundSlot)
+		return false;
+
+	return foundSlot->Detach();
 }
 
 bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment)
@@ -78,7 +96,9 @@ bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FNam
 	if (!Attachment)
 		return false;
 
-	auto foundSlot = AttachmentSlots.FindRef(SlotId);
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot->SlotName == SlotId;
+	});
 	if (!foundSlot)
 		return false;
 
@@ -89,7 +109,9 @@ bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FNam
 
 bool UMounteaAttachmentContainerComponent::ForceDetach_Implementation(const FName& SlotId)
 {
-	auto foundSlot = AttachmentSlots.FindRef(SlotId);
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+		return Slot->SlotName == SlotId;
+	});
 	if (!foundSlot)
 		return false;
 
@@ -101,13 +123,12 @@ bool UMounteaAttachmentContainerComponent::ForceDetach_Implementation(const FNam
 FName UMounteaAttachmentContainerComponent::FindFirstFreeSlotWithTags_Implementation(const FGameplayTagContainer& RequiredTags) const
 {
 	const auto* found = Algo::FindByPredicate(AttachmentSlots,
-		[&](const TPair<FName, UMounteaAdvancedAttachmentSlot*>& pair)
+		[&](const UMounteaAdvancedAttachmentSlot* slot)
 		{
-			const UMounteaAdvancedAttachmentSlot* slot = pair.Value;
 			return slot != nullptr && slot->CanAttach() && slot->MatchesTags(RequiredTags, true);
 		});
 
-	return found ? found->Key : NAME_None;
+	return found ? (*found)->SlotName : NAME_None;
 }
 
 FName UMounteaAttachmentContainerComponent::GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const
@@ -116,28 +137,28 @@ FName UMounteaAttachmentContainerComponent::GetSlotIdForAttachable_Implementatio
 		return NAME_None;
 
 	const auto* Found = Algo::FindByPredicate(AttachmentSlots,
-		[&](const TPair<FName, UMounteaAdvancedAttachmentSlot*>& Pair)
+		[&](const UMounteaAdvancedAttachmentSlot* Slot)
 		{
-			return Pair.Value != nullptr && Pair.Value->IsOccupied() && Pair.Value->Attachment == Attachable;
+			return Slot != nullptr && Slot->IsOccupied() && Slot->Attachment == Attachable;
 		});
 
-	return Found ? Found->Key : NAME_None;
+	return Found ? (*Found)->SlotName : NAME_None;	
 }
 
 void UMounteaAttachmentContainerComponent::ClearAll_Implementation()
 {
-	for (auto& pair : AttachmentSlots)
+	for (auto& attachmentSlot : AttachmentSlots)
 	{
-		pair.Value->Detach();
+		attachmentSlot->Detach();
 	}
 }
 
 void UMounteaAttachmentContainerComponent::ApplyParentContainer()
 {
-	for (auto& pair : AttachmentSlots)
+	for (auto& slot : AttachmentSlots)
 	{
-		if (!pair.Value || pair.Value->ParentContainer.GetObject()) continue;
-		pair.Value->ParentContainer = this;
+		if (!slot || slot->ParentContainer.GetObject()) continue;
+		slot->ParentContainer = this;
 	}
 }
 
@@ -153,6 +174,16 @@ TArray<FName> UMounteaAttachmentContainerComponent::GetAvailableTargetNames() co
 	return UMounteaAttachmentsStatics::GetAvailableComponentNames(ownerActor);
 }
 
+void UMounteaAttachmentContainerComponent::GetLifetimeReplicatedProps(
+	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// TODO: update if needed
+	DOREPLIFETIME_CONDITION(UMounteaAttachmentContainerComponent, State, COND_SimulatedOnly);
+	DOREPLIFETIME(UMounteaAttachmentContainerComponent, AttachmentSlots);
+}
+
 #if WITH_EDITOR
 
 void UMounteaAttachmentContainerComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -164,6 +195,16 @@ void UMounteaAttachmentContainerComponent::PostEditChangeProperty(FPropertyChang
 	{
 		ApplyParentContainer();
 	}
+}
+
+EDataValidationResult UMounteaAttachmentContainerComponent::IsDataValid(FDataValidationContext& Context) const
+{
+	for (const auto& slot : AttachmentSlots)
+	{
+		slot->IsDataValid(Context);
+	}
+	Super::IsDataValid(Context);
+	return Context.GetNumErrors() > 0 ? EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 
 #endif
