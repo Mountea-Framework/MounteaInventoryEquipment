@@ -36,9 +36,7 @@ TArray<FName> UMounteaAttachmentsStatics::GetAvailableSocketNames(const AActor* 
 	for (USceneComponent* comp : components)
 	{
 		if (IsValid(comp) && comp->GetFName() == ComponentName)
-		{
 			return comp->GetAllSocketNames();
-		}
 	}
 
 	return TArray<FName>();
