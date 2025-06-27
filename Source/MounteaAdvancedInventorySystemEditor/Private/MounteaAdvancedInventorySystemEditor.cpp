@@ -462,7 +462,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 			{
 				const FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
 				TArray<FString> folderPaths;
-				folderPaths.Add(TEXT("/MounteaDialogueSystem"));
+				folderPaths.Add(TEXT("/MounteaAdvancedInventorySystem"));
 				contentBrowserModule.Get().SetSelectedPaths(folderPaths, true);
 			})
 		)
