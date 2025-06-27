@@ -37,6 +37,7 @@
 
 #include "AssetToolsModule.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
+#include "UObject/SavePackage.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
 
@@ -316,7 +317,10 @@ FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 				FString packageName = package->GetName();
 				FString fileName = FPackageName::LongPackageNameToFilename(packageName, FPackageName::GetAssetPackageExtension());
 				
-				if (UPackage::SavePackage(package, itemTemplate, RF_Public | RF_Standalone, *fileName))
+				FSavePackageArgs saveArgs;
+				saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+				saveArgs.SaveFlags = SAVE_None;
+				if (UPackage::SavePackage(package, itemTemplate, *fileName, saveArgs))
 				{
 					savedCount++;
 					UntrackDirtyAsset(itemTemplate);
@@ -364,7 +368,10 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 		FString packageName = package->GetName();
 		FString fileName = FPackageName::LongPackageNameToFilename(packageName, FPackageName::GetAssetPackageExtension());
 		
-		if (UPackage::SavePackage(package, itemTemplate, RF_Public | RF_Standalone, *fileName))
+		FSavePackageArgs saveArgs;
+		saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+		saveArgs.SaveFlags = SAVE_None;
+		if (UPackage::SavePackage(package, itemTemplate, *fileName, saveArgs))
 		{
 			UntrackDirtyAsset(itemTemplate);
 			ShowTemplateEditorNotification(TEXT("Template saved successfully!"), true);
@@ -432,7 +439,10 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 		if (UPackage* package = newTemplate->GetPackage())
 		{
 			FString fileName = FPackageName::LongPackageNameToFilename(package->GetName(), FPackageName::GetAssetPackageExtension());
-			if (UPackage::SavePackage(package, newTemplate, RF_Public | RF_Standalone, *fileName))
+			FSavePackageArgs saveArgs;
+			saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+			saveArgs.SaveFlags = SAVE_None;
+			if (UPackage::SavePackage(package, newTemplate, *fileName, saveArgs))
 			{
 				// Clean up transient template
 				UntrackDirtyAsset(transientTemplate);
