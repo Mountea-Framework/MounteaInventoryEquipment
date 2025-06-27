@@ -7,6 +7,7 @@
 #include "FileHelpers.h"
 #include "IContentBrowserSingleton.h"
 #include "ISettingsModule.h"
+#include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
@@ -72,6 +73,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 				{
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventorySettingsConfig", MounteaAdvancedInventorySettingsConfigClassThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventorySettingsConfig", MounteaAdvancedInventorySettingsConfigClassIcon);
+				}
+
+				FSlateImageBrush* MounteaAdvancedEquipmentSettingsConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedEquipmentSettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedEquipmentSettingsConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedEquipmentSettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedEquipmentSettingsConfigClassIcon && MounteaAdvancedEquipmentSettingsConfigClassThumb)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedEquipmentSettingsConfig", MounteaAdvancedEquipmentSettingsConfigClassThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedEquipmentSettingsConfig", MounteaAdvancedEquipmentSettingsConfigClassIcon);
 				}
 
 				FSlateImageBrush* MounteaAdvancedInventoryThemeConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ThemeConfigClassIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
@@ -141,6 +150,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventorySettingsConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryThemeConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentSettingsConfig_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{
@@ -247,7 +257,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterTabSpawners()
 	)
 	.SetDisplayName(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
 	.SetTooltipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Open the Mountea Inventory Template Editor"))
-	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon"));
+	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon")); 
 }
 
 void FMounteaAdvancedInventorySystemEditor::UnregisterTabSpawners()
@@ -263,7 +273,7 @@ void FMounteaAdvancedInventorySystemEditor::OpenInventoryTemplateEditor()
 
 TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTemplateEditorTab(const FSpawnTabArgs& Args)
 {
-	TSharedRef<SMounteaInventoryTemplateEditor> NewEditor = SNew(SMounteaInventoryTemplateEditor)
+	TSharedRef<SMounteaInventoryTemplateEditor> newEditor = SNew(SMounteaInventoryTemplateEditor)
 		.OnTemplateChanged_Lambda([](UMounteaInventoryItemTemplate* Template)
 		{
 			// Handle template changes if needed
@@ -274,17 +284,17 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 			}
 		});
 
-	CurrentTemplateEditor = NewEditor;
+	CurrentTemplateEditor = newEditor;
 
-	TSharedRef<SDockTab> NewTab = SNew(SDockTab)
+	TSharedRef<SDockTab> newTab = SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
 		.Label(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
 		.ToolTipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Create and edit Mountea Inventory Item Templates"))
 		[
-			NewEditor
+			newEditor
 		];
 
-	return NewTab;
+	return newTab;
 }
 
 void FMounteaAdvancedInventorySystemEditor::InventoryManagerButtonClicked() const
