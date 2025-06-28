@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedEquipmentSettingsConfig.generated.h"
 
@@ -18,4 +20,11 @@ UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Equipmen
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedEquipmentSettingsConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
+		meta=(ForceInlineRow, NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<FName, FMounteaEquipmentSlotHeaderData> AllowedEquipmentSlots;
+
 };
