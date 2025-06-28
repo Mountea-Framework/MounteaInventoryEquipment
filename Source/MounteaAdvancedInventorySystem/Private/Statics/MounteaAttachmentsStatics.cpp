@@ -158,7 +158,7 @@ void UMounteaAttachmentsStatics::SetTags(const TScriptInterface<IMounteaAdvanced
 
 EAttachmentState UMounteaAttachmentsStatics::GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
 {
-	return (Target.GetObject() != nullptr) ? Target->Execute_GetState(Target.GetObject()) : EAttachmentSlotState();
+	return (Target.GetObject() != nullptr) ? Target->Execute_GetState(Target.GetObject()) : EAttachmentState();
 }
 
 void UMounteaAttachmentsStatics::SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentState NewState)
