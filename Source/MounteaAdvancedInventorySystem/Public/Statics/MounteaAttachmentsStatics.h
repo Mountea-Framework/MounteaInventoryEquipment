@@ -46,6 +46,17 @@ public:
 	static TArray<FName> GetAvailableComponentNames(const AActor* Target);
 
 	/**
+	 * Returns first found mesh component available on the target actor by name.
+	 * 
+	 * @param Target  Actor to get component names from
+	 * @param ComponentName Name of component to search for.
+	 * @return  Mesh component available on the target actor.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static USceneComponent* GetAvailableComponentByName(const AActor* Target, const FName& ComponentName);
+	
+	/**
 	 * Returns an array of socket names available on the specified component of the target actor.
 	 * 
 	 * @param Target  Actor to get socket names from

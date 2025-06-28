@@ -28,10 +28,18 @@ public:
 
 	UMounteaAttachmentContainerComponent();
 
+protected:
+
+	virtual void BeginPlay() override;
+
 public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
-	virtual FName GetDefaultAttachmentTarget_Implementation() const override { return DefaultAttachmentTarget; }
+	virtual FName GetDefaultAttachmentTarget_Implementation() const override
+	{ return DefaultAttachmentTarget; }
+	virtual USceneComponent* GetAttachmentTargetComponent_Implementation() const override
+	{ return DefaultAttachmentTargetComponent; };
+	virtual void SetDefaultAttachmentTargetComponent_Implementation(USceneComponent* NewTarget) override;
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const override;
 	virtual UMounteaAdvancedAttachmentSlot* GetSlot_Implementation(const FName& SlotId) const override;
 	virtual bool IsSlotOccupied_Implementation(const FName& SlotId) const override;
@@ -51,6 +59,9 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment",
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName DefaultAttachmentTarget;
+
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment")
+	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
 	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	EAttachmentSlotState State;

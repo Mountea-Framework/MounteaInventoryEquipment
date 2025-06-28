@@ -9,6 +9,9 @@
 
 enum class EAttachmentSlotState : uint8;
 enum class EAttachmentSlotType : uint8;
+class IMounteaAdvancedAttachmentContainerInterface;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotBeginPlaySignature);
 
 /**
  * Represents a single attachment slot in an equipment system.
@@ -23,6 +26,17 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlotBase : pu
 public:
 
 	UMounteaAdvancedAttachmentSlotBase();
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	void BeginPlay();
+	virtual void BeginPlay_Implementation();
+
+	virtual void InitializeAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent);
+
+protected:
+
+	UPROPERTY(BlueprintAssignable, DisplayName="Begin Play")
+	FSlotBeginPlaySignature SlotBeginPlay;
 
 public:
 
@@ -47,6 +61,16 @@ public:
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	EAttachmentSlotType SlotType;
 
+	UPROPERTY(BlueprintReadOnly, Category="Debug",
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault), AdvancedDisplay)
+	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
+
+	UPROPERTY(BlueprintReadOnly, Category="Debug",
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault), AdvancedDisplay)
+	TObjectPtr<UObject> Attachment;
+	
 protected:
 
 	UFUNCTION()

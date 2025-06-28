@@ -31,6 +31,14 @@ public:
 	virtual FName GetDefaultAttachmentTarget_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	USceneComponent* GetAttachmentTargetComponent() const;
+	virtual USceneComponent* GetAttachmentTargetComponent_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	void SetDefaultAttachmentTargetComponent(USceneComponent* NewTarget);
+	virtual void SetDefaultAttachmentTargetComponent_Implementation(USceneComponent* NewTarget) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	bool IsValidSlot(const FName& SlotId) const;
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const = 0;
 

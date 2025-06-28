@@ -29,9 +29,30 @@ UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 	ApplyParentContainer();
 }
 
+void UMounteaAttachmentContainerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	for (const auto& attachmentSlot : AttachmentSlots)
+	{
+		if (!IsValid(attachmentSlot))
+			continue;
+
+		attachmentSlot->InitializeAttachmentSlot(this);
+		attachmentSlot->BeginPlay();
+	}
+}
+
 AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() const
 {
 	return UMounteaInventorySystemStatics::GetOwningActor(this);
+}
+
+void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_Implementation(
+	USceneComponent* NewTarget)
+{
+	if (NewTarget != DefaultAttachmentTargetComponent)
+		DefaultAttachmentTargetComponent = NewTarget;
 }
 
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const

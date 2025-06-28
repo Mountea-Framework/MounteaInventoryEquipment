@@ -18,31 +18,56 @@ TArray<USceneComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(cons
 
 TArray<FName> UMounteaAttachmentsStatics::GetAvailableComponentNames(const AActor* Target)
 {
-	TArray<FName> names;
 	TArray<USceneComponent*> components = GetAvailableComponents(Target);
 
-	for (USceneComponent* comp : components)
-	{
-		if (IsValid(comp))
-			names.Add(comp->GetFName());
-	}
+	TArray<FName> names;
+	names.Reserve(components.Num());
+
+	Algo::TransformIf(
+		components,
+		names,
+		[](const USceneComponent* Comp) { return IsValid(Comp); },
+		[](const USceneComponent* Comp) { return Comp->GetFName(); }
+	);
 
 	return names;
 }
 
+USceneComponent* UMounteaAttachmentsStatics::GetAvailableComponentByName(const AActor* Target,
+	const FName& ComponentName)
+{
+	if (!IsValid(Target) || ComponentName.IsNone())
+		return nullptr;
+
+	const TArray<USceneComponent*> components = GetAvailableComponents(Target);
+
+	USceneComponent* const* match = Algo::FindByPredicate(
+		components,
+		[&](const USceneComponent* Comp)
+		{
+			return IsValid(Comp) && Comp->GetFName() == ComponentName;
+		}
+	);
+
+	return match ? *match : nullptr;
+}
+
 TArray<FName> UMounteaAttachmentsStatics::GetAvailableSocketNames(const AActor* Target, const FName& ComponentName)
 {
-	if (!IsValid(Target))
+	if (!IsValid(Target) || ComponentName.IsNone())
 		return {};
 
-	TArray<USceneComponent*> components = GetAvailableComponents(Target);
-	for (USceneComponent* comp : components)
-	{
-		if (IsValid(comp) && comp->GetFName() == ComponentName)
-			return comp->GetAllSocketNames();
-	}
+	const TArray<USceneComponent*> components = GetAvailableComponents(Target);
 
-	return TArray<FName>();
+	const USceneComponent* const* match = Algo::FindByPredicate(
+		components,
+		[&](const USceneComponent* Comp)
+		{
+			return IsValid(Comp) && Comp->GetFName() == ComponentName;
+		}
+	);
+
+	return match ? (*match)->GetAllSocketNames() : TArray<FName>();
 }
 
 AActor* UMounteaAttachmentsStatics::GetOwningActor(

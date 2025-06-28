@@ -14,6 +14,17 @@ UMounteaAdvancedAttachmentSlotBase::UMounteaAdvancedAttachmentSlotBase() :
 {
 }
 
+void UMounteaAdvancedAttachmentSlotBase::BeginPlay_Implementation()
+{
+	SlotBeginPlay.Broadcast();
+}
+
+void UMounteaAdvancedAttachmentSlotBase::InitializeAttachmentSlot(
+	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent)
+{
+	ParentContainer = Parent;
+}
+
 TArray<FName> UMounteaAdvancedAttachmentSlotBase::GetAvailableSlotNames() const
 {
 	const auto advanedSettings = GetDefault<UMounteaAdvancedInventorySettings>();

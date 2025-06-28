@@ -5,10 +5,13 @@
 #include "CoreMinimal.h"
 #include "MounteaAdvancedAttachmentSlotBase.h"
 #include "MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "UObject/Object.h"
+
+#include 
+
 #include "MounteaAdvancedAttachmentSlot.generated.h"
 
-class IMounteaAdvancedAttachmentContainerInterface;
 class UMounteaAttachableComponent;
 enum class EAttachmentSlotState : uint8;
 enum class EAttachmentSlotType : uint8;
@@ -28,6 +31,11 @@ public:
 
 	UMounteaAdvancedAttachmentSlot();
 
+protected:
+
+	virtual void BeginPlay_Implementation() override;
+	void TryResolveAttachmentTarget();
+
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
@@ -35,22 +43,15 @@ public:
 		meta=(NoResetToDefault))
 	FName AttachmentTargetOverride;
 
+	UPROPERTY(BlueprintReadOnly, Category="Settings")
+	TObjectPtr<USceneComponent> AttachmentTargetComponentOverride = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableSocketNames"),
 		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket"),
 		meta=(EditConditionHides),
 		meta=(NoResetToDefault))
 	FName SocketName;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
-		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault), AdvancedDisplay)
-	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
-		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault), AdvancedDisplay)
-	TObjectPtr<UObject> Attachment;
 
 public:
 
@@ -61,7 +62,9 @@ public:
 
 	FORCEINLINE bool IsSlotValid() const
 	{
-		return !DisplayName.IsEmpty() && !SlotTags.IsEmpty();
+		return  ParentContainer.GetObject() != nullptr
+		&& !DisplayName.IsEmpty()
+		&& !SlotTags.IsEmpty();
 	}
 
 	bool IsEmpty() const;
@@ -79,6 +82,12 @@ public:
 	}
 
 	bool Attach(UObject* NewAttachment);
+	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> FindAttachableInterface(UObject* Object) const;
+	bool IsValidAttachableInterface(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& AttachableInterface) const;
+	bool ValidateAttachmentSlot(const USceneComponent* Target) const;
+	bool PerformPhysicalAttachment(UObject* Object, USceneComponent* Target) const;
+	FName GetAttachmentSocketName() const;
+	void CompleteAttachment(UObject* NewAttachment, const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& AttachableInterface);
 
 	bool Detach();
 
