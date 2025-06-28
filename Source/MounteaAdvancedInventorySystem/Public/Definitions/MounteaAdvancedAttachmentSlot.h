@@ -87,6 +87,7 @@ public:
 	FName GetAttachmentSocketName() const;
 
 	bool Detach();
+	void PerformPhysicalDetachment() const;
 
 	FORCEINLINE bool HasTag(const FGameplayTag& Tag) const
 	{

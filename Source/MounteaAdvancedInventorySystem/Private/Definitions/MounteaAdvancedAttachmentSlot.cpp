@@ -241,12 +241,22 @@ bool UMounteaAdvancedAttachmentSlot::Detach()
 	if (!IsOccupied())
 		return false;
 
-	if (Attachment && Attachment->Implements<UMounteaAdvancedAttachmentAttachableInterface>())
+	PerformPhysicalDetachment();
+
+	if (IsValid(Attachment) && Attachment->Implements<UMounteaAdvancedAttachmentAttachableInterface>())
 		IMounteaAdvancedAttachmentAttachableInterface::Execute_SetState(Attachment, EAttachmentState::EAS_Detached);
 
 	Attachment = nullptr;
 	State = EAttachmentSlotState::EASS_Empty;
 	return true;
+}
+
+void UMounteaAdvancedAttachmentSlot::PerformPhysicalDetachment() const
+{
+	if (USceneComponent* sceneComp = Cast<USceneComponent>(Attachment))
+		sceneComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	else if (AActor* actor = Cast<AActor>(Attachment))
+		actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
 #if WITH_EDITOR
