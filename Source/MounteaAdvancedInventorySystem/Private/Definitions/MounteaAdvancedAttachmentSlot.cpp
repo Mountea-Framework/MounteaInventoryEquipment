@@ -4,6 +4,7 @@
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "Misc/DataValidation.h"
 #include "Statics/MounteaAttachmentsStatics.h"
@@ -93,6 +94,9 @@ bool UMounteaAdvancedAttachmentSlot::Detach()
 {
 	if (!IsOccupied())
 		return false;
+
+	if (Attachment && Attachment->Implements<UMounteaAdvancedAttachmentAttachableInterface>())
+		IMounteaAdvancedAttachmentAttachableInterface::Execute_SetState(Attachment, EAttachmentState::EAS_Detached);
 
 	Attachment = nullptr;
 	State = EAttachmentSlotState::EASS_Empty;

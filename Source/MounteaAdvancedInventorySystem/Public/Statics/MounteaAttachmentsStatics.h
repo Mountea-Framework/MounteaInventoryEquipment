@@ -7,6 +7,7 @@
 #include "MounteaAttachmentsStatics.generated.h"
 
 enum class EAttachmentSlotState : uint8;
+enum class EAttachmentState : uint8;
 struct FGameplayTag;
 struct FGameplayTagContainer;
 class UMounteaAttachableComponent;
@@ -289,7 +290,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(CustomTag="MounteaK2Getter"))
-	static EAttachmentSlotState GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
+	static EAttachmentState GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
 	 * Sets the state of the attachable.
@@ -299,7 +300,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(CustomTag="MounteaK2Setter"))
-	static void SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentSlotState NewState);
+	static void SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentState NewState);
 
 	/**
 	 * Checks if the attachable is valid.
@@ -310,36 +311,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(CustomTag="MounteaK2Validate", ExpandBoolAsExecs="ReturnValue"))
 	static bool IsValidAttachable(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
-
-	/**
-	 * Checks if the attachable is empty.
-	 * 
-	 * @param Target  Target to check
-	 * @return  True if the attachable is empty, false otherwise
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
-		meta=(CustomTag="MounteaK2Validate", ExpandBoolAsExecs="ReturnValue"))
-	static bool IsEmpty(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
-
-	/**
-	 * Checks if the attachable is occupied.
-	 * 
-	 * @param Target  Target to check
-	 * @return  True if the attachable is occupied, false otherwise
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
-		meta=(CustomTag="MounteaK2Validate", ExpandBoolAsExecs="ReturnValue"))
-	static bool IsOccupied(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
-
-	/**
-	 * Checks if the attachable is locked.
-	 * 
-	 * @param Target  Target to check
-	 * @return  True if the attachable is locked, false otherwise
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
-		meta=(CustomTag="MounteaK2Validate", ExpandBoolAsExecs="ReturnValue"))
-	static bool IsLocked(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
 	 * Checks if the attachable can attach.
@@ -383,15 +354,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(CustomTag="MounteaK2Setter", ExpandBoolAsExecs="ReturnValue"))
 	static bool Detach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
-
-	/**
-	 * Disables the attachable.
-	 * 
-	 * @param Target  Target attachable to disable
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
-		meta=(CustomTag="MounteaK2Setter"))
-	static void Disable(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
 	 * Checks if the attachable has a specific tag.

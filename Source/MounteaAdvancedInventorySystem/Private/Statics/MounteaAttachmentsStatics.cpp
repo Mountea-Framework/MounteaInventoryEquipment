@@ -131,9 +131,7 @@ FName UMounteaAttachmentsStatics::GetId(const TScriptInterface<IMounteaAdvancedA
 void UMounteaAttachmentsStatics::SetId(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FName& NewId)
 {
 	if (Target.GetObject() != nullptr)
-	{
 		Target->Execute_SetId(Target.GetObject(), NewId);
-	}
 }
 
 FText UMounteaAttachmentsStatics::GetDisplayName(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
@@ -144,9 +142,7 @@ FText UMounteaAttachmentsStatics::GetDisplayName(const TScriptInterface<IMountea
 void UMounteaAttachmentsStatics::SetDisplayName(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FText& NewDisplayName)
 {
 	if (Target.GetObject() != nullptr)
-	{
 		Target->Execute_SetDisplayName(Target.GetObject(), NewDisplayName);
-	}
 }
 
 FGameplayTagContainer UMounteaAttachmentsStatics::GetTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
@@ -157,42 +153,23 @@ FGameplayTagContainer UMounteaAttachmentsStatics::GetTags(const TScriptInterface
 void UMounteaAttachmentsStatics::SetTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FGameplayTagContainer& NewTags)
 {
 	if (Target.GetObject() != nullptr)
-	{
 		Target->Execute_SetTags(Target.GetObject(), NewTags);
-	}
 }
 
-EAttachmentSlotState UMounteaAttachmentsStatics::GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+EAttachmentState UMounteaAttachmentsStatics::GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_GetState(Target.GetObject()) : EAttachmentSlotState();
 }
 
-void UMounteaAttachmentsStatics::SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentSlotState NewState)
+void UMounteaAttachmentsStatics::SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentState NewState)
 {
 	if (Target.GetObject() != nullptr)
-	{
 		Target->Execute_SetState(Target.GetObject(), NewState);
-	}
 }
 
 bool UMounteaAttachmentsStatics::IsValidAttachable(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_IsValidAttachable(Target.GetObject()) : false;
-}
-
-bool UMounteaAttachmentsStatics::IsEmpty(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
-{
-	return (Target.GetObject() != nullptr) ? Target->Execute_IsEmpty(Target.GetObject()) : false;
-}
-
-bool UMounteaAttachmentsStatics::IsOccupied(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
-{
-	return (Target.GetObject() != nullptr) ? Target->Execute_IsOccupied(Target.GetObject()) : false;
-}
-
-bool UMounteaAttachmentsStatics::IsLocked(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
-{
-	return (Target.GetObject() != nullptr) ? Target->Execute_IsLocked(Target.GetObject()) : false;
 }
 
 bool UMounteaAttachmentsStatics::CanAttach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
@@ -213,14 +190,6 @@ bool UMounteaAttachmentsStatics::AttachToContainer(const TScriptInterface<IMount
 bool UMounteaAttachmentsStatics::Detach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_Detach(Target.GetObject()) : false;
-}
-
-void UMounteaAttachmentsStatics::Disable(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
-{
-	if (Target.GetObject() != nullptr)
-	{
-		Target->Execute_Disable(Target.GetObject());
-	}
 }
 
 bool UMounteaAttachmentsStatics::HasTag(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FGameplayTag& Tag)

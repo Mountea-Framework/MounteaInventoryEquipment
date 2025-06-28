@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "MounteaAdvancedAttachmentAttachableInterface.generated.h"
 
-enum class EAttachmentSlotState : uint8;
+enum class EAttachmentState : uint8;
 class IMounteaAdvancedAttachmentContainerInterface;
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
@@ -51,29 +51,17 @@ public:
 	virtual void SetTags_Implementation(const FGameplayTagContainer& NewTags) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
-	EAttachmentSlotState GetState() const;
-	virtual EAttachmentSlotState GetState_Implementation() const = 0;
+	EAttachmentState GetState() const;
+	virtual EAttachmentState GetState_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
-	void SetState(const EAttachmentSlotState NewState);
-	virtual void SetState_Implementation(const EAttachmentSlotState NewState) = 0;
+	void SetState(const EAttachmentState NewState);
+	virtual void SetState_Implementation(const EAttachmentState NewState) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
 	bool IsValidAttachable() const;
 	virtual bool IsValidAttachable_Implementation() const = 0;
-
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
-	bool IsEmpty() const;
-	virtual bool IsEmpty_Implementation() const = 0;
-
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
-	bool IsOccupied() const;
-	virtual bool IsOccupied_Implementation() const = 0;
-
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
-	bool IsLocked() const;
-	virtual bool IsLocked_Implementation() const = 0;
-
+	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
 	bool CanAttach() const;
 	virtual bool CanAttach_Implementation() const = 0;
@@ -89,10 +77,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
 	bool Detach();
 	virtual bool Detach_Implementation() = 0;
-
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
-	void Disable();
-	virtual void Disable_Implementation() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
 	bool HasTag(const FGameplayTag& Tag) const;

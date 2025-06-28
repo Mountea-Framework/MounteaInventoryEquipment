@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Net/Serialization/FastArraySerializer.h"
 #include "UObject/Object.h"
 #include "MounteaInventoryItem.generated.h"
 

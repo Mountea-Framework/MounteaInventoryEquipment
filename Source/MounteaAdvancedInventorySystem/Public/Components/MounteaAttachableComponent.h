@@ -42,7 +42,7 @@ public:
 	FGameplayTagContainer Tags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
-	EAttachmentSlotState State;
+	EAttachmentState State;
 
 public:
 	
@@ -53,17 +53,13 @@ public:
 	virtual void SetDisplayName_Implementation(const FText& NewDisplayName) override;
 	virtual FGameplayTagContainer GetTags_Implementation() const override { return Tags; } ;
 	virtual void SetTags_Implementation(const FGameplayTagContainer& NewTags) override;
-	virtual EAttachmentSlotState GetState_Implementation() const override { return State; } ;
-	virtual void SetState_Implementation(const EAttachmentSlotState NewState) override;
+	virtual EAttachmentState GetState_Implementation() const override { return State; } ;
+	virtual void SetState_Implementation(const EAttachmentState NewState) override;
 	virtual bool IsValidAttachable_Implementation() const override;
-	virtual bool IsEmpty_Implementation() const override;
-	virtual bool IsOccupied_Implementation() const override;
-	virtual bool IsLocked_Implementation() const override;
 	virtual bool CanAttach_Implementation() const override;
 	virtual bool AttachToSlot_Implementation(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId) override;
 	virtual bool AttachToContainer_Implementation(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target) override;
 	virtual bool Detach_Implementation() override;
-	virtual void Disable_Implementation() override;
 	virtual bool HasTag_Implementation(const FGameplayTag& Tag) const override;
 	virtual bool MatchesTags_Implementation(const FGameplayTagContainer& OtherTags, bool bRequireAll) const override;
 };
