@@ -14,8 +14,7 @@ enum class EAttachmentSlotType : uint8;
  * Represents a single attachment slot in an equipment system.
  * Defines the properties of an attachment slot, including its ID, tags, display name, State, type, and target name.
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable,
-	AutoExpandCategories="Mountea",
+UCLASS(Abstract, ClassGroup=(Mountea), AutoExpandCategories="Mountea",
 	EditInlineNew)
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlotBase : public UObject
 {
@@ -28,19 +27,24 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableSlotNames"))
+		meta=(GetOptions="GetAvailableSlotNames"),
+		meta=(DisplayPriority=-1, NoResetToDefault))
 	FName SlotName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(DisplayPriority=-1, NoResetToDefault))
 	FGameplayTagContainer SlotTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(DisplayPriority=-1, NoResetToDefault))
 	FText DisplayName;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(DisplayPriority=-1, NoResetToDefault))
 	EAttachmentSlotState State;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(DisplayPriority=-1, NoResetToDefault))
 	EAttachmentSlotType SlotType;
 
 protected:

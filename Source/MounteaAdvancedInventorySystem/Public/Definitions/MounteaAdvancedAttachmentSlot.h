@@ -31,21 +31,25 @@ public:
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableTargetNames"))
+		meta=(GetOptions="GetAvailableTargetNames"),
+		meta=(NoResetToDefault))
 	FName AttachmentTargetOverride;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableSocketNames"),
 		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket"),
-		meta=(EditConditionHides))
+		meta=(EditConditionHides),
+		meta=(NoResetToDefault))
 	FName SocketName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
-		meta=(DisplayThumbnail=false))
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault), AdvancedDisplay)
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
-		meta=(DisplayThumbnail=false))
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault), AdvancedDisplay)
 	TObjectPtr<UObject> Attachment;
 
 public:
