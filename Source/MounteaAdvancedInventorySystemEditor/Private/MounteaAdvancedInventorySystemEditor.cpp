@@ -267,7 +267,7 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 
 void FMounteaAdvancedInventorySystemEditor::RegisterTabSpawners()
 {
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
+	FGlobalTabmanager::Get()->RegisterTabSpawner(
 		InventoryTemplateEditorTabId,
 		FOnSpawnTab::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::SpawnInventoryTemplateEditorTab)
 	)
