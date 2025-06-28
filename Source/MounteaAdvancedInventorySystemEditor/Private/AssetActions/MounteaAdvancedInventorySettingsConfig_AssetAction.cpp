@@ -39,7 +39,7 @@ const TArray<FText>& FMounteaAdvancedInventorySettingsConfig_AssetAction::GetSub
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("Configuration")
+		FText::FromString("3. Configuration")
 	};
 	return AssetTypeActionSubMenu;
 }

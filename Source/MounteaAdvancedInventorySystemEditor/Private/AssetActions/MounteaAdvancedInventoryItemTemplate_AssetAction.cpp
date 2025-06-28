@@ -40,7 +40,7 @@ const TArray<FText>& FMounteaAdvancedInventoryItemTemplate_AssetAction::GetSubMe
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("Templates")
+		FText::FromString("1. Templates")
 	};
 	return AssetTypeActionSubMenu;
 }
