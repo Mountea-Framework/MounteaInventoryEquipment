@@ -48,17 +48,18 @@ public:
 
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment",
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName DefaultAttachmentTarget;
 	
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	EAttachmentSlotState State;
 	
 	// Does not support runtime addition/removal of slots.
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment",
 		Instanced,
-		meta=(ForceInlineRow), meta=(TitleProperty="DisplayName"), meta=(ShowInnerProperties))
+		meta=(TitleProperty="DisplayName"),
+		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView))
 	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 
 protected:
