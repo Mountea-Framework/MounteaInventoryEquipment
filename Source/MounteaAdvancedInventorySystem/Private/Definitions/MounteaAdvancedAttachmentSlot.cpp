@@ -111,8 +111,7 @@ bool UMounteaAdvancedAttachmentSlot::Attach(UObject* NewAttachment)
 		return false;
 	}
 
-	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> attachableInterface = FindAttachableInterface(NewAttachment);
-	if (!IsValidAttachableInterface(attachableInterface))
+	if (!IsValidForAttachment(NewAttachment))
 		return false;
 
 	if (!ValidateAttachmentSlot(attachmentTarget))
@@ -121,11 +120,20 @@ bool UMounteaAdvancedAttachmentSlot::Attach(UObject* NewAttachment)
 	if (!PerformPhysicalAttachment(NewAttachment, attachmentTarget))
 		return false;
 
-	CompleteAttachment(NewAttachment, attachableInterface);
+	Attachment = NewAttachment;
+	State = EAttachmentSlotState::EASS_Occupied;
+	
+	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> attachableInterface = FindAttachableInterface(NewAttachment);
+	if (attachableInterface.GetObject())
+		IMounteaAdvancedAttachmentAttachableInterface::Execute_AttachToSlot(
+					attachableInterface.GetObject(), ParentContainer, SlotName);
+	else
+		LOG_WARNING(TEXT("Attachment does not implement the attachable interface! Attachment will be performed, however, it may not behave as expected."));
+    
 	return true;
 }
 
-TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> UMounteaAdvancedAttachmentSlot::FindAttachableInterface(UObject* Object) const
+TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> UMounteaAdvancedAttachmentSlot::FindAttachableInterface(UObject* Object)
 {
 	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> returnAttachable;
 
@@ -160,13 +168,26 @@ TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> UMounteaAdvanced
 	return returnAttachable;
 }
 
-bool UMounteaAdvancedAttachmentSlot::IsValidAttachableInterface(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& AttachableInterface) const
+bool UMounteaAdvancedAttachmentSlot::IsValidForAttachment(const UObject* NewAttachment)
 {
-	if (!AttachableInterface || !AttachableInterface->Execute_CanAttach(AttachableInterface.GetObject()))
+	if (!IsValid(NewAttachment))
 	{
-		LOG_WARNING(TEXT("Attachment object does not implement IMounteaAdvancedAttachmentAttachableInterface or is not attachable."));
+		LOG_ERROR(TEXT("Attachment is not valid!"));
 		return false;
 	}
+	
+	if (!NewAttachment->Implements<UMounteaAdvancedAttachmentAttachableInterface>())
+	{
+		LOG_WARNING(TEXT("Attachable %s does not implement the required interface! Attachment will be performed, however, it may not behave as expected."), *NewAttachment->GetName())
+		return true;
+	}
+
+	if (!IMounteaAdvancedAttachmentAttachableInterface::Execute_CanAttach(NewAttachment))
+	{
+		LOG_WARNING(TEXT("Attachable object is not compatible with selected Slot!."));
+		return false;
+	}
+	
 	return true;
 }
 
@@ -213,13 +234,6 @@ FName UMounteaAdvancedAttachmentSlot::GetAttachmentSocketName() const
 		default:
 			return NAME_None;
 	}
-}
-
-void UMounteaAdvancedAttachmentSlot::CompleteAttachment(UObject* NewAttachment, const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& AttachableInterface)
-{
-	Attachment = NewAttachment;
-	State = EAttachmentSlotState::EASS_Occupied;
-	AttachableInterface->Execute_AttachToSlot(AttachableInterface.GetObject(), ParentContainer, SlotName);
 }
 
 bool UMounteaAdvancedAttachmentSlot::Detach()

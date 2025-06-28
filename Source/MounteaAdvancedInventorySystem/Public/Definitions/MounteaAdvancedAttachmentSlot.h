@@ -8,8 +8,6 @@
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "UObject/Object.h"
 
-#include 
-
 #include "MounteaAdvancedAttachmentSlot.generated.h"
 
 class UMounteaAttachableComponent;
@@ -82,12 +80,11 @@ public:
 	}
 
 	bool Attach(UObject* NewAttachment);
-	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> FindAttachableInterface(UObject* Object) const;
-	bool IsValidAttachableInterface(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& AttachableInterface) const;
+	static TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> FindAttachableInterface(UObject* Object);
+	static bool IsValidForAttachment(const UObject* NewAttachment);
 	bool ValidateAttachmentSlot(const USceneComponent* Target) const;
 	bool PerformPhysicalAttachment(UObject* Object, USceneComponent* Target) const;
 	FName GetAttachmentSocketName() const;
-	void CompleteAttachment(UObject* NewAttachment, const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& AttachableInterface);
 
 	bool Detach();
 
