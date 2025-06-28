@@ -27,7 +27,8 @@ public:
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(GetOptions="GetAvailableSlotNames"))
 	FName SlotName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
@@ -41,4 +42,15 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
 	EAttachmentSlotType SlotType;
+
+protected:
+
+	UFUNCTION()
+	virtual TArray<FName> GetAvailableSlotNames() const;
+
+protected:
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+	
 };
