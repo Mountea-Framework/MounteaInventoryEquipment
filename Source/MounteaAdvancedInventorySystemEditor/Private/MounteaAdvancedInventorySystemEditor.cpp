@@ -7,7 +7,9 @@
 #include "FileHelpers.h"
 #include "IContentBrowserSingleton.h"
 #include "ISettingsModule.h"
+#include "AssetActions/MounteaAdvancedEquipmentComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
@@ -162,7 +164,9 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentSettingsConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryItemTemplate_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIComponent_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentComponent_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{

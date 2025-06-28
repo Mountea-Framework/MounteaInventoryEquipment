@@ -39,7 +39,7 @@ const TArray<FText>& FMounteaAdvancedInventoryUIComponent_AssetAction::GetSubMen
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("2. Base Classes")
+		FText::FromString("2. Base Classes (Inventory)")
 	};
 	return AssetTypeActionSubMenu;
 };
