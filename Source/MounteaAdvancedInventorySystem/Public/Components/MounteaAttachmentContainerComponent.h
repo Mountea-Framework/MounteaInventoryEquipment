@@ -36,12 +36,13 @@ public:
 	virtual UMounteaAdvancedAttachmentSlot* GetSlot_Implementation(const FName& SlotId) const override;
 	virtual bool IsSlotOccupied_Implementation(const FName& SlotId) const override;
 	virtual bool DisableSlot_Implementation(const FName& SlotId) override;
-	virtual bool TryAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) override;
+	virtual bool TryAttach_Implementation(const FName& SlotId, UObject* Attachment) override;
 	virtual bool TryDetach_Implementation(const FName& SlotId) override;
-	virtual bool ForceAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) override;
+	virtual bool ForceAttach_Implementation(const FName& SlotId, UObject* Attachment) override;
 	virtual bool ForceDetach_Implementation(const FName& SlotId) override;
 	virtual FName FindFirstFreeSlotWithTags_Implementation(const FGameplayTagContainer& RequiredTags) const override;
 	virtual FName GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const override;
+	virtual FName GetFirstEmptySlot_Implementation() const override;
 	virtual void ClearAll_Implementation() override;
 	void ApplyParentContainer();
 

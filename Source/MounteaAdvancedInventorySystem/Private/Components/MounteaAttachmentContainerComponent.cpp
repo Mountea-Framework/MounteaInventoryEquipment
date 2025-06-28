@@ -69,7 +69,7 @@ bool UMounteaAttachmentContainerComponent::DisableSlot_Implementation(const FNam
 	return foundSlot->Detach();
 }
 
-bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName& SlotId, UObject* Attachment)
 {
 	if (!Attachment)
 		return false;
@@ -91,7 +91,7 @@ bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName&
 	return foundSlot->Detach();
 }
 
-bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FName& SlotId, UObject* Attachment)
 {
 	if (!Attachment)
 		return false;
@@ -143,6 +143,17 @@ FName UMounteaAttachmentContainerComponent::GetSlotIdForAttachable_Implementatio
 		});
 
 	return Found ? (*Found)->SlotName : NAME_None;	
+}
+
+FName UMounteaAttachmentContainerComponent::GetFirstEmptySlot_Implementation() const
+{
+	const auto* Found = Algo::FindByPredicate(AttachmentSlots,
+		[&](const UMounteaAdvancedAttachmentSlot* Slot)
+		{
+			return Slot != nullptr && !Slot->IsOccupied();
+		});
+
+	return Found ? (*Found)->SlotName : NAME_None;
 }
 
 void UMounteaAttachmentContainerComponent::ClearAll_Implementation()
