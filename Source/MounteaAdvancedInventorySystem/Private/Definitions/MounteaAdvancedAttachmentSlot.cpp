@@ -79,7 +79,7 @@ bool UMounteaAdvancedAttachmentSlot::IsLocked() const
 	return State == EAttachmentSlotState::EASS_Locked;
 }
 
-bool UMounteaAdvancedAttachmentSlot::Attach(UMounteaAttachableComponent* NewAttachment)
+bool UMounteaAdvancedAttachmentSlot::Attach(UObject* NewAttachment)
 {
 	if (!CanAttach() || !NewAttachment)
 		return false;

@@ -63,7 +63,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
 		meta=(DisplayThumbnail=false))
-	TObjectPtr<UMounteaAttachableComponent> Attachment;
+	TObjectPtr<UObject> Attachment;
 
 public:
 
@@ -91,7 +91,7 @@ public:
 		return IsSlotValid() && IsEmpty() && !IsLocked();
 	}
 
-	bool Attach(UMounteaAttachableComponent* NewAttachment);
+	bool Attach(UObject* NewAttachment);
 
 	bool Detach();
 
