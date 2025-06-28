@@ -75,7 +75,7 @@ bool UMounteaAttachmentsStatics::DisableSlot(const TScriptInterface<IMounteaAdva
 	return (Target.GetObject() != nullptr) ? Target->Execute_DisableSlot(Target.GetObject(), SlotId) : false;
 }
 
-bool UMounteaAttachmentsStatics::TryAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentsStatics::TryAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_TryAttach(Target.GetObject(), SlotId, Attachment) : false;
 }
@@ -85,7 +85,7 @@ bool UMounteaAttachmentsStatics::TryDetach(const TScriptInterface<IMounteaAdvanc
 	return (Target.GetObject() != nullptr) ? Target->Execute_TryDetach(Target.GetObject(), SlotId) : false;
 }
 
-bool UMounteaAttachmentsStatics::ForceAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentsStatics::ForceAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_ForceAttach(Target.GetObject(), SlotId, Attachment) : false;
 }
@@ -109,4 +109,10 @@ void UMounteaAttachmentsStatics::ClearAll(const TScriptInterface<IMounteaAdvance
 {
 	if (Target.GetObject() != nullptr)
 		Target->Execute_ClearAll(Target.GetObject());
+}
+
+FName UMounteaAttachmentsStatics::GetFirstEmptySlot(
+	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target)
+{
+		return Target.GetObject() != nullptr ? Target->Execute_GetFirstEmptySlot(Target.GetObject()) : NAME_None;
 }

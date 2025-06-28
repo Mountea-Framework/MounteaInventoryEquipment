@@ -117,16 +117,16 @@ public:
 	static bool DisableSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
-	 * Tries to attach an attachable component to the specified slot.
+	 * Tries to attach an attachment to the specified slot.
 	 * 
 	 * @param Target     Target to attach to
 	 * @param SlotId     The slot ID to attach to
-	 * @param Attachment The attachable component to attach
+	 * @param Attachment The attachable object to attach. If implements Attachable interface, it will be used as such.
 	 * @return  True if attachment was successful, false otherwise
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
 		meta=(CustomTag="MounteaK2Setter", ExpandBoolAsExecs="ReturnValue"))
-	static bool TryAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UMounteaAttachableComponent* Attachment);
+	static bool TryAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment);
 
 	/**
 	 * Tries to detach from the specified slot.
@@ -144,12 +144,12 @@ public:
 	 * 
 	 * @param Target     Target to attach to
 	 * @param SlotId     The slot ID to attach to
-	 * @param Attachment The attachable component to attach
+	 * @param Attachment The attachable object to attach. If implements Attachable interface, it will be used as such.
 	 * @return  True if attachment was successful, false otherwise
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
 		meta=(CustomTag="MounteaK2Setter", ExpandBoolAsExecs="ReturnValue"))
-	static bool ForceAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UMounteaAttachableComponent* Attachment);
+	static bool ForceAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment);
 
 	/**
 	 * Forces detachment from the specified slot.
@@ -192,4 +192,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
 		meta=(CustomTag="MounteaK2Setter"))
 	static void ClearAll(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
+
+	/**
+	 * Gets the first emtpy slot ID.
+	 * 
+	 * @param Target  Target to clear all attachments from
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static FName GetFirstEmptySlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 };
