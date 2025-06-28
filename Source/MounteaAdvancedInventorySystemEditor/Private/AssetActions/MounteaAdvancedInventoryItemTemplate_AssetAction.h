@@ -7,6 +7,8 @@
 
 class FMounteaAdvancedInventoryItemTemplate_AssetAction : public FAssetTypeActions_Base
 {
+	
+public:
 	FMounteaAdvancedInventoryItemTemplate_AssetAction();
 
 	virtual FText GetName() const override;
