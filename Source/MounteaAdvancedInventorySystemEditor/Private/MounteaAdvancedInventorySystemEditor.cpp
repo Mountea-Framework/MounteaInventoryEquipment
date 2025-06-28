@@ -9,8 +9,10 @@
 #include "ISettingsModule.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryUIComponent_AssetAction.h"
 #include "Commands/FMAISCommands.h"
 #include "Components/MounteaAttachmentContainerComponent.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -66,7 +68,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaInventoryItemTemplate", MounteaInventoryItemTemplateThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryItemTemplate", MounteaInventoryItemTemplateClassIcon);
 				}
-
+				
 				FSlateImageBrush* MounteaAdvancedInventorySettingsConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventorySettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
 				FSlateImageBrush* MounteaAdvancedInventorySettingsConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventorySettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
 				if (MounteaAdvancedInventorySettingsConfigClassIcon && MounteaAdvancedInventorySettingsConfigClassThumb)
@@ -123,6 +125,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryComponent", InventoryComponentIcon);
 				}
 
+				FSlateImageBrush* MounteaInventoryUIComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUIComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaInventoryUIComponentClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUIComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaInventoryUIComponentThumb && MounteaInventoryUIComponentClassIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaInventoryUIComponent", MounteaInventoryUIComponentThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryUIComponent", MounteaInventoryUIComponentClassIcon);
+				}
+
 				FSlateImageBrush* AttachableComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachableComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
 				FSlateImageBrush* AttachableComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachableComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
 				if (AttachableComponentThumb && AttachableComponentIcon)
@@ -151,6 +161,8 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryThemeConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentSettingsConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryItemTemplate_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIComponent_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{

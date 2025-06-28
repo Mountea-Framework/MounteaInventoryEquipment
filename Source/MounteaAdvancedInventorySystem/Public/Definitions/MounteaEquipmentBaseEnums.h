@@ -22,3 +22,12 @@ enum class EAttachmentSlotType : uint8
 
 	Default UMETA(Hidden)
 };
+
+UENUM(BlueprintType)
+enum class EAttachmentState : uint8
+{
+	EAS_Attached		UMETA(DisplayName = "Attached", Tooltip = "Attachment is Attached. Slot should be valid."),
+	EAS_Detached	UMETA(DisplayName = "Detached", Tooltip = "Attachment is Detached. Slot should be invalid."),
+
+	Default UMETA(Hidden)
+};

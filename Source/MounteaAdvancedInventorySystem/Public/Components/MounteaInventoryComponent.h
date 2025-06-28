@@ -129,15 +129,20 @@ protected:
 
 private:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess))
 	EInventoryType InventoryType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess))
 	EInventoryFlags InventoryTypeFlag;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly,
+		ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess))
 	FInventoryItemArray InventoryItems;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryWidget;
 };

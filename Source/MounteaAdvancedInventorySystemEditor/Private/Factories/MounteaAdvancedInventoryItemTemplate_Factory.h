@@ -1,0 +1,28 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Factories/Factory.h"
+#include "MounteaAdvancedInventoryItemTemplate_Factory.generated.h"
+
+class UMounteaInventoryItemTemplate;
+
+/**
+ * 
+ */
+UCLASS()
+class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UMounteaAdvancedInventoryItemTemplate_Factory : public UFactory
+{
+	GENERATED_BODY()
+	
+public:
+	UMounteaAdvancedInventoryItemTemplate_Factory();
+	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
+	virtual bool ConfigureProperties() override;
+
+private:
+	// Holds the template of the class we are building
+	UPROPERTY()
+	TSubclassOf<UMounteaInventoryItemTemplate> ParentClass;
+};

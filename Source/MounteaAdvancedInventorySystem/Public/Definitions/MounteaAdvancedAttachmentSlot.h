@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
-#include "MounteaEquipmentBaseDataTypes.h"
+#include "MounteaAdvancedAttachmentSlotBase.h"
 #include "MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "UObject/Object.h"
+
 #include "MounteaAdvancedAttachmentSlot.generated.h"
 
-class IMounteaAdvancedAttachmentContainerInterface;
 class UMounteaAttachableComponent;
 enum class EAttachmentSlotState : uint8;
 enum class EAttachmentSlotType : uint8;
@@ -21,49 +21,35 @@ enum class EAttachmentSlotType : uint8;
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable,
 	AutoExpandCategories="Mountea",
 	EditInlineNew)
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlot : public UObject
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlot : public UMounteaAdvancedAttachmentSlotBase
 {
 	GENERATED_BODY()
 
 public:
 
 	UMounteaAdvancedAttachmentSlot();
-	explicit UMounteaAdvancedAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& NewParentContainer);
+
+protected:
+
+	virtual void BeginPlay_Implementation() override;
+	void TryResolveAttachmentTarget();
 
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	FName SlotName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	FGameplayTagContainer SlotTags;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	FText DisplayName;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings")
-	EAttachmentSlotState State;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	EAttachmentSlotType SlotType;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableTargetNames"))
+		meta=(GetOptions="GetAvailableTargetNames"),
+		meta=(NoResetToDefault))
 	FName AttachmentTargetOverride;
+
+	UPROPERTY(BlueprintReadOnly, Category="Settings")
+	TObjectPtr<USceneComponent> AttachmentTargetComponentOverride = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableSocketNames"),
 		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket"),
-		meta=(EditConditionHides))
+		meta=(EditConditionHides),
+		meta=(NoResetToDefault))
 	FName SocketName;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
-		meta=(DisplayThumbnail=false))
-	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Debug",
-		meta=(DisplayThumbnail=false))
-	TObjectPtr<UMounteaAttachableComponent> Attachment;
 
 public:
 
@@ -74,7 +60,9 @@ public:
 
 	FORCEINLINE bool IsSlotValid() const
 	{
-		return !DisplayName.IsEmpty() && !SlotTags.IsEmpty();
+		return  ParentContainer.GetObject() != nullptr
+		&& !DisplayName.IsEmpty()
+		&& !SlotTags.IsEmpty();
 	}
 
 	bool IsEmpty() const;
@@ -91,9 +79,15 @@ public:
 		return IsSlotValid() && IsEmpty() && !IsLocked();
 	}
 
-	bool Attach(UMounteaAttachableComponent* NewAttachment);
+	bool Attach(UObject* NewAttachment);
+	static TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> FindAttachableInterface(UObject* Object);
+	static bool IsValidForAttachment(const UObject* NewAttachment);
+	bool ValidateAttachmentSlot(const USceneComponent* Target) const;
+	bool PerformPhysicalAttachment(UObject* Object, USceneComponent* Target) const;
+	FName GetAttachmentSocketName() const;
 
 	bool Detach();
+	void PerformPhysicalDetachment() const;
 
 	FORCEINLINE bool HasTag(const FGameplayTag& Tag) const
 	{

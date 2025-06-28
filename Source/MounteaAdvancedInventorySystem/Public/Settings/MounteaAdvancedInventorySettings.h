@@ -8,6 +8,7 @@
 #include "Logs/MounteaAdvancedInventorySystemLogTypes.h"
 #include "MounteaAdvancedInventorySettings.generated.h"
 
+class UMounteaAdvancedEquipmentSettingsConfig;
 class UInputMappingContext;
 class UMounteaAdvancedInventorySettingsConfig;
 
@@ -60,6 +61,13 @@ public:
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config")
 	TSoftObjectPtr<UMounteaAdvancedInventorySettingsConfig> InventorySettingsConfig;
+
+	/**
+	 * Holds a reference to the configuration settings for Mountea Advanced Equipment.
+	 * This reference is used to define and load equipment-specific configurations.
+	 */
+	UPROPERTY(Config, EditAnywhere, Category="Config")
+	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> EquipmentSettingsConfig;
 
 	/**
 	 * Defines logging level that is allowed to be shown.

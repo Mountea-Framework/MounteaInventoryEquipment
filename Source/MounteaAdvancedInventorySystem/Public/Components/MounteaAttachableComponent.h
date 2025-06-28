@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "MounteaAttachableComponent.generated.h"
 
 enum class EAttachmentSlotState : uint8;
@@ -19,7 +20,7 @@ UCLASS(ClassGroup=(Mountea), Blueprintable,
 	AutoExpandCategories=("Mountea","Attachable","Mountea|Attachable"),
 	HideCategories=("Cooking","Collision"),
 	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachable Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachableComponent : public UActorComponent
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachableComponent : public UActorComponent, public IMounteaAdvancedAttachmentAttachableInterface
 {
 	GENERATED_BODY()
 
@@ -41,19 +42,24 @@ public:
 	FGameplayTagContainer Tags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
-	EAttachmentSlotState State;
+	EAttachmentState State;
 
 public:
 	
-	bool IsValidAttachable() const;
-	bool IsEmpty() const;
-	bool IsOccupied() const;
-	bool IsLocked() const;
-	bool CanAttach() const;
-	bool AttachTo(TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> Target, const FName& SlotId);
-	bool AttachTo(TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> Target);
-	bool Detach();
-	void Disable();
-	bool HasTag(const FGameplayTag& Tag) const;
-	bool MatchesTags(const FGameplayTagContainer& OtherTags, bool bRequireAll) const;
+	virtual TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> GetAttachedTo_Implementation() const override { return AttachedTo; };
+	virtual FName GetId_Implementation() const override { return Id; };
+	virtual void SetId_Implementation(const FName& NewId) override;
+	virtual FText GetDisplayName_Implementation() const override { return DisplayName; };
+	virtual void SetDisplayName_Implementation(const FText& NewDisplayName) override;
+	virtual FGameplayTagContainer GetTags_Implementation() const override { return Tags; } ;
+	virtual void SetTags_Implementation(const FGameplayTagContainer& NewTags) override;
+	virtual EAttachmentState GetState_Implementation() const override { return State; } ;
+	virtual void SetState_Implementation(const EAttachmentState NewState) override;
+	virtual bool IsValidAttachable_Implementation() const override;
+	virtual bool CanAttach_Implementation() const override;
+	virtual bool AttachToSlot_Implementation(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId) override;
+	virtual bool AttachToContainer_Implementation(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target) override;
+	virtual bool Detach_Implementation() override;
+	virtual bool HasTag_Implementation(const FGameplayTag& Tag) const override;
+	virtual bool MatchesTags_Implementation(const FGameplayTagContainer& OtherTags, bool bRequireAll) const override;
 };

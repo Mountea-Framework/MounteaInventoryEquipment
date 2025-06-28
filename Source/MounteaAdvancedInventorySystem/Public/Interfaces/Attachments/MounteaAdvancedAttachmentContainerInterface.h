@@ -31,6 +31,14 @@ public:
 	virtual FName GetDefaultAttachmentTarget_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	USceneComponent* GetAttachmentTargetComponent() const;
+	virtual USceneComponent* GetAttachmentTargetComponent_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	void SetDefaultAttachmentTargetComponent(USceneComponent* NewTarget);
+	virtual void SetDefaultAttachmentTargetComponent_Implementation(USceneComponent* NewTarget) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	bool IsValidSlot(const FName& SlotId) const;
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const = 0;
 
@@ -47,16 +55,16 @@ public:
 	virtual bool DisableSlot_Implementation(const FName& SlotId) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
-	bool TryAttach(const FName& SlotId, UMounteaAttachableComponent* Attachment);
-	virtual bool TryAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) = 0;
-
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	bool TryDetach(const FName& SlotId);
 	virtual bool TryDetach_Implementation(const FName& SlotId) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
-	bool ForceAttach(const FName& SlotId, UMounteaAttachableComponent* Attachment);
-	virtual bool ForceAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) = 0;
+	bool TryAttach(const FName& SlotId, UObject* Attachment);
+	virtual bool TryAttach_Implementation(const FName& SlotId, UObject* Attachment) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	bool ForceAttach(const FName& SlotId, UObject* Attachment);
+	virtual bool ForceAttach_Implementation(const FName& SlotId, UObject* Attachment) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	bool ForceDetach(const FName& SlotId);
@@ -69,6 +77,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	FName GetSlotIdForAttachable(const UMounteaAttachableComponent* Attachable) const;
 	virtual FName GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	FName GetFirstEmptySlot() const;
+	virtual FName GetFirstEmptySlot_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	void ClearAll();

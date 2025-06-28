@@ -3,6 +3,7 @@
 
 #include "Statics/MounteaAttachmentsStatics.h"
 
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 
 TArray<USceneComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(const AActor* Target)
@@ -17,31 +18,56 @@ TArray<USceneComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(cons
 
 TArray<FName> UMounteaAttachmentsStatics::GetAvailableComponentNames(const AActor* Target)
 {
-	TArray<FName> names;
 	TArray<USceneComponent*> components = GetAvailableComponents(Target);
 
-	for (USceneComponent* comp : components)
-	{
-		if (IsValid(comp))
-			names.Add(comp->GetFName());
-	}
+	TArray<FName> names;
+	names.Reserve(components.Num());
+
+	Algo::TransformIf(
+		components,
+		names,
+		[](const USceneComponent* Comp) { return IsValid(Comp); },
+		[](const USceneComponent* Comp) { return Comp->GetFName(); }
+	);
 
 	return names;
 }
 
+USceneComponent* UMounteaAttachmentsStatics::GetAvailableComponentByName(const AActor* Target,
+	const FName& ComponentName)
+{
+	if (!IsValid(Target) || ComponentName.IsNone())
+		return nullptr;
+
+	const TArray<USceneComponent*> components = GetAvailableComponents(Target);
+
+	USceneComponent* const* match = Algo::FindByPredicate(
+		components,
+		[&](const USceneComponent* Comp)
+		{
+			return IsValid(Comp) && Comp->GetFName() == ComponentName;
+		}
+	);
+
+	return match ? *match : nullptr;
+}
+
 TArray<FName> UMounteaAttachmentsStatics::GetAvailableSocketNames(const AActor* Target, const FName& ComponentName)
 {
-	if (!IsValid(Target))
+	if (!IsValid(Target) || ComponentName.IsNone())
 		return {};
 
-	TArray<USceneComponent*> components = GetAvailableComponents(Target);
-	for (USceneComponent* comp : components)
-	{
-		if (IsValid(comp) && comp->GetFName() == ComponentName)
-			return comp->GetAllSocketNames();
-	}
+	const TArray<USceneComponent*> components = GetAvailableComponents(Target);
 
-	return TArray<FName>();
+	const USceneComponent* const* match = Algo::FindByPredicate(
+		components,
+		[&](const USceneComponent* Comp)
+		{
+			return IsValid(Comp) && Comp->GetFName() == ComponentName;
+		}
+	);
+
+	return match ? (*match)->GetAllSocketNames() : TArray<FName>();
 }
 
 AActor* UMounteaAttachmentsStatics::GetOwningActor(
@@ -75,7 +101,7 @@ bool UMounteaAttachmentsStatics::DisableSlot(const TScriptInterface<IMounteaAdva
 	return (Target.GetObject() != nullptr) ? Target->Execute_DisableSlot(Target.GetObject(), SlotId) : false;
 }
 
-bool UMounteaAttachmentsStatics::TryAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentsStatics::TryAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_TryAttach(Target.GetObject(), SlotId, Attachment) : false;
 }
@@ -85,7 +111,7 @@ bool UMounteaAttachmentsStatics::TryDetach(const TScriptInterface<IMounteaAdvanc
 	return (Target.GetObject() != nullptr) ? Target->Execute_TryDetach(Target.GetObject(), SlotId) : false;
 }
 
-bool UMounteaAttachmentsStatics::ForceAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentsStatics::ForceAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_ForceAttach(Target.GetObject(), SlotId, Attachment) : false;
 }
@@ -109,4 +135,94 @@ void UMounteaAttachmentsStatics::ClearAll(const TScriptInterface<IMounteaAdvance
 {
 	if (Target.GetObject() != nullptr)
 		Target->Execute_ClearAll(Target.GetObject());
+}
+
+FName UMounteaAttachmentsStatics::GetFirstEmptySlot(
+	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target)
+{
+		return Target.GetObject() != nullptr ? Target->Execute_GetFirstEmptySlot(Target.GetObject()) : NAME_None;
+}
+
+TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> UMounteaAttachmentsStatics::GetAttachedTo(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_GetAttachedTo(Target.GetObject()) : TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>();
+}
+
+FName UMounteaAttachmentsStatics::GetId(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_GetId(Target.GetObject()) : NAME_None;
+}
+
+void UMounteaAttachmentsStatics::SetId(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FName& NewId)
+{
+	if (Target.GetObject() != nullptr)
+		Target->Execute_SetId(Target.GetObject(), NewId);
+}
+
+FText UMounteaAttachmentsStatics::GetDisplayName(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_GetDisplayName(Target.GetObject()) : FText::GetEmpty();
+}
+
+void UMounteaAttachmentsStatics::SetDisplayName(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FText& NewDisplayName)
+{
+	if (Target.GetObject() != nullptr)
+		Target->Execute_SetDisplayName(Target.GetObject(), NewDisplayName);
+}
+
+FGameplayTagContainer UMounteaAttachmentsStatics::GetTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_GetTags(Target.GetObject()) : FGameplayTagContainer();
+}
+
+void UMounteaAttachmentsStatics::SetTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FGameplayTagContainer& NewTags)
+{
+	if (Target.GetObject() != nullptr)
+		Target->Execute_SetTags(Target.GetObject(), NewTags);
+}
+
+EAttachmentState UMounteaAttachmentsStatics::GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_GetState(Target.GetObject()) : EAttachmentState();
+}
+
+void UMounteaAttachmentsStatics::SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentState NewState)
+{
+	if (Target.GetObject() != nullptr)
+		Target->Execute_SetState(Target.GetObject(), NewState);
+}
+
+bool UMounteaAttachmentsStatics::IsValidAttachable(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_IsValidAttachable(Target.GetObject()) : false;
+}
+
+bool UMounteaAttachmentsStatics::CanAttach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_CanAttach(Target.GetObject()) : false;
+}
+
+bool UMounteaAttachmentsStatics::AttachToSlot(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Container, const FName& SlotId)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_AttachToSlot(Target.GetObject(), Container, SlotId) : false;
+}
+
+bool UMounteaAttachmentsStatics::AttachToContainer(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Container)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_AttachToContainer(Target.GetObject(), Container) : false;
+}
+
+bool UMounteaAttachmentsStatics::Detach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_Detach(Target.GetObject()) : false;
+}
+
+bool UMounteaAttachmentsStatics::HasTag(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FGameplayTag& Tag)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_HasTag(Target.GetObject(), Tag) : false;
+}
+
+bool UMounteaAttachmentsStatics::MatchesTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FGameplayTagContainer& OtherTags, bool bRequireAll)
+{
+	return (Target.GetObject() != nullptr) ? Target->Execute_MatchesTags(Target.GetObject(), OtherTags, bRequireAll) : false;
 }

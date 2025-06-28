@@ -28,36 +28,49 @@ public:
 
 	UMounteaAttachmentContainerComponent();
 
+protected:
+
+	virtual void BeginPlay() override;
+
 public:
 
 	virtual AActor* GetOwningActor_Implementation() const override;
-	virtual FName GetDefaultAttachmentTarget_Implementation() const override { return DefaultAttachmentTarget; }
+	virtual FName GetDefaultAttachmentTarget_Implementation() const override
+	{ return DefaultAttachmentTarget; }
+	virtual USceneComponent* GetAttachmentTargetComponent_Implementation() const override
+	{ return DefaultAttachmentTargetComponent; };
+	virtual void SetDefaultAttachmentTargetComponent_Implementation(USceneComponent* NewTarget) override;
 	virtual bool IsValidSlot_Implementation(const FName& SlotId) const override;
 	virtual UMounteaAdvancedAttachmentSlot* GetSlot_Implementation(const FName& SlotId) const override;
 	virtual bool IsSlotOccupied_Implementation(const FName& SlotId) const override;
 	virtual bool DisableSlot_Implementation(const FName& SlotId) override;
-	virtual bool TryAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) override;
+	virtual bool TryAttach_Implementation(const FName& SlotId, UObject* Attachment) override;
 	virtual bool TryDetach_Implementation(const FName& SlotId) override;
-	virtual bool ForceAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment) override;
+	virtual bool ForceAttach_Implementation(const FName& SlotId, UObject* Attachment) override;
 	virtual bool ForceDetach_Implementation(const FName& SlotId) override;
 	virtual FName FindFirstFreeSlotWithTags_Implementation(const FGameplayTagContainer& RequiredTags) const override;
 	virtual FName GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const override;
+	virtual FName GetFirstEmptySlot_Implementation() const override;
 	virtual void ClearAll_Implementation() override;
 	void ApplyParentContainer();
 
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment",
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName DefaultAttachmentTarget;
+
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment")
+	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
 	EAttachmentSlotState State;
 	
 	// Does not support runtime addition/removal of slots.
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment",
 		Instanced,
-		meta=(ForceInlineRow), meta=(TitleProperty="DisplayName"), meta=(ShowInnerProperties))
+		meta=(TitleProperty="DisplayName"),
+		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView))
 	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 
 protected:

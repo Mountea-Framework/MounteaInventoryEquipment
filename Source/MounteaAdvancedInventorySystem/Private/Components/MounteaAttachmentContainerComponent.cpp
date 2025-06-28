@@ -29,9 +29,36 @@ UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 	ApplyParentContainer();
 }
 
+void UMounteaAttachmentContainerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	const auto attachmentTargetComponent = UMounteaAttachmentsStatics::GetAvailableComponentByName(Execute_GetOwningActor(this), DefaultAttachmentTarget);
+	if (!IsValid(attachmentTargetComponent))
+		LOG_ERROR(TEXT("Default attachment target component '%s' is not valid!"), *DefaultAttachmentTarget.ToString());
+
+	Execute_SetDefaultAttachmentTargetComponent(this, attachmentTargetComponent);
+
+	for (const auto& attachmentSlot : AttachmentSlots)
+	{
+		if (!IsValid(attachmentSlot))
+			continue;
+
+		attachmentSlot->InitializeAttachmentSlot(this);
+		attachmentSlot->BeginPlay();
+	}
+}
+
 AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() const
 {
 	return UMounteaInventorySystemStatics::GetOwningActor(this);
+}
+
+void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_Implementation(
+	USceneComponent* NewTarget)
+{
+	if (NewTarget != DefaultAttachmentTargetComponent)
+		DefaultAttachmentTargetComponent = NewTarget;
 }
 
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const
@@ -69,7 +96,7 @@ bool UMounteaAttachmentContainerComponent::DisableSlot_Implementation(const FNam
 	return foundSlot->Detach();
 }
 
-bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName& SlotId, UObject* Attachment)
 {
 	if (!Attachment)
 		return false;
@@ -91,7 +118,7 @@ bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName&
 	return foundSlot->Detach();
 }
 
-bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FName& SlotId, UMounteaAttachableComponent* Attachment)
+bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FName& SlotId, UObject* Attachment)
 {
 	if (!Attachment)
 		return false;
@@ -143,6 +170,17 @@ FName UMounteaAttachmentContainerComponent::GetSlotIdForAttachable_Implementatio
 		});
 
 	return Found ? (*Found)->SlotName : NAME_None;	
+}
+
+FName UMounteaAttachmentContainerComponent::GetFirstEmptySlot_Implementation() const
+{
+	const auto* Found = Algo::FindByPredicate(AttachmentSlots,
+		[&](const UMounteaAdvancedAttachmentSlot* Slot)
+		{
+			return Slot != nullptr && !Slot->IsOccupied();
+		});
+
+	return Found ? (*Found)->SlotName : NAME_None;
 }
 
 void UMounteaAttachmentContainerComponent::ClearAll_Implementation()
