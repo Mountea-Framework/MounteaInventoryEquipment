@@ -32,46 +32,57 @@ public:
 	/** Primary Data **/
 
 	/** A globally unique identifier for this item template. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", DuplicateTransient, meta=(NoResetToDefault))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", DuplicateTransient,
+		meta=(NoResetToDefault))
 	FGuid Guid;
 
 	/** The item’s name, displayed in-game. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(NoResetToDefault))
 	FText DisplayName = LOCTEXT("MounteaInventoryItemTemplate_DisplayName", "");
 
 	/** Reference to the item’s specific category (e.g., Weapon, Armor, Consumable). */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(GetOptions="GetAllowedCategories"), meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(GetOptions="GetAllowedCategories"), meta=(NoResetToDefault))
 	FString ItemCategory;
 
 	/**
 	 * Represents the subcategory of the inventory item, which provides additional classification beyond the main category.
 	 * Used to further organize and identify items, such as distinguishing between different types within the same category.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(GetOptions="GetAllowedSubCategories"), meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(GetOptions="GetAllowedSubCategories"), meta=(NoResetToDefault))
 	FString ItemSubCategory = TEXT("");
 
 	/** Reference to the item’s rarity (e.g., Common, Rare, Epic). */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(GetOptions="GetAllowedRarities"), meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(GetOptions="GetAllowedRarities"), meta=(NoResetToDefault))
 	FString ItemRarity;
 
 	/** A bitmask to define item properties such as tradeable, stackable, or consumable. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags"), meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags"),
+		meta=(NoResetToDefault))
 	uint8 ItemFlags;
 
 	/** Maximum amount of this item that can be held in a single inventory slot. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(UIMin=0,ClampMin=0), meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(UIMin=0,ClampMin=0), meta=(NoResetToDefault))
 	int32 MaxQuantity;
 
 	/** Maximum stack size for this item in the inventory. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(UIMin=1,ClampMin=1), meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(UIMin=1,ClampMin=1), meta=(NoResetToDefault))
 	int32 MaxStackSize;
 
 	/** Tags for categorization, filtering, or triggering gameplay logic. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(NoResetToDefault))
 	FGameplayTagContainer Tags;
 
 	/** The actor spawned when the item is used, dropped, or equipped. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data", meta=(NoResetToDefault))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
+		meta=(NoResetToDefault))
 	TSoftClassPtr<AActor> SpawnActor;
 
 	/** Secondary Data **/
@@ -81,7 +92,8 @@ public:
 	FText ItemShortInfo=  LOCTEXT("MounteaInventoryItemTemplate_ItemShortInfo", "");;
 
 	/** A detailed description providing additional lore or functionality. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(MultiLine=true))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(MultiLine=true))
 	FText ItemLongInfo = LOCTEXT("MounteaInventoryItemTemplate_ItemLongInfo", "");;
 
 	/** A small icon representing the item in the inventory UI. */
@@ -101,19 +113,27 @@ public:
 	bool bHasDurability;
 
 	/** The maximum durability value of the item. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(EditCondition="bHasDurability"), meta=(UIMin=1,ClampMin=1))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(EditCondition="bHasDurability", EditConditionHides),
+		meta=(UIMin=1,ClampMin=1))
 	float MaxDurability;
 
 	/** The starting durability value of the item. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(EditCondition="bHasDurability"), meta=(UIMin=0,ClampMin=0))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(EditCondition="bHasDurability", EditConditionHides),
+		meta=(UIMin=0,ClampMin=0))
 	float BaseDurability;
 
 	/** The penalty applied to durability under certain conditions (e.g., usage). */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(EditCondition="bHasDurability"), meta=(UIMin=0,ClampMin=0))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(EditCondition="bHasDurability", EditConditionHides),
+		meta=(UIMin=0,ClampMin=0))
 	float DurabilityPenalization;
 
 	/** The coefficient affecting the item's price based on its durability. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(EditCondition="bHasDurability"), meta=(UIMin=0,ClampMin=0))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(EditCondition="bHasDurability", EditConditionHides),
+		meta=(UIMin=0,ClampMin=0))
 	float DurabilityToPriceCoefficient;
 
 	/** Whether the item has an associated monetary value. */
@@ -121,11 +141,15 @@ public:
 	bool bHasPrice;
 
 	/** The base monetary value of the item. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(EditCondition="bHasPrice"), meta=(UIMin=0,ClampMin=0))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(EditCondition="bHasPrice", EditConditionHides),
+		meta=(UIMin=0,ClampMin=0))
 	float BasePrice;
 
 	/** A multiplier applied to the base price when selling the item. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(EditCondition="bHasPrice"), meta=(UIMin=0,ClampMin=0))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(EditCondition="bHasPrice", EditConditionHides),
+		meta=(UIMin=0,ClampMin=0))
 	float SellPriceCoefficient;
 
 	/** Whether the item has weight. */
@@ -133,7 +157,9 @@ public:
 	bool bHasWeight;
 
 	/** The weight of the item, which may affect inventory limits. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data", meta=(EditCondition="bHasWeight"), meta=(UIMin=0.001,ClampMin=0.001))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(EditCondition="bHasWeight", EditConditionHides),
+		meta=(UIMin=0.001,ClampMin=0.001))
 	float Weight;
 
 	/** Defines the compatible slots or affector types for this item template. */
