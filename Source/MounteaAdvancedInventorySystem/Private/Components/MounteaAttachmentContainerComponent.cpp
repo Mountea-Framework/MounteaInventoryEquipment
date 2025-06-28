@@ -33,6 +33,12 @@ void UMounteaAttachmentContainerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	const auto attachmentTargetComponent = UMounteaAttachmentsStatics::GetAvailableComponentByName(Execute_GetOwningActor(this), DefaultAttachmentTarget);
+	if (!IsValid(attachmentTargetComponent))
+		LOG_ERROR(TEXT("Default attachment target component '%s' is not valid!"), *DefaultAttachmentTarget.ToString());
+
+	Execute_SetDefaultAttachmentTargetComponent(this, attachmentTargetComponent);
+
 	for (const auto& attachmentSlot : AttachmentSlots)
 	{
 		if (!IsValid(attachmentSlot))
