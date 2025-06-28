@@ -88,11 +88,11 @@ bool UMounteaAttachableComponent::AttachToContainer_Implementation(const TScript
 	if (!CanAttach() || !Target.GetObject())
 		return false;
 
-	const FName FoundSlotId = Target->Execute_FindFirstFreeSlotWithTags(Target.GetObject(), Tags);
-	if (FoundSlotId.IsNone())
+	const FName foundSlotId = Target->Execute_FindFirstFreeSlotWithTags(Target.GetObject(), Tags);
+	if (foundSlotId.IsNone())
 		return false;
 
-	return Execute_AttachToSlot(this, Target, FoundSlotId);
+	return Execute_AttachToSlot(this, Target, foundSlotId);
 }
 
 bool UMounteaAttachableComponent::Detach_Implementation()
@@ -100,9 +100,9 @@ bool UMounteaAttachableComponent::Detach_Implementation()
 	if (!IsOccupied() || !AttachedTo.GetObject())
 		return false;
 
-	const FName SlotId = AttachedTo->Execute_GetSlotIdForAttachable(AttachedTo.GetObject(), this);
-	if (!SlotId.IsNone())
-		AttachedTo->Execute_TryDetach(AttachedTo.GetObject(), SlotId);
+	const FName slotId = AttachedTo->Execute_GetSlotIdForAttachable(AttachedTo.GetObject(), this);
+	if (!slotId.IsNone())
+		AttachedTo->Execute_TryDetach(AttachedTo.GetObject(), slotId);
 
 	AttachedTo = nullptr;
 	State = EAttachmentSlotState::EASS_Empty;
