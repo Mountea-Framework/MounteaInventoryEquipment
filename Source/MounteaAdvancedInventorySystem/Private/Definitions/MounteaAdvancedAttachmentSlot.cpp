@@ -10,16 +10,9 @@
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
-UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot():
-	State(EAttachmentSlotState::EASS_Empty), SlotType(EAttachmentSlotType::EAST_Socket)
+UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot()
 {
 	SlotName = "NewEmptySlot";
-}
-
-UMounteaAdvancedAttachmentSlot::UMounteaAdvancedAttachmentSlot(
-	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& NewParentContainer) :
-	State(EAttachmentSlotState::EASS_Empty), SlotType(EAttachmentSlotType::EAST_Socket), ParentContainer(NewParentContainer)
-{
 }
 
 TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableSocketNames() const

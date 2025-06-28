@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
-#include "MounteaEquipmentBaseDataTypes.h"
+#include "MounteaAdvancedAttachmentSlotBase.h"
 #include "MounteaEquipmentBaseEnums.h"
 #include "UObject/Object.h"
 #include "MounteaAdvancedAttachmentSlot.generated.h"
@@ -21,32 +20,16 @@ enum class EAttachmentSlotType : uint8;
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable,
 	AutoExpandCategories="Mountea",
 	EditInlineNew)
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlot : public UObject
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlot : public UMounteaAdvancedAttachmentSlotBase
 {
 	GENERATED_BODY()
 
 public:
 
 	UMounteaAdvancedAttachmentSlot();
-	explicit UMounteaAdvancedAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& NewParentContainer);
 
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	FName SlotName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	FGameplayTagContainer SlotTags;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	FText DisplayName;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings")
-	EAttachmentSlotState State;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings")
-	EAttachmentSlotType SlotType;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName AttachmentTargetOverride;
