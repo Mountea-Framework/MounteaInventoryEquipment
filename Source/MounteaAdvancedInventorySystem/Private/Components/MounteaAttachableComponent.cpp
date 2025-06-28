@@ -20,45 +20,70 @@ UMounteaAttachableComponent::UMounteaAttachableComponent()
 	ComponentTags.Append({ TEXT("Mountea"), TEXT("Attachable") });
 }
 
-bool UMounteaAttachableComponent::IsValidAttachable() const
+void UMounteaAttachableComponent::SetId_Implementation(const FName& NewId)
+{
+	if (Id != NewId)
+		Id = NewId;
+}
+
+void UMounteaAttachableComponent::SetDisplayName_Implementation(const FText& NewDisplayName)
+{
+	if (!NewDisplayName.EqualTo(DisplayName))
+		DisplayName = NewDisplayName;
+}
+
+void UMounteaAttachableComponent::SetTags_Implementation(const FGameplayTagContainer& NewTags)
+{
+	Tags.Reset();
+	Tags.AppendTags(NewTags);
+}
+
+void UMounteaAttachableComponent::SetState_Implementation(const EAttachmentSlotState NewState)
+{
+	if (NewState != State)
+		State = NewState;
+}
+
+bool UMounteaAttachableComponent::IsValidAttachable_Implementation() const
 {
 	return !DisplayName.IsEmpty() && !Id.IsNone();
 }
 
-bool UMounteaAttachableComponent::IsEmpty() const
+bool UMounteaAttachableComponent::IsEmpty_Implementation() const
 {
 	return State == EAttachmentSlotState::EASS_Empty && !AttachedTo.GetObject();
 }
 
-bool UMounteaAttachableComponent::IsOccupied() const
+bool UMounteaAttachableComponent::IsOccupied_Implementation() const
 {
 	return State == EAttachmentSlotState::EASS_Occupied && AttachedTo.GetObject();
 }
 
-bool UMounteaAttachableComponent::IsLocked() const
+bool UMounteaAttachableComponent::IsLocked_Implementation() const
 {
 	return State == EAttachmentSlotState::EASS_Locked;
 }
 
-bool UMounteaAttachableComponent::CanAttach() const
+bool UMounteaAttachableComponent::CanAttach_Implementation() const
 {
 	return IsValidAttachable() && IsEmpty() && !IsLocked();
 }
 
-bool UMounteaAttachableComponent::AttachTo(TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> Target, const FName& SlotId)
+bool UMounteaAttachableComponent::AttachToSlot_Implementation(
+	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId)
 {
-	if (!CanAttach() || !Target.GetObject())
+	if (!Execute_CanAttach(this) || !IsValid(Target.GetObject()))
 		return false;
 
 	if (!Target->Execute_TryAttach(Target.GetObject(), SlotId, this))
 		return false;
 
 	AttachedTo = Target;
-	State = EAttachmentSlotState::EASS_Occupied;
+	Execute_SetState(this, EAttachmentSlotState::EASS_Occupied);
 	return true;
 }
 
-bool UMounteaAttachableComponent::AttachTo(TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> Target)
+bool UMounteaAttachableComponent::AttachToContainer_Implementation(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target)
 {
 	if (!CanAttach() || !Target.GetObject())
 		return false;
@@ -67,10 +92,10 @@ bool UMounteaAttachableComponent::AttachTo(TScriptInterface<IMounteaAdvancedAtta
 	if (FoundSlotId.IsNone())
 		return false;
 
-	return AttachTo(Target, FoundSlotId);
+	return Execute_AttachToSlot(this, Target, FoundSlotId);
 }
 
-bool UMounteaAttachableComponent::Detach()
+bool UMounteaAttachableComponent::Detach_Implementation()
 {
 	if (!IsOccupied() || !AttachedTo.GetObject())
 		return false;
@@ -84,7 +109,7 @@ bool UMounteaAttachableComponent::Detach()
 	return true;
 }
 
-void UMounteaAttachableComponent::Disable()
+void UMounteaAttachableComponent::Disable_Implementation()
 {
 	if (!IsEmpty())
 		Detach();
@@ -92,12 +117,12 @@ void UMounteaAttachableComponent::Disable()
 	State = EAttachmentSlotState::EASS_Locked;
 }
 
-bool UMounteaAttachableComponent::HasTag(const FGameplayTag& Tag) const
+bool UMounteaAttachableComponent::HasTag_Implementation(const FGameplayTag& Tag) const
 {
 	return Tags.HasTag(Tag);
 }
 
-bool UMounteaAttachableComponent::MatchesTags(const FGameplayTagContainer& OtherTags, const bool bRequireAll) const
+bool UMounteaAttachableComponent::MatchesTags_Implementation(const FGameplayTagContainer& OtherTags, const bool bRequireAll) const
 {
 	return bRequireAll ? Tags.HasAll(OtherTags) : Tags.HasAny(OtherTags);
 }
