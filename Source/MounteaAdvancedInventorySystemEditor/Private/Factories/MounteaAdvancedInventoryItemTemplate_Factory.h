@@ -14,6 +14,8 @@ class UMounteaInventoryItemTemplate;
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UMounteaAdvancedInventoryItemTemplate_Factory : public UFactory
 {
+	GENERATED_BODY()
+	
 public:
 	UMounteaAdvancedInventoryItemTemplate_Factory();
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
