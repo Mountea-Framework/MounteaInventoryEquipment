@@ -18,8 +18,15 @@
 #include "MounteaAdvancedInventoryBaseWidget.generated.h"
 
 /**
- * 
+ * UMounteaAdvancedInventoryBaseWidget is the base class for all inventory-related UI widgets.
+ * Base widgets provide core functionality including theme application, widget refresh, command processing,
+ * and parent UI component management for consistent inventory interface behavior.
+ *
+ * @see [Inventory UI System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryUI)
+ * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaInventoryGenericWidgetInterface
  */
+UCLASS()
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryBaseWidget : public UUserWidget,
 public IMounteaInventoryGenericWidgetInterface,
