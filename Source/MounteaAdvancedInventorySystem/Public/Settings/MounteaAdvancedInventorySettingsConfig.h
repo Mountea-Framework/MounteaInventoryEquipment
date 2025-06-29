@@ -20,15 +20,15 @@
 class UMounteaAdvancedInventoryThemeConfig;
 
 /**
-* Data Asset that manages configuration settings for Mountea Advanced Inventory System.
-* Defines inventory types, rarities, and categories with their respective settings.
-*
-* @see UDataAsset
-* @see FInventoryTypeConfig
-* @see FInventoryRarity
-* @see FInventoryCategory
-* @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Settings-Config
-*/
+ * UMounteaAdvancedInventorySettingsConfig is a data asset managing comprehensive inventory system configuration.
+ * Settings config defines inventory types, item rarities, categories, UI classes, notification systems,
+ * and visual parameters for complete inventory system customization and behavior control.
+ *
+ * @see [Settings Configuration](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see FInventoryTypeConfig
+ * @see FInventoryRarity
+ * @see FInventoryCategory
+ */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining inventory types, rarities and categories."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventorySettingsConfig : public UPrimaryDataAsset
 {

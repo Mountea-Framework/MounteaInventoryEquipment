@@ -22,9 +22,13 @@ class UInputMappingContext;
 class UMounteaAdvancedInventorySettingsConfig;
 
 /**
- * Represents the main configuration settings for the Mountea Advanced Inventory System.
- * This class provides centralized control over inventory-related configurations,
- * including input mappings, logging verbosity, and allowed inventory properties.
+ * UMounteaAdvancedInventorySettings provides centralized configuration for the Mountea Advanced Inventory System.
+ * Settings control input mappings, logging verbosity, asset references, and system-wide behavior
+ * through Unreal's developer settings framework for project-wide inventory configuration.
+ *
+ * @see [System Settings](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see UMounteaAdvancedInventorySettingsConfig
+ * @see UDeveloperSettings
  */
 UCLASS(config = MounteaSettings, defaultconfig, meta = (DisplayName = "Mountea Inventory System Settings"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventorySettings : public UDeveloperSettings
