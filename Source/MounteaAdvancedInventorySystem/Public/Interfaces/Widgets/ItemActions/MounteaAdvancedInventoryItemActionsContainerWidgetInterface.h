@@ -22,7 +22,12 @@ class UMounteaAdvancedInventoryItemActionsContainerWidgetInterface : public UInt
 };
 
 /**
- * 
+ * IMounteaAdvancedInventoryItemActionsContainerWidgetInterface manages container widgets for item actions.
+ * Item actions container interfaces handle the grouping and presentation of available item actions
+ * within action panels and context menus for inventory item interaction.
+ *
+ * @see [Item Actions](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see IMounteaAdvancedInventoryItemActionWidgetInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionsContainerWidgetInterface
 {
