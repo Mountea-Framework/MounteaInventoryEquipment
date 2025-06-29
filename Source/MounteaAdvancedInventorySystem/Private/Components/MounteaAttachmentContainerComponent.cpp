@@ -158,11 +158,6 @@ bool UMounteaAttachmentContainerComponent::TryAttachInternal(const FName& SlotId
 	return foundSlot && (*foundSlot)->Attach(Attachment);
 }
 
-void UMounteaAttachmentContainerComponent::OnRep_AttachmentSlots()
-{
-	LOG_WARNING(TEXT("SLOTS REPLICATED"))
-}
-
 bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName& SlotId)
 {
 	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {

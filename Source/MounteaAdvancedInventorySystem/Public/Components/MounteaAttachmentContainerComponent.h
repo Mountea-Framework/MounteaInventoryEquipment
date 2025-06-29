@@ -29,7 +29,7 @@ public:
 	UMounteaAttachmentContainerComponent();
 
 protected:
-
+	
 	virtual void BeginPlay() override;
 	
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
@@ -71,10 +71,7 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerTryAttach(const FName& SlotId, UObject* Attachment);
 	bool TryAttachInternal(const FName& SlotId, UObject* Attachment);
-
-	UFUNCTION()
-	void OnRep_AttachmentSlots();
-
+	
 public:
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
@@ -88,7 +85,7 @@ public:
 	EAttachmentSlotState State;
 	
 	// Does not support runtime addition/removal of slots.
-	UPROPERTY(SaveGame, ReplicatedUsing="OnRep_AttachmentSlots", EditAnywhere, BlueprintReadWrite,
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite,
 		Category="Attachment Container",
 		Instanced,
 		meta=(TitleProperty="DisplayName"),

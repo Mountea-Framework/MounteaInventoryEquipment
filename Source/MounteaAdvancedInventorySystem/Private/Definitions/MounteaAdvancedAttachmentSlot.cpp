@@ -259,7 +259,32 @@ void UMounteaAdvancedAttachmentSlot::PerformPhysicalDetachment() const
 		actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
+// TODO: How to handle detachments? We cannot call this as we have no idea if we are detaching or attaching...
+void UMounteaAdvancedAttachmentSlot::OnRep_Attachment()
+{
+	USceneComponent* attachmentTarget = AttachmentTargetComponentOverride ? 
+		AttachmentTargetComponentOverride : 
+		ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject());
+	if (!IsValid(attachmentTarget))
+	{
+		LOG_WARNING(TEXT("Attachment target component is invalid!"));
+		return;
+	}
+
+	if (!IsValidForAttachment(Attachment))
+		return;
+
+	if (!ValidateAttachmentSlot(attachmentTarget))
+		return;
+
+	if (!PerformPhysicalAttachment(Attachment, attachmentTarget))
+		return;
+	
+	Super::OnRep_Attachment();
+}
+
 #if WITH_EDITOR
+
 EDataValidationResult UMounteaAdvancedAttachmentSlot::IsDataValid(class FDataValidationContext& Context) const
 {
 	if (!IsSlotValid())

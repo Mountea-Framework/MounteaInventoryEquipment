@@ -81,6 +81,14 @@ bool UMounteaAdvancedAttachmentSlotBase::CallRemoteFunction(UFunction* Function,
 	return false;
 }
 
+void UMounteaAdvancedAttachmentSlotBase::OnRep_Attachment()
+{
+	if (!ParentContainer.GetObject())
+		return;
+	
+	ParentContainer->GetOnAttachmentChangedEventHandle().Broadcast(SlotName, Attachment, nullptr);
+}
+
 TArray<FName> UMounteaAdvancedAttachmentSlotBase::GetAvailableSlotNames() const
 {
 	const auto advanedSettings = GetDefault<UMounteaAdvancedInventorySettings>();

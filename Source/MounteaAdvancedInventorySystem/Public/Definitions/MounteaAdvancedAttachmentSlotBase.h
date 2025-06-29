@@ -42,6 +42,9 @@ public:
 	virtual int32 GetFunctionCallspace(UFunction* Function, FFrame* Stack) override;
 	virtual bool CallRemoteFunction(UFunction* Function, void* Parms, struct FOutParmRec* OutParms, FFrame* Stack) override;
 	//End of implementation
+	
+	UFUNCTION()
+    virtual void OnRep_Attachment();
 
 protected:
 
@@ -76,7 +79,7 @@ public:
 		meta=(NoResetToDefault), AdvancedDisplay)
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
 
-	UPROPERTY(Replicated, BlueprintReadOnly, Category="Debug",
+	UPROPERTY(ReplicatedUsing=OnRep_Attachment, BlueprintReadOnly, Category="Debug",
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault), AdvancedDisplay)
 	TObjectPtr<UObject> Attachment;

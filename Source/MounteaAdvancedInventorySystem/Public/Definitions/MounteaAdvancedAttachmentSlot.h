@@ -97,6 +97,8 @@ public:
 		return bRequireAll ? SlotTags.HasAll(Tags) : SlotTags.HasAny(Tags);
 	}
 
+	virtual void OnRep_Attachment() override;
+
 #if WITH_EDITOR
 
 	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
