@@ -25,7 +25,13 @@ class UTexture;
 enum class EInventoryItemFlags : uint8;
 
 /**
- * Inventory Item Template class defining all properties of an inventory item.
+ * UMounteaInventoryItemTemplate is a data asset that defines the static properties of inventory items.
+ * Item templates serve as blueprints for creating inventory item instances, containing all base data
+ * such as display information, categories, flags, durability settings, and gameplay tags.
+ *
+ * @see [Item Templates](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemTemplates)
+ * @see FInventoryItem
+ * @see UMounteaInventoryManagerComponent
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName = "Inventory Item Template"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemTemplate : public UPrimaryDataAsset
