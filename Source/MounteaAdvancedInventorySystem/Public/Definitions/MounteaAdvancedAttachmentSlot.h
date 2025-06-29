@@ -59,7 +59,7 @@ public:
 	FORCEINLINE bool IsSlotValid() const
 	{
 		return  ParentContainer.GetObject() != nullptr
-		&& !DisplayName.IsEmpty()
+		&& !SlotName.IsNone()
 		&& !SlotTags.IsEmpty();
 	}
 
@@ -78,6 +78,7 @@ public:
 	}
 
 	bool Attach(UObject* NewAttachment);
+	bool ForceAttach(UObject* NewAttachment);
 	static TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> FindAttachableInterface(UObject* Object);
 	static bool IsValidForAttachment(const UObject* NewAttachment);
 	bool ValidateAttachmentSlot(const USceneComponent* Target) const;
@@ -85,6 +86,7 @@ public:
 	FName GetAttachmentSocketName() const;
 
 	bool Detach();
+	bool ForceDetach();
 	void PerformPhysicalDetachment() const;
 
 	FORCEINLINE bool HasTag(const FGameplayTag& Tag) const
@@ -97,7 +99,7 @@ public:
 		return bRequireAll ? SlotTags.HasAll(Tags) : SlotTags.HasAny(Tags);
 	}
 
-	virtual void OnRep_Attachment() override;
+	virtual void OnRep_State() override;
 
 #if WITH_EDITOR
 

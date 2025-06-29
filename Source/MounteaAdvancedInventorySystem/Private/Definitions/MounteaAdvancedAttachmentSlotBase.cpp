@@ -81,12 +81,21 @@ bool UMounteaAdvancedAttachmentSlotBase::CallRemoteFunction(UFunction* Function,
 	return false;
 }
 
-void UMounteaAdvancedAttachmentSlotBase::OnRep_Attachment()
+void UMounteaAdvancedAttachmentSlotBase::OnRep_State()
 {
-	if (!ParentContainer.GetObject())
-		return;
-	
-	ParentContainer->GetOnAttachmentChangedEventHandle().Broadcast(SlotName, Attachment, nullptr);
+	UObject* oldAttachment = LastAttachment;
+    
+	switch (State)
+	{
+		case EAttachmentSlotState::EASS_Occupied:
+			LastAttachment = Attachment;
+			break;
+		case EAttachmentSlotState::EASS_Empty:
+			break;
+	}
+    
+	if (ParentContainer.GetObject())
+		ParentContainer->GetOnAttachmentChangedEventHandle().Broadcast(SlotName, Attachment, oldAttachment);
 }
 
 TArray<FName> UMounteaAdvancedAttachmentSlotBase::GetAvailableSlotNames() const

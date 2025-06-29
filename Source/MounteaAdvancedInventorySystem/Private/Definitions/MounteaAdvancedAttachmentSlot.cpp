@@ -121,6 +121,44 @@ bool UMounteaAdvancedAttachmentSlot::Attach(UObject* NewAttachment)
 		return false;
 
 	Attachment = NewAttachment;
+	LastAttachment = NewAttachment;
+	State = EAttachmentSlotState::EASS_Occupied;
+	
+	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> attachableInterface = FindAttachableInterface(NewAttachment);
+	if (attachableInterface.GetObject())
+		IMounteaAdvancedAttachmentAttachableInterface::Execute_AttachToSlot(
+					attachableInterface.GetObject(), ParentContainer, SlotName);
+	else
+		LOG_WARNING(TEXT("Attachment does not implement the attachable interface! Attachment will be performed, however, it may not behave as expected."));
+    
+	return true;
+}
+
+bool UMounteaAdvancedAttachmentSlot::ForceAttach(UObject* NewAttachment)
+{
+	if (!IsSlotValid() || !IsValid(NewAttachment))
+		return false;
+
+	USceneComponent* attachmentTarget = AttachmentTargetComponentOverride ? 
+		AttachmentTargetComponentOverride : 
+		ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject());
+	if (!IsValid(attachmentTarget))
+	{
+		LOG_WARNING(TEXT("Attachment target component is invalid!"));
+		return false;
+	}
+
+	if (!IsValidForAttachment(NewAttachment))
+		return false;
+
+	if (!ValidateAttachmentSlot(attachmentTarget))
+		return false;
+
+	if (!PerformPhysicalAttachment(NewAttachment, attachmentTarget))
+		return false;
+
+	Attachment = NewAttachment;
+	LastAttachment = NewAttachment;
 	State = EAttachmentSlotState::EASS_Occupied;
 	
 	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> attachableInterface = FindAttachableInterface(NewAttachment);
@@ -251,50 +289,42 @@ bool UMounteaAdvancedAttachmentSlot::Detach()
 	return true;
 }
 
+bool UMounteaAdvancedAttachmentSlot::ForceDetach()
+{
+	auto tempAttachment = !Attachment ? LastAttachment : Attachment;
+	PerformPhysicalDetachment();
+
+	if (IsValid(tempAttachment) && tempAttachment->Implements<UMounteaAdvancedAttachmentAttachableInterface>())
+		IMounteaAdvancedAttachmentAttachableInterface::Execute_SetState(tempAttachment, EAttachmentState::EAS_Detached);
+
+	Attachment = nullptr;
+	State = EAttachmentSlotState::EASS_Empty;
+	return true;
+}
+
 void UMounteaAdvancedAttachmentSlot::PerformPhysicalDetachment() const
 {
-	if (USceneComponent* sceneComp = Cast<USceneComponent>(Attachment))
+	auto tempAttachment = !Attachment ? LastAttachment : Attachment;
+	if (USceneComponent* sceneComp = Cast<USceneComponent>(tempAttachment))
 		sceneComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	else if (AActor* actor = Cast<AActor>(Attachment))
+	else if (AActor* actor = Cast<AActor>(tempAttachment))
 		actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
-// TODO: How to handle detachments? We cannot call this as we have no idea if we are detaching or attaching...
-void UMounteaAdvancedAttachmentSlot::OnRep_Attachment()
+void UMounteaAdvancedAttachmentSlot::OnRep_State()
 {
 	switch (State)
 	{
-		case EAttachmentSlotState::EASS_Empty:
-			{
-				USceneComponent* attachmentTarget = AttachmentTargetComponentOverride ? 
-				AttachmentTargetComponentOverride : 
-				ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject());
-				if (!IsValid(attachmentTarget))
-				{
-					LOG_WARNING(TEXT("Attachment target component is invalid!"));
-					return;
-				}
-
-				if (!IsValidForAttachment(Attachment))
-					return;
-
-				if (!ValidateAttachmentSlot(attachmentTarget))
-					return;
-
-				if (!PerformPhysicalAttachment(Attachment, attachmentTarget))
-					return;
-			}
-			break;
 		case EAttachmentSlotState::EASS_Occupied:
-			Detach();
+			if (Attachment)
+				ForceAttach(Attachment);
 			break;
-		case EAttachmentSlotState::EASS_Locked:
-			break;
-		case EAttachmentSlotState::Default:
+		case EAttachmentSlotState::EASS_Empty:
+			ForceDetach();
 			break;
 	}
 	
-	Super::OnRep_Attachment();
+	Super::OnRep_State();
 }
 
 #if WITH_EDITOR

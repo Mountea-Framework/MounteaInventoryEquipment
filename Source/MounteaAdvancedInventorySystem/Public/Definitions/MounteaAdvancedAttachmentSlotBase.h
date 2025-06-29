@@ -44,7 +44,7 @@ public:
 	//End of implementation
 	
 	UFUNCTION()
-    virtual void OnRep_Attachment();
+    virtual void OnRep_State();
 
 protected:
 
@@ -66,7 +66,7 @@ public:
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	FText DisplayName;
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	EAttachmentSlotState State;
 	
@@ -79,10 +79,13 @@ public:
 		meta=(NoResetToDefault), AdvancedDisplay)
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
 
-	UPROPERTY(ReplicatedUsing=OnRep_Attachment, BlueprintReadOnly, Category="Debug",
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Debug",
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault), AdvancedDisplay)
 	TObjectPtr<UObject> Attachment;
+
+	UPROPERTY()
+	TObjectPtr<UObject> LastAttachment;
 	
 protected:
 
