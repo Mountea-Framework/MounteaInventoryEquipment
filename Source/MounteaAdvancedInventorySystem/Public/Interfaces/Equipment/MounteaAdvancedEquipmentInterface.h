@@ -26,6 +26,15 @@ class UMounteaAdvancedEquipmentInterface : public UInterface
 	GENERATED_BODY()
 };
 
+/**
+ * IMounteaAdvancedEquipmentInterface provides specialized functionality for equipment management systems.
+ * Equipment interfaces extend attachment containers with equipment-specific operations, stat modifications,
+ * and character integration for comprehensive equipment systems within the inventory framework.
+ *
+ * @see [Equipment Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/EquipmentSystem)
+ * @see UMounteaEquipmentComponent
+ * @see IMounteaAdvancedAttachmentContainerInterface
+ */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedEquipmentInterface
 {
 	GENERATED_BODY()
