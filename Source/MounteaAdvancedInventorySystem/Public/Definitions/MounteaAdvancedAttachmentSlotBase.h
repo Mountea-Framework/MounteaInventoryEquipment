@@ -14,87 +14,91 @@ class IMounteaAdvancedAttachmentContainerInterface;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotBeginPlaySignature);
 
 /**
- * Represents a single attachment slot in an equipment system.
+ * Base class for attachment slots in an equipment system.
  * Defines the properties of an attachment slot, including its ID, tags, display name, State, type, and target name.
  */
-UCLASS(Abstract, ClassGroup=(Mountea), AutoExpandCategories="Mountea",
-	EditInlineNew)
+UCLASS(Abstract, ClassGroup=(Mountea), AutoExpandCategories="Mountea", EditInlineNew)
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlotBase : public UObject
 {
 	GENERATED_BODY()
 
 public:
-
 	UMounteaAdvancedAttachmentSlotBase();
 
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
-	void BeginPlay();
-	virtual void BeginPlay_Implementation();
-
-	virtual AActor* GetOwningActor() const;
-
-	virtual void InitializeAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent);
-
-	//UObject interface implementation
-	virtual UWorld* GetWorld() const override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	virtual bool IsSupportedForNetworking() const override { return true; };
-	virtual int32 GetFunctionCallspace(UFunction* Function, FFrame* Stack) override;
-	virtual bool CallRemoteFunction(UFunction* Function, void* Parms, struct FOutParmRec* OutParms, FFrame* Stack) override;
-	//End of implementation
-	
-	UFUNCTION()
-    virtual void OnRep_State();
-
-protected:
-
-	UPROPERTY(BlueprintAssignable, DisplayName="Begin Play")
-	FSlotBeginPlaySignature SlotBeginPlay;
-
 public:
-
+	/** Unique identifier for this attachment slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableSlotNames"),
-		meta=(DisplayPriority=-1, NoResetToDefault))
+		meta=(GetOptions="GetAvailableSlotNames", DisplayPriority=-1, NoResetToDefault))
 	FName SlotName;
 
+	/** Gameplay tags that define what can attach to this slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	FGameplayTagContainer SlotTags;
 
+	/** Human-readable name for this slot displayed in UI */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	FText DisplayName;
 
+	/** Current state of the attachment slot (Empty, Occupied, Locked) */
 	UPROPERTY(ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	EAttachmentSlotState State;
 	
+	/** Type of attachment this slot supports (Socket, Component) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	EAttachmentSlotType SlotType;
 
-	UPROPERTY(BlueprintReadOnly, Category="Debug",
-		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault), AdvancedDisplay)
+	/** Reference to the container that owns this slot */
+	UPROPERTY(BlueprintReadOnly, Category="Debug", AdvancedDisplay,
+		meta=(DisplayThumbnail=false, NoResetToDefault))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
 
-	UPROPERTY(Replicated, BlueprintReadOnly, Category="Debug",
-		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault), AdvancedDisplay)
+	/** Currently attached object (replicated to clients) */
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
+		meta=(DisplayThumbnail=false, NoResetToDefault))
 	TObjectPtr<UObject> Attachment;
 
+	/** Local cache of last attachment for detachment operations */
 	UPROPERTY()
 	TObjectPtr<UObject> LastAttachment;
-	
-protected:
 
+protected:
+	/** Event broadcasted when slot begins play */
+	UPROPERTY(BlueprintAssignable, DisplayName="Begin Play")
+	FSlotBeginPlaySignature SlotBeginPlay;
+
+public:
+	// Lifecycle
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	void BeginPlay();
+	virtual void BeginPlay_Implementation();
+
+	virtual void InitializeAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent);
+	virtual AActor* GetOwningActor() const;
+
+public:
+	// UObject interface
+	virtual UWorld* GetWorld() const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool IsSupportedForNetworking() const override { return true; }
+	virtual int32 GetFunctionCallspace(UFunction* Function, FFrame* Stack) override;
+	virtual bool CallRemoteFunction(UFunction* Function, void* Parms, struct FOutParmRec* OutParms, FFrame* Stack) override;
+
+protected:
+	// Replication
+	UFUNCTION()
+	virtual void OnRep_State();
+
+protected:
+	// Editor helpers
 	UFUNCTION()
 	virtual TArray<FName> GetAvailableSlotNames() const;
 
-protected:
 #if WITH_EDITOR
+protected:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
-	
 };
