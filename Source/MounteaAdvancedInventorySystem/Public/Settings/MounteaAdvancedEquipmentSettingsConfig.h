@@ -1,4 +1,13 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -9,11 +18,14 @@
 #include "MounteaAdvancedEquipmentSettingsConfig.generated.h"
 
 /**
-* Data Asset that manages configuration settings for Mountea Advanced Equipment System.
-* Defines Equipment Slots and other settings.
-*
-* @see https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Equipment-Settings-Config
-*/
+ * UMounteaAdvancedEquipmentSettingsConfig manages configuration for the Mountea Advanced Equipment System.
+ * Equipment settings define allowed equipment slots with metadata for comprehensive equipment
+ * management and attachment system configuration within the inventory framework.
+ *
+ * @see [Equipment Configuration](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see FMounteaEquipmentSlotHeaderData
+ * @see UMounteaAdvancedInventorySettings
+ */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Equipment Settings Config",
 	meta=(ShortTooltip="Configuration asset for the Mountea Equipment System defining equipment types, slots and other settings."))
 

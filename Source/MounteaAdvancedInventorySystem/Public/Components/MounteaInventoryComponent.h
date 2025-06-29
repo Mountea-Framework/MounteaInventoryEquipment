@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -14,13 +23,18 @@ enum class EInventoryFlags : uint8;
 enum class EInventoryType : uint8;
 
 /**
- *  Mountea Inventory Component
- * 
+ * UMounteaInventoryComponent manages inventory item collections with network replication support.
+ * Inventory components provide item storage, modification, searching, and notification systems
+ * with efficient delta replication for multiplayer inventory management.
+ *
+ * @see [Inventory System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see IMounteaAdvancedInventoryInterface
+ * @see FInventoryItem
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
-	AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"),
-	HideCategories=("Cooking","Collision"),
-	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory Component"))
+    AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"),
+    HideCategories=("Cooking","Collision"),
+    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryComponent : public UActorComponent, public IMounteaAdvancedInventoryInterface
 {
 	GENERATED_BODY()

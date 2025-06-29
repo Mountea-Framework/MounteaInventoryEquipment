@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -15,7 +24,12 @@ class UMounteaAdvancedBaseInventoryWidgetInterface : public UInterface
 };
 
 /**
- * 
+ * IMounteaAdvancedBaseInventoryWidgetInterface establishes parent-child relationships for inventory widgets.
+ * Base inventory widget interfaces manage ownership associations between widgets and their parent
+ * inventory UI systems for proper widget hierarchy and communication.
+ *
+ * @see [Base Inventory Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see IMounteaAdvancedInventoryUIInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedBaseInventoryWidgetInterface
 {

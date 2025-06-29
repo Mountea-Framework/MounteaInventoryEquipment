@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -16,10 +25,12 @@ class UMounteaInventorySystemBaseWidgetInterface : public UInterface
 };
 
 /**
- * An interface for managing base inventory widget functionality in the Mountea Advanced Inventory System.
- * This interface provides the necessary functions to initialize, display, and configure inventory UI elements.
+ * IMounteaInventorySystemBaseWidgetInterface manages main inventory system wrapper widget.
+ * System base interfaces handle initialization, visibility management, and inventory source assignment
+ * for top-level inventory UI wrappers and container widgets.
  *
- * This Interface should be applied to main wrapper.
+ * @see [System Base Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see IMounteaAdvancedInventoryUIInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventorySystemBaseWidgetInterface
 {

@@ -1,14 +1,28 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "GameplayTagContainer.h"
+#include "Net/Serialization/FastArraySerializer.h"
 #include "MounteaAdvancedAttachmentContainerInterface.generated.h"
 
 class UMounteaAttachableComponent;
 class UMounteaAdvancedAttachmentSlot;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAttachmentChanged, const FName&, SlotId, UObject*, NewAttachment, UObject*, OldAttachment);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlotStateChanged, const FName&, SlotId, bool, bIsEnabled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainerCleared);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedAttachmentContainerInterface : public UInterface
@@ -16,6 +30,15 @@ class UMounteaAdvancedAttachmentContainerInterface : public UInterface
 	GENERATED_BODY()
 };
 
+/**
+ * IMounteaAdvancedAttachmentContainerInterface defines the contract for managing attachment slots and operations.
+ * Container interfaces provide slot management, attachment validation, event broadcasting, and comprehensive
+ * attachment system operations for equipment containers and inventory attachment systems.
+ *
+ * @see [Container Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see IMounteaAdvancedAttachmentAttachableInterface
+ * @see UMounteaAttachmentContainerComponent
+ */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedAttachmentContainerInterface
 {
 	GENERATED_BODY()
@@ -85,4 +108,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	void ClearAll();
 	virtual void ClearAll_Implementation() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots() const;
+	virtual TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots_Implementation() const = 0;
+
+	virtual FOnAttachmentChanged& GetOnAttachmentChangedEventHandle() = 0;
+	virtual FOnSlotStateChanged& GetOnSlotStateChangedEventHandle() = 0;
+	virtual FOnContainerCleared& GetOnContainerClearedEventHandle() = 0;
 };

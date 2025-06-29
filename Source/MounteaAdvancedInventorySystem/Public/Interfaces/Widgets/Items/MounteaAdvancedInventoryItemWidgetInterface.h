@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -15,7 +24,13 @@ class UMounteaAdvancedInventoryItemWidgetInterface : public UInterface
 };
 
 /**
- * 
+ * IMounteaAdvancedInventoryItemWidgetInterface manages individual inventory item widget presentation.
+ * Item widget interfaces handle item identification, visual refresh, highlighting, and slot association
+ * for individual item representations within inventory interfaces.
+ *
+ * @see [Item Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemWidgets)
+ * @see FInventoryItem
+ * @see FInventorySlot
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemWidgetInterface
 {

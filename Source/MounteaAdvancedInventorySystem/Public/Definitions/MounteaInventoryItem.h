@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -12,8 +21,12 @@ class IMounteaAdvancedInventoryInterface;
 class UMounteaInventoryItemTemplate;
 
 /**
- * Snapshot of replication-relevant item data.
- * Used to track changes between replication states.
+ * FInventoryItemSnapshot is a lightweight data structure for tracking replication changes.
+ * Snapshots capture the state of inventory items before replication to detect and calculate
+ * deltas for quantity, durability, and custom data changes.
+ *
+ * @see [Replication System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Replication)
+ * @see FInventoryItem
  */
 USTRUCT()
 struct FInventoryItemSnapshot
@@ -41,9 +54,14 @@ private:
 };
 
 /**
-* Represents a single instance of an inventory item.
-* Contains all runtime data for the item including its template, quantity, durability and custom data.
-*/
+ * FInventoryItem represents a runtime instance of an inventory item with network replication support.
+ * Item instances contain template references, current quantity, durability, custom data, and affector slots.
+ * Implements FastArraySerializer for efficient delta replication in multiplayer environments.
+ *
+ * @see [Inventory Items](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryItems)
+ * @see UMounteaInventoryItemTemplate
+ * @see IMounteaAdvancedInventoryInterface
+ */
 USTRUCT(BlueprintType,meta=(HasNativeMake="/Script/MounteaAdvancedInventorySystem.MounteaInventoryStatics.NewInventoryItem"))
 struct FInventoryItem : public FFastArraySerializerItem
 {
@@ -315,6 +333,14 @@ public:
 	//void PostReplicatedReceive(const FInventoryItemArray::FPostReplicatedReceiveParameters& Parameters) {};
 };
 
+/**
+ * FInventoryItemArray is a replicated container for inventory item collections.
+ * Provides efficient delta serialization for inventory item arrays using Unreal's FastArraySerializer
+ * to minimize network bandwidth in multiplayer scenarios.
+ *
+ * @see [Replication System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Replication)
+ * @see FInventoryItem
+ */
 USTRUCT(BlueprintType)
 struct FInventoryItemArray : public FFastArraySerializer
 {

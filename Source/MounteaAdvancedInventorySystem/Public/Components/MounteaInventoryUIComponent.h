@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -10,10 +19,18 @@
 #include "MounteaInventoryUIComponent.generated.h"
 
 /**
- *  Mountea Inventory UI Component
- * 
+ * UMounteaInventoryUIComponent manages user interface aspects of inventory systems.
+ * UI components handle widget creation, visibility management, item selection, category filtering,
+ * notification display, and grid slot persistence for comprehensive inventory interface control.
+ *
+ * @see [Inventory UI System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see IMounteaAdvancedInventoryUIInterface
+ * @see UMounteaInventoryComponent
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable,  AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory UI Component"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, 
+    AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
+    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory UI Component"))
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIInterface
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIInterface
 {
 	GENERATED_BODY()

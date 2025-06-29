@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -12,14 +21,18 @@ enum class EAttachmentSlotState : uint8;
 class IMounteaAdvancedAttachmentContainerInterface;
 
 /**
- * Component that represents an attachable item in the Mountea Advanced Inventory System.
- * This component can be used to define items that can be attached to other actors or components.
- * It holds properties such as ID, display name, tags, state, and slot ID.
+ * UMounteaAttachableComponent represents items that can be attached to other actors or components.
+ * Attachable components implement the attachment interface with identification, tags, state management,
+ * and container association for flexible item attachment within the equipment system.
+ *
+ * @see [Attachable Components](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see IMounteaAdvancedAttachmentAttachableInterface
+ * @see UMounteaAttachmentContainerComponent
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
-	AutoExpandCategories=("Mountea","Attachable","Mountea|Attachable"),
-	HideCategories=("Cooking","Collision"),
-	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachable Component"))
+    AutoExpandCategories=("Mountea","Attachable","Mountea|Attachable"),
+    HideCategories=("Cooking","Collision"),
+    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachable Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachableComponent : public UActorComponent, public IMounteaAdvancedAttachmentAttachableInterface
 {
 	GENERATED_BODY()

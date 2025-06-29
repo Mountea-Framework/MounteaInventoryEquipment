@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -12,14 +21,18 @@ enum class EAttachmentSlotState : uint8;
 class UMounteaAdvancedAttachmentSlot;
 
 /**
- * Component that holds an attachment container for equipment systems.
- * This component allows actors to manage attachments dynamically at runtime.
- * It can be used to equip, unequip, and manage attachments on actors.
+ * UMounteaAttachmentContainerComponent manages dynamic attachment systems for equipment at runtime.
+ * Container components provide slot-based attachment management with network replication, event broadcasting,
+ * and comprehensive attachment operations for flexible equipment systems on actors.
+ *
+ * @see [Attachment Containers](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see IMounteaAdvancedAttachmentContainerInterface
+ * @see UMounteaAdvancedAttachmentSlot
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
-	AutoExpandCategories=("Mountea","AttachableContainer","Mountea|AttachableContainer"),
-	HideCategories=("Cooking","Collision"),
-	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachment Container Component"))
+    AutoExpandCategories=("Mountea","AttachableContainer","Mountea|AttachableContainer"),
+    HideCategories=("Cooking","Collision"),
+    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachment Container Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachmentContainerComponent : public UActorComponent, public IMounteaAdvancedAttachmentContainerInterface
 {
 	GENERATED_BODY()
@@ -29,8 +42,11 @@ public:
 	UMounteaAttachmentContainerComponent();
 
 protected:
-
+	
 	virtual void BeginPlay() override;
+	
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 
@@ -52,33 +68,70 @@ public:
 	virtual FName GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const override;
 	virtual FName GetFirstEmptySlot_Implementation() const override;
 	virtual void ClearAll_Implementation() override;
+	virtual TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots_Implementation() const override
+	{ return AttachmentSlots; };
 	void ApplyParentContainer();
 
+	virtual FOnAttachmentChanged& GetOnAttachmentChangedEventHandle() override
+	{ return OnAttachmentChanged; };
+	virtual FOnSlotStateChanged& GetOnSlotStateChangedEventHandle() override
+	{ return OnSlotStateChanged; };
+	virtual FOnContainerCleared& GetOnContainerClearedEventHandle() override
+	{ return OnContainerCleared; };
+
+protected:
+
+	UFUNCTION(Server, Reliable)
+	void ServerTryAttach(const FName& SlotId, UObject* Attachment);
+	bool TryAttachInternal(const FName& SlotId, UObject* Attachment);
+	UFUNCTION(Server, Reliable)
+	void ServerTryDetach(const FName& SlotId);
+	
 public:
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName DefaultAttachmentTarget;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment")
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment Container")
 	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment Container")
 	EAttachmentSlotState State;
 	
 	// Does not support runtime addition/removal of slots.
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite,
+		Category="Attachment Container",
 		Instanced,
 		meta=(TitleProperty="DisplayName"),
 		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView))
 	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 
+	/**
+	 * Event triggered when an attachment is added or removed from the container.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
+		meta = (IsBindableEvent=true))
+	FOnAttachmentChanged OnAttachmentChanged;
+
+	/**
+	 * Event triggered when the state of a slot changes.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
+		meta = (IsBindableEvent=true))
+	FOnSlotStateChanged OnSlotStateChanged;
+
+	/**
+	 * Event triggered when the container is cleared of all attachments.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
+		meta = (IsBindableEvent=true))
+	FOnContainerCleared OnContainerCleared;
+
 protected:
 
 	UFUNCTION()
 	TArray<FName> GetAvailableTargetNames() const;
-
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 

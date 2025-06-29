@@ -1,9 +1,20 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 
 #include "Definitions/MounteaAdvancedAttachmentSlotBase.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
+#include "Net/UnrealNetwork.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
@@ -19,10 +30,81 @@ void UMounteaAdvancedAttachmentSlotBase::BeginPlay_Implementation()
 	SlotBeginPlay.Broadcast();
 }
 
+AActor* UMounteaAdvancedAttachmentSlotBase::GetOwningActor() const
+{
+	if (!IsValid(ParentContainer.GetObject()))
+		return nullptr;
+
+	const auto ownerObject = ParentContainer.GetObject();
+	return ParentContainer->Execute_GetOwningActor(ownerObject);
+}
+
 void UMounteaAdvancedAttachmentSlotBase::InitializeAttachmentSlot(
 	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent)
 {
 	ParentContainer = Parent;
+}
+
+UWorld* UMounteaAdvancedAttachmentSlotBase::GetWorld() const
+{
+	if (GetOuter() == nullptr)
+		return nullptr;
+		
+	if (Cast<UPackage>(GetOuter()) != nullptr)
+		return Cast<UWorld>(GetOuter()->GetOuter());
+
+	if (!IsValid(GetOwningActor()))
+		return nullptr;
+		
+	return GetOwningActor()->GetWorld();
+}
+
+void UMounteaAdvancedAttachmentSlotBase::GetLifetimeReplicatedProps(
+	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UMounteaAdvancedAttachmentSlotBase, Attachment);
+	DOREPLIFETIME(UMounteaAdvancedAttachmentSlotBase, State);
+
+	if (UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(GetClass()))
+		blueprintClass->GetLifetimeBlueprintReplicationList(OutLifetimeProps);
+}
+int32 UMounteaAdvancedAttachmentSlotBase::GetFunctionCallspace(UFunction* Function, FFrame* Stack)
+{
+	if (HasAnyFlags(RF_ClassDefaultObject) || !IsSupportedForNetworking())
+		return GEngine->GetGlobalFunctionCallspace(Function, this, Stack);
+	
+	return GetOuter()->GetFunctionCallspace(Function, Stack);
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::CallRemoteFunction(UFunction* Function, void* Parms,
+	struct FOutParmRec* OutParms, FFrame* Stack)
+{
+	AActor* owningActor = GetOwningActor();
+	if (UNetDriver* netDriver = owningActor->GetNetDriver())
+	{
+		netDriver->ProcessRemoteFunction(owningActor, Function, Parms, OutParms, Stack, this);
+		return true;
+	}
+	return false;
+}
+
+void UMounteaAdvancedAttachmentSlotBase::OnRep_State()
+{
+	UObject* oldAttachment = LastAttachment;
+    
+	switch (State)
+	{
+		case EAttachmentSlotState::EASS_Occupied:
+			LastAttachment = Attachment;
+			break;
+		case EAttachmentSlotState::EASS_Empty:
+			break;
+	}
+    
+	if (ParentContainer.GetObject())
+		ParentContainer->GetOnAttachmentChangedEventHandle().Broadcast(SlotName, Attachment, oldAttachment);
 }
 
 TArray<FName> UMounteaAdvancedAttachmentSlotBase::GetAvailableSlotNames() const

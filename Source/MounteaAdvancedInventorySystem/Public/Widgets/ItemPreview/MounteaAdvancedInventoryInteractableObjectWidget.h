@@ -14,20 +14,13 @@ class USkeletalMesh;
 class AMounteaAdvancedInventoryItemPreviewRenderer;
 
 /**
- * @class UMounteaAdvancedInventoryInteractableObjectWidget
+ * UMounteaAdvancedInventoryInteractableObjectWidget provides 3D preview and interaction for inventory items.
+ * Interactable widgets render inventory items in 3D space with camera controls, mesh preview capabilities,
+ * and interactive manipulation for detailed item inspection within the inventory interface.
  *
- * @brief Represents an advanced interactable widget specifically designed for inventory objects in the Mountea framework.
- *
- * This class is intended to handle and display information related to inventory interactable objects.
- * It serves as an integral part of the user interface, providing functionality and visualization
- * to interact with inventory elements in virtual 3D space.
- *
- * The class integrates seamlessly with the Mountea Inventory system, and may include features such
- * as dynamic updates, custom interactions, and extended customization for specific inventory objects.
- *
- * Key features include:
- * - 3D representation of inventory objects through widgets.
- * - Customizable behavior for interaction with inventory items.
+ * @see [3D Item Preview](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemPreview)
+ * @see UMounteaAdvancedInventoryBaseWidget
+ * @see AMounteaAdvancedInventoryItemPreviewRenderer
  */
 UCLASS(ClassGroup=(Mountea), meta=(DisplayName="Interactable Object Widget"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryInteractableObjectWidget : public UMounteaAdvancedInventoryBaseWidget

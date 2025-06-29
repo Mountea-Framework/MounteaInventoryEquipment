@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -51,8 +60,13 @@ namespace MounteaInventoryNotificationBaseTypes
 
 
 /**
-* Categories of inventory notifications.
-*/
+ * EInventoryNotificationCategory defines the severity and visual presentation of inventory notifications.
+ * Categories determine the styling, iconography, and user attention level for different types
+ * of inventory system feedback (informational, warning, or error states).
+ *
+ * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see FInventoryNotificationData
+ */
 UENUM(BlueprintType)
 enum class EInventoryNotificationCategory : uint8
 {
@@ -63,6 +77,14 @@ enum class EInventoryNotificationCategory : uint8
 	Default UMETA(Hidden)
  };
 
+/**
+ * FInventoryNotificationStyle defines the visual and audio presentation of inventory notifications.
+ * Styles control the appearance through icon brushes and audio feedback through sound assets
+ * for consistent user experience across different notification types.
+ *
+ * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see FInventoryNotificationConfig
+ */
 USTRUCT(BlueprintType)
 struct FInventoryNotificationStyle
 {
@@ -75,6 +97,14 @@ struct FInventoryNotificationStyle
 	TSoftObjectPtr<USoundBase> NotificationSound;
 };
 
+/**
+ * FInventoryNotificationConfig defines the behavior and presentation settings for inventory notifications.
+ * Configurations control notification enablement, categorization, timing, appearance, and widget overrides
+ * to provide flexible notification management across different inventory operations.
+ *
+ * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see FInventoryNotificationData
+ */
 USTRUCT(BlueprintType)
 struct FInventoryNotificationConfig
 {
@@ -119,6 +149,15 @@ struct FInventoryNotificationConfig
 	TSoftClassPtr<UUserWidget> NotificationWidgetClassOverride;
 };
 
+/**
+ * FInventoryNotificationData contains all information required to display and process inventory notifications.
+ * Notification data includes type classification, display content, timing, item context, and payload
+ * for comprehensive feedback about inventory system operations and state changes.
+ *
+ * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see IMounteaAdvancedInventoryInterface
+ * @see EInventoryNotificationCategory
+ */
 USTRUCT(BlueprintType)
 struct FInventoryNotificationData
 {

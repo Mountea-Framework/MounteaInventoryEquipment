@@ -1,4 +1,13 @@
-﻿// All rights reserved Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -9,9 +18,14 @@
 #include "MounteaAdvancedInventoryButtonWidget.generated.h"
 
 /**
- * 
+ * UMounteaAdvancedInventoryButtonWidget provides gameplay tag-based button functionality for inventory interfaces.
+ * Inventory buttons support action tag classification, contextual command processing, and theme application
+ * for consistent and extensible user interaction within the inventory system.
+ *
+ * @see [Inventory UI Controls](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/SlateElements)
+ * @see IMounteaInventoryGenericWidgetInterface
+ * @see FGameplayTag
  */
-UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API
 	UMounteaAdvancedInventoryButtonWidget : public UButton, public IMounteaInventoryGenericWidgetInterface
 {

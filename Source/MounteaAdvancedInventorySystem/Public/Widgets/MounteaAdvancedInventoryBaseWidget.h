@@ -1,4 +1,13 @@
-// All rights reserved Dominik Morse 2024
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -9,8 +18,15 @@
 #include "MounteaAdvancedInventoryBaseWidget.generated.h"
 
 /**
- * 
+ * UMounteaAdvancedInventoryBaseWidget is the base class for all inventory-related UI widgets.
+ * Base widgets provide core functionality including theme application, widget refresh, command processing,
+ * and parent UI component management for consistent inventory interface behavior.
+ *
+ * @see [Inventory UI System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryUI)
+ * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaInventoryGenericWidgetInterface
  */
+UCLASS()
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryBaseWidget : public UUserWidget,
 public IMounteaInventoryGenericWidgetInterface,
