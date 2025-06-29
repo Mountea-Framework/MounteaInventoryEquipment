@@ -24,7 +24,12 @@ class UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface : public UInterf
 };
 
 /**
- * 
+ * IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface manages category selection wrapper widgets.
+ * Categories wrapper interfaces handle active category tracking and state management
+ * for category selection containers within inventory interfaces.
+ *
+ * @see [Category Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see IMounteaAdvancedInventoryCategoryWidgetInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface
 {
