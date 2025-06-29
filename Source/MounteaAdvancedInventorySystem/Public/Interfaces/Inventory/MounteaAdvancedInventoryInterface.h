@@ -20,8 +20,13 @@
 class UMounteaInventoryItemTemplate;
 
 /**
- * Defines a structure used to set parameters for searching inventory items.
- * Provides multiple criteria such as GUID, templates, tags, categories, and rarity to customize search queries.
+ * FInventoryItemSearchParams defines search criteria for locating inventory items.
+ * Search parameters support multiple filtering methods including GUID, template, tags, category,
+ * and rarity for flexible item queries within inventory systems.
+ *
+ * @see [Item Search](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemSearch)
+ * @see IMounteaAdvancedInventoryInterface
+ * @see UMounteaInventoryItemTemplate
  */
 USTRUCT(BlueprintType)
 struct FInventoryItemSearchParams
@@ -129,7 +134,13 @@ class UMounteaAdvancedInventoryInterface : public UInterface
 };
 
 /**
- * 
+ * IMounteaAdvancedInventoryInterface defines comprehensive inventory management operations.
+ * Inventory interfaces provide item addition, removal, searching, quantity management, durability handling,
+ * and notification processing with event broadcasting for complete inventory system functionality.
+ *
+ * @see [Inventory Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see UMounteaInventoryComponent
+ * @see FInventoryItem
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryInterface
 {
