@@ -24,7 +24,12 @@ class UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface : public UInterfa
 };
 
 /**
- * 
+ * IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface manages container widgets for item slots.
+ * Item slots wrapper interfaces handle slot collection management, item addition/removal,
+ * and slot selection coordination for inventory slot container widgets.
+ *
+ * @see [Item Slots](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see IMounteaAdvancedInventoryItemSlotWidgetInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface
 {

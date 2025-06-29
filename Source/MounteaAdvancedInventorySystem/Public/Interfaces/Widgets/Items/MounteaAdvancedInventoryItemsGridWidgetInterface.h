@@ -23,10 +23,13 @@ class UMounteaAdvancedInventoryItemsGridWidgetInterface : public UInterface
 };
 
 /**
- * Interface for an advanced inventory items grid widget.
- * 
- * This interface allows interacting with the item grid in the UI by adding, removing,
- * swapping, and querying items in individual slots.
+ * IMounteaAdvancedInventoryItemsGridWidgetInterface provides comprehensive grid-based inventory management.
+ * Items grid interfaces handle spatial item organization, slot management, drag-drop operations,
+ * and coordinate-based item placement for structured grid inventory systems.
+ *
+ * @see [Grid Inventory](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see FMounteaInventoryGridSlot
+ * @see UMounteaAdvancedInventoryItemsGridWidget
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemsGridWidgetInterface
 {
