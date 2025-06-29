@@ -15,14 +15,16 @@
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
 /**
- * A generic inventory slot structure that encapsulates the core properties
- * shared by all types of inventory slots (e.g., item ID, quantity, associated widget).
+ * FInventorySlot is the base structure for all inventory slot UI representations.
+ * Inventory slots encapsulate core properties shared across different slot types including
+ * item identification, quantity tracking, and widget associations for UI management.
  *
- * This struct serves as a parent/base for more specialized slot types (like grid slots,
- * list slots, etc.), allowing you to keep common logic and data in one place.
+ * @see [Inventory UI System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryUI)
+ * @see FMounteaInventoryGridSlot
+ * @see FInventoryItem
  */
 USTRUCT(BlueprintType,
-	meta=(HasNativeMake="/Script/MounteaAdvancedInventorySystem.MounteaInventoryUIStatics.MakeInventorySlot"))
+    meta=(HasNativeMake="/Script/MounteaAdvancedInventorySystem.MounteaInventoryUIStatics.MakeInventorySlot"))
 struct FInventorySlot
 {
 	GENERATED_BODY()
@@ -123,10 +125,13 @@ public:
 };
 
 /**
- * Defines the position of the slot in a grid.
+ * FMounteaInventoryGridSlot extends FInventorySlot with 2D grid positioning for grid-based inventory layouts.
+ * Grid slots provide spatial positioning information for inventory items in grid-based UI systems,
+ * enabling precise placement and collision detection within structured inventory grids.
  *
- * This property specifies the 2D position of the inventory slot, represented as an integer point
- * with X and Y coordinates. Typically used for inventory or grid-based UI layouts.
+ * @see [Grid Inventory System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/GridInventory)
+ * @see FInventorySlot
+ * @see FInventoryItem
  */
 USTRUCT(BlueprintType)
 struct FMounteaInventoryGridSlot : public FInventorySlot
