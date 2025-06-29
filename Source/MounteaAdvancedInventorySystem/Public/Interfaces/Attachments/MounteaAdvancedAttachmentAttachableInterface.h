@@ -25,6 +25,15 @@ class UMounteaAdvancedAttachmentAttachableInterface : public UInterface
 	GENERATED_BODY()
 };
 
+/**
+ * IMounteaAdvancedAttachmentAttachableInterface defines the contract for objects that can be attached to containers.
+ * Attachable interfaces provide identification, state management, tag filtering, and attachment operations
+ * for items that participate in the attachment system within equipment and inventory frameworks.
+ *
+ * @see [Attachable Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see IMounteaAdvancedAttachmentContainerInterface
+ * @see UMounteaAttachableComponent
+ */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedAttachmentAttachableInterface
 {
 	GENERATED_BODY()

@@ -30,6 +30,15 @@ class UMounteaAdvancedAttachmentContainerInterface : public UInterface
 	GENERATED_BODY()
 };
 
+/**
+ * IMounteaAdvancedAttachmentContainerInterface defines the contract for managing attachment slots and operations.
+ * Container interfaces provide slot management, attachment validation, event broadcasting, and comprehensive
+ * attachment system operations for equipment containers and inventory attachment systems.
+ *
+ * @see [Container Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see IMounteaAdvancedAttachmentAttachableInterface
+ * @see UMounteaAttachmentContainerComponent
+ */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedAttachmentContainerInterface
 {
 	GENERATED_BODY()
