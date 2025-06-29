@@ -22,7 +22,12 @@ class UTexture;
 #define LOCTEXT_NAMESPACE "InventoryRarity"
 
 /**
- * Structure defining inventory rarity properties.
+ * FInventoryRarity defines the visual and economic properties of item rarity levels.
+ * Rarity structures control item appearance through color coding, economic value through price multipliers,
+ * and gameplay behavior through associated tags for consistent item classification systems.
+ *
+ * @see [Item Rarity System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemRarity)
+ * @see UMounteaInventoryItemTemplate
  */
 USTRUCT(BlueprintType)
 struct FInventoryRarity
@@ -61,8 +66,13 @@ struct FInventoryRarity
 #define LOCTEXT_NAMESPACE "InventoryCategory"
 
 /**
- * Structure representing the category data for an inventory system, providing configuration and metadata
- * for organizing and defining inventory item categories.
+ * FInventoryCategoryData contains the configuration and metadata for inventory item categories.
+ * Category data defines display properties, sorting priorities, associated tags, visual icons,
+ * behavioral flags, and allowed actions for comprehensive item classification.
+ *
+ * @see [Item Categories](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemCategories)
+ * @see FInventoryCategory
+ * @see UMounteaInventoryItemAction
  */
 USTRUCT(BlueprintType)
 struct FInventoryCategoryData
@@ -110,7 +120,13 @@ struct FInventoryCategoryData
 };
 
 /**
- * Structure defining inventory category properties.
+ * FInventoryCategory represents a complete item category with hierarchical subcategory support.
+ * Categories provide primary classification for inventory items with nested subcategory structures
+ * for detailed item organization and management within the inventory system.
+ *
+ * @see [Item Categories](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemCategories)
+ * @see FInventoryCategoryData
+ * @see UMounteaInventoryItemTemplate
  */
 USTRUCT(BlueprintType)
 struct FInventoryCategory
@@ -139,7 +155,13 @@ struct FInventoryCategory
 #define LOCTEXT_NAMESPACE "InventoryType"
 
 /**
- * Structure defining inventory type properties.
+ * FInventoryTypeConfig defines the behavior, constraints, and presentation of different inventory types.
+ * Type configurations control UI widgets, access permissions, capacity limits, weight systems,
+ * and value restrictions for flexible inventory management across different use cases.
+ *
+ * @see [Inventory Types](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryTypes)
+ * @see IMounteaAdvancedInventoryInterface
+ * @see EInventoryFlags
  */
 USTRUCT(BlueprintType)
 struct FInventoryTypeConfig
