@@ -15,7 +15,6 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryGenericWidgetInterface.generated.h"
 
-// This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventoryGenericWidgetInterface : public UInterface
 {
@@ -23,13 +22,17 @@ class UMounteaInventoryGenericWidgetInterface : public UInterface
 };
 
 /**
- * 
+ * IMounteaInventoryGenericWidgetInterface provides base functionality for all inventory UI widgets.
+ * Generic widget interfaces define command processing, theme application, and refresh operations
+ * for consistent widget behavior across the inventory system.
+ *
+ * @see [Widget Interfaces](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see UMounteaAdvancedInventoryBaseWidget
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventoryGenericWidgetInterface
 {
 	GENERATED_BODY()
 
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	
 	/**
