@@ -19,7 +19,13 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAnimationFinished, UWidget*, ActiveWidget, int32, ActiveIndex);
 
 /**
- * 
+ * UMounteaAdvancedInventoryAnimatedSwitcher extends UCommonAnimatedSwitcher with enhanced animation event handling.
+ * Animated switchers provide smooth transitions between inventory UI panels with completion callbacks
+ * for coordinated interface updates and responsive user experience in complex inventory layouts.
+ *
+ * @see [Inventory UI Transitions](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/SlateElements)
+ * @see UCommonAnimatedSwitcher
+ * @see FOnAnimationFinished
  */
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryAnimatedSwitcher : public UCommonAnimatedSwitcher
