@@ -3,6 +3,7 @@
 
 #include "Components/MounteaAttachmentContainerComponent.h"
 
+#include "Algo/ForEach.h"
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
@@ -26,6 +27,10 @@ UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 
 	ComponentTags.Append( { TEXT("Mountea"), TEXT("Attachment") } );
 
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 1
+	bReplicateUsingRegisteredSubObjectList = true;
+#endif
+	
 	ApplyParentContainer();
 }
 
@@ -39,14 +44,39 @@ void UMounteaAttachmentContainerComponent::BeginPlay()
 
 	Execute_SetDefaultAttachmentTargetComponent(this, attachmentTargetComponent);
 
-	for (const auto& attachmentSlot : AttachmentSlots)
+	Algo::ForEach(AttachmentSlots, [this](const auto& AttachmentSlot)
 	{
-		if (!IsValid(attachmentSlot))
-			continue;
+		if (IsValid(AttachmentSlot))
+		{
+			AttachmentSlot->InitializeAttachmentSlot(this);
+			AttachmentSlot->BeginPlay();
+		}
+	});
+}
 
-		attachmentSlot->InitializeAttachmentSlot(this);
-		attachmentSlot->BeginPlay();
+bool UMounteaAttachmentContainerComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch,
+	FReplicationFlags* RepFlags)
+{
+#if ENGINE_MAJOR_VERSION == 5 && ENGINE_MINOR_VERSION >= 1
+	bool wroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+    
+	for (auto& Slot : AttachmentSlots)
+	{
+		if (IsValid(Slot))
+			AddReplicatedSubObject(Slot);
 	}
+	return wroteSomething;
+#else
+	bool wroteSomething = true;
+
+	for (UORReplicatedObject* ReplicatedObject : ReplicatedObjects)
+	{
+		if (IsValid(ReplicatedObject))
+			wroteSomething |= Channel->ReplicateSubobject(ReplicatedObject, *Bunch, *RepFlags);
+	}
+
+	return wroteSomething;
+#endif
 }
 
 AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() const
@@ -98,13 +128,39 @@ bool UMounteaAttachmentContainerComponent::DisableSlot_Implementation(const FNam
 
 bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName& SlotId, UObject* Attachment)
 {
-	if (!Attachment)
-		return false;
+	if (!Attachment) return false;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		ServerTryAttach(SlotId, Attachment);
+		return true;
+	}
+
+	const bool bSuccess = TryAttachInternal(SlotId, Attachment);
+	if (bSuccess)
+		OnAttachmentChanged.Broadcast(SlotId, Attachment, nullptr);
+	return bSuccess;
+}
+
+void UMounteaAttachmentContainerComponent::ServerTryAttach_Implementation(const FName& SlotId, UObject* Attachment)
+{
+	Execute_TryAttach(this, SlotId, Attachment);
+}
+
+bool UMounteaAttachmentContainerComponent::TryAttachInternal(const FName& SlotId, UObject* Attachment)
+{
+	if (!Attachment) return false;
 
 	auto foundSlot = AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
 		return Slot && Slot->SlotName == SlotId;
 	});
+    
 	return foundSlot && (*foundSlot)->Attach(Attachment);
+}
+
+void UMounteaAttachmentContainerComponent::OnRep_AttachmentSlots()
+{
+	LOG_WARNING(TEXT("SLOTS REPLICATED"))
 }
 
 bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName& SlotId)
@@ -218,7 +274,8 @@ void UMounteaAttachmentContainerComponent::GetLifetimeReplicatedProps(
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// TODO: update if needed
-	DOREPLIFETIME_CONDITION(UMounteaAttachmentContainerComponent, State, COND_SimulatedOnly);
+	//DOREPLIFETIME_CONDITION(UMounteaAttachmentContainerComponent, State, COND_SimulatedOnly);
+	DOREPLIFETIME(UMounteaAttachmentContainerComponent, State);
 	DOREPLIFETIME(UMounteaAttachmentContainerComponent, AttachmentSlots);
 }
 

@@ -31,6 +31,9 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+	
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 
@@ -52,33 +55,71 @@ public:
 	virtual FName GetSlotIdForAttachable_Implementation(const UMounteaAttachableComponent* Attachable) const override;
 	virtual FName GetFirstEmptySlot_Implementation() const override;
 	virtual void ClearAll_Implementation() override;
+	virtual TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots_Implementation() const override
+	{ return AttachmentSlots; };
 	void ApplyParentContainer();
+
+	virtual FOnAttachmentChanged& GetOnAttachmentChangedEventHandle() override
+	{ return OnAttachmentChanged; };
+	virtual FOnSlotStateChanged& GetOnSlotStateChangedEventHandle() override
+	{ return OnSlotStateChanged; };
+	virtual FOnContainerCleared& GetOnContainerClearedEventHandle() override
+	{ return OnContainerCleared; };
+
+protected:
+
+	UFUNCTION(Server, Reliable)
+	void ServerTryAttach(const FName& SlotId, UObject* Attachment);
+	bool TryAttachInternal(const FName& SlotId, UObject* Attachment);
+
+	UFUNCTION()
+	void OnRep_AttachmentSlots();
 
 public:
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
 		meta=(GetOptions="GetAvailableTargetNames"))
 	FName DefaultAttachmentTarget;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment")
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment Container")
 	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment")
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment Container")
 	EAttachmentSlotState State;
 	
 	// Does not support runtime addition/removal of slots.
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment",
+	UPROPERTY(SaveGame, ReplicatedUsing="OnRep_AttachmentSlots", EditAnywhere, BlueprintReadWrite,
+		Category="Attachment Container",
 		Instanced,
 		meta=(TitleProperty="DisplayName"),
 		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView))
 	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 
+	/**
+	 * Event triggered when an attachment is added or removed from the container.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
+		meta = (IsBindableEvent=true))
+	FOnAttachmentChanged OnAttachmentChanged;
+
+	/**
+	 * Event triggered when the state of a slot changes.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
+		meta = (IsBindableEvent=true))
+	FOnSlotStateChanged OnSlotStateChanged;
+
+	/**
+	 * Event triggered when the container is cleared of all attachments.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
+		meta = (IsBindableEvent=true))
+	FOnContainerCleared OnContainerCleared;
+
 protected:
 
 	UFUNCTION()
 	TArray<FName> GetAvailableTargetNames() const;
-
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 

@@ -219,6 +219,15 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static FName GetFirstEmptySlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
+	/**
+	 * Gets all Slots in the Attachment Container.
+	 * 
+	 * @param Target  Target to clear all attachments from
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
+		meta=(CustomTag="MounteaK2Getter"))
+	static TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
+
 #pragma endregion
 
 #pragma region Attachable

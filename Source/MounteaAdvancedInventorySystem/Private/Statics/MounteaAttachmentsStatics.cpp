@@ -143,6 +143,12 @@ FName UMounteaAttachmentsStatics::GetFirstEmptySlot(
 		return Target.GetObject() != nullptr ? Target->Execute_GetFirstEmptySlot(Target.GetObject()) : NAME_None;
 }
 
+TArray<UMounteaAdvancedAttachmentSlot*> UMounteaAttachmentsStatics::GetAttachmentSlots(
+	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target)
+{
+	return Target.GetObject() != nullptr ? Target->Execute_GetAttachmentSlots(Target.GetObject()) : TArray<UMounteaAdvancedAttachmentSlot*>();
+}
+
 TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> UMounteaAttachmentsStatics::GetAttachedTo(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
 {
 	return (Target.GetObject() != nullptr) ? Target->Execute_GetAttachedTo(Target.GetObject()) : TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>();

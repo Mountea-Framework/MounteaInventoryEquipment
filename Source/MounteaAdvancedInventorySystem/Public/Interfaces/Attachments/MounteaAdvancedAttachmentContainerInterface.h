@@ -5,10 +5,15 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "GameplayTagContainer.h"
+#include "Net/Serialization/FastArraySerializer.h"
 #include "MounteaAdvancedAttachmentContainerInterface.generated.h"
 
 class UMounteaAttachableComponent;
 class UMounteaAdvancedAttachmentSlot;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAttachmentChanged, const FName&, SlotId, UObject*, NewAttachment, UObject*, OldAttachment);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlotStateChanged, const FName&, SlotId, bool, bIsEnabled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainerCleared);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedAttachmentContainerInterface : public UInterface
@@ -85,4 +90,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
 	void ClearAll();
 	virtual void ClearAll_Implementation() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachment")
+	TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots() const;
+	virtual TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots_Implementation() const = 0;
+
+	virtual FOnAttachmentChanged& GetOnAttachmentChangedEventHandle() = 0;
+	virtual FOnSlotStateChanged& GetOnSlotStateChangedEventHandle() = 0;
+	virtual FOnContainerCleared& GetOnContainerClearedEventHandle() = 0;
 };

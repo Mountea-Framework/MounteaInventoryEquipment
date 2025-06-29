@@ -18,9 +18,7 @@ enum class EAttachmentSlotType : uint8;
  * Represents a single attachment slot in an equipment system.
  * Defines the properties of an attachment slot, including its ID, tags, display name, State, type, and target name.
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable,
-	AutoExpandCategories="Mountea",
-	EditInlineNew)
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, EditInlineNew)
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlot : public UMounteaAdvancedAttachmentSlotBase
 {
 	GENERATED_BODY()

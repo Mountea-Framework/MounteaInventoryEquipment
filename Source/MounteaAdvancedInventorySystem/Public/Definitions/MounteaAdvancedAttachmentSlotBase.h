@@ -31,7 +31,17 @@ public:
 	void BeginPlay();
 	virtual void BeginPlay_Implementation();
 
+	virtual AActor* GetOwningActor() const;
+
 	virtual void InitializeAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent);
+
+	//UObject interface implementation
+	virtual UWorld* GetWorld() const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool IsSupportedForNetworking() const override { return true; };
+	virtual int32 GetFunctionCallspace(UFunction* Function, FFrame* Stack) override;
+	virtual bool CallRemoteFunction(UFunction* Function, void* Parms, struct FOutParmRec* OutParms, FFrame* Stack) override;
+	//End of implementation
 
 protected:
 
@@ -53,7 +63,7 @@ public:
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	FText DisplayName;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1, NoResetToDefault))
 	EAttachmentSlotState State;
 	
@@ -66,7 +76,7 @@ public:
 		meta=(NoResetToDefault), AdvancedDisplay)
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
 
-	UPROPERTY(BlueprintReadOnly, Category="Debug",
+	UPROPERTY(Replicated, BlueprintReadOnly, Category="Debug",
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault), AdvancedDisplay)
 	TObjectPtr<UObject> Attachment;
