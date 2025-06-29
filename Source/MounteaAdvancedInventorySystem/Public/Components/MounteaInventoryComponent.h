@@ -23,13 +23,18 @@ enum class EInventoryFlags : uint8;
 enum class EInventoryType : uint8;
 
 /**
- *  Mountea Inventory Component
- * 
+ * UMounteaInventoryComponent manages inventory item collections with network replication support.
+ * Inventory components provide item storage, modification, searching, and notification systems
+ * with efficient delta replication for multiplayer inventory management.
+ *
+ * @see [Inventory System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see IMounteaAdvancedInventoryInterface
+ * @see FInventoryItem
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
-	AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"),
-	HideCategories=("Cooking","Collision"),
-	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory Component"))
+    AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"),
+    HideCategories=("Cooking","Collision"),
+    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryComponent : public UActorComponent, public IMounteaAdvancedInventoryInterface
 {
 	GENERATED_BODY()
