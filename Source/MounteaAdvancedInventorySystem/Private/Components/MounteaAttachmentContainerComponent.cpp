@@ -166,7 +166,18 @@ bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName&
 	if (!foundSlot)
 		return false;
 
+	if (!GetOwner()->HasAuthority())
+	{
+		ServerTryDetach(SlotId);
+		return true;
+	}
+
 	return foundSlot->Detach();
+}
+
+void UMounteaAttachmentContainerComponent::ServerTryDetach_Implementation(const FName& SlotId)
+{
+	Execute_TryDetach(this, SlotId);
 }
 
 bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FName& SlotId, UObject* Attachment)

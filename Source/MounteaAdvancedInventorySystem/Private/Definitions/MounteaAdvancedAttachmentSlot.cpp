@@ -262,23 +262,37 @@ void UMounteaAdvancedAttachmentSlot::PerformPhysicalDetachment() const
 // TODO: How to handle detachments? We cannot call this as we have no idea if we are detaching or attaching...
 void UMounteaAdvancedAttachmentSlot::OnRep_Attachment()
 {
-	USceneComponent* attachmentTarget = AttachmentTargetComponentOverride ? 
-		AttachmentTargetComponentOverride : 
-		ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject());
-	if (!IsValid(attachmentTarget))
+	switch (State)
 	{
-		LOG_WARNING(TEXT("Attachment target component is invalid!"));
-		return;
+		case EAttachmentSlotState::EASS_Empty:
+			{
+				USceneComponent* attachmentTarget = AttachmentTargetComponentOverride ? 
+				AttachmentTargetComponentOverride : 
+				ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject());
+				if (!IsValid(attachmentTarget))
+				{
+					LOG_WARNING(TEXT("Attachment target component is invalid!"));
+					return;
+				}
+
+				if (!IsValidForAttachment(Attachment))
+					return;
+
+				if (!ValidateAttachmentSlot(attachmentTarget))
+					return;
+
+				if (!PerformPhysicalAttachment(Attachment, attachmentTarget))
+					return;
+			}
+			break;
+		case EAttachmentSlotState::EASS_Occupied:
+			Detach();
+			break;
+		case EAttachmentSlotState::EASS_Locked:
+			break;
+		case EAttachmentSlotState::Default:
+			break;
 	}
-
-	if (!IsValidForAttachment(Attachment))
-		return;
-
-	if (!ValidateAttachmentSlot(attachmentTarget))
-		return;
-
-	if (!PerformPhysicalAttachment(Attachment, attachmentTarget))
-		return;
 	
 	Super::OnRep_Attachment();
 }
