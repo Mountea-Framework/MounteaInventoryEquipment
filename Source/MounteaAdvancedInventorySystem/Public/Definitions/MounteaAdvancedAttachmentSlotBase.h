@@ -23,8 +23,13 @@ class IMounteaAdvancedAttachmentContainerInterface;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotBeginPlaySignature);
 
 /**
- * Base class for attachment slots in an equipment system.
- * Defines the properties of an attachment slot, including its ID, tags, display name, State, type, and target name.
+ * UMounteaAdvancedAttachmentSlotBase is the base class for attachment slots in equipment systems.
+ * Attachment slots define locations where equipment can be attached to actors, with support for
+ * gameplay tag filtering, state management, and network replication.
+ *
+ * @see [Attachment System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see UMounteaAdvancedAttachmentSlot
+ * @see IMounteaAdvancedAttachmentContainerInterface
  */
 UCLASS(Abstract, ClassGroup=(Mountea), AutoExpandCategories="Mountea", EditInlineNew)
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlotBase : public UObject

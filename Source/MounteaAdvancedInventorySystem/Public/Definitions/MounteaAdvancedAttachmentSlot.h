@@ -24,8 +24,13 @@ enum class EAttachmentSlotState : uint8;
 enum class EAttachmentSlotType : uint8;
 
 /**
- * Represents a single attachment slot in an equipment system.
- * Defines the properties of an attachment slot, including its ID, tags, display name, State, type, and target name.
+ * UMounteaAdvancedAttachmentSlot is a concrete attachment slot implementation for equipment systems.
+ * Attachment slots define specific locations where equipment can be attached to actors, supporting
+ * socket-based and component-based attachment methods with gameplay tag filtering and network replication.
+ *
+ * @see [Attachment System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see UMounteaAdvancedAttachmentSlotBase
+ * @see IMounteaAdvancedAttachmentContainerInterface
  */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, EditInlineNew)
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedAttachmentSlot : public UMounteaAdvancedAttachmentSlotBase
