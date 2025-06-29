@@ -21,14 +21,18 @@ enum class EAttachmentSlotState : uint8;
 class IMounteaAdvancedAttachmentContainerInterface;
 
 /**
- * Component that represents an attachable item in the Mountea Advanced Inventory System.
- * This component can be used to define items that can be attached to other actors or components.
- * It holds properties such as ID, display name, tags, state, and slot ID.
+ * UMounteaAttachableComponent represents items that can be attached to other actors or components.
+ * Attachable components implement the attachment interface with identification, tags, state management,
+ * and container association for flexible item attachment within the equipment system.
+ *
+ * @see [Attachable Components](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see IMounteaAdvancedAttachmentAttachableInterface
+ * @see UMounteaAttachmentContainerComponent
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
-	AutoExpandCategories=("Mountea","Attachable","Mountea|Attachable"),
-	HideCategories=("Cooking","Collision"),
-	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachable Component"))
+    AutoExpandCategories=("Mountea","Attachable","Mountea|Attachable"),
+    HideCategories=("Cooking","Collision"),
+    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachable Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachableComponent : public UActorComponent, public IMounteaAdvancedAttachmentAttachableInterface
 {
 	GENERATED_BODY()

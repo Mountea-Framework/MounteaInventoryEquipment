@@ -21,14 +21,18 @@ enum class EAttachmentSlotState : uint8;
 class UMounteaAdvancedAttachmentSlot;
 
 /**
- * Component that holds an attachment container for equipment systems.
- * This component allows actors to manage attachments dynamically at runtime.
- * It can be used to equip, unequip, and manage attachments on actors.
+ * UMounteaAttachmentContainerComponent manages dynamic attachment systems for equipment at runtime.
+ * Container components provide slot-based attachment management with network replication, event broadcasting,
+ * and comprehensive attachment operations for flexible equipment systems on actors.
+ *
+ * @see [Attachment Containers](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see IMounteaAdvancedAttachmentContainerInterface
+ * @see UMounteaAdvancedAttachmentSlot
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
-	AutoExpandCategories=("Mountea","AttachableContainer","Mountea|AttachableContainer"),
-	HideCategories=("Cooking","Collision"),
-	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachment Container Component"))
+    AutoExpandCategories=("Mountea","AttachableContainer","Mountea|AttachableContainer"),
+    HideCategories=("Cooking","Collision"),
+    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachment Container Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachmentContainerComponent : public UActorComponent, public IMounteaAdvancedAttachmentContainerInterface
 {
 	GENERATED_BODY()
