@@ -11,9 +11,12 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 <a href="https://discord.gg/waYT2cn37z"><img src="https://anbhelp.zendesk.com/hc/article_attachments/360021176052/discord.gif" alt="Discord LINK" width="100"></a>
 
 ## Documentation
-<a href="https://discord.gg/2vXWEEN"><img src="https://media.tenor.com/mTz7WCbH92oAAAAj/book-transparent.gif" alt="DOCUMENTATION" width="100"></a>
+<a href="https://mountea.tools/docs/advancedinventoryequipmentsystem/Overview/"><img src="https://media.tenor.com/mTz7WCbH92oAAAAj/book-transparent.gif" alt="DOCUMENTATION" width="100"></a>
 
-Online [Documentation](https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Getting-Started) including a Quick Start guide which will help you set up the plugin in a few easy-to-follow steps.
+We have a brand new documentation page! Feel free to take a look and learn how to install, setup, customize and use the system in your own projects.
+<p align="center" width="100%">
+    <img width="65%" src="https://github.com/user-attachments/assets/c1970005-fe66-4cd0-9ce7-32ed03640cec">
+</p>
 
 ## Tutorial videos
 <a href="https://www.youtube.com/playlist?list=PLIU53wA8zZmg5eBKEcpZr7G8JBBZ4QPKq"><img src="https://cdnl.iconscout.com/lottie/premium/thumb/youtube-8622218-6842833.gif" alt="TUTORIAL playlist" width="150"></a>
