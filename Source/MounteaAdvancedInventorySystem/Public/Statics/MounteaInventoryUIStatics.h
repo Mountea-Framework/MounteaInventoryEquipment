@@ -167,6 +167,11 @@ public:
 		DisplayName="Mouse Event - Is Input Allowed")
 	static bool MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Input Event - Is Input Allowed")
+	static bool KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName);
+
 #pragma endregion
 	
 	// --- Theme  ------------------------------

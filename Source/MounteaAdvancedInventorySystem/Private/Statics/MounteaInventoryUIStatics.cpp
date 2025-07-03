@@ -254,11 +254,11 @@ FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGri
 	return SourceData.ToString();
 }
 
-bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
+bool IsInputAllowed(const FKey& InputKey, const FName& InputName)
 {
 	if (InputName.IsNone())
 		return false;
-	
+    
 	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
 	if (!IsValid(settings))
 		return false;
@@ -267,22 +267,30 @@ bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& 
 	if (!IsValid(inputMapping))
 		return false;
 
-	LOG_WARNING(TEXT("Found %d"), inputMapping->GetMappings().Num())
-
 	const auto inputActions = inputMapping->GetMappings();
 	if (inputActions.IsEmpty())
 		return false;
-
-	const FKey mouseButton = MouseEvent.GetEffectingButton();
+	
 	const FText inputText = FText::FromName(InputName);
 
 	const auto* matchingAction = Algo::FindByPredicate(inputActions, [&](const auto& inputAction)
 	{
-		return inputAction.Action->GetFName().ToString() == InputName.ToString() && inputAction.Key == mouseButton;
+		return inputAction.Action->GetFName().ToString() == InputName.ToString() && inputAction.Key == InputKey;
 	});
 
 	return matchingAction != nullptr;
 }
+
+bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
+{
+	return IsInputAllowed(MouseEvent.GetEffectingButton(), InputName);
+}
+
+bool UMounteaInventoryUIStatics::KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName)
+{
+	return IsInputAllowed(InKeyEvent.GetKey(), InputName);
+}
+
 
 FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(
 	const FButtonStyle& BaseBrush,
