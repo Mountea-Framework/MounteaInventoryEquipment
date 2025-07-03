@@ -12,6 +12,7 @@
 
 #include "Statics/MounteaInventoryUIStatics.h"
 
+#include "InputMappingContext.h"
 #include "Algo/Copy.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
@@ -251,6 +252,36 @@ void UMounteaInventoryUIStatics::ResetItem(FMounteaInventoryGridSlot& SourceData
 FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGridSlot& SourceData)
 {
 	return SourceData.ToString();
+}
+
+bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
+{
+	if (InputName.IsNone())
+		return false;
+	
+	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings))
+		return false;
+
+	const auto inputMapping = settings->AdvancedInventoryEquipmentInputMapping.LoadSynchronous();
+	if (!IsValid(inputMapping))
+		return false;
+
+	LOG_WARNING(TEXT("Found %d"), inputMapping->GetMappings().Num())
+
+	const auto inputActions = inputMapping->GetMappings();
+	if (inputActions.IsEmpty())
+		return false;
+
+	const FKey mouseButton = MouseEvent.GetEffectingButton();
+	const FText inputText = FText::FromName(InputName);
+
+	const auto* matchingAction = Algo::FindByPredicate(inputActions, [&](const auto& inputAction)
+	{
+		return inputAction.Action->GetFName().ToString() == InputName.ToString() && inputAction.Key == mouseButton;
+	});
+
+	return matchingAction != nullptr;
 }
 
 FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(

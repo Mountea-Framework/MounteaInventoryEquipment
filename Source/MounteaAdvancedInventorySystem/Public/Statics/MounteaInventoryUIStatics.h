@@ -162,6 +162,11 @@ public:
 		DisplayName="Grid Slot - ToString")
 	static FString GridSlot_ToString(const FMounteaInventoryGridSlot& SourceData);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Mouse Event - Is Input Allowed")
+	static bool MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName);
+
 #pragma endregion
 	
 	// --- Theme  ------------------------------
