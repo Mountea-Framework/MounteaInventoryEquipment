@@ -26,6 +26,7 @@
  * @see IMounteaInventoryGenericWidgetInterface
  * @see FGameplayTag
  */
+UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API
 	UMounteaAdvancedInventoryButtonWidget : public UButton, public IMounteaInventoryGenericWidgetInterface
 {

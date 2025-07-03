@@ -27,7 +27,6 @@
  * @see IMounteaInventoryGenericWidgetInterface
  */
 UCLASS()
-UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryBaseWidget : public UUserWidget,
 public IMounteaInventoryGenericWidgetInterface,
 public IMounteaAdvancedBaseInventoryWidgetInterface

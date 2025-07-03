@@ -31,7 +31,6 @@ UCLASS(ClassGroup=(Mountea), Blueprintable,
     AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
     meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory UI Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIInterface
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIInterface
 {
 	GENERATED_BODY()
 
