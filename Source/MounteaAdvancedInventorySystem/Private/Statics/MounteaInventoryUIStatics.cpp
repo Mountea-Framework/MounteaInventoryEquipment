@@ -254,7 +254,7 @@ FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGri
 	return SourceData.ToString();
 }
 
-bool IsInputAllowed(const FKey& InputKey, const FName& InputName)
+bool UMounteaInventoryUIStatics::IsInputAllowed(const FKey& InputKey, const FName& InputName)
 {
 	if (InputName.IsNone())
 		return false;
@@ -290,7 +290,6 @@ bool UMounteaInventoryUIStatics::KeyEvent_IsInputAllowed(const FKeyEvent& InKeyE
 {
 	return IsInputAllowed(InKeyEvent.GetKey(), InputName);
 }
-
 
 FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(
 	const FButtonStyle& BaseBrush,
