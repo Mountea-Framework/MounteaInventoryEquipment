@@ -32,6 +32,5 @@ class UMounteaAdvancedInventoryItemActionsContainerWidgetInterface : public UInt
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionsContainerWidgetInterface
 {
 	GENERATED_BODY()
-
-public:
+	
 };

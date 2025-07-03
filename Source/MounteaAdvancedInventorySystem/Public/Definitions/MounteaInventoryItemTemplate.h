@@ -22,6 +22,7 @@
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemTemplate"
 
 class UTexture;
+class UMounteaInventoryItemAction;
 enum class EInventoryItemFlags : uint8;
 
 /**
@@ -181,9 +182,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")
 	FGameplayTagContainer AttachmentSlots;
 
-	/** A reference to a special gameplay ability or effect triggered by this item. */
+	/** A reference to a special gameplay abilities or effects triggered by this item. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")
-	TObjectPtr<UObject> ItemSpecialAffect;
+	TArray<TSoftClassPtr<UMounteaInventoryItemAction>> ItemSpecialAffects;
 
 protected:
 

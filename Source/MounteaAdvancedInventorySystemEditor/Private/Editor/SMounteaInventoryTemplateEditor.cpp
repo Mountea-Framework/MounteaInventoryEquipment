@@ -423,7 +423,7 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 		newTemplate->ItemSubCategory = transientTemplate->ItemSubCategory;
 		newTemplate->ItemFlags = transientTemplate->ItemFlags;
 		newTemplate->AttachmentSlots = transientTemplate->AttachmentSlots;
-		newTemplate->ItemSpecialAffect = transientTemplate->ItemSpecialAffect;
+		newTemplate->ItemSpecialAffects = transientTemplate->ItemSpecialAffects;
 		newTemplate->bHasDurability = transientTemplate->bHasDurability;
 		newTemplate->MaxDurability = transientTemplate->MaxDurability;
 		newTemplate->BaseDurability = transientTemplate->BaseDurability;
