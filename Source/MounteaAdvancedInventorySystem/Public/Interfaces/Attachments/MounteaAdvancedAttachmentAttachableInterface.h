@@ -19,6 +19,9 @@
 enum class EAttachmentState : uint8;
 class IMounteaAdvancedAttachmentContainerInterface;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttachableAttached, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container, const FName&, SlotId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttachableDetached, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container);
+
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedAttachmentAttachableInterface : public UInterface
 {
@@ -103,4 +106,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Attachable")
 	bool MatchesTags(const FGameplayTagContainer& OtherTags, bool bRequireAll) const;
 	virtual bool MatchesTags_Implementation(const FGameplayTagContainer& OtherTags, bool bRequireAll) const = 0;
+
+	virtual FOnAttachableAttached& GetOnAttachableAttachedEventHandle() = 0;
+	virtual FOnAttachableDetached& GetOnAttachableDetachedEventHandle() = 0;
 };

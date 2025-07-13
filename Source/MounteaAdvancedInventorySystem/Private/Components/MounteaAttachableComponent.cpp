@@ -77,6 +77,8 @@ bool UMounteaAttachableComponent::AttachToSlot_Implementation(
 
 	AttachedTo = Target;
 	Execute_SetState(this, EAttachmentState::EAS_Attached);
+
+	OnAttachableAttached.Broadcast(Target, SlotId);
 	return true;
 }
 
@@ -103,6 +105,8 @@ bool UMounteaAttachableComponent::Detach_Implementation()
 
 	AttachedTo = nullptr;
 	State = EAttachmentState::EAS_Detached;
+
+	OnAttachableDetached.Broadcast(AttachedTo);
 	return true;
 }
 

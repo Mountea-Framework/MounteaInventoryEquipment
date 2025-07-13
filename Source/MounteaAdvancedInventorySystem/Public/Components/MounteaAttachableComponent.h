@@ -58,6 +58,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
 	EAttachmentState State;
 
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	FOnAttachableAttached OnAttachableAttached;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	FOnAttachableDetached OnAttachableDetached;
+
 public:
 	
 	virtual TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> GetAttachedTo_Implementation() const override { return AttachedTo; };
@@ -76,4 +82,7 @@ public:
 	virtual bool Detach_Implementation() override;
 	virtual bool HasTag_Implementation(const FGameplayTag& Tag) const override;
 	virtual bool MatchesTags_Implementation(const FGameplayTagContainer& OtherTags, bool bRequireAll) const override;
+
+	virtual FOnAttachableAttached& GetOnAttachableAttachedEventHandle() override { return OnAttachableAttached; };
+	virtual FOnAttachableDetached& GetOnAttachableDetachedEventHandle() override { return OnAttachableDetached; };
 };
