@@ -42,7 +42,8 @@ public:
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea|Attachable", AdvancedDisplay,
+		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> AttachedTo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
@@ -54,7 +55,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
 	FGameplayTagContainer Tags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
 	EAttachmentState State;
 
 public:
