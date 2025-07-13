@@ -26,7 +26,7 @@ class UMounteaInventoryGenericWidgetInterface : public UInterface
  * Generic widget interfaces define command processing, theme application, and refresh operations
  * for consistent widget behavior across the inventory system.
  *
- * @see [Widget Interfaces](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Widget Interfaces](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see UMounteaAdvancedInventoryBaseWidget
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventoryGenericWidgetInterface

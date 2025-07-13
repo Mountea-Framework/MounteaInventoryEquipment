@@ -26,7 +26,7 @@ class UTexture;
  * Rarity structures control item appearance through color coding, economic value through price multipliers,
  * and gameplay behavior through associated tags for consistent item classification systems.
  *
- * @see [Item Rarity System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemRarity)
+ * @see [Item Rarity System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemRarity)
  * @see UMounteaInventoryItemTemplate
  */
 USTRUCT(BlueprintType)
@@ -70,7 +70,7 @@ struct FInventoryRarity
  * Category data defines display properties, sorting priorities, associated tags, visual icons,
  * behavioral flags, and allowed actions for comprehensive item classification.
  *
- * @see [Item Categories](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemCategories)
+ * @see [Item Categories](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemCategories)
  * @see FInventoryCategory
  * @see UMounteaInventoryItemAction
  */
@@ -124,7 +124,7 @@ struct FInventoryCategoryData
  * Categories provide primary classification for inventory items with nested subcategory structures
  * for detailed item organization and management within the inventory system.
  *
- * @see [Item Categories](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemCategories)
+ * @see [Item Categories](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemCategories)
  * @see FInventoryCategoryData
  * @see UMounteaInventoryItemTemplate
  */
@@ -159,7 +159,7 @@ struct FInventoryCategory
  * Type configurations control UI widgets, access permissions, capacity limits, weight systems,
  * and value restrictions for flexible inventory management across different use cases.
  *
- * @see [Inventory Types](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryTypes)
+ * @see [Inventory Types](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryTypes)
  * @see IMounteaAdvancedInventoryInterface
  * @see EInventoryFlags
  */

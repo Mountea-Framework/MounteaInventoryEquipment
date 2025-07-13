@@ -30,7 +30,7 @@ class UMounteaAdvancedInventoryItemSlotWidgetInterface : public UInterface
  * Item slot interfaces manage individual slot presentation, item containment, tooltip generation,
  * and slot-specific operations for individual inventory slot widgets.
  *
- * @see [Item Slots](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Item Slots](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see FInventorySlot
  * @see FMounteaInventoryGridSlot
  */

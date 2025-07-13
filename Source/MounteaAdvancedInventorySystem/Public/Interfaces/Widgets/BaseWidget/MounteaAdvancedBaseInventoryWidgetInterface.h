@@ -28,7 +28,7 @@ class UMounteaAdvancedBaseInventoryWidgetInterface : public UInterface
  * Base inventory widget interfaces manage ownership associations between widgets and their parent
  * inventory UI systems for proper widget hierarchy and communication.
  *
- * @see [Base Inventory Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Base Inventory Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see IMounteaAdvancedInventoryUIInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedBaseInventoryWidgetInterface

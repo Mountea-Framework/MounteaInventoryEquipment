@@ -30,7 +30,7 @@ class UMounteaAdvancedAttachmentAttachableInterface : public UInterface
  * Attachable interfaces provide identification, state management, tag filtering, and attachment operations
  * for items that participate in the attachment system within equipment and inventory frameworks.
  *
- * @see [Attachable Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see [Attachable Interface](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see IMounteaAdvancedAttachmentContainerInterface
  * @see UMounteaAttachableComponent
  */

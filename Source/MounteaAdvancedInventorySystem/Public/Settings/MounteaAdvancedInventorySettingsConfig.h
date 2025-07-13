@@ -24,7 +24,7 @@ class UMounteaAdvancedInventoryThemeConfig;
  * Settings config defines inventory types, item rarities, categories, UI classes, notification systems,
  * and visual parameters for complete inventory system customization and behavior control.
  *
- * @see [Settings Configuration](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see [Settings Configuration](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  * @see FInventoryTypeConfig
  * @see FInventoryRarity
  * @see FInventoryCategory

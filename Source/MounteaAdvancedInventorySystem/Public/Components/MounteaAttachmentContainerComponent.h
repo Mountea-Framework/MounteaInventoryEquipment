@@ -25,7 +25,7 @@ class UMounteaAdvancedAttachmentSlot;
  * Container components provide slot-based attachment management with network replication, event broadcasting,
  * and comprehensive attachment operations for flexible equipment systems on actors.
  *
- * @see [Attachment Containers](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see [Attachment Containers](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see IMounteaAdvancedAttachmentContainerInterface
  * @see UMounteaAdvancedAttachmentSlot
  */

@@ -23,7 +23,7 @@ class IMounteaAdvancedInventoryUIInterface;
  * Grid widgets provide 2D spatial organization for inventory items with drag-drop functionality,
  * slot-based placement, item swapping, and coordinate-based positioning for structured inventory systems.
  *
- * @see [Inventory System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Inventory)
+ * @see [Inventory System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Inventory)
  * @see UMounteaAdvancedInventoryBaseWidget
  * @see FMounteaInventoryGridSlot
  */

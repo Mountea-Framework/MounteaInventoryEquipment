@@ -18,7 +18,7 @@ class AMounteaAdvancedInventoryItemPreviewRenderer;
  * Interactable widgets render inventory items in 3D space with camera controls, mesh preview capabilities,
  * and interactive manipulation for detailed item inspection within the inventory interface.
  *
- * @see [3D Item Preview](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemPreview)
+ * @see [3D Item Preview](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemPreview)
  * @see UMounteaAdvancedInventoryBaseWidget
  * @see AMounteaAdvancedInventoryItemPreviewRenderer
  */

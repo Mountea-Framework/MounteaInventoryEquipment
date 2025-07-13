@@ -28,7 +28,7 @@ class UMounteaAdvancedInventoryCategoryWidgetInterface : public UInterface
  * Category widget interfaces manage category identification, selection state, and activation
  * for individual category buttons and selection elements within category systems.
  *
- * @see [Category Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Category Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryCategoryWidgetInterface

@@ -26,7 +26,7 @@ class UMounteaAdvancedInventoryItemActionWidgetInterface : public UInterface
  * Item action interfaces manage individual actionable buttons and controls for inventory item operations
  * such as use, equip, drop, and other context-specific item interactions.
  *
- * @see [Item Actions](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Item Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see IMounteaAdvancedInventoryItemActionsContainerWidgetInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionWidgetInterface

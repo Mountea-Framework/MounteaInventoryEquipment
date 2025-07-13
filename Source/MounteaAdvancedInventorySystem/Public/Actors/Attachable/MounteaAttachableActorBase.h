@@ -20,7 +20,7 @@
  * Attachable actors contain an attachable component that enables them to be attached to
  * attachment containers, providing a foundation for equipment items, weapons, and other attachable objects.
  *
- * @see [Attachment System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see [Attachment System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see UMounteaAttachableComponent
  * @see UMounteaAttachmentContainerComponent
  */

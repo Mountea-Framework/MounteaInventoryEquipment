@@ -28,7 +28,7 @@ class UMounteaAdvancedInventoryItemWidgetInterface : public UInterface
  * Item widget interfaces handle item identification, visual refresh, highlighting, and slot association
  * for individual item representations within inventory interfaces.
  *
- * @see [Item Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemWidgets)
+ * @see [Item Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemWidgets)
  * @see FInventoryItem
  * @see FInventorySlot
  */

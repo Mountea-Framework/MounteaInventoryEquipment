@@ -24,7 +24,7 @@ class UMounteaInventoryItemTemplate;
  * Search parameters support multiple filtering methods including GUID, template, tags, category,
  * and rarity for flexible item queries within inventory systems.
  *
- * @see [Item Search](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemSearch)
+ * @see [Item Search](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemSearch)
  * @see IMounteaAdvancedInventoryInterface
  * @see UMounteaInventoryItemTemplate
  */
@@ -138,7 +138,7 @@ class UMounteaAdvancedInventoryInterface : public UInterface
  * Inventory interfaces provide item addition, removal, searching, quantity management, durability handling,
  * and notification processing with event broadcasting for complete inventory system functionality.
  *
- * @see [Inventory Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see [Inventory Interface](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
  * @see UMounteaInventoryComponent
  * @see FInventoryItem
  */

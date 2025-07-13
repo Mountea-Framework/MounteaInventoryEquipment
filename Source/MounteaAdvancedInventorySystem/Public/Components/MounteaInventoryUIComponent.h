@@ -23,7 +23,7 @@
  * UI components handle widget creation, visibility management, item selection, category filtering,
  * notification display, and grid slot persistence for comprehensive inventory interface control.
  *
- * @see [Inventory UI System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see [Inventory UI System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
  * @see IMounteaAdvancedInventoryUIInterface
  * @see UMounteaInventoryComponent
  */

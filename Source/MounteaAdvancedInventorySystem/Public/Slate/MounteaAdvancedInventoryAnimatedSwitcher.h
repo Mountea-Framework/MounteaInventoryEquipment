@@ -23,7 +23,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAnimationFinished, UWidget*, Act
  * Animated switchers provide smooth transitions between inventory UI panels with completion callbacks
  * for coordinated interface updates and responsive user experience in complex inventory layouts.
  *
- * @see [Inventory UI Transitions](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/SlateElements)
+ * @see [Inventory UI Transitions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/SlateElements)
  * @see UCommonAnimatedSwitcher
  * @see FOnAnimationFinished
  */

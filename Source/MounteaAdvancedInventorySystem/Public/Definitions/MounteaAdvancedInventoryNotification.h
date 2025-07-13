@@ -64,7 +64,7 @@ namespace MounteaInventoryNotificationBaseTypes
  * Categories determine the styling, iconography, and user attention level for different types
  * of inventory system feedback (informational, warning, or error states).
  *
- * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see [Notification System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
  * @see FInventoryNotificationData
  */
 UENUM(BlueprintType)
@@ -82,7 +82,7 @@ enum class EInventoryNotificationCategory : uint8
  * Styles control the appearance through icon brushes and audio feedback through sound assets
  * for consistent user experience across different notification types.
  *
- * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see [Notification System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
  * @see FInventoryNotificationConfig
  */
 USTRUCT(BlueprintType)
@@ -102,7 +102,7 @@ struct FInventoryNotificationStyle
  * Configurations control notification enablement, categorization, timing, appearance, and widget overrides
  * to provide flexible notification management across different inventory operations.
  *
- * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see [Notification System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
  * @see FInventoryNotificationData
  */
 USTRUCT(BlueprintType)
@@ -154,7 +154,7 @@ struct FInventoryNotificationConfig
  * Notification data includes type classification, display content, timing, item context, and payload
  * for comprehensive feedback about inventory system operations and state changes.
  *
- * @see [Notification System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
+ * @see [Notification System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Notifications)
  * @see IMounteaAdvancedInventoryInterface
  * @see EInventoryNotificationCategory
  */

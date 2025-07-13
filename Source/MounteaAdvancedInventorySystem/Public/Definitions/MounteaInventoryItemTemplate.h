@@ -30,7 +30,7 @@ enum class EInventoryItemFlags : uint8;
  * Item templates serve as blueprints for creating inventory item instances, containing all base data
  * such as display information, categories, flags, durability settings, and gameplay tags.
  *
- * @see [Item Templates](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/ItemTemplates)
+ * @see [Item Templates](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemTemplates)
  * @see FInventoryItem
  * @see UMounteaInventoryManagerComponent
  */

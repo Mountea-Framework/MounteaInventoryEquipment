@@ -25,7 +25,7 @@ class IMounteaAdvancedAttachmentContainerInterface;
  * Attachable components implement the attachment interface with identification, tags, state management,
  * and container association for flexible item attachment within the equipment system.
  *
- * @see [Attachable Components](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see [Attachable Components](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see IMounteaAdvancedAttachmentAttachableInterface
  * @see UMounteaAttachmentContainerComponent
  */
