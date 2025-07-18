@@ -15,6 +15,9 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemActionWidgetInterface.generated.h"
 
+class UMounteaInventoryItemAction;
+class IMounteaAdvancedInventoryUIInterface;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemActionWidgetInterface : public UInterface
 {
@@ -34,4 +37,20 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionWidg
 	GENERATED_BODY()
 
 public:
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	void InitializeItemActions(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, UMounteaInventoryItemAction* ItemAction, const FGuid& ItemId);
+	virtual void InitializeItemActions_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, UMounteaInventoryItemAction* ItemAction, const FGuid& ItemId) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	bool IsActionEnabled() const;
+	virtual bool IsActionEnabled_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	bool IsActionValid() const;
+	virtual bool IsActionValid_Implementation() const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	void ExecuteItemAction();
+	virtual void ExecuteItemAction_Implementation() = 0;
 };
