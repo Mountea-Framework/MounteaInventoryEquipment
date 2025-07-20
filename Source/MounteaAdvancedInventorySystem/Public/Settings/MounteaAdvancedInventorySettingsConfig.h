@@ -140,7 +140,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Tooltips",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryTooltipWidgetInterface"))
-	TSoftClassPtr<UUserWidget> InventoryItemThumbnailWidgetClass;
+	TSoftClassPtr<UUserWidget> InventoryItemTooltipWidgetClass;
 
 	// --- user Interface: Item Actions
 	
