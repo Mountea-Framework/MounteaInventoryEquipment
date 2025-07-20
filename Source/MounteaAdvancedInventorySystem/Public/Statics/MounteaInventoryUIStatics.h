@@ -93,7 +93,7 @@ public:
 public:
 
 	/*************************************************************/
-	/*********************** INTERNAL *************************/
+	/*********************** INTERNAL ****************************/
 	/*************************************************************/
 	
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
@@ -102,7 +102,7 @@ public:
 public:
 
 	/*************************************************************/
-	/******************* BLUEPRINTABLE *********************/
+	/******************* BLUEPRINTABLE ***************************/
 	/*************************************************************/
 
 	// --- Helpers  ------------------------------
@@ -161,6 +161,34 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Grid Slot - ToString")
 	static FString GridSlot_ToString(const FMounteaInventoryGridSlot& SourceData);
+
+	/**
+	 * Function to check if a specific input key event is allowed based on the provided input name.
+	 * Checks global Inventory settings for input definitions and validates the key event against them.
+	 * 
+	 * @param MouseEvent Mouse Input event to validate input from
+	 * @param InputName Name if of the input mapping to check against, eg. "IA_InputAction" etc.
+	 * @return True if the input is allowed, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Mouse Event - Is Input Allowed")
+	static bool MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName);
+
+	/**
+	 * Function to check if a specific input key event is allowed based on the provided input name.
+	 * Checks global Inventory settings for input definitions and validates the key event against them.
+	 * 
+	 * @param InKeyEvent Input event to validate input from
+	 * @param InputName Name if of the input mapping to check against, eg. "IA_InputAction" etc.
+	 * @return True if the input is allowed, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Input Event - Is Input Allowed")
+	static bool KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName);
+
+	static bool IsInputAllowed(const FKey& InputKey, const FName& InputName);
 
 #pragma endregion
 	

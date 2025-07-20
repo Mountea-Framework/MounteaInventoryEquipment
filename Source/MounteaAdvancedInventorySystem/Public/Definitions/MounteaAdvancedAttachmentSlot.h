@@ -28,7 +28,7 @@ enum class EAttachmentSlotType : uint8;
  * Attachment slots define specific locations where equipment can be attached to actors, supporting
  * socket-based and component-based attachment methods with gameplay tag filtering and network replication.
  *
- * @see [Attachment System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see [Attachment System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see UMounteaAdvancedAttachmentSlotBase
  * @see IMounteaAdvancedAttachmentContainerInterface
  */

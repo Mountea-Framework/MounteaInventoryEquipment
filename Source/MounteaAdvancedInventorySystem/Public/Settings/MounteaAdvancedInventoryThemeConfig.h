@@ -20,7 +20,7 @@
  * Theme configs provide color palettes, text styling, and audio assets for consistent visual presentation
  * across different UI states including normal, hovered, active, focus, and disabled appearances.
  *
- * @see [UI Theming](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see [UI Theming](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  * @see UMounteaAdvancedInventorySettingsConfig
  */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Theme Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining colours."))

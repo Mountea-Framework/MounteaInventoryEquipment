@@ -26,7 +26,7 @@ class UWorld;
  * Interactive widget configs define preview renderers, materials, render targets, and widget classes
  * for sophisticated 3D item visualization and interaction within inventory interfaces.
  *
- * @see [3D Item Preview Configuration](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see [3D Item Preview Configuration](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  * @see UMounteaAdvancedInventoryInteractableObjectWidget
  * @see AMounteaAdvancedInventoryItemPreviewRenderer
  */

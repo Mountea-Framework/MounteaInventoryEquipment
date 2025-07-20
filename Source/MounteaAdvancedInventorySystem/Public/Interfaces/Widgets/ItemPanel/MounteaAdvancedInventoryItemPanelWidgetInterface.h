@@ -26,7 +26,7 @@ class UMounteaAdvancedInventoryItemPanelWidgetInterface : public UInterface
  * Item panel interfaces handle comprehensive item presentation including descriptions, statistics,
  * properties, and detailed information for selected inventory items.
  *
- * @see [Item Panels](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Item Panels](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see IMounteaAdvancedInventoryItemWidgetInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemPanelWidgetInterface

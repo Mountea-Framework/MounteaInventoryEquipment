@@ -36,6 +36,7 @@
 #include "Subsystems/MounteaInventoryTemplateEditorSubsystem.h"
 
 #include "AssetToolsModule.h"
+#include "Algo/ForEach.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "UObject/SavePackage.h"
 
@@ -79,21 +80,21 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 
 void SMounteaInventoryTemplateEditor::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged)
 {
-	if (PropertyChangedEvent.ChangeType != EPropertyChangeType::Interactive)
+	if (PropertyChangedEvent.ChangeType == EPropertyChangeType::Interactive)
+		return;
+	
+	if (auto itemTemplate = const_cast<UMounteaInventoryItemTemplate*>(Cast<UMounteaInventoryItemTemplate>(PropertyChangedEvent.GetObjectBeingEdited(0))))
 	{
-		if (auto itemTemplate = const_cast<UMounteaInventoryItemTemplate*>(Cast<UMounteaInventoryItemTemplate>(PropertyChangedEvent.GetObjectBeingEdited(0))))
+		if (!itemTemplate->HasAnyFlags(RF_Transient))
 		{
-			if (!itemTemplate->HasAnyFlags(RF_Transient))
-			{
-				itemTemplate->GetPackage()->MarkPackageDirty();
-				TrackDirtyAsset(itemTemplate);
-			}
-			else
-				TrackDirtyAsset(itemTemplate);
-
-			if (TemplateListView.IsValid())
-				TemplateListView->RequestListRefresh();
+			itemTemplate->GetPackage()->MarkPackageDirty();
+			TrackDirtyAsset(itemTemplate);
 		}
+		else
+			TrackDirtyAsset(itemTemplate);
+
+		if (TemplateListView.IsValid())
+			TemplateListView->RequestListRefresh();
 	}
 }
 
@@ -109,12 +110,22 @@ TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 	TArray<FAssetData> assetDataList;
 	assetRegistryModule.Get().GetAssetsByClass(UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName(), assetDataList, true);
 	
-	for (const FAssetData& assetData : assetDataList)
-	{
-		if (UMounteaInventoryItemTemplate* itemTemplate = Cast<UMounteaInventoryItemTemplate>(assetData.GetAsset()))
-			if (!itemTemplate->HasAnyFlags(RF_Transient))
-				allTemplates.Add(itemTemplate);
-	}
+	TArray<UMounteaInventoryItemTemplate*> filteredTemplates;
+	Algo::TransformIf(
+		assetDataList,
+		filteredTemplates,
+		[](const FAssetData& AssetData)
+		{
+			const auto* Item = Cast<UMounteaInventoryItemTemplate>(AssetData.GetAsset());
+			return Item && !Item->HasAnyFlags(RF_Transient);
+		},
+		[](const FAssetData& AssetData)
+		{
+			return Cast<UMounteaInventoryItemTemplate>(AssetData.GetAsset());
+		}
+	);
+
+	allTemplates.Append(filteredTemplates);
 	
 	allTemplates.Sort([](const UObject& A, const UObject& B)
 	{
@@ -145,12 +156,19 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 	
 	// Convert to TWeakObjectPtr for list view
 	AvailableTemplates.Empty();
-	for (UObject* obj : allTemplates)
-	{
-		if (UMounteaInventoryItemTemplate* itemTemplate = Cast<UMounteaInventoryItemTemplate>(obj))
-			if (!itemTemplate->HasAnyFlags(RF_Transient))
-				AvailableTemplates.Add(itemTemplate);
-	}
+	Algo::TransformIf(
+		allTemplates,
+		AvailableTemplates,
+		[](UObject* Obj)
+		{
+			auto* ItemTemplate = Cast<UMounteaInventoryItemTemplate>(Obj);
+			return ItemTemplate && !ItemTemplate->HasAnyFlags(RF_Transient);
+		},
+		[](UObject* Obj)
+		{
+			return TWeakObjectPtr<UMounteaInventoryItemTemplate>(Cast<UMounteaInventoryItemTemplate>(Obj));
+		}
+	);
 	
 	if (TemplateListView.IsValid())
 		TemplateListView->RequestListRefresh();
@@ -162,11 +180,18 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 	
 	// Convert to TWeakObjectPtr for list view
 	AvailableTemplates.Empty();
-	for (UObject* obj : allTemplates)
-	{
-		if (UMounteaInventoryItemTemplate* itemTemplate = Cast<UMounteaInventoryItemTemplate>(obj))
-			AvailableTemplates.Add(itemTemplate);
-	}
+	Algo::TransformIf(
+		allTemplates,
+		AvailableTemplates,
+		[](UObject* obj)
+		{
+			return Cast<UMounteaInventoryItemTemplate>(obj) != nullptr;
+		},
+		[](UObject* obj)
+		{
+			return TWeakObjectPtr<UMounteaInventoryItemTemplate>(Cast<UMounteaInventoryItemTemplate>(obj));
+		}
+	);
 	
 	FPropertyEditorModule& propertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	
@@ -211,51 +236,53 @@ void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(TWeakObjectPtr<
 {
 	if (!PropertyDetailsView.IsValid())
 		return;
-	
-	// Check for unsaved changes in transient template
-	if (bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate.Get()->HasAnyFlags(RF_Transient))
+
+	const bool bHasTransient = bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate->HasAnyFlags(RF_Transient);
+	const bool bIsDirty = DirtyTemplates.Contains(CurrentTemplate);
+
+	if (bHasTransient && bIsDirty && !CheckForUnsavedChanges())
 	{
-		if (DirtyTemplates.Contains(CurrentTemplate))
-		{
-			if (!CheckForUnsavedChanges())
-			{
-				// User cancelled - reselect the transient template
-				TemplateListView->SetSelection(CurrentTemplate, ESelectInfo::Direct);
-				return;
-			}
-		}
+		TemplateListView->SetSelection(CurrentTemplate, ESelectInfo::Direct);
+		return;
 	}
-		
-	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> selectedTemplates = TemplateListView->GetSelectedItems();
-	SelectedTemplates = selectedTemplates;
-	
+
+	SelectedTemplates = TemplateListView->GetSelectedItems();
+
 	TArray<UObject*> selectedObjects;
 	bIsShowingTransient = false;
 	
-	for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& weakTemplate : selectedTemplates)
-	{
-		if (UMounteaInventoryItemTemplate* itemTemplate = weakTemplate.Get())
+	Algo::TransformIf(
+		SelectedTemplates,
+		selectedObjects,
+		[this](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& WeakTemplate)
 		{
-			selectedObjects.Add(itemTemplate);
-			if (itemTemplate->HasAnyFlags(RF_Transient))
+			auto* Template = WeakTemplate.Get();
+			if (Template && Template->HasAnyFlags(RF_Transient))
 				bIsShowingTransient = true;
+			return Template != nullptr;
+		},
+		[](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& WeakTemplate)
+		{
+			return static_cast<UObject*>(WeakTemplate.Get());
 		}
-	}
+	);
 
-	if (selectedTemplates.Num() == 1)
-		CurrentTemplate = selectedTemplates[0];
-	if (selectedObjects.Num() == 0)
+	if (SelectedTemplates.Num() == 1)
+		CurrentTemplate = SelectedTemplates[0];
+	else
+		CurrentTemplate = nullptr;
+
+	if (selectedObjects.IsEmpty())
 	{
 		UMounteaInventoryTemplateEditorSubsystem* subsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>();
 		if (subsystem && subsystem->HasTempTemplate())
 		{
-			selectedObjects.Add(subsystem->GetOrCreateTempTemplate());
-			CurrentTemplate = subsystem->GetOrCreateTempTemplate();
+			UObject* tempObject = subsystem->GetOrCreateTempTemplate();
+			selectedObjects.Add(tempObject);
+			CurrentTemplate = Cast<UMounteaInventoryItemTemplate>(tempObject);;
 			bIsShowingTransient = true;
 		}
 	}
-	else
-		CurrentTemplate = nullptr;
 	
 	PropertyDetailsView->SetObjects(selectedObjects);
 }
@@ -300,40 +327,41 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 
 FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 {
+	if (DirtyTemplates.IsEmpty())
+		return FReply::Unhandled();
+
 	int32 savedCount = 0;
 	TArray<FString> failedAssets;
-	if (DirtyTemplates.IsEmpty()) return FReply::Unhandled();
-	
-	for (auto& dirtyTemplate : DirtyTemplates)
+
+	Algo::ForEach(DirtyTemplates, [&](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& weakTemplate)
 	{
-		if (UMounteaInventoryItemTemplate* itemTemplate = dirtyTemplate.Get())
+		UMounteaInventoryItemTemplate* itemTemplate = weakTemplate.Get();
+		if (!itemTemplate || itemTemplate->HasAnyFlags(RF_Transient))
+			return;
+
+		UPackage* package = itemTemplate->GetPackage();
+		if (!package)
+			return;
+
+		const FString packageName = package->GetName();
+		const FString fileName = FPackageName::LongPackageNameToFilename(packageName, FPackageName::GetAssetPackageExtension());
+
+		FSavePackageArgs saveArgs;
+		saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+		saveArgs.SaveFlags = SAVE_None;
+
+		if (UPackage::SavePackage(package, itemTemplate, *fileName, saveArgs))
 		{
-			// Skip transient templates in bulk save
-			if (itemTemplate->HasAnyFlags(RF_Transient))
-				continue;
-			
-			if (UPackage* package = itemTemplate->GetPackage())
-			{
-				FString packageName = package->GetName();
-				FString fileName = FPackageName::LongPackageNameToFilename(packageName, FPackageName::GetAssetPackageExtension());
-				
-				FSavePackageArgs saveArgs;
-				saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-				saveArgs.SaveFlags = SAVE_None;
-				if (UPackage::SavePackage(package, itemTemplate, *fileName, saveArgs))
-				{
-					savedCount++;
-					UntrackDirtyAsset(itemTemplate);
-				}
-				else
-					failedAssets.Add(itemTemplate->DisplayName.ToString());
-			}
+			savedCount++;
+			UntrackDirtyAsset(itemTemplate);
 		}
-	}
-	
-	if (failedAssets.Num() > 0)
+		else
+			failedAssets.Add(itemTemplate->DisplayName.ToString());
+	});
+
+	if (!failedAssets.IsEmpty())
 	{
-		FString errorMsg = FString::Printf(TEXT("Failed to save %d assets: %s"), 
+		const FString errorMsg = FString::Printf(TEXT("Failed to save %d assets: %s"),
 			failedAssets.Num(), *FString::Join(failedAssets, TEXT(", ")));
 		ShowTemplateEditorNotification(errorMsg, false);
 	}
@@ -341,7 +369,7 @@ FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 		ShowTemplateEditorNotification(FString::Printf(TEXT("Successfully saved %d templates."), savedCount), true);
 	else
 		ShowTemplateEditorNotification(TEXT("No templates to save."), true);
-	
+
 	return FReply::Handled();
 }
 
@@ -423,7 +451,7 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 		newTemplate->ItemSubCategory = transientTemplate->ItemSubCategory;
 		newTemplate->ItemFlags = transientTemplate->ItemFlags;
 		newTemplate->AttachmentSlots = transientTemplate->AttachmentSlots;
-		newTemplate->ItemSpecialAffect = transientTemplate->ItemSpecialAffect;
+		newTemplate->ItemSpecialAffects = transientTemplate->ItemSpecialAffects;
 		newTemplate->bHasDurability = transientTemplate->bHasDurability;
 		newTemplate->MaxDurability = transientTemplate->MaxDurability;
 		newTemplate->BaseDurability = transientTemplate->BaseDurability;

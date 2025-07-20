@@ -19,7 +19,7 @@
  * Inventory slots encapsulate core properties shared across different slot types including
  * item identification, quantity tracking, and widget associations for UI management.
  *
- * @see [Inventory UI System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryUI)
+ * @see [Inventory UI System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryUI)
  * @see FMounteaInventoryGridSlot
  * @see FInventoryItem
  */
@@ -129,7 +129,7 @@ public:
  * Grid slots provide spatial positioning information for inventory items in grid-based UI systems,
  * enabling precise placement and collision detection within structured inventory grids.
  *
- * @see [Grid Inventory System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/GridInventory)
+ * @see [Grid Inventory System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/GridInventory)
  * @see FInventorySlot
  * @see FInventoryItem
  */

@@ -12,6 +12,7 @@
 
 #include "Statics/MounteaInventoryUIStatics.h"
 
+#include "InputMappingContext.h"
 #include "Algo/Copy.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
@@ -251,6 +252,43 @@ void UMounteaInventoryUIStatics::ResetItem(FMounteaInventoryGridSlot& SourceData
 FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGridSlot& SourceData)
 {
 	return SourceData.ToString();
+}
+
+bool UMounteaInventoryUIStatics::IsInputAllowed(const FKey& InputKey, const FName& InputName)
+{
+	if (InputName.IsNone())
+		return false;
+    
+	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings))
+		return false;
+
+	const auto inputMapping = settings->AdvancedInventoryEquipmentInputMapping.LoadSynchronous();
+	if (!IsValid(inputMapping))
+		return false;
+
+	const auto inputActions = inputMapping->GetMappings();
+	if (inputActions.IsEmpty())
+		return false;
+	
+	const FText inputText = FText::FromName(InputName);
+
+	const auto* matchingAction = Algo::FindByPredicate(inputActions, [&](const auto& inputAction)
+	{
+		return inputAction.Action->GetFName().ToString() == InputName.ToString() && inputAction.Key == InputKey;
+	});
+
+	return matchingAction != nullptr;
+}
+
+bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
+{
+	return IsInputAllowed(MouseEvent.GetEffectingButton(), InputName);
+}
+
+bool UMounteaInventoryUIStatics::KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName)
+{
+	return IsInputAllowed(InKeyEvent.GetKey(), InputName);
 }
 
 FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(

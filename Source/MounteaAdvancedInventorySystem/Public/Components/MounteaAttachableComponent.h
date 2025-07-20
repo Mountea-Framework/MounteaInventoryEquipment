@@ -25,7 +25,7 @@ class IMounteaAdvancedAttachmentContainerInterface;
  * Attachable components implement the attachment interface with identification, tags, state management,
  * and container association for flexible item attachment within the equipment system.
  *
- * @see [Attachable Components](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see [Attachable Components](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see IMounteaAdvancedAttachmentAttachableInterface
  * @see UMounteaAttachmentContainerComponent
  */
@@ -42,7 +42,8 @@ public:
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea|Attachable", AdvancedDisplay,
+		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> AttachedTo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
@@ -54,8 +55,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
 	FGameplayTagContainer Tags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
 	EAttachmentState State;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	FOnAttachableAttached OnAttachableAttached;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	FOnAttachableDetached OnAttachableDetached;
 
 public:
 	
@@ -75,4 +82,7 @@ public:
 	virtual bool Detach_Implementation() override;
 	virtual bool HasTag_Implementation(const FGameplayTag& Tag) const override;
 	virtual bool MatchesTags_Implementation(const FGameplayTagContainer& OtherTags, bool bRequireAll) const override;
+
+	virtual FOnAttachableAttached& GetOnAttachableAttachedEventHandle() override { return OnAttachableAttached; };
+	virtual FOnAttachableDetached& GetOnAttachableDetachedEventHandle() override { return OnAttachableDetached; };
 };

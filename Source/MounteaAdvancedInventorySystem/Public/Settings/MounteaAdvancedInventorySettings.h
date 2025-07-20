@@ -26,7 +26,7 @@ class UMounteaAdvancedInventorySettingsConfig;
  * Settings control input mappings, logging verbosity, asset references, and system-wide behavior
  * through Unreal's developer settings framework for project-wide inventory configuration.
  *
- * @see [System Settings](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see [System Settings](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  * @see UMounteaAdvancedInventorySettingsConfig
  * @see UDeveloperSettings
  */

@@ -27,7 +27,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotBeginPlaySignature);
  * Attachment slots define locations where equipment can be attached to actors, with support for
  * gameplay tag filtering, state management, and network replication.
  *
- * @see [Attachment System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
+ * @see [Attachment System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see UMounteaAdvancedAttachmentSlot
  * @see IMounteaAdvancedAttachmentContainerInterface
  */

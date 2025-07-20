@@ -29,7 +29,7 @@ class UMounteaInventorySystemBaseWidgetInterface : public UInterface
  * System base interfaces handle initialization, visibility management, and inventory source assignment
  * for top-level inventory UI wrappers and container widgets.
  *
- * @see [System Base Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [System Base Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see IMounteaAdvancedInventoryUIInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventorySystemBaseWidgetInterface

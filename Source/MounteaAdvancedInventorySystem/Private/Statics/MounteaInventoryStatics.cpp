@@ -195,6 +195,32 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
+TArray<TSoftClassPtr<UMounteaInventoryItemAction>> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+{
+	if (!Item.IsItemValid()) return {};
+	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!settings) return {};
+	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
+	if (!inventorySettingsConfig) return {};
+	
+	const auto itemCategory = Item.GetTemplate()->ItemCategory;
+	const auto itemSubCategory = Item.GetTemplate()->ItemSubCategory;
+	
+	const auto categoryDefinition = inventorySettingsConfig->AllowedCategories.FindRef(itemCategory);
+	if (categoryDefinition.CategoryData.AllowedActions.Num() <= 0)
+	{
+		LOG_WARNING(TEXT("No actions defined for category '%s'!"), *itemCategory);
+		return {};
+	}
+	auto categoryAllowedActions = categoryDefinition.CategoryData.AllowedActions;
+	if (!itemSubCategory.IsEmpty())
+		categoryAllowedActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
+
+	TArray<TSoftClassPtr<UMounteaInventoryItemAction>> allowedCategories =
+		categoryAllowedActions.Array();
+	return allowedCategories;
+}
+
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const FString& Type,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,

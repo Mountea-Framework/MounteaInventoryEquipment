@@ -22,10 +22,11 @@
  * Inventory buttons support action tag classification, contextual command processing, and theme application
  * for consistent and extensible user interaction within the inventory system.
  *
- * @see [Inventory UI Controls](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/SlateElements)
+ * @see [Inventory UI Controls](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/SlateElements)
  * @see IMounteaInventoryGenericWidgetInterface
  * @see FGameplayTag
  */
+UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API
 	UMounteaAdvancedInventoryButtonWidget : public UButton, public IMounteaInventoryGenericWidgetInterface
 {

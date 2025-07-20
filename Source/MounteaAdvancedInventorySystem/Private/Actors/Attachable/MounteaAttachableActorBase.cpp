@@ -10,4 +10,18 @@
 // For more information, visit: https://mountea.tools
 
 
-#include "Decorations/MounteaInventoryItemEffect.h"
+#include "Actors/Attachable/MounteaAttachableActorBase.h"
+
+#include "Components/MounteaAttachableComponent.h"
+
+AMounteaAttachableActorBase::AMounteaAttachableActorBase()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+	AttachableComponent = CreateDefaultSubobject<UMounteaAttachableComponent>(TEXT("AttachableComponent"));
+}
+void AMounteaAttachableActorBase::BeginPlay()
+{
+	Super::BeginPlay();	
+}
+

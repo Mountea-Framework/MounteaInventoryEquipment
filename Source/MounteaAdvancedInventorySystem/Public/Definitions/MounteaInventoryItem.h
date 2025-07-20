@@ -25,7 +25,7 @@ class UMounteaInventoryItemTemplate;
  * Snapshots capture the state of inventory items before replication to detect and calculate
  * deltas for quantity, durability, and custom data changes.
  *
- * @see [Replication System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Replication)
+ * @see [Replication System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Replication)
  * @see FInventoryItem
  */
 USTRUCT()
@@ -58,7 +58,7 @@ private:
  * Item instances contain template references, current quantity, durability, custom data, and affector slots.
  * Implements FastArraySerializer for efficient delta replication in multiplayer environments.
  *
- * @see [Inventory Items](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryItems)
+ * @see [Inventory Items](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryItems)
  * @see UMounteaInventoryItemTemplate
  * @see IMounteaAdvancedInventoryInterface
  */
@@ -338,7 +338,7 @@ public:
  * Provides efficient delta serialization for inventory item arrays using Unreal's FastArraySerializer
  * to minimize network bandwidth in multiplayer scenarios.
  *
- * @see [Replication System](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Replication)
+ * @see [Replication System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Replication)
  * @see FInventoryItem
  */
 USTRUCT(BlueprintType)

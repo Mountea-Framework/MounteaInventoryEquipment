@@ -27,7 +27,7 @@ class UMounteaAdvancedInventoryItemsGridWidgetInterface : public UInterface
  * Items grid interfaces handle spatial item organization, slot management, drag-drop operations,
  * and coordinate-based item placement for structured grid inventory systems.
  *
- * @see [Grid Inventory](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Grid Inventory](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see FMounteaInventoryGridSlot
  * @see UMounteaAdvancedInventoryItemsGridWidget
  */

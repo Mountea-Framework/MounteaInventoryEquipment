@@ -22,7 +22,7 @@
  * Equipment settings define allowed equipment slots with metadata for comprehensive equipment
  * management and attachment system configuration within the inventory framework.
  *
- * @see [Equipment Configuration](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
+ * @see [Equipment Configuration](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  * @see FMounteaEquipmentSlotHeaderData
  * @see UMounteaAdvancedInventorySettings
  */

@@ -31,7 +31,7 @@ class UMounteaAdvancedEquipmentInterface : public UInterface
  * Equipment interfaces extend attachment containers with equipment-specific operations, stat modifications,
  * and character integration for comprehensive equipment systems within the inventory framework.
  *
- * @see [Equipment Interface](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/EquipmentSystem)
+ * @see [Equipment Interface](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/EquipmentSystem)
  * @see UMounteaEquipmentComponent
  * @see IMounteaAdvancedAttachmentContainerInterface
  */

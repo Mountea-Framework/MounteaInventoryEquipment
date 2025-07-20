@@ -28,7 +28,7 @@ class UMounteaAdvancedInventoryWidgetInterface : public UInterface
  * Inventory widget interfaces define the primary inventory display container with comprehensive
  * inventory management and presentation capabilities for the main inventory interface.
  *
- * @see [Inventory Widgets](https://montea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
+ * @see [Inventory Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see IMounteaAdvancedInventoryUIInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryWidgetInterface
