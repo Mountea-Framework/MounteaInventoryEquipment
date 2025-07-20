@@ -15,6 +15,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemActionsContainerWidgetInterface.generated.h"
 
+class UMounteaInventoryItemAction;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemActionsContainerWidgetInterface : public UInterface
 {
@@ -79,4 +81,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
 	TArray<UUserWidget*> GetItemActionsInContainer();
 	virtual TArray<UUserWidget*> GetItemActionsInContainer_Implementation() const = 0;
+
+	/**
+	 * Retrieves all item action widgets currently in the container as a set.
+	 * 
+	 * @return A set of UUserWidget pointers representing the item action widgets in the container.
+	 *         Each widget must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	TSet<UUserWidget*> GetContainerItemActions() const;
+	virtual TSet<UUserWidget*> GetContainerItemActions_Implementation() const = 0;
 };
