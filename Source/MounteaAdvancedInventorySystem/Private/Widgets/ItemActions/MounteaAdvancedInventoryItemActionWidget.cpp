@@ -4,8 +4,8 @@
 #include "Widgets/ItemActions/MounteaAdvancedInventoryItemActionWidget.h"
 
 void UMounteaAdvancedInventoryItemActionWidget::InitializeItemAction_Implementation(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, TSubclassOf<UMounteaInventoryItemAction> ItemAction,
-	const FGuid& ItemId)
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId)
 {
 }
 

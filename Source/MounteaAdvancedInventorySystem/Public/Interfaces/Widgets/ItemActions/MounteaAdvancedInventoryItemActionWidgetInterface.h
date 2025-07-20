@@ -18,6 +18,8 @@
 class UMounteaInventoryItemAction;
 class IMounteaAdvancedInventoryUIInterface;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemActionSelected, const UUserWidget*, SelectedItemActionWidget);
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemActionWidgetInterface : public UInterface
 {
@@ -46,8 +48,8 @@ public:
 	 * @param ItemId The unique identifier for the item this action is associated with.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
-	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, TSubclassOf<UMounteaInventoryItemAction> ItemAction, const FGuid& ItemId);
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, TSubclassOf<UMounteaInventoryItemAction> ItemAction, const FGuid& ItemId) = 0;
+	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId);
+	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.
@@ -76,4 +78,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
 	void ExecuteItemAction();
 	virtual void ExecuteItemAction_Implementation() = 0;
+
+	/**
+	 * Retrieves the item action class associated with this widget.
+	 * 
+	 * @return The soft class reference to the item action.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	TSoftClassPtr<UMounteaInventoryItemAction> GetItemAction() const;
+	virtual TSoftClassPtr<UMounteaInventoryItemAction> GetItemAction_Implementation() const = 0;
+
+	virtual FOnItemActionSelected& GetOnItemActionSelectedEventHandle() = 0;
 };
