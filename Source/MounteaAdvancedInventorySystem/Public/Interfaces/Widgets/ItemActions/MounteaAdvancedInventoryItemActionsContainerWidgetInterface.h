@@ -39,6 +39,7 @@ public:
 	
 	/**
 	 * Adds an item action widget to the container.
+	 * 
 	 * @param ItemActionWidget The widget to be added to the container. Must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
@@ -76,19 +77,9 @@ public:
 	 * Retrieves all item action widgets currently in the container.
 	 * 
 	 * @return An array of UUserWidget pointers representing the item action widgets in the container.
-	 *         Each widget must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 * Each widget must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	TArray<UUserWidget*> GetItemActionsInContainer();
 	virtual TArray<UUserWidget*> GetItemActionsInContainer_Implementation() const = 0;
-
-	/**
-	 * Retrieves all item action widgets currently in the container as a set.
-	 * 
-	 * @return A set of UUserWidget pointers representing the item action widgets in the container.
-	 *         Each widget must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
-	TSet<UUserWidget*> GetContainerItemActions() const;
-	virtual TSet<UUserWidget*> GetContainerItemActions_Implementation() const = 0;
 };
