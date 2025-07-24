@@ -41,7 +41,7 @@ public:
 	 * Adds an item action widget to the container.
 	 * @param ItemActionWidget The widget to be added to the container. Must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	void AddItemActionToContainer(UUserWidget* ItemActionWidget);
 	virtual void AddItemActionToContainer_Implementation(UUserWidget* ItemActionWidget) = 0;
 
@@ -50,7 +50,7 @@ public:
 	 * 
 	 * @param ItemActionWidget The widget to be removed from the container. Must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	void RemoveItemActionFromContainer(UUserWidget* ItemActionWidget);
 	virtual void RemoveItemActionFromContainer_Implementation(UUserWidget* ItemActionWidget) = 0;
 
@@ -59,7 +59,7 @@ public:
 	 * 
 	 * This function is typically called when the item actions are no longer needed or when the inventory is closed.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	void ClearItemActionsContainer();
 	virtual void ClearItemActionsContainer_Implementation() = 0;
 
@@ -68,7 +68,7 @@ public:
 	 * 
 	 * @param ItemActionWidget The widget to be selected. Must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	void SeletectItemAction(UUserWidget* ItemActionWidget);
 	virtual void SeletectItemAction_Implementation(UUserWidget* ItemActionWidget) = 0;
 
@@ -78,7 +78,7 @@ public:
 	 * @return An array of UUserWidget pointers representing the item action widgets in the container.
 	 *         Each widget must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	TArray<UUserWidget*> GetItemActionsInContainer();
 	virtual TArray<UUserWidget*> GetItemActionsInContainer_Implementation() const = 0;
 
@@ -88,7 +88,7 @@ public:
 	 * @return A set of UUserWidget pointers representing the item action widgets in the container.
 	 *         Each widget must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	TSet<UUserWidget*> GetContainerItemActions() const;
 	virtual TSet<UUserWidget*> GetContainerItemActions_Implementation() const = 0;
 };
