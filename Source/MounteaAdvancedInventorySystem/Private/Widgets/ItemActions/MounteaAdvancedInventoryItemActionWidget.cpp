@@ -63,8 +63,7 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 		LOG_ERROR(TEXT("[ExecuteItemAction] Failed to Initialize Item Action for widget '%s'"), *GetName());
 		return;
 	}
-
-	// TODO: Get the proper guid
+	
 	FGuid inventoryItemId = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryItemId(ParentItemWidget);
 	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItemId));
 	

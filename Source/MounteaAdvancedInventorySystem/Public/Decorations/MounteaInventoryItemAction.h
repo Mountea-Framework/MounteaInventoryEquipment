@@ -33,7 +33,7 @@ public:
 
 	UMounteaInventoryItemAction();
 
-	#pragma region Inventory Specific
+#pragma region Inventory Specific
 
 	/**
 	 * Display name of the action shown in the user interface.
@@ -77,9 +77,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
 	TArray<TSubclassOf<UGameplayEffect>> ActionEffects;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Core Functions
+#pragma region Core Functions
+
+	/**
+	 * Gets the tag associated with this inventory item action.
+	 * 
+	 * @return The gameplay tag that identifies this action.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Inventory Action")
+	FGameplayTag GetInventoryItemTag() const;
+	virtual FGameplayTag GetInventoryItemTag_Implementation() const
+	{ return ItemActionTag; }; 
 
 	/**
 	 * Determines whether this action should be visible in the UI for the given item.
@@ -107,9 +117,9 @@ public:
 	 */
 	bool ExecuteInventoryAction(const FInventoryItem& TargetItem);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Ability Overrides
+#pragma region Ability Overrides
 
 protected:
 
@@ -117,9 +127,9 @@ protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Blueprint Events
+#pragma region Blueprint Events
 
 	/**
 	 * Blueprint event called when the inventory action begins execution.
@@ -139,9 +149,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category="Inventory Action", DisplayName="On Action Failed")
 	void ReceiveActionFailed(const FInventoryItem& TargetItem, const FText& Reason);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Helper Functions
+#pragma region Helper Functions
 
 	/**
 	 * Main execution logic for the inventory action.
@@ -165,17 +175,30 @@ protected:
 	 */
 	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Private Data
+protected:
+
+#pragma region Data
+
+	/**
+	 * The tag used to identify this action in the gameplay ability system.
+	 * This tag is used for filtering and identifying actions in the UI and logic.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory Action")
+	FGameplayTag ItemActionTag;
+	
+#pragma endregion
+	
+#pragma region Private Data
 
 private:
-
+	
 	/**
 	 * The inventory item currently being processed by this action.
 	 */
 	UPROPERTY(Transient)
 	FInventoryItem CurrentTargetItem;
 
-	#pragma endregion
+#pragma endregion
 };
