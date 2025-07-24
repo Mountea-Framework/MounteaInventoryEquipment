@@ -281,6 +281,20 @@ bool UMounteaInventoryUIStatics::IsInputAllowed(const FKey& InputKey, const FNam
 	return matchingAction != nullptr;
 }
 
+FInventoryItem UMounteaInventoryUIStatics::FindItem(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const FInventoryItemSearchParams& SearchParams)
+{
+	if (!IsValid(Target.GetObject()))
+		return {};
+
+	const auto& inventory = Target->Execute_GetParentInventory(Target.GetObject());
+	if (!IsValid(inventory.GetObject()))
+		return {};
+
+	return inventory->Execute_FindItem(Target.GetObject(), SearchParams);
+}
+
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
 {
 	return IsInputAllowed(MouseEvent.GetEffectingButton(), InputName);

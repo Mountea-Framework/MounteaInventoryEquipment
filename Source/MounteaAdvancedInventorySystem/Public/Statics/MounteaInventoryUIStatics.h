@@ -17,6 +17,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+struct FInventoryItemSearchParams;
 class UWidget;
 class UTextBlock;
 class UMounteaAdvancedInventoryInterface;
@@ -189,6 +190,11 @@ public:
 	static bool KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName);
 
 	static bool IsInputAllowed(const FKey& InputKey, const FName& InputName);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find Item (From UI Component)")
+	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
 #pragma endregion
 	
