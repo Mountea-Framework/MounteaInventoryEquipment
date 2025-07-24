@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract, Category=Mountea, meta=(DisplayName="Mountea Advanced Inventory Item Action Widget (Base)"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API
 	UMounteaAdvancedInventoryItemActionWidget : public UMounteaAdvancedInventoryBaseWidget, public IMounteaAdvancedInventoryItemActionWidgetInterface
 {
