@@ -45,12 +45,11 @@ public:
 	 * 
 	 * @param ParentUI The parent UI interface that owns this item action widget.
 	 * @param ItemActionClass The item action class associated with this widget.
-	 * @param ItemId The unique identifier for the item this action is associated with.
 	 * @param ParentWidget Inventory Item widget which owns this item action widget.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
-	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId, UUserWidget* ParentWidget);
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId, UUserWidget* ParentWidget) = 0;
+	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget);
+	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.

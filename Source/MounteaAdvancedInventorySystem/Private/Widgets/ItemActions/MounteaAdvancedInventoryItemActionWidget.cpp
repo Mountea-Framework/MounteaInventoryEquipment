@@ -4,25 +4,43 @@
 #include "Widgets/ItemActions/MounteaAdvancedInventoryItemActionWidget.h"
 
 #include "Decorations/MounteaInventoryItemAction.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
 void UMounteaAdvancedInventoryItemActionWidget::InitializeItemAction_Implementation(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId,  UUserWidget* ParentWidget)
-		: ActionClass(ItemActionClass)
+	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget)
 {
 	ParentUIComponent = ParentUI;
+	ActionClass = ItemActionClass;
+	ParentItemWidget = ParentWidget;
 }
 
 bool UMounteaAdvancedInventoryItemActionWidget::IsActionEnabled_Implementation() const
 {
-	return false;
+	if (!Execute_IsActionValid(this))
+		return false;
+	
+	return true;
 }
 
 bool UMounteaAdvancedInventoryItemActionWidget::IsActionValid_Implementation() const
 {
-	return false;
+	if (!IsValid(ParentItemWidget))
+		return false;
+
+	if (!ParentItemWidget->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		return false;
+	
+	if (!IsValid(ParentUIComponent.GetObject()))
+		return false;
+
+	if (!IsValid(ParentUIComponent->Execute_GetParentInventory(ParentUIComponent.GetObject()).GetObject()))
+		return false;
+	
+	return true;
 }
 
 void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation()
@@ -47,8 +65,8 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 	}
 
 	// TODO: Get the proper guid
-	FGuid inventoryItemId = FGuid();
-	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItem));
+	FGuid inventoryItemId = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryItemId(ParentItemWidget);
+	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItemId));
 	
 	actionInstance->ExecuteInventoryAction(inventoryItem);
 }
