@@ -29,6 +29,7 @@
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
+#include "Interfaces/Widgets/ItemActions/MounteaAdvancedInventoryItemActionWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemsGridWidgetInterface.h"
@@ -919,6 +920,56 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_HighlightItem(Target, bIsSelected);
+}
+
+void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UUserWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
+		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeItemAction(
+				Target, ParentUI, ItemActionClass, ParentWidget);
+	else
+		LOG_ERROR(TEXT("[ItemAction_InitializeItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
+}
+
+bool UMounteaInventoryUIStatics::ItemAction_IsActionEnabled(UUserWidget* Target)
+{
+	return IsValid(Target) &&
+		Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>() && 
+		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_IsActionEnabled(Target);
+}
+
+bool UMounteaInventoryUIStatics::ItemAction_IsActionValid(UUserWidget* Target)
+{
+	return IsValid(Target) && 
+		Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>() && 
+		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_IsActionValid(Target);
+}
+
+void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UUserWidget* Target)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
+		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_ExecuteItemAction(Target);
+	else
+		LOG_ERROR(TEXT("[ItemAction_ExecuteItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
+}
+
+TSoftClassPtr<UMounteaInventoryItemAction> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUserWidget* Target)
+{
+	if (!IsValid(Target))
+	{
+		LOG_ERROR(TEXT("[ItemAction_GetItemAction] Target is not valid!"));
+		return nullptr;
+	}
+
+	if (!Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[ItemAction_GetItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
+		return nullptr;
+	}
+
+	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
 }
 
 void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, const FInventorySlot& SourceSlot)

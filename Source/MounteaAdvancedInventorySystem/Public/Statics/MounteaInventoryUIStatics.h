@@ -17,6 +17,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class UMounteaInventoryItemAction;
 struct FInventoryItemSearchParams;
 class UWidget;
 class UTextBlock;
@@ -823,6 +824,80 @@ public:
 	
 #pragma endregion
 
+	// --- Item Action ------------------------------
+#pragma region ItemActionsContainer
+
+	/**
+	 * Initializes the item action widget with the parent UI and item action data.
+	 *
+	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * @param ParentUI The parent UI interface that owns this item action widget.
+	 * @param ItemActionClass The item action class associated with this widget.
+	 * @param ParentWidget Inventory Item widget which owns this item action widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemAction",
+		meta=(CustomTag="MounteaK2Setter"))
+	static void ItemAction_InitializeItemAction(UUserWidget* Target,
+		const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+		const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass,
+		UUserWidget* ParentWidget);
+
+	/**
+	 * Checks if the item action associated with the specified target widget is enabled.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the IsActionEnabled method if available.
+	 *
+	 * @param Target The target widget from which to check the item action status. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return True if the item action is enabled; otherwise, false.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemAction",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Is Action Enabled")
+	static bool ItemAction_IsActionEnabled(UUserWidget* Target);
+
+	/**
+	 * Checks if the item action associated with the specified target widget is valid.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the IsActionValid method if available.
+	 *
+	 * @param Target The target widget from which to check the item action validity. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return True if the item action is valid; otherwise, false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemAction",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Is Action Valid")
+	static bool ItemAction_IsActionValid(UUserWidget* Target);
+
+	/**
+	 * Executes the item action associated with the specified target widget.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the ExecuteItemAction method if available.
+	 *
+	 * @param Target The target widget from which to execute the item action. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemAction",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Execute Item Action")
+	static void ItemAction_ExecuteItemAction(UUserWidget* Target);
+
+	/**
+	 * Retrieves the item action class associated with the specified target widget.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and retrieves the item action class if available.
+	 *
+	 * @param Target The target widget from which to retrieve the item action class. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return A TSoftClassPtr to the UMounteaInventoryItemAction class if available; otherwise, returns nullptr.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemAction",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Item Action")
+	static TSoftClassPtr<UMounteaInventoryItemAction> ItemAction_GetItemAction(UUserWidget* Target);
+
+#pragma endregion
+	
 	// --- Item Tooltip ------------------------------
 #pragma region ItemTooltip
 
