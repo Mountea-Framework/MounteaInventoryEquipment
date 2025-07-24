@@ -18,7 +18,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API
 
 public:
 
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId) override;
+	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId, UUserWidget* ParentWidget) override;
 	virtual bool IsActionEnabled_Implementation() const override;
 	virtual bool IsActionValid_Implementation() const override;
 	virtual void ExecuteItemAction_Implementation() override;

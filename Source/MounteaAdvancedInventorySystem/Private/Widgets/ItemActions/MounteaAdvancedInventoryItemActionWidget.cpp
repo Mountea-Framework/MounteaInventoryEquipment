@@ -5,11 +5,14 @@
 
 #include "Decorations/MounteaInventoryItemAction.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Statics/MounteaInventoryUIStatics.h"
 
 void UMounteaAdvancedInventoryItemActionWidget::InitializeItemAction_Implementation(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId)
+	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId,  UUserWidget* ParentWidget)
+		: ActionClass(ItemActionClass)
 {
+	ParentUIComponent = ParentUI;
 }
 
 bool UMounteaAdvancedInventoryItemActionWidget::IsActionEnabled_Implementation() const
@@ -24,6 +27,12 @@ bool UMounteaAdvancedInventoryItemActionWidget::IsActionValid_Implementation() c
 
 void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation()
 {
+	if (!IsValid(ParentUIComponent.GetObject()))
+	{
+		LOG_ERROR(TEXT("[ExecuteItemAction] Invalid or empty `Parent UI` for widget '%s'"), *GetName());
+		return;
+	}
+	
 	if (!ActionClass.Get() || ActionClass.LoadSynchronous())
 	{
 		LOG_ERROR(TEXT("[ExecuteItemAction] Invalid or empty `ActionClass` for widget '%s'"), *GetName());
@@ -37,7 +46,9 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 		return;
 	}
 
-	// TODO: Find item from Inventory with GUID
-	FInventoryItem targetItem = FInventoryItem();
-	actionInstance->ExecuteInventoryAction(targetItem);
+	// TODO: Get the proper guid
+	FGuid inventoryItemId = FGuid();
+	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItem));
+	
+	actionInstance->ExecuteInventoryAction(inventoryItem);
 }
