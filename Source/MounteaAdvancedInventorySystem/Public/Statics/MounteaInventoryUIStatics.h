@@ -193,6 +193,16 @@ public:
 
 	static bool IsInputAllowed(const FKey& InputKey, const FName& InputName);
 
+	/**
+	 * Finds an item in the inventory using the provided search parameters.
+	 * This function retrieves the parent inventory from the target UI component
+	 * and searches for the item based on the specified search parameters.
+	 *
+	 * @param Target The target UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param SearchParams The parameters used to search for the item.
+	 * 
+	 * @return The found inventory item, or an invalid item if not found.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find Item (From UI Component)")
