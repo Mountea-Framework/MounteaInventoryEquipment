@@ -1029,7 +1029,7 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UUserWidg
 		return;
 	}
 
-	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_SeletectItemAction(Target, ItemActionWidget);
+	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_SelectItemAction(Target, ItemActionWidget);
 }
 
 TArray<UUserWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemActionsInContainer(UUserWidget* Target)
