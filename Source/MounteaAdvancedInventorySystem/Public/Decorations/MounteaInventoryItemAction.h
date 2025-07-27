@@ -15,6 +15,7 @@
 #include "GameplayTagContainer.h"
 #include "Abilities/GameplayAbility.h"
 #include "Definitions/MounteaInventoryItem.h"
+#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "MounteaInventoryItemAction.generated.h"
 
 class UTexture2D;
@@ -25,7 +26,7 @@ class UGameplayEffect;
  * Leverages GAS for cooldowns, costs, targeting, and effect application.
  */
 UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, DisplayName="Inventory Item Action")
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UGameplayAbility
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UGameplayAbility, public IMounteaAdvancedInventoryItemActionInterface
 {
 	GENERATED_BODY()
 
@@ -35,87 +36,23 @@ public:
 
 #pragma region Inventory Specific
 
-	/**
-	 * Display name of the action shown in the user interface.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
-	FText ActionDisplayName;
-
-	/**
-	 * Brief description explaining what this action does.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
-	FText ActionDescription;
-
-	/**
-	 * Icon representing this action in the user interface.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
-	TSoftObjectPtr<UTexture2D> ActionIcon;
-
-	/**
-	 * Priority value used for sorting actions in UI elements.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action", meta=(ClampMin=0))
-	int32 ActionPriority = 0;
-
-	/**
-	 * Whether this action should be visible by default in the UI.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
-	bool bIsVisibleByDefault = true;
-
-	/**
-	 * Whether this action requires confirmation before execution.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
-	bool bRequiresConfirmation = false;
-
-	/**
-	 * Gameplay effects to apply when this action is successfully executed.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
-	TArray<TSubclassOf<UGameplayEffect>> ActionEffects;
+	/** Data of the Inventory Action. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action",
+		meta=(ShowOnlyInnerProperties))
+	FMounteaItemActionData ItemActionData;
 
 #pragma endregion
 
-#pragma region Core Functions
+#pragma region IMounteaAdvancedInventoryItemActionInterface
 
-	/**
-	 * Gets the tag associated with this inventory item action.
-	 * 
-	 * @return The gameplay tag that identifies this action.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Inventory Action")
-	FGameplayTag GetInventoryItemTag() const;
-	virtual FGameplayTag GetInventoryItemTag_Implementation() const
-	{ return ItemActionTag; }; 
-
-	/**
-	 * Determines whether this action should be visible in the UI for the given item.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Inventory Action")
-	bool IsActionVisible(const FInventoryItem& TargetItem) const;
-	virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const;
-
-	/**
-	 * Determines whether this action is currently allowed to be executed.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Inventory Action")
-	bool IsAllowed(const FInventoryItem& TargetItem) const;
-	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const;
-
-	/**
-	 * Gets a user-friendly reason why the action is not allowed.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Inventory Action")
-	FText GetDisallowedReason(const FInventoryItem& TargetItem) const;
-	virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const;
-
-	/**
-	 * Executes the inventory action using the GAS system.
-	 */
-	bool ExecuteInventoryAction(const FInventoryItem& TargetItem);
+	virtual FMounteaItemActionData GetActionData_Implementation() const override
+	{ return ItemActionData; };
+	virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const override;
+	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const override;
+	virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const override;
+	virtual bool ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem) override;
+	virtual FGameplayTag GetInventoryItemTag_Implementation() const override
+	{ return ItemActionData.ItemActionTag; }; 
 
 #pragma endregion
 
@@ -177,19 +114,6 @@ protected:
 
 #pragma endregion
 
-protected:
-
-#pragma region Data
-
-	/**
-	 * The tag used to identify this action in the gameplay ability system.
-	 * This tag is used for filtering and identifying actions in the UI and logic.
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory Action")
-	FGameplayTag ItemActionTag;
-	
-#pragma endregion
-	
 #pragma region Private Data
 
 private:
