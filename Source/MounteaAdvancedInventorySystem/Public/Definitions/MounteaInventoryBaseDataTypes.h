@@ -115,8 +115,9 @@ struct FInventoryCategoryData
 	 * Defines a list of allowed Actions.
 	 * Each Item of this category can perform those Actions.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
-	TSet<TSoftClassPtr<UMounteaInventoryItemAction>> AllowedActions;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
+	TSet<TSoftClassPtr<UObject>> AllowedActions;
 };
 
 /**
