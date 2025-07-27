@@ -18,9 +18,19 @@
 #include "MounteaInventorySimpleItemAction.generated.h"
 
 /**
- * Inventory simple item action.
+ * UMounteaInventorySimpleItemAction provides lightweight inventory actions for local UI operations.
+ * Simple actions execute directly without Gameplay Ability System overhead, making them ideal
+ * for non-gameplay inventory operations like splitting stacks, moving items, or UI-only modifications
+ * with immediate execution and minimal performance impact for inventory management tasks.
+ *
+ * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/SimpleActions)
+ * @see IMounteaAdvancedInventoryItemActionInterface
+ * @see UMounteaInventoryItemAction
  */
-UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, DisplayName="Inventory Item Action (Simple)")
+UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable,
+	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
+	HideCategories=("Cooking","Collision"),
+	meta=(DisplayName="Mountea Simple Inventory Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventorySimpleItemAction : public UObject, public IMounteaAdvancedInventoryItemActionInterface
 {
 	GENERATED_BODY()

@@ -22,10 +22,19 @@ class UTexture2D;
 class UGameplayEffect;
 
 /**
- * Inventory item action implemented as a Gameplay Ability.
- * Leverages GAS for cooldowns, costs, targeting, and effect application.
+ * UMounteaInventoryItemAction implements inventory actions as Gameplay Abilities for complex interactions.
+ * Leverages the Gameplay Ability System for cooldowns, resource costs, targeting validation, and gameplay effect application,
+ * providing full GAS integration with network replication, prediction, and ability lifecycle management
+ * for gameplay-affecting inventory operations like consuming items, applying buffs, or triggering abilities.
+ *
+ * @see [GAS Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/GASActions)
+ * @see IMounteaAdvancedInventoryItemActionInterface
+ * @see UMounteaInventorySimpleItemAction
  */
-UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, DisplayName="Inventory Item Action")
+UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable,
+	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
+	HideCategories=("Cooking","Collision"),
+	meta=(DisplayName="Mountea GAS Inventory Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UGameplayAbility, public IMounteaAdvancedInventoryItemActionInterface
 {
 	GENERATED_BODY()
