@@ -30,6 +30,17 @@ UMounteaInventoryItemAction::UMounteaInventoryItemAction()
 	ItemActionData.bRequiresConfirmation = false;
 }
 
+bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory)
+{
+	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
+		return false;
+	
+	CurrentTargetItem = NewTargetItem;
+
+	return true;
+}
+
 bool UMounteaInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
 {
 	if (!TargetItem.IsItemValid())
@@ -176,12 +187,7 @@ void UMounteaInventoryItemAction::ApplyActionEffects()
 	}
 }
 
-FInventoryItem UMounteaInventoryItemAction::GetTargetItem() const
-{
-	return CurrentTargetItem;
-}
-
-TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::GetOwningInventory() const
+TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::GetOwningInventory_Implementation() const
 {
 	if (CurrentTargetItem.IsItemValid())
 		return CurrentTargetItem.GetOwningInventory();

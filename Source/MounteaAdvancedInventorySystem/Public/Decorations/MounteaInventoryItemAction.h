@@ -45,6 +45,11 @@ public:
 
 #pragma region IMounteaAdvancedInventoryItemActionInterface
 
+	virtual bool InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory) override;
+	virtual FInventoryItem GetTargetItem_Implementation() const override
+	{ return CurrentTargetItem; };
+	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory_Implementation() const override;
 	virtual FMounteaItemActionData GetActionData_Implementation() const override
 	{ return ItemActionData; };
 	virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const override;
@@ -52,11 +57,14 @@ public:
 	virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const override;
 	virtual bool ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem) override;
 	virtual FGameplayTag GetInventoryItemTag_Implementation() const override
-	{ return ItemActionData.ItemActionTag; }; 
+	{ return ItemActionData.ItemActionTag; };
+	virtual bool ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem) override;
+	virtual bool CanModifyTargetItem_Implementation() const override
+	{ return true; };
 
 #pragma endregion
 
-#pragma region Ability Overrides
+#pragma region UGameplayAbility
 
 protected:
 
@@ -89,28 +97,11 @@ protected:
 #pragma endregion
 
 #pragma region Helper Functions
-
-	/**
-	 * Main execution logic for the inventory action.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Inventory Action")
-	bool ProcessAction(UObject* ActionInitiator, const FInventoryItem& TargetItem);
-	virtual bool ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem);
-
+	
 	/**
 	 * Applies the configured gameplay effects to the ability owner.
 	 */
 	void ApplyActionEffects();
-
-	/**
-	 * Gets the inventory item from the current ability execution context.
-	 */
-	FInventoryItem GetTargetItem() const;
-
-	/**
-	 * Gets the inventory interface from the ability owner.
-	 */
-	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const;
 
 #pragma endregion
 
@@ -123,6 +114,6 @@ private:
 	 */
 	UPROPERTY(Transient)
 	FInventoryItem CurrentTargetItem;
-
+	
 #pragma endregion
 };
