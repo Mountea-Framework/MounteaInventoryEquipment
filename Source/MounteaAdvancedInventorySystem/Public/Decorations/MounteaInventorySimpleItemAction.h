@@ -12,27 +12,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
-#include "Abilities/GameplayAbility.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
-#include "MounteaInventoryItemAction.generated.h"
-
-class UTexture2D;
-class UGameplayEffect;
+#include "UObject/Object.h"
+#include "MounteaInventorySimpleItemAction.generated.h"
 
 /**
- * Inventory item action implemented as a Gameplay Ability.
- * Leverages GAS for cooldowns, costs, targeting, and effect application.
+ * Inventory simple item action.
  */
-UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, DisplayName="Inventory Item Action")
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UGameplayAbility, public IMounteaAdvancedInventoryItemActionInterface
+UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, DisplayName="Inventory Item Action (Simple)")
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventorySimpleItemAction : public UObject, public IMounteaAdvancedInventoryItemActionInterface
 {
 	GENERATED_BODY()
-
-public:
-
-	UMounteaInventoryItemAction();
 
 #pragma region Inventory Specific
 
@@ -63,47 +54,6 @@ protected:
 	virtual bool ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem) override;
 	virtual bool CanModifyTargetItem_Implementation() const override
 	{ return true; };
-
-#pragma endregion
-
-#pragma region UGameplayAbility
-
-protected:
-
-	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const override;
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-
-#pragma endregion
-
-#pragma region Blueprint Events
-
-	/**
-	 * Blueprint event called when the inventory action begins execution.
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category="Inventory Action", DisplayName="On Execute Action")
-	void ReceiveExecuteAction(const FInventoryItem& TargetItem);
-
-	/**
-	 * Blueprint event called when the inventory action completes successfully.
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category="Inventory Action", DisplayName="On Action Completed")
-	void ReceiveActionCompleted(const FInventoryItem& TargetItem);
-
-	/**
-	 * Blueprint event called when the inventory action fails or is cancelled.
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category="Inventory Action", DisplayName="On Action Failed")
-	void ReceiveActionFailed(const FInventoryItem& TargetItem, const FText& Reason);
-
-#pragma endregion
-
-#pragma region Helper Functions
-	
-	/**
-	 * Applies the configured gameplay effects to the ability owner.
-	 */
-	void ApplyActionEffects();
 
 #pragma endregion
 
