@@ -336,8 +336,16 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Validate"))
 	static bool IsInventoryItemValid(const FInventoryItem& Item);
 
+	/**
+	 * Retrieves the actions associated with a specified inventory item.
+	 * This function returns an array of soft class pointers representing the actions that can be performed on the item.
+	 * Actions must implement the `MounteaAdvancedInventoryItemActionInterface` interface.
+	 *
+	 * @param Item - The inventory item for which to retrieve the associated actions
+	 * @return - An array of TSoftClassPtr<UObject> containing the item actions
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
-	static TArray<TSoftClassPtr<UMounteaInventoryItemAction>> GetItemActions(const FInventoryItem& Item);
+	static TArray<TSoftClassPtr<UObject>> GetItemActions(const FInventoryItem& Item);
 	
 	/*************************************************************/
 	/************************ INTERNAL ***********************/
