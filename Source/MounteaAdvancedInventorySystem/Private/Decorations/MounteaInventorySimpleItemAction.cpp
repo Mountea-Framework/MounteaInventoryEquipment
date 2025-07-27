@@ -12,7 +12,9 @@
 
 #include "Decorations/MounteaInventorySimpleItemAction.h"
 
+#include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Statics/MounteaInventoryStatics.h"
 
 bool UMounteaInventorySimpleItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
 																			const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory)
@@ -50,7 +52,17 @@ bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventor
 	if (!IsActionVisible(TargetItem))
 		return false;
 
-	return true;
+	if (!IsValid(TargetItem.Template))
+		return false;
+
+	auto allowedActions = UMounteaInventoryStatics::GetItemActions(CurrentTargetItem);
+
+	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const TSoftClassPtr<UObject>& action)
+	{
+		return action == GetClass();
+	}) != nullptr;
+
+	return bFound;
 }
 
 FText UMounteaInventorySimpleItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const

@@ -17,6 +17,7 @@
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Statics/MounteaInventoryStatics.h"
 
 UMounteaInventoryItemAction::UMounteaInventoryItemAction()
 {
@@ -57,7 +58,17 @@ bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem&
 	if (!IsActionVisible(TargetItem))
 		return false;
 
-	return true;
+	if (!IsValid(TargetItem.Template))
+		return false;
+
+	auto allowedActions = UMounteaInventoryStatics::GetItemActions(CurrentTargetItem);
+
+	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const TSoftClassPtr<UObject>& action)
+	{
+		return action == GetClass();
+	}) != nullptr;
+
+	return bFound;
 }
 
 FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
