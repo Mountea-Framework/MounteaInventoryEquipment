@@ -70,7 +70,7 @@ public:
 	 * @param ItemActionWidget The widget to be selected. Must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
-	void SeletectItemAction(UUserWidget* ItemActionWidget);
+	void SelectItemAction(UUserWidget* ItemActionWidget);
 	virtual void SelectItemAction_Implementation(UUserWidget* ItemActionWidget) = 0;
 
 	/**
