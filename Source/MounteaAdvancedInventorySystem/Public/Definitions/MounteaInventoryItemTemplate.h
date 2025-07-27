@@ -183,8 +183,9 @@ public:
 	FGameplayTagContainer AttachmentSlots;
 
 	/** A reference to a special gameplay abilities or effects triggered by this item. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data")
-	TArray<TSoftClassPtr<UMounteaInventoryItemAction>> ItemSpecialAffects;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
+	TSet<TSoftClassPtr<UObject>> ItemSpecialAffects;
 
 protected:
 

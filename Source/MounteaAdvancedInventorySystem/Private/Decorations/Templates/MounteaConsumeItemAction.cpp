@@ -19,10 +19,10 @@
 
 UMounteaConsumeItemAction::UMounteaConsumeItemAction()
 {
-	ActionDisplayName = FText::FromString(TEXT("Consume"));
-	ActionDescription = FText::FromString(TEXT("Consume this item"));
-	ActionPriority = 100;
-	bRequiresConfirmation = false;
+	ItemActionData.ActionDisplayName = FText::FromString(TEXT("Consume"));
+	ItemActionData.ActionDescription = FText::FromString(TEXT("Consume this item"));
+	ItemActionData.ActionPriority = 100;
+	ItemActionData.bRequiresConfirmation = false;
 }
 
 bool UMounteaConsumeItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const

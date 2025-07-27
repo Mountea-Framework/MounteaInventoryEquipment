@@ -17,14 +17,17 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+struct FMounteaInventoryGridSlot;
+struct FInventoryItemSearchParams;
+
 class UWidget;
 class UTextBlock;
+class UMounteaInventoryItemAction;
 class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
-struct FMounteaInventoryGridSlot;
+class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventorySystemBaseWidgetInterface;
-class UMounteaAdvancedInventoryInteractableObjectWidget;
 
 UENUM(BlueprintType)
 enum class EMounteaThemeLevel : uint8
@@ -60,7 +63,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIStatics : public UBl
 	GENERATED_BODY()
 
 	/*************************************************************/
-	/********************* TEMPLATES **********************/
+	/************************* TEMPLATES *************************/
 	/*************************************************************/
 public:
 	template<typename ReturnType, typename Func, typename... Args>
@@ -189,6 +192,21 @@ public:
 	static bool KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName);
 
 	static bool IsInputAllowed(const FKey& InputKey, const FName& InputName);
+
+	/**
+	 * Finds an item in the inventory using the provided search parameters.
+	 * This function retrieves the parent inventory from the target UI component
+	 * and searches for the item based on the specified search parameters.
+	 *
+	 * @param Target The target UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param SearchParams The parameters used to search for the item.
+	 * 
+	 * @return The found inventory item, or an invalid item if not found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find Item (From UI Component)")
+	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
 #pragma endregion
 	
@@ -817,6 +835,150 @@ public:
 	
 #pragma endregion
 
+	// --- Item Action ------------------------------
+#pragma region ItemActions
+
+	/**
+	 * Initializes the item action widget with the parent UI and item action data.
+	 *
+	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * @param ParentUI The parent UI interface that owns this item action widget.
+	 * @param ItemActionClass The item action class associated with this widget.
+	 * @param ParentWidget Inventory Item widget which owns this item action widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Setter"))
+	static void ItemAction_InitializeItemAction(UUserWidget* Target,
+		const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+		const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass,
+		UUserWidget* ParentWidget);
+
+	/**
+	 * Checks if the item action associated with the specified target widget is enabled.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the IsActionEnabled method if available.
+	 *
+	 * @param Target The target widget from which to check the item action status. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return True if the item action is enabled; otherwise, false.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Is Action Enabled")
+	static bool ItemAction_IsActionEnabled(UUserWidget* Target);
+
+	/**
+	 * Checks if the item action associated with the specified target widget is valid.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the IsActionValid method if available.
+	 *
+	 * @param Target The target widget from which to check the item action validity. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return True if the item action is valid; otherwise, false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Is Action Valid")
+	static bool ItemAction_IsActionValid(UUserWidget* Target);
+
+	/**
+	 * Executes the item action associated with the specified target widget.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the ExecuteItemAction method if available.
+	 *
+	 * @param Target The target widget from which to execute the item action. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Execute Item Action")
+	static void ItemAction_ExecuteItemAction(UUserWidget* Target);
+
+	/**
+	 * Retrieves the item action class associated with the specified target widget.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and retrieves the item action class if available.
+	 *
+	 * @param Target The target widget from which to retrieve the item action class. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return A TSoftClassPtr to the UMounteaInventoryItemAction class if available; otherwise, returns nullptr.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Item Action")
+	static TSoftClassPtr<UMounteaInventoryItemAction> ItemAction_GetItemAction(UUserWidget* Target);
+
+#pragma endregion
+
+	// --- Item Actions Container------------------------
+#pragma region ItemActionsContainer
+
+	/**
+	 * Initializes the item actions container widget with the parent UI.
+	 *
+	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ItemActionWidget The widget to be added to the container. Must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Add Item Action To Container")
+	static void ItemActionsContainer_AddItemActionToContainer(UUserWidget* Target, UUserWidget* ItemActionWidget);
+
+	/**
+	 * Removes the specified item action widget from the item actions container.
+	 *
+	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ItemActionWidget The item action widget to be removed from the container.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Remove Item Action From Container")
+	static void ItemActionsContainer_RemoveItemActionFromContainer(UUserWidget* Target, UUserWidget* ItemActionWidget);
+
+	/**
+	 * Clears all item action widgets from the item actions container.
+	 *
+	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Clear Item Actions Container")
+	static void ItemActionsContainer_ClearItemActionsContainer(UUserWidget* Target);
+
+	/**
+	 * Selects a specific item action widget within the item actions container.
+	 *
+	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ItemActionWidget The item action widget to be selected.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Select Item Action")
+	static void ItemActionsContainer_SelectItemAction(UUserWidget* Target, UUserWidget* ItemActionWidget);
+
+	/**
+	 * Retrieves all item action widgets currently present in the item actions container.
+	 *
+	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @return An array of UUserWidget pointers representing the item actions in the container.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Item Actions In Container")
+	static TArray<UUserWidget*> ItemActionsContainer_GetItemActionsInContainer(UUserWidget* Target);
+
+	/**
+	 * Selects an item action widget by its index within the item actions container.
+	 *
+	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ItemActionIndex The index of the item action to be selected.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Get Item Actions In Container By Index")
+	static void ItemActionsContainer_SelectItemActionByIndex(UUserWidget* Target, int32 ItemActionIndex);
+	
+#pragma endregion
+	
 	// --- Item Tooltip ------------------------------
 #pragma region ItemTooltip
 

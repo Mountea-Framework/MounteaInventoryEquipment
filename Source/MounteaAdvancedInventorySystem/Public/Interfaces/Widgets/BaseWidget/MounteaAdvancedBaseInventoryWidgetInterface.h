@@ -48,10 +48,12 @@ public:
 	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI) = 0;
 
 	/**
-	 * 
-	 * @return 
+	 * Retrieves the owning inventory UI interface for this widget.
+	 * This function allows other components to access the parent inventory UI.
+	 *
+	 * @return The TScriptInterface reference to the owning inventory UI interface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Base")
 	TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI() const;
 	virtual TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI_Implementation() const = 0;
 };

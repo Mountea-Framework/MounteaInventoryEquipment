@@ -195,7 +195,7 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
-TArray<TSoftClassPtr<UMounteaInventoryItemAction>> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
 {
 	if (!Item.IsItemValid()) return {};
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -216,7 +216,7 @@ TArray<TSoftClassPtr<UMounteaInventoryItemAction>> UMounteaInventoryStatics::Get
 	if (!itemSubCategory.IsEmpty())
 		categoryAllowedActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
 
-	TArray<TSoftClassPtr<UMounteaInventoryItemAction>> allowedCategories =
+	TArray<TSoftClassPtr<UObject>> allowedCategories =
 		categoryAllowedActions.Array();
 	return allowedCategories;
 }

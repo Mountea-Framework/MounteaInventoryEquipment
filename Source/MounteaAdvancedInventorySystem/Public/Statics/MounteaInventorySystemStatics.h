@@ -51,7 +51,7 @@ public:
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 	
 	/*************************************************************/
-	/******************* BLUEPRINTABLE *******************/
+	/********************** BLUEPRINTABLE ************************/
 	/*************************************************************/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
 		meta=(CustomTag="MounteaK2Getter"))

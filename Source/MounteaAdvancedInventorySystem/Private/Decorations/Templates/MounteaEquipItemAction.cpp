@@ -21,10 +21,10 @@
 
 UMounteaEquipItemAction::UMounteaEquipItemAction()
 {
-	ActionDisplayName = FText::FromString(TEXT("Equip"));
-	ActionDescription = FText::FromString(TEXT("Equip this item"));
-	ActionPriority = 200;
-	bRequiresConfirmation = false;
+	ItemActionData.ActionDisplayName = FText::FromString(TEXT("Equip"));
+	ItemActionData.ActionDescription = FText::FromString(TEXT("Equip this item"));
+	ItemActionData.ActionPriority = 200;
+	ItemActionData.bRequiresConfirmation = false;
 }
 
 bool UMounteaEquipItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const

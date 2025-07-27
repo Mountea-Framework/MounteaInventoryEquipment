@@ -16,7 +16,7 @@
 // Log category declaration
 MOUNTEAADVANCEDINVENTORYSYSTEM_API DECLARE_LOG_CATEGORY_EXTERN(LogMounteaAdvancedInventorySystem, Log, All);
 
-void PrintLog(const ELogVerbosity::Type Verbosity, const FString& Message, FLinearColor Color, float Duration);
+MOUNTEAADVANCEDINVENTORYSYSTEM_API void PrintLog(const ELogVerbosity::Type Verbosity, const FString& Message, FLinearColor Color, float Duration);
 
 // Logging macro definitions
 #define LOG_INFO(Format, ...) \

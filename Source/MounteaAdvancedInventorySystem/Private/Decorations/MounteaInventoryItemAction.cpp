@@ -17,17 +17,29 @@
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Statics/MounteaInventoryStatics.h"
 
 UMounteaInventoryItemAction::UMounteaInventoryItemAction()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
 	
-	ActionDisplayName = FText::FromString(TEXT("Default Action"));
-	ActionDescription = FText::FromString(TEXT("A basic inventory item action"));
-	ActionPriority = 0;
-	bIsVisibleByDefault = true;
-	bRequiresConfirmation = false;
+	ItemActionData.ActionDisplayName = FText::FromString(TEXT("Default Action"));
+	ItemActionData.ActionDescription = FText::FromString(TEXT("A basic inventory item action"));
+	ItemActionData.ActionPriority = 0;
+	ItemActionData.bIsVisibleByDefault = true;
+	ItemActionData.bRequiresConfirmation = false;
+}
+
+bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory)
+{
+	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
+		return false;
+	
+	CurrentTargetItem = NewTargetItem;
+
+	return true;
 }
 
 bool UMounteaInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
@@ -35,7 +47,7 @@ bool UMounteaInventoryItemAction::IsActionVisible_Implementation(const FInventor
 	if (!TargetItem.IsItemValid())
 		return false;
 
-	return bIsVisibleByDefault;
+	return ItemActionData.bIsVisibleByDefault;
 }
 
 bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
@@ -46,7 +58,17 @@ bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem&
 	if (!IsActionVisible(TargetItem))
 		return false;
 
-	return true;
+	if (!IsValid(TargetItem.Template))
+		return false;
+
+	auto allowedActions = UMounteaInventoryStatics::GetItemActions(CurrentTargetItem);
+
+	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const TSoftClassPtr<UObject>& action)
+	{
+		return action == GetClass();
+	}) != nullptr;
+
+	return bFound;
 }
 
 FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
@@ -57,7 +79,7 @@ FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInv
 	return FText::FromString(TEXT("Action is not currently available"));
 }
 
-bool UMounteaInventoryItemAction::ExecuteInventoryAction(const FInventoryItem& TargetItem)
+bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem)
 {
 	UAbilitySystemComponent* asc = GetAbilitySystemComponentFromActorInfo();
 	if (!asc)
@@ -161,27 +183,22 @@ void UMounteaInventoryItemAction::ApplyActionEffects()
 		LOG_WARNING(TEXT("[%s] No AbilitySystemComponent found"), *GetName())
 		return;
 	}
-
-	for (const TSubclassOf<UGameplayEffect>& effectClass : ActionEffects)
+	
+	for (const auto& effectClass : ItemActionData.ActionEffects)
 	{
-		if (effectClass)
-		{
-			FGameplayEffectContextHandle contextHandle = asc->MakeEffectContext();
-			contextHandle.AddSourceObject(this);
+		if (!effectClass.IsValid())
+			continue;
+		
+		FGameplayEffectContextHandle contextHandle = asc->MakeEffectContext();
+		contextHandle.AddSourceObject(this);
 			
-			FGameplayEffectSpecHandle specHandle = asc->MakeOutgoingSpec(effectClass, 1.0f, contextHandle);
-			if (specHandle.IsValid())
-				asc->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
-		}
+		FGameplayEffectSpecHandle specHandle = asc->MakeOutgoingSpec(effectClass.LoadSynchronous(), 1.0f, contextHandle);
+		if (specHandle.IsValid())
+			asc->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
 	}
 }
 
-FInventoryItem UMounteaInventoryItemAction::GetTargetItem() const
-{
-	return CurrentTargetItem;
-}
-
-TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::GetOwningInventory() const
+TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::GetOwningInventory_Implementation() const
 {
 	if (CurrentTargetItem.IsItemValid())
 		return CurrentTargetItem.GetOwningInventory();

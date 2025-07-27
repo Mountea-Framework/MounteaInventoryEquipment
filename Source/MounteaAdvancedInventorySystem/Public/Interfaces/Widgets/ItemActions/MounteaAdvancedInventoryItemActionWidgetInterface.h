@@ -44,19 +44,19 @@ public:
 	 * Initializes the item action widget with the parent UI and item action data.
 	 * 
 	 * @param ParentUI The parent UI interface that owns this item action widget.
-	 * @param ItemAction The item action class associated with this widget.
-	 * @param ItemId The unique identifier for the item this action is associated with.
+	 * @param ItemActionClass The item action class associated with this widget.
+	 * @param ParentWidget Inventory Item widget which owns this item action widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
-	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId);
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, const FGuid& ItemId) = 0;
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
+	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget);
+	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.
 	 * 
 	 * @return The item action data associated with this widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
 	bool IsActionEnabled() const;
 	virtual bool IsActionEnabled_Implementation() const = 0;
 
@@ -65,7 +65,7 @@ public:
 	 * 
 	 * @return True if the action is valid, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
 	bool IsActionValid() const;
 	virtual bool IsActionValid_Implementation() const = 0;
 
@@ -75,7 +75,7 @@ public:
 	 * This function is typically called when the user clicks or interacts with the item action button.
 	 * It should handle the logic for performing the action, such as using, equipping, or dropping the item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
 	void ExecuteItemAction();
 	virtual void ExecuteItemAction_Implementation() = 0;
 
@@ -84,7 +84,7 @@ public:
 	 * 
 	 * @return The soft class reference to the item action.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemActions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
 	TSoftClassPtr<UMounteaInventoryItemAction> GetItemAction() const;
 	virtual TSoftClassPtr<UMounteaInventoryItemAction> GetItemAction_Implementation() const = 0;
 

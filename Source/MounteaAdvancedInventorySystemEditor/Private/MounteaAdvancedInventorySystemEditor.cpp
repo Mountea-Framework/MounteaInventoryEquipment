@@ -504,7 +504,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	);
 	MenuBuilder.EndSection();
 	
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "Mountea Advanced Inventory Settings"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "⚙ Mountea Advanced Inventory Settings"));
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_ConfigButton_Label", "Mountea Advanced Inventory Config"),
@@ -535,7 +535,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 
-	MenuBuilder.BeginSection("MounteaMenu_Links", LOCTEXT("MounteaMenuOptions_Options", "Mountea Links"));
+	MenuBuilder.BeginSection("MounteaMenu_Links", LOCTEXT("MounteaMenuOptions_Options", "🌐 Mountea Links"));
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_SupportButton_Label", "Mountea Support"),
@@ -564,7 +564,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Tools", "Mountea Tools"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Tools", "⚒ Mountea Tools"));
 	{
 		MenuBuilder.AddMenuEntry(
 		LOCTEXT("MounteaSystemEditor_InventoryManagerButton_Label", "Mountea Inventory Manager"),
