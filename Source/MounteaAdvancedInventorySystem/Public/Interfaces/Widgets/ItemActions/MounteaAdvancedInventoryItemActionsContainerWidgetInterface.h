@@ -71,7 +71,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
 	void SeletectItemAction(UUserWidget* ItemActionWidget);
-	virtual void SeletectItemAction_Implementation(UUserWidget* ItemActionWidget) = 0;
+	virtual void SelectItemAction_Implementation(UUserWidget* ItemActionWidget) = 0;
 
 	/**
 	 * Retrieves all item action widgets currently in the container.
