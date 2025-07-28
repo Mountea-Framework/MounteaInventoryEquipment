@@ -208,6 +208,18 @@ public:
 		DisplayName="Find Item (From UI Component)")
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
+
+	/**
+	 * Calculates the spawn location for an actions list based on the provided widget.
+	 *
+	 * @param ParentWidget The parent widget used for determining the spawn location. Must be a valid widget.
+	 * 
+	 * @return A FVector2D representing the calculated screen position where the actions list should spawn. Returns FVector2D::ZeroVector if the ParentWidget or its world is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static FVector2D GetActionsListSpawnLocation(UWidget* ParentWidget);
+
 #pragma endregion
 	
 	// --- Theme  ------------------------------

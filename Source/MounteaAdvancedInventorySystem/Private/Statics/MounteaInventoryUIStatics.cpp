@@ -14,6 +14,7 @@
 
 #include "InputMappingContext.h"
 #include "Algo/Copy.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 
@@ -295,6 +296,27 @@ FInventoryItem UMounteaInventoryUIStatics::FindItem(
 		return {};
 
 	return inventory->Execute_FindItem(inventory.GetObject(), SearchParams);
+}
+
+FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
+{
+	if (!IsValid(ParentWidget))
+	{
+		LOG_ERROR(TEXT("[GetActionsListSpawnLocation] Invalid Parent Widget!"));
+		return FVector2D::ZeroVector;
+	}
+
+	if (!IsValid(ParentWidget->GetWorld()))
+	{
+		LOG_ERROR(TEXT("[GetActionsListSpawnLocation] Invalid World!"));
+		return FVector2D::ZeroVector;
+	}
+	const auto Geometry = ParentWidget->GetCachedGeometry();
+	FVector2D localCoordinates = FVector2D(Geometry.GetLocalSize().X, 0.f);
+	FVector2D pixelPosition, viewportPosition;
+	USlateBlueprintLibrary::LocalToViewport(ParentWidget->GetWorld(), Geometry, localCoordinates, pixelPosition, viewportPosition);
+
+	return pixelPosition;
 }
 
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
