@@ -112,12 +112,17 @@ public:
 	 * 
 	 * @param TargetItem The inventory item this action will operate on.
 	 * @param OwningInventory The inventory interface that contains the target item.
+	 * @param ContextPayload Optional context object for additional data (e.g., player controller, UI context).
 	 * 
 	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool InitializeItemAction(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory);
-	virtual bool InitializeItemAction_Implementation(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory) = 0;
+	bool InitializeItemAction(const FInventoryItem& TargetItem,
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+		UObject* ContextPayload = nullptr);
+	virtual bool InitializeItemAction_Implementation(const FInventoryItem& TargetItem,
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+		UObject* ContextPayload = nullptr) = 0;
 
 	/**
 	 * Checks if this action has been properly initialized and is ready for execution.
