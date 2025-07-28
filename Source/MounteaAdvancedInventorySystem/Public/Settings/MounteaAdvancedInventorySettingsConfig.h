@@ -18,6 +18,7 @@
 #include "MounteaAdvancedInventorySettingsConfig.generated.h"
 
 class UMounteaAdvancedInventoryThemeConfig;
+class UCommonActivatableWidget;
 
 /**
  * UMounteaAdvancedInventorySettingsConfig is a data asset managing comprehensive inventory system configuration.
@@ -110,7 +111,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Wrapper",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemBaseWidgetInterface"))
-	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
+	TSoftClassPtr<UCommonActivatableWidget> UserInterfaceWrapperClass;
 
 	// --- User Interface: Inventory
 	
