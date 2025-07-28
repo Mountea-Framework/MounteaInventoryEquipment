@@ -202,23 +202,28 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 	if (!settings) return {};
 	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
 	if (!inventorySettingsConfig) return {};
-	
+    
 	const auto itemCategory = Item.GetTemplate()->ItemCategory;
 	const auto itemSubCategory = Item.GetTemplate()->ItemSubCategory;
-	
+    
 	const auto categoryDefinition = inventorySettingsConfig->AllowedCategories.FindRef(itemCategory);
 	if (categoryDefinition.CategoryData.AllowedActions.Num() <= 0)
 	{
 		LOG_WARNING(TEXT("No actions defined for category '%s'!"), *itemCategory);
 		return {};
 	}
-	auto categoryAllowedActions = categoryDefinition.CategoryData.AllowedActions;
+    
+	TSet<TSoftClassPtr<UObject>> uniqueActions = categoryDefinition.CategoryData.AllowedActions;
 	if (!itemSubCategory.IsEmpty())
-		categoryAllowedActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
+		uniqueActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
 
-	TArray<TSoftClassPtr<UObject>> allowedCategories =
-		categoryAllowedActions.Array();
-	return allowedCategories;
+	TArray<TSoftClassPtr<UObject>> validActions = uniqueActions.Array();
+	validActions.RemoveAll([](const TSoftClassPtr<UObject>& actionClass)
+	{
+		return actionClass.IsNull() || !actionClass.IsValid();
+	});
+
+	return validActions;
 }
 
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
