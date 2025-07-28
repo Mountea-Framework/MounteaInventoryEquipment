@@ -36,6 +36,17 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionsCon
 	GENERATED_BODY()
 
 public:
+
+	/**
+	 * Constructs the item actions container from a list of item action classes.
+	 * 
+	 * @param ItemActionsList An array of TSoftClassPtr<UObject> representing the item actions to be added to the container.
+	 * 
+	 * Each class must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
+	void ConstructFromActionsList(const TArray<TSoftClassPtr<UObject>>& ItemActionsList);
+	virtual void ConstructFromActionsList_Implementation(const TArray<TSoftClassPtr<UObject>>& ItemActionsList) = 0;
 	
 	/**
 	 * Adds an item action widget to the container.
