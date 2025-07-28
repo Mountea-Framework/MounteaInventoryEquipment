@@ -203,7 +203,7 @@ public:
 	 * 
 	 * @return The found inventory item, or an invalid item if not found.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find Item (From UI Component)")
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
@@ -911,6 +911,19 @@ public:
 
 	// --- Item Actions Container------------------------
 #pragma region ItemActionsContainer
+
+	/**
+	 * Constructs the item actions container from a list of item action classes.
+	 *
+	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ItemActionsList An array of TSoftClassPtr<UObject> representing the item actions to be added to the container.
+	 * 
+	 * Each class must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Construct From Actions List")
+	static void ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target, const TArray<TSoftClassPtr<UObject>>& ItemActionsList);
 
 	/**
 	 * Initializes the item actions container widget with the parent UI.

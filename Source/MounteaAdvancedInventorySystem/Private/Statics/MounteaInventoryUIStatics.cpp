@@ -294,7 +294,7 @@ FInventoryItem UMounteaInventoryUIStatics::FindItem(
 	if (!IsValid(inventory.GetObject()))
 		return {};
 
-	return inventory->Execute_FindItem(Target.GetObject(), SearchParams);
+	return inventory->Execute_FindItem(inventory.GetObject(), SearchParams);
 }
 
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
@@ -971,6 +971,18 @@ TSoftClassPtr<UMounteaInventoryItemAction> UMounteaInventoryUIStatics::ItemActio
 	}
 
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
+}
+
+void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target,
+	const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[ConstructFromActionsList] Target does not implement IMounteaAdvancedInventoryItemActionsContainerWidgetInterface or is invalid!"));
+		return;
+	}
+
+	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, ItemActionsList);
 }
 
 void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UUserWidget* Target,
