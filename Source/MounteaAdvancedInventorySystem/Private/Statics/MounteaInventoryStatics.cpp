@@ -220,7 +220,7 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 	TArray<TSoftClassPtr<UObject>> validActions = uniqueActions.Array();
 	validActions.RemoveAll([](const TSoftClassPtr<UObject>& actionClass)
 	{
-		return actionClass.IsNull() || !actionClass.IsValid();
+		return actionClass.IsNull() || !actionClass.ToSoftObjectPath().IsValid();
 	});
 
 	return validActions;
