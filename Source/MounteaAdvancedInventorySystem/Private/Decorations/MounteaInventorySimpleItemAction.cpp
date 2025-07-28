@@ -12,18 +12,25 @@
 
 #include "Decorations/MounteaInventorySimpleItemAction.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaInventoryStatics.h"
 
 bool UMounteaInventorySimpleItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
-																			const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory)
+ const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory, UObject* ContextPayload)
 {
 	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
 		return false;
 	
 	CurrentTargetItem = NewTargetItem;
 
+	if (TObjectPtr<UUserWidget> payloadWidget = Cast<UUserWidget>(ContextPayload))
+		ParentItemWidget = payloadWidget;
+	else
+		LOG_WARNING(TEXT("[%s] Invalid context payload for item action!"), *GetName())
+	
 	return true;
 }
 

@@ -57,7 +57,8 @@ protected:
 #pragma region IMounteaAdvancedInventoryItemActionInterface
 
 	virtual bool InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory) override;
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory,
+		UObject* ContextPayload = nullptr) override;
 	virtual FInventoryItem GetTargetItem_Implementation() const override
 	{ return CurrentTargetItem; };
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory_Implementation() const override;

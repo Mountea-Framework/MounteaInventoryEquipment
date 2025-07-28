@@ -32,7 +32,7 @@ UMounteaInventoryItemAction::UMounteaInventoryItemAction()
 }
 
 bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
-	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory)
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory, UObject* ContextPayload)
 {
 	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
 		return false;
