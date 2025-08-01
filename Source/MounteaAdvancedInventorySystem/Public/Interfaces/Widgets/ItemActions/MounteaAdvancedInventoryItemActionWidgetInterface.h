@@ -17,6 +17,7 @@
 
 struct FMounteaItemActionData;
 
+class UWidget;
 class UMounteaInventoryItemAction;
 class IMounteaAdvancedInventoryUIInterface;
 
@@ -51,9 +52,9 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
 	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-		const TSoftClassPtr<UObject>& ItemActionClass, UUserWidget* ParentWidget);
+		const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget);
 	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-		const TSoftClassPtr<UObject>& ItemActionClass, UUserWidget* ParentWidget) = 0;
+		const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.

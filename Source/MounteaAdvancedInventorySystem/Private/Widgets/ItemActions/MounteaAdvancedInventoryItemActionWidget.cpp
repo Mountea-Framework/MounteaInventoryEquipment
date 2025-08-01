@@ -20,7 +20,7 @@
 
 void UMounteaAdvancedInventoryItemActionWidget::InitializeItemAction_Implementation(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-	const TSoftClassPtr<UObject>& ItemActionClass, UUserWidget* ParentWidget)
+	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
 {
 	ParentUIComponent = ParentUI;
 	ActionClass = ItemActionClass;
