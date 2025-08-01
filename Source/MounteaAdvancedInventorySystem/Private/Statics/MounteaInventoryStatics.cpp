@@ -13,7 +13,9 @@
 #include "Statics/MounteaInventoryStatics.h"
 
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
+#include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
@@ -224,6 +226,86 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 	});
 
 	return validActions;
+}
+
+EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UObject* Target)
+{
+	if (!IsValid(Target))
+	{
+		LOG_ERROR(TEXT("[GetItemActionFlags] Target is invalid!"))
+		return EInventoryItemActionCallback::EIIAC_None;
+	}
+	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
+	{
+		LOG_ERROR(TEXT("[GetItemActionFlags] Target does not implement IMounteaInventoryItemActionInterface!"))
+		return EInventoryItemActionCallback::EIIAC_None;
+	}
+	return IMounteaAdvancedInventoryItemActionInterface::Execute_GetInventoryItemActionCallback(Target);
+}
+
+bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToCheck)
+{
+	if (!IsValid(Target))
+	{
+		LOG_ERROR(TEXT("[HasActionFlag] Target is invalid!"))
+		return false;
+	}
+	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
+	{
+		LOG_ERROR(TEXT("[HasActionFlag] Target does not implement IMounteaInventoryItemActionInterface!"))
+		return false;
+	}
+	
+	return (static_cast<uint8>(IMounteaAdvancedInventoryItemActionInterface::Execute_GetInventoryItemActionCallback(Target))
+		& static_cast<uint8>(FlagToCheck)) != 0;
+}
+
+void UMounteaInventoryStatics::ItemAction_AddActionFlag(UObject* Target, EInventoryItemActionCallback FlagToAdd)
+{
+	if (!IsValid(Target))
+	{
+		LOG_ERROR(TEXT("[AddActionFlag] Target is invalid!"))
+		return;
+	}
+	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
+	{
+		LOG_ERROR(TEXT("[AddActionFlag] Target does not implement IMounteaInventoryItemActionInterface!"))
+		return;
+	}
+
+	IMounteaAdvancedInventoryItemActionInterface::Execute_AddActionFlag(Target, FlagToAdd);	
+}
+
+void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToRemove)
+{
+	if (!IsValid(Target))
+	{
+		LOG_ERROR(TEXT("[RemoveActionFlag] Target is invalid!"))
+		return;
+	}
+	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
+	{
+		LOG_ERROR(TEXT("[RemoveActionFlag] Target does not implement IMounteaInventoryItemActionInterface!"))
+		return;
+	}
+
+	IMounteaAdvancedInventoryItemActionInterface::Execute_RemoveActionFlag(Target, FlagToRemove);
+}
+
+void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UObject* Target)
+{
+	if (!IsValid(Target))
+	{
+		LOG_ERROR(TEXT("[ClearAllActionFlags] Target is invalid!"))
+		return;
+	}
+	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
+	{
+		LOG_ERROR(TEXT("[ClearAllActionFlags] Target does not implement IMounteaInventoryItemActionInterface!"))
+		return;
+	}
+
+	IMounteaAdvancedInventoryItemActionInterface::Execute_ClearAllActionFlags(Target);
 }
 
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(

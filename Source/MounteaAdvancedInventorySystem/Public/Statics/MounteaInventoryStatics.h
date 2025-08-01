@@ -12,6 +12,7 @@ class UMounteaAdvancedInventorySettings;
 class UMounteaAdvancedInventorySettingsConfig;
 enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
+enum class EInventoryItemActionCallback : uint8;
 
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryStatics : public UBlueprintFunctionLibrary
@@ -19,7 +20,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryStatics : public UBlue
 	GENERATED_BODY()
 
 	/*************************************************************/
-	/********************* TEMPLATES **********************/
+	/************************* TEMPLATES *************************/
 	/*************************************************************/
 public:
 	template<typename ReturnType, typename Func, typename... Args>
@@ -346,9 +347,62 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static TArray<TSoftClassPtr<UObject>> GetItemActions(const FInventoryItem& Item);
+
+	// --- Item Actions ------------------------------
+
+#pragma region ItemActions
+
+	/**
+	 * Retrieves the item action flags for the specified target.
+	 * This function returns the current set of flags that indicate which item actions are available for the target.
+	 *
+	 * @param Target The object for which to retrieve the item action flags.
+	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	static EInventoryItemActionCallback GetItemActionFlags(const UObject* Target);
+	
+	/**
+	 * Checks if a specific flag is set in the given flag container.
+	 *
+	 * @param Flags The current set of flags.
+	 * @param FlagToCheck The specific flag to test for.
+	 * @return True if the flag is set, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	static bool ItemAction_HasActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToCheck);
+
+	/**
+	 * Adds a specific flag to the flag container.
+	 *
+	 * @param Flags The current flags.
+	 * @param FlagToAdd The flag to add.
+	 * @return Updated flag container with the new flag set.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	static void ItemAction_AddActionFlag(UObject* Target, EInventoryItemActionCallback FlagToAdd);
+
+	/**
+	 * Removes a specific flag from the flag container.
+	 *
+	 * @param FlagToRemove The flag to clear.
+	 * @return Updated flag container with the flag cleared.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	static void ItemAction_RemoveActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToRemove);
+
+	/**
+	 * Clears all flags.
+	 *
+	 * @return An empty flag container (EIIAC_None).
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	static void ItemAction_ClearAllActionFlags(UObject* Target);
+
+#pragma endregion
 	
 	/*************************************************************/
-	/************************ INTERNAL ***********************/
+	/************************ INTERNAL **************************/
 	/*************************************************************/
 public:
 	static FInventoryNotificationData CreateNotificationData(
