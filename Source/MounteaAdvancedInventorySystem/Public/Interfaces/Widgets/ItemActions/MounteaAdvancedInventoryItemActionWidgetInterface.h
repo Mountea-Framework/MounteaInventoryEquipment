@@ -15,6 +15,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemActionWidgetInterface.generated.h"
 
+struct FMounteaItemActionData;
+
 class UMounteaInventoryItemAction;
 class IMounteaAdvancedInventoryUIInterface;
 
@@ -48,8 +50,10 @@ public:
 	 * @param ParentWidget Inventory Item widget which owns this item action widget.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
-	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget);
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget) = 0;
+	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+		const TSoftClassPtr<UObject>& ItemActionClass, UUserWidget* ParentWidget);
+	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+		const TSoftClassPtr<UObject>& ItemActionClass, UUserWidget* ParentWidget) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.
@@ -85,8 +89,17 @@ public:
 	 * @return The soft class reference to the item action.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
-	TSoftClassPtr<UMounteaInventoryItemAction> GetItemAction() const;
-	virtual TSoftClassPtr<UMounteaInventoryItemAction> GetItemAction_Implementation() const = 0;
+	TSoftClassPtr<UObject> GetItemAction() const;
+	virtual TSoftClassPtr<UObject> GetItemAction_Implementation() const = 0;
+
+	/**
+	 * Gets the data associated with this item's action, including its display name, icon, and other properties.
+	 * 
+	 * @return The action data containing information about the item action.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
+	FMounteaItemActionData GetItemActionData() const;
+	virtual FMounteaItemActionData GetItemActionData_Implementation() const = 0;
 
 	virtual FOnItemActionSelected& GetOnItemActionSelectedEventHandle() = 0;
 };
