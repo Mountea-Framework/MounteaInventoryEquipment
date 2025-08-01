@@ -940,6 +940,17 @@ public:
 #pragma region ItemActionsContainer
 
 	/**
+	 * Sets the parent item widget for the item actions container.
+	 *
+	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ParentItemWidget The parent item widget to be set for the item actions container.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Construct From Actions List")
+	static void ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget);
+
+	/**
 	 * Constructs the item actions container from a list of item action classes.
 	 *
 	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.

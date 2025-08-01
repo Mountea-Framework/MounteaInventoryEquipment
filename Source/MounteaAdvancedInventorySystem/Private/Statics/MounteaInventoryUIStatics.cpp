@@ -1013,8 +1013,19 @@ FMounteaItemActionData UMounteaInventoryUIStatics::ItemAction_GetActionData(UWid
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemActionData(Target);
 }
 
+void UMounteaInventoryUIStatics::ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[SetParentItemWidget] Target does not implement IMounteaAdvancedInventoryItemActionsContainerWidgetInterface or is invalid!"));
+		return;
+	}
+
+	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_SetParentItemWidget(Target, ParentItemWidget);
+}
+
 void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target,
-	const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
+																			   const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
