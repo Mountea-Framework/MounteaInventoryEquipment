@@ -19,6 +19,7 @@
 
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
+struct FMounteaItemActionData;
 
 class UWidget;
 class UTextBlock;
@@ -862,7 +863,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_InitializeItemAction(UUserWidget* Target,
 		const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-		const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass,
+		const TSoftClassPtr<UObject>& ItemActionClass,
 		UUserWidget* ParentWidget);
 
 	/**
@@ -917,7 +918,21 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Item Action")
-	static TSoftClassPtr<UMounteaInventoryItemAction> ItemAction_GetItemAction(UUserWidget* Target);
+	static TSoftClassPtr<UObject> ItemAction_GetItemAction(UUserWidget* Target);
+
+	/**
+	 * Retrieves the action data associated with a specific target widget.
+	 * This function checks if the target widget is valid and implements the MounteaAdvancedInventoryItemActionWidgetInterface,
+	 * then retrieves the action data from it.
+	 *
+	 * @param Target The target widget from which to retrieve the action data. Must be a valid widget implementing the interface.
+	 * 
+	 * @return The FMounteaItemActionData containing the action's display information, or an empty struct if the target is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Item Action Data")
+	static FMounteaItemActionData ItemAction_GetActionData(UWidget* Target);
 
 #pragma endregion
 
