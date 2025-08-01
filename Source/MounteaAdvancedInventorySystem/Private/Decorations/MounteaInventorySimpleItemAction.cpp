@@ -57,7 +57,7 @@ bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventor
 	if (!TargetItem.IsItemValid())
 		return false;
 
-	if (!IsActionVisible(TargetItem))
+	if (!Execute_IsActionVisible(this, TargetItem))
 		return false;
 
 	if (!IsValid(TargetItem.Template))
@@ -83,7 +83,7 @@ FText UMounteaInventorySimpleItemAction::GetDisallowedReason_Implementation(cons
 
 bool UMounteaInventorySimpleItemAction::ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem)
 {
-	if (!IsAllowed(TargetItem))
+	if (!Execute_IsAllowed(this, TargetItem))
 	{
 		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *GetDisallowedReason(TargetItem).ToString())
 		return false;
