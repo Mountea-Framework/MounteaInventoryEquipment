@@ -66,7 +66,7 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 		return;
 	}
 
-	UMounteaInventoryItemAction* actionInstance = NewObject<UMounteaInventoryItemAction>(this, ActionClass.LoadSynchronous());
+	UObject* actionInstance = NewObject<UObject>(this, ActionClass.LoadSynchronous());
 	if (!actionInstance)
 	{
 		LOG_ERROR(TEXT("[ExecuteItemAction] Failed to Initialize Item Action for widget '%s'"), *GetName());
@@ -75,8 +75,8 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 	
 	FGuid inventoryItemId = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryItemId(ParentItemWidget);
 	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItemId));
-	
-	actionInstance->ExecuteInventoryAction(inventoryItem);
+
+	IMounteaAdvancedInventoryItemActionInterface::Execute_ExecuteInventoryAction(actionInstance, inventoryItem);
 }
 
 FMounteaItemActionData UMounteaAdvancedInventoryItemActionWidget::GetItemActionData_Implementation() const

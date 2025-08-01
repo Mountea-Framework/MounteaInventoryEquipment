@@ -864,7 +864,7 @@ public:
 	static void ItemAction_InitializeItemAction(UUserWidget* Target,
 		const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
 		const TSoftClassPtr<UObject>& ItemActionClass,
-		UUserWidget* ParentWidget);
+		UWidget* ParentWidget);
 
 	/**
 	 * Checks if the item action associated with the specified target widget is enabled.
