@@ -152,6 +152,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Item Actions",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryItemActionsWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Item Actions",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryActionQuantityProviderWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryItemActionsQuantityProviderWidgetClass;
 	
 	// --- User Interface: Item Panel
 
