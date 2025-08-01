@@ -20,6 +20,8 @@ class UGameplayEffect;
 class IMounteaAdvancedInventoryInterface;
 struct FInventoryItem;
 
+enum class EInventoryItemActionCallback : uint8;
+
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemActionData"
 
 /**
@@ -83,6 +85,14 @@ public:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
 	FGameplayTag ItemActionTag;
+
+	/**
+	 * Callback type for this action, used to determine how the action is processed.
+	 * This can be used to trigger different behaviors based on the action type.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action",
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback"))
+	uint8 InventoryItemActionCallback;
 
 	/**
 	 * Gameplay effects to apply when this action is successfully executed.
@@ -268,4 +278,43 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	FGameplayTag GetInventoryItemTag() const;
 	virtual FGameplayTag GetInventoryItemTag_Implementation() const = 0;
+
+	/**
+	 * Gets the callback type for this inventory item action.
+	 * 
+	 * This defines how the action interacts with the inventory system and UI.
+	 * 
+	 * @return The callback type indicating how this action should be processed.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	EInventoryItemActionCallback GetInventoryItemActionCallback() const;
+	virtual EInventoryItemActionCallback GetInventoryItemActionCallback_Implementation() const = 0;
+
+	/**
+	 * Adds a specified action flag to an inventory item action.
+	 * Designed to modify the behavior of item actions by appending a predefined flag.
+	 *
+	 * @param FlagToAdd The action flag to be added to the item action.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void AddActionFlag(const EInventoryItemActionCallback FlagToAdd);
+	virtual void AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd) = 0;
+	
+	/**
+	 * Removes a specific action flag from the item.
+	 * Allows modification of action flags associated with inventory items.
+	 *
+	 * @param FlagToRemove The flag to be removed from the item's action flags.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void RemoveActionFlag(const EInventoryItemActionCallback FlagToRemove);
+	virtual void RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove) = 0;
+
+	/**
+	 * Clears all action flags associated with the item.
+	 * Designed to reset the item's action state for further configuration or reinitialization.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void ClearAllActionFlags();
+	virtual void ClearAllActionFlags_Implementation() = 0;
 };
