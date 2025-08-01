@@ -60,7 +60,7 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 		return;
 	}
 	
-	if (!ActionClass.Get() || ActionClass.LoadSynchronous())
+	if (!ActionClass.Get())
 	{
 		LOG_ERROR(TEXT("[ExecuteItemAction] Invalid or empty `ActionClass` for widget '%s'"), *GetName());
 		return;
