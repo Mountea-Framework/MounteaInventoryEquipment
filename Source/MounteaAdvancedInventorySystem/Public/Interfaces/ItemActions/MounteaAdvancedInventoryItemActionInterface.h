@@ -38,7 +38,8 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaItemActionData
 		ActionDescription(LOCTEXT("DefaultActionDescription", "A basic inventory item action")),
 		ActionPriority(0),
 		bIsVisibleByDefault(true),
-		bRequiresConfirmation(false)
+		bRequiresConfirmation(false),
+		InventoryItemActionCallback(0)
 	{}
 
 public:
