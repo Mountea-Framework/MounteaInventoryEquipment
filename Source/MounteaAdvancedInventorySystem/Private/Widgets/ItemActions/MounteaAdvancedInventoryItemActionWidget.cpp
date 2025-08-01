@@ -20,7 +20,7 @@
 
 void UMounteaAdvancedInventoryItemActionWidget::InitializeItemAction_Implementation(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget)
+	const TSoftClassPtr<UObject>& ItemActionClass, UUserWidget* ParentWidget)
 {
 	ParentUIComponent = ParentUI;
 	ActionClass = ItemActionClass;
@@ -77,4 +77,22 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItemId));
 	
 	actionInstance->ExecuteInventoryAction(inventoryItem);
+}
+
+FMounteaItemActionData UMounteaAdvancedInventoryItemActionWidget::GetItemActionData_Implementation() const
+{
+	if (ActionClass.IsNull())
+	{
+		LOG_ERROR(TEXT("[GetItemActionData] Invalid or empty `ActionClass` for widget '%s'"), *GetName());
+		return FMounteaItemActionData();
+	}
+	const auto actionClass = ActionClass.LoadSynchronous();
+	if (!IsValid(actionClass))
+	{
+		LOG_ERROR(TEXT("[GetItemActionData] Invalid or empty `ActionClass` for widget '%s'"), *GetName());
+		return FMounteaItemActionData();
+	}
+
+	const auto actionDefault =  GetDefault<UObject>(actionClass);
+	return IMounteaAdvancedInventoryItemActionInterface::Execute_GetActionData(actionDefault);
 }
