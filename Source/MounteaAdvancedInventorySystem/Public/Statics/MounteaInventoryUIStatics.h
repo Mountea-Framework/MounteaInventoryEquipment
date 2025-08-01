@@ -19,6 +19,7 @@
 
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
+struct FMounteaItemActionData;
 
 class UWidget;
 class UTextBlock;
@@ -203,10 +204,22 @@ public:
 	 * 
 	 * @return The found inventory item, or an invalid item if not found.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find Item (From UI Component)")
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+
+
+	/**
+	 * Calculates the spawn location for an actions list based on the provided widget.
+	 *
+	 * @param ParentWidget The parent widget used for determining the spawn location. Must be a valid widget.
+	 * 
+	 * @return A FVector2D representing the calculated screen position where the actions list should spawn. Returns FVector2D::ZeroVector if the ParentWidget or its world is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static FVector2D GetActionsListSpawnLocation(UWidget* ParentWidget);
 
 #pragma endregion
 	
@@ -850,8 +863,8 @@ public:
 		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_InitializeItemAction(UUserWidget* Target,
 		const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-		const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass,
-		UUserWidget* ParentWidget);
+		const TSoftClassPtr<UObject>& ItemActionClass,
+		UWidget* ParentWidget);
 
 	/**
 	 * Checks if the item action associated with the specified target widget is enabled.
@@ -905,12 +918,50 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Item Action")
-	static TSoftClassPtr<UMounteaInventoryItemAction> ItemAction_GetItemAction(UUserWidget* Target);
+	static TSoftClassPtr<UObject> ItemAction_GetItemAction(UUserWidget* Target);
+
+	/**
+	 * Retrieves the action data associated with a specific target widget.
+	 * This function checks if the target widget is valid and implements the MounteaAdvancedInventoryItemActionWidgetInterface,
+	 * then retrieves the action data from it.
+	 *
+	 * @param Target The target widget from which to retrieve the action data. Must be a valid widget implementing the interface.
+	 * 
+	 * @return The FMounteaItemActionData containing the action's display information, or an empty struct if the target is invalid.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Item Action Data")
+	static FMounteaItemActionData ItemAction_GetActionData(UWidget* Target);
 
 #pragma endregion
 
 	// --- Item Actions Container------------------------
 #pragma region ItemActionsContainer
+
+	/**
+	 * Sets the parent item widget for the item actions container.
+	 *
+	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ParentItemWidget The parent item widget to be set for the item actions container.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Parent Item Widget")
+	static void ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget);
+
+	/**
+	 * Constructs the item actions container from a list of item action classes.
+	 *
+	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
+	 * @param ItemActionsList An array of TSoftClassPtr<UObject> representing the item actions to be added to the container.
+	 * 
+	 * Each class must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Construct From Actions List")
+	static void ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target, const TArray<TSoftClassPtr<UObject>>& ItemActionsList);
 
 	/**
 	 * Initializes the item actions container widget with the parent UI.

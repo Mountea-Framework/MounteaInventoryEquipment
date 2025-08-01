@@ -12,18 +12,26 @@
 
 #include "Decorations/MounteaInventorySimpleItemAction.h"
 
+#include "Blueprint/UserWidget.h"
+#include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaInventoryStatics.h"
 
 bool UMounteaInventorySimpleItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
-																			const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory)
+ const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory, UObject* ContextPayload)
 {
 	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
 		return false;
 	
 	CurrentTargetItem = NewTargetItem;
 
+	if (TObjectPtr<UUserWidget> payloadWidget = Cast<UUserWidget>(ContextPayload))
+		ParentItemWidget = payloadWidget;
+	else
+		LOG_WARNING(TEXT("[%s] Invalid context payload for item action!"), *GetName())
+	
 	return true;
 }
 
@@ -49,7 +57,7 @@ bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventor
 	if (!TargetItem.IsItemValid())
 		return false;
 
-	if (!IsActionVisible(TargetItem))
+	if (!Execute_IsActionVisible(this, TargetItem))
 		return false;
 
 	if (!IsValid(TargetItem.Template))
@@ -75,9 +83,9 @@ FText UMounteaInventorySimpleItemAction::GetDisallowedReason_Implementation(cons
 
 bool UMounteaInventorySimpleItemAction::ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem)
 {
-	if (!IsAllowed(TargetItem))
+	if (!Execute_IsAllowed(this, TargetItem))
 	{
-		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *GetDisallowedReason(TargetItem).ToString())
+		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *Execute_GetDisallowedReason(this, TargetItem).ToString())
 		return false;
 	}
 	
@@ -90,3 +98,24 @@ bool UMounteaInventorySimpleItemAction::ProcessAction_Implementation(UObject* Ac
 	LOG_WARNING(TEXT("[ProcessAction] Called on base simple action class for %s!"), *GetName())
 	return false;
 }
+
+EInventoryItemActionCallback UMounteaInventorySimpleItemAction::GetInventoryItemActionCallback_Implementation() const
+{
+	return static_cast<EInventoryItemActionCallback>(ItemActionData.InventoryItemActionCallback);
+}
+
+void UMounteaInventorySimpleItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
+{
+	ItemActionData.InventoryItemActionCallback |= static_cast<uint8>(FlagToAdd);
+}
+
+void UMounteaInventorySimpleItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
+{
+	ItemActionData.InventoryItemActionCallback &= ~static_cast<uint8>(FlagToRemove);
+}
+
+void UMounteaInventorySimpleItemAction::ClearAllActionFlags_Implementation()
+{
+	ItemActionData.InventoryItemActionCallback = 0;
+}
+

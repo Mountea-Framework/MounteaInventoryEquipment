@@ -36,7 +36,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventorySimpleItemAction : pub
 	GENERATED_BODY()
 
 #pragma region Inventory Specific
-
 protected:
 
 	/** Data of the Inventory Action. */
@@ -47,9 +46,11 @@ protected:
 #pragma endregion
 
 #pragma region IMounteaAdvancedInventoryItemActionInterface
-
+public:
+	
 	virtual bool InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory) override;
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory,
+		UObject* ContextPayload = nullptr) override;
 	virtual FInventoryItem GetTargetItem_Implementation() const override
 	{ return CurrentTargetItem; };
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory_Implementation() const override;
@@ -64,17 +65,27 @@ protected:
 	virtual bool ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem) override;
 	virtual bool CanModifyTargetItem_Implementation() const override
 	{ return true; };
+	virtual void AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd) override;
+	virtual void RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove) override;
+	virtual void ClearAllActionFlags_Implementation() override;
+	virtual EInventoryItemActionCallback GetInventoryItemActionCallback_Implementation() const override;
 
 #pragma endregion
 
 #pragma region Private Data
-
 private:
+
+	/**
+	 * The parent widget that owns this item action.
+	 * Used for UI context and interaction.
+	 */
+	UPROPERTY(Transient, BlueprintReadOnly, meta=(ExposeOnSpawn, AllowPrivateAccess))
+	TObjectPtr<UUserWidget> ParentItemWidget;
 	
 	/**
 	 * The inventory item currently being processed by this action.
 	 */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess))
 	FInventoryItem CurrentTargetItem;
 	
 #pragma endregion

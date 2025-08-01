@@ -27,12 +27,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API
 
 public:
 
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI, const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget) override;
+	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+		const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget) override;
 	virtual bool IsActionEnabled_Implementation() const override;
 	virtual bool IsActionValid_Implementation() const override;
 	virtual void ExecuteItemAction_Implementation() override;
-	virtual TSoftClassPtr<UMounteaInventoryItemAction> GetItemAction_Implementation() const override
+	virtual TSoftClassPtr<UObject> GetItemAction_Implementation() const override
 	{ return ActionClass; };
+	virtual FMounteaItemActionData GetItemActionData_Implementation() const override;
 
 	virtual FOnItemActionSelected& GetOnItemActionSelectedEventHandle() override
 	{ return OnItemActionSelected; };
@@ -40,13 +42,14 @@ public:
 protected:
 
 	/** The class of the item action to be executed by this widget. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item Action")
-	TSoftClassPtr<UMounteaInventoryItemAction> ActionClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item Action",
+		meta=(MustImplement="/Script/ActorInteractionPlugin.MounteaAdvancedInventoryItemActionInterface"))
+	TSoftClassPtr<UObject> ActionClass;
 
 	/** The parent Item component that owns this item action widget. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Item Action",
 		meta=(DisplayThumbnail=false))
-	TObjectPtr<UUserWidget> ParentItemWidget;
+	TObjectPtr<UWidget> ParentItemWidget;
 
 	/** Event triggered when an item action is selected. */
 	UPROPERTY(BlueprintAssignable, BlueprintReadOnly, Category="Item Action")

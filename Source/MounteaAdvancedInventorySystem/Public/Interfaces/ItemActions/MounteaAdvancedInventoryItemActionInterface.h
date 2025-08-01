@@ -20,6 +20,8 @@ class UGameplayEffect;
 class IMounteaAdvancedInventoryInterface;
 struct FInventoryItem;
 
+enum class EInventoryItemActionCallback : uint8;
+
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemActionData"
 
 /**
@@ -36,7 +38,8 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaItemActionData
 		ActionDescription(LOCTEXT("DefaultActionDescription", "A basic inventory item action")),
 		ActionPriority(0),
 		bIsVisibleByDefault(true),
-		bRequiresConfirmation(false)
+		bRequiresConfirmation(false),
+		InventoryItemActionCallback(0)
 	{}
 
 public:
@@ -85,6 +88,14 @@ public:
 	FGameplayTag ItemActionTag;
 
 	/**
+	 * Callback type for this action, used to determine how the action is processed.
+	 * This can be used to trigger different behaviors based on the action type.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action",
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback"))
+	uint8 InventoryItemActionCallback;
+
+	/**
 	 * Gameplay effects to apply when this action is successfully executed.
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action",
@@ -112,12 +123,17 @@ public:
 	 * 
 	 * @param TargetItem The inventory item this action will operate on.
 	 * @param OwningInventory The inventory interface that contains the target item.
+	 * @param ContextPayload Optional context object for additional data (e.g., player controller, UI context).
 	 * 
 	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool InitializeItemAction(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory);
-	virtual bool InitializeItemAction_Implementation(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory) = 0;
+	bool InitializeItemAction(const FInventoryItem& TargetItem,
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+		UObject* ContextPayload = nullptr);
+	virtual bool InitializeItemAction_Implementation(const FInventoryItem& TargetItem,
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+		UObject* ContextPayload = nullptr) = 0;
 
 	/**
 	 * Checks if this action has been properly initialized and is ready for execution.
@@ -177,47 +193,47 @@ public:
 	bool CanModifyTargetItem() const;
 	virtual bool CanModifyTargetItem_Implementation() const = 0;
 	
-    /**
-     * Gets the action data containing display information and configuration.
-     * 
-     * @return The action data structure with name, description, icon, and other properties.
-     */
-    UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-    FMounteaItemActionData GetActionData() const;
-    virtual FMounteaItemActionData GetActionData_Implementation() const = 0;
+	/**
+	 * Gets the action data containing display information and configuration.
+	 * 
+	 * @return The action data structure with name, description, icon, and other properties.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	FMounteaItemActionData GetActionData() const;
+	virtual FMounteaItemActionData GetActionData_Implementation() const = 0;
 
-    /**
-     * Determines whether this action should be visible in the UI for the given item.
-     * 
-     * @param TargetItem The inventory item to check visibility for.
-     * 
-     * @return True if the action should be shown in the user interface, false otherwise.
-     */
-    UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-    bool IsActionVisible(const FInventoryItem& TargetItem) const;
-    virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const = 0;
+	/**
+	 * Determines whether this action should be visible in the UI for the given item.
+	 * 
+	 * @param TargetItem The inventory item to check visibility for.
+	 * 
+	 * @return True if the action should be shown in the user interface, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool IsActionVisible(const FInventoryItem& TargetItem) const;
+	virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const = 0;
 
-    /**
-     * Determines whether this action is currently allowed to be executed on the target item.
-     * 
-     * @param TargetItem The inventory item to check execution permissions for.
-     * 
-     * @return True if the action can be executed, false if it's currently blocked.
-     */
-    UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-    bool IsAllowed(const FInventoryItem& TargetItem) const;
-    virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const = 0;
+	/**
+	 * Determines whether this action is currently allowed to be executed on the target item.
+	 * 
+	 * @param TargetItem The inventory item to check execution permissions for.
+	 * 
+	 * @return True if the action can be executed, false if it's currently blocked.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool IsAllowed(const FInventoryItem& TargetItem) const;
+	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const = 0;
 
-    /**
-     * Gets a user-friendly reason explaining why the action is not allowed.
-     * 
-     * @param TargetItem The inventory item that the action cannot be performed on.
-     * 
-     * @return Localized text explaining why the action is disabled or unavailable.
-     */
-    UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-    FText GetDisallowedReason(const FInventoryItem& TargetItem) const;
-    virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const = 0;
+	/**
+	 * Gets a user-friendly reason explaining why the action is not allowed.
+	 * 
+	 * @param TargetItem The inventory item that the action cannot be performed on.
+	 * 
+	 * @return Localized text explaining why the action is disabled or unavailable.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	FText GetDisallowedReason(const FInventoryItem& TargetItem) const;
+	virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const = 0;
 
 	/**
 	 * Executes the inventory action on the specified target item.
@@ -231,7 +247,7 @@ public:
 	 * @return True if the action was executed successfully, false if it failed.
 	 * 
 	 * @note For GAS-based actions, this function initiates the ability system workflow.
-	 *       The actual execution logic occurs in ActivateAbility() called by GAS.
+	 *	   The actual execution logic occurs in ActivateAbility() called by GAS.
 	 * @note For simple actions, this function contains the complete execution logic.
 	 * @note Always call InitializeItemAction() before executing actions to ensure proper context.
 	 */
@@ -255,12 +271,51 @@ public:
 	bool ProcessAction(UObject* ActionInitiator, const FInventoryItem& TargetItem);
 	virtual bool ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem) = 0;
 
-    /**
-     * Gets the gameplay tag that uniquely identifies this inventory action.
-     * 
-     * @return The gameplay tag used for filtering and identifying this action type.
-     */
-    UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-    FGameplayTag GetInventoryItemTag() const;
-    virtual FGameplayTag GetInventoryItemTag_Implementation() const = 0;
+	/**
+	 * Gets the gameplay tag that uniquely identifies this inventory action.
+	 * 
+	 * @return The gameplay tag used for filtering and identifying this action type.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	FGameplayTag GetInventoryItemTag() const;
+	virtual FGameplayTag GetInventoryItemTag_Implementation() const = 0;
+
+	/**
+	 * Gets the callback type for this inventory item action.
+	 * 
+	 * This defines how the action interacts with the inventory system and UI.
+	 * 
+	 * @return The callback type indicating how this action should be processed.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	EInventoryItemActionCallback GetInventoryItemActionCallback() const;
+	virtual EInventoryItemActionCallback GetInventoryItemActionCallback_Implementation() const = 0;
+
+	/**
+	 * Adds a specified action flag to an inventory item action.
+	 * Designed to modify the behavior of item actions by appending a predefined flag.
+	 *
+	 * @param FlagToAdd The action flag to be added to the item action.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void AddActionFlag(const EInventoryItemActionCallback FlagToAdd);
+	virtual void AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd) = 0;
+	
+	/**
+	 * Removes a specific action flag from the item.
+	 * Allows modification of action flags associated with inventory items.
+	 *
+	 * @param FlagToRemove The flag to be removed from the item's action flags.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void RemoveActionFlag(const EInventoryItemActionCallback FlagToRemove);
+	virtual void RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove) = 0;
+
+	/**
+	 * Clears all action flags associated with the item.
+	 * Designed to reset the item's action state for further configuration or reinitialization.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void ClearAllActionFlags();
+	virtual void ClearAllActionFlags_Implementation() = 0;
 };

@@ -14,6 +14,7 @@
 
 #include "InputMappingContext.h"
 #include "Algo/Copy.h"
+#include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 
@@ -25,6 +26,7 @@
 #include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Interfaces/Widgets/BaseWidget/MounteaAdvancedBaseInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
@@ -294,7 +296,28 @@ FInventoryItem UMounteaInventoryUIStatics::FindItem(
 	if (!IsValid(inventory.GetObject()))
 		return {};
 
-	return inventory->Execute_FindItem(Target.GetObject(), SearchParams);
+	return inventory->Execute_FindItem(inventory.GetObject(), SearchParams);
+}
+
+FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
+{
+	if (!IsValid(ParentWidget))
+	{
+		LOG_ERROR(TEXT("[GetActionsListSpawnLocation] Invalid Parent Widget!"));
+		return FVector2D::ZeroVector;
+	}
+
+	if (!IsValid(ParentWidget->GetWorld()))
+	{
+		LOG_ERROR(TEXT("[GetActionsListSpawnLocation] Invalid World!"));
+		return FVector2D::ZeroVector;
+	}
+	const auto Geometry = ParentWidget->GetCachedGeometry();
+	FVector2D localCoordinates = FVector2D(Geometry.GetLocalSize().X, 0.f);
+	FVector2D pixelPosition, viewportPosition;
+	USlateBlueprintLibrary::LocalToViewport(ParentWidget->GetWorld(), Geometry, localCoordinates, pixelPosition, viewportPosition);
+
+	return pixelPosition;
 }
 
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
@@ -925,7 +948,7 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 
 void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UUserWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
-	const TSoftClassPtr<UMounteaInventoryItemAction>& ItemActionClass, UUserWidget* ParentWidget)
+	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeItemAction(
@@ -956,7 +979,7 @@ void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UUserWidget* Targe
 		LOG_ERROR(TEXT("[ExecuteItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
 }
 
-TSoftClassPtr<UMounteaInventoryItemAction> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUserWidget* Target)
+TSoftClassPtr<UObject> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUserWidget* Target)
 {
 	if (!IsValid(Target))
 	{
@@ -971,6 +994,46 @@ TSoftClassPtr<UMounteaInventoryItemAction> UMounteaInventoryUIStatics::ItemActio
 	}
 
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
+}
+
+FMounteaItemActionData UMounteaInventoryUIStatics::ItemAction_GetActionData(UWidget* Target)
+{
+	if (!IsValid(Target))
+	{
+		LOG_ERROR(TEXT("[GetActionData] Invalid Target!"));
+		return FMounteaItemActionData();
+	}
+
+	if (!Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[GetActionData] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
+		return FMounteaItemActionData();
+	}
+
+	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemActionData(Target);
+}
+
+void UMounteaInventoryUIStatics::ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[SetParentItemWidget] Target does not implement IMounteaAdvancedInventoryItemActionsContainerWidgetInterface or is invalid!"));
+		return;
+	}
+
+	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_SetParentItemWidget(Target, ParentItemWidget);
+}
+
+void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target,
+																			   const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[ConstructFromActionsList] Target does not implement IMounteaAdvancedInventoryItemActionsContainerWidgetInterface or is invalid!"));
+		return;
+	}
+
+	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, ItemActionsList);
 }
 
 void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UUserWidget* Target,

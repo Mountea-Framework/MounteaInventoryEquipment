@@ -12,6 +12,7 @@
 
 #include "Components/MounteaInventoryUIComponent.h"
 
+#include "CommonActivatableWidget.h"
 #include "Blueprint/UserWidget.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
@@ -88,14 +89,14 @@ void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScri
 
 bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 {
-	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
-	if (!Config)
+	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig();
+	if (!inventoryConfig)
 	{
 		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory Config!"))
 		return false;
 	}
 
-	auto widgetClass = Config->UserInterfaceWrapperClass.LoadSynchronous();
+	auto widgetClass = inventoryConfig->UserInterfaceWrapperClass.LoadSynchronous();
 	if (!IsValid(widgetClass))
 	{
 		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory UI Class from Config!"))
@@ -129,7 +130,7 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 		return false;
 	}
 
-	auto newWidget = CreateWidget<UUserWidget>(playerController, widgetClass);
+	auto newWidget = CreateWidget<UCommonActivatableWidget>(playerController, widgetClass);
 	if (!newWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>())
 	{
 		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI  must implement `MounteaInventorySystemBaseWidgetInterface`!"))
@@ -137,6 +138,8 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 	}
 
 	InventoryWidget = newWidget;
+	InventoryWidget->ActivateWidget();
+	
 	TScriptInterface<IMounteaInventorySystemBaseWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
@@ -169,6 +172,7 @@ void UMounteaInventoryUIComponent::RemoveMainUIWrapper_Implementation()
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
 	inventoryInterface->Execute_RemoveMainUI(InventoryWidget);
+	InventoryWidget->DeactivateWidget();
 	
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{

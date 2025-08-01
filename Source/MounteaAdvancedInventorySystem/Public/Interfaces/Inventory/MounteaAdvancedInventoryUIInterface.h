@@ -19,6 +19,7 @@
 struct FInventoryItem;
 struct FInventoryNotificationData;
 class IMounteaAdvancedInventoryInterface;
+class UCommonActivatableWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&, SelectedItemId);
@@ -97,8 +98,8 @@ public:
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	UUserWidget* GetMainUIWrapper() const;
-	virtual UUserWidget* GetMainUIWrapper_Implementation() const = 0;
+	UCommonActivatableWidget* GetMainUIWrapper() const;
+	virtual UCommonActivatableWidget* GetMainUIWrapper_Implementation() const = 0;
 
 	/**
 	 * Removes the inventory UI.
