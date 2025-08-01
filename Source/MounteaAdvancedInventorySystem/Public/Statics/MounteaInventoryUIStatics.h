@@ -947,7 +947,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Construct From Actions List")
+		DisplayName="Set Parent Item Widget")
 	static void ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget);
 
 	/**
