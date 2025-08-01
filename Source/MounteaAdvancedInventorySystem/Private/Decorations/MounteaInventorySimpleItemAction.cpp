@@ -85,7 +85,7 @@ bool UMounteaInventorySimpleItemAction::ExecuteInventoryAction_Implementation(co
 {
 	if (!Execute_IsAllowed(this, TargetItem))
 	{
-		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *GetDisallowedReason(TargetItem).ToString())
+		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *Execute_GetDisallowedReason(this, TargetItem).ToString())
 		return false;
 	}
 	
