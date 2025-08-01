@@ -28,6 +28,9 @@ namespace InventoryUICommands
 	
 	const FString RefreshInventory(TEXT("RefreshInventory"));
 
+	const FString AddModalWindow(TEXT("AddModalWindow"));
+	const FString RemoveModalWindow(TEXT("RemoveModalWindow"));
+
 	const FString ItemAdded(TEXT("ItemAdded"));
 	const FString ItemRemoved(TEXT("ItemRemoved"));
 	const FString ItemModified(TEXT("ItemModified"));
@@ -55,6 +58,9 @@ namespace InventoryUICommands
 
 		CategorySelected,
 		ItemSelected,
+
+		AddModalWindow,
+		RemoveModalWindow,
 
 		ItemAdded,
 		ItemRemoved,
