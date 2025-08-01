@@ -175,6 +175,27 @@ bool UMounteaInventoryItemAction::ProcessAction_Implementation(UObject* ActionIn
 	return false;
 }
 
+EInventoryItemActionCallback UMounteaInventoryItemAction::GetInventoryItemActionCallback_Implementation() const
+{
+	return static_cast<EInventoryItemActionCallback>(ItemActionData.InventoryItemActionCallback);
+}
+
+void UMounteaInventoryItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
+{
+	ItemActionData.InventoryItemActionCallback |= static_cast<uint8>(FlagToAdd);
+}
+
+void UMounteaInventoryItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
+{
+	ItemActionData.InventoryItemActionCallback &= ~static_cast<uint8>(FlagToRemove);
+}
+
+void UMounteaInventoryItemAction::ClearAllActionFlags_Implementation()
+{
+	ItemActionData.InventoryItemActionCallback = 0;
+}
+
+
 void UMounteaInventoryItemAction::ApplyActionEffects()
 {
 	UAbilitySystemComponent* asc = GetAbilitySystemComponentFromActorInfo();

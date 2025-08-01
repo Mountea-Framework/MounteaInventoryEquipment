@@ -13,6 +13,7 @@
 #include "Decorations/MounteaInventorySimpleItemAction.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
@@ -97,3 +98,24 @@ bool UMounteaInventorySimpleItemAction::ProcessAction_Implementation(UObject* Ac
 	LOG_WARNING(TEXT("[ProcessAction] Called on base simple action class for %s!"), *GetName())
 	return false;
 }
+
+EInventoryItemActionCallback UMounteaInventorySimpleItemAction::GetInventoryItemActionCallback_Implementation() const
+{
+	return static_cast<EInventoryItemActionCallback>(ItemActionData.InventoryItemActionCallback);
+}
+
+void UMounteaInventorySimpleItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
+{
+	ItemActionData.InventoryItemActionCallback |= static_cast<uint8>(FlagToAdd);
+}
+
+void UMounteaInventorySimpleItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
+{
+	ItemActionData.InventoryItemActionCallback &= ~static_cast<uint8>(FlagToRemove);
+}
+
+void UMounteaInventorySimpleItemAction::ClearAllActionFlags_Implementation()
+{
+	ItemActionData.InventoryItemActionCallback = 0;
+}
+

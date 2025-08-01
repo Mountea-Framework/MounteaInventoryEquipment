@@ -73,6 +73,10 @@ protected:
 	virtual bool ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem) override;
 	virtual bool CanModifyTargetItem_Implementation() const override
 	{ return true; };
+	virtual void AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd) override;
+	virtual void RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove) override;
+	virtual void ClearAllActionFlags_Implementation() override;
+	virtual EInventoryItemActionCallback GetInventoryItemActionCallback_Implementation() const override;
 
 #pragma endregion
 
