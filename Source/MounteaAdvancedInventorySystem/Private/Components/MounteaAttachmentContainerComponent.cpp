@@ -137,18 +137,23 @@ bool UMounteaAttachmentContainerComponent::DisableSlot_Implementation(const FNam
 
 bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName& SlotId, UObject* Attachment)
 {
+	if (!Attachment) return false;
+
 	if (!GetOwner()->HasAuthority())
 	{
-		LOG_WARNING(TEXT("TryAttach: Client has no authority."));
-		return false;
+		ServerTryAttach(SlotId, Attachment);
+		return true;
 	}
-
-	if (!Attachment) return false;
 
 	const bool bSuccess = TryAttachInternal(SlotId, Attachment);
 	if (bSuccess)
 		OnAttachmentChanged.Broadcast(SlotId, Attachment, nullptr);
 	return bSuccess;
+}
+
+void UMounteaAttachmentContainerComponent::ServerTryAttach_Implementation(const FName& SlotId, UObject* Attachment)
+{
+	Execute_TryAttach(this, SlotId, Attachment);
 }
 
 bool UMounteaAttachmentContainerComponent::TryAttachInternal(const FName& SlotId, UObject* Attachment)
@@ -164,19 +169,24 @@ bool UMounteaAttachmentContainerComponent::TryAttachInternal(const FName& SlotId
 
 bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName& SlotId)
 {
-	if (!GetOwner()->HasAuthority())
-	{
-		LOG_WARNING(TEXT("TryDetach: Client has no authority."));
-		return false;
-	}
-
 	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
 		return Slot->SlotName == SlotId;
 	});
 	if (!foundSlot)
 		return false;
 
+	if (!GetOwner()->HasAuthority())
+	{
+		ServerTryDetach(SlotId);
+		return true;
+	}
+
 	return foundSlot->Detach();
+}
+
+void UMounteaAttachmentContainerComponent::ServerTryDetach_Implementation(const FName& SlotId)
+{
+	Execute_TryDetach(this, SlotId);
 }
 
 bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FName& SlotId, UObject* Attachment)
