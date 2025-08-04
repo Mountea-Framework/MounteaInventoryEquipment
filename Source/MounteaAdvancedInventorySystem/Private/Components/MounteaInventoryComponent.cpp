@@ -61,6 +61,12 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 
 bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& Item)
 {
+	if (!IsAuthority())
+	{
+		LOG_WARNING(TEXT("AddItem: Client has no authority."));
+		return false;
+	}
+	
 	if (!Execute_CanAddItem(this, Item))
 	{
 		auto notificationData =  UMounteaInventoryStatics::CreateNotificationData(
@@ -71,12 +77,6 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 		);
 		Execute_ProcessInventoryNotification(this, notificationData);
 		return false;
-	}
-
-	if (!IsAuthority())
-	{
-		AddItem_Server(Item);
-		return true;
 	}
 	
 	auto existingItem = Execute_FindItem(this, FInventoryItemSearchParams(Item.GetGuid()));
@@ -177,6 +177,12 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 
 bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid)
 {
+	if (!IsAuthority())
+	{
+		LOG_WARNING(TEXT("RemoveItem: Client has no authority."));
+		return false;
+	}
+
 	if (!IsActive()) return false;
 	
 	const int32 ItemIndex = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
@@ -186,12 +192,6 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 	const FInventoryItem RemovedItem = InventoryItems.Items[ItemIndex];
 	
 	OnItemRemoved.Broadcast(RemovedItem);
-	
-	if (!IsAuthority())
-	{
-		RemoveItem_Server(ItemGuid);
-		return true;
-	}
 	
 	PostItemRemoved_Client(RemovedItem);
 	
@@ -203,6 +203,12 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 
 bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* const Template, const int32 Quantity)
 {
+	if (!IsAuthority())
+	{
+		LOG_WARNING(TEXT("RemoveItemFromTemplate: Client has no authority."));
+		return false;
+	}
+	
 	if (!IsValid(Template))
 		return false;
 
@@ -225,10 +231,7 @@ bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaI
 	}
 	else
 	{
-		if (!IsAuthority())
-			ChangeItemQuantity_Server(inventoryItem.GetGuid(), -Quantity);
-		else
-			Execute_DecreaseItemQuantity(this, inventoryItem.GetGuid(), Quantity);
+		Execute_DecreaseItemQuantity(this, inventoryItem.GetGuid(), Quantity);
 		return true;
 	}	
 }
@@ -488,15 +491,6 @@ bool UMounteaInventoryComponent::IsAuthority() const
 	return false;
 }
 
-void UMounteaInventoryComponent::ChangeItemQuantity_Server_Implementation(const FGuid& ItemGuid,
-	const int32 DeltaAmount)
-{
-	if (DeltaAmount < 0)
-		Execute_DecreaseItemQuantity(this, ItemGuid, FMath::Abs(DeltaAmount));
-	else if (DeltaAmount > 0)
-		Execute_IncreaseItemQuantity(this, ItemGuid, FMath::Abs(DeltaAmount));
-}
-
 void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementation(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta)
 {
 	// Wait for the next tick before executing the broadcast to avoid timing issues with replication (item might not exist yet)
@@ -511,16 +505,6 @@ void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementat
 			QuantityDelta
 		));
 	});
-}
-
-void UMounteaInventoryComponent::AddItem_Server_Implementation(const FInventoryItem& Item)
-{
-	Execute_AddItem(this, Item);
-}
-
-void UMounteaInventoryComponent::RemoveItem_Server_Implementation(const FGuid& ItemGuid)
-{
-	Execute_RemoveItem(this, ItemGuid);
 }
 
 void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInventoryItem& Item)
