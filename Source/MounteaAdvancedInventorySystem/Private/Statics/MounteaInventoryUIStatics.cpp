@@ -21,6 +21,7 @@
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
+#include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerState.h"
 
 #include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"

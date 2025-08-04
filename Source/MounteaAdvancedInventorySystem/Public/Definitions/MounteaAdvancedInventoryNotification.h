@@ -13,9 +13,13 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Styling/SlateBrush.h"
+
 #include "MounteaAdvancedInventoryNotification.generated.h"
 
 class IMounteaAdvancedInventoryInterface;
+class USoundBase;
+class UUserWidget;
 
 /**
 * Types of inventory notifications.

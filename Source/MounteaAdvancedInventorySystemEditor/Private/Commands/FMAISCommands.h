@@ -10,6 +10,8 @@
 // For more information, visit: https://mountea.tools
 
 #pragma once
+
+#include "Framework/Commands/Commands.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 class FMAISCommands : public TCommands<FMAISCommands>

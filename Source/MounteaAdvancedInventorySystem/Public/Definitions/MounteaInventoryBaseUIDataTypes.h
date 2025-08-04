@@ -14,6 +14,8 @@
 #include "CoreMinimal.h"
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
+class UUserWidget;
+
 /**
  * FInventorySlot is the base structure for all inventory slot UI representations.
  * Inventory slots encapsulate core properties shared across different slot types including

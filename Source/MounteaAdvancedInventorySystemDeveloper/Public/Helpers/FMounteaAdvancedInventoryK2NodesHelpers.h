@@ -11,6 +11,7 @@
 
 #pragma once
 #include "Interfaces/IPluginManager.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "UObject/Interface.h"
 
 enum class EFunctionCallType

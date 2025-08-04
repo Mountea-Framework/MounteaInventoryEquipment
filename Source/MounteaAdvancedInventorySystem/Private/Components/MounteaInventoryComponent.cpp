@@ -19,6 +19,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Statics/MounteaInventoryStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
+#include "TimerManager.h"
 
 UMounteaInventoryComponent::UMounteaInventoryComponent() : InventoryTypeFlag(EInventoryFlags::EIF_Private)
 {
