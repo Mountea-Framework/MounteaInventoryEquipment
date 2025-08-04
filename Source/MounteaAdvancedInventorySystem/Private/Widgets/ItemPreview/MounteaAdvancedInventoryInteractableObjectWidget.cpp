@@ -7,6 +7,7 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryInteractiveWidgetConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
 

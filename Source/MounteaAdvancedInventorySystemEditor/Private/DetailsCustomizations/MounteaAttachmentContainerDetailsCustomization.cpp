@@ -15,6 +15,9 @@
 #include "DetailCategoryBuilder.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailWidgetRow.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "Widgets/Input/SComboBox.h"
+
 #include "Components/MounteaAttachmentContainerComponent.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 
@@ -31,8 +34,13 @@ void FMounteaAttachmentContainerDetailsCustomization::CustomizeDetails(IDetailLa
 	// find an actor or CDO to pull components from
 	AActor* ownerActor = Comp->GetOwner();
 	if (!IsValid(ownerActor))
+	{
 		if (UBlueprintGeneratedClass* bpClass = Cast<UBlueprintGeneratedClass>(Comp->GetOuter()))
+		{
 			ownerActor = Cast<AActor>(bpClass->GetDefaultObject());
+		}
+	}
+		
 	if (!IsValid(ownerActor))
 	{
 		//LOG_WARNING(TEXT("[%s] Could not find owner actor or class default"), *Comp->GetName());

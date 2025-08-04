@@ -12,6 +12,7 @@
 
 #include "Statics/MounteaInventorySystemStatics.h"
 
+#include "Internationalization/Regex.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
