@@ -31,7 +31,7 @@ void FMounteaAdvancedInventoryDeveloperStyle::Create()
 	const FVector2D Icon200x70(200.f, 70.f);
 	
 	StyleSet = MakeShareable(new FSlateStyleSet(GetAppStyleSetName()));
-	StyleSet->SetContentRoot(IPluginManager::Get().FindPlugin("MounteaDialogueSystem")->GetBaseDir() / TEXT("Resources"));
+	StyleSet->SetContentRoot(IPluginManager::Get().FindPlugin(TEXT("MounteaAdvancedInventorySystem"))->GetBaseDir() / TEXT("Resources"));
 
 	StyleSet->Set("MAISStyleSet.MounteaLogo.Small", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon16x16));
 	StyleSet->Set("MAISStyleSet.MounteaLogo", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon40x40));
