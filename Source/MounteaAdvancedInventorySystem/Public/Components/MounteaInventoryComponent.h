@@ -77,13 +77,6 @@ protected:
 	// --- Class Functions ------------------------------
 protected:
 	bool IsAuthority() const;
-	
-	UFUNCTION(Server, Reliable)
-	void AddItem_Server(const FInventoryItem& Item);
-	UFUNCTION(Server, Reliable)
-	void RemoveItem_Server(const FGuid& ItemGuid);
-	UFUNCTION(Server, Reliable)
-	void ChangeItemQuantity_Server(const FGuid& ItemGuid, const int32 DeltaAmount);
 
 	UFUNCTION(Client, Unreliable)
 	void ProcessInventoryNotification_Client(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta);
