@@ -29,6 +29,7 @@ class UMounteaAdvancedInventoryThemeConfig;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventorySystemBaseWidgetInterface;
+struct FKey;
 
 UENUM(BlueprintType)
 enum class EMounteaThemeLevel : uint8

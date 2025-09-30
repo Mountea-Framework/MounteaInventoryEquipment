@@ -18,6 +18,7 @@
 
 class UMounteaInventoryItemAction;
 class UTexture;
+class UUserWidget;
 
 #define LOCTEXT_NAMESPACE "InventoryRarity"
 

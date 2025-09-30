@@ -14,6 +14,7 @@
 
 #include "Definitions/MounteaInventoryBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Engine/Texture2D.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Statics/MounteaInventoryStatics.h"
 

@@ -21,8 +21,9 @@
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemTemplate"
 
-class UTexture;
 class UMounteaInventoryItemAction;
+class UStreamableRenderAsset;
+class UTexture;
 enum class EInventoryItemFlags : uint8;
 
 /**

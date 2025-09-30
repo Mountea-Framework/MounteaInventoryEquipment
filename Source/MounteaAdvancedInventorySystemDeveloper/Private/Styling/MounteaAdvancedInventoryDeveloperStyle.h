@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Styling/AppStyle.h"
 #include "Styling/SlateStyle.h"
 
 class FMounteaAdvancedInventoryDeveloperStyle : public FAppStyle

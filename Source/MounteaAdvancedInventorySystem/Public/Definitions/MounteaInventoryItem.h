@@ -19,6 +19,7 @@
 
 class IMounteaAdvancedInventoryInterface;
 class UMounteaInventoryItemTemplate;
+class UTexture2D;
 
 /**
  * FInventoryItemSnapshot is a lightweight data structure for tracking replication changes.

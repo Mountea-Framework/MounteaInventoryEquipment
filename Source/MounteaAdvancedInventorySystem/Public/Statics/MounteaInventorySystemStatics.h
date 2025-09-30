@@ -14,6 +14,8 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Templates/SubclassOf.h"
+
 #include "MounteaInventorySystemStatics.generated.h"
 
 class UMounteaAdvancedInventorySettingsConfig;

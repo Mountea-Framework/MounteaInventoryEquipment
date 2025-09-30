@@ -89,7 +89,7 @@ bool UMounteaAdvancedAttachmentSlot::IsLocked() const
 USceneComponent* UMounteaAdvancedAttachmentSlot::GetAttachmentTargetComponent() const
 {
 	return AttachmentTargetComponentOverride ? 
-		AttachmentTargetComponentOverride : 
+		AttachmentTargetComponentOverride.Get() : 
 		ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject());
 }
 

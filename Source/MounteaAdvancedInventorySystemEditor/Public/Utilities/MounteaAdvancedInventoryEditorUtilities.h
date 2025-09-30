@@ -12,6 +12,7 @@
 #pragma once
 
 #include "ClassViewerFilter.h"
+#include "UObject/UObjectIterator.h"
 
 class UK2Node_Event;
 class UEdGraph;

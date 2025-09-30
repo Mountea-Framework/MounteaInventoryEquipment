@@ -13,6 +13,8 @@
 #include "Definitions/MounteaAdvancedAttachmentSlotBase.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/Engine.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"

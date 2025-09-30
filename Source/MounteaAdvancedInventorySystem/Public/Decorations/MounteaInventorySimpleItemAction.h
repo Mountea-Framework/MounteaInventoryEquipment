@@ -17,6 +17,8 @@
 #include "UObject/Object.h"
 #include "MounteaInventorySimpleItemAction.generated.h"
 
+class UUserWidget;
+
 /**
  * UMounteaInventorySimpleItemAction provides lightweight inventory actions for local UI operations.
  * Simple actions execute directly without Gameplay Ability System overhead, making them ideal

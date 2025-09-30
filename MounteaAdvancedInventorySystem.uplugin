@@ -53,12 +53,16 @@
 			"Enabled": true
 		},
 		{
-		  "Name": "EnhancedInput",
-		  "Enabled": true
+			"Name": "EditorScriptingUtilities",
+			"Enabled": true
 		},
-	  {
-		"Name": "GameplayAbilities",
-		"Enabled": true
-	  }
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
+		}
 	]
 }
