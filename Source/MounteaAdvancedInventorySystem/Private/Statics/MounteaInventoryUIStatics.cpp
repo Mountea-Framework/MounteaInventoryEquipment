@@ -23,6 +23,8 @@
 
 #include "GameFramework/PlayerState.h"
 
+#include "CommonActivatableWidget.h"
+
 #include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"

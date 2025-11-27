@@ -21,6 +21,7 @@
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 #include "UObject/ObjectSaveContext.h"
+#include "Components/MounteaAttachableComponent.h"
 
 UMounteaAttachmentContainerComponent::UMounteaAttachmentContainerComponent()
 {
