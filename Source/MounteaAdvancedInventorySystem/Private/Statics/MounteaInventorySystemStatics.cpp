@@ -13,6 +13,7 @@
 #include "Statics/MounteaInventorySystemStatics.h"
 
 #include "Kismet/KismetSystemLibrary.h"
+#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
 bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* WorldContext)
