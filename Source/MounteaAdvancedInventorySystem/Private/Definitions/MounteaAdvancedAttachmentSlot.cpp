@@ -90,7 +90,7 @@ USceneComponent* UMounteaAdvancedAttachmentSlot::GetAttachmentTargetComponent() 
 {
 	return AttachmentTargetComponentOverride ? 
 		AttachmentTargetComponentOverride : 
-		ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject());
+		TObjectPtr<USceneComponent>(ParentContainer->Execute_GetAttachmentTargetComponent(ParentContainer.GetObject()));
 }
 
 bool UMounteaAdvancedAttachmentSlot::PerformAttachmentLogic(UObject* NewAttachment)

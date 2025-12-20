@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.0.0.53",
+	"VersionName": "0.0.0.56",
 	"FriendlyName": "Mountea Advanced Inventory System",
 	"Description": "",
 	"Category": "Mountea Framework",
@@ -10,11 +10,11 @@
 	"DocsURL": "",
 	"MarketplaceURL": "",
 	"SupportURL": "https://discord.gg/waYT2cn37z",
-	"EngineVersion": "5.3.0",
+	"EngineVersion": "5.6.0",
 	"CanContainContent": true,
 	"IsBetaVersion": true,
 	"IsExperimentalVersion": true,
-	"Installed": true,
+	"Installed": false,
 	"Modules": [
 		{
 			"Name": "MounteaAdvancedInventorySystem",

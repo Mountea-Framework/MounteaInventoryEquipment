@@ -12,6 +12,7 @@
 #include "MounteaAdvancedInventoryDeveloperStyle.h"
 
 #include "Interfaces/IPluginManager.h"
+#include "Styling/AppStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 
 #define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
