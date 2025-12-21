@@ -29,6 +29,7 @@
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
@@ -212,7 +213,7 @@ void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(co
 	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
 	ensure(notificationContainerInterface.GetObject() != nullptr);
 	
-	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventoryUIConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventoryUISettingsConfig.LoadSynchronous();
 	if (!Config)
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))

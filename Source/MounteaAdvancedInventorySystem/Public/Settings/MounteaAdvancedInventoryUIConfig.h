@@ -29,9 +29,21 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryUIConfig : pub
 	
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notification Card")
+	// ---- Notifications
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications|Notification Card")
 	TSoftObjectPtr<UMaterialInterface> NotificationCardMaterial = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notification Card")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications|Notification Card")
 	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications|Classes",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
+	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications|Classes",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
+	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
+	
+	// ---- 
 };

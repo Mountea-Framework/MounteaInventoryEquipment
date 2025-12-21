@@ -175,14 +175,6 @@ public:
 	
 	// --- Notifications ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Notifications",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
-	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Notifications",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
-	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🔔 Notifications|Style", meta=(ForceInlineRow))
 	TMap<EInventoryNotificationCategory, FInventoryNotificationStyle> NotificationCategoryStyle;
 
