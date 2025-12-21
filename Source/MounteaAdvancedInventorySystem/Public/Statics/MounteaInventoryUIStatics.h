@@ -29,7 +29,7 @@ class UMounteaAdvancedInventoryThemeConfig;
 class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
-class IMounteaInventorySystemBaseWidgetInterface;
+class IMounteaInventorySystemWrapperWidgetInterface;
 
 UENUM(BlueprintType)
 enum class EMounteaThemeLevel : uint8
@@ -527,7 +527,7 @@ public:
 	 * @param Parent The parent widget that implements the IMounteaAdvancedInventoryUIInterface. This parent is used to provide context or linking to the target widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void InitializeMainUIWidget(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
+	static void InitializeMainUIWidget(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
 
 	/**
 	 * Returns the inventory UI.
@@ -591,7 +591,7 @@ public:
 	 * @param Target The target interface implementing IMounteaInventorySystemBaseWidgetInterface for which the inventory widget wrapper should be removed.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveInventoryWidgetWrapper(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target);
+	static void RemoveInventoryWidgetWrapper(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target);
 
 	/**
 	 * Sets the source inventory for a given target widget interface.
@@ -601,7 +601,7 @@ public:
 	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool SetSourceInventory(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
+	static bool SetSourceInventory(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 
 	/**
 	 * Triggers the 'CategorySelected' functionality on a given target, indicating that a specific inventory category has been selected.

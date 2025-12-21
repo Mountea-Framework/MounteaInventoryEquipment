@@ -25,7 +25,7 @@
 
 #include "CommonActivatableWidget.h"
 
-#include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
@@ -844,7 +844,7 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 }
 
 void UMounteaInventoryUIStatics::InitializeMainUIWidget(
-	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target,
+	const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
 {
 	if (Target.GetObject() && Parent.GetObject())
@@ -852,14 +852,14 @@ void UMounteaInventoryUIStatics::InitializeMainUIWidget(
 }
 
 void UMounteaInventoryUIStatics::RemoveInventoryWidgetWrapper(
-	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target)
+	const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target)
 {
 	if (Target.GetObject())
 		Target->Execute_RemoveMainUI(Target.GetObject());
 }
 
 bool UMounteaInventoryUIStatics::SetSourceInventory(
-	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target,
+	const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
 {
 	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;

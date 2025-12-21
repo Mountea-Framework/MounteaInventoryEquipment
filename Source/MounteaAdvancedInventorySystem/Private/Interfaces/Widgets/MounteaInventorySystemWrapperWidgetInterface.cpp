@@ -10,7 +10,7 @@
 // For more information, visit: https://mountea.tools
 
 
-#include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 
 
-// Add default functionality here for any IMounteaInventorySystemBaseWidgetInterface functions that are not pure virtual.
+// Add default functionality here for any IMounteaInventorySystemWrapperWidgetInterface functions that are not pure virtual.

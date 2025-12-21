@@ -13,26 +13,26 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "MounteaInventorySystemBaseWidgetInterface.generated.h"
+#include "MounteaInventorySystemWrapperWidgetInterface.generated.h"
 
 class IMounteaAdvancedInventoryInterface;
 class IMounteaAdvancedInventoryUIInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
-class UMounteaInventorySystemBaseWidgetInterface : public UInterface
+class UMounteaInventorySystemWrapperWidgetInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 /**
- * IMounteaInventorySystemBaseWidgetInterface manages main inventory system wrapper widget.
+ * IMounteaInventorySystemWrapperWidgetInterface manages main inventory system wrapper widget.
  * System base interfaces handle initialization, visibility management, and inventory source assignment
  * for top-level inventory UI wrappers and container widgets.
  *
  * @see [System Base Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
  * @see IMounteaAdvancedInventoryUIInterface
  */
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventorySystemBaseWidgetInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventorySystemWrapperWidgetInterface
 {
 	GENERATED_BODY()
 

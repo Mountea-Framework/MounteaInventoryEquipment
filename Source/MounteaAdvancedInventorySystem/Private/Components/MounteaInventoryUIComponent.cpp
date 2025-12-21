@@ -20,7 +20,7 @@
 #include "Helpers/MounteaAdvancedInventoryWidgetPayload.h"
 
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
-#include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/Notification/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Interfaces/Widgets/Notification/MounteaInventoryNotificationWidgetInterface.h"
@@ -103,7 +103,7 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory UI Class from Config!"))
 		return false;
 	}
-	if (!widgetClass->ImplementsInterface(UMounteaInventorySystemBaseWidgetInterface::StaticClass()))
+	if (!widgetClass->ImplementsInterface(UMounteaInventorySystemWrapperWidgetInterface::StaticClass()))
 	{
 		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI Class must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
@@ -132,7 +132,7 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 	}
 
 	auto newWidget = CreateWidget<UCommonActivatableWidget>(playerController, widgetClass);
-	if (!newWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>())
+	if (!newWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
 	{
 		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI  must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
@@ -141,7 +141,7 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 	InventoryWidget = newWidget;
 	InventoryWidget->ActivateWidget();
 	
-	TScriptInterface<IMounteaInventorySystemBaseWidgetInterface> inventoryInterface = InventoryWidget;
+	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
 	inventoryInterface->Execute_InitializeMainUI(InventoryWidget, this);
@@ -157,19 +157,19 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 
 ESlateVisibility UMounteaInventoryUIComponent::GetMainUIVisibility_Implementation() const
 {
-	return IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>()
-	? IMounteaInventorySystemBaseWidgetInterface::Execute_GetMainUIVisibility(InventoryWidget) : ESlateVisibility::Hidden;
+	return IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>()
+	? IMounteaInventorySystemWrapperWidgetInterface::Execute_GetMainUIVisibility(InventoryWidget) : ESlateVisibility::Hidden;
 }
 
 void UMounteaInventoryUIComponent::SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility)
 {
-	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>())
-		IMounteaInventorySystemBaseWidgetInterface::Execute_SetMainUIVisibility(InventoryWidget, NewVisibility);
+	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_SetMainUIVisibility(InventoryWidget, NewVisibility);
 }
 
 void UMounteaInventoryUIComponent::RemoveMainUIWrapper_Implementation()
 {
-	TScriptInterface<IMounteaInventorySystemBaseWidgetInterface> inventoryInterface = InventoryWidget;
+	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
 	inventoryInterface->Execute_RemoveMainUI(InventoryWidget);

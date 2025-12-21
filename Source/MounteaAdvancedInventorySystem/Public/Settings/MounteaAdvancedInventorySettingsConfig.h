@@ -110,7 +110,7 @@ public:
 	// --- User Interface: Main UI
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Wrapper",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemBaseWidgetInterface"))
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"))
 	TSoftClassPtr<UCommonActivatableWidget> UserInterfaceWrapperClass;
 
 	// --- User Interface: Inventory
