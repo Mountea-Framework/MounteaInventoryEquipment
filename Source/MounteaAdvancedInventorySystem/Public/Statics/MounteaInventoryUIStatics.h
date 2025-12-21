@@ -497,7 +497,7 @@ public:
 	 * @return True if UI was successfully created and initialized, otherwise false
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool CreateMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 	/**
 	 * Retrieves the visibility state of the main UI.
@@ -535,14 +535,14 @@ public:
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
 	 * Removes the inventory UI from the viewport and cleans up resources.
 	 * @param Target The UI interface to remove the inventory UI from
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 #pragma endregion
 	

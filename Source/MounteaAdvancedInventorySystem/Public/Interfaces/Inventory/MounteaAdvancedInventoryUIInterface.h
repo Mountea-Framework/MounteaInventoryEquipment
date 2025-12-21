@@ -63,50 +63,29 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
 	void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
-
-	/**
-	 * Retrieves the visibility state of the main UI.
-	 *
-	 * This function determines the current visibility status of the main UI
-	 * and returns an appropriate ESlateVisibility value.
-	 *
-	 * @return The visibility state of the main UI.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	ESlateVisibility GetMainUIVisibility() const;
-	virtual ESlateVisibility GetMainUIVisibility_Implementation() const = 0;
-
-	/**
-	 * Updates the visibility state of the main  UI.
-	 *
-	 * @param NewVisibility The new visibility state of the UI, defined as an ESlateVisibility value.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	void SetMainUIVisibility(const ESlateVisibility NewVisibility);
-	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) = 0;
-
+	
 	/**
 	 * Creates the inventory UI.
 	 * @return True if UI was successfully created, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	bool CreateMainUIWrapper();
-	virtual bool CreateMainUIWrapper_Implementation() = 0;
+	bool CreateWrapperWidget();
+	virtual bool CreateWrapperWidget_Implementation() = 0;
 
 	/**
 	 * Returns the inventory UI.
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	UCommonActivatableWidget* GetMainUIWrapper() const;
-	virtual UCommonActivatableWidget* GetMainUIWrapper_Implementation() const = 0;
+	UCommonActivatableWidget* GetWrapperWidget() const;
+	virtual UCommonActivatableWidget* GetWrapperWidget_Implementation() const = 0;
 
 	/**
 	 * Removes the inventory UI.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	void RemoveMainUIWrapper();
-	virtual void RemoveMainUIWrapper_Implementation() = 0;
+	void RemoveWrapperWidget();
+	virtual void RemoveWrapperWidget_Implementation() = 0;
 	
 	// --- Notification  ------------------------------
 
@@ -140,6 +119,29 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
 	void RemoveInventoryNotifications();
 	virtual void RemoveInventoryNotifications_Implementation() = 0;
+	
+	// --- DELETE
+	
+	/**
+	 * Retrieves the visibility state of the main UI.
+	 *
+	 * This function determines the current visibility status of the main UI
+	 * and returns an appropriate ESlateVisibility value.
+	 *
+	 * @return The visibility state of the main UI.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	ESlateVisibility GetMainUIVisibility() const;
+	virtual ESlateVisibility GetMainUIVisibility_Implementation() const = 0;
+
+	/**
+	 * Updates the visibility state of the main  UI.
+	 *
+	 * @param NewVisibility The new visibility state of the UI, defined as an ESlateVisibility value.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	void SetMainUIVisibility(const ESlateVisibility NewVisibility);
+	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) = 0;
 
 	// --- Categories
 	

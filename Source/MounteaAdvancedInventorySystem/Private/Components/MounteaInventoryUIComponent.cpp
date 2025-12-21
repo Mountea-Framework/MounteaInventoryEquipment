@@ -88,24 +88,24 @@ void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScri
 	if (ParentInventory != NewParentInventory) ParentInventory = NewParentInventory;
 }
 
-bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
+bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 {
-	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig();
-	if (!inventoryConfig)
+	const UMounteaAdvancedInventoryUIConfig* inventoryUIConfig = UMounteaInventoryUIStatics::GetInventoryUISettingsConfig();
+	if (!inventoryUIConfig)
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory Config!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load Inventory Config!"))
 		return false;
 	}
 
-	auto widgetClass = inventoryConfig->UserInterfaceWrapperClass.LoadSynchronous();
+	auto widgetClass = inventoryUIConfig->UserInterfaceWrapperClass.LoadSynchronous();
 	if (!IsValid(widgetClass))
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory UI Class from Config!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load Inventory UI Class from Config!"))
 		return false;
 	}
 	if (!widgetClass->ImplementsInterface(UMounteaInventorySystemWrapperWidgetInterface::StaticClass()))
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI Class must implement `MounteaInventorySystemBaseWidgetInterface`!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Base Inventory UI Class must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
 	}
 
@@ -121,20 +121,25 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 	}
 	if (!bSuccess)
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Failed to find Player Controller. Message:\n%s"), *Message)
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Failed to find Player Controller. Message:\n%s"), *Message)
 		return false;
 	}
 
 	if (!playerController->IsLocalController())
 	{
-		LOG_WARNING(TEXT("[Create Inventory UI] UI Can be created for Local Players only!"))
+		LOG_WARNING(TEXT("[CreateWrapperWidget] UI Can be created for Local Players only!"))
 		return false;
 	}
 
-	auto newWidget = CreateWidget<UCommonActivatableWidget>(playerController, widgetClass);
+	auto newWidget = CreateWidget<UUserWidget>(playerController, widgetClass);
+	if (!newWidget)
+	{
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Failed to create Wrapper Widget!"))
+		return false;
+	}
 	if (!newWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI  must implement `MounteaInventorySystemBaseWidgetInterface`!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Base Inventory UI  must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
 	}
 
@@ -167,7 +172,7 @@ void UMounteaInventoryUIComponent::SetMainUIVisibility_Implementation(const ESla
 		IMounteaInventorySystemWrapperWidgetInterface::Execute_SetMainUIVisibility(InventoryWidget, NewVisibility);
 }
 
-void UMounteaInventoryUIComponent::RemoveMainUIWrapper_Implementation()
+void UMounteaInventoryUIComponent::RemoveWrapperWidget_Implementation()
 {
 	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
