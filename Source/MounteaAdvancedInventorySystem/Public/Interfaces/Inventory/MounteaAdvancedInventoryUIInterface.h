@@ -77,8 +77,8 @@ public:
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	UCommonActivatableWidget* GetWrapperWidget() const;
-	virtual UCommonActivatableWidget* GetWrapperWidget_Implementation() const = 0;
+	UUserWidget* GetWrapperWidget() const;
+	virtual UUserWidget* GetWrapperWidget_Implementation() const = 0;
 
 	/**
 	 * Removes the inventory UI.

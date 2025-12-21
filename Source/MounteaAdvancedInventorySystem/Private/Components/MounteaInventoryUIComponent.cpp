@@ -144,7 +144,6 @@ bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 	}
 
 	InventoryWidget = newWidget;
-	InventoryWidget->ActivateWidget();
 	
 	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
@@ -178,7 +177,6 @@ void UMounteaInventoryUIComponent::RemoveWrapperWidget_Implementation()
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
 	inventoryInterface->Execute_RemoveMainUI(InventoryWidget);
-	InventoryWidget->DeactivateWidget();
 	
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{

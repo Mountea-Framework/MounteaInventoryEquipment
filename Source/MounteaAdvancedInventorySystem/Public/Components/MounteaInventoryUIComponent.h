@@ -51,7 +51,7 @@ public:
 	virtual bool CreateWrapperWidget_Implementation() override;
 	virtual ESlateVisibility GetMainUIVisibility_Implementation() const override;
 	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) override;	
-	virtual UCommonActivatableWidget* GetWrapperWidget_Implementation() const override { return InventoryWidget; };
+	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return InventoryWidget; };
 	virtual void RemoveWrapperWidget_Implementation() override;
 
 	virtual UUserWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
@@ -144,7 +144,7 @@ private:
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
-	TObjectPtr<UCommonActivatableWidget> InventoryWidget;
+	TObjectPtr<UUserWidget> InventoryWidget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
