@@ -70,13 +70,18 @@ bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromSlot_Implementation
 	const FGuid itemId = tempGridSlot.OccupiedItemId;
 	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_RemoveItemFromSlot(slotWidget, itemId);
 
-	tempGridSlot.ResetSlot();
-	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(slotWidget, tempGridSlot);
-	ParentUIComponent->Execute_UpdateSlot(ParentUIComponent.GetObject(), tempGridSlot);
+	FMounteaInventoryGridSlot cleanSlot = tempGridSlot;
+	cleanSlot.ResetSlot();
+	IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(slotWidget, cleanSlot);
 	
-	GridSlots.Emplace(tempGridSlot);
+	
+	ParentUIComponent->Execute_UpdateSlot(ParentUIComponent.GetObject(), cleanSlot);
+	
+	GridSlots.Emplace(cleanSlot);
 
 	IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(slotWidget);
+	
+	tempGridSlot.ResetSlot();
 
 	return true;
 }
