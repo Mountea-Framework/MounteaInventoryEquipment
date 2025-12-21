@@ -1467,16 +1467,20 @@ int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IM
 	const int32 maxStack = InventoryItem.Template->MaxStackSize;
 	
 	TSet<FMounteaInventoryGridSlot> itemSlots;
+	
 	Algo::CopyIf(GridSlots, itemSlots, [&InventoryItem](const FMounteaInventoryGridSlot& gridSlot) {
 		return gridSlot.OccupiedItemId == InventoryItem.GetGuid();
 	});
 	
+	// Storing itemSlots in a temp array first to avoid a dangling reference in line 1475
+	TArray<FMounteaInventoryGridSlot> slotsArray = itemSlots.Array();
+	
 	// Find slot with this item that has the most available space
-	if (bAlwaysStackItems && !itemSlots.IsEmpty())
+	if (bAlwaysStackItems && !slotsArray.IsEmpty())
 	{
-		for (int i = 0; i < itemSlots.Num(); i++)
+		for (int i = 0; i < slotsArray.Num(); i++)
 		{
-			const auto& gridSlot = itemSlots.Array()[i];
+			const auto& gridSlot = slotsArray[i];
 			if (gridSlot.OccupiedItemId != InventoryItem.GetGuid()) continue;
 			
 			const int32 currentStack = gridSlot.SlotQuantity;

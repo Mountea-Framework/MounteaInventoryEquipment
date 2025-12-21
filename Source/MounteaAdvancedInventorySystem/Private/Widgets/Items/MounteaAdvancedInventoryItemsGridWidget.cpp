@@ -288,7 +288,8 @@ UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemWidgetInSlot_Imple
 {
 	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return nullptr;
 
-	const FMounteaInventoryGridSlot& checkedSlot = GridSlots.Array()[SlotIndex];
+	const TArray<FMounteaInventoryGridSlot> slotsArray = GridSlots.Array();
+	const FMounteaInventoryGridSlot& checkedSlot = slotsArray[SlotIndex];
 
 	if (!IsValid(checkedSlot.SlotWidget)) return nullptr;
 
