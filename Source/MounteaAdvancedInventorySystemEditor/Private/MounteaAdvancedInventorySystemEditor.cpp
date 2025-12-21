@@ -204,10 +204,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 						
 			FToolMenuEntry Entry = Section.AddMenuEntryWithCommandList
 			(
-				FMAISCommands::Get().PluginAction,
+				FMAISCommands::Get().MAI_MounteaSupportAction,
 				PluginCommands,
 				NSLOCTEXT("MounteaSupport", "TabTitle", "Mountea Support"),
-				NSLOCTEXT("MounteaSupport", "TooltipText", "Opens Mountea Framework Support channel"),
+				NSLOCTEXT("MounteaSupport", "TooltipText", "🆘 Open Mountea Framework Support channel"),
 				FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Help")
 			);
 		}
@@ -388,7 +388,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 				
 				FToolMenuEntry SupportEntry = Section.AddMenuEntryWithCommandList
 				(
-					FMAISCommands::Get().PluginAction,
+					FMAISCommands::Get().MAI_MounteaSupportAction,
 					PluginCommands,
 					LOCTEXT("MounteaSystemEditor_SupportButton_Label", "Mountea Support"),
 					LOCTEXT("MounteaSystemEditor_SupportButton_ToolTip", "🆘 Open Mountea Framework Support channel"),

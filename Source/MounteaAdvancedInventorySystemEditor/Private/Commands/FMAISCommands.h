@@ -30,6 +30,6 @@ public:
 
 public:
 	
-	TSharedPtr< FUICommandInfo > PluginAction;
+	TSharedPtr< FUICommandInfo > MAI_MounteaSupportAction;
 	
 };

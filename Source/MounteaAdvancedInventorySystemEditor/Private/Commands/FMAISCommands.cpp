@@ -11,7 +11,11 @@
 
 #include <Commands/FMAISCommands.h>
 
+#define LOCTEXT_NAMESPACE "FMAISCommands"
+
 void FMAISCommands::RegisterCommands()
 {
-	
+	UI_COMMAND(MAI_MounteaSupportAction, "Mountea Support", "🆘 Opens Mountea Framework Support channel", EUserInterfaceActionType::Button, FInputChord());
 }
+
+#undef LOCTEXT_NAMESPACE
