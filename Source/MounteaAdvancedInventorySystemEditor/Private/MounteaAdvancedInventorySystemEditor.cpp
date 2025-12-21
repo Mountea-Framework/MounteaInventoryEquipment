@@ -518,7 +518,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_ConfigButton_Label", "Mountea Advanced Inventory Config"),
-			LOCTEXT("MounteaSystemEditor_ConfigButton_ToolTip", "📄 Open Mountea Inventory Configuration\n\n❔ Define inventory types, rarities, categories, limits, UI layouts, and notification behaviors used by the core system."),
+			LOCTEXT("MounteaSystemEditor_ConfigButton_ToolTip", "📄 Open Mountea Inventory Configuration\n\n❔ Define inventory types, rarities, categories, limits and notification behaviors used by the core system."),
 			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
 			FUIAction(
 				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked)
