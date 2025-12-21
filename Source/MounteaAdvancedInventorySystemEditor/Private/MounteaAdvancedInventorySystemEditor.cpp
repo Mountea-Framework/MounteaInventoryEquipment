@@ -16,6 +16,7 @@
 #include "FileHelpers.h"
 #include "IContentBrowserSingleton.h"
 #include "ISettingsModule.h"
+#include "AssetActions/FMounteaAdvancedInventoryUIConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
@@ -159,6 +160,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedAttachmentSlot", AttachableSlotThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedAttachmentSlot", AttachableSlotIcon);
 				}
+				
+				FSlateImageBrush* InventoryUIConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUISettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InventoryUIConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUISettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (InventoryUIConfigThumb && InventoryUIConfigIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryUIConfig", InventoryUIConfigThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryUIConfig", InventoryUIConfigIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
@@ -176,6 +185,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentComponent_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIConfig_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{

@@ -43,6 +43,7 @@
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
 
@@ -87,6 +88,13 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 	}
 
 	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
+}
+
+UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISettingsConfig()
+{
+	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!settings) return nullptr;
+	return settings->InventoryUISettingsConfig.LoadSynchronous();
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(

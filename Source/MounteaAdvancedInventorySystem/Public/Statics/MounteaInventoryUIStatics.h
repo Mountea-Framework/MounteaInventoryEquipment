@@ -26,6 +26,7 @@ class UTextBlock;
 class UMounteaInventoryItemAction;
 class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
+class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaInventorySystemBaseWidgetInterface;
@@ -112,7 +113,15 @@ public:
 	// --- Helpers  ------------------------------
 #pragma region Helpers
 
-
+	/**
+	 * Retrieves the advanced configuration settings for the Mountea Inventory System.
+	 * Facilitates access to inventory-specific configurations like inventory types, rarities, and categories.
+	 *
+	 * @return - A pointer to the Mountea Advanced Inventory Settings configuration object
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventoryUIConfig* GetInventoryUISettingsConfig();
+	
 	/**
 	 * Checks whether the main UI is currently open.
 	 *
