@@ -49,8 +49,6 @@ public:
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
 	
 	virtual bool CreateWrapperWidget_Implementation() override;
-	virtual ESlateVisibility GetMainUIVisibility_Implementation() const override;
-	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) override;	
 	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return InventoryWidget; };
 	virtual void RemoveWrapperWidget_Implementation() override;
 

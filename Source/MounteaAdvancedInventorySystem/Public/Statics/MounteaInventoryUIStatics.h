@@ -29,6 +29,7 @@ class UMounteaAdvancedInventoryThemeConfig;
 class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
+class IMounteaAdvancedBaseInventoryWidgetInterface;
 class IMounteaInventorySystemWrapperWidgetInterface;
 
 UENUM(BlueprintType)
@@ -488,8 +489,8 @@ public:
 	
 #pragma endregion
 	
-	// --- Main UI  ------------------------------
-#pragma region MainUI
+	// --- Wrapper  ------------------------------
+#pragma region Wrapper
 
 	/**
 	 * Creates and initializes the inventory UI widgets.
@@ -522,6 +523,16 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
 	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+
+	/**
+	 * Sets the source inventory for a given target widget interface.
+	 *
+	 * @param Target The target widget interface that will have its source inventory set.
+	 * @param ParentInventory The parent inventory interface to associate with the target widget.
+	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
+	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 	
 #pragma endregion
 	
@@ -563,25 +574,7 @@ public:
 	
 	// --- InventoryUI  ------------------------------
 #pragma region InventoryUI
-
-	/**
-	 * Removes the inventory widget wrapper for the specified target.
-	 *
-	 * @param Target The target interface implementing IMounteaInventorySystemBaseWidgetInterface for which the inventory widget wrapper should be removed.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveInventoryWidgetWrapper(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target);
-
-	/**
-	 * Sets the source inventory for a given target widget interface.
-	 *
-	 * @param Target The target widget interface that will have its source inventory set.
-	 * @param ParentInventory The parent inventory interface to associate with the target widget.
-	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool SetSourceInventory(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
-
+	
 	/**
 	 * Triggers the 'CategorySelected' functionality on a given target, indicating that a specific inventory category has been selected.
 	 *

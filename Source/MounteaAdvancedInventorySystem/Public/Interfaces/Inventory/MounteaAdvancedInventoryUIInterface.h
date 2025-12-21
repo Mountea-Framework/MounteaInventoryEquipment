@@ -119,29 +119,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
 	void RemoveInventoryNotifications();
 	virtual void RemoveInventoryNotifications_Implementation() = 0;
-	
-	// --- DELETE
-	
-	/**
-	 * Retrieves the visibility state of the main UI.
-	 *
-	 * This function determines the current visibility status of the main UI
-	 * and returns an appropriate ESlateVisibility value.
-	 *
-	 * @return The visibility state of the main UI.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	ESlateVisibility GetMainUIVisibility() const;
-	virtual ESlateVisibility GetMainUIVisibility_Implementation() const = 0;
-
-	/**
-	 * Updates the visibility state of the main  UI.
-	 *
-	 * @param NewVisibility The new visibility state of the UI, defined as an ESlateVisibility value.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	void SetMainUIVisibility(const ESlateVisibility NewVisibility);
-	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) = 0;
 
 	// --- Categories
 	

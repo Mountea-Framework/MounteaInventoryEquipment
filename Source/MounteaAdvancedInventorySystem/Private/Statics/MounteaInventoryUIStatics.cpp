@@ -207,19 +207,7 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 
 bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	if (!IsValid(Target.GetObject())) return false;
-	switch (Target->Execute_GetMainUIVisibility(Target.GetObject()))
-	{
-		case ESlateVisibility::Visible:
-		case ESlateVisibility::HitTestInvisible:
-		case ESlateVisibility::SelfHitTestInvisible:
-			return true;
-			break;
-		case ESlateVisibility::Collapsed:
-		case ESlateVisibility::Hidden:
-			return false;
-			break;
-	}
+	//TODO: REWORK
 	return false;
 }
 
@@ -848,34 +836,15 @@ void UMounteaInventoryUIStatics::InitializeWrapperWidget(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
 {
 	if (Target.GetObject() && Parent.GetObject())
-		Target->Execute_InitializeMainUI(Target.GetObject(), Parent);
+		Target->Execute_InitializeWrapperWidget(Target.GetObject(), Parent);
 }
 
-void UMounteaInventoryUIStatics::RemoveInventoryWidgetWrapper(
-	const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target)
-{
-	if (Target.GetObject())
-		Target->Execute_RemoveMainUI(Target.GetObject());
-}
-
-bool UMounteaInventoryUIStatics::SetSourceInventory(
-	const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
+void UMounteaInventoryUIStatics::SetSourceInventory(
+	const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
 {
-	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;
-}
-
-ESlateVisibility UMounteaInventoryUIStatics::GetMainUIVisibility(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
-{
-	return Target.GetObject() ? Target->Execute_GetMainUIVisibility(Target.GetObject()) : ESlateVisibility::Hidden;
-}
-
-void UMounteaInventoryUIStatics::SetMainUIVisibility(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility Visibility)
-{
 	if (Target.GetObject())
-		Target->Execute_SetMainUIVisibility(Target.GetObject(), Visibility);
+		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
 }
 
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UWidget* Target, const FString& CategoryId)

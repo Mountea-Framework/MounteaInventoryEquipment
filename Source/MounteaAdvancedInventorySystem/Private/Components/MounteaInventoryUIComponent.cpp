@@ -148,7 +148,7 @@ bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
-	inventoryInterface->Execute_InitializeMainUI(InventoryWidget, this);
+	inventoryInterface->Execute_InitializeWrapperWidget(InventoryWidget, this);
 	
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
@@ -159,24 +159,12 @@ bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 	return true;
 }
 
-ESlateVisibility UMounteaInventoryUIComponent::GetMainUIVisibility_Implementation() const
-{
-	return IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>()
-	? IMounteaInventorySystemWrapperWidgetInterface::Execute_GetMainUIVisibility(InventoryWidget) : ESlateVisibility::Hidden;
-}
-
-void UMounteaInventoryUIComponent::SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility)
-{
-	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
-		IMounteaInventorySystemWrapperWidgetInterface::Execute_SetMainUIVisibility(InventoryWidget, NewVisibility);
-}
-
 void UMounteaInventoryUIComponent::RemoveWrapperWidget_Implementation()
 {
 	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
-	inventoryInterface->Execute_RemoveMainUI(InventoryWidget);
+	inventoryInterface->Execute_RemoveWrapperWidget(InventoryWidget);
 	
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
