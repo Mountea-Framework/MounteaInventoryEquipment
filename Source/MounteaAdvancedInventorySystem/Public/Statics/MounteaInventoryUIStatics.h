@@ -498,36 +498,15 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
-	
-	/**
-	 * Retrieves the visibility state of the main UI.
-	 *
-	 * This function determines the current visibility status of the main UI
-	 * and returns an appropriate ESlateVisibility value.
-	 *
-	 * @param Target MounteaAdvancedInventoryUI Object
-	 * @return The visibility state of the main UI.
-	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Getter"))
-	static ESlateVisibility GetMainUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
-	 * Sets the visibility of the main UI.
-	 *
-	 * @param Target The interface of the advanced inventory UI where the visibility will be set.
-	 * @param Visibility The desired slate visibility to apply to the main UI.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void SetMainUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility Visibility);
-
-	/**
-	 * Initializes the main UI widget for the Mountea inventory system by linking it with a parent widget.
+	 * Initializes theWrapper widget for the Mountea inventory system by linking it with a parent widget.
 	 *
 	 * @param Target The target widget that implements the IMounteaInventorySystemBaseWidgetInterface. This widget will have its main UI initialized.
 	 * @param Parent The parent widget that implements the IMounteaAdvancedInventoryUIInterface. This parent is used to provide context or linking to the target widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void InitializeMainUIWidget(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
+	static void InitializeWrapperWidget(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
 
 	/**
 	 * Returns the inventory UI.

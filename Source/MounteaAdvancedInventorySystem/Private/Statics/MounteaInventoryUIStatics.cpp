@@ -843,7 +843,7 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::InitializeMainUIWidget(
+void UMounteaInventoryUIStatics::InitializeWrapperWidget(
 	const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
 {
