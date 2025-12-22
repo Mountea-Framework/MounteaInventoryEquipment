@@ -51,5 +51,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications|Notification Card")
 	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
 	
-	// ---- 
+	// ---- Categories
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Categories",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoriesWrapperWidgetInterface"))
+	TSoftClassPtr<UUserWidget> CategoriesContainerWidgetClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Categories",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"))
+	TSoftClassPtr<UUserWidget> CategoryWidgetClass;
 };

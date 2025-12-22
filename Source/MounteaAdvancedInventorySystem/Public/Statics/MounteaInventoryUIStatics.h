@@ -113,6 +113,19 @@ public:
 
 	// --- Helpers  ------------------------------
 #pragma region Helpers
+	
+	/**
+	 * Centers a specific item in a list widget by applying render translation.
+	 * Calculates the necessary offset to position the selected item in the vertical center of the viewport.
+	 * 
+	 * @param ListWidget The panel widget containing the list items (e.g., Vertical Box, Scroll Box content)
+	 * @param SelectedIndex Zero-based index of the item to center in the viewport
+	 * 
+	 * @note Requires uniform item heights. Uses the first child's height for calculations.
+	 * @note Cached geometry must be valid (call after first frame/tick).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Setter"))
+	static void CenterListItemAtIndex(class UPanelWidget* ListWidget, int32 SelectedIndex);
 
 	/**
 	 * Retrieves the advanced configuration settings for the Mountea Inventory System.

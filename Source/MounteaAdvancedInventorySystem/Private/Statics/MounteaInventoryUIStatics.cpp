@@ -24,6 +24,7 @@
 #include "GameFramework/PlayerState.h"
 
 #include "CommonActivatableWidget.h"
+#include "Components/PanelWidget.h"
 
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
@@ -88,6 +89,31 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 	}
 
 	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
+}
+
+void UMounteaInventoryUIStatics::CenterListItemAtIndex(UPanelWidget* ListWidget, int32 SelectedIndex)
+{
+	if (!ListWidget || SelectedIndex < 0)
+		return;
+    
+	if (ListWidget->GetChildrenCount() == 0)
+		return;
+    
+	UWidget* FirstChild = ListWidget->GetChildAt(0);
+	if (!FirstChild)
+		return;
+    
+	const float ItemHeight = FirstChild->GetDesiredSize().Y;
+	const float ViewportHeight = ListWidget->GetCachedGeometry().GetLocalSize().Y;
+    
+	if (ViewportHeight <= 0.0f || ItemHeight <= 0.0f)
+		return;
+    
+	const float ViewportCenter = ViewportHeight * 0.5f;
+	const float ItemCenter = (SelectedIndex * ItemHeight) + (ItemHeight * 0.5f);
+	const float TranslationY = ViewportCenter - ItemCenter;
+    
+	ListWidget->SetRenderTranslation(FVector2D(0.0f, TranslationY));
 }
 
 UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISettingsConfig()
