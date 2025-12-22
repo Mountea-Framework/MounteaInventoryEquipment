@@ -377,8 +377,10 @@ public:
 	 * @return Returns JSON manifest of the Item Template if already written.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(DisplayName="Get Item Template Json"))
-	static FString ItemTemplate_GetItemTemplateJson(const UMounteaInventoryItemTemplate* ItemTemplate);
+		meta=(DisplayName="Get Item Template Json"), meta=(CustomTag="MounteaK2Getter"))
+	static FString ItemTemplate_GetItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate);
+	
+	static bool ItemTemplate_CalculateItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate);
 	
 #pragma endregion
 		
@@ -393,7 +395,8 @@ public:
 	 * @param Target The object for which to retrieve the item action flags.
 	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Getter"))
 	static EInventoryItemActionCallback GetItemActionFlags(const UObject* Target);
 	
 	/**
@@ -403,7 +406,8 @@ public:
 	 * @param FlagToCheck The specific flag to test for.
 	 * @return True if the flag is set, false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Validate"))
 	static bool ItemAction_HasActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToCheck);
 
 	/**
@@ -413,7 +417,8 @@ public:
 	 * @param FlagToAdd The flag to add.
 	 * @return Updated flag container with the new flag set.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_AddActionFlag(UObject* Target, EInventoryItemActionCallback FlagToAdd);
 
 	/**
@@ -422,7 +427,8 @@ public:
 	 * @param FlagToRemove The flag to clear.
 	 * @return Updated flag container with the flag cleared.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_RemoveActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToRemove);
 
 	/**
@@ -430,7 +436,8 @@ public:
 	 *
 	 * @return An empty flag container (EIIAC_None).
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_ClearAllActionFlags(UObject* Target);
 
 #pragma endregion
