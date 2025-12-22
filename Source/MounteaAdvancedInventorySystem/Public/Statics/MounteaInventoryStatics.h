@@ -366,7 +366,22 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static void SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UPARAM(ref) TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
 
-	// --- Item Actions ------------------------------
+	// --- Item Template
+	
+#pragma region ItemTemplate
+
+	/**
+	 * Retrieve JSON manifest of the Inventory Item Template.
+	 * 
+	 * @param ItemTemplate Template to read JSON from
+	 * @return Returns JSON manifest of the Item Template if already written.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	static FString GetItemTemplateJson(const UMounteaInventoryItemTemplate* ItemTemplate);
+	
+#pragma endregion
+		
+	// --- Item Actions
 
 #pragma region ItemActions
 

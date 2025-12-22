@@ -305,6 +305,14 @@ void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounte
 	}
 }
 
+FString UMounteaInventoryStatics::GetItemTemplateJson(const UMounteaInventoryItemTemplate* ItemTemplate)
+{
+	if (!ItemTemplate)
+		return TEXT("");
+	
+	return ItemTemplate->GetJson();
+}
+
 EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UObject* Target)
 {
 	if (!IsValid(Target))
