@@ -17,6 +17,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class UMounteaAdvancedInventoryUISubsystem;
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
 struct FMounteaItemActionData;
@@ -112,6 +113,7 @@ public:
 	/*************************************************************/
 
 	// --- Helpers  ------------------------------
+	
 #pragma region Helpers
 	
 	/**
@@ -126,6 +128,21 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Setter"))
 	static void CenterListItemAtIndex(class UPanelWidget* ListWidget, int32 SelectedIndex);
+	
+	/**
+	 * Calculates the render translation needed to center a specific item in a list widget.
+	 * Returns the translation vector without applying it, allowing for animated transitions.
+	 * 
+	 * @param ListWidget The panel widget containing the list items (e.g., Vertical Box, Scroll Box content)
+	 * @param SelectedIndex Zero-based index of the item to center in the viewport
+	 * @return The translation vector to apply via SetRenderTranslation
+	 * 
+	 * @note Requires uniform item heights. Uses the first child's height for calculations.
+	 * @note Cached geometry must be valid (call after first frame/tick).
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static FVector2D CalculateCenteredListTranslation(UPanelWidget* ListWidget, int32 SelectedIndex);
+
 
 	/**
 	 * Retrieves the advanced configuration settings for the Mountea Inventory System.
@@ -243,6 +260,28 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"))
 	static FVector2D GetActionsListSpawnLocation(UWidget* ParentWidget);
+	
+	// --- UI Subsystem
+	
+	/**
+	 * Returns Inventory UI Manager.
+	 * 
+	 * @param FromActor World Context to find local player from.
+	 * @return Inventory UI Manager if possible, null otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static UObject* GetInventoryUIManager(AActor* FromActor);
+	
+	/**
+	 * Returns local player subsystem which holds reusable references.
+	 * 
+	 * @param FromPlayerController World Context to find local player from.
+	 * @return UI Subsystem if possible, null otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventoryUISubsystem* GetInventoryUISubsystem(APlayerController* FromPlayerController);
 
 #pragma endregion
 	

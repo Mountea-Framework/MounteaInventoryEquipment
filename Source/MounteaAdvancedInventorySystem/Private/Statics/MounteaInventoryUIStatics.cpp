@@ -49,6 +49,7 @@
 #include "Statics/MounteaInventoryStatics.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
+#include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
 #include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
@@ -114,6 +115,28 @@ void UMounteaInventoryUIStatics::CenterListItemAtIndex(UPanelWidget* ListWidget,
 	const float TranslationY = ViewportCenter - ItemCenter;
     
 	ListWidget->SetRenderTranslation(FVector2D(0.0f, TranslationY));
+}
+
+FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWidget* ListWidget, const int32 SelectedIndex)
+{
+	if (!ListWidget || SelectedIndex < 0 || ListWidget->GetChildrenCount() == 0)
+		return FVector2D::ZeroVector;
+
+	const UWidget* firstChild = ListWidget->GetChildAt(0);
+	if (!firstChild)
+		return FVector2D::ZeroVector;
+    
+	const float itemHeight = firstChild->GetDesiredSize().Y;
+	const float viewportHeight = ListWidget->GetCachedGeometry().GetLocalSize().Y;
+    
+	if (viewportHeight <= 0.0f || itemHeight <= 0.0f)
+		return FVector2D::ZeroVector;
+    
+	const float viewportCenter = viewportHeight * 0.5f;
+	const float itemCenter = (SelectedIndex * itemHeight) + (itemHeight * 0.5f);
+	const float translationY = viewportCenter - itemCenter;
+    
+	return FVector2D(0.0f, translationY);
 }
 
 UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISettingsConfig()
@@ -342,6 +365,26 @@ FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* Paren
 	USlateBlueprintLibrary::LocalToViewport(ParentWidget->GetWorld(), Geometry, localCoordinates, pixelPosition, viewportPosition);
 
 	return pixelPosition;
+}
+
+UObject* UMounteaInventoryUIStatics::GetInventoryUIManager(AActor* FromActor)
+{
+	if (!FromActor) return nullptr;
+
+	APlayerController* playerController = FindPlayerController(FromActor, 3);
+	if (!playerController) return nullptr;
+
+	const UMounteaAdvancedInventoryUISubsystem* localSubsystem = GetInventoryUISubsystem(playerController);
+	return localSubsystem ? localSubsystem->GetInventoryUIManager() : nullptr;
+}
+
+UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUISubsystem(APlayerController* FromPlayerController)
+{
+	if (!FromPlayerController) return nullptr;
+
+	UMounteaAdvancedInventoryUISubsystem* localSubsystem = FromPlayerController->GetLocalPlayer()->GetSubsystem<
+		UMounteaAdvancedInventoryUISubsystem>();
+	return localSubsystem;
 }
 
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
