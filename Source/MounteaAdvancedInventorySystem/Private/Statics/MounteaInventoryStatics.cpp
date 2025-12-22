@@ -299,7 +299,7 @@ void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounte
 					}
 				
 				default:
-				return false;
+					return false;
 			}
 		});
 	}
