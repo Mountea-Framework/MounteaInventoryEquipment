@@ -33,6 +33,7 @@
 
 #include "Statics/MounteaInventorySystemStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
+#include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
 
 class UMounteaAdvancedInventorySettings;
 
@@ -59,9 +60,7 @@ void UMounteaInventoryUIComponent::BeginPlay()
 	{
 		auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
 		if (!IsValid(inventoryComponent))
-		{
 			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! UI will NOT work!"))
-		}
 		else
 		{
 			Execute_SetParentInventory(this, inventoryComponent);
@@ -75,6 +74,13 @@ void UMounteaInventoryUIComponent::BeginPlay()
 			ParentInventory->GetOnItemDurabilityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemDurabilityChanged);
 			ParentInventory->GetOnItemQuantityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemQuantityChanged);
 		}
+		
+		const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
+			UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
+		if (!inventoryUISubsystem)
+			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem' UI will NOT work!"))
+		else
+			inventoryUISubsystem->RegisterInventoryUIManager(this);
 	}
 }
 
