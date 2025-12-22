@@ -199,7 +199,7 @@ public:
 	FString GetJson() const;
 	void SetJson(const FString& Json);
 	bool CalculateJson();
-
+	
 protected:
 
 	UFUNCTION()

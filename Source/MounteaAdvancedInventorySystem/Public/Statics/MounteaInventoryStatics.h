@@ -376,8 +376,9 @@ public:
 	 * @param ItemTemplate Template to read JSON from
 	 * @return Returns JSON manifest of the Item Template if already written.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	static FString GetItemTemplateJson(const UMounteaInventoryItemTemplate* ItemTemplate);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(DisplayName="Get Item Template Json"))
+	static FString ItemTemplate_GetItemTemplateJson(const UMounteaInventoryItemTemplate* ItemTemplate);
 	
 #pragma endregion
 		

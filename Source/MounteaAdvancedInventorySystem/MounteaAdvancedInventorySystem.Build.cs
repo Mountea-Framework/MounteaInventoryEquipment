@@ -49,7 +49,9 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 				"NetCore",
 				
 				"InputCore",
-				"EnhancedInput"
+				"EnhancedInput",
+				
+				"Json"
 			}
 			);
 		
