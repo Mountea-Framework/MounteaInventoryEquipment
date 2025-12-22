@@ -107,7 +107,6 @@ public:
 	 * Adds an item to the inventory
 	 * @param Target The inventory interface to execute on
 	 * @param Item The item to add
-	 * @param bAutoStack If true, will try to stack with existing items
 	 * @return True if item was added successfully
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
@@ -357,6 +356,15 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static TArray<TSoftClassPtr<UObject>> GetItemActions(const FInventoryItem& Item);
+
+	/**
+	 * Sorts provided Inventory Items based on Sorting Criteria.
+	 * @param Target Inventory interface.
+	 * @param Items List of cached Items. This is to avoid touching the "source" Items, so we rather sort temp. data.
+	 * @param SortingCriteria Defines what criteria are applied
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static void SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UPARAM(ref) TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
 
 	// --- Item Actions ------------------------------
 

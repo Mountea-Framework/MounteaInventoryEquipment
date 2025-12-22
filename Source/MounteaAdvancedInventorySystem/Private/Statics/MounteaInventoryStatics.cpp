@@ -249,6 +249,62 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 	return validActions;
 }
 
+void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
+{
+	if (Items.Num() <= 1 || SortingCriteria.Num() == 0)
+		return;
+	
+	enum class ESortKey : uint8 { Name, Value, Weight, Rarity, Unknown };
+	
+	auto getSortKey = [](const FString& Key) -> ESortKey
+	{
+		if (Key.Equals(TEXT("Name"), ESearchCase::IgnoreCase)) return ESortKey::Name;
+		if (Key.Equals(TEXT("Value"), ESearchCase::IgnoreCase)) return ESortKey::Value;
+		if (Key.Equals(TEXT("Weight"), ESearchCase::IgnoreCase)) return ESortKey::Weight;
+		if (Key.Equals(TEXT("Rarity"), ESearchCase::IgnoreCase)) return ESortKey::Rarity;
+		return ESortKey::Unknown;
+	};
+	
+	TArray<FInventorySortCriteria> sortedCriteria = SortingCriteria;
+	sortedCriteria.Sort([](const FInventorySortCriteria& A, const FInventorySortCriteria& B)
+	{
+		return A.SortPriority > B.SortPriority;
+	});
+	
+	for (const FInventorySortCriteria& Criteria : sortedCriteria)
+	{
+		const ESortKey sortKey = getSortKey(Criteria.SortingKey);
+		
+		Algo::StableSort(Items, [sortKey](const FInventoryItem& A, const FInventoryItem& B)
+		{
+			switch (sortKey)
+			{
+				case ESortKey::Name:
+				return GetInventoryItemName(A).ToString().Compare(GetInventoryItemName(B).ToString()) < 0;
+				
+				case ESortKey::Value:
+					if (!A.Template || !B.Template) return false;
+					return A.Template->BasePrice * A.GetQuantity() < B.Template->BasePrice * B.GetQuantity();
+					
+				case ESortKey::Weight:
+					if (!A.Template || !B.Template) return false;
+					return A.Template->Weight * A.GetQuantity() < B.Template->Weight * B.GetQuantity();
+					
+				case ESortKey::Rarity:
+					{
+						FInventoryRarity RarityA = GetInventoryRarity(A);
+						FInventoryRarity RarityB = GetInventoryRarity(B);
+						return RarityA.RarityPriority < RarityB.RarityPriority;
+					}
+				
+				default:
+				return false;
+			}
+		});
+	}
+}
+
 EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UObject* Target)
 {
 	if (!IsValid(Target))
