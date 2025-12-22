@@ -133,6 +133,27 @@ void UMounteaInventoryStatics::ProcessInventoryNotification(const TScriptInterfa
 		Target->Execute_ProcessInventoryNotification(Target.GetObject(), Notification);
 }
 
+FString UMounteaInventoryStatics::InventoryToString(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
+{
+	if (!Target.GetObject() || !Target.GetObject()->Implements<UMounteaAdvancedInventoryInterface>())
+		return FString();
+	
+	TArray<FInventoryItem> allItems = GetAllItems(Target);
+	AActor* inventoryOwner = GetOwningActor(Target);
+	
+	FString returnValue = FString::Printf(TEXT("Inventory [Owner: %s, Items: %d]\n"),
+		inventoryOwner ? *inventoryOwner->GetName() : TEXT("None"),
+		allItems.Num()
+	);
+	
+	for (int32 i = 0; i < allItems.Num(); ++i)
+	{
+		returnValue += FString::Printf(TEXT("[%d] %s\n"), i, *InventoryItemToString(allItems[i]));
+	}
+	
+	return returnValue;
+}
+
 FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& Item)
 {
 	return Item.ToString();

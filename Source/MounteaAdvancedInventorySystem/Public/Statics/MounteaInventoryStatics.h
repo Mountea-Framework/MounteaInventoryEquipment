@@ -251,6 +251,16 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void ProcessInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryNotificationData& Notification);
+
+	/**
+	 * Translates Inventory to list of Items.
+	 * Add some additional info.
+	 * 
+	 * @param Target Inventory interface.
+	 * @return A message that provides details about inventory content.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FString InventoryToString(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
 	
 	/**
 	 * Translates Inventory Item to string.
