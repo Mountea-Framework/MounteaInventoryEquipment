@@ -507,7 +507,7 @@ public:
 	 * @param Parent The parent widget that implements the IMounteaAdvancedInventoryUIInterface. This parent is used to provide context or linking to the target widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void InitializeWrapperWidget(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
+	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
 
 	/**
 	 * Returns the inventory UI.

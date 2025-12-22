@@ -832,11 +832,11 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 }
 
 void UMounteaInventoryUIStatics::InitializeWrapperWidget(
-	const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
+	UObject* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
 {
-	if (Target.GetObject() && Parent.GetObject())
-		Target->Execute_InitializeWrapperWidget(Target.GetObject(), Parent);
+	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(Target, Parent);
 }
 
 void UMounteaInventoryUIStatics::SetSourceInventory(
