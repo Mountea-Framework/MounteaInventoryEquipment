@@ -66,4 +66,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Categories",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"))
 	TSoftClassPtr<UUserWidget> CategoryWidgetClass;
+	
+	// --- Fonts
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|🔤 Font")
+	FSlateFontInfo DefaultFont;
 };

@@ -139,6 +139,20 @@ FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWid
 	return FVector2D(0.0f, translationY);
 }
 
+FSlateFontInfo UMounteaInventoryUIStatics::SetFontSize(const FSlateFontInfo& Font, const int32 NewSize)
+{
+	auto returnValue = Font;
+	returnValue.Size = NewSize;
+	return returnValue;
+}
+
+FSlateFontInfo UMounteaInventoryUIStatics::SetFontTypeface(const FSlateFontInfo& Font, const FName& NewTypeface)
+{
+	auto returnValue = Font;
+	returnValue.TypefaceFontName = NewTypeface;
+	return returnValue;
+}
+
 UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISettingsConfig()
 {
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();

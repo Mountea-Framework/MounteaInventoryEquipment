@@ -65,10 +65,7 @@ UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-
-	/*************************************************************/
-	/************************* TEMPLATES *************************/
-	/*************************************************************/
+	
 public:
 	template<typename ReturnType, typename Func, typename... Args>
 	static ReturnType ExecuteIfImplements(UObject* Target, const TCHAR* FunctionName, Func Function, Args&&... args)
@@ -97,22 +94,12 @@ public:
 		else return;
 	}
 
-public:
-
-	/*************************************************************/
-	/*********************** INTERNAL ****************************/
-	/*************************************************************/
-	
+public:	
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
 	
 public:
-
-	/*************************************************************/
-	/******************* BLUEPRINTABLE ***************************/
-	/*************************************************************/
-
-	// --- Helpers  ------------------------------
+	// --- Helpers
 	
 #pragma region Helpers
 	
@@ -143,6 +130,24 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Getter"))
 	static FVector2D CalculateCenteredListTranslation(UPanelWidget* ListWidget, int32 SelectedIndex);
 
+	/**
+	 * Applies size to font.
+	 * 
+	 * @param Font Font to be updated.
+	 * @param NewSize Size to apply.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Setter"))
+	static FSlateFontInfo SetFontSize(const FSlateFontInfo& Font, const int32 NewSize);
+	
+	/**
+	 * Applies typeface to font.
+	 * 
+	 * @param Font Font to be updated.
+	 * @param NewTypeface Typeface to apply.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Setter"))
+	static FSlateFontInfo SetFontTypeface(const FSlateFontInfo& Font, const FName& NewTypeface);
+
 
 	/**
 	 * Retrieves the advanced configuration settings for the Mountea Inventory System.
@@ -150,7 +155,7 @@ public:
 	 *
 	 * @return - A pointer to the Mountea Advanced Inventory Settings configuration object
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventoryUIConfig* GetInventoryUISettingsConfig();
 	
 	/**
