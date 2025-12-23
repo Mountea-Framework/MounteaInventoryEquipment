@@ -181,31 +181,31 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
 	ValidateInventoryTypes();
 	
 	// Setup item categories
-	FInventoryCategory AllCategory;
-	AllCategory.CategoryData.CategoryDisplayName = LOCTEXT("AllCategory", "All");
-	AllCategory.CategoryData.CategoryPriority = -5;
-	AllowedCategories.Add("All", AllCategory);
-	
 	FInventoryCategory FavouriteCategory;
 	FavouriteCategory.CategoryData.CategoryDisplayName = LOCTEXT("FavouriteCategory", "Favourite");
-	FavouriteCategory.CategoryData.CategoryPriority = -4;
+	FavouriteCategory.CategoryData.CategoryPriority = 8;
 	AllowedCategories.Add("Favourite", FavouriteCategory);
+	
+	FInventoryCategory AllCategory;
+	AllCategory.CategoryData.CategoryDisplayName = LOCTEXT("AllCategory", "All");
+	AllCategory.CategoryData.CategoryPriority = 7;
+	AllowedCategories.Add("All", AllCategory);
 	
 	FInventoryCategory WeaponCategory;
 	WeaponCategory.CategoryData.CategoryDisplayName = LOCTEXT("WeaponCategory", "Weapons");
-	WeaponCategory.CategoryData.CategoryPriority = 0;
+	WeaponCategory.CategoryData.CategoryPriority = 6;
 	WeaponCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
 	AllowedCategories.Add("Weapons", WeaponCategory);
 	
 	FInventoryCategory ArmorCategory;
 	ArmorCategory.CategoryData.CategoryDisplayName = LOCTEXT("ArmorCategory", "Armor");
-	ArmorCategory.CategoryData.CategoryPriority = 1;
+	ArmorCategory.CategoryData.CategoryPriority = 5;
 	ArmorCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Durable | EInventoryItemFlags::EIIF_Dropable);
 	AllowedCategories.Add("Armors", ArmorCategory);
 	
 	FInventoryCategory ConsumableCategory;
 	ConsumableCategory.CategoryData.CategoryDisplayName = LOCTEXT("ConsumableCategory", "Consumables");
-	ConsumableCategory.CategoryData.CategoryPriority = 2;
+	ConsumableCategory.CategoryData.CategoryPriority = 4;
 	ConsumableCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_Consumable | EInventoryItemFlags::EIIF_Stackable);
 	AllowedCategories.Add("Consumables", ConsumableCategory);
 	
@@ -217,13 +217,13 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultValues()
 
 	FInventoryCategory QuestCategory;
 	QuestCategory.CategoryData.CategoryDisplayName = LOCTEXT("QuestCategory", "Quest Items");
-	QuestCategory.CategoryData.CategoryPriority = 4;
+	QuestCategory.CategoryData.CategoryPriority = 2;
 	QuestCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
 	AllowedCategories.Add("Quest Items", QuestCategory);
 
 	FInventoryCategory KeysCategory;
 	KeysCategory.CategoryData.CategoryDisplayName = LOCTEXT("KeysCategory", "Keys");
-	KeysCategory.CategoryData.CategoryPriority = 4;
+	KeysCategory.CategoryData.CategoryPriority = 1;
 	KeysCategory.CategoryData.CategoryFlags = static_cast<uint8>(EInventoryItemFlags::EIIF_QuestItem);
 	AllowedCategories.Add("Keys", KeysCategory);
 	

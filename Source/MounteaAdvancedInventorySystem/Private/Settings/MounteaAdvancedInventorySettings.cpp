@@ -38,10 +38,20 @@ TMap<FString, FInventoryRarity> UMounteaAdvancedInventorySettings::GetAllowedRar
 		CommonRarity.RarityColor = FLinearColor(0.5f, 0.5f, 0.5f);
 		CommonRarity.BasePriceMultiplier = 1.0f;
 		CommonRarity.RarityPriority = 0;
-		returnValues.Add("Common", CommonRarity);
+		returnValues.Add(TEXT("Common"), CommonRarity);
+
 		return returnValues;
 	}
-	return inventorySettingsConfig->AllowedRarities;
+
+	auto returnValues = inventorySettingsConfig->AllowedRarities;
+
+	returnValues.ValueStableSort(
+		[](const FInventoryRarity& A, const FInventoryRarity& B)
+		{
+			return A.RarityPriority > B.RarityPriority;
+		});
+
+	return returnValues;
 }
 
 TMap<FString, FInventoryCategory> UMounteaAdvancedInventorySettings::GetAllowedCategories() const
@@ -54,12 +64,22 @@ TMap<FString, FInventoryCategory> UMounteaAdvancedInventorySettings::GetAllowedC
 		miscellaneousCategory.CategoryData.CategoryDisplayName = NSLOCTEXT(
 			"UMounteaAdvancedInventorySettings", "miscellaneousCategory", "Miscellaneous");
 		miscellaneousCategory.CategoryData.CategoryPriority = -5;
-		returnValues.Add("All", miscellaneousCategory);
+		returnValues.Add(TEXT("All"), miscellaneousCategory);
+
 		return returnValues;
 	}
-	
-	return inventorySettingsConfig->AllowedCategories;
+
+	auto returnValues = inventorySettingsConfig->AllowedCategories;
+
+	returnValues.ValueStableSort(
+		[](const FInventoryCategory& A, const FInventoryCategory& B)
+		{
+			return A.CategoryData.CategoryPriority > B.CategoryData.CategoryPriority;
+		});
+
+	return returnValues;
 }
+
 
 TSoftObjectPtr<UInputMappingContext> UMounteaAdvancedInventorySettings::
 GetAdvancedInventoryEquipmentInputMapping() const
