@@ -29,11 +29,17 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryUIConfig : pub
 	
 public:
 	
-	// --- User Interface: Wrapper
+	// --- Wrapper
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Wrapper",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"))
 	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
+	
+	// --- Inventory
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Inventory",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
 	
 	// ---- Notifications
 	

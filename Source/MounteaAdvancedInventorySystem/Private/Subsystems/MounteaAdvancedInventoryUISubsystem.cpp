@@ -22,7 +22,7 @@ void UMounteaAdvancedInventoryUISubsystem::Initialize(FSubsystemCollectionBase& 
 
 void UMounteaAdvancedInventoryUISubsystem::Deinitialize()
 {
-	UnregisterInventoryUIComponent(InventoryUIManager.GetObject());
+	UnregisterInventoryUIManager(InventoryUIManager.GetObject());
 	
 	Super::Deinitialize();
 }
@@ -50,7 +50,7 @@ void UMounteaAdvancedInventoryUISubsystem::RegisterInventoryUIManager(UObject* N
 	InventoryUIManager.SetInterface(Cast<IMounteaAdvancedInventoryUIInterface>(NewInventoryUIManager));
 }
 
-void UMounteaAdvancedInventoryUISubsystem::UnregisterInventoryUIComponent(const UObject* DirtyInventoryUIManager)
+void UMounteaAdvancedInventoryUISubsystem::UnregisterInventoryUIManager(const UObject* DirtyInventoryUIManager)
 {
 	if (InventoryUIManager.GetObject() == DirtyInventoryUIManager)
 	{

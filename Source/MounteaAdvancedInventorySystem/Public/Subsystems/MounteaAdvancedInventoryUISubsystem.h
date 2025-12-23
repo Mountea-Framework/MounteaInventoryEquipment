@@ -31,7 +31,7 @@ public:
 	virtual void Deinitialize() override;
 	
 	void RegisterInventoryUIManager(UObject* NewInventoryUIManager);
-	void UnregisterInventoryUIComponent(const UObject* DirtyInventoryUIManager);
+	void UnregisterInventoryUIManager(const UObject* DirtyInventoryUIManager);
 	UObject* GetInventoryUIManager() const;
 
 private:
