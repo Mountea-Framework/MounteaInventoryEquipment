@@ -106,18 +106,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Config", meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;
-
-	// --- User Interface: Main UI
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Wrapper",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"))
-	TSoftClassPtr<UCommonActivatableWidget> UserInterfaceWrapperClass;
-
-	// --- User Interface: Inventory
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
-	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
 	
 	// --- User Interface: Items
 
@@ -162,16 +150,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Item Panel",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemPanelWidgetInterface"))
 	TSoftClassPtr<UUserWidget> InventoryItemPanelWidgetClass;
-
-	// --- User Interface: Categories
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Categories",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoriesWrapperWidgetInterface"))
-	TSoftClassPtr<UUserWidget> InventoryCategoriesWrapperWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Classes|Inventory|Categories",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"))
-	TSoftClassPtr<UUserWidget> InventoryCategoryWidgetClass;
 	
 	// --- Notifications ------------------------------
 	

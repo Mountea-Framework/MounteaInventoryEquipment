@@ -15,68 +15,124 @@
 
 namespace InventoryUICommands
 {
-	const FString CreateWrapper(TEXT("CreateWrapper"));
-	const FString RemoveWrapper(TEXT("RemoveWrapper"));
+	// Wrapper lifecycle
+	namespace Wrapper
+	{
+		inline const FString Create(TEXT("CreateWrapper"));
+		inline const FString Remove(TEXT("RemoveWrapper"));
+
+		inline const TSet<FString> All = {
+			Create,
+			Remove
+		};
+	}
+
+	// Inventory widget (main inventory UI)
+	namespace Inventory
+	{
+		inline const FString Open(TEXT("OpenInventoryWidget"));
+		inline const FString Close(TEXT("CloseInventoryWidget"));
+		inline const FString Toggle(TEXT("ToggleInventoryWidget"));
+
+		inline const FString Refresh(TEXT("RefreshInventory"));
+
+		inline const FString SortItems(TEXT("SortInventoryItems"));
+		inline const FString FilterItems(TEXT("FilterInventoryItems"));
+
+		inline const FString ClearSelection(TEXT("ClearInventorySelection"));
+
+		inline const TSet<FString> All = {
+			Open,
+			Close,
+			Toggle,
+			Refresh,
+			SortItems,
+			FilterItems,
+			ClearSelection
+		};
+	}
+
+	// Equipment widget
+	namespace Equipment
+	{
+		inline const FString Open(TEXT("OpenEquipmentWidget"));
+		inline const FString Close(TEXT("CloseEquipmentWidget"));
+
+		inline const TSet<FString> All = {
+			Open,
+			Close
+		};
+	}
+
+	// Modal windows
+	namespace Modal
+	{
+		inline const FString Add(TEXT("AddModalWindow"));
+		inline const FString Remove(TEXT("RemoveModalWindow"));
+
+		inline const TSet<FString> All = {
+			Add,
+			Remove
+		};
+	}
+
+	// Item-level events/actions
+	namespace Items
+	{
+		inline const FString Added(TEXT("ItemAdded"));
+		inline const FString Removed(TEXT("ItemRemoved"));
+		inline const FString Modified(TEXT("ItemModified"));
+
+		inline const FString Selected(TEXT("ItemSelected"));
+		inline const FString ShowDetails(TEXT("ShowItemDetails"));
+
+		inline const TSet<FString> All = {
+			Added,
+			Removed,
+			Modified,
+			Selected,
+			ShowDetails
+		};
+	}
+
+	// Category-level actions
+	namespace Categories
+	{
+		inline const FString Selected(TEXT("CategorySelected"));
+
+		inline const TSet<FString> All = {
+			Selected
+		};
+	}
+
+	// Notifications
+	namespace Notifications
+	{
+		inline const FString Show(TEXT("ShowInventoryNotification"));
+
+		inline const TSet<FString> All = {
+			Show
+		};
+	}
+
+	// Aggregate set
+	inline const TSet<FString> AllCommands = []()
+	{
+		TSet<FString> Result;
+
+		Result.Append(Wrapper::All);
+		Result.Append(Inventory::All);
+		Result.Append(Equipment::All);
+		Result.Append(Modal::All);
+		Result.Append(Items::All);
+		Result.Append(Categories::All);
+		Result.Append(Notifications::All);
+
+		return Result;
+	}();
 	
-	const FString OpenInventoryWidget(TEXT("OpenInventoryWidget"));
-	const FString CloseInventoryWidget(TEXT("CloseInventoryWidget"));
-	
-	const FString OpenEquipmentWidget(TEXT("OpenEquipmentWidget"));
-	const FString CloseEquipmentWidget(TEXT("CloseEquipmentWidget"));
-	
-	const FString ToggleInventoryWidget(TEXT("ToggleInventoryWidget"));
-	
-	const FString RefreshInventory(TEXT("RefreshInventory"));
-
-	const FString AddModalWindow(TEXT("AddModalWindow"));
-	const FString RemoveModalWindow(TEXT("RemoveModalWindow"));
-
-	const FString ItemAdded(TEXT("ItemAdded"));
-	const FString ItemRemoved(TEXT("ItemRemoved"));
-	const FString ItemModified(TEXT("ItemModified"));
-
-	const FString CategorySelected(TEXT("CategorySelected"));
-
-	const FString ItemSelected(TEXT("ItemSelected"));
-	const FString ShowItemDetails(TEXT("ShowItemDetails"));
-	
-	const FString SortInventoryItems(TEXT("SortInventoryItems"));
-	const FString FilterInventoryItems(TEXT("FilterInventoryItems"));
-	const FString ClearInventorySelection(TEXT("ClearInventorySelection"));
-	
-	const FString ShowInventoryNotification(TEXT("ShowInventoryNotification"));
-
-	inline const TSet<FString> CommandsSet = {
-		CreateWrapper,
-		RemoveWrapper,
-		
-		OpenInventoryWidget,
-		CloseInventoryWidget,
-
-		OpenEquipmentWidget,
-		CloseEquipmentWidget,
-
-		CategorySelected,
-		ItemSelected,
-
-		AddModalWindow,
-		RemoveModalWindow,
-
-		ItemAdded,
-		ItemRemoved,
-		ItemModified,
-		
-		ToggleInventoryWidget,
-		RefreshInventory,
-		ShowItemDetails,
-		SortInventoryItems,
-		FilterInventoryItems,
-		ClearInventorySelection,
-		ShowInventoryNotification
-	};
-
 	inline TArray<FString> GetAllCommandTypes()
 	{
-		return CommandsSet.Array();
+		return AllCommands.Array();
 	}
 }

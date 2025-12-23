@@ -27,6 +27,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTagContainer TagContainer;
+	
+	// Eg.: `LeftHand` is blocked by `TwoHanded` weapons etc.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag BlackedByTags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText DisplayName;
