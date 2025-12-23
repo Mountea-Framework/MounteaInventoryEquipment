@@ -39,6 +39,8 @@
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Docking/TabManager.h"
 #include "Framework/Notifications/NotificationManager.h"
+#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
@@ -451,6 +453,32 @@ void FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked() const
 	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
 }
 
+void FMounteaAdvancedInventorySystemEditor::UIConfigButtonClicked() const
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	auto config = settings ? settings->InventoryUISettingsConfig.LoadSynchronous() : nullptr;
+	if (!IsValid(config))
+	{
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
+		return;
+	}
+
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+}
+
+void FMounteaAdvancedInventorySystemEditor::EquipmentConfigButtonClicked() const
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	auto config = settings ? settings->EquipmentSettingsConfig.LoadSynchronous() : nullptr;
+	if (!IsValid(config))
+	{
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Equipment Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
+		return;
+	}
+
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+}
+
 void FMounteaAdvancedInventorySystemEditor::EditorSettingsButtonClicked() const
 {
 	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
@@ -523,7 +551,25 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 			FUIAction(
 				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked)
 			)
+		);	
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("MounteaSystemEditor_UIConfigButton_Label", "Mountea Advanced Inventory UI Config"),
+			LOCTEXT("MounteaSystemEditor_UIConfigButton_ToolTip", "📄 Open Mountea Inventory UI Configuration\n\n❔ Define inventory UI classes, styles and themes."),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::UIConfigButtonClicked)
+			)
 		);		
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_Label", "Mountea Advanced Equipment Config"),
+			LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_ToolTip", "📄 Open Mountea Equipment Configuration\n\n❔ Define Equipment types, slots, rules and other configuration."),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::EquipmentConfigButtonClicked)
+			)
+		);	
 	}
 	MenuBuilder.EndSection();
 	
