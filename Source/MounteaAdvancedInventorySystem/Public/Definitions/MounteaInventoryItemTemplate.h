@@ -190,8 +190,8 @@ public:
 protected:
 	
 	// JSON manifest of the Inventory Item.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data",
-		meta=(Multiline))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data",
+		AdvancedDisplay, meta=(Multiline))
 	FString JsonManifest;
 	
 public:

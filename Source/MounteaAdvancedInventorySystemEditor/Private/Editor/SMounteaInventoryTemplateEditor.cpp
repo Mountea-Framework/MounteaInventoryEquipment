@@ -36,6 +36,7 @@
 #include "Subsystems/MounteaInventoryTemplateEditorSubsystem.h"
 
 #include "AssetToolsModule.h"
+#include "DesktopPlatformModule.h"
 #include "Algo/ForEach.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "UObject/SavePackage.h"
@@ -622,10 +623,97 @@ void SMounteaInventoryTemplateEditor::ImportTemplate()
 	ShowTemplateEditorNotification(TEXT("Import functionality not yet implemented."), false);
 }
 
+// TODO: Make Editor Statics?
 void SMounteaInventoryTemplateEditor::ExportTemplate()
 {
-	// TODO: Implement export functionality
-	ShowTemplateEditorNotification(TEXT("Export functionality not yet implemented."), false);
+    if (SelectedTemplates.Num() == 0)
+    {
+        ShowTemplateEditorNotification(TEXT("No templates selected for export"), false);
+        return;
+    }
+
+    TArray<FString> validJsonData;
+    for (const auto& itemTemplate : SelectedTemplates)
+    {
+        if (!itemTemplate.IsValid())
+            continue;
+
+        const FString JsonData = itemTemplate->GetJson();
+        if (!JsonData.IsEmpty())
+        	validJsonData.Add(JsonData);
+    }
+
+    if (validJsonData.Num() == 0)
+    {
+        ShowTemplateEditorNotification(TEXT("Selected templates have no JSON data to export"), false);
+        return;
+    }
+
+    IDesktopPlatform* desktopPlatform = FDesktopPlatformModule::Get();
+    if (!desktopPlatform)
+    {
+        ShowTemplateEditorNotification(TEXT("Failed to access desktop platform"), false);
+        return;
+    }
+
+    const bool bMultipleTemplates = validJsonData.Num() > 1;
+    const FString fileExtension = bMultipleTemplates ? TEXT(".mnteaitems") : TEXT(".mnteaitem");
+    const FString fileTypes = bMultipleTemplates 
+        ? TEXT("Mountea Items Files (*.mnteaitems)|*.mnteaitems")
+        : TEXT("Mountea Item Files (*.mnteaitem)|*.mnteaitem");
+    
+    FString defaultFileName;
+    if (bMultipleTemplates)
+    	defaultFileName = TEXT("ExportedTemplates");
+    else if (SelectedTemplates[0].IsValid())
+    	defaultFileName = SelectedTemplates[0]->DisplayName.ToString().Replace(TEXT(" "), TEXT("_"));
+    
+    TArray<FString> saveFilenames;
+    const bool bFileSelected = desktopPlatform->SaveFileDialog(
+        FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr),
+        TEXT("Export Template"),
+        FPaths::ProjectContentDir(),
+        defaultFileName,
+        fileTypes,
+        EFileDialogFlags::None,
+        saveFilenames
+    );
+
+    if (!bFileSelected || saveFilenames.Num() == 0)
+    	return;
+
+    FString filePath = saveFilenames[0];
+    if (!filePath.EndsWith(fileExtension))
+    	filePath += fileExtension;
+
+    FString finalJson;
+    if (bMultipleTemplates)
+    {
+        finalJson = TEXT("{\n\t\"items\": [\n");
+        for (int32 i = 0; i < validJsonData.Num(); ++i)
+        {
+            finalJson += TEXT("\t\t") + validJsonData[i];
+            if (i < validJsonData.Num() - 1)
+            	finalJson += TEXT(",");
+            finalJson += TEXT("\n");
+        }
+        finalJson += TEXT("\t]\n}");
+    }
+    else
+    	finalJson = validJsonData[0];
+
+    if (FFileHelper::SaveStringToFile(finalJson, *filePath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
+    {
+        const FString resultMessage = FString::Printf(
+            TEXT("Exported %d template%s successfully to: %s"), 
+            validJsonData.Num(),
+            validJsonData.Num() > 1 ? TEXT("s") : TEXT(""),
+            *filePath
+        );
+        ShowTemplateEditorNotification(resultMessage, true);
+    }
+    else
+    	ShowTemplateEditorNotification(TEXT("Failed to write export file"), false);
 }
 
 TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
@@ -735,6 +823,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 
 	const auto foregroundColor = FSlateColor::UseForeground();
 	
+	// TODO: Make the Table row "styleless" and wrap the content in Border/Button that will implement better styling
 	return SNew(STableRow<TWeakObjectPtr<UMounteaInventoryItemTemplate>>, OwnerTable)
 		.Padding(2.f)
 	//.Style(&FMounteaAdvancedInventoryEditorStyle::Get().GetWidgetStyle<FTableRowStyle>("MAISStyleSet.TemplateTableRow"))
