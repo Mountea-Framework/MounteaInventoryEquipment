@@ -300,7 +300,8 @@ void UMounteaInventoryUIComponent::ProcessItemRemoved_Implementation(const FInve
 {
 	if (!IsValid(InventoryWidget))
 	{
-		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!")) return;
+		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!")) 
+		return;
 	}
 
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())

@@ -115,6 +115,26 @@ namespace InventoryUICommands
 		};
 	}
 
+	// General
+	namespace General
+	{
+		inline const FString Create(TEXT("CreateWidget"));
+		inline const FString Remove(TEXT("RemoveWidget"));
+		inline const FString Toggle(TEXT("ToggleWidget"));
+		inline const FString Refresh(TEXT("RefreshWidget"));
+		inline const FString Show(TEXT("ShowWidget"));
+		inline const FString Hide(TEXT("HideWidget"));
+
+		inline const TSet<FString> All = {
+			Create,
+			Remove,
+			Toggle,
+			Refresh,
+			Show,
+			Hide
+		};
+	}
+	
 	// Aggregate set
 	inline const TSet<FString> AllCommands = []()
 	{
@@ -127,6 +147,7 @@ namespace InventoryUICommands
 		Result.Append(Items::All);
 		Result.Append(Categories::All);
 		Result.Append(Notifications::All);
+		Result.Append(General::All);
 
 		return Result;
 	}();
