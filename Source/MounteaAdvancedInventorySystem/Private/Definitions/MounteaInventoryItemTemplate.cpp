@@ -61,13 +61,15 @@ bool UMounteaInventoryItemTemplate::CalculateJson()
 TArray<FString> UMounteaInventoryItemTemplate::GetAllowedCategories()
 {
 	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	TArray<FString> returnValues;
 	if (!IsValid(inventorySettings))
 	{
-		TArray<FString> returnValues;
+		
 		returnValues.Add(TEXT("Miscellaneous"));
 		return returnValues;
 	}
-	return inventorySettings->GetAllowedCategories();
+	inventorySettings->GetAllowedCategories().GetKeys(returnValues);
+	return returnValues;
 }
 
 TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
@@ -91,15 +93,16 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
 }
 
 TArray<FString> UMounteaInventoryItemTemplate::GetAllowedRarities()
-{
-	TArray<FString> returnValues;
+{	
 	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	TArray<FString> returnValues;
 	if (!IsValid(inventorySettings))
 	{
 		returnValues.Add(TEXT("Common"));
 		return returnValues;
 	}
-	return inventorySettings->GetAllowedRarities();
+	inventorySettings->GetAllowedRarities().GetKeys(returnValues);
+	return returnValues;
 }
 
 #if WITH_EDITOR

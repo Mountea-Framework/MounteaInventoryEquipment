@@ -29,10 +29,40 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-	
+
+	/**
+	 * Registers an Inventory UI Manager instance.
+	 *
+	 * Stores the provided object as the active Inventory UI Manager used
+	 * to control inventory-related user interface logic.
+	 *
+	 * @param NewInventoryUIManager Object instance to register as the Inventory UI Manager.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Subsystem",
+		meta=(CustomTag="MounteaK2Setter"))
 	void RegisterInventoryUIManager(UObject* NewInventoryUIManager);
+
+	/**
+	 * Unregisters the currently registered Inventory UI Manager.
+	 *
+	 * If the provided object matches the currently registered Inventory UI Manager,
+	 * it will be cleared and no longer used by the inventory system.
+	 *
+	 * @param DirtyInventoryUIManager Inventory UI Manager instance to unregister.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Subsystem",
+		meta=(CustomTag="MounteaK2Setter"))
 	void UnregisterInventoryUIManager(const UObject* DirtyInventoryUIManager);
+
+	/**
+	 * Returns the currently registered Inventory UI Manager.
+	 *
+	 * @return The active Inventory UI Manager instance, or nullptr if none is registered.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Subsystem",
+		meta=(CustomTag="MounteaK2Getter"))
 	UObject* GetInventoryUIManager() const;
+
 
 private:
 
