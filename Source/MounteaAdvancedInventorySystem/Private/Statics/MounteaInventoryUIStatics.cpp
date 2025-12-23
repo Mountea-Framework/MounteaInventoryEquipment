@@ -134,7 +134,7 @@ FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWid
     
 	const float viewportCenter = viewportHeight * 0.5f;
 	const float itemCenter = (SelectedIndex * itemHeight) + (itemHeight * 0.5f);
-	const float translationY = viewportCenter - itemCenter;
+	const float translationY = (viewportCenter - itemCenter) - SelectedIndex;
     
 	return FVector2D(0.0f, translationY);
 }
