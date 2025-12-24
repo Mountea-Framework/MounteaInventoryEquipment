@@ -64,6 +64,8 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				
 				"EditorSubsystem", 
 				"EditorScriptingUtilities",
+				
+				"Json"
 			}
 		);
 
