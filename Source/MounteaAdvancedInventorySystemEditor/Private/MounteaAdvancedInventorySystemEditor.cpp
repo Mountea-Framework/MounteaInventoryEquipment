@@ -325,7 +325,7 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 
 	TSharedRef<SDockTab> newTab = SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
-		.Label(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
+		.Label(LOCTEXT("InventoryTemplateEditorTabTitle", "Inventory Template Editor"))
 		.ToolTipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Create and edit Mountea Inventory Item Templates"))
 		[
 			newEditor

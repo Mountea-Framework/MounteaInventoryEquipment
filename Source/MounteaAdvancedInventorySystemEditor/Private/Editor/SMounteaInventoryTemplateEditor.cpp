@@ -667,7 +667,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		.Padding(5.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("NewTemplate", "New Template"))
+			.Text(LOCTEXT("NewTemplate", "🆕 New Template"))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCreateNewTemplate)
 		]
 		
@@ -677,7 +677,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		.Padding(5.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("SaveTemplate", "Save Template"))
+			.Text(LOCTEXT("SaveTemplate", "💾 Save Template"))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveTemplate)
 			.IsEnabled_Lambda([this]() { 
 				if (bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate.Get()->HasAnyFlags(RF_Transient))
@@ -695,7 +695,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		.Padding(5.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("SaveAllTemplates", "Save All"))
+			.Text(LOCTEXT("SaveAllTemplates", "🗃 Save All"))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates)
 			.IsEnabled_Lambda([this]() { return DirtyTemplates.Num() > 0; })
 		]
@@ -706,7 +706,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		.Padding(5.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("ImportTemplate", "Import Items"))
+			.Text(LOCTEXT("ImportTemplate", "⬇ Import Items"))
 			.OnClicked_Lambda([this]() { ImportTemplate(); return FReply::Handled(); })
 		]
 		
@@ -716,7 +716,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		.Padding(5.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("ExportTemplate", "Export Items"))
+			.Text(LOCTEXT("ExportTemplate", "⬆ Export Items"))
 			.OnClicked_Lambda([this]() { ExportTemplate(); return FReply::Handled(); })
 		]
 
@@ -726,7 +726,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		.Padding(5.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("CloseTemplate", "Close Template"))
+			.Text(LOCTEXT("CloseTemplate", "❌ Close Template"))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::CloseTemplate)
 		]
 		
