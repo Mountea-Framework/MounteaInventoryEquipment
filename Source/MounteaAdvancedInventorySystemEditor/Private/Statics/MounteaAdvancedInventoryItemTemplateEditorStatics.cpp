@@ -11,7 +11,9 @@
 
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 
+#include "ContentBrowserModule.h"
 #include "DesktopPlatformModule.h"
+#include "IContentBrowserSingleton.h"
 #include "IDesktopPlatform.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -69,8 +71,9 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
         }
         else
         {
-            const FString targetFolder = ShowFolderDialog(
-                TEXT("Select Target Folder for New Template"),
+            const FString targetFolder = ShowContentBrowserPathPicker(
+                NSLOCTEXT("UMounteaAdvancedInventoryItemTemplateEditorStatics", "Import_TargetFolder", 
+                    "Select Target Folder for New Template").ToString(),
                 TEXT("/Game/")
             );
 
@@ -470,4 +473,77 @@ FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowFolderDialog(
     );
 
     return bFolderSelected ? selectedFolder : FString();
+}
+
+FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowContentBrowserPathPicker(
+    const FString& DialogTitle, 
+    const FString& DefaultPath)
+{
+    FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+    
+    FString selectedPath;
+    
+    FPathPickerConfig pathPickerConfig;
+    pathPickerConfig.DefaultPath = DefaultPath;
+    pathPickerConfig.bAllowContextMenu = true;
+    pathPickerConfig.bAllowClassesFolder = false;
+    pathPickerConfig.OnPathSelected = FOnPathSelected::CreateLambda([&selectedPath](const FString& Path)
+    {
+        selectedPath = Path;
+    });
+
+    TSharedRef<SWidget> pathPicker = contentBrowserModule.Get().CreatePathPicker(pathPickerConfig);
+    
+    TSharedRef<SWindow> pickerWindow = SNew(SWindow)
+        .Title(FText::FromString(DialogTitle))
+        .ClientSize(FVector2D(450, 600))
+        .SupportsMaximize(false)
+        .SupportsMinimize(false)
+        [
+            SNew(SVerticalBox)
+            + SVerticalBox::Slot()
+            .FillHeight(1.0f)
+            [
+                pathPicker
+            ]
+            + SVerticalBox::Slot()
+            .AutoHeight()
+            .Padding(5)
+            [
+                SNew(SHorizontalBox)
+                + SHorizontalBox::Slot()
+                .FillWidth(1.0f)
+                [
+                    SNullWidget::NullWidget
+                ]
+                + SHorizontalBox::Slot()
+                .AutoWidth()
+                .Padding(5, 0)
+                [
+                    SNew(SButton)
+                    .Text(FText::FromString(TEXT("OK")))
+                    .OnClicked_Lambda([&pickerWindow]()
+                    {
+                        pickerWindow->RequestDestroyWindow();
+                        return FReply::Handled();
+                    })
+                ]
+                + SHorizontalBox::Slot()
+                .AutoWidth()
+                [
+                    SNew(SButton)
+                    .Text(FText::FromString(TEXT("Cancel")))
+                    .OnClicked_Lambda([&pickerWindow, &selectedPath]()
+                    {
+                        selectedPath.Empty();
+                        pickerWindow->RequestDestroyWindow();
+                        return FReply::Handled();
+                    })
+                ]
+            ]
+        ];
+
+    GEditor->EditorAddModalWindow(pickerWindow);
+    
+    return selectedPath;
 }

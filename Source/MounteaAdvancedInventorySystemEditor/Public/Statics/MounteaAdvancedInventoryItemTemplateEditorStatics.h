@@ -45,4 +45,5 @@ private:
 	static FString ShowOpenFileDialog(const FString& DialogTitle, const FString& FileTypes);
 	static FString ShowSaveFileDialog(const FString& DialogTitle, const FString& DefaultFileName, const FString& FileTypes);
 	static FString ShowFolderDialog(const FString& DialogTitle, const FString& DefaultPath);
+	static FString ShowContentBrowserPathPicker(const FString& DialogTitle, const FString& DefaultPath);
 };
