@@ -564,7 +564,6 @@ FReply SMounteaInventoryTemplateEditor::DeleteTemplate(TWeakObjectPtr<UMounteaIn
 	
 	UMounteaInventoryItemTemplate* itemTemplate = Template.Get();
 	
-	// Don't delete transient templates
 	if (itemTemplate->HasAnyFlags(RF_Transient))
 	{
 		ShowTemplateEditorNotification(TEXT("Cannot delete unsaved template."), false);
@@ -577,9 +576,10 @@ FReply SMounteaInventoryTemplateEditor::DeleteTemplate(TWeakObjectPtr<UMounteaIn
 	
 	if (FMessageDialog::Open(EAppMsgType::YesNo, message, title) == EAppReturnType::Yes)
 	{
+		UntrackDirtyAsset(itemTemplate);
+		
 		if (UEditorAssetLibrary::DeleteAsset(itemTemplate->GetPathName()))
 		{
-			UntrackDirtyAsset(itemTemplate);
 			RefreshTemplateList();
 			ShowTemplateEditorNotification(TEXT("Template deleted successfully."), true);
 		}
