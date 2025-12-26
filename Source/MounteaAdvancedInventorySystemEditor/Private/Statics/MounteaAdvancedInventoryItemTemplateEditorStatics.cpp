@@ -39,17 +39,6 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
         return false;
     }
 
-    const FString targetFolder = ShowFolderDialog(
-        TEXT("Select Target Folder for Templates"),
-        TEXT("/Game/")
-    );
-
-    if (targetFolder.IsEmpty())
-    {
-        OutErrorMessage = TEXT("No target folder selected");
-        return false;
-    }
-
     const bool bIsMultipleFile = filePath.EndsWith(TEXT(".mnteaitems"));
     
     TArray<FString> itemJsons;
@@ -61,21 +50,53 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
     else
         itemJsons.Add(fileContent);
 
-    for (int32 i = 0; i < itemJsons.Num(); ++i)
-    {
-        const FString assetName = FString::Printf(TEXT("ImportedTemplate_%d"), i + 1);
-        UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(targetFolder, assetName, OutErrorMessage);
-        
-        if (!newTemplate)
-            continue;
+    TArray<UMounteaInventoryItemTemplate*> existingTemplates = LoadAllExistingTemplates();
+    
+    int32 updatedCount = 0;
+    int32 createdCount = 0;
 
-        if (ParseSingleTemplateJson(itemJsons[i], newTemplate, OutErrorMessage))
+    for (const FString& itemJson : itemJsons)
+    {
+        const FGuid itemGuid = ExtractGuidFromJson(itemJson);
+
+        if (UMounteaInventoryItemTemplate* targetTemplate = FindTemplateByGuid(existingTemplates, itemGuid))
         {
-            newTemplate->CalculateJson();
+            if (UpdateExistingTemplate(targetTemplate, itemJson, OutErrorMessage))
+            {
+                OutTemplates.Add(targetTemplate);
+                updatedCount++;
+            }
+        }
+        else
+        {
+            const FString targetFolder = ShowFolderDialog(
+                TEXT("Select Target Folder for New Template"),
+                TEXT("/Game/")
+            );
+
+            if (targetFolder.IsEmpty())
+            {
+                OutErrorMessage = TEXT("No target folder selected for new template");
+                continue;
+            }
+
+            const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"), *itemGuid.ToString(EGuidFormats::Short));
+            UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(targetFolder, assetName, OutErrorMessage);
             
-            const FString packagePath = FPaths::Combine(targetFolder, assetName);
-            if (SaveTemplateAsset(newTemplate, packagePath))
-                OutTemplates.Add(newTemplate);
+            if (!newTemplate)
+                continue;
+
+            if (ParseSingleTemplateJson(itemJson, newTemplate, OutErrorMessage))
+            {
+                newTemplate->CalculateJson();
+                
+                const FString packagePath = FPaths::Combine(targetFolder, assetName);
+                if (SaveTemplateAsset(newTemplate, packagePath))
+                {
+                    OutTemplates.Add(newTemplate);
+                    createdCount++;
+                }
+            }
         }
     }
 
@@ -84,6 +105,12 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
         OutErrorMessage = TEXT("No templates were successfully imported");
         return false;
     }
+
+    OutErrorMessage = FString::Printf(
+        TEXT("Import complete: %d created, %d updated"),
+        createdCount,
+        updatedCount
+    );
 
     return true;
 }
@@ -164,6 +191,102 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ExportTemplatesToFile(
     }
 
     return true;
+}
+
+TArray<UMounteaInventoryItemTemplate*> UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates()
+{
+    TArray<UMounteaInventoryItemTemplate*> templates;
+    
+    FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+    TArray<FAssetData> assetData;
+    const FTopLevelAssetPath assetPath = UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName();
+    assetRegistryModule.Get().GetAssetsByClass(assetPath, assetData, true);
+
+    for (const FAssetData& asset : assetData)
+    {
+        if (UMounteaInventoryItemTemplate* itemTemplate = Cast<UMounteaInventoryItemTemplate>(asset.GetAsset()))
+            templates.Add(itemTemplate);
+    }
+
+    return templates;
+}
+
+UMounteaInventoryItemTemplate* UMounteaAdvancedInventoryItemTemplateEditorStatics::FindTemplateByGuid(
+    const TArray<UMounteaInventoryItemTemplate*>& Templates, 
+    const FGuid& Guid)
+{
+    if (!Guid.IsValid())
+        return nullptr;
+
+    UMounteaInventoryItemTemplate* const* foundTemplate = Templates.FindByPredicate(
+        [&Guid](const UMounteaInventoryItemTemplate* Template)
+    {
+        return IsValid(Template) && Template->Guid == Guid;
+    });
+
+    return foundTemplate ? *foundTemplate : nullptr;
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::UpdateExistingTemplate(
+    UMounteaInventoryItemTemplate* Template, 
+    const FString& JsonString, 
+    FString& OutErrorMessage)
+{
+    if (!IsValid(Template))
+    {
+        OutErrorMessage = TEXT("Invalid template object for update");
+        return false;
+    }
+
+    if (!ParseSingleTemplateJson(JsonString, Template, OutErrorMessage))
+        return false;
+
+    Template->CalculateJson();
+    
+    UPackage* templatePackage = Template->GetOutermost();
+    if (!templatePackage)
+    {
+        OutErrorMessage = TEXT("Template has no valid package");
+        return false;
+    }
+
+    templatePackage->MarkPackageDirty();
+
+    FSavePackageArgs saveArgs;
+    saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    saveArgs.SaveFlags = SAVE_NoError;
+
+    const FString packageFileName = FPackageName::LongPackageNameToFilename(
+        templatePackage->GetName(), 
+        FPackageName::GetAssetPackageExtension()
+    );
+    
+    if (!UPackage::SavePackage(templatePackage, Template, *packageFileName, saveArgs))
+    {
+        OutErrorMessage = TEXT("Failed to save updated template");
+        return false;
+    }
+
+    return true;
+}
+
+FGuid UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(const FString& JsonString)
+{
+    TSharedPtr<FJsonObject> jsonObject;
+    TSharedRef<TJsonReader<>> jsonReader = TJsonReaderFactory<>::Create(JsonString);
+
+    if (!FJsonSerializer::Deserialize(jsonReader, jsonObject) || !jsonObject.IsValid())
+        return FGuid();
+
+    FString guidString;
+    if (jsonObject->TryGetStringField(TEXT("Guid"), guidString))
+    {
+        FGuid guid;
+        if (FGuid::Parse(guidString, guid))
+            return guid;
+    }
+
+    return FGuid();
 }
 
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(

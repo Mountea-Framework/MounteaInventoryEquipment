@@ -625,16 +625,13 @@ void SMounteaInventoryTemplateEditor::ImportTemplate()
     
 	if (UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile(importedTemplates, errorMessage))
 	{
-		const FString tempMessage = FString::Printf(
-			TEXT("Successfully imported %d template%s"),
-			importedTemplates.Num(),
-			importedTemplates.Num() > 1 ? TEXT("s") : TEXT("")
-		);
-		ShowTemplateEditorNotification(tempMessage, true);
+		ShowTemplateEditorNotification(errorMessage, true);
 		RefreshTemplateList();
 	}
 	else
+	{
 		ShowTemplateEditorNotification(errorMessage, false);
+	}
 }
 
 void SMounteaInventoryTemplateEditor::ExportTemplate()

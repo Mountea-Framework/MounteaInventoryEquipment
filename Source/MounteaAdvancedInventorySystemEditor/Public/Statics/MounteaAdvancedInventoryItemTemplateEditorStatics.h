@@ -31,6 +31,11 @@ public:
 	static bool ExportTemplatesToFile(const TArray<UMounteaInventoryItemTemplate*>& Templates, FString& OutErrorMessage);
 
 private:
+	static TArray<UMounteaInventoryItemTemplate*> LoadAllExistingTemplates();
+	static UMounteaInventoryItemTemplate* FindTemplateByGuid(const TArray<UMounteaInventoryItemTemplate*>& Templates, const FGuid& Guid);
+	static bool UpdateExistingTemplate(UMounteaInventoryItemTemplate* Template, const FString& JsonString, FString& OutErrorMessage);
+	static FGuid ExtractGuidFromJson(const FString& JsonString);
+	
 	static bool ParseSingleTemplateJson(const FString& JsonString, UMounteaInventoryItemTemplate* Template, FString& OutErrorMessage);
 	static bool ParseMultipleTemplatesJson(const FString& JsonString, TArray<FString>& OutItemJsons, FString& OutErrorMessage);
     
