@@ -15,6 +15,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaAdvancedInventoryItemTemplateEditorStatics.generated.h"
 
+struct FGameplayTagContainer;
 class UMounteaInventoryItemTemplate;
 
 /**
@@ -46,4 +47,8 @@ private:
 	static FString ShowSaveFileDialog(const FString& DialogTitle, const FString& DefaultFileName, const FString& FileTypes);
 	static FString ShowFolderDialog(const FString& DialogTitle, const FString& DefaultPath);
 	static FString ShowContentBrowserPathPicker(const FString& DialogTitle, const FString& DefaultPath);
+
+	static bool DeserializeTemplateFromJson(const TSharedPtr<FJsonObject>& JsonObject, UMounteaInventoryItemTemplate* Template, FString& OutErrorMessage);
+	static bool DeserializeGameplayTagContainer(const TSharedPtr<FJsonObject>& JsonObject, const FString& FieldName, FGameplayTagContainer& OutContainer);
+	static bool DeserializeSoftClassPtrSet(const TSharedPtr<FJsonObject>& JsonObject, const FString& FieldName, TSet<TSoftClassPtr<UObject>>& OutSet);
 };

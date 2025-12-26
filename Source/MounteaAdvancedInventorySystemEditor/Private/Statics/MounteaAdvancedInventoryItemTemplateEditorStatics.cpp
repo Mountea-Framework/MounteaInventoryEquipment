@@ -312,6 +312,9 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson
         return false;
     }
 
+    if (!DeserializeTemplateFromJson(jsonObject, Template, OutErrorMessage))
+        return false;
+
     Template->SetJson(JsonString);
     
     return true;
@@ -546,4 +549,197 @@ FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowContentBrowserPa
     GEditor->EditorAddModalWindow(pickerWindow);
     
     return selectedPath;
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::DeserializeTemplateFromJson(
+    const TSharedPtr<FJsonObject>& JsonObject, 
+    UMounteaInventoryItemTemplate* Template, 
+    FString& OutErrorMessage)
+{
+    if (!JsonObject.IsValid() || !IsValid(Template))
+    {
+        OutErrorMessage = TEXT("Invalid JSON object or template");
+        return false;
+    }
+
+    FString guidString;
+    if (JsonObject->TryGetStringField(TEXT("guid"), guidString))
+    {
+        FGuid parsedGuid;        
+        if (FGuid::Parse(guidString, parsedGuid))
+            Template->Guid = parsedGuid;
+        else
+            OutErrorMessage.Append(TEXT("\nParse GUID: Failed"));
+    }
+
+    FString displayName;
+    if (JsonObject->TryGetStringField(TEXT("displayName"), displayName))
+        Template->DisplayName = FText::FromString(displayName);
+
+    JsonObject->TryGetStringField(TEXT("category"), Template->ItemCategory);
+    JsonObject->TryGetStringField(TEXT("subCategory"), Template->ItemSubCategory);
+    JsonObject->TryGetStringField(TEXT("rarity"), Template->ItemRarity);
+
+    int32 itemFlags;
+    if (JsonObject->TryGetNumberField(TEXT("flags"), itemFlags))
+        Template->ItemFlags = static_cast<uint8>(itemFlags);
+
+    JsonObject->TryGetNumberField(TEXT("maxQuantity"), Template->MaxQuantity);
+    JsonObject->TryGetNumberField(TEXT("maxStackSize"), Template->MaxStackSize);
+
+    DeserializeGameplayTagContainer(JsonObject, TEXT("tags"), Template->Tags);
+
+    const TSharedPtr<FJsonObject>* spawnActorObject;
+    if (JsonObject->TryGetObjectField(TEXT("spawnActor"), spawnActorObject))
+    {
+        FString spawnActorPath;
+        if ((*spawnActorObject)->TryGetStringField(TEXT("path"), spawnActorPath) && !spawnActorPath.IsEmpty())
+            Template->SpawnActor = TSoftClassPtr<AActor>(FSoftObjectPath(spawnActorPath));
+    }
+
+    const TSharedPtr<FJsonObject>* descriptionObject;
+    if (JsonObject->TryGetObjectField(TEXT("description"), descriptionObject))
+    {
+        FString shortDesc, longDesc;
+        if ((*descriptionObject)->TryGetStringField(TEXT("short"), shortDesc))
+            Template->ItemShortInfo = FText::FromString(shortDesc);
+        if ((*descriptionObject)->TryGetStringField(TEXT("long"), longDesc))
+            Template->ItemLongInfo = FText::FromString(longDesc);
+    }
+
+    const TSharedPtr<FJsonObject>* visualsObject;
+    if (JsonObject->TryGetObjectField(TEXT("visuals"), visualsObject))
+    {
+        const TSharedPtr<FJsonObject>* thumbnailObject;
+        if ((*visualsObject)->TryGetObjectField(TEXT("thumbnail"), thumbnailObject))
+        {
+            FString thumbnailPath;
+            if ((*thumbnailObject)->TryGetStringField(TEXT("path"), thumbnailPath) && !thumbnailPath.IsEmpty())
+                Template->ItemThumbnail = TSoftObjectPtr<UTexture2D>(FSoftObjectPath(thumbnailPath));
+        }
+
+        const TSharedPtr<FJsonObject>* coverObject;
+        if ((*visualsObject)->TryGetObjectField(TEXT("cover"), coverObject))
+        {
+            FString coverPath;
+            if ((*coverObject)->TryGetStringField(TEXT("path"), coverPath) && !coverPath.IsEmpty())
+                Template->ItemCover = TSoftObjectPtr<UTexture2D>(FSoftObjectPath(coverPath));
+        }
+
+        const TSharedPtr<FJsonObject>* meshObject;
+        if ((*visualsObject)->TryGetObjectField(TEXT("mesh"), meshObject))
+        {
+            FString meshPath;
+            if ((*meshObject)->TryGetStringField(TEXT("path"), meshPath) && !meshPath.IsEmpty())
+            {
+                FSoftObjectPath softPath(meshPath);
+                if (UObject* loadedMesh = softPath.TryLoad())
+                {
+                    if (UStreamableRenderAsset* renderAsset = Cast<UStreamableRenderAsset>(loadedMesh))
+                        Template->ItemMesh = renderAsset;
+                }
+            }
+        }
+    }
+
+    const TSharedPtr<FJsonObject>* durabilityObject;
+    if (JsonObject->TryGetObjectField(TEXT("durability"), durabilityObject))
+    {
+        (*durabilityObject)->TryGetBoolField(TEXT("enabled"), Template->bHasDurability);
+        
+        if (Template->bHasDurability)
+        {
+            double maxDurability, baseDurability, penalization, priceCoef;
+            if ((*durabilityObject)->TryGetNumberField(TEXT("max"), maxDurability))
+                Template->MaxDurability = static_cast<float>(maxDurability);
+            if ((*durabilityObject)->TryGetNumberField(TEXT("base"), baseDurability))
+                Template->BaseDurability = static_cast<float>(baseDurability);
+            if ((*durabilityObject)->TryGetNumberField(TEXT("penalization"), penalization))
+                Template->DurabilityPenalization = static_cast<float>(penalization);
+            if ((*durabilityObject)->TryGetNumberField(TEXT("priceCoefficient"), priceCoef))
+                Template->DurabilityToPriceCoefficient = static_cast<float>(priceCoef);
+        }
+    }
+
+    const TSharedPtr<FJsonObject>* economyObject;
+    if (JsonObject->TryGetObjectField(TEXT("economy"), economyObject))
+    {
+        (*economyObject)->TryGetBoolField(TEXT("enabled"), Template->bHasPrice);
+        
+        if (Template->bHasPrice)
+        {
+            double basePrice, sellCoef;
+            if ((*economyObject)->TryGetNumberField(TEXT("basePrice"), basePrice))
+                Template->BasePrice = static_cast<float>(basePrice);
+            if ((*economyObject)->TryGetNumberField(TEXT("sellCoefficient"), sellCoef))
+                Template->SellPriceCoefficient = static_cast<float>(sellCoef);
+        }
+    }
+
+    const TSharedPtr<FJsonObject>* weightObject;
+    if (JsonObject->TryGetObjectField(TEXT("weight"), weightObject))
+    {
+        (*weightObject)->TryGetBoolField(TEXT("enabled"), Template->bHasWeight);
+        
+        if (Template->bHasWeight)
+        {
+            double weightValue;
+            if ((*weightObject)->TryGetNumberField(TEXT("value"), weightValue))
+                Template->Weight = static_cast<float>(weightValue);
+        }
+    }
+
+    DeserializeGameplayTagContainer(JsonObject, TEXT("attachmentSlots"), Template->AttachmentSlots);
+    DeserializeSoftClassPtrSet(JsonObject, TEXT("specialAffects"), Template->ItemSpecialAffects);
+
+    return true;
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::DeserializeGameplayTagContainer(
+    const TSharedPtr<FJsonObject>& JsonObject, 
+    const FString& FieldName, 
+    FGameplayTagContainer& OutContainer)
+{
+    OutContainer.Reset();
+    
+    const TArray<TSharedPtr<FJsonValue>>* tagsArray;
+    if (!JsonObject->TryGetArrayField(FieldName, tagsArray))
+        return false;
+
+    for (const auto& tagValue : *tagsArray)
+    {
+        FString tagString;
+        if (tagValue->TryGetString(tagString))
+        {
+            const FGameplayTag tag = FGameplayTag::RequestGameplayTag(FName(*tagString), false);
+            if (tag.IsValid())
+                OutContainer.AddTag(tag);
+        }
+    }
+
+    return true;
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::DeserializeSoftClassPtrSet(
+    const TSharedPtr<FJsonObject>& JsonObject, 
+    const FString& FieldName, 
+    TSet<TSoftClassPtr<UObject>>& OutSet)
+{
+    OutSet.Empty();
+    
+    const TArray<TSharedPtr<FJsonValue>>* classArray;
+    if (!JsonObject->TryGetArrayField(FieldName, classArray))
+        return false;
+
+    for (const auto& classValue : *classArray)
+    {
+        FString classPath;
+        if (classValue->TryGetString(classPath) && !classPath.IsEmpty())
+        {
+            TSoftClassPtr<UObject> softClass = TSoftClassPtr<UObject>(FSoftObjectPath(classPath));
+            OutSet.Add(softClass);
+        }
+    }
+
+    return true;
 }
