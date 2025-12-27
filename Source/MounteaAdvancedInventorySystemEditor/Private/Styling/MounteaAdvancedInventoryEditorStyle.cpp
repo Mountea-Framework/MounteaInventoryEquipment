@@ -74,6 +74,11 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 
 	StyleSet->Set("MAISStyleSet.Level", new IMAGE_BRUSH(TEXT("LevelIcon"), Icon40x40));
 	StyleSet->Set("MAISStyleSet.Folder", new IMAGE_BRUSH(TEXT("FolderIcon"), Icon40x40));
+	
+	StyleSet->Set("MAISStyleSet.Import", new IMAGE_BRUSH(TEXT("EditorIcons/Import"), Icon16x16));
+	StyleSet->Set("MAISStyleSet.Export", new IMAGE_BRUSH(TEXT("EditorIcons/Export"), Icon16x16));
+	StyleSet->Set("MAISStyleSet.Close", new IMAGE_BRUSH(TEXT("EditorIcons/Close"), Icon16x16));
+	StyleSet->Set("MAISStyleSet.SaveMultiple", new IMAGE_BRUSH(TEXT("EditorIcons/SaveMultiple"), Icon16x16));
 
 	StyleSet->Set("MAISStyleSet.InventorySystemIcon", new IMAGE_BRUSH(TEXT("InventorySystem_Icon"), Icon16x16));
 

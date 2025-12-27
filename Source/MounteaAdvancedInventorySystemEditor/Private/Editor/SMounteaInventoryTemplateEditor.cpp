@@ -744,11 +744,44 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		// New Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
-		.Padding(5.0f)
+		.Padding(2.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("NewTemplate", "🆕 New Template"))
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("NewTemplateTooltip", "Create new empty template"))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCreateNewTemplate)
+			.IsEnabled_Lambda([this]() 
+			{ 
+				return true;
+			})
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("Icons.Plus"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("NewTemplate", "New Template"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
 		]
 		
 		// Save Template
@@ -802,42 +835,174 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		// Save All
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
-		.Padding(5.0f)
+		.Padding(2.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("SaveAllTemplates", "🗃 Save All"))
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("SaveTemplateTooltip", "Save all unsaved templates."))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates)
 			.IsEnabled_Lambda([this]() { return DirtyTemplates.Num() > 0; })
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("MAISStyleSet.SaveMultiple"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SaveTemplates", "Save All Templates"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
 		]
+
+		// TODO: Add vertical separator
 		
 		// Import Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
-		.Padding(5.0f)
+		.Padding(2.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("ImportTemplate", "⬇ Import Items"))
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("ImportTemplateTooltip", "Import single or multiple item templates from source files."))
 			.OnClicked_Lambda([this]() { ImportTemplate(); return FReply::Handled(); })
+			.IsEnabled_Lambda([this]() 
+			{ 
+				return true;
+			})
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("MAISStyleSet.Import"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("ImportTemplate", "Import Template"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
 		]
 		
 		// Export Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
-		.Padding(5.0f)
+		.Padding(2.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("ExportTemplate", "⬆ Export Items"))
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("ExportTemplateTooltip", "Export all selected item templates to new source files."))
 			.OnClicked_Lambda([this]() { ExportTemplate(); return FReply::Handled(); })
+			.IsEnabled_Lambda([this]() 
+			{ 
+				return true;
+			})
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("MAISStyleSet.Export"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("ExportTemplate", "Export Item"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
 		]
 
+		// TODO: Add vertical separator
+		
 		// Close Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
-		.Padding(5.0f)
+		.Padding(2.0f)
 		[
 			SNew(SButton)
-			.Text(LOCTEXT("CloseTemplate", "❌ Close Template"))
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("CloseTemplateTooltip", "Close current template and return to blank canvas."))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::CloseTemplate)
+			.IsEnabled_Lambda([this]() 
+			{ 
+				return true;
+			})
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("MAISStyleSet.Close"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("CloseTemplate", "Close Template"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
 		]
 		
 		// Spacer
