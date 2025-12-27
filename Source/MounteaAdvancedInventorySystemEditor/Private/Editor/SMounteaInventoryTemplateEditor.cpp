@@ -1,4 +1,13 @@
-﻿// Copyright Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 
@@ -38,6 +47,7 @@
 #include "AssetToolsModule.h"
 #include "DesktopPlatformModule.h"
 #include "Algo/ForEach.h"
+#include "Search/MounteaInventoryTemplateSearchFilter.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "UObject/SavePackage.h"
@@ -563,25 +573,60 @@ FTemplateDisplayInfo SMounteaInventoryTemplateEditor::GenerateTemplateDisplayInf
 
 void SMounteaInventoryTemplateEditor::OnSearchTextChanged(const FText& InSearchText)
 {
-	CurrentSearchText = InSearchText;
 	ApplySearchFilter();
+}
+
+void SMounteaInventoryTemplateEditor::OnFiltersChanged()
+{
+	ApplySearchFilter();
+}
+
+bool SMounteaInventoryTemplateEditor::PassesFilters(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template) const
+{
+	if (!Template.IsValid() || !SearchFilterWidget.IsValid())
+		return false;
+	
+	UMounteaInventoryItemTemplate* itemTemplatePtr = Template.Get();
+	
+	bool bIsTransient = itemTemplatePtr->HasAnyFlags(RF_Transient);
+	bool bIsDirty = DirtyTemplates.Contains(Template);
+	
+	const FName itemCategory = FName(itemTemplatePtr->ItemCategory);
+	const FName itemRarity = FName(itemTemplatePtr->ItemRarity);
+	
+	return SearchFilterWidget->GetActiveFilters().PassesFilter(
+		bIsDirty,
+		bIsTransient,
+		itemCategory,
+		itemRarity
+	);
 }
 
 void SMounteaInventoryTemplateEditor::ApplySearchFilter()
 {
 	FilteredTemplates.Empty();
 	
-	if (CurrentSearchText.IsEmpty())
-		FilteredTemplates = AvailableTemplates;
-	else
+	if (!SearchFilterWidget.IsValid())
 	{
-		const FString searchString = CurrentSearchText.ToString().ToLower();
+		FilteredTemplates = AvailableTemplates;
+		if (TemplateListView.IsValid())
+			TemplateListView->RequestListRefresh();
+		return;
+	}
+	
+	const FText searchText = SearchFilterWidget->GetSearchText();
+	const FString searchString = searchText.ToString().ToLower();
+	const bool bHasSearchText = !searchText.IsEmpty();
+	
+	for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& itemTemplate : AvailableTemplates)
+	{
+		if (!PassesFilters(itemTemplate))
+			continue;
 		
-		for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template : AvailableTemplates)
-		{
-			if (DoesTemplateMatchSearch(Template, searchString))
-				FilteredTemplates.Add(Template);
-		}
+		if (bHasSearchText && !DoesTemplateMatchSearch(itemTemplate, searchString))
+			continue;
+		
+		FilteredTemplates.Add(itemTemplate);
 	}
 	
 	if (TemplateListView.IsValid())
@@ -789,45 +834,17 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 	]
 	
 	// Search box
+		// Replace the search box section with:
 	+ SHorizontalBox::Slot()
 	.AutoWidth()
 	.Padding(5.0f)
 	[
 		SNew(SBox)
-		.WidthOverride(200.0f)
+		.WidthOverride(250.0f)
 		[
-			SNew(SHorizontalBox)
-			
-			+ SHorizontalBox::Slot()
-			.FillWidth(1.0f)
-			[
-				SAssignNew(SearchBox, SEditableTextBox)
-				.HintText(LOCTEXT("SearchTemplates", "Search templates..."))
-				.OnTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
-			]
-			
-			+ SHorizontalBox::Slot()
-			.AutoWidth()
-			.Padding(2, 0, 0, 0)
-			[
-				SNew(SButton)
-				.ButtonStyle(FAppStyle::Get(), "SimpleButton")
-				.ContentPadding(FMargin(2))
-				.ToolTipText(LOCTEXT("ClearSearch", "Clear search"))
-				.OnClicked_Lambda([this]() -> FReply
-				{
-					CurrentSearchText = FText::GetEmpty();
-					if (SearchBox.IsValid())
-						SearchBox->SetText(CurrentSearchText);
-					ApplySearchFilter();
-					return FReply::Handled();
-				})
-				[
-					SNew(SImage)
-					.Image(FAppStyle::GetBrush("Icons.X"))
-					.ColorAndOpacity(FSlateColor::UseForeground())
-				]
-			]
+			SAssignNew(SearchFilterWidget, SMounteaInventoryTemplateSearchFilter)
+			.OnSearchTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
+			.OnFiltersChanged(this, &SMounteaInventoryTemplateEditor::OnFiltersChanged)
 		]
 	];
 }
