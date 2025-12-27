@@ -13,6 +13,7 @@
 #include "MounteaInventoryTemplateSearchFilter.h"
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Widgets/Input/SSearchBox.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateSearchFilter"
 
@@ -24,10 +25,18 @@ void SMounteaInventoryTemplateSearchFilter::Construct(const FArguments& InArgs)
 	ChildSlot
 	[
 		SNew(SHorizontalBox)
+
+		+ SHorizontalBox::Slot()
+		.FillWidth(1.0f)
+		[
+			SAssignNew(SearchBox, SSearchBox)
+			.HintText(LOCTEXT("SearchTemplates", "Search templates..."))
+			.OnTextChanged(this, &SMounteaInventoryTemplateSearchFilter::OnSearchChanged)
+		]
 		
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
-		.Padding(0, 0, 2, 0)
+		.Padding(4, 0, 2, 0)
 		[
 			SNew(SComboButton)
 			.ComboButtonStyle(FAppStyle::Get(), "SimpleComboButton")
@@ -67,34 +76,6 @@ void SMounteaInventoryTemplateSearchFilter::Construct(const FArguments& InArgs)
 							: FSlateColor(FLinearColor(0.4f, 0.7f, 1.0f));
 					})
 				]
-			]
-		]
-		
-		+ SHorizontalBox::Slot()
-		.FillWidth(1.0f)
-		[
-			SAssignNew(SearchBox, SEditableTextBox)
-			.HintText(LOCTEXT("SearchTemplates", "Search templates..."))
-			.OnTextChanged(this, &SMounteaInventoryTemplateSearchFilter::OnSearchChanged)
-		]
-		
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(2, 0, 0, 0)
-		[
-			SNew(SButton)
-			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
-			.ContentPadding(FMargin(2))
-			.ToolTipText(LOCTEXT("ClearSearch", "Clear search"))
-			.OnClicked_Lambda([this]() -> FReply
-			{
-				ClearSearch();
-				return FReply::Handled();
-			})
-			[
-				SNew(SImage)
-				.Image(FAppStyle::GetBrush("Icons.X"))
-				.ColorAndOpacity(FSlateColor::UseForeground())
 			]
 		]
 	];
@@ -189,7 +170,7 @@ void SMounteaInventoryTemplateSearchFilter::ClearSearch()
 {
 	if (SearchBox.IsValid())
 	{
-		SearchBox->SetText(FText::GetEmpty());
+		//SearchBox->SetText(FText::GetEmpty());
 	}
 	CurrentSearchText = FText::GetEmpty();
 	OnSearchTextChangedDelegate.ExecuteIfBound(FText::GetEmpty());

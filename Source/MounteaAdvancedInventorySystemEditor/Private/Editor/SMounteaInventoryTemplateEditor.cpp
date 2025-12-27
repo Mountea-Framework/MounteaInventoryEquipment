@@ -73,6 +73,7 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 		
 		+ SVerticalBox::Slot()
 		.AutoHeight()
+		.MinHeight(36.f)
 		[
 			CreateToolbar()
 		]
@@ -232,7 +233,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 		[
 			SNew(SBorder)
 			.Padding(4.0f)
-			.BorderImage(FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.RoundedBorder"))
+			.BorderImage(FAppStyle::GetBrush("Brushes.Background"))
 			[
 				SAssignNew(TemplateListView, SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>)
 				.ListItemsSource(&FilteredTemplates)
@@ -512,17 +513,19 @@ FString SMounteaInventoryTemplateEditor::ShowSaveAssetDialog()
 	FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
     
 	FSaveAssetDialogConfig config;
-	config.DialogTitleOverride = LOCTEXT("SaveInventoryTemplateDialogTitle", "Save Inventory Template");
-	config.DefaultPath = TEXT("/Game");
-	config.DefaultAssetName = TEXT("NewInventoryTemplate");
-	config.AssetClassNames.Add(UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName());
-	config.ExistingAssetPolicy = ESaveAssetDialogExistingAssetPolicy::AllowButWarn;
+	{
+		config.DialogTitleOverride = LOCTEXT("SaveInventoryTemplateDialogTitle", "Save Inventory Template");
+		config.DefaultPath = TEXT("/Game");
+		config.DefaultAssetName = TEXT("NewInventoryTemplate");
+		config.AssetClassNames.Add(UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName());
+		config.ExistingAssetPolicy = ESaveAssetDialogExistingAssetPolicy::AllowButWarn;
+	}
     
 	return contentBrowserModule.Get().CreateModalSaveAssetDialog(config);
 }
 
 FTemplateDisplayInfo SMounteaInventoryTemplateEditor::GenerateTemplateDisplayInfo(
-	TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
+	const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
 	const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates)
 {
 	FTemplateDisplayInfo returnInfo;
@@ -582,7 +585,7 @@ void SMounteaInventoryTemplateEditor::OnFiltersChanged()
 	ApplySearchFilter();
 }
 
-bool SMounteaInventoryTemplateEditor::PassesFilters(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template) const
+bool SMounteaInventoryTemplateEditor::PassesFilters(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template) const
 {
 	if (!Template.IsValid() || !SearchFilterWidget.IsValid())
 		return false;
@@ -663,7 +666,7 @@ FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMou
 	return FReply::Handled();
 }
 
-FReply SMounteaInventoryTemplateEditor::DuplicateTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)
+FReply SMounteaInventoryTemplateEditor::DuplicateTemplate(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)
 {
 	if (!Template.IsValid())
 		return FReply::Unhandled();
@@ -736,9 +739,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 	SNew(SBorder)
 	.VAlign(VAlign_Center)
 	.BorderImage(FAppStyle::Get().GetBrush("AssetEditorToolbar.Background"))
-	.Padding(FMargin(0.0f, 4.0f))
+	.Padding(4.f, 4.f, 0.f, 4.f)
 	[
-		
 		SNew(SHorizontalBox)
 		
 		// New Template
@@ -783,7 +785,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				]
 			]
 		]
-		
+			
 		// Save Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
@@ -1041,14 +1043,14 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			SNullWidget::NullWidget
 		]
 		
-		// Search box
-			// Replace the search box section with:
+		// Search box			
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(5.0f)
 		[
 			SNew(SBox)
-			.WidthOverride(250.0f)
+			//.WidthOverride(250.0f)
+			.MinDesiredWidth(300.0f)
 			[
 				SAssignNew(SearchFilterWidget, SMounteaInventoryTemplateSearchFilter)
 				.OnSearchTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
@@ -1309,7 +1311,7 @@ bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage
 	return true;
 }
 
-void SMounteaInventoryTemplateEditor::ShowTemplateEditorNotification(const FString& Message, const bool bSuccess) const
+void SMounteaInventoryTemplateEditor::ShowTemplateEditorNotification(const FString& Message, const bool bSuccess)
 {
 	FNotificationInfo notifInfo(FText::FromString(Message));
 	notifInfo.bFireAndForget = true;

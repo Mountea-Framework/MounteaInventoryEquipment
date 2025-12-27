@@ -58,8 +58,8 @@ private:
 	TSharedRef<SWidget> CreatePropertyMatrix();
 	TSharedRef<SWidget> CreateToolbar();
 	TSharedRef<ITableRow> GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable);
-	
-	TArray<UObject*> LoadAllTemplatesForMatrix();
+
+	static TArray<UObject*> LoadAllTemplatesForMatrix();
 	void RefreshTemplateList();
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
 	
@@ -78,7 +78,7 @@ private:
 	void CreateTransientTemplate();
 	void CleanupTransientTemplate();
 	bool ValidateTemplateData(FString& ErrorMessage) const;
-	void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true) const;
+	static void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true);
 	
 	// New functions for tracking dirty assets
 	void TrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
@@ -87,10 +87,10 @@ private:
 	bool CheckForUnsavedChanges();
 	
 	// Asset creation dialog
-	FString ShowSaveAssetDialog();
+	static FString ShowSaveAssetDialog();
 
-	FTemplateDisplayInfo  GenerateTemplateDisplayInfo(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
-	const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates);
+	static FTemplateDisplayInfo  GenerateTemplateDisplayInfo(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
+	                                                         const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates);
 
 private:
 	FOnTemplateChanged OnTemplateChanged;

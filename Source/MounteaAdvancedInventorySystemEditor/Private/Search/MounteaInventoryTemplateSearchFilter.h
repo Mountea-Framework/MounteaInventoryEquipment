@@ -89,7 +89,7 @@ private:
 	FOnSearchTextChanged OnSearchTextChangedDelegate;
 	FOnFiltersChanged OnFiltersChangedDelegate;
 	
-	TSharedPtr<SEditableTextBox> SearchBox;
+	TSharedPtr<SSearchBox> SearchBox;
 	FMounteaTemplateFilters ActiveFilters;
 	FText CurrentSearchText;
 };
