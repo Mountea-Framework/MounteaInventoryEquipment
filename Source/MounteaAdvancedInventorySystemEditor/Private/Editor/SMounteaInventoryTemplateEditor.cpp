@@ -54,6 +54,8 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 {
 	OnTemplateChanged = InArgs._OnTemplateChanged;
 	
+	FilteredTemplates = AvailableTemplates;
+	
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -172,6 +174,8 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 		}
 	);
 	
+	ApplySearchFilter();
+	
 	if (TemplateListView.IsValid())
 		TemplateListView->RequestListRefresh();
 }
@@ -220,7 +224,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 			.BorderImage(FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.RoundedBorder"))
 			[
 				SAssignNew(TemplateListView, SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>)
-				.ListItemsSource(&AvailableTemplates)
+				.ListItemsSource(&FilteredTemplates)
 				.OnGenerateRow(this, &SMounteaInventoryTemplateEditor::GenerateTemplateListRow)
 				.OnSelectionChanged(this, &SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged)
 				.SelectionMode(ESelectionMode::Multi)
@@ -557,7 +561,54 @@ FTemplateDisplayInfo SMounteaInventoryTemplateEditor::GenerateTemplateDisplayInf
 	return returnInfo;
 }
 
-FReply SMounteaInventoryTemplateEditor::DeleteTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)
+void SMounteaInventoryTemplateEditor::OnSearchTextChanged(const FText& InSearchText)
+{
+	CurrentSearchText = InSearchText;
+	ApplySearchFilter();
+}
+
+void SMounteaInventoryTemplateEditor::ApplySearchFilter()
+{
+	FilteredTemplates.Empty();
+	
+	if (CurrentSearchText.IsEmpty())
+		FilteredTemplates = AvailableTemplates;
+	else
+	{
+		const FString searchString = CurrentSearchText.ToString().ToLower();
+		
+		for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template : AvailableTemplates)
+		{
+			if (DoesTemplateMatchSearch(Template, searchString))
+				FilteredTemplates.Add(Template);
+		}
+	}
+	
+	if (TemplateListView.IsValid())
+		TemplateListView->RequestListRefresh();
+}
+
+bool SMounteaInventoryTemplateEditor::DoesTemplateMatchSearch(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
+	const FString& SearchString)
+{
+	if (!Template.IsValid())
+		return false;
+	
+	const UMounteaInventoryItemTemplate* templatePtr = Template.Get();
+	
+	if (templatePtr->DisplayName.ToString().ToLower().Contains(SearchString))
+		return true;
+	
+	if (templatePtr->GetPathName().ToLower().Contains(SearchString))
+		return true;
+	
+	if (templatePtr->Guid.ToString().ToLower().Contains(SearchString))
+		return true;
+	
+	return false;
+}
+
+FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)
 {
 	if (!Template.IsValid())
 		return FReply::Unhandled();
@@ -661,94 +712,122 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 {
 	return SNew(SHorizontalBox)
 		
-		// New Template
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(5.0f)
-		[
-			SNew(SButton)
-			.Text(LOCTEXT("NewTemplate", "🆕 New Template"))
-			.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCreateNewTemplate)
-		]
-		
-		// Save Template
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(5.0f)
-		[
-			SNew(SButton)
-			.Text(LOCTEXT("SaveTemplate", "💾 Save Template"))
-			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveTemplate)
-			.IsEnabled_Lambda([this]() { 
-				if (bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate.Get()->HasAnyFlags(RF_Transient))
-					return true;
-				if (CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate))
-					return true;
-				UMounteaInventoryTemplateEditorSubsystem* subsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>();
-				return subsystem && subsystem->HasTempTemplate() && DirtyTemplates.Contains(subsystem->GetOrCreateTempTemplate());
-			})
-		]
-		
-		// Save All
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(5.0f)
-		[
-			SNew(SButton)
-			.Text(LOCTEXT("SaveAllTemplates", "🗃 Save All"))
-			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates)
-			.IsEnabled_Lambda([this]() { return DirtyTemplates.Num() > 0; })
-		]
-		
-		// Import Template
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(5.0f)
-		[
-			SNew(SButton)
-			.Text(LOCTEXT("ImportTemplate", "⬇ Import Items"))
-			.OnClicked_Lambda([this]() { ImportTemplate(); return FReply::Handled(); })
-		]
-		
-		// Export Template
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(5.0f)
-		[
-			SNew(SButton)
-			.Text(LOCTEXT("ExportTemplate", "⬆ Export Items"))
-			.OnClicked_Lambda([this]() { ExportTemplate(); return FReply::Handled(); })
-		]
+	// New Template
+	+ SHorizontalBox::Slot()
+	.AutoWidth()
+	.Padding(5.0f)
+	[
+		SNew(SButton)
+		.Text(LOCTEXT("NewTemplate", "🆕 New Template"))
+		.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCreateNewTemplate)
+	]
+	
+	// Save Template
+	+ SHorizontalBox::Slot()
+	.AutoWidth()
+	.Padding(5.0f)
+	[
+		SNew(SButton)
+		.Text(LOCTEXT("SaveTemplate", "💾 Save Template"))
+		.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveTemplate)
+		.IsEnabled_Lambda([this]() { 
+			if (bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate.Get()->HasAnyFlags(RF_Transient))
+				return true;
+			if (CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate))
+				return true;
+			UMounteaInventoryTemplateEditorSubsystem* subsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>();
+			return subsystem && subsystem->HasTempTemplate() && DirtyTemplates.Contains(subsystem->GetOrCreateTempTemplate());
+		})
+	]
+	
+	// Save All
+	+ SHorizontalBox::Slot()
+	.AutoWidth()
+	.Padding(5.0f)
+	[
+		SNew(SButton)
+		.Text(LOCTEXT("SaveAllTemplates", "🗃 Save All"))
+		.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates)
+		.IsEnabled_Lambda([this]() { return DirtyTemplates.Num() > 0; })
+	]
+	
+	// Import Template
+	+ SHorizontalBox::Slot()
+	.AutoWidth()
+	.Padding(5.0f)
+	[
+		SNew(SButton)
+		.Text(LOCTEXT("ImportTemplate", "⬇ Import Items"))
+		.OnClicked_Lambda([this]() { ImportTemplate(); return FReply::Handled(); })
+	]
+	
+	// Export Template
+	+ SHorizontalBox::Slot()
+	.AutoWidth()
+	.Padding(5.0f)
+	[
+		SNew(SButton)
+		.Text(LOCTEXT("ExportTemplate", "⬆ Export Items"))
+		.OnClicked_Lambda([this]() { ExportTemplate(); return FReply::Handled(); })
+	]
 
-		// Close Template
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(5.0f)
+	// Close Template
+	+ SHorizontalBox::Slot()
+	.AutoWidth()
+	.Padding(5.0f)
+	[
+		SNew(SButton)
+		.Text(LOCTEXT("CloseTemplate", "❌ Close Template"))
+		.OnClicked(this, &SMounteaInventoryTemplateEditor::CloseTemplate)
+	]
+	
+	// Spacer
+	+ SHorizontalBox::Slot()
+	.FillWidth(1.0f)
+	[
+		SNullWidget::NullWidget
+	]
+	
+	// Search box
+	+ SHorizontalBox::Slot()
+	.AutoWidth()
+	.Padding(5.0f)
+	[
+		SNew(SBox)
+		.WidthOverride(200.0f)
 		[
-			SNew(SButton)
-			.Text(LOCTEXT("CloseTemplate", "❌ Close Template"))
-			.OnClicked(this, &SMounteaInventoryTemplateEditor::CloseTemplate)
-		]
-		
-		// Spacer
-		+ SHorizontalBox::Slot()
-		.FillWidth(1.0f)
-		[
-			SNullWidget::NullWidget
-		]
-		
-		// Search box
-		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.Padding(5.0f)
-		[
-			SNew(SBox)
-			.WidthOverride(200.0f)
+			SNew(SHorizontalBox)
+			
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.0f)
 			[
 				SNew(SEditableTextBox)
 				.HintText(LOCTEXT("SearchTemplates", "Search templates..."))
+				.OnTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
 			]
-		];
+			
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(2, 0, 0, 0)
+			[
+				SNew(SButton)
+				.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+				.ContentPadding(FMargin(2))
+				.ToolTipText(LOCTEXT("ClearSearch", "Clear search"))
+				.OnClicked_Lambda([this]() -> FReply
+				{
+					CurrentSearchText = FText::GetEmpty();
+					ApplySearchFilter();
+					return FReply::Handled();
+				})
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("Icons.X"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			]
+		]
+	];
 }
 
 TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable)

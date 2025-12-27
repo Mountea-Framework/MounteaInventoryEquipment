@@ -97,6 +97,13 @@ private:
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> OriginalTemplate;
 	bool bIsEditingExisting = false;
 	bool bIsShowingTransient = false;
+	
+	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> FilteredTemplates;
+	FText CurrentSearchText;
+	
+	void OnSearchTextChanged(const FText& InSearchText);
+	void ApplySearchFilter();
+	static bool DoesTemplateMatchSearch(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const FString& SearchString);
 };
 
 #undef LOCTEXT_NAMESPACE
