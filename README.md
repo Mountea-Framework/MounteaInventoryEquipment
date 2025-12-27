@@ -40,6 +40,13 @@ UE 5.00 | - | 🟪
 UE 5.1 | - | 🟨
 
 ## Features
+
+### Item Templates Editor
+Allows in-editor bulk changes with options to export to `mnteaitem` or `mnteaitems` files for edits outside of Unreal Engine.
+<p align="center" width="100%">
+    <img width="65%" src="https://github.com/user-attachments/assets/30a2ea90-4744-48f4-a8f2-2529494bb423">
+</p>
+
 ### Data-Driven Approach
 Import Data Tables, use Data Tables to define Items. Easy to manage system with extreme flexibility.
 <p align="center" width="100%">
