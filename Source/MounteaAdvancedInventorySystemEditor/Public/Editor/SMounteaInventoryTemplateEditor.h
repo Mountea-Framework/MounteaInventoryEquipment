@@ -112,7 +112,6 @@ private:
 	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> FilteredTemplates;
 	
 	void ApplySearchFilter();
-	static bool DoesTemplateMatchSearch(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const FString& SearchString);
 	
 	void OnSearchTextChanged(const FText& InSearchText);
 	void OnFiltersChanged();

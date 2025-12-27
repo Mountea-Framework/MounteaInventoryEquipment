@@ -12,6 +12,8 @@
 
 #include "MounteaInventoryTemplateSearchFilter.h"
 
+#include "Definitions/MounteaInventoryItemTemplate.h"
+
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateSearchFilter"
 
 void SMounteaInventoryTemplateSearchFilter::Construct(const FArguments& InArgs)
@@ -191,6 +193,29 @@ void SMounteaInventoryTemplateSearchFilter::ClearSearch()
 	}
 	CurrentSearchText = FText::GetEmpty();
 	OnSearchTextChangedDelegate.ExecuteIfBound(FText::GetEmpty());
+}
+
+bool SMounteaInventoryTemplateSearchFilter::DoesTemplateMatchSearch(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template) const
+{
+	if (!Template.IsValid())
+		return false;
+	
+	if (CurrentSearchText.IsEmptyOrWhitespace())
+		return true;
+	
+	const FString searchString = CurrentSearchText.ToString().ToLower();
+	const UMounteaInventoryItemTemplate* itemTemplatePtr = Template.Get();
+	
+	if (itemTemplatePtr->DisplayName.ToString().ToLower().Contains(searchString))
+		return true;
+	
+	if (itemTemplatePtr->GetPathName().ToLower().Contains(searchString))
+		return true;
+	
+	if (itemTemplatePtr->Guid.ToString().ToLower().Contains(searchString))
+		return true;
+	
+	return false;
 }
 
 #undef LOCTEXT_NAMESPACE

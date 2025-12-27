@@ -614,43 +614,19 @@ void SMounteaInventoryTemplateEditor::ApplySearchFilter()
 		return;
 	}
 	
-	const FText searchText = SearchFilterWidget->GetSearchText();
-	const FString searchString = searchText.ToString().ToLower();
-	const bool bHasSearchText = !searchText.IsEmpty();
-	
-	for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& itemTemplate : AvailableTemplates)
+	for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template : AvailableTemplates)
 	{
-		if (!PassesFilters(itemTemplate))
+		if (!PassesFilters(Template))
 			continue;
 		
-		if (bHasSearchText && !DoesTemplateMatchSearch(itemTemplate, searchString))
+		if (!SearchFilterWidget->DoesTemplateMatchSearch(Template))
 			continue;
 		
-		FilteredTemplates.Add(itemTemplate);
+		FilteredTemplates.Add(Template);
 	}
 	
 	if (TemplateListView.IsValid())
 		TemplateListView->RequestListRefresh();
-}
-
-bool SMounteaInventoryTemplateEditor::DoesTemplateMatchSearch(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
-	const FString& SearchString)
-{
-	if (!Template.IsValid())
-		return false;
-	
-	const UMounteaInventoryItemTemplate* templatePtr = Template.Get();
-	
-	if (templatePtr->DisplayName.ToString().ToLower().Contains(SearchString))
-		return true;
-	
-	if (templatePtr->GetPathName().ToLower().Contains(SearchString))
-		return true;
-	
-	if (templatePtr->Guid.ToString().ToLower().Contains(SearchString))
-		return true;
-	
-	return false;
 }
 
 FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)

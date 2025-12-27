@@ -76,7 +76,10 @@ public:
 	
 	const FMounteaTemplateFilters& GetActiveFilters() const { return ActiveFilters; }
 	FText GetSearchText() const { return CurrentSearchText; }
+	bool HasSearchText() const { return !CurrentSearchText.IsEmptyOrWhitespace(); }
 	void ClearSearch();
+	
+	bool DoesTemplateMatchSearch(TWeakObjectPtr<class UMounteaInventoryItemTemplate> Template) const;
 
 private:
 	TSharedRef<SWidget> CreateFilterMenu();
