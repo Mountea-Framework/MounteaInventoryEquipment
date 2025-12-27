@@ -47,6 +47,10 @@ struct FInventoryRarity
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity")
 	FLinearColor RarityColor;
+	
+	// Rarity priority used for Sorting.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity")
+	int32 RarityPriority = 0;
 
 	/**
 	 * A multiplier applied to item trade or sale prices for this rarity.
@@ -242,6 +246,52 @@ public:
 };
 
 #undef LOCTEXT_NAMESPACE
+
+/**
+ * Defines a single sorting rule used to order items in an inventory.
+ *
+ * Each instance represents one criterion (sorting key) and its priority
+ * relative to other criteria. When multiple sorting criteria are provided,
+ * they are applied sequentially in ascending SortPriority order, where
+ * lower values indicate higher priority.
+ *
+ * Example usage:
+ * - SortPriority = 0, SortingKey = "Rarity"
+ * - SortPriority = 1, SortingKey = "Value"
+ * - SortPriority = 2, SortingKey = "Name"
+ *
+ * In this case, items are first sorted by Rarity, then by Value for items
+ * with equal rarity, and finally by Name as a tie-breaker.
+ *
+ * Supported sorting keys typically include (but are not limited to):
+ * - Name
+ * - Value
+ * - Weight
+ * - Rarity
+ */
+USTRUCT(BlueprintType)
+struct FInventorySortCriteria
+{
+	GENERATED_BODY()
+	
+public:
+	
+	// If more than 1 sorting criteria are provided, sorting will happen one after another based on priority.
+	UPROPERTY(EditAnywhere)
+	int32 SortPriority = 0;
+	
+	/* 
+	 * Defines what sorting criteria there are. 
+	 * Defaults:
+	 * * Name
+	 * * Value
+	 * * Weight
+	 * * Rarity
+	 */
+	UPROPERTY(EditAnywhere)
+	FString SortingKey;
+	
+};
 
 // Equality operator for FInventoryRarity
 FORCEINLINE bool operator==(const FInventoryRarity& LHS, const FInventoryRarity& RHS)

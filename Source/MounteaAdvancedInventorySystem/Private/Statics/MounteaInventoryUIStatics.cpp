@@ -24,8 +24,9 @@
 #include "GameFramework/PlayerState.h"
 
 #include "CommonActivatableWidget.h"
+#include "Components/PanelWidget.h"
 
-#include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
@@ -48,6 +49,7 @@
 #include "Statics/MounteaInventoryStatics.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
+#include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
 #include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
@@ -90,6 +92,67 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
 }
 
+void UMounteaInventoryUIStatics::CenterListItemAtIndex(UPanelWidget* ListWidget, int32 SelectedIndex)
+{
+	if (!ListWidget || SelectedIndex < 0)
+		return;
+    
+	if (ListWidget->GetChildrenCount() == 0)
+		return;
+    
+	UWidget* FirstChild = ListWidget->GetChildAt(0);
+	if (!FirstChild)
+		return;
+    
+	const float ItemHeight = FirstChild->GetDesiredSize().Y;
+	const float ViewportHeight = ListWidget->GetCachedGeometry().GetLocalSize().Y;
+    
+	if (ViewportHeight <= 0.0f || ItemHeight <= 0.0f)
+		return;
+    
+	const float ViewportCenter = ViewportHeight * 0.5f;
+	const float ItemCenter = (SelectedIndex * ItemHeight) + (ItemHeight * 0.5f);
+	const float TranslationY = ViewportCenter - ItemCenter;
+    
+	ListWidget->SetRenderTranslation(FVector2D(0.0f, TranslationY));
+}
+
+FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWidget* ListWidget, const int32 SelectedIndex)
+{
+	if (!ListWidget || SelectedIndex < 0 || ListWidget->GetChildrenCount() == 0)
+		return FVector2D::ZeroVector;
+
+	const UWidget* firstChild = ListWidget->GetChildAt(0);
+	if (!firstChild)
+		return FVector2D::ZeroVector;
+    
+	const float itemHeight = firstChild->GetDesiredSize().Y;
+	const float viewportHeight = ListWidget->GetCachedGeometry().GetLocalSize().Y;
+    
+	if (viewportHeight <= 0.0f || itemHeight <= 0.0f)
+		return FVector2D::ZeroVector;
+    
+	const float viewportCenter = viewportHeight * 0.5f;
+	const float itemCenter = (SelectedIndex * itemHeight) + (itemHeight * 0.5f);
+	const float translationY = (viewportCenter - itemCenter);
+    
+	return FVector2D(0.0f, translationY);
+}
+
+FSlateFontInfo UMounteaInventoryUIStatics::SetFontSize(const FSlateFontInfo& Font, const int32 NewSize)
+{
+	auto returnValue = Font;
+	returnValue.Size = NewSize;
+	return returnValue;
+}
+
+FSlateFontInfo UMounteaInventoryUIStatics::SetFontTypeface(const FSlateFontInfo& Font, const FName& NewTypeface)
+{
+	auto returnValue = Font;
+	returnValue.TypefaceFontName = NewTypeface;
+	return returnValue;
+}
+
 UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISettingsConfig()
 {
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -111,20 +174,20 @@ void UMounteaInventoryUIStatics::SetParentInventory(
 		Target->Execute_SetParentInventory(Target.GetObject(), NewParentInventory);
 }
 
-bool UMounteaInventoryUIStatics::CreateMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+bool UMounteaInventoryUIStatics::CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	return Target.GetObject() ? Target->Execute_CreateMainUIWrapper(Target.GetObject()) : false;
+	return Target.GetObject() ? Target->Execute_CreateWrapperWidget(Target.GetObject()) : false;
 }
 
-UUserWidget* UMounteaInventoryUIStatics::GetMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+UUserWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	return Target.GetObject() ? Target->Execute_GetMainUIWrapper(Target.GetObject()) : nullptr;
+	return Target.GetObject() ? Target->Execute_GetWrapperWidget(Target.GetObject()) : nullptr;
 }
 
-void UMounteaInventoryUIStatics::RemoveMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+void UMounteaInventoryUIStatics::RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
 	if (Target.GetObject())
-		Target->Execute_RemoveMainUIWrapper(Target.GetObject());
+		Target->Execute_RemoveWrapperWidget(Target.GetObject());
 }
 
 UUserWidget* UMounteaInventoryUIStatics::GetNotificationContainer(
@@ -207,19 +270,7 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 
 bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
-	if (!IsValid(Target.GetObject())) return false;
-	switch (Target->Execute_GetMainUIVisibility(Target.GetObject()))
-	{
-		case ESlateVisibility::Visible:
-		case ESlateVisibility::HitTestInvisible:
-		case ESlateVisibility::SelfHitTestInvisible:
-			return true;
-			break;
-		case ESlateVisibility::Collapsed:
-		case ESlateVisibility::Hidden:
-			return false;
-			break;
-	}
+	//TODO: REWORK
 	return false;
 }
 
@@ -328,6 +379,26 @@ FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* Paren
 	USlateBlueprintLibrary::LocalToViewport(ParentWidget->GetWorld(), Geometry, localCoordinates, pixelPosition, viewportPosition);
 
 	return pixelPosition;
+}
+
+UObject* UMounteaInventoryUIStatics::GetInventoryUIManager(AActor* FromActor)
+{
+	if (!FromActor) return nullptr;
+
+	APlayerController* playerController = FindPlayerController(FromActor, 3);
+	if (!playerController) return nullptr;
+
+	const UMounteaAdvancedInventoryUISubsystem* localSubsystem = GetInventoryUISubsystem(playerController);
+	return localSubsystem ? localSubsystem->GetInventoryUIManager() : nullptr;
+}
+
+UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUISubsystem(APlayerController* FromPlayerController)
+{
+	if (!FromPlayerController) return nullptr;
+
+	UMounteaAdvancedInventoryUISubsystem* localSubsystem = FromPlayerController->GetLocalPlayer()->GetSubsystem<
+		UMounteaAdvancedInventoryUISubsystem>();
+	return localSubsystem;
 }
 
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
@@ -843,39 +914,20 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::InitializeMainUIWidget(
-	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target,
+void UMounteaInventoryUIStatics::InitializeWrapperWidget(
+	UObject* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
 {
-	if (Target.GetObject() && Parent.GetObject())
-		Target->Execute_InitializeMainUI(Target.GetObject(), Parent);
+	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(Target, Parent);
 }
 
-void UMounteaInventoryUIStatics::RemoveInventoryWidgetWrapper(
-	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target)
-{
-	if (Target.GetObject())
-		Target->Execute_RemoveMainUI(Target.GetObject());
-}
-
-bool UMounteaInventoryUIStatics::SetSourceInventory(
-	const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target,
+void UMounteaInventoryUIStatics::SetSourceInventory(
+	const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
 {
-	return Target.GetObject() ? Target->Execute_SetSourceInventory(Target.GetObject(), ParentInventory) : false;
-}
-
-ESlateVisibility UMounteaInventoryUIStatics::GetMainUIVisibility(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
-{
-	return Target.GetObject() ? Target->Execute_GetMainUIVisibility(Target.GetObject()) : ESlateVisibility::Hidden;
-}
-
-void UMounteaInventoryUIStatics::SetMainUIVisibility(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility Visibility)
-{
 	if (Target.GetObject())
-		Target->Execute_SetMainUIVisibility(Target.GetObject(), Visibility);
+		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
 }
 
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UWidget* Target, const FString& CategoryId)

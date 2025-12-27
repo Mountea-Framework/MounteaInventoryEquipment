@@ -133,6 +133,27 @@ void UMounteaInventoryStatics::ProcessInventoryNotification(const TScriptInterfa
 		Target->Execute_ProcessInventoryNotification(Target.GetObject(), Notification);
 }
 
+FString UMounteaInventoryStatics::InventoryToString(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
+{
+	if (!Target.GetObject() || !Target.GetObject()->Implements<UMounteaAdvancedInventoryInterface>())
+		return FString();
+	
+	TArray<FInventoryItem> allItems = GetAllItems(Target);
+	AActor* inventoryOwner = GetOwningActor(Target);
+	
+	FString returnValue = FString::Printf(TEXT("Inventory [Owner: %s, Items: %d]\n"),
+		inventoryOwner ? *inventoryOwner->GetName() : TEXT("None"),
+		allItems.Num()
+	);
+	
+	for (int32 i = 0; i < allItems.Num(); ++i)
+	{
+		returnValue += FString::Printf(TEXT("[%d] %s\n"), i, *InventoryItemToString(allItems[i]));
+	}
+	
+	return returnValue;
+}
+
 FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& Item)
 {
 	return Item.ToString();
@@ -226,6 +247,165 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 	});
 
 	return validActions;
+}
+
+void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
+{
+	if (Items.Num() <= 1 || SortingCriteria.Num() == 0)
+		return;
+	
+	enum class ESortKey : uint8 { Name, Value, Weight, Rarity, Unknown };
+	
+	auto getSortKey = [](const FString& Key) -> ESortKey
+	{
+		if (Key.Equals(TEXT("Name"), ESearchCase::IgnoreCase)) return ESortKey::Name;
+		if (Key.Equals(TEXT("Value"), ESearchCase::IgnoreCase)) return ESortKey::Value;
+		if (Key.Equals(TEXT("Weight"), ESearchCase::IgnoreCase)) return ESortKey::Weight;
+		if (Key.Equals(TEXT("Rarity"), ESearchCase::IgnoreCase)) return ESortKey::Rarity;
+		return ESortKey::Unknown;
+	};
+	
+	TArray<FInventorySortCriteria> sortedCriteria = SortingCriteria;
+	sortedCriteria.Sort([](const FInventorySortCriteria& A, const FInventorySortCriteria& B)
+	{
+		return A.SortPriority > B.SortPriority;
+	});
+	
+	for (const FInventorySortCriteria& Criteria : sortedCriteria)
+	{
+		const ESortKey sortKey = getSortKey(Criteria.SortingKey);
+		
+		Algo::StableSort(Items, [sortKey](const FInventoryItem& A, const FInventoryItem& B)
+		{
+			switch (sortKey)
+			{
+				case ESortKey::Name:
+				return GetInventoryItemName(A).ToString().Compare(GetInventoryItemName(B).ToString()) < 0;
+				
+				case ESortKey::Value:
+					if (!A.Template || !B.Template) return false;
+					return A.Template->BasePrice * A.GetQuantity() < B.Template->BasePrice * B.GetQuantity();
+					
+				case ESortKey::Weight:
+					if (!A.Template || !B.Template) return false;
+					return A.Template->Weight * A.GetQuantity() < B.Template->Weight * B.GetQuantity();
+					
+				case ESortKey::Rarity:
+					{
+						FInventoryRarity RarityA = GetInventoryRarity(A);
+						FInventoryRarity RarityB = GetInventoryRarity(B);
+						return RarityA.RarityPriority < RarityB.RarityPriority;
+					}
+				
+				default:
+					return false;
+			}
+		});
+	}
+}
+
+FString UMounteaInventoryStatics::ItemTemplate_GetItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate)
+{
+	if (!ItemTemplate)
+		return TEXT("");
+	
+	ItemTemplate_CalculateItemTemplateJson(ItemTemplate);
+	
+	return ItemTemplate->GetJson();
+}
+
+bool UMounteaInventoryStatics::ItemTemplate_CalculateItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate)
+{
+	auto CreateAssetLookup = [](const FSoftObjectPath& SoftPath) -> TSharedPtr<FJsonObject>
+    {
+        TSharedPtr<FJsonObject> lookupObject = MakeShared<FJsonObject>();
+        if (SoftPath.IsValid())
+        {
+            lookupObject->SetStringField(TEXT("name"), SoftPath.GetAssetName());
+            lookupObject->SetStringField(TEXT("path"), SoftPath.ToString());
+        }
+        else
+        {
+            lookupObject->SetStringField(TEXT("name"), TEXT(""));
+            lookupObject->SetStringField(TEXT("path"), TEXT(""));
+        }
+        return lookupObject;
+    };
+    
+    TSharedPtr<FJsonObject> rootObject = MakeShared<FJsonObject>();
+    
+    rootObject->SetStringField(TEXT("guid"), ItemTemplate->Guid.ToString());
+    rootObject->SetStringField(TEXT("displayName"), ItemTemplate->DisplayName.ToString());
+    rootObject->SetStringField(TEXT("category"), ItemTemplate->ItemCategory);
+    rootObject->SetStringField(TEXT("subCategory"), ItemTemplate->ItemSubCategory);
+    rootObject->SetStringField(TEXT("rarity"), ItemTemplate->ItemRarity);
+    rootObject->SetNumberField(TEXT("flags"), ItemTemplate->ItemFlags);
+    rootObject->SetNumberField(TEXT("maxQuantity"), ItemTemplate->MaxQuantity);
+    rootObject->SetNumberField(TEXT("maxStackSize"),ItemTemplate->MaxStackSize);
+    
+    TArray<TSharedPtr<FJsonValue>> tagsArray;
+    for (const FGameplayTag& Tag : ItemTemplate->Tags)
+    {
+        tagsArray.Add(MakeShared<FJsonValueString>(Tag.ToString()));
+    }
+    rootObject->SetArrayField(TEXT("tags"), tagsArray);
+    
+    rootObject->SetObjectField(TEXT("spawnActor"), CreateAssetLookup(ItemTemplate->SpawnActor.ToSoftObjectPath()));
+    
+    TSharedPtr<FJsonObject> descriptionObject = MakeShared<FJsonObject>();
+    descriptionObject->SetStringField(TEXT("short"), ItemTemplate->ItemShortInfo.ToString());
+    descriptionObject->SetStringField(TEXT("long"), ItemTemplate->ItemLongInfo.ToString());
+    rootObject->SetObjectField(TEXT("description"), descriptionObject);
+    
+    TSharedPtr<FJsonObject> visualsObject = MakeShared<FJsonObject>();
+    visualsObject->SetObjectField(TEXT("thumbnail"), CreateAssetLookup(ItemTemplate->ItemThumbnail.ToSoftObjectPath()));
+    visualsObject->SetObjectField(TEXT("cover"), CreateAssetLookup(ItemTemplate->ItemCover.ToSoftObjectPath()));
+    visualsObject->SetObjectField(TEXT("mesh"), CreateAssetLookup(ItemTemplate->ItemMesh ? FSoftObjectPath(ItemTemplate->ItemMesh->GetPathName()) : FSoftObjectPath()));
+    rootObject->SetObjectField(TEXT("visuals"), visualsObject);
+    
+    TSharedPtr<FJsonObject> durabilityObject = MakeShared<FJsonObject>();
+    durabilityObject->SetBoolField(TEXT("enabled"), ItemTemplate->bHasDurability);
+    durabilityObject->SetNumberField(TEXT("max"), ItemTemplate->MaxDurability);
+    durabilityObject->SetNumberField(TEXT("base"), ItemTemplate->BaseDurability);
+    durabilityObject->SetNumberField(TEXT("penalization"), ItemTemplate->DurabilityPenalization);
+    durabilityObject->SetNumberField(TEXT("priceCoefficient"), ItemTemplate->DurabilityToPriceCoefficient);
+    rootObject->SetObjectField(TEXT("durability"), durabilityObject);
+    
+    TSharedPtr<FJsonObject> economyObject = MakeShared<FJsonObject>();
+    economyObject->SetBoolField(TEXT("enabled"), ItemTemplate->bHasPrice);
+    economyObject->SetNumberField(TEXT("basePrice"), ItemTemplate->BasePrice);
+    economyObject->SetNumberField(TEXT("sellCoefficient"), ItemTemplate->SellPriceCoefficient);
+    rootObject->SetObjectField(TEXT("economy"), economyObject);
+    
+    TSharedPtr<FJsonObject> weightObject = MakeShared<FJsonObject>();
+    weightObject->SetBoolField(TEXT("enabled"), ItemTemplate->bHasWeight);
+    weightObject->SetNumberField(TEXT("value"), ItemTemplate->Weight);
+    rootObject->SetObjectField(TEXT("weight"), weightObject);
+    
+    TArray<TSharedPtr<FJsonValue>> attachmentSlotsArray;
+    for (const FGameplayTag& Slot : ItemTemplate->AttachmentSlots)
+    {
+        attachmentSlotsArray.Add(MakeShared<FJsonValueString>(Slot.ToString()));
+    }
+    rootObject->SetArrayField(TEXT("attachmentSlots"), attachmentSlotsArray);
+    
+    TArray<TSharedPtr<FJsonValue>> specialAffectsArray;
+    for (const TSoftClassPtr<UObject>& Affect : ItemTemplate->ItemSpecialAffects)
+    {
+        specialAffectsArray.Add(MakeShared<FJsonValueObject>(CreateAssetLookup(Affect.ToSoftObjectPath())));
+    }
+    rootObject->SetArrayField(TEXT("specialAffects"), specialAffectsArray);
+    
+    FString outputString;
+    TSharedRef<TJsonWriter<>> jsonWriter = TJsonWriterFactory<>::Create(&outputString);
+    if (FJsonSerializer::Serialize(rootObject.ToSharedRef(), jsonWriter))
+    {
+    	ItemTemplate->SetJson(outputString);
+        return true;
+    }
+    
+    return false;
 }
 
 EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UObject* Target)

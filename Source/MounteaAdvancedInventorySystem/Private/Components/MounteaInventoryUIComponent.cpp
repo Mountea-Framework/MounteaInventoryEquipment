@@ -20,7 +20,7 @@
 #include "Helpers/MounteaAdvancedInventoryWidgetPayload.h"
 
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
-#include "Interfaces/Widgets/MounteaInventorySystemBaseWidgetInterface.h"
+#include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/Notification/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Interfaces/Widgets/Notification/MounteaInventoryNotificationWidgetInterface.h"
@@ -29,9 +29,11 @@
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
+#include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
 
 class UMounteaAdvancedInventorySettings;
 
@@ -58,9 +60,7 @@ void UMounteaInventoryUIComponent::BeginPlay()
 	{
 		auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
 		if (!IsValid(inventoryComponent))
-		{
 			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! UI will NOT work!"))
-		}
 		else
 		{
 			Execute_SetParentInventory(this, inventoryComponent);
@@ -74,7 +74,28 @@ void UMounteaInventoryUIComponent::BeginPlay()
 			ParentInventory->GetOnItemDurabilityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemDurabilityChanged);
 			ParentInventory->GetOnItemQuantityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemQuantityChanged);
 		}
+		
+		const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
+			UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
+		if (!inventoryUISubsystem)
+			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will NOT work!"))
+		else
+			inventoryUISubsystem->RegisterInventoryUIManager(this);
 	}
+}
+
+void UMounteaInventoryUIComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (GetOwner() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	{
+		const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
+			UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
+		if (!inventoryUISubsystem)
+			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will UNREGISTER properly!"))
+		else
+			inventoryUISubsystem->UnregisterInventoryUIManager(this);
+	}
+	Super::EndPlay(EndPlayReason);
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIComponent::GetParentInventory_Implementation() const
@@ -87,24 +108,24 @@ void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScri
 	if (ParentInventory != NewParentInventory) ParentInventory = NewParentInventory;
 }
 
-bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
+bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 {
-	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig();
-	if (!inventoryConfig)
+	const UMounteaAdvancedInventoryUIConfig* inventoryUIConfig = UMounteaInventoryUIStatics::GetInventoryUISettingsConfig();
+	if (!inventoryUIConfig)
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory Config!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load Inventory Config!"))
 		return false;
 	}
 
-	auto widgetClass = inventoryConfig->UserInterfaceWrapperClass.LoadSynchronous();
+	auto widgetClass = inventoryUIConfig->UserInterfaceWrapperClass.LoadSynchronous();
 	if (!IsValid(widgetClass))
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Unable to load Inventory UI Class from Config!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load Inventory UI Class from Config!"))
 		return false;
 	}
-	if (!widgetClass->ImplementsInterface(UMounteaInventorySystemBaseWidgetInterface::StaticClass()))
+	if (!widgetClass->ImplementsInterface(UMounteaInventorySystemWrapperWidgetInterface::StaticClass()))
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI Class must implement `MounteaInventorySystemBaseWidgetInterface`!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Base Inventory UI Class must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
 	}
 
@@ -120,64 +141,55 @@ bool UMounteaInventoryUIComponent::CreateMainUIWrapper_Implementation()
 	}
 	if (!bSuccess)
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Failed to find Player Controller. Message:\n%s"), *Message)
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Failed to find Player Controller. Message:\n%s"), *Message)
 		return false;
 	}
 
 	if (!playerController->IsLocalController())
 	{
-		LOG_WARNING(TEXT("[Create Inventory UI] UI Can be created for Local Players only!"))
+		LOG_WARNING(TEXT("[CreateWrapperWidget] UI Can be created for Local Players only!"))
 		return false;
 	}
 
-	auto newWidget = CreateWidget<UCommonActivatableWidget>(playerController, widgetClass);
-	if (!newWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>())
+	auto newWidget = CreateWidget<UUserWidget>(playerController, widgetClass);
+	if (!newWidget)
 	{
-		LOG_ERROR(TEXT("[Create Inventory UI] Base Inventory UI  must implement `MounteaInventorySystemBaseWidgetInterface`!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Failed to create Wrapper Widget!"))
+		return false;
+	}
+	if (!newWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
+	{
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Base Inventory UI  must implement `MounteaInventorySystemBaseWidgetInterface`!"))
 		return false;
 	}
 
 	InventoryWidget = newWidget;
-	InventoryWidget->ActivateWidget();
 	
-	TScriptInterface<IMounteaInventorySystemBaseWidgetInterface> inventoryInterface = InventoryWidget;
+	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
-	inventoryInterface->Execute_InitializeMainUI(InventoryWidget, this);
+	inventoryInterface->Execute_InitializeWrapperWidget(InventoryWidget, this);
 	
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CreateWrapper, nullptr);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Wrapper::Create, nullptr);
 	}
 
 	return true;
 }
 
-ESlateVisibility UMounteaInventoryUIComponent::GetMainUIVisibility_Implementation() const
+void UMounteaInventoryUIComponent::RemoveWrapperWidget_Implementation()
 {
-	return IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>()
-	? IMounteaInventorySystemBaseWidgetInterface::Execute_GetMainUIVisibility(InventoryWidget) : ESlateVisibility::Hidden;
-}
-
-void UMounteaInventoryUIComponent::SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility)
-{
-	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventorySystemBaseWidgetInterface>())
-		IMounteaInventorySystemBaseWidgetInterface::Execute_SetMainUIVisibility(InventoryWidget, NewVisibility);
-}
-
-void UMounteaInventoryUIComponent::RemoveMainUIWrapper_Implementation()
-{
-	TScriptInterface<IMounteaInventorySystemBaseWidgetInterface> inventoryInterface = InventoryWidget;
+	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
 	ensure(inventoryInterface.GetObject() != nullptr);
 	
-	inventoryInterface->Execute_RemoveMainUI(InventoryWidget);
-	InventoryWidget->DeactivateWidget();
+	inventoryInterface->Execute_RemoveWrapperWidget(InventoryWidget);
 	
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::RemoveWrapper, nullptr);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Wrapper::Remove, nullptr);
 	}
 }
 
@@ -212,7 +224,7 @@ void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(co
 	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
 	ensure(notificationContainerInterface.GetObject() != nullptr);
 	
-	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventoryUIConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventoryUISettingsConfig.LoadSynchronous();
 	if (!Config)
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))
@@ -263,7 +275,7 @@ void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FInvent
 	{
 		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
 		newPayload->PayloadData.Add(AddedItem.Guid);
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemAdded, newPayload);
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Added, newPayload);
 	}
 }
 
@@ -280,7 +292,7 @@ void UMounteaInventoryUIComponent::ProcessItemModified_Implementation(const FInv
 		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
 		newPayload->PayloadData.Add(ModifiedItem.Guid);
 		newPayload->PayloadQuantities.Add(ModifiedItem.Quantity);
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemModified, newPayload);
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Modified, newPayload);
 	}
 }
 
@@ -288,14 +300,15 @@ void UMounteaInventoryUIComponent::ProcessItemRemoved_Implementation(const FInve
 {
 	if (!IsValid(InventoryWidget))
 	{
-		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!")) return;
+		LOG_WARNING(TEXT("[ProcessItemAdded] Invalid Inventory UI!")) 
+		return;
 	}
 
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
 		newPayload->PayloadData.Add(RemovedItem.Guid);
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemRemoved, newPayload);
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Removed, newPayload);
 	}
 }
 
@@ -309,7 +322,7 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::CategorySelected, nullptr);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Categories::Selected, nullptr);
 	}
 
 	OnCategorySelected.Broadcast(SelectedCategoryId);
@@ -323,7 +336,7 @@ void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& Sele
 	if (IsValid(InventoryWidget) && InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
 		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::ItemSelected, nullptr);
+		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Selected, nullptr);
 	}
 
 	OnItemSelected.Broadcast(SelectedItem);

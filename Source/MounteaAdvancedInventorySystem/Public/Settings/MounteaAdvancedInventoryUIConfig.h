@@ -29,9 +29,46 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryUIConfig : pub
 	
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notification Card")
+	// --- Wrapper
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Wrapper",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"))
+	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
+	
+	// --- Inventory
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Inventory",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
+	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
+	
+	// ---- Notifications
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"))
+	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
+	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications|Notification Card")
 	TSoftObjectPtr<UMaterialInterface> NotificationCardMaterial = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notification Card")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Notifications|Notification Card")
 	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
+	
+	// ---- Categories
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Categories",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoriesWrapperWidgetInterface"))
+	TSoftClassPtr<UUserWidget> CategoriesContainerWidgetClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Categories",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"))
+	TSoftClassPtr<UUserWidget> CategoryWidgetClass;
+	
+	// --- Fonts
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|🔤 Font")
+	FSlateFontInfo DefaultFont;
 };

@@ -16,6 +16,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Statics/MounteaInventoryStatics.h"
 
 UMounteaInventoryItemTemplate::UMounteaInventoryItemTemplate():
 	Guid(FGuid::NewGuid()),
@@ -39,16 +40,36 @@ UMounteaInventoryItemTemplate::UMounteaInventoryItemTemplate():
 {
 }
 
+FString UMounteaInventoryItemTemplate::GetJson() const
+{
+	return JsonManifest;
+}
+
+void UMounteaInventoryItemTemplate::SetJson(const FString& Json)
+{
+	if (Json.Equals(JsonManifest))
+		return;
+	
+	JsonManifest = Json;
+}
+
+bool UMounteaInventoryItemTemplate::CalculateJson()
+{
+    return UMounteaInventoryStatics::ItemTemplate_CalculateItemTemplateJson(this);
+}
+
 TArray<FString> UMounteaInventoryItemTemplate::GetAllowedCategories()
 {
 	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	TArray<FString> returnValues;
 	if (!IsValid(inventorySettings))
 	{
-		TArray<FString> returnValues;
+		
 		returnValues.Add(TEXT("Miscellaneous"));
 		return returnValues;
 	}
-	return inventorySettings->GetAllowedCategories();
+	inventorySettings->GetAllowedCategories().GetKeys(returnValues);
+	return returnValues;
 }
 
 TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
@@ -72,15 +93,16 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
 }
 
 TArray<FString> UMounteaInventoryItemTemplate::GetAllowedRarities()
-{
-	TArray<FString> returnValues;
+{	
 	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	TArray<FString> returnValues;
 	if (!IsValid(inventorySettings))
 	{
 		returnValues.Add(TEXT("Common"));
 		return returnValues;
 	}
-	return inventorySettings->GetAllowedRarities();
+	inventorySettings->GetAllowedRarities().GetKeys(returnValues);
+	return returnValues;
 }
 
 #if WITH_EDITOR
@@ -104,6 +126,8 @@ void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChang
 
 		ItemSubCategory = TEXT("");
 	}
+	
+	CalculateJson();
 }
 
 #endif
