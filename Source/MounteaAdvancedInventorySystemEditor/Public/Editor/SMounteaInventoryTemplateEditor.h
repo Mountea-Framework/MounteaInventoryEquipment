@@ -87,6 +87,7 @@ private:
 	
 	TSharedPtr<IDetailsView> PropertyDetailsView;
 	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;
+	TSharedPtr<SEditableTextBox> SearchBox;
 	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> AvailableTemplates;
 	
 	// Track selected and dirty templates

@@ -801,7 +801,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			+ SHorizontalBox::Slot()
 			.FillWidth(1.0f)
 			[
-				SNew(SEditableTextBox)
+				SAssignNew(SearchBox, SEditableTextBox)
 				.HintText(LOCTEXT("SearchTemplates", "Search templates..."))
 				.OnTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
 			]
@@ -817,6 +817,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.OnClicked_Lambda([this]() -> FReply
 				{
 					CurrentSearchText = FText::GetEmpty();
+					if (SearchBox.IsValid())
+						SearchBox->SetText(CurrentSearchText);
 					ApplySearchFilter();
 					return FReply::Handled();
 				})
