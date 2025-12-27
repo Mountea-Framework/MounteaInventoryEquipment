@@ -872,7 +872,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 
-		// TODO: Add vertical separator
+		// Vertical separator
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(8.0f, 4.0f)
+		[
+			SNew(SSeparator)
+			.SeparatorImage(FAppStyle::Get().GetBrush("Separator"))
+			.Thickness(1.0f)
+			.Orientation(Orient_Vertical)
+		]
 		
 		// Import Template
 		+ SHorizontalBox::Slot()
@@ -960,7 +969,16 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 
-		// TODO: Add vertical separator
+		// Vertical separator
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(8.0f, 4.0f)
+		[
+			SNew(SSeparator)
+			.SeparatorImage(FAppStyle::Get().GetBrush("Separator"))
+			.Thickness(1.0f)
+			.Orientation(Orient_Vertical)
+		]
 		
 		// Close Template
 		+ SHorizontalBox::Slot()
@@ -1003,6 +1021,17 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 					})
 				]
 			]
+		]
+
+		// Vertical separator
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(8.0f, 4.0f)
+		[
+			SNew(SSeparator)
+			.SeparatorImage(FAppStyle::Get().GetBrush("Separator"))
+			.Thickness(1.0f)
+			.Orientation(Orient_Vertical)
 		]
 		
 		// Spacer
