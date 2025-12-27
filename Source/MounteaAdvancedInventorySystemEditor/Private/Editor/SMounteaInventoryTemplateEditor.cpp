@@ -49,6 +49,7 @@
 #include "Algo/ForEach.h"
 #include "Search/MounteaInventoryTemplateSearchFilter.h"
 #include "Settings/EditorStyleSettings.h"
+#include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "UObject/SavePackage.h"
@@ -780,6 +781,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
 						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
 					})
 				]
@@ -828,6 +832,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
 						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
 					})
 				]
@@ -868,6 +875,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
 						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
 					})
 				]
@@ -922,6 +932,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
 						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
 					})
 				]
@@ -965,6 +978,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
 						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
 					})
 				]
@@ -1019,6 +1035,9 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
 						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
 					})
 				]
@@ -1049,8 +1068,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		.Padding(5.0f)
 		[
 			SNew(SBox)
-			//.WidthOverride(250.0f)
-			.MinDesiredWidth(300.0f)
+			.WidthOverride(300.0f)
+			//.MinDesiredWidth(300.0f)
 			[
 				SAssignNew(SearchFilterWidget, SMounteaInventoryTemplateSearchFilter)
 				.OnSearchTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
