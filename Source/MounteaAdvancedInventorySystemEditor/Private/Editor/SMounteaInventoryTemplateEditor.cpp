@@ -48,6 +48,7 @@
 #include "DesktopPlatformModule.h"
 #include "Algo/ForEach.h"
 #include "Search/MounteaInventoryTemplateSearchFilter.h"
+#include "Settings/EditorStyleSettings.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "UObject/SavePackage.h"
@@ -731,96 +732,134 @@ void SMounteaInventoryTemplateEditor::ExportTemplate()
 
 TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 {
-	return SNew(SHorizontalBox)
+	return 
+	SNew(SBorder)
+	.VAlign(VAlign_Center)
+	.BorderImage(FAppStyle::Get().GetBrush("AssetEditorToolbar.Background"))
+	.Padding(FMargin(0.0f, 4.0f))
+	[
 		
-	// New Template
-	+ SHorizontalBox::Slot()
-	.AutoWidth()
-	.Padding(5.0f)
-	[
-		SNew(SButton)
-		.Text(LOCTEXT("NewTemplate", "🆕 New Template"))
-		.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCreateNewTemplate)
-	]
-	
-	// Save Template
-	+ SHorizontalBox::Slot()
-	.AutoWidth()
-	.Padding(5.0f)
-	[
-		SNew(SButton)
-		.Text(LOCTEXT("SaveTemplate", "💾 Save Template"))
-		.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveTemplate)
-		.IsEnabled_Lambda([this]() { 
-			if (bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate.Get()->HasAnyFlags(RF_Transient))
-				return true;
-			if (CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate))
-				return true;
-			UMounteaInventoryTemplateEditorSubsystem* subsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>();
-			return subsystem && subsystem->HasTempTemplate() && DirtyTemplates.Contains(subsystem->GetOrCreateTempTemplate());
-		})
-	]
-	
-	// Save All
-	+ SHorizontalBox::Slot()
-	.AutoWidth()
-	.Padding(5.0f)
-	[
-		SNew(SButton)
-		.Text(LOCTEXT("SaveAllTemplates", "🗃 Save All"))
-		.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates)
-		.IsEnabled_Lambda([this]() { return DirtyTemplates.Num() > 0; })
-	]
-	
-	// Import Template
-	+ SHorizontalBox::Slot()
-	.AutoWidth()
-	.Padding(5.0f)
-	[
-		SNew(SButton)
-		.Text(LOCTEXT("ImportTemplate", "⬇ Import Items"))
-		.OnClicked_Lambda([this]() { ImportTemplate(); return FReply::Handled(); })
-	]
-	
-	// Export Template
-	+ SHorizontalBox::Slot()
-	.AutoWidth()
-	.Padding(5.0f)
-	[
-		SNew(SButton)
-		.Text(LOCTEXT("ExportTemplate", "⬆ Export Items"))
-		.OnClicked_Lambda([this]() { ExportTemplate(); return FReply::Handled(); })
-	]
-
-	// Close Template
-	+ SHorizontalBox::Slot()
-	.AutoWidth()
-	.Padding(5.0f)
-	[
-		SNew(SButton)
-		.Text(LOCTEXT("CloseTemplate", "❌ Close Template"))
-		.OnClicked(this, &SMounteaInventoryTemplateEditor::CloseTemplate)
-	]
-	
-	// Spacer
-	+ SHorizontalBox::Slot()
-	.FillWidth(1.0f)
-	[
-		SNullWidget::NullWidget
-	]
-	
-	// Search box
-		// Replace the search box section with:
-	+ SHorizontalBox::Slot()
-	.AutoWidth()
-	.Padding(5.0f)
-	[
-		SNew(SBox)
-		.WidthOverride(250.0f)
+		SNew(SHorizontalBox)
+		
+		// New Template
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(5.0f)
 		[
-			SAssignNew(SearchFilterWidget, SMounteaInventoryTemplateSearchFilter)
-			.OnSearchTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
-			.OnFiltersChanged(this, &SMounteaInventoryTemplateEditor::OnFiltersChanged)
+			SNew(SButton)
+			.Text(LOCTEXT("NewTemplate", "🆕 New Template"))
+			.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCreateNewTemplate)
+		]
+		
+		// Save Template
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(2.0f)
+		[
+			SNew(SButton)
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("SaveTemplateTooltip", "Save the current template"))
+			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveTemplate)
+			.IsEnabled_Lambda([this]() 
+			{ 
+				if (bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate.Get()->HasAnyFlags(RF_Transient))
+					return true;
+				if (CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate))
+					return true;
+				UMounteaInventoryTemplateEditorSubsystem* subsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>();
+				return subsystem && subsystem->HasTempTemplate() && DirtyTemplates.Contains(subsystem->GetOrCreateTempTemplate());
+			})
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("Icons.Save"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SaveTemplate", "Save Template"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
+		]
+		
+		// Save All
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(5.0f)
+		[
+			SNew(SButton)
+			.Text(LOCTEXT("SaveAllTemplates", "🗃 Save All"))
+			.OnClicked(this, &SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates)
+			.IsEnabled_Lambda([this]() { return DirtyTemplates.Num() > 0; })
+		]
+		
+		// Import Template
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(5.0f)
+		[
+			SNew(SButton)
+			.Text(LOCTEXT("ImportTemplate", "⬇ Import Items"))
+			.OnClicked_Lambda([this]() { ImportTemplate(); return FReply::Handled(); })
+		]
+		
+		// Export Template
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(5.0f)
+		[
+			SNew(SButton)
+			.Text(LOCTEXT("ExportTemplate", "⬆ Export Items"))
+			.OnClicked_Lambda([this]() { ExportTemplate(); return FReply::Handled(); })
+		]
+
+		// Close Template
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(5.0f)
+		[
+			SNew(SButton)
+			.Text(LOCTEXT("CloseTemplate", "❌ Close Template"))
+			.OnClicked(this, &SMounteaInventoryTemplateEditor::CloseTemplate)
+		]
+		
+		// Spacer
+		+ SHorizontalBox::Slot()
+		.FillWidth(1.0f)
+		[
+			SNullWidget::NullWidget
+		]
+		
+		// Search box
+			// Replace the search box section with:
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(5.0f)
+		[
+			SNew(SBox)
+			.WidthOverride(250.0f)
+			[
+				SAssignNew(SearchFilterWidget, SMounteaInventoryTemplateSearchFilter)
+				.OnSearchTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)
+				.OnFiltersChanged(this, &SMounteaInventoryTemplateEditor::OnFiltersChanged)
+			]
 		]
 	];
 }
