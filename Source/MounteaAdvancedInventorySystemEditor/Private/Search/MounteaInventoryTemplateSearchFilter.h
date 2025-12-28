@@ -30,8 +30,8 @@ struct FMounteaTemplateFilters
 	bool bFilterByCategory = false;
 	bool bFilterByRarity = false;
 		
-	TSet<FString> AllowedCategories;
-	TSet<FString> AllowedRarities;
+	TSet<FString> AllowedCategories = TSet<FString>(GetAvailableCategories());;
+	TSet<FString> AllowedRarities = TSet<FString>(GetAvailableRarities());
 	
 	void Reset()
 	{
@@ -41,17 +41,17 @@ struct FMounteaTemplateFilters
 		bFilterByGuid = true;
 		bFilterByCategory = false;
 		bFilterByRarity = false;
-		AllowedCategories.Empty();
-		AllowedRarities.Empty();
+		AllowedCategories = TSet<FString>(GetAvailableCategories());
+		AllowedRarities = TSet<FString>(GetAvailableRarities());
 	}
 	
 	bool IsDefault() const
 	{
 		return bShowDirty && bShowClean && bFilterByName && bFilterByGuid && !bFilterByCategory && !bFilterByRarity &&
-			   AllowedCategories.Num() == 0 && AllowedRarities.Num() == 0;
+			   AllowedCategories.Num() == GetAvailableCategories().Num() && AllowedRarities.Num() == GetAvailableRarities().Num();
 	}
 	
-	bool PassesFilter(const bool bIsDirty) const
+	bool PassesFilter(const bool bIsDirty, const FString& Category, const FString& Rarity) const
 	{		
 		if (bIsDirty && !bShowDirty)
 			return false;
@@ -59,8 +59,17 @@ struct FMounteaTemplateFilters
 		if (!bIsDirty && !bShowClean)
 			return false;
 		
+		if (!AllowedCategories.Contains(Category))
+			return false;
+		
+		if (!AllowedRarities.Contains(Rarity))
+			return false;
+		
 		return true;
 	}
+	
+	static TArray<FString> GetAvailableCategories();
+	static TArray<FString> GetAvailableRarities();
 };
 
 class SMounteaInventoryTemplateSearchFilter : public SCompoundWidget
@@ -87,10 +96,10 @@ private:
 	void OnSearchChanged(const FText& InText);
 	
 	void ToggleCategory(const FString& Category);
-	static TArray<FString> GetAvailableCategories();
+	TArray<FString> GetAvailableCategories() const;
 	
 	void ToggleRarity(const FString& Rarity);
-	static TArray<FString> GetAvailableRarities();
+	TArray<FString> GetAvailableRarities() const;
 	
 	FOnSearchTextChanged OnSearchTextChangedDelegate;
 	FOnFiltersChanged OnFiltersChangedDelegate;

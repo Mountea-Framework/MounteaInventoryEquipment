@@ -598,7 +598,7 @@ bool SMounteaInventoryTemplateEditor::PassesFilters(const TWeakObjectPtr<UMounte
 		return false;
 	
 	return SearchFilterWidget->GetActiveFilters().PassesFilter(
-	DirtyTemplates.Contains(Template)
+	DirtyTemplates.Contains(Template), Template->ItemCategory, Template->ItemRarity
 	);
 }
 
