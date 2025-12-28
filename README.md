@@ -44,7 +44,7 @@ UE 5.1 | - | 🟨
 ### Item Templates Editor
 Allows in-editor bulk changes with options to export to `mnteaitem` or `mnteaitems` files for edits outside of Unreal Engine.
 <p align="center" width="100%">
-    <img width="65%" src="https://github.com/user-attachments/assets/30a2ea90-4744-48f4-a8f2-2529494bb423">
+    <img width="65%" src="https://github.com/user-attachments/assets/ffeb8000-e7a7-4d46-b74f-3c373438b348">
 </p>
 
 ### Data-Driven Approach
