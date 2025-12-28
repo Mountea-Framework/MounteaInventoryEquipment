@@ -82,8 +82,15 @@ public:
 
 private:
 	TSharedRef<SWidget> CreateFilterMenu();
+	
 	void OnResetFilters();
 	void OnSearchChanged(const FText& InText);
+	
+	void ToggleCategory(const FString& Category);
+	static TArray<FString> GetAvailableCategories();
+	
+	void ToggleRarity(const FString& Rarity);
+	static TArray<FString> GetAvailableRarities();
 	
 	FOnSearchTextChanged OnSearchTextChangedDelegate;
 	FOnFiltersChanged OnFiltersChangedDelegate;
