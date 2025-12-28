@@ -28,8 +28,8 @@ UMounteaAdvancedInventoryItemTemplate_Factory::UMounteaAdvancedInventoryItemTemp
 	SupportedClass = UMounteaInventoryItemTemplate::StaticClass();
 }
 
-UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name,
-	EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
+UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateNew(UClass* Class, UObject* InParent, const FName Name,
+	const EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
 {
 	return NewObject<UMounteaInventoryItemTemplate>(InParent, ParentClass, Name, Flags, Context);
 }
@@ -57,9 +57,31 @@ bool UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCanImport(const FStri
 		   Extension.Equals(TEXT("mnteaitems"), ESearchCase::IgnoreCase);
 }
 
+bool UMounteaAdvancedInventoryItemTemplate_Factory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames)
+{
+	if (Obj == nullptr) return false;
+	UMounteaInventoryItemTemplate* itemTemplate = Cast<UMounteaInventoryItemTemplate>(Obj);
+	if (itemTemplate == nullptr) return false;
+	
+	return true;
+}
+
+EReimportResult::Type UMounteaAdvancedInventoryItemTemplate_Factory::Reimport(UObject* Obj)
+{
+	bool bReimportSuccess = false;
+	return bReimportSuccess ? EReimportResult::Succeeded : EReimportResult::Failed;
+}
+
+void UMounteaAdvancedInventoryItemTemplate_Factory::PostImportCleanUp()
+{
+	FReimportHandler::PostImportCleanUp();
+	
+	ReimportPaths.Empty();
+}
+
 UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass* InClass, UObject* InParent,
-	const FName InName, const EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn,
-	bool& bOutOperationCanceled)
+                                                                          const FName InName, const EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn,
+                                                                          bool& bOutOperationCanceled)
 {
 	TArray<UMounteaInventoryItemTemplate*> importedTemplates;
 	FString errorMessage;
@@ -84,4 +106,10 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass
 	return importedTemplates[0];
 }
 
-// TODO: Post-create call the Editor subsystem to refresh list of Items
+UObject* UMounteaAdvancedInventoryItemTemplate_Factory::ImportObject(UClass* InClass, UObject* InOuter, const FName InName,
+	const EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, bool& OutCanceled)
+{
+	if (!FactoryCanImport(Filename))
+		return nullptr;
+	return FactoryCreateFile(InClass, InOuter, InName, Flags, Filename, Parms, nullptr, OutCanceled);
+}
