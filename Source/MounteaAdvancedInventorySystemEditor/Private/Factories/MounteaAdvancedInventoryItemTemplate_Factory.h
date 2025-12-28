@@ -35,10 +35,6 @@ public:
 		FFeedbackContext* Warn, bool& bOutOperationCanceled) override;
 
 private:
-	static UMounteaInventoryItemTemplate* CreateSingleTemplate(const UClass* InClass, UObject* InParent, 
-	                                                           FName InName, EObjectFlags Flags, const FString& JsonString, FFeedbackContext* Warn);
-
-private:
 	// Holds the template of the class we are building
 	UPROPERTY()
 	TSubclassOf<UMounteaInventoryItemTemplate> ParentClass;

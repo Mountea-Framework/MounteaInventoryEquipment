@@ -58,74 +58,22 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass
 	const FName InName, const EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn,
 	bool& bOutOperationCanceled)
 {
-	FString fileContent;
-	if (!FFileHelper::LoadFileToString(fileContent, *Filename))
+	TArray<UMounteaInventoryItemTemplate*> importedTemplates;
+	FString errorMessage;
+    
+	if (!UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile(importedTemplates, errorMessage))
 	{
 		if (Warn)
-			Warn->Logf(ELogVerbosity::Error, TEXT("Failed to load file: %s"), *Filename);
+			Warn->Logf(ELogVerbosity::Error, TEXT("%s"), *errorMessage);
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
-    
-	if (Filename.EndsWith(TEXT(".mnteaitems")))
+
+	if (importedTemplates.Num() == 0)
 	{
-		TArray<FString> itemJsons;
-		FString errorMessage;
-        
-		if (!UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseMultipleTemplatesJson(fileContent, itemJsons, errorMessage))
-		{
-			if (Warn)
-				Warn->Logf(ELogVerbosity::Error, TEXT("Failed to parse templates: %s"), *errorMessage);
-			bOutOperationCanceled = true;
-			return nullptr;
-		}
-
-		if (itemJsons.Num() == 0)
-		{
-			if (Warn)
-				Warn->Logf(ELogVerbosity::Warning, TEXT("No templates found in file"));
-			bOutOperationCanceled = true;
-			return nullptr;
-		}
-
-		UMounteaInventoryItemTemplate* newTemplate = nullptr;
-		for (int32 i = 0; i < itemJsons.Num(); ++i)
-		{
-			FName templateName = (i == 0) ? InName : FName(*FString::Printf(TEXT("%s_%d"), *InName.ToString(), i));
-			UMounteaInventoryItemTemplate* resultTemplate = CreateSingleTemplate(InClass, InParent, templateName, Flags, itemJsons[i], Warn);
-            
-			if (i == 0)
-				newTemplate = resultTemplate;
-		}
-
-		return newTemplate;
-	}
-	else
-		return CreateSingleTemplate(InClass, InParent, InName, Flags, fileContent, Warn);
-}
-
-UMounteaInventoryItemTemplate* UMounteaAdvancedInventoryItemTemplate_Factory::CreateSingleTemplate(const UClass* InClass,
-	UObject* InParent, const FName InName, const EObjectFlags Flags, const FString& JsonString, FFeedbackContext* Warn)
-{
-	TSharedPtr<FJsonObject> jsonObject;
-	TSharedRef<TJsonReader<>> jsonReader = TJsonReaderFactory<>::Create(JsonString);
-    
-	if (!FJsonSerializer::Deserialize(jsonReader, jsonObject) || !jsonObject.IsValid())
-	{
-		if (Warn)
-			Warn->Logf(ELogVerbosity::Error, TEXT("Invalid JSON format"));
+		bOutOperationCanceled = true;
 		return nullptr;
 	}
 
-	UMounteaInventoryItemTemplate* resultTemplate = NewObject<UMounteaInventoryItemTemplate>(InParent, InClass, InName, Flags);
-    
-	FString errorMessage;
-	if (!UMounteaAdvancedInventoryItemTemplateEditorStatics::DeserializeTemplateFromJson(jsonObject, resultTemplate, errorMessage))
-	{
-		if (Warn)
-			Warn->Logf(ELogVerbosity::Error, TEXT("Failed to deserialize: %s"), *errorMessage);
-		return nullptr;
-	}
-
-	return resultTemplate;
+	return importedTemplates[0];
 }
