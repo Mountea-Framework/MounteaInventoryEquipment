@@ -26,6 +26,10 @@ class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UMounteaAdvancedInventorySettings
 public:
 
 	UMounteaAdvancedInventorySettingsEditor();
+	
+	// If True, Icons will display Text next to icons.
+	UPROPERTY(Config, EditAnywhere, Category="Config")
+	uint8 bDisplayEditorButtonText : 1;
 
 public:
 

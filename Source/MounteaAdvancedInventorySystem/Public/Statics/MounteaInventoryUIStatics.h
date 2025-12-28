@@ -17,6 +17,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class UMounteaAdvancedInventoryUISubsystem;
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
 struct FMounteaItemActionData;
@@ -26,9 +27,11 @@ class UTextBlock;
 class UMounteaInventoryItemAction;
 class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
+class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
-class IMounteaInventorySystemBaseWidgetInterface;
+class IMounteaAdvancedBaseInventoryWidgetInterface;
+class IMounteaInventorySystemWrapperWidgetInterface;
 
 UENUM(BlueprintType)
 enum class EMounteaThemeLevel : uint8
@@ -62,10 +65,7 @@ UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-
-	/*************************************************************/
-	/************************* TEMPLATES *************************/
-	/*************************************************************/
+	
 public:
 	template<typename ReturnType, typename Func, typename... Args>
 	static ReturnType ExecuteIfImplements(UObject* Target, const TCHAR* FunctionName, Func Function, Args&&... args)
@@ -94,25 +94,70 @@ public:
 		else return;
 	}
 
-public:
-
-	/*************************************************************/
-	/*********************** INTERNAL ****************************/
-	/*************************************************************/
-	
+public:	
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
 	
 public:
-
-	/*************************************************************/
-	/******************* BLUEPRINTABLE ***************************/
-	/*************************************************************/
-
-	// --- Helpers  ------------------------------
+	// --- Helpers
+	
 #pragma region Helpers
+	
+	/**
+	 * Centers a specific item in a list widget by applying render translation.
+	 * Calculates the necessary offset to position the selected item in the vertical center of the viewport.
+	 * 
+	 * @param ListWidget The panel widget containing the list items (e.g., Vertical Box, Scroll Box content)
+	 * @param SelectedIndex Zero-based index of the item to center in the viewport
+	 * 
+	 * @note Requires uniform item heights. Uses the first child's height for calculations.
+	 * @note Cached geometry must be valid (call after first frame/tick).
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Setter"))
+	static void CenterListItemAtIndex(class UPanelWidget* ListWidget, int32 SelectedIndex);
+	
+	/**
+	 * Calculates the render translation needed to center a specific item in a list widget.
+	 * Returns the translation vector without applying it, allowing for animated transitions.
+	 * 
+	 * @param ListWidget The panel widget containing the list items (e.g., Vertical Box, Scroll Box content)
+	 * @param SelectedIndex Zero-based index of the item to center in the viewport
+	 * @return The translation vector to apply via SetRenderTranslation
+	 * 
+	 * @note Requires uniform item heights. Uses the first child's height for calculations.
+	 * @note Cached geometry must be valid (call after first frame/tick).
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	static FVector2D CalculateCenteredListTranslation(UPanelWidget* ListWidget, int32 SelectedIndex);
+
+	/**
+	 * Applies size to font.
+	 * 
+	 * @param Font Font to be updated.
+	 * @param NewSize Size to apply.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Setter"))
+	static FSlateFontInfo SetFontSize(const FSlateFontInfo& Font, const int32 NewSize);
+	
+	/**
+	 * Applies typeface to font.
+	 * 
+	 * @param Font Font to be updated.
+	 * @param NewTypeface Typeface to apply.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Setter"))
+	static FSlateFontInfo SetFontTypeface(const FSlateFontInfo& Font, const FName& NewTypeface);
 
 
+	/**
+	 * Retrieves the advanced configuration settings for the Mountea Inventory System.
+	 * Facilitates access to inventory-specific configurations like inventory types, rarities, and categories.
+	 *
+	 * @return - A pointer to the Mountea Advanced Inventory Settings configuration object
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventoryUIConfig* GetInventoryUISettingsConfig();
+	
 	/**
 	 * Checks whether the main UI is currently open.
 	 *
@@ -220,6 +265,28 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"))
 	static FVector2D GetActionsListSpawnLocation(UWidget* ParentWidget);
+	
+	// --- UI Subsystem
+	
+	/**
+	 * Returns Inventory UI Manager.
+	 * 
+	 * @param FromActor World Context to find local player from.
+	 * @return Inventory UI Manager if possible, null otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static UObject* GetInventoryUIManager(AActor* FromActor);
+	
+	/**
+	 * Returns local player subsystem which holds reusable references.
+	 * 
+	 * @param FromPlayerController World Context to find local player from.
+	 * @return UI Subsystem if possible, null otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"))
+	static UMounteaAdvancedInventoryUISubsystem* GetInventoryUISubsystem(APlayerController* FromPlayerController);
 
 #pragma endregion
 	
@@ -479,8 +546,8 @@ public:
 	
 #pragma endregion
 	
-	// --- Main UI  ------------------------------
-#pragma region MainUI
+	// --- Wrapper  ------------------------------
+#pragma region Wrapper
 
 	/**
 	 * Creates and initializes the inventory UI widgets.
@@ -488,37 +555,16 @@ public:
 	 * @return True if UI was successfully created and initialized, otherwise false
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool CreateMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
-	
-	/**
-	 * Retrieves the visibility state of the main UI.
-	 *
-	 * This function determines the current visibility status of the main UI
-	 * and returns an appropriate ESlateVisibility value.
-	 *
-	 * @param Target MounteaAdvancedInventoryUI Object
-	 * @return The visibility state of the main UI.
-	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Getter"))
-	static ESlateVisibility GetMainUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
-	 * Sets the visibility of the main UI.
-	 *
-	 * @param Target The interface of the advanced inventory UI where the visibility will be set.
-	 * @param Visibility The desired slate visibility to apply to the main UI.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void SetMainUIVisibility(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const ESlateVisibility Visibility);
-
-	/**
-	 * Initializes the main UI widget for the Mountea inventory system by linking it with a parent widget.
+	 * Initializes theWrapper widget for the Mountea inventory system by linking it with a parent widget.
 	 *
 	 * @param Target The target widget that implements the IMounteaInventorySystemBaseWidgetInterface. This widget will have its main UI initialized.
 	 * @param Parent The parent widget that implements the IMounteaAdvancedInventoryUIInterface. This parent is used to provide context or linking to the target widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void InitializeMainUIWidget(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
+	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
 
 	/**
 	 * Returns the inventory UI.
@@ -526,14 +572,24 @@ public:
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
 	 * Removes the inventory UI from the viewport and cleans up resources.
 	 * @param Target The UI interface to remove the inventory UI from
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveMainUIWrapper(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+
+	/**
+	 * Sets the source inventory for a given target widget interface.
+	 *
+	 * @param Target The target widget interface that will have its source inventory set.
+	 * @param ParentInventory The parent inventory interface to associate with the target widget.
+	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
+	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
 	
 #pragma endregion
 	
@@ -575,25 +631,7 @@ public:
 	
 	// --- InventoryUI  ------------------------------
 #pragma region InventoryUI
-
-	/**
-	 * Removes the inventory widget wrapper for the specified target.
-	 *
-	 * @param Target The target interface implementing IMounteaInventorySystemBaseWidgetInterface for which the inventory widget wrapper should be removed.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveInventoryWidgetWrapper(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target);
-
-	/**
-	 * Sets the source inventory for a given target widget interface.
-	 *
-	 * @param Target The target widget interface that will have its source inventory set.
-	 * @param ParentInventory The parent inventory interface to associate with the target widget.
-	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool SetSourceInventory(const TScriptInterface<IMounteaInventorySystemBaseWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
-
+	
 	/**
 	 * Triggers the 'CategorySelected' functionality on a given target, indicating that a specific inventory category has been selected.
 	 *

@@ -1,4 +1,13 @@
-﻿// Copyright Dominik Morse 2024
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -9,6 +18,7 @@
 #include "IDetailsView.h"
 
 class UMounteaInventoryItemTemplate;
+class SMounteaInventoryTemplateSearchFilter;
 
 DECLARE_DELEGATE_OneParam(FOnTemplateChanged, UMounteaInventoryItemTemplate*);
 
@@ -48,8 +58,8 @@ private:
 	TSharedRef<SWidget> CreatePropertyMatrix();
 	TSharedRef<SWidget> CreateToolbar();
 	TSharedRef<ITableRow> GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable);
-	
-	TArray<UObject*> LoadAllTemplatesForMatrix();
+
+	static TArray<UObject*> LoadAllTemplatesForMatrix();
 	void RefreshTemplateList();
 	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
 	
@@ -68,7 +78,7 @@ private:
 	void CreateTransientTemplate();
 	void CleanupTransientTemplate();
 	bool ValidateTemplateData(FString& ErrorMessage) const;
-	void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true) const;
+	static void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true);
 	
 	// New functions for tracking dirty assets
 	void TrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
@@ -77,16 +87,17 @@ private:
 	bool CheckForUnsavedChanges();
 	
 	// Asset creation dialog
-	FString ShowSaveAssetDialog();
+	static FString ShowSaveAssetDialog();
 
-	FTemplateDisplayInfo  GenerateTemplateDisplayInfo(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
-	const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates);
+	static FTemplateDisplayInfo  GenerateTemplateDisplayInfo(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
+	                                                         const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates);
 
 private:
 	FOnTemplateChanged OnTemplateChanged;
 	
 	TSharedPtr<IDetailsView> PropertyDetailsView;
 	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;
+	TSharedPtr<SMounteaInventoryTemplateSearchFilter> SearchFilterWidget;
 	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> AvailableTemplates;
 	
 	// Track selected and dirty templates
@@ -97,6 +108,14 @@ private:
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> OriginalTemplate;
 	bool bIsEditingExisting = false;
 	bool bIsShowingTransient = false;
+	
+	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> FilteredTemplates;
+	
+	void ApplySearchFilter();
+	
+	void OnSearchTextChanged(const FText& InSearchText);
+	void OnFiltersChanged();
+	bool PassesFilters(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template) const;
 };
 
 #undef LOCTEXT_NAMESPACE

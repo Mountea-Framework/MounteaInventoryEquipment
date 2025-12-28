@@ -58,7 +58,7 @@ public:
 	 *
 	 * @return - A reference to the Mountea Advanced Inventory Settings configuration object
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettings* GetInventorySettings();
 
 	/**
@@ -67,10 +67,10 @@ public:
 	 *
 	 * @return - A pointer to the Mountea Advanced Inventory Settings configuration object
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettingsConfig* GetInventorySettingsConfig();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", meta=(CustomTag="MounteaK2Getter"))
 	static UPrimaryDataAsset* GetTemplateConfig(const FString& Key);
 
 	/**
@@ -107,7 +107,6 @@ public:
 	 * Adds an item to the inventory
 	 * @param Target The inventory interface to execute on
 	 * @param Item The item to add
-	 * @param bAutoStack If true, will try to stack with existing items
 	 * @return True if item was added successfully
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
@@ -251,6 +250,16 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Notifications", meta=(CustomTag="MounteaK2Setter"))
 	static void ProcessInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryNotificationData& Notification);
+
+	/**
+	 * Translates Inventory to list of Items.
+	 * Add some additional info.
+	 * 
+	 * @param Target Inventory interface.
+	 * @return A message that provides details about inventory content.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static FString InventoryToString(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
 	
 	/**
 	 * Translates Inventory Item to string.
@@ -348,7 +357,34 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static TArray<TSoftClassPtr<UObject>> GetItemActions(const FInventoryItem& Item);
 
-	// --- Item Actions ------------------------------
+	/**
+	 * Sorts provided Inventory Items based on Sorting Criteria.
+	 * @param Target Inventory interface.
+	 * @param Items List of cached Items. This is to avoid touching the "source" Items, so we rather sort temp. data.
+	 * @param SortingCriteria Defines what criteria are applied
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static void SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UPARAM(ref) TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
+
+	// --- Item Template
+	
+#pragma region ItemTemplate
+
+	/**
+	 * Retrieve JSON manifest of the Inventory Item Template.
+	 * 
+	 * @param ItemTemplate Template to read JSON from
+	 * @return Returns JSON manifest of the Item Template if already written.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(DisplayName="Get Item Template Json"), meta=(CustomTag="MounteaK2Getter"))
+	static FString ItemTemplate_GetItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate);
+	
+	static bool ItemTemplate_CalculateItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate);
+	
+#pragma endregion
+		
+	// --- Item Actions
 
 #pragma region ItemActions
 
@@ -359,7 +395,8 @@ public:
 	 * @param Target The object for which to retrieve the item action flags.
 	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Getter"))
 	static EInventoryItemActionCallback GetItemActionFlags(const UObject* Target);
 	
 	/**
@@ -369,7 +406,8 @@ public:
 	 * @param FlagToCheck The specific flag to test for.
 	 * @return True if the flag is set, false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Validate"))
 	static bool ItemAction_HasActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToCheck);
 
 	/**
@@ -379,7 +417,8 @@ public:
 	 * @param FlagToAdd The flag to add.
 	 * @return Updated flag container with the new flag set.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_AddActionFlag(UObject* Target, EInventoryItemActionCallback FlagToAdd);
 
 	/**
@@ -388,7 +427,8 @@ public:
 	 * @param FlagToRemove The flag to clear.
 	 * @return Updated flag container with the flag cleared.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_RemoveActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToRemove);
 
 	/**
@@ -396,7 +436,8 @@ public:
 	 *
 	 * @return An empty flag container (EIIAC_None).
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemAction_ClearAllActionFlags(UObject* Target);
 
 #pragma endregion

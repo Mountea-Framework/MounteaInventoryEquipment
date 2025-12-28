@@ -186,7 +186,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
 	TSet<TSoftClassPtr<UObject>> ItemSpecialAffects;
-
+	
+protected:
+	
+	// JSON manifest of the Inventory Item.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data",
+		AdvancedDisplay, meta=(Multiline))
+	FString JsonManifest;
+	
+public:
+	
+	FString GetJson() const;
+	void SetJson(const FString& Json);
+	bool CalculateJson();
+	
 protected:
 
 	UFUNCTION()
@@ -203,7 +216,6 @@ protected:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 
 #endif
-	
 	
 };
 

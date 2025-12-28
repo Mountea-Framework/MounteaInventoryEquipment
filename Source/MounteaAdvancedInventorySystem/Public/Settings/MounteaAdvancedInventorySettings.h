@@ -17,6 +17,7 @@
 #include "Logs/MounteaAdvancedInventorySystemLogTypes.h"
 #include "MounteaAdvancedInventorySettings.generated.h"
 
+class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedEquipmentSettingsConfig;
 class UInputMappingContext;
 class UMounteaAdvancedInventorySettingsConfig;
@@ -81,6 +82,13 @@ public:
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config")
 	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> EquipmentSettingsConfig;
+	
+	/**
+	 * Holds a reference to the configuration settings for Mountea Advanced Inventory UI.
+	 * This reference is used to define and load inventory-specific configurations.
+	 */
+	UPROPERTY(Config, EditAnywhere, Category="Config")
+	TSoftObjectPtr<UMounteaAdvancedInventoryUIConfig> InventoryUISettingsConfig;
 
 	/**
 	 * Defines logging level that is allowed to be shown.
@@ -97,7 +105,7 @@ public:
 	 *
 	 * @return The allowed logging verbosity as an enum value of EMounteaAdvancedInventoryLoggingVerbosity.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory|Settings",  meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
 	EMounteaAdvancedInventoryLoggingVerbosity GetAllowedLoggVerbosity() const;
 
 	/**
@@ -106,17 +114,17 @@ public:
 	 *
 	 * @return An array of strings representing the allowed item rarities.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory|Settings",  meta=(CustomTag="MounteaK2Getter"))
-	TArray<FString> GetAllowedRarities() const;
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
+	TMap<FString, FInventoryRarity> GetAllowedRarities() const;
 
 	/**
 	 * Retrieves the list of allowed categories for inventory items as defined in the Mountea Advanced Inventory settings.
 	 * If no valid settings configuration is found, a default category of "Miscellaneous" is returned.
 	 *
-	 * @return An array of strings representing the allowed inventory categories.
+	 * @return An list of strings representing the allowed inventory categories.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory|Settings",  meta=(CustomTag="MounteaK2Getter"))
-	TArray<FString> GetAllowedCategories() const;
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
+	TMap<FString, FInventoryCategory> GetAllowedCategories() const;
 
 	/**
 	 * Retrieves the input mapping context used for handling equipment-related actions
@@ -124,6 +132,6 @@ public:
 	 *
 	 * @return A soft object pointer to the input mapping context for inventory equipment management.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory|Settings",  meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
 	TSoftObjectPtr<UInputMappingContext> GetAdvancedInventoryEquipmentInputMapping() const;
 };

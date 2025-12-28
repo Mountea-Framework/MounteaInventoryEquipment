@@ -17,6 +17,8 @@
 
 class UMounteaInventoryItemTemplate;
 
+DECLARE_MULTICAST_DELEGATE(FOnTemplatesChanged);
+
 /**
  * 
  */
@@ -29,8 +31,13 @@ public:
 	UMounteaInventoryItemTemplate* GetOrCreateTempTemplate();
 	void ClearTempTemplate();
 	bool HasTempTemplate() const;
+	
+	void NotifyTemplatesChanged();
+	FOnTemplatesChanged& OnTemplatesChanged() { return TemplatesChangedDelegate; }
 
 private:
 	UPROPERTY()
 	TObjectPtr<UMounteaInventoryItemTemplate> TempTemplate;
+	
+	FOnTemplatesChanged TemplatesChangedDelegate;
 };

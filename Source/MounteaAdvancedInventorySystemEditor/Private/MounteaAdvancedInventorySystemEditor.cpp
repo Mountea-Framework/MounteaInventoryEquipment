@@ -16,6 +16,7 @@
 #include "FileHelpers.h"
 #include "IContentBrowserSingleton.h"
 #include "ISettingsModule.h"
+#include "AssetActions/FMounteaAdvancedInventoryUIConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
@@ -38,6 +39,8 @@
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Docking/TabManager.h"
 #include "Framework/Notifications/NotificationManager.h"
+#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
@@ -159,6 +162,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedAttachmentSlot", AttachableSlotThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedAttachmentSlot", AttachableSlotIcon);
 				}
+				
+				FSlateImageBrush* InventoryUIConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUISettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InventoryUIConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUISettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (InventoryUIConfigThumb && InventoryUIConfigIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryUIConfig", InventoryUIConfigThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryUIConfig", InventoryUIConfigIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
@@ -176,6 +187,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentComponent_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIConfig_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{
@@ -204,10 +216,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 						
 			FToolMenuEntry Entry = Section.AddMenuEntryWithCommandList
 			(
-				FMAISCommands::Get().PluginAction,
+				FMAISCommands::Get().MAI_MounteaSupportAction,
 				PluginCommands,
 				NSLOCTEXT("MounteaSupport", "TabTitle", "Mountea Support"),
-				NSLOCTEXT("MounteaSupport", "TooltipText", "Opens Mountea Framework Support channel"),
+				NSLOCTEXT("MounteaSupport", "TooltipText", "🆘 Open Mountea Framework Support channel"),
 				FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Help")
 			);
 		}
@@ -313,7 +325,7 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 
 	TSharedRef<SDockTab> newTab = SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
-		.Label(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
+		.Label(LOCTEXT("InventoryTemplateEditorTabTitle", "Inventory Template Editor"))
 		.ToolTipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Create and edit Mountea Inventory Item Templates"))
 		[
 			newEditor
@@ -388,7 +400,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 				
 				FToolMenuEntry SupportEntry = Section.AddMenuEntryWithCommandList
 				(
-					FMAISCommands::Get().PluginAction,
+					FMAISCommands::Get().MAI_MounteaSupportAction,
 					PluginCommands,
 					LOCTEXT("MounteaSystemEditor_SupportButton_Label", "Mountea Support"),
 					LOCTEXT("MounteaSystemEditor_SupportButton_ToolTip", "🆘 Open Mountea Framework Support channel"),
@@ -435,6 +447,32 @@ void FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked() const
 	if (!IsValid(config))
 	{
 		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
+		return;
+	}
+
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+}
+
+void FMounteaAdvancedInventorySystemEditor::UIConfigButtonClicked() const
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	auto config = settings ? settings->InventoryUISettingsConfig.LoadSynchronous() : nullptr;
+	if (!IsValid(config))
+	{
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
+		return;
+	}
+
+	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+}
+
+void FMounteaAdvancedInventorySystemEditor::EquipmentConfigButtonClicked() const
+{
+	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	auto config = settings ? settings->EquipmentSettingsConfig.LoadSynchronous() : nullptr;
+	if (!IsValid(config))
+	{
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Equipment Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
 		return;
 	}
 
@@ -504,17 +542,39 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	);
 	MenuBuilder.EndSection();
 	
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "⚙ Mountea Advanced Inventory Settings"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Config", "📄 Mountea Advanced Inventory Configs"));
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_ConfigButton_Label", "Mountea Advanced Inventory Config"),
-			LOCTEXT("MounteaSystemEditor_ConfigButton_ToolTip", "📄 Open Mountea Inventory Configuration\n\n❔ Define inventory types, rarities, categories, limits, UI layouts, and notification behaviors used by the core system."),
+			LOCTEXT("MounteaSystemEditor_ConfigButton_ToolTip", "📄 Open Mountea Inventory Configuration\n\n❔ Define inventory types, rarities, categories, limits and notification behaviors used by the core system."),
 			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
 			FUIAction(
 				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked)
 			)
-		);
+		);	
 		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("MounteaSystemEditor_UIConfigButton_Label", "Mountea Advanced Inventory UI Config"),
+			LOCTEXT("MounteaSystemEditor_UIConfigButton_ToolTip", "📄 Open Mountea Inventory UI Configuration\n\n❔ Define inventory UI classes, styles and themes."),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::UIConfigButtonClicked)
+			)
+		);		
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_Label", "Mountea Advanced Equipment Config"),
+			LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_ToolTip", "📄 Open Mountea Equipment Configuration\n\n❔ Define Equipment types, slots, rules and other configuration."),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+			FUIAction(
+				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::EquipmentConfigButtonClicked)
+			)
+		);	
+	}
+	MenuBuilder.EndSection();
+	
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "⚙ Mountea Advanced Inventory Settings"));
+	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_SettingsButton_Label", "Mountea Advanced Inventory Settings"),
 			LOCTEXT("MounteaSystemEditor_SettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Settings\n\n❔ Configure core Advanced Inventory system settings including default behaviors, performance options, and Advanced Inventory flow parameters. Customize your Advanced Inventory system's foundation here."),

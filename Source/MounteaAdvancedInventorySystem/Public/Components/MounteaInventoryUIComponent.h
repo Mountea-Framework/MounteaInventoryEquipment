@@ -41,6 +41,7 @@ public:
 protected:
 	
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	// --- Interface Functions ------------------------------
 	
@@ -48,11 +49,9 @@ public:
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override;
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
 	
-	virtual bool CreateMainUIWrapper_Implementation() override;
-	virtual ESlateVisibility GetMainUIVisibility_Implementation() const override;
-	virtual void SetMainUIVisibility_Implementation(const ESlateVisibility NewVisibility) override;	
-	virtual UCommonActivatableWidget* GetMainUIWrapper_Implementation() const override { return InventoryWidget; };
-	virtual void RemoveMainUIWrapper_Implementation() override;
+	virtual bool CreateWrapperWidget_Implementation() override;
+	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return InventoryWidget; };
+	virtual void RemoveWrapperWidget_Implementation() override;
 
 	virtual UUserWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
 	virtual void SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget) override;
@@ -144,7 +143,7 @@ private:
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
-	TObjectPtr<UCommonActivatableWidget> InventoryWidget;
+	TObjectPtr<UUserWidget> InventoryWidget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;

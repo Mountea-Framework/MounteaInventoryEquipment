@@ -26,31 +26,60 @@ EMounteaAdvancedInventoryLoggingVerbosity UMounteaAdvancedInventorySettings::Get
 	return static_cast<EMounteaAdvancedInventoryLoggingVerbosity>(LogVerbosity);
 }
 
-TArray<FString> UMounteaAdvancedInventorySettings::GetAllowedRarities() const
+TMap<FString, FInventoryRarity> UMounteaAdvancedInventorySettings::GetAllowedRarities() const
 {
-	TArray<FString> returnValues;
 	auto inventorySettingsConfig = InventorySettingsConfig.LoadSynchronous();
 	if (!IsValid(inventorySettingsConfig))
 	{
-		returnValues.Add(TEXT("Common"));
+		TMap<FString, FInventoryRarity> returnValues;
+		FInventoryRarity CommonRarity;
+		CommonRarity.RarityDisplayName = NSLOCTEXT(
+			"UMounteaAdvancedInventorySettings", "CommonRarity", "Common");
+		CommonRarity.RarityColor = FLinearColor(0.5f, 0.5f, 0.5f);
+		CommonRarity.BasePriceMultiplier = 1.0f;
+		CommonRarity.RarityPriority = 0;
+		returnValues.Add(TEXT("Common"), CommonRarity);
+
 		return returnValues;
 	}
-	inventorySettingsConfig->AllowedRarities.GetKeys(returnValues);
+
+	auto returnValues = inventorySettingsConfig->AllowedRarities;
+
+	returnValues.ValueStableSort(
+		[](const FInventoryRarity& A, const FInventoryRarity& B)
+		{
+			return A.RarityPriority > B.RarityPriority;
+		});
+
 	return returnValues;
 }
 
-TArray<FString> UMounteaAdvancedInventorySettings::GetAllowedCategories() const
+TMap<FString, FInventoryCategory> UMounteaAdvancedInventorySettings::GetAllowedCategories() const
 {
-	TArray<FString> returnValues;
 	auto inventorySettingsConfig = InventorySettingsConfig.LoadSynchronous();
 	if (!IsValid(inventorySettingsConfig))
 	{
-		returnValues.Add(TEXT("Miscellaneous"));
+		TMap<FString, FInventoryCategory> returnValues;
+		FInventoryCategory miscellaneousCategory;
+		miscellaneousCategory.CategoryData.CategoryDisplayName = NSLOCTEXT(
+			"UMounteaAdvancedInventorySettings", "miscellaneousCategory", "Miscellaneous");
+		miscellaneousCategory.CategoryData.CategoryPriority = -5;
+		returnValues.Add(TEXT("All"), miscellaneousCategory);
+
 		return returnValues;
 	}
-	inventorySettingsConfig->AllowedCategories.GetKeys(returnValues);
+
+	auto returnValues = inventorySettingsConfig->AllowedCategories;
+
+	returnValues.ValueStableSort(
+		[](const FInventoryCategory& A, const FInventoryCategory& B)
+		{
+			return A.CategoryData.CategoryPriority > B.CategoryData.CategoryPriority;
+		});
+
 	return returnValues;
 }
+
 
 TSoftObjectPtr<UInputMappingContext> UMounteaAdvancedInventorySettings::
 GetAdvancedInventoryEquipmentInputMapping() const

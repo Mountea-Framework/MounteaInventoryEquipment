@@ -12,7 +12,7 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 
-UMounteaAdvancedInventorySettingsEditor::UMounteaAdvancedInventorySettingsEditor()
+UMounteaAdvancedInventorySettingsEditor::UMounteaAdvancedInventorySettingsEditor() : bDisplayEditorButtonText(false)
 {
 	CategoryName = TEXT("Mountea Framework");
 	SectionName = TEXT("Mountea Inventory System (Editor)");
