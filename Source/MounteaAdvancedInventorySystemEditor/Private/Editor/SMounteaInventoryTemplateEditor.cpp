@@ -597,19 +597,8 @@ bool SMounteaInventoryTemplateEditor::PassesFilters(const TWeakObjectPtr<UMounte
 	if (!Template.IsValid() || !SearchFilterWidget.IsValid())
 		return false;
 	
-	UMounteaInventoryItemTemplate* itemTemplatePtr = Template.Get();
-	
-	bool bIsTransient = itemTemplatePtr->HasAnyFlags(RF_Transient);
-	bool bIsDirty = DirtyTemplates.Contains(Template);
-	
-	const FName itemCategory = FName(itemTemplatePtr->ItemCategory);
-	const FName itemRarity = FName(itemTemplatePtr->ItemRarity);
-	
 	return SearchFilterWidget->GetActiveFilters().PassesFilter(
-		bIsDirty,
-		bIsTransient,
-		itemCategory,
-		itemRarity
+	DirtyTemplates.Contains(Template)
 	);
 }
 

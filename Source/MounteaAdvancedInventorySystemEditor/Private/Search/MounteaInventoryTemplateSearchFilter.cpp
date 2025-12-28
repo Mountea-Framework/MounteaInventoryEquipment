@@ -96,6 +96,78 @@ TSharedRef<SWidget> SMounteaInventoryTemplateSearchFilter::CreateFilterMenu()
 	}
 	MenuBuilder.EndSection();
 	
+	MenuBuilder.BeginSection("Conditions", LOCTEXT("ConditionsSection", "CONDITIONS"));
+	{
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByName", "Filter by Name"),
+			LOCTEXT("FilterByNameTooltip", "If enabled, the search criteria input will be used to filter by Item Template name."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByName = !ActiveFilters.bFilterByName;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByName; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByGUID", "Filter by GUID"),
+			LOCTEXT("FilterByGUIDTooltip", "If enabled, the search criteria input will be used to filter by Item Template guid."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByGuid = !ActiveFilters.bFilterByGuid;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByGuid; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByCategory", "Filter by Category"),
+			LOCTEXT("FilterByCategoryTooltip", "If enabled, the search criteria input will be used to filter by Item Template Category."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByCategory = !ActiveFilters.bFilterByCategory;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByCategory; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByRarity", "Filter by Rarity"),
+			LOCTEXT("FilterByRarityTooltip", "If enabled, the search criteria input will be used to filter by Item Template Rarity."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByRarity = !ActiveFilters.bFilterByRarity;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByRarity; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+	}
+	MenuBuilder.EndSection();
+	
 	MenuBuilder.BeginSection("CommonFilters", LOCTEXT("CommonFiltersSection", "COMMON FILTERS"));
 	{
 		MenuBuilder.AddMenuEntry(
@@ -131,23 +203,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateSearchFilter::CreateFilterMenu()
 			NAME_None,
 			EUserInterfaceActionType::ToggleButton
 		);
-		
-		MenuBuilder.AddMenuEntry(
-			LOCTEXT("ShowTransient", "Show Transient"),
-			LOCTEXT("ShowTransientTooltip", "Show unsaved new templates"),
-			FSlateIcon(),
-			FUIAction(
-				FExecuteAction::CreateLambda([this]()
-				{
-					ActiveFilters.bShowTransient = !ActiveFilters.bShowTransient;
-					OnFiltersChangedDelegate.ExecuteIfBound();
-				}),
-				FCanExecuteAction(),
-				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bShowTransient; })
-			),
-			NAME_None,
-			EUserInterfaceActionType::ToggleButton
-		);
 	}
 	MenuBuilder.EndSection();
 	
@@ -168,10 +223,6 @@ void SMounteaInventoryTemplateSearchFilter::OnSearchChanged(const FText& InText)
 
 void SMounteaInventoryTemplateSearchFilter::ClearSearch()
 {
-	if (SearchBox.IsValid())
-	{
-		//SearchBox->SetText(FText::GetEmpty());
-	}
 	CurrentSearchText = FText::GetEmpty();
 	OnSearchTextChangedDelegate.ExecuteIfBound(FText::GetEmpty());
 }
@@ -187,13 +238,19 @@ bool SMounteaInventoryTemplateSearchFilter::DoesTemplateMatchSearch(const TWeakO
 	const FString searchString = CurrentSearchText.ToString().ToLower();
 	const UMounteaInventoryItemTemplate* itemTemplatePtr = Template.Get();
 	
-	if (itemTemplatePtr->DisplayName.ToString().ToLower().Contains(searchString))
+	if (ActiveFilters.bFilterByName && itemTemplatePtr->DisplayName.ToString().ToLower().Contains(searchString))
 		return true;
 	
-	if (itemTemplatePtr->GetPathName().ToLower().Contains(searchString))
+	if (ActiveFilters.bFilterByName && itemTemplatePtr->GetPathName().ToLower().Contains(searchString))
 		return true;
 	
-	if (itemTemplatePtr->Guid.ToString().ToLower().Contains(searchString))
+	if (ActiveFilters.bFilterByGuid && itemTemplatePtr->Guid.ToString().ToLower().Contains(searchString))
+		return true;
+	
+	if (ActiveFilters.bFilterByCategory && itemTemplatePtr->ItemCategory.ToLower().Contains(searchString))
+		return true;
+	
+	if (ActiveFilters.bFilterByRarity && itemTemplatePtr->ItemRarity.ToLower().Contains(searchString))
 		return true;
 	
 	return false;

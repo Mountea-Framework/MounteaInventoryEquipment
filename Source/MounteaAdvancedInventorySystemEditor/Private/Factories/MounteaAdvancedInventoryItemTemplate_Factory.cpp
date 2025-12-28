@@ -36,7 +36,7 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateNew(UClass*
 
 bool UMounteaAdvancedInventoryItemTemplate_Factory::ConfigureProperties()
 {
-	static const FText TitleText = FText::FromString(TEXT("Pick Parent Class for new Mountea Inventory Settings Config"));
+	static const FText TitleText = FText::FromString(TEXT("Pick Parent Class for new Mountea Inventory Item Template"));
 	
 	UClass* ChosenClass = nullptr;
 	const bool bPressedOk = FMounteaAdvancedInventoryEditorUtilities::PickChildrenOfClass

@@ -24,40 +24,39 @@ struct FMounteaTemplateFilters
 {
 	bool bShowDirty = true;
 	bool bShowClean = true;
-	bool bShowTransient = true;
-	TSet<FName> AllowedCategories;
-	TSet<FName> AllowedRarities;
+	
+	bool bFilterByName = true;
+	bool bFilterByGuid = true;
+	bool bFilterByCategory = false;
+	bool bFilterByRarity = false;
+		
+	TSet<FString> AllowedCategories;
+	TSet<FString> AllowedRarities;
 	
 	void Reset()
 	{
 		bShowDirty = true;
 		bShowClean = true;
-		bShowTransient = true;
+		bFilterByName = true;
+		bFilterByGuid = true;
+		bFilterByCategory = false;
+		bFilterByRarity = false;
 		AllowedCategories.Empty();
 		AllowedRarities.Empty();
 	}
 	
 	bool IsDefault() const
 	{
-		return bShowDirty && bShowClean && bShowTransient && 
+		return bShowDirty && bShowClean && bFilterByName && bFilterByGuid && !bFilterByCategory && !bFilterByRarity &&
 			   AllowedCategories.Num() == 0 && AllowedRarities.Num() == 0;
 	}
 	
-	bool PassesFilter(const bool bIsDirty, const bool bIsTransient, const FName Category, const FName Rarity) const
-	{
-		if (bIsTransient && !bShowTransient)
-			return false;
-		
+	bool PassesFilter(const bool bIsDirty) const
+	{		
 		if (bIsDirty && !bShowDirty)
 			return false;
 		
-		if (!bIsDirty && !bIsTransient && !bShowClean)
-			return false;
-		
-		if (AllowedCategories.Num() > 0 && !AllowedCategories.Contains(Category))
-			return false;
-		
-		if (AllowedRarities.Num() > 0 && !AllowedRarities.Contains(Rarity))
+		if (!bIsDirty && !bShowClean)
 			return false;
 		
 		return true;
