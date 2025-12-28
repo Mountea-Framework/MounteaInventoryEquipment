@@ -1069,7 +1069,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 		[
 			SNew(SBox)
 			.WidthOverride(300.0f)
-			//.MinDesiredWidth(300.0f)
 			[
 				SAssignNew(SearchFilterWidget, SMounteaInventoryTemplateSearchFilter)
 				.OnSearchTextChanged(this, &SMounteaInventoryTemplateEditor::OnSearchTextChanged)

@@ -31,7 +31,7 @@ public:
 	static bool ImportTemplatesFromFile(TArray<UMounteaInventoryItemTemplate*>& OutTemplates, FString& OutErrorMessage);
 	static bool ExportTemplatesToFile(const TArray<UMounteaInventoryItemTemplate*>& Templates, FString& OutErrorMessage);
 
-private:
+public:
 	static TArray<UMounteaInventoryItemTemplate*> LoadAllExistingTemplates();
 	static UMounteaInventoryItemTemplate* FindTemplateByGuid(const TArray<UMounteaInventoryItemTemplate*>& Templates, const FGuid& Guid);
 	static bool UpdateExistingTemplate(UMounteaInventoryItemTemplate* Template, const FString& JsonString, FString& OutErrorMessage);

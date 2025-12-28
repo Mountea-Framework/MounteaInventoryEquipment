@@ -29,6 +29,14 @@ public:
 	UMounteaAdvancedInventoryItemTemplate_Factory();
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 	virtual bool ConfigureProperties() override;
+	virtual bool FactoryCanImport(const FString& Filename) override;
+	virtual UObject* FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, 
+		EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, 
+		FFeedbackContext* Warn, bool& bOutOperationCanceled) override;
+
+private:
+	static UMounteaInventoryItemTemplate* CreateSingleTemplate(const UClass* InClass, UObject* InParent, 
+	                                                           FName InName, EObjectFlags Flags, const FString& JsonString, FFeedbackContext* Warn);
 
 private:
 	// Holds the template of the class we are building
