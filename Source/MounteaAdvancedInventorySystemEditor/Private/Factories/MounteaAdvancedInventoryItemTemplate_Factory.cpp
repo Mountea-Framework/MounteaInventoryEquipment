@@ -80,13 +80,15 @@ void UMounteaAdvancedInventoryItemTemplate_Factory::PostImportCleanUp()
 }
 
 UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass* InClass, UObject* InParent,
-                                                                          const FName InName, const EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn,
-                                                                          bool& bOutOperationCanceled)
+	const FName InName, const EObjectFlags Flags, const FString& Filename, const TCHAR* Parms, FFeedbackContext* Warn,
+	bool& bOutOperationCanceled)
 {
+	const FString targetFolder = InParent->GetPathName();
+    
 	TArray<UMounteaInventoryItemTemplate*> importedTemplates;
 	FString errorMessage;
     
-	if (!UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile(importedTemplates, errorMessage))
+	if (!UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFilePath(Filename, targetFolder, importedTemplates, errorMessage))
 	{
 		if (Warn)
 			Warn->Logf(ELogVerbosity::Error, TEXT("%s"), *errorMessage);
@@ -99,7 +101,7 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
-	
+
 	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
 		editorTemplateSubsystem->NotifyTemplatesChanged();
 

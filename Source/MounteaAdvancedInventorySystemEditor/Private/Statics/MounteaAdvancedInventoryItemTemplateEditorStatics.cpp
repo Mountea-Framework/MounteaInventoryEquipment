@@ -34,14 +34,23 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
         return false;
     }
 
+    return ImportTemplatesFromFilePath(filePath, FString(), OutTemplates, OutErrorMessage);
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFilePath(
+    const FString& FilePath,
+    const FString& TargetFolder,
+    TArray<UMounteaInventoryItemTemplate*>& OutTemplates, 
+    FString& OutErrorMessage)
+{
     FString fileContent;
-    if (!FFileHelper::LoadFileToString(fileContent, *filePath))
+    if (!FFileHelper::LoadFileToString(fileContent, *FilePath))
     {
-        OutErrorMessage = FString::Printf(TEXT("Failed to read file: %s"), *filePath);
+        OutErrorMessage = FString::Printf(TEXT("Failed to read file: %s"), *FilePath);
         return false;
     }
 
-    const bool bIsMultipleFile = filePath.EndsWith(TEXT(".mnteaitems"));
+    const bool bIsMultipleFile = FilePath.EndsWith(TEXT(".mnteaitems"));
     
     TArray<FString> itemJsons;
     if (bIsMultipleFile)
@@ -61,30 +70,34 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
     {
         const FGuid itemGuid = ExtractGuidFromJson(itemJson);
 
-        if (UMounteaInventoryItemTemplate* targetTemplate = FindTemplateByGuid(existingTemplates, itemGuid))
+        if (UMounteaInventoryItemTemplate* TargetTemplate = FindTemplateByGuid(existingTemplates, itemGuid))
         {
-            if (UpdateExistingTemplate(targetTemplate, itemJson, OutErrorMessage))
+            if (UpdateExistingTemplate(TargetTemplate, itemJson, OutErrorMessage))
             {
-                OutTemplates.Add(targetTemplate);
+                OutTemplates.Add(TargetTemplate);
                 updatedCount++;
             }
         }
         else
         {
-            const FString targetFolder = ShowContentBrowserPathPicker(
-                NSLOCTEXT("UMounteaAdvancedInventoryItemTemplateEditorStatics", "Import_TargetFolder", 
-                    "Select Target Folder for New Template").ToString(),
-                TEXT("/Game/")
-            );
-
-            if (targetFolder.IsEmpty())
+            FString folderToUse = TargetFolder;
+            if (folderToUse.IsEmpty())
             {
-                OutErrorMessage = TEXT("No target folder selected for new template");
-                continue;
+                folderToUse = ShowContentBrowserPathPicker(
+                    NSLOCTEXT("UMounteaAdvancedInventoryItemTemplateEditorStatics", "Import_TargetFolder", 
+                        "Select Target Folder for New Template").ToString(),
+                    TEXT("/Game/")
+                );
+
+                if (folderToUse.IsEmpty())
+                {
+                    OutErrorMessage = TEXT("No target folder selected for new template");
+                    continue;
+                }
             }
 
             const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"), *itemGuid.ToString(EGuidFormats::Short));
-            UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(targetFolder, assetName, OutErrorMessage);
+            UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(folderToUse, assetName, OutErrorMessage);
             
             if (!newTemplate)
                 continue;
@@ -93,7 +106,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
             {
                 newTemplate->CalculateJson();
                 
-                const FString packagePath = FPaths::Combine(targetFolder, assetName);
+                const FString packagePath = FPaths::Combine(folderToUse, assetName);
                 if (SaveTemplateAsset(newTemplate, packagePath))
                 {
                     OutTemplates.Add(newTemplate);
@@ -128,24 +141,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ExportTemplatesToFile(
         return false;
     }
 
-    TArray<FString> validJsonData;
-    for (const auto* Template : Templates)
-    {
-        if (!IsValid(Template))
-            continue;
-
-        const FString JsonData = Template->GetJson();
-        if (!JsonData.IsEmpty())
-            validJsonData.Add(JsonData);
-    }
-
-    if (validJsonData.Num() == 0)
-    {
-        OutErrorMessage = TEXT("Selected templates have no JSON data to export");
-        return false;
-    }
-
-    const bool bMultipleTemplates = validJsonData.Num() > 1;
+    const bool bMultipleTemplates = Templates.Num() > 1;
     const FString fileExtension = bMultipleTemplates ? TEXT(".mnteaitems") : TEXT(".mnteaitem");
     const FString fileTypes = bMultipleTemplates 
         ? TEXT("Mountea Items Files (*.mnteaitems)|*.mnteaitems")
@@ -167,7 +163,35 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ExportTemplatesToFile(
         return false;
     }
 
-    FString finalPath = filePath;
+    return ExportTemplatesToFilePath(Templates, filePath, OutErrorMessage);
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ExportTemplatesToFilePath(
+    const TArray<UMounteaInventoryItemTemplate*>& Templates,
+    const FString& FilePath,
+    FString& OutErrorMessage)
+{
+    TArray<FString> validJsonData;
+    for (const auto* Template : Templates)
+    {
+        if (!IsValid(Template))
+            continue;
+
+        const FString jsonData = Template->GetJson();
+        if (!jsonData.IsEmpty())
+            validJsonData.Add(jsonData);
+    }
+
+    if (validJsonData.Num() == 0)
+    {
+        OutErrorMessage = TEXT("Selected templates have no JSON data to export");
+        return false;
+    }
+
+    const bool bMultipleTemplates = validJsonData.Num() > 1;
+    const FString fileExtension = bMultipleTemplates ? TEXT(".mnteaitems") : TEXT(".mnteaitem");
+
+    FString finalPath = FilePath;
     if (!finalPath.EndsWith(fileExtension))
         finalPath += fileExtension;
 

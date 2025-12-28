@@ -28,8 +28,11 @@ class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API
 	GENERATED_BODY()
 	
 public:
+public:
 	static bool ImportTemplatesFromFile(TArray<UMounteaInventoryItemTemplate*>& OutTemplates, FString& OutErrorMessage);
+	static bool ImportTemplatesFromFilePath(const FString& FilePath, const FString& TargetFolder, TArray<UMounteaInventoryItemTemplate*>& OutTemplates, FString& OutErrorMessage);
 	static bool ExportTemplatesToFile(const TArray<UMounteaInventoryItemTemplate*>& Templates, FString& OutErrorMessage);
+	static bool ExportTemplatesToFilePath(const TArray<UMounteaInventoryItemTemplate*>& Templates, const FString& FilePath, FString& OutErrorMessage);
 
 public:
 	static TArray<UMounteaInventoryItemTemplate*> LoadAllExistingTemplates();
