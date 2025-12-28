@@ -19,6 +19,38 @@
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateSearchFilter"
 
+TArray<FString> FMounteaTemplateFilters::GetAvailableCategories()
+{
+	TArray<FString> returnValue;
+	
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!inventorySettings)
+		return returnValue;
+	
+	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	if (!inventoryConfig)
+		return returnValue;
+	
+	inventoryConfig->AllowedCategories.GetKeys(returnValue);
+	return returnValue;
+}
+
+TArray<FString> FMounteaTemplateFilters::GetAvailableRarities()
+{
+	TArray<FString> returnValue;
+	
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!inventorySettings)
+		return returnValue;
+	
+	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	if (!inventoryConfig)
+		return returnValue;
+	
+	inventoryConfig->AllowedRarities.GetKeys(returnValue);
+	return returnValue;
+}
+
 void SMounteaInventoryTemplateSearchFilter::Construct(const FArguments& InArgs)
 {
 	OnSearchTextChangedDelegate = InArgs._OnSearchTextChanged;
@@ -69,7 +101,7 @@ void SMounteaInventoryTemplateSearchFilter::Construct(const FArguments& InArgs)
 					{
 						return ActiveFilters.IsDefault() 
 							? LOCTEXT("Filters", "Filters") 
-							: LOCTEXT("FiltersActive", "Filters (Active)");
+							: LOCTEXT("FiltersActive", "Filters");
 					})
 					.ColorAndOpacity_Lambda([this]()
 					{
@@ -81,6 +113,9 @@ void SMounteaInventoryTemplateSearchFilter::Construct(const FArguments& InArgs)
 			]
 		]
 	];
+	
+	ActiveFilters.AllowedCategories = TSet<FString>(GetAvailableCategories());
+	ActiveFilters.AllowedRarities = TSet<FString>(GetAvailableRarities());
 }
 
 TSharedRef<SWidget> SMounteaInventoryTemplateSearchFilter::CreateFilterMenu()
@@ -363,20 +398,9 @@ void SMounteaInventoryTemplateSearchFilter::ToggleCategory(const FString& Catego
 	OnFiltersChangedDelegate.ExecuteIfBound();
 }
 
-TArray<FString> SMounteaInventoryTemplateSearchFilter::GetAvailableCategories()
+TArray<FString> SMounteaInventoryTemplateSearchFilter::GetAvailableCategories() const
 {
-	TArray<FString> returnValue;
-	
-	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!inventorySettings)
-		return returnValue;
-	
-	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
-	if (!inventoryConfig)
-		return returnValue;
-	
-	inventoryConfig->AllowedCategories.GetKeys(returnValue);
-	return returnValue;
+	return ActiveFilters.GetAvailableCategories();
 }
 
 void SMounteaInventoryTemplateSearchFilter::ToggleRarity(const FString& Rarity)
@@ -389,20 +413,9 @@ void SMounteaInventoryTemplateSearchFilter::ToggleRarity(const FString& Rarity)
 	OnFiltersChangedDelegate.ExecuteIfBound();
 }
 
-TArray<FString> SMounteaInventoryTemplateSearchFilter::GetAvailableRarities()
+TArray<FString> SMounteaInventoryTemplateSearchFilter::GetAvailableRarities() const
 {
-	TArray<FString> returnValue;
-	
-	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!inventorySettings)
-		return returnValue;
-	
-	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
-	if (!inventoryConfig)
-		return returnValue;
-	
-	inventoryConfig->AllowedRarities.GetKeys(returnValue);
-	return returnValue;
+	return ActiveFilters.GetAvailableRarities();
 }
 
 void SMounteaInventoryTemplateSearchFilter::ClearSearch()
@@ -422,7 +435,10 @@ bool SMounteaInventoryTemplateSearchFilter::DoesTemplateMatchSearch(const TWeakO
 	const FString searchString = CurrentSearchText.ToString().ToLower();
 	const UMounteaInventoryItemTemplate* itemTemplatePtr = Template.Get();
 	
-	if (ActiveFilters.AllowedCategories.Num() > 0 && ActiveFilters.AllowedCategories.Contains(itemTemplatePtr->ItemCategory))
+	if (ActiveFilters.bFilterByCategory && ActiveFilters.AllowedCategories.Contains(itemTemplatePtr->ItemCategory))
+		return true;
+	
+	if (ActiveFilters.bFilterByRarity && ActiveFilters.AllowedRarities.Contains(itemTemplatePtr->ItemRarity))
 		return true;
 	
 	if (ActiveFilters.bFilterByName && itemTemplatePtr->DisplayName.ToString().ToLower().Contains(searchString))
