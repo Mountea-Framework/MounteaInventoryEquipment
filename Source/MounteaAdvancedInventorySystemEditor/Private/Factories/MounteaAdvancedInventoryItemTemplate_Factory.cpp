@@ -14,6 +14,7 @@
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
+#include "Subsystems/MounteaInventoryTemplateEditorSubsystem.h"
 #include "Utilities/MounteaAdvancedInventoryEditorUtilities.h"
 
 
@@ -76,6 +77,9 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
+	
+	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
+		editorTemplateSubsystem->NotifyTemplatesChanged();
 
 	return importedTemplates[0];
 }

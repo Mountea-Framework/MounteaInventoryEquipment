@@ -43,3 +43,8 @@ void UMounteaInventoryTemplateEditorSubsystem::ClearTempTemplate()
 
 bool UMounteaInventoryTemplateEditorSubsystem::HasTempTemplate() const
 { return IsValid(TempTemplate); }
+
+void UMounteaInventoryTemplateEditorSubsystem::NotifyTemplatesChanged()
+{
+	TemplatesChangedDelegate.Broadcast();
+}

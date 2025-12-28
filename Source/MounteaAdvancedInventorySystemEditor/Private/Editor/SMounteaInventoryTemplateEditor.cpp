@@ -60,6 +60,9 @@ SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 {
 	// Clean up transient template on destruction
 	CleanupTransientTemplate();
+	
+	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
+		editorTemplateSubsystem->OnTemplatesChanged().RemoveAll(this);
 }
 
 void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
@@ -93,6 +96,9 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 
 		OnTemplateSelectionChanged(nullptr, ESelectInfo::Direct);
 	}
+	
+	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
+		editorTemplateSubsystem->OnTemplatesChanged().AddRaw(this, &SMounteaInventoryTemplateEditor::RefreshTemplateList);
 }
 
 void SMounteaInventoryTemplateEditor::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged)
