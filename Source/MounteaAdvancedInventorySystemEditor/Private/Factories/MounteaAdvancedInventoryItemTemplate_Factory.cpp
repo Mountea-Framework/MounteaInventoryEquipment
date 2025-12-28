@@ -21,7 +21,9 @@ UMounteaAdvancedInventoryItemTemplate_Factory::UMounteaAdvancedInventoryItemTemp
 {
 	bCreateNew = true;
 	bEditAfterNew = true;
-
+	bEditorImport = true;
+	Formats.Add("mnteaitem;Mountea Item Template File");
+	Formats.Add("mnteaitems;Mountea Item Templates File");
 	SupportedClass = UMounteaInventoryItemTemplate::StaticClass();
 }
 
@@ -77,3 +79,5 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass
 
 	return importedTemplates[0];
 }
+
+// TODO: Post-create call the Editor subsystem to refresh list of Items
