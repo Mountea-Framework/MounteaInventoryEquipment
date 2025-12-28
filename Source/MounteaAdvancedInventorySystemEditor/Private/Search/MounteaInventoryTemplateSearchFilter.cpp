@@ -13,6 +13,8 @@
 #include "MounteaInventoryTemplateSearchFilter.h"
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Widgets/Input/SSearchBox.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateSearchFilter"
@@ -96,6 +98,78 @@ TSharedRef<SWidget> SMounteaInventoryTemplateSearchFilter::CreateFilterMenu()
 	}
 	MenuBuilder.EndSection();
 	
+	MenuBuilder.BeginSection("Conditions", LOCTEXT("ConditionsSection", "CONDITIONS"));
+	{
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByName", "Filter by Name"),
+			LOCTEXT("FilterByNameTooltip", "If enabled, the search criteria input will be used to filter by Item Template name."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByName = !ActiveFilters.bFilterByName;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByName; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByGUID", "Filter by GUID"),
+			LOCTEXT("FilterByGUIDTooltip", "If enabled, the search criteria input will be used to filter by Item Template guid."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByGuid = !ActiveFilters.bFilterByGuid;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByGuid; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByCategory", "Filter by Category"),
+			LOCTEXT("FilterByCategoryTooltip", "If enabled, the search criteria input will be used to filter by Item Template Category."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByCategory = !ActiveFilters.bFilterByCategory;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByCategory; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+		
+		MenuBuilder.AddMenuEntry(
+			LOCTEXT("FilterByRarity", "Filter by Rarity"),
+			LOCTEXT("FilterByRarityTooltip", "If enabled, the search criteria input will be used to filter by Item Template Rarity."),
+			FSlateIcon(),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()
+				{
+					ActiveFilters.bFilterByRarity = !ActiveFilters.bFilterByRarity;
+					OnFiltersChangedDelegate.ExecuteIfBound();
+				}),
+				FCanExecuteAction(),
+				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bFilterByRarity; })
+			),
+			NAME_None,
+			EUserInterfaceActionType::ToggleButton
+		);
+	}
+	MenuBuilder.EndSection();
+	
 	MenuBuilder.BeginSection("CommonFilters", LOCTEXT("CommonFiltersSection", "COMMON FILTERS"));
 	{
 		MenuBuilder.AddMenuEntry(
@@ -131,22 +205,135 @@ TSharedRef<SWidget> SMounteaInventoryTemplateSearchFilter::CreateFilterMenu()
 			NAME_None,
 			EUserInterfaceActionType::ToggleButton
 		);
-		
-		MenuBuilder.AddMenuEntry(
-			LOCTEXT("ShowTransient", "Show Transient"),
-			LOCTEXT("ShowTransientTooltip", "Show unsaved new templates"),
-			FSlateIcon(),
-			FUIAction(
-				FExecuteAction::CreateLambda([this]()
+	}
+	MenuBuilder.EndSection();
+	
+	MenuBuilder.BeginSection("Display Conditions", LOCTEXT("DisplayConditions", "DISPLAY CONDITIONS"));
+	{
+		// Categories
+		MenuBuilder.AddSubMenu(
+	LOCTEXT("CategoriesFilter", "Categories Filter"),
+	LOCTEXT("CategoriesFilterTooltip", "Show templates only with matching categories."),
+	FNewMenuDelegate::CreateLambda([this](FMenuBuilder& SubMenuBuilder)
+			{
+				const TArray<FString> availableCategories = GetAvailableCategories();
+				
+				if (availableCategories.Num() == 0)
 				{
-					ActiveFilters.bShowTransient = !ActiveFilters.bShowTransient;
-					OnFiltersChangedDelegate.ExecuteIfBound();
-				}),
-				FCanExecuteAction(),
-				FIsActionChecked::CreateLambda([this]() { return ActiveFilters.bShowTransient; })
-			),
-			NAME_None,
-			EUserInterfaceActionType::ToggleButton
+					SubMenuBuilder.AddMenuEntry(
+						LOCTEXT("NoCategories", "No categories available"),
+						FText::GetEmpty(),
+						FSlateIcon(),
+						FUIAction(),
+						NAME_None,
+						EUserInterfaceActionType::None
+					);
+				}
+				else
+				{
+					SubMenuBuilder.AddMenuEntry(
+						LOCTEXT("ClearAllCategories", "Clear All"),
+						LOCTEXT("ClearAllCategoriesTooltip", "Clear all category filters"),
+						FSlateIcon(),
+						FUIAction(
+							FExecuteAction::CreateLambda([this]()
+							{
+								ActiveFilters.AllowedCategories.Empty();
+								OnFiltersChangedDelegate.ExecuteIfBound();
+							})
+						)
+					);
+					
+					SubMenuBuilder.AddSeparator();
+					
+					for (const FString& itemCategory : availableCategories)
+					{
+						SubMenuBuilder.AddMenuEntry(
+							FText::FromString(itemCategory),
+							FText::Format(LOCTEXT("ToggleCategoryTooltip", "Toggle {0} category filter"), FText::FromString(itemCategory)),
+							FSlateIcon(),
+							FUIAction(
+								FExecuteAction::CreateLambda([this, itemCategory]()
+								{
+									ToggleCategory(itemCategory);
+								}),
+								FCanExecuteAction(),
+								FIsActionChecked::CreateLambda([this, itemCategory]() 
+								{ 
+									return ActiveFilters.AllowedCategories.Contains(itemCategory); 
+								})
+							),
+							NAME_None,
+							EUserInterfaceActionType::ToggleButton
+						);
+					}
+				}
+			}),
+			false,
+			FSlateIcon()
+		);
+		
+		// Rarities
+		MenuBuilder.AddSubMenu(
+	LOCTEXT("RaritiesFilter", "Rarities Filter"),
+	LOCTEXT("RaritiesFilterTooltip", "Show templates only with matching rarities."),
+	FNewMenuDelegate::CreateLambda([this](FMenuBuilder& SubMenuBuilder)
+			{
+				const TArray<FString> availableRarities = GetAvailableRarities();
+				
+				if (availableRarities.Num() == 0)
+				{
+					SubMenuBuilder.AddMenuEntry(
+						LOCTEXT("NoRarities", "No rarities available"),
+						FText::GetEmpty(),
+						FSlateIcon(),
+						FUIAction(),
+						NAME_None,
+						EUserInterfaceActionType::None
+					);
+				}
+				else
+				{
+					SubMenuBuilder.AddMenuEntry(
+						LOCTEXT("ClearAllRarities", "Clear All"),
+						LOCTEXT("ClearAllRaritiesTooltip", "Clear all rarity filters"),
+						FSlateIcon(),
+						FUIAction(
+							FExecuteAction::CreateLambda([this]()
+							{
+								ActiveFilters.AllowedRarities.Empty();
+								OnFiltersChangedDelegate.ExecuteIfBound();
+							})
+						)
+					);
+					
+					SubMenuBuilder.AddSeparator();
+					
+					for (const FString& itemRarity : availableRarities)
+					{
+						SubMenuBuilder.AddMenuEntry(
+							FText::FromString(itemRarity),
+							FText::Format(LOCTEXT("ToggleRariryTooltip", "Toggle {0} rarity filter"), FText::FromString(itemRarity)),
+							FSlateIcon(),
+							FUIAction(
+								FExecuteAction::CreateLambda([this, itemRarity]()
+								{
+									ToggleRarity(itemRarity);
+								}),
+								FCanExecuteAction(),
+								FIsActionChecked::CreateLambda([this, itemRarity]() 
+								{ 
+									return ActiveFilters.AllowedRarities.Contains(itemRarity); 
+								})
+							),
+							NAME_None,
+							EUserInterfaceActionType::ToggleButton
+						);
+					}
+				}
+			}),
+			false,
+			FSlateIcon()
 		);
 	}
 	MenuBuilder.EndSection();
@@ -166,12 +353,60 @@ void SMounteaInventoryTemplateSearchFilter::OnSearchChanged(const FText& InText)
 	OnSearchTextChangedDelegate.ExecuteIfBound(InText);
 }
 
+void SMounteaInventoryTemplateSearchFilter::ToggleCategory(const FString& Category)
+{
+	if (ActiveFilters.AllowedCategories.Contains(Category))
+		ActiveFilters.AllowedCategories.Remove(Category);
+	else
+		ActiveFilters.AllowedCategories.Add(Category);
+	
+	OnFiltersChangedDelegate.ExecuteIfBound();
+}
+
+TArray<FString> SMounteaInventoryTemplateSearchFilter::GetAvailableCategories()
+{
+	TArray<FString> returnValue;
+	
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!inventorySettings)
+		return returnValue;
+	
+	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	if (!inventoryConfig)
+		return returnValue;
+	
+	inventoryConfig->AllowedCategories.GetKeys(returnValue);
+	return returnValue;
+}
+
+void SMounteaInventoryTemplateSearchFilter::ToggleRarity(const FString& Rarity)
+{
+	if (ActiveFilters.AllowedRarities.Contains(Rarity))
+		ActiveFilters.AllowedRarities.Remove(Rarity);
+	else
+		ActiveFilters.AllowedRarities.Add(Rarity);
+	
+	OnFiltersChangedDelegate.ExecuteIfBound();
+}
+
+TArray<FString> SMounteaInventoryTemplateSearchFilter::GetAvailableRarities()
+{
+	TArray<FString> returnValue;
+	
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!inventorySettings)
+		return returnValue;
+	
+	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	if (!inventoryConfig)
+		return returnValue;
+	
+	inventoryConfig->AllowedRarities.GetKeys(returnValue);
+	return returnValue;
+}
+
 void SMounteaInventoryTemplateSearchFilter::ClearSearch()
 {
-	if (SearchBox.IsValid())
-	{
-		//SearchBox->SetText(FText::GetEmpty());
-	}
 	CurrentSearchText = FText::GetEmpty();
 	OnSearchTextChangedDelegate.ExecuteIfBound(FText::GetEmpty());
 }
@@ -187,13 +422,22 @@ bool SMounteaInventoryTemplateSearchFilter::DoesTemplateMatchSearch(const TWeakO
 	const FString searchString = CurrentSearchText.ToString().ToLower();
 	const UMounteaInventoryItemTemplate* itemTemplatePtr = Template.Get();
 	
-	if (itemTemplatePtr->DisplayName.ToString().ToLower().Contains(searchString))
+	if (ActiveFilters.AllowedCategories.Num() > 0 && ActiveFilters.AllowedCategories.Contains(itemTemplatePtr->ItemCategory))
 		return true;
 	
-	if (itemTemplatePtr->GetPathName().ToLower().Contains(searchString))
+	if (ActiveFilters.bFilterByName && itemTemplatePtr->DisplayName.ToString().ToLower().Contains(searchString))
 		return true;
 	
-	if (itemTemplatePtr->Guid.ToString().ToLower().Contains(searchString))
+	if (ActiveFilters.bFilterByName && itemTemplatePtr->GetPathName().ToLower().Contains(searchString))
+		return true;
+	
+	if (ActiveFilters.bFilterByGuid && itemTemplatePtr->Guid.ToString().ToLower().Contains(searchString))
+		return true;
+	
+	if (ActiveFilters.bFilterByCategory && itemTemplatePtr->ItemCategory.ToLower().Contains(searchString))
+		return true;
+	
+	if (ActiveFilters.bFilterByRarity && itemTemplatePtr->ItemRarity.ToLower().Contains(searchString))
 		return true;
 	
 	return false;
