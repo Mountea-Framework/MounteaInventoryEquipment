@@ -301,7 +301,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateSearchFilter::CreateFilterMenu()
 						FUIAction(
 							FExecuteAction::CreateLambda([this]()
 							{
-								ActiveFilters.AllowedCategories.Empty();
+								ActiveFilters.AllowedRarities.Empty();
 								OnFiltersChangedDelegate.ExecuteIfBound();
 							})
 						)
