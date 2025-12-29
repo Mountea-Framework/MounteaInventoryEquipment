@@ -21,42 +21,48 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 {
 	ChildSlot
 	[
-		SNew(SHorizontalBox)
-		
-		+ SHorizontalBox::Slot()
-		.FillWidth(0.25f)
-		.Padding(5)
+		SNew(SBorder)
+		.BorderBackgroundColor(FLinearColor::Transparent)
+		.Padding(0)
 		[
-			SNew(SBorder)
-			.BorderBackgroundColor(FLinearColor::Transparent)
+			SNew(SHorizontalBox)
+		
+			+ SHorizontalBox::Slot()
+			.FillWidth(0.25f)
+			.Padding(0)
 			[
-				SNew(SScrollBox)
-				+ SScrollBox::Slot()
+				SNew(SBorder)
+				.BorderImage(FAppStyle::GetBrush("Brushes.Background"))
+				.Padding(10)
 				[
-					SNew(SVerticalBox)
-					+ SVerticalBox::Slot()
-					.AutoHeight()
+					SNew(SScrollBox)
+					+ SScrollBox::Slot()
 					[
-						CreateNavigationButton(LOCTEXT("Overview", "Overview"), 0)
-					]
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					[
-						CreateNavigationButton(LOCTEXT("Filters", "Filters"), 1)
+						SNew(SVerticalBox)
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						[
+							CreateNavigationButton(LOCTEXT("Overview", "Overview"), 0)
+						]
+						+ SVerticalBox::Slot()
+						.AutoHeight()
+						[
+							CreateNavigationButton(LOCTEXT("Filters", "Filters"), 1)
+						]
 					]
 				]
 			]
-		]
-		
-		+ SHorizontalBox::Slot()
-		.FillWidth(0.75f)
-		[
-			SAssignNew(WebBrowser, SWebBrowser)
-			.ShowControls(false)
-			.ShowAddressBar(false)
-			.ShowInitialThrobber(true)
-			.SupportsTransparency(true)
-		]
+			
+			+ SHorizontalBox::Slot()
+			.FillWidth(0.75f)
+			[
+				SAssignNew(WebBrowser, SWebBrowser)
+				.ShowControls(false)
+				.ShowAddressBar(false)
+				.ShowInitialThrobber(true)
+				.SupportsTransparency(true)
+			]
+		]		
 	];
 	
 	SwitchToPage(0);

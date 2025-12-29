@@ -74,19 +74,86 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 	
 	ChildSlot
 	[
-		SNew(SVerticalBox)
+		SAssignNew(RootOverlay, SOverlay)
 		
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.MinHeight(36.f)
+		+ SOverlay::Slot()
 		[
-			CreateToolbar()
+			SNew(SVerticalBox)
+			
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.MinHeight(36.f)
+			[
+				CreateToolbar()
+			]
+			
+			+ SVerticalBox::Slot()
+			.FillHeight(1.0f)
+			[
+				CreatePropertyMatrix()
+			]
 		]
-		
-		+ SVerticalBox::Slot()
-		.FillHeight(1.0f)
+
+		+ SOverlay::Slot()
+		.HAlign(HAlign_Fill)
+		.VAlign(VAlign_Fill)
 		[
-			CreatePropertyMatrix()
+			SNew(SBox)
+			.Visibility_Lambda([this]() { return bIsHelpVisible ? EVisibility::Visible : EVisibility::Collapsed; })
+			[
+				SNew(SOverlay)
+				
+				+ SOverlay::Slot()
+				.HAlign(HAlign_Fill)
+				.VAlign(VAlign_Fill)
+				[
+					SNew(SBorder)
+					.BorderImage(FAppStyle::GetBrush("WhiteBrush"))
+					.BorderBackgroundColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.75f))
+				]
+				
+				+ SOverlay::Slot()
+				.HAlign(HAlign_Center)
+				.VAlign(VAlign_Center)
+				[
+					SNew(SBox)
+					.WidthOverride(1200)
+					.HeightOverride(900)
+					[
+						SNew(SBorder)
+						.BorderImage(FAppStyle::GetBrush("ToolPanel.DarkGroupBorder"))
+						.BorderBackgroundColor(FAppStyle::GetSlateColor("DefaultForeground"))
+						.Padding(0)
+						[
+							SNew(SOverlay)
+							
+							+ SOverlay::Slot()
+							[
+								SAssignNew(HelpWidget, SMounteaItemTemplatesEditorHelp)
+							]
+							
+							+ SOverlay::Slot()
+							.HAlign(HAlign_Right)
+							.VAlign(VAlign_Top)
+							.Padding(0)
+							[
+								SNew(SButton)
+								.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+								.ContentPadding(FMargin(2))
+								.RenderTransformPivot(FVector2f(1.f, 1.f))
+								.RenderTransform(FSlateRenderTransform(FVector2f(25.f, 0.f)))
+								.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCloseHelp)
+								[
+									SNew(SImage)
+									.Image(FAppStyle::GetBrush("MAISStyleSet.Close"))
+									.ColorAndOpacity(FSlateColor::UseForeground())
+									.DesiredSizeOverride(FVector2D(16, 16))
+								]
+							]
+						]
+					]
+				]
+			]
 		]
 	];
 	
@@ -437,26 +504,15 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 	return FReply::Unhandled();
 }
 
-// TODO: Blueprint Assist has great window for startup, let's take a look at that
 FReply SMounteaInventoryTemplateEditor::ShowHelpModal()
 {
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
-		FName("MounteaInventoryHelp"),
-		FOnSpawnTab::CreateLambda([](const FSpawnTabArgs& Args) -> TSharedRef<SDockTab>
-		{
-			return SNew(SDockTab)
-				.TabRole(ETabRole::DocumentTab)
-				.Label(LOCTEXT("HelpTitle", "Help"))
-				[
-					SNew(SMounteaItemTemplatesEditorHelp)
-				];
-		})
-	)
-	.SetDisplayName(LOCTEXT("HelpTitle", "Item Template Editor Help"))
-	.SetMenuType(ETabSpawnerMenuType::Hidden);
+	bIsHelpVisible = true;
+	return FReply::Handled();
+}
 
-	FGlobalTabmanager::Get()->TryInvokeTab(FName("MounteaInventoryHelp"));
-    
+FReply SMounteaInventoryTemplateEditor::OnCloseHelp()
+{
+	bIsHelpVisible = false;
 	return FReply::Handled();
 }
 
