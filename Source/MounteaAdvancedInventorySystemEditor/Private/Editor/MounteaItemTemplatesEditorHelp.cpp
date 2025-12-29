@@ -133,9 +133,37 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 	const FString filePath = GetHtmlPath(PageId);
 	
 	if (FFileHelper::LoadFileToString(htmlContent, *filePath))
-		WebBrowser->LoadString(htmlContent, TEXT("main"));
+	{
+		const FString htmlWithCss = InjectSharedCss(htmlContent);
+		WebBrowser->LoadString(htmlWithCss, TEXT("main"));
+	}
 	else
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);
+}
+
+FString SMounteaItemTemplatesEditorHelp::InjectSharedCss(const FString& HtmlContent)
+{
+	const UMounteaAdvancedInventorySettingsEditor* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>();
+	if (!editorSettings || editorSettings->SharedStylesheetPath.FilePath.IsEmpty())
+		return HtmlContent;
+	
+	FString cssContent;
+	const FString cssPath = FPaths::ConvertRelativePathToFull(editorSettings->SharedStylesheetPath.FilePath);
+	
+	if (!FFileHelper::LoadFileToString(cssContent, *cssPath))
+		return HtmlContent;
+	
+	const FString styleTag = FString::Printf(TEXT("<style>%s</style>"), *cssContent);
+	
+	FString result = HtmlContent;
+	const int32 headEndPos = result.Find(TEXT("</head>"), ESearchCase::IgnoreCase);
+	
+	if (headEndPos != INDEX_NONE)
+		result.InsertAt(headEndPos, styleTag);
+	else
+		result = styleTag + result;
+	
+	return result;
 }
 
 FString SMounteaItemTemplatesEditorHelp::GetHtmlPath(const int32 PageId)

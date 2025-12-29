@@ -29,6 +29,7 @@ UMounteaAdvancedInventorySettingsEditor::UMounteaAdvancedInventorySettingsEditor
 		return FPaths::ConvertRelativePathToFull(fullPath);
 	};
 
+	SharedStylesheetPath.FilePath = ResolvePluginPath(TEXT("Resources/Help/ItemTemplateEditor.css"));
 	
 	FItemTemplateEditorPageConfig firstPage(
 		NSLOCTEXT("MounteaAdvancedInventorySettingsEditor", "EditorTemplatePages_FirstPage", "Introduction"),

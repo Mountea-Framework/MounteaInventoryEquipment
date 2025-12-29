@@ -29,6 +29,7 @@ public:
 private:
 	TSharedRef<SWidget> CreateNavigationButton(const FText& Label, int32 PageId);
 	void SwitchToPage(int32 PageId);
+	static FString InjectSharedCss(const FString& HtmlContent);
 	static FString GetHtmlPath(int32 PageId);
 
 	TSharedPtr<SWebBrowser> WebBrowser;

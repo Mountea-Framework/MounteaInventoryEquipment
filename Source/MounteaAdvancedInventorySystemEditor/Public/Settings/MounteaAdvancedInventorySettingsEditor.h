@@ -32,7 +32,17 @@ public:
 	UPROPERTY(Config, EditAnywhere, Category="Config")
 	uint8 bDisplayEditorButtonText : 1;
 	
-	UPROPERTY(Config, EditAnywhere, Category="Editor Template")
+	// Shared styling for all documentation pages.
+	UPROPERTY(Config, EditAnywhere, Category = "Editor Templates",
+		AdvancedDisplay)
+	FFilePath SharedStylesheetPath;
+
+	/**
+	 * Defines the list of tutorial pages.
+	 * You can easily extend those if needed for your colleagues.
+	 */
+	UPROPERTY(Config, EditAnywhere, Category="Editor Templates",
+		AdvancedDisplay)
 	TMap<int32, FItemTemplateEditorPageConfig> EditorTemplatePages;
 
 public:
