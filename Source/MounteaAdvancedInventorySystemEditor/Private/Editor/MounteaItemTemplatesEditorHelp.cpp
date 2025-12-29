@@ -33,11 +33,12 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 			[
 				SNew(SBorder)
 				.BorderImage(FAppStyle::GetBrush("Brushes.Background"))
-				.Padding(10)
+				.Padding(25, 10)
 				[
 					SNew(SScrollBox)
 					+ SScrollBox::Slot()
 					[
+						// TODO: Create buttons based on UMounteaAdvancedInventorySettingsEditor->EditorTemplatePages
 						SNew(SVerticalBox)
 						+ SVerticalBox::Slot()
 						.AutoHeight()

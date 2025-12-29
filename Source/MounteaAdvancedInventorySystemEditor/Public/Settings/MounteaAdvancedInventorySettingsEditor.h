@@ -13,6 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
+#include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
 #include "MounteaAdvancedInventorySettingsEditor.generated.h"
 
 /**
@@ -30,6 +31,9 @@ public:
 	// If True, Icons will display Text next to icons.
 	UPROPERTY(Config, EditAnywhere, Category="Config")
 	uint8 bDisplayEditorButtonText : 1;
+	
+	UPROPERTY(Config, EditAnywhere, Category="Editor Template")
+	TMap<int32, FItemTemplateEditorPageConfig> EditorTemplatePages;
 
 public:
 

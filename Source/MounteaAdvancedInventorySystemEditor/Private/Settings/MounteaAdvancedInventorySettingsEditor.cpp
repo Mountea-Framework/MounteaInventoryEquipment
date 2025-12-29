@@ -12,8 +12,34 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 
+#include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
+#include "Interfaces/IPluginManager.h"
+
 UMounteaAdvancedInventorySettingsEditor::UMounteaAdvancedInventorySettingsEditor() : bDisplayEditorButtonText(false)
 {
 	CategoryName = TEXT("Mountea Framework");
 	SectionName = TEXT("Mountea Inventory System (Editor)");
+	
+	auto ResolvePluginPath = [](const FString& RelativePath) -> FString
+	{
+		const FString pluginDir =
+			IPluginManager::Get().FindPlugin(TEXT("MounteaAdvancedInventorySystem"))->GetBaseDir();
+
+		const FString fullPath = FPaths::Combine(pluginDir, RelativePath);
+		return FPaths::ConvertRelativePathToFull(fullPath);
+	};
+
+	
+	FItemTemplateEditorPageConfig firstPage(
+		NSLOCTEXT("MounteaAdvancedInventorySettingsEditor", "EditorTemplatePages_FirstPage", "Introduction"),
+		ResolvePluginPath(TEXT("Resources/Help/page_0.html"))
+	);
+	
+	FItemTemplateEditorPageConfig secondPage(
+		NSLOCTEXT("MounteaAdvancedInventorySettingsEditor", "EditorTemplatePages_SecondPage", "Create New Template"),
+		ResolvePluginPath(TEXT("Resources/Help/page_1.html"))
+	);
+
+	EditorTemplatePages.Add(0, firstPage);
+	EditorTemplatePages.Add(1, secondPage);
 }
