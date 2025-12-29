@@ -436,6 +436,11 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 	return FReply::Unhandled();
 }
 
+FReply SMounteaInventoryTemplateEditor::ShowHelpModal()
+{
+	return FReply::Handled();
+}
+
 FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 {
 	FString selectedPath = ShowSaveAssetDialog();
@@ -1027,6 +1032,63 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				[
 					SNew(STextBlock)
 					.Text(LOCTEXT("CloseTemplate", "Close Template"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
+		]
+
+		// Vertical separator
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(8.0f, 4.0f)
+		[
+			SNew(SSeparator)
+			.SeparatorImage(FAppStyle::Get().GetBrush("Separator"))
+			.Thickness(1.0f)
+			.Orientation(Orient_Vertical)
+		]
+
+		// Help
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(2.0f)
+		[
+			SNew(SButton)
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("HelpTooltip", "Show a quick help window explaining how to work with the Item Template Editor."))
+			.OnClicked(this, &SMounteaInventoryTemplateEditor::ShowHelpModal)
+			.IsEnabled_Lambda([this]() 
+			{ 
+				return true;
+			})
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("MAISStyleSet.Help"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("Help", "Show Help"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{

@@ -69,6 +69,7 @@ private:
 	FReply CloseTemplate();
 	FReply SaveNewTemplate();
 	FReply SaveExistingTemplate();
+	FReply ShowHelpModal();
 	FReply DeleteTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template);
 	FReply DuplicateTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template);
 
