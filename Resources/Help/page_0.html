@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Introduction to Item Template Editor</title>
+	</head>
+	<body>
+		<div class="doc-page">
+			<header>
+				<div class="version">Version · 1.0</div>
+				<h1>Item Template Editor</h1>
+				<p>
+					This page gives a quick tour of the Item Template Editor so you know
+					what each main area is for and how to move around it.
+				</p>
+			</header>
+
+			<section>
+				<h2>What the editor is for</h2>
+				<p>
+					The Item Template Editor is where you create and manage item templates
+					for the Mountea Inventory System. The goal is to provide a centralized
+					interface to improve quality of life.
+				</p>
+			</section>
+
+			<section>
+				<h2>Layout overview</h2>
+				<p>The window is divided into three main parts:</p>
+				<ul>
+					<li>
+						<strong>Top toolbar (top)</strong> contains following actions:
+						<ul>
+							<li><strong>New Template</strong></li>
+							<li><strong>Save Template</strong></li>
+							<li><strong>Save All Templates</strong></li>
+							<li><strong>Import Template</strong></li>
+							<li><strong>Export Item</strong></li>
+							<li><strong>Show Help</strong></li>
+						</ul>
+					</li>
+					<li>
+						<strong>Template list (left)</strong>
+						<ul>
+							<li>
+								Shows all available item templates from the whole Project,
+								including all Project folders and plugins.
+							</li>
+							<li>Each entry also displays its asset path under the name</li>
+						</ul>
+					</li>
+					<li>
+						<strong>Template details (right)</strong>
+						<ul>
+							<li>
+								Shows all properties for the currently selected template,
+								grouped in sections.
+							</li>
+							<li>
+								Shows all properties of all currently selected templates to
+								allow bulk editing similar to Matrix Editor.
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Working with templates</h2>
+				<p>
+					When you open the Editor, the Template details show transient data you
+					can directly start editing to create new record. You can also select
+					from existing template from the Template list to load its data.
+				</p>
+				<ul>
+					<li>
+						Select a template in the list on the left to load its details on the
+						right.
+					</li>
+					<li>
+						Use the search box in the upper-right corner of the list panel to
+						find templates by specified filters.
+					</li>
+					<li>
+						Use the Item Template buttons to open containing folder, duplicate
+						the selected template, or even delete it.
+					</li>
+					<li>
+						In the details panel, expand or collapse sections to focus on the
+						data you need, such as basic information, visuals, or gameplay
+						properties.
+					</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Saving and exporting</h2>
+				<ul>
+					<li>
+						After editing a template, click <strong>Save Template</strong> to
+						save just the active item, or <strong>Save All Templates</strong> to
+						save all modified entries.
+					</li>
+					<li>
+						You can use <strong>Ctrl+S</strong> or <strong>Cmd+S</strong> to
+						save records, too!
+					</li>
+					<li>
+						Use <strong>Export Item</strong> to create a file that can be shared
+						or imported into another project using
+						<strong>Import Template</strong>.
+					</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Next steps</h2>
+				<p>
+					Once you are comfortable with navigating the editor, you can start
+					creating new item templates, assigning icons and meshes, and filling
+					in gameplay data.
+					Next page will demonstrate how to create your first item template.
+				</p>
+			</section>
+
+			<footer>
+				<span class="tag">inventory</span>
+				<span class="tag">templates</span>
+				<span class="tag">editor guide</span>
+				·
+				<a href="#top">Back to top</a>
+			</footer>
+		</div>
+
+		<script>
+			(function () {
+				var toggles = document.querySelectorAll("[data-toggle]");
+				toggles.forEach(function (toggle) {
+					toggle.addEventListener("click", function () {
+						var endpoint = toggle.closest("[data-endpoint]");
+						var body = endpoint.querySelector(".endpoint-body");
+						var isOpen = body.classList.contains("open");
+						body.classList.toggle("open", !isOpen);
+						toggle.textContent = isOpen ? "Show details" : "Hide details";
+					});
+				});
+			})();
+		</script>
+	</body>
+</html>
