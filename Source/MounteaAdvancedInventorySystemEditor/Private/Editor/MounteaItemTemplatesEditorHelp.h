@@ -11,6 +11,8 @@
 
 #pragma once
 
+class SWebBrowser;
+
 #include "CoreMinimal.h"
 
 /**
@@ -29,6 +31,6 @@ private:
 	void SwitchToPage(int32 PageId);
 	static FString GetHtmlPath(int32 PageId);
 
-	TSharedPtr<class SWebBrowser> WebBrowser;
+	TSharedPtr<SWebBrowser> WebBrowser;
 	int32 CurrentPageId = 0;
 };

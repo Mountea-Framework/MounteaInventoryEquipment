@@ -59,7 +59,6 @@
 
 SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 {
-	// Clean up transient template on destruction
 	CleanupTransientTemplate();
 	
 	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())

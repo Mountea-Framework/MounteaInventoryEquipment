@@ -12,13 +12,37 @@
 
 #include "MounteaItemTemplatesEditorHelp.h"
 
+#include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
 #include "Interfaces/IPluginManager.h"
 #include "Runtime/WebBrowser/Public/SWebBrowser.h"
+#include "Settings/MounteaAdvancedInventorySettingsEditor.h"
+#include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySystemEditorHelp"
 
 void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 {
+	TSharedRef<SVerticalBox> navigationBox = SNew(SVerticalBox);
+
+	if (const UMounteaAdvancedInventorySettingsEditor* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>())
+	{
+		TArray<int32> pageIds;
+		editorSettings->EditorTemplatePages.GetKeys(pageIds);
+		pageIds.Sort();
+		
+		for (const int32 pageId : pageIds)
+		{
+			if (const FItemTemplateEditorPageConfig* pageConfig = editorSettings->EditorTemplatePages.Find(pageId))
+			{
+				navigationBox->AddSlot()
+				.AutoHeight()
+				[
+					CreateNavigationButton(pageConfig->PageTitle, pageId)
+				];
+			}
+		}
+	}
+	
 	ChildSlot
 	[
 		SNew(SBorder)
@@ -33,23 +57,12 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 			[
 				SNew(SBorder)
 				.BorderImage(FAppStyle::GetBrush("Brushes.Background"))
-				.Padding(25, 10)
+				.Padding(25)
 				[
 					SNew(SScrollBox)
 					+ SScrollBox::Slot()
 					[
-						// TODO: Create buttons based on UMounteaAdvancedInventorySettingsEditor->EditorTemplatePages
-						SNew(SVerticalBox)
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						[
-							CreateNavigationButton(LOCTEXT("Overview", "Overview"), 0)
-						]
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						[
-							CreateNavigationButton(LOCTEXT("Filters", "Filters"), 1)
-						]
+						navigationBox
 					]
 				]
 			]
@@ -71,13 +84,42 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 
 TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(const FText& Label, int32 PageId)
 {
-	return SNew(SButton)
-		.Text(Label)
+	TSharedPtr<SBorder> borderWidget;
+	
+	TSharedRef<SButton> button = SNew(SButton)
+		.ButtonStyle(FAppStyle::Get(), "NoBorder")
 		.OnClicked_Lambda([this, PageId]()
 		{
 			SwitchToPage(PageId);
 			return FReply::Handled();
-		});
+		})
+		.ContentPadding(4)
+		[
+			SAssignNew(borderWidget, SBorder)
+			.Padding(FMargin(10, 8))
+			[
+				SNew(STextBlock)
+				.Text(Label)
+				.Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+			]
+		];
+	
+	borderWidget->SetBorderImage(TAttribute<const FSlateBrush*>::CreateLambda([this, PageId, WeakButton = TWeakPtr<SButton>(button)]() -> const FSlateBrush*
+	{
+		const bool bSelected = (CurrentPageId == PageId);
+		const bool bHovered = WeakButton.IsValid() && WeakButton.Pin()->IsHovered();
+		
+		if (bSelected && bHovered)
+			return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.SelectedHovered");
+		if (bSelected)
+			return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Selected");
+		if (bHovered)
+			return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Hovered");
+		
+		return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Normal");
+	}));
+	
+	return button;
 }
 
 void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
@@ -96,11 +138,13 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);
 }
 
-FString SMounteaItemTemplatesEditorHelp::GetHtmlPath(const int32 pageId)
+FString SMounteaItemTemplatesEditorHelp::GetHtmlPath(const int32 PageId)
 {
-	const FString pluginDir = IPluginManager::Get().FindPlugin("MounteaAdvancedInventorySystem")->GetBaseDir();
-	const FString relativePath = FPaths::Combine(pluginDir, TEXT("Resources"), TEXT("Help"), FString::Printf(TEXT("page_%d.html"), pageId));
-	return FPaths::ConvertRelativePathToFull(relativePath);
+	if (const UMounteaAdvancedInventorySettingsEditor* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>())
+		if (const FItemTemplateEditorPageConfig* pageConfig = editorSettings->EditorTemplatePages.Find(PageId))
+			return FPaths::ConvertRelativePathToFull(pageConfig->PageFile.FilePath);
+	
+	return FString();
 }
 
 #undef LOCTEXT_NAMESPACE
