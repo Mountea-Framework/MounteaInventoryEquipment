@@ -100,7 +100,10 @@ TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(cons
 			[
 				SNew(STextBlock)
 				.Text(Label)
-				.Font(FCoreStyle::GetDefaultFontStyle("Regular", 12))
+				.Font_Lambda([this, PageId]()
+				{
+					return CurrentPageId == PageId ? FCoreStyle::GetDefaultFontStyle("Bold", 12) : FCoreStyle::GetDefaultFontStyle("Regular", 10);
+				})
 			]
 		];
 	
@@ -135,7 +138,10 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 	if (FFileHelper::LoadFileToString(htmlContent, *filePath))
 	{
 		const FString htmlWithCss = InjectSharedCss(htmlContent);
-		WebBrowser->LoadString(htmlWithCss, TEXT("main"));
+		const FString baseUrl = FString::Printf(
+			TEXT("file:///%s/"), 
+			*FPaths::GetPath(filePath).Replace(TEXT("\\"), TEXT("/")));
+		WebBrowser->LoadString(htmlWithCss, *baseUrl);
 	}
 	else
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);
