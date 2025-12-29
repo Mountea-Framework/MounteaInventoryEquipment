@@ -46,6 +46,7 @@
 
 #include "AssetToolsModule.h"
 #include "DesktopPlatformModule.h"
+#include "MounteaItemTemplatesEditorHelp.h"
 #include "Algo/ForEach.h"
 #include "Search/MounteaInventoryTemplateSearchFilter.h"
 #include "Settings/EditorStyleSettings.h"
@@ -439,26 +440,22 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 // TODO: Blueprint Assist has great window for startup, let's take a look at that
 FReply SMounteaInventoryTemplateEditor::ShowHelpModal()
 {
-	TSharedRef<SWindow> helpWindow = SNew(SWindow)
-		.Title(LOCTEXT("HelpModalTitle", "Template Editor Help"))
-		.SizingRule(ESizingRule::UserSized)
-		.ClientSize(FVector2D(800, 600))
-		.SupportsMaximize(false)
-		.SupportsMinimize(false)
-		[
-			SNew(SVerticalBox)
-            
-			+ SVerticalBox::Slot()
-			.FillHeight(1.0f)
-			.Padding(10)
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("HelpContent", "CONTENT HERE..."))
-				.AutoWrapText(true)
-			]
-		];
-    
-	GEditor->EditorAddModalWindow(helpWindow);
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
+		FName("MounteaInventoryHelp"),
+		FOnSpawnTab::CreateLambda([](const FSpawnTabArgs& Args) -> TSharedRef<SDockTab>
+		{
+			return SNew(SDockTab)
+				.TabRole(ETabRole::DocumentTab)
+				.Label(LOCTEXT("HelpTitle", "Help"))
+				[
+					SNew(SMounteaItemTemplatesEditorHelp)
+				];
+		})
+	)
+	.SetDisplayName(LOCTEXT("HelpTitle", "Item Template Editor Help"))
+	.SetMenuType(ETabSpawnerMenuType::Hidden);
+
+	FGlobalTabmanager::Get()->TryInvokeTab(FName("MounteaInventoryHelp"));
     
 	return FReply::Handled();
 }
