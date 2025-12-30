@@ -12,25 +12,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MounteaAdvancedInventoryEditorTypes.generated.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "MounteaAdvancedInventorySystemEditorStatics.generated.h"
 
-USTRUCT(Blueprintable)
-struct FItemTemplateEditorPageConfig
+/**
+ * 
+ */
+UCLASS()
+class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API
+	UMounteaAdvancedInventorySystemEditorStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FText PageTitle;
+public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta = (FilePathFilter = "html"))
-	FFilePath PageFile;
+	static void OpenSettings(const FString& ContainerName, const FString& CategoryName, const FString& SectionName);
+	static void OpenAsset(const FString& AssetPath);
 	
-	FItemTemplateEditorPageConfig()
-	{};
-	FItemTemplateEditorPageConfig(const FText& InPageTitle, const FString& InPageFile)
-	{
-		PageTitle = InPageTitle;
-		PageFile = FFilePath(InPageFile);
-	}
+	static void OpenInventoryConfig();
+	static void OpenEquipmentConfig();
+	
+	static void OpenInventoryUIConfig();
 };

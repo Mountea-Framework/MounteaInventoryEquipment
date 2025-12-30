@@ -12,10 +12,12 @@
 
 #include "MounteaItemTemplatesEditorHelp.h"
 
+#include "ContentBrowserModule.h"
+#include "IContentBrowserSingleton.h"
 #include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
-#include "Interfaces/IPluginManager.h"
 #include "Runtime/WebBrowser/Public/SWebBrowser.h"
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
+#include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySystemEditorHelp"
@@ -75,11 +77,19 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 				.ShowAddressBar(false)
 				.ShowInitialThrobber(true)
 				.SupportsTransparency(true)
+				.OnConsoleMessage_Raw(this, &SMounteaItemTemplatesEditorHelp::HandleConsoleMessage)
+				.InitialURL(TEXT("about:blank"))
 			]
 		]		
 	];
 	
-	SwitchToPage(0);
+	RegisterActiveTimer(1.f, FWidgetActiveTimerDelegate::CreateLambda(
+	[this](double, float) -> EActiveTimerReturnType
+		{
+			SwitchToPage(0);
+			return EActiveTimerReturnType::Stop;
+		}
+	));
 }
 
 TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(const FText& Label, int32 PageId)
@@ -126,9 +136,11 @@ TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(cons
 }
 
 void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
-{
+{	
 	if (!WebBrowser.IsValid())
 		return;
+	
+	WebBrowser->Reload();
 	
 	CurrentPageId = PageId;
 	
@@ -137,37 +149,95 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 	
 	if (FFileHelper::LoadFileToString(htmlContent, *filePath))
 	{
-		const FString htmlWithCss = InjectSharedCss(htmlContent);
-		const FString baseUrl = FString::Printf(
-			TEXT("file:///%s/"), 
-			*FPaths::GetPath(filePath).Replace(TEXT("\\"), TEXT("/")));
+		const FString htmlWithCss = InjectSharedAssets(htmlContent);
+		
+		const FString baseUrl = FString::Printf(TEXT("file:///%s/"), *FPaths::GetPath(filePath).Replace(TEXT("\\"), TEXT("/")));
+		
 		WebBrowser->LoadString(htmlWithCss, *baseUrl);
+		
+		RegisterActiveTimer(0.1f, FWidgetActiveTimerDelegate::CreateLambda(
+	[this](double, float) -> EActiveTimerReturnType
+			{
+				if (WebBrowser.IsValid())
+				{
+					WebBrowser->ExecuteJavascript(TEXT(
+						"(function() {"
+						"  var start = window.pageYOffset || document.documentElement.scrollTop;"
+						"  var startTime = null;"
+						"  var duration = 200;"
+						"  function animation(currentTime) {"
+						"    if (startTime === null) startTime = currentTime;"
+						"    var timeElapsed = currentTime - startTime;"
+						"    var progress = Math.min(timeElapsed / duration, 1);"
+						"    var ease = 1 - Math.pow(1 - progress, 3);"
+						"    window.scrollTo(0, start * (1 - ease));"
+						"    if (timeElapsed < duration) {"
+						"      requestAnimationFrame(animation);"
+						"    }"
+						"  }"
+						"  requestAnimationFrame(animation);"
+						"})();"
+					));
+				}
+				return EActiveTimerReturnType::Stop;
+			}
+		));	
 	}
 	else
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);
 }
 
-FString SMounteaItemTemplatesEditorHelp::InjectSharedCss(const FString& HtmlContent)
+FString SMounteaItemTemplatesEditorHelp::InjectSharedAssets(const FString& HtmlContent)
 {
 	const UMounteaAdvancedInventorySettingsEditor* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>();
-	if (!editorSettings || editorSettings->SharedStylesheetPath.FilePath.IsEmpty())
+	if (!editorSettings)
 		return HtmlContent;
-	
-	FString cssContent;
-	const FString cssPath = FPaths::ConvertRelativePathToFull(editorSettings->SharedStylesheetPath.FilePath);
-	
-	if (!FFileHelper::LoadFileToString(cssContent, *cssPath))
-		return HtmlContent;
-	
-	const FString styleTag = FString::Printf(TEXT("<style>%s</style>"), *cssContent);
 	
 	FString result = HtmlContent;
-	const int32 headEndPos = result.Find(TEXT("</head>"), ESearchCase::IgnoreCase);
 	
-	if (headEndPos != INDEX_NONE)
-		result.InsertAt(headEndPos, styleTag);
-	else
-		result = styleTag + result;
+	// Inject CSS
+	if (!editorSettings->SharedStylesheetPath.FilePath.IsEmpty())
+	{
+		FString cssContent;
+		const FString cssPath = FPaths::ConvertRelativePathToFull(editorSettings->SharedStylesheetPath.FilePath);
+		
+		if (FFileHelper::LoadFileToString(cssContent, *cssPath))
+		{
+			const FString styleTag = FString::Printf(TEXT("<style>%s</style>"), *cssContent);
+			
+			if (!result.Contains(styleTag))
+			{
+				const int32 headEndPos = result.Find(TEXT("</head>"), ESearchCase::IgnoreCase);
+				
+				if (headEndPos != INDEX_NONE)
+					result.InsertAt(headEndPos, styleTag);
+				else
+					result = styleTag + result;
+			}
+		}
+	}
+	
+	// Inject Script
+	if (!editorSettings->SharedScriptPath.FilePath.IsEmpty())
+	{
+		FString scriptContent;
+		const FString scriptPath = FPaths::ConvertRelativePathToFull(editorSettings->SharedScriptPath.FilePath);
+		
+		if (FFileHelper::LoadFileToString(scriptContent, *scriptPath))
+		{
+			const FString scriptTag = FString::Printf(TEXT("<script>%s</script>"), *scriptContent);
+			
+			if (!result.Contains(scriptTag))
+			{
+				const int32 bodyEndPos = result.Find(TEXT("</body>"), ESearchCase::IgnoreCase);
+				
+				if (bodyEndPos != INDEX_NONE)
+					result.InsertAt(bodyEndPos, scriptTag);
+				else
+					result += scriptTag;
+			}
+		}
+	}
 	
 	return result;
 }
@@ -179,6 +249,47 @@ FString SMounteaItemTemplatesEditorHelp::GetHtmlPath(const int32 PageId)
 			return FPaths::ConvertRelativePathToFull(pageConfig->PageFile.FilePath);
 	
 	return FString();
+}
+
+void SMounteaItemTemplatesEditorHelp::HandleConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity)
+{
+	if (Message.StartsWith(TEXT("MIAE_LINK:")))
+	{
+		const FString data = Message.RightChop(10);
+		
+		FString dataType, url;
+		if (data.Split(TEXT(":"), &dataType, &url))
+		{
+			if (dataType.Equals(TEXT("content")))
+			{
+				FContentBrowserModule& contentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+				contentBrowserModule.Get().SyncBrowserToAssets(TArray<FAssetData>());
+			}
+			else if (dataType.Equals(TEXT("page")))
+			{
+				const int32 pageId = FCString::Atoi(*url);
+				SwitchToPage(pageId);
+			}
+			else if (dataType.Equals(TEXT("external")))
+			{
+				FPlatformProcess::LaunchURL(*url, nullptr, nullptr);
+			}
+			else if (dataType.Equals(TEXT("settings")))
+			{
+				UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
+					"Project", TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
+			}
+			else if (dataType.Equals(TEXT("editor-settings")))
+			{
+				UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
+					"Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
+			}
+			else if (dataType.Equals(TEXT("inventory-configuration")))
+			{
+				UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig();
+			}
+		}
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

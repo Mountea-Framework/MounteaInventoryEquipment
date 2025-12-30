@@ -37,6 +37,7 @@
 							<li><strong>Import Template</strong></li>
 							<li><strong>Export Item</strong></li>
 							<li><strong>Show Help</strong></li>
+							<li><strong>Search</strong></li>
 						</ul>
 					</li>
 					<li>
@@ -94,32 +95,12 @@
 			</section>
 
 			<section>
-				<h2>Saving and exporting</h2>
-				<ul>
-					<li>
-						After editing a template, click <strong>Save Template</strong> to
-						save just the active item, or <strong>Save All Templates</strong> to
-						save all modified entries.
-					</li>
-					<li>
-						You can use <strong class="tag">Ctrl+S</strong> or <strong class="tag">Cmd+S</strong> to
-						save records, too!
-					</li>
-					<li>
-						Use <strong>Export Item</strong> to create a file that can be shared
-						or imported into another project using
-						<strong>Import Template</strong>.
-					</li>
-				</ul>
-			</section>
-
-			<section>
 				<h2>Next steps</h2>
 				<p>
 					Once you are comfortable with navigating the editor, you can start
 					creating new item templates, assigning icons and meshes, and filling
-					in gameplay data.
-					Next page will demonstrate how to create your first item template.
+					in gameplay data. Next page will demonstrate how to create your first
+					item template.
 				</p>
 			</section>
 
@@ -131,20 +112,5 @@
 				<a href="#top">Back to top</a>
 			</footer>
 		</div>
-
-		<script>
-			(function () {
-				var toggles = document.querySelectorAll("[data-toggle]");
-				toggles.forEach(function (toggle) {
-					toggle.addEventListener("click", function () {
-						var endpoint = toggle.closest("[data-endpoint]");
-						var body = endpoint.querySelector(".endpoint-body");
-						var isOpen = body.classList.contains("open");
-						body.classList.toggle("open", !isOpen);
-						toggle.textContent = isOpen ? "Show details" : "Hide details";
-					});
-				});
-			})();
-		</script>
 	</body>
 </html>

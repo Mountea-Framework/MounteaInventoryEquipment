@@ -34,8 +34,13 @@ public:
 	
 	// Shared styling for all documentation pages.
 	UPROPERTY(Config, EditAnywhere, Category = "Editor Templates",
-		AdvancedDisplay)
+		AdvancedDisplay, meta = (FilePathFilter = "css"))
 	FFilePath SharedStylesheetPath;
+	
+	// Shared script for all documentation pages.
+	UPROPERTY(Config, EditAnywhere, Category = "Editor Templates",
+		AdvancedDisplay, meta = (FilePathFilter = "js"))
+	FFilePath SharedScriptPath;
 
 	/**
 	 * Defines the list of tutorial pages.
