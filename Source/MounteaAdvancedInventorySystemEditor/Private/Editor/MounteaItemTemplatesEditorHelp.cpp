@@ -82,14 +82,18 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 			]
 		]		
 	];
-	
-	RegisterActiveTimer(1.f, FWidgetActiveTimerDelegate::CreateLambda(
-	[this](double, float) -> EActiveTimerReturnType
-		{
-			SwitchToPage(0);
-			return EActiveTimerReturnType::Stop;
-		}
-	));
+}
+
+void SMounteaItemTemplatesEditorHelp::Reset()
+{
+	CurrentPageId = 0;
+	WebBrowser->LoadString(TEXT(""), TEXT("about:blank"));
+}
+
+void SMounteaItemTemplatesEditorHelp::Start()
+{
+	CurrentPageId = 0;
+	SwitchToPage(CurrentPageId);
 }
 
 TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(const FText& Label, int32 PageId)
@@ -139,8 +143,6 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 {	
 	if (!WebBrowser.IsValid())
 		return;
-	
-	WebBrowser->Reload();
 	
 	CurrentPageId = PageId;
 	

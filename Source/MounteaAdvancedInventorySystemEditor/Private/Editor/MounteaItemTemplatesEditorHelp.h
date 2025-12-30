@@ -26,6 +26,9 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);
+	
+	void Reset();
+	void Start();
 
 private:
 	TSharedRef<SWidget> CreateNavigationButton(const FText& Label, int32 PageId);

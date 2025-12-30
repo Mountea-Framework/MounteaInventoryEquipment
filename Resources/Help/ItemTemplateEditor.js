@@ -22,4 +22,8 @@
 			toggle.textContent = isOpen ? "Show details" : "Hide details";
 		});
 	});
+
+	document.addEventListener("contextmenu", function (event) {
+		event.preventDefault();
+	});
 })();
