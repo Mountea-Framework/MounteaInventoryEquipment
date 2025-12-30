@@ -15,7 +15,6 @@
 #include "ContentBrowserModule.h"
 #include "FileHelpers.h"
 #include "IContentBrowserSingleton.h"
-#include "ISettingsModule.h"
 #include "AssetActions/FMounteaAdvancedInventoryUIConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
@@ -32,15 +31,12 @@
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
-#include "Settings/MounteaAdvancedInventorySettings.h"
-#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 #include "Framework/Docking/TabManager.h"
 #include "Framework/Notifications/NotificationManager.h"
-#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
-#include "Settings/MounteaAdvancedInventoryUIConfig.h"
+#include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
 #include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
@@ -437,51 +433,29 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 
 void FMounteaAdvancedInventorySystemEditor::SettingsButtonClicked() const
 {
-	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
+	UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
+		"Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
 }
 
 void FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked() const
 {
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
-	if (!IsValid(config))
-	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
-		return;
-	}
-
-	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+	UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig();
 }
 
 void FMounteaAdvancedInventorySystemEditor::UIConfigButtonClicked() const
 {
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->InventoryUISettingsConfig.LoadSynchronous() : nullptr;
-	if (!IsValid(config))
-	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
-		return;
-	}
-
-	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+	UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryUIConfig();
 }
 
 void FMounteaAdvancedInventorySystemEditor::EquipmentConfigButtonClicked() const
 {
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->EquipmentSettingsConfig.LoadSynchronous() : nullptr;
-	if (!IsValid(config))
-	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Equipment Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
-		return;
-	}
-
-	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(config->GetPathName());
+	UMounteaAdvancedInventorySystemEditorStatics::OpenEquipmentConfig();
 }
 
 void FMounteaAdvancedInventorySystemEditor::EditorSettingsButtonClicked() const
 {
-	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
+	UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
+		"Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
 }
 
 TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget()
