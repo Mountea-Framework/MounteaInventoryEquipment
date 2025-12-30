@@ -14,11 +14,10 @@
 
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
-#include "ISettingsModule.h"
 #include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
-#include "Interfaces/IPluginManager.h"
 #include "Runtime/WebBrowser/Public/SWebBrowser.h"
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
+#include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySystemEditorHelp"
@@ -137,14 +136,9 @@ TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(cons
 }
 
 void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
-{
-	UE_LOG(LogTemp, Warning, TEXT("SwitchToPage called: %d"), PageId);
-	
+{	
 	if (!WebBrowser.IsValid())
-	{
-		UE_LOG(LogTemp, Error, TEXT("WebBrowser is INVALID!"));
 		return;
-	}
 	
 	WebBrowser->Reload();
 	
@@ -152,18 +146,42 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 	
 	FString htmlContent;
 	const FString filePath = GetHtmlPath(PageId);
-	UE_LOG(LogTemp, Warning, TEXT("HTML Path: %s"), *filePath);
 	
 	if (FFileHelper::LoadFileToString(htmlContent, *filePath))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HTML loaded: %d chars"), htmlContent.Len());
 		const FString htmlWithCss = InjectSharedAssets(htmlContent);
-		UE_LOG(LogTemp, Warning, TEXT("After injection: %d chars"), htmlWithCss.Len());
 		
 		const FString baseUrl = FString::Printf(TEXT("file:///%s/"), *FPaths::GetPath(filePath).Replace(TEXT("\\"), TEXT("/")));
-		UE_LOG(LogTemp, Warning, TEXT("Base URL: %s"), *baseUrl);
 		
 		WebBrowser->LoadString(htmlWithCss, *baseUrl);
+		
+		RegisterActiveTimer(0.1f, FWidgetActiveTimerDelegate::CreateLambda(
+	[this](double, float) -> EActiveTimerReturnType
+			{
+				if (WebBrowser.IsValid())
+				{
+					WebBrowser->ExecuteJavascript(TEXT(
+						"(function() {"
+						"  var start = window.pageYOffset || document.documentElement.scrollTop;"
+						"  var startTime = null;"
+						"  var duration = 200;"
+						"  function animation(currentTime) {"
+						"    if (startTime === null) startTime = currentTime;"
+						"    var timeElapsed = currentTime - startTime;"
+						"    var progress = Math.min(timeElapsed / duration, 1);"
+						"    var ease = 1 - Math.pow(1 - progress, 3);"
+						"    window.scrollTo(0, start * (1 - ease));"
+						"    if (timeElapsed < duration) {"
+						"      requestAnimationFrame(animation);"
+						"    }"
+						"  }"
+						"  requestAnimationFrame(animation);"
+						"})();"
+					));
+				}
+				return EActiveTimerReturnType::Stop;
+			}
+		));	
 	}
 	else
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);
@@ -258,17 +276,20 @@ void SMounteaItemTemplatesEditorHelp::HandleConsoleMessage(const FString& Messag
 			}
 			else if (dataType.Equals(TEXT("settings")))
 			{
-				FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer(
+				UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
 					"Project", TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
 			}
 			else if (dataType.Equals(TEXT("editor-settings")))
 			{
-				FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer(
+				UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
 					"Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
+			}
+			else if (dataType.Equals(TEXT("inventory-configuration")))
+			{
+				UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig();
 			}
 		}
 	}
 }
-
 
 #undef LOCTEXT_NAMESPACE
