@@ -9,8 +9,19 @@
         const url = link.getAttribute('href') || '';
         const dataType = link.getAttribute('data-type') || '';
         
-        if (window.ueHandler && window.ueHandler.HandleLinkClick) {
-            window.ueHandler.HandleLinkClick(url, dataType);
-        }
+        console.log('MIAE_LINK:' + dataType + ':' + url);
     });
+})();
+
+(function () {
+	var toggles = document.querySelectorAll("[data-toggle]");
+	toggles.forEach(function (toggle) {
+		toggle.addEventListener("click", function () {
+			var endpoint = toggle.closest("[data-endpoint]");
+			var body = endpoint.querySelector(".endpoint-body");
+			var isOpen = body.classList.contains("open");
+			body.classList.toggle("open", !isOpen);
+			toggle.textContent = isOpen ? "Show details" : "Hide details";
+		});
+	});
 })();
