@@ -11,6 +11,7 @@
 
 #pragma once
 
+class SMounteaInventoryWebBrowserWrapper;
 enum class EWebBrowserConsoleLogSeverity;
 class SWebBrowser;
 
@@ -38,6 +39,8 @@ private:
 	void HandleConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
 
 
-	TSharedPtr<SWebBrowser> WebBrowser;
+	TSharedPtr<SMounteaInventoryWebBrowserWrapper> WebBrowser;
+	TSharedPtr<SWidget> InputBlockerOverlay;
+	bool bBlockInput = false;
 	int32 CurrentPageId = 0;
 };

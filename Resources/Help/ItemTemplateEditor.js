@@ -1,4 +1,38 @@
 (function () {
+	history.pushState(null, null, location.href);
+
+	window.addEventListener("popstate", function (event) {
+		history.pushState(null, null, location.href);
+	});
+
+	document.addEventListener("contextmenu", function (event) {
+		event.preventDefault();
+	});
+
+	document.addEventListener(
+		"keydown",
+		function (event) {
+			if (
+				event.altKey &&
+				(event.key === "ArrowLeft" || event.key === "ArrowRight")
+			) {
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
+			}
+
+			if (
+				event.key === "Backspace" &&
+				!["INPUT", "TEXTAREA"].includes(event.target.tagName)
+			) {
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
+			}
+		},
+		true
+	);
+
 	document.addEventListener("click", function (event) {
 		const link = event.target.closest("a[data-type]");
 
@@ -10,11 +44,7 @@
 		const dataType = link.getAttribute("data-type") || "";
 
 		console.log("MIAE_LINK:" + dataType + ":" + url);
-	});
-
-	document.addEventListener("contextmenu", function (event) {
-		event.preventDefault();
-	});
+	});	
 
 	var toggles = document.querySelectorAll("[data-toggle]");
 	toggles.forEach(function (toggle) {
@@ -26,25 +56,4 @@
 			toggle.textContent = isOpen ? "Show details" : "Hide details";
 		});
 	});
-
-	document.addEventListener('keydown', function(event) {
-		if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
-			event.preventDefault();
-			event.stopPropagation();
-			return false;
-		}
-		
-		if (event.key === 'Backspace' && 
-			!['INPUT', 'TEXTAREA'].includes(event.target.tagName)) {
-			event.preventDefault();
-			event.stopPropagation();
-			return false;
-		}
-	}, true);
-
-	history.pushState(null, null, location.href);
-	
-	window.addEventListener('popstate', function(event) {
-		history.pushState(null, null, location.href);
-	});	
 })();
