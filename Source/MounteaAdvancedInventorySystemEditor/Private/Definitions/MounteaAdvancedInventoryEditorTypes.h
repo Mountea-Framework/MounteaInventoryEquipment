@@ -22,7 +22,8 @@ struct FItemTemplateEditorPageConfig
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText PageTitle;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta = (FilePathFilter = "html"))
 	FFilePath PageFile;
 	
 	FItemTemplateEditorPageConfig()
