@@ -16,6 +16,7 @@
 #include "IContentBrowserSingleton.h"
 #include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
 #include "Runtime/WebBrowser/Public/SWebBrowser.h"
+#include "Slate/MounteaInventoryWebBrowserWrapper.h"
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 #include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
@@ -72,24 +73,74 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 			+ SHorizontalBox::Slot()
 			.FillWidth(0.75f)
 			[
-				SAssignNew(WebBrowser, SWebBrowser)
-				.ShowControls(false)
-				.ShowAddressBar(false)
-				.ShowInitialThrobber(true)
-				.SupportsTransparency(true)
-				.OnConsoleMessage_Raw(this, &SMounteaItemTemplatesEditorHelp::HandleConsoleMessage)
-				.InitialURL(TEXT("about:blank"))
+				SNew(SOverlay)
+	
+				+ SOverlay::Slot()
+				[
+					SAssignNew(WebBrowser, SMounteaInventoryWebBrowserWrapper)
+					.OnConsoleMessage_Raw(this, &SMounteaItemTemplatesEditorHelp::HandleConsoleMessage)
+					.InitialURL(TEXT("about:blank"))
+					.OnLoadStarted_Lambda([this]()
+	                {
+                		bBlockInput = true;
+	                })
+					.OnLoadCompleted_Lambda([this]()
+					{
+						if (!WebBrowser.IsValid())
+							return;
+						
+						WebBrowser->ExecuteJavascript(TEXT(
+							"(function() {"
+							"  var start = window.pageYOffset || document.documentElement.scrollTop;"
+							"  var startTime = null;"
+							"  var duration = 100;"
+							"  function animation(currentTime) {"
+							"    if (startTime === null) startTime = currentTime;"
+							"    var timeElapsed = currentTime - startTime;"
+							"    var progress = Math.min(timeElapsed / duration, 1);"
+							"    var ease = 1 - Math.pow(1 - progress, 3);"
+							"    window.scrollTo(0, start * (1 - ease));"
+							"    if (timeElapsed < duration) requestAnimationFrame(animation);"
+							"  }"
+							"  requestAnimationFrame(animation);"
+							"})();"						
+						));
+						
+						RegisterActiveTimer(0.2f, FWidgetActiveTimerDelegate::CreateLambda(
+							[this](double, float) -> EActiveTimerReturnType
+							{
+								bBlockInput = false;
+								return EActiveTimerReturnType::Stop;
+							}
+						));
+					})
+				]
+
+				+ SOverlay::Slot()
+				[
+					SNew(SBox)
+					.Visibility_Lambda([this]() { return bBlockInput ? EVisibility::Visible : EVisibility::Collapsed; })
+					[
+						SNew(SBorder)
+						.BorderImage(FAppStyle::GetBrush("NoBorder"))
+						.Padding(0)
+					]
+				]
 			]
 		]		
 	];
-	
-	RegisterActiveTimer(1.f, FWidgetActiveTimerDelegate::CreateLambda(
-	[this](double, float) -> EActiveTimerReturnType
-		{
-			SwitchToPage(0);
-			return EActiveTimerReturnType::Stop;
-		}
-	));
+}
+
+void SMounteaItemTemplatesEditorHelp::Reset()
+{
+	CurrentPageId = 0;
+	WebBrowser->LoadString(TEXT(""), TEXT("about:blank"));
+}
+
+void SMounteaItemTemplatesEditorHelp::Start()
+{
+	CurrentPageId = 0;
+	SwitchToPage(CurrentPageId);
 }
 
 TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(const FText& Label, int32 PageId)
@@ -140,8 +191,6 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 	if (!WebBrowser.IsValid())
 		return;
 	
-	WebBrowser->Reload();
-	
 	CurrentPageId = PageId;
 	
 	FString htmlContent;
@@ -149,39 +198,9 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 	
 	if (FFileHelper::LoadFileToString(htmlContent, *filePath))
 	{
-		const FString htmlWithCss = InjectSharedAssets(htmlContent);
-		
-		const FString baseUrl = FString::Printf(TEXT("file:///%s/"), *FPaths::GetPath(filePath).Replace(TEXT("\\"), TEXT("/")));
-		
+		const FString htmlWithCss = InjectSharedAssets(htmlContent);		
+		const FString baseUrl = FString::Printf(TEXT("file:///%s/"), *FPaths::GetPath(filePath).Replace(TEXT("\\"), TEXT("/")));		
 		WebBrowser->LoadString(htmlWithCss, *baseUrl);
-		
-		RegisterActiveTimer(0.1f, FWidgetActiveTimerDelegate::CreateLambda(
-	[this](double, float) -> EActiveTimerReturnType
-			{
-				if (WebBrowser.IsValid())
-				{
-					WebBrowser->ExecuteJavascript(TEXT(
-						"(function() {"
-						"  var start = window.pageYOffset || document.documentElement.scrollTop;"
-						"  var startTime = null;"
-						"  var duration = 200;"
-						"  function animation(currentTime) {"
-						"    if (startTime === null) startTime = currentTime;"
-						"    var timeElapsed = currentTime - startTime;"
-						"    var progress = Math.min(timeElapsed / duration, 1);"
-						"    var ease = 1 - Math.pow(1 - progress, 3);"
-						"    window.scrollTo(0, start * (1 - ease));"
-						"    if (timeElapsed < duration) {"
-						"      requestAnimationFrame(animation);"
-						"    }"
-						"  }"
-						"  requestAnimationFrame(animation);"
-						"})();"
-					));
-				}
-				return EActiveTimerReturnType::Stop;
-			}
-		));	
 	}
 	else
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);

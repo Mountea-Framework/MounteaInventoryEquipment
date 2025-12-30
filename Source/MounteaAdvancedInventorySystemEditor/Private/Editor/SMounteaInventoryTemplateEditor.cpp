@@ -116,8 +116,16 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 				.VAlign(VAlign_Center)
 				[
 					SNew(SBox)
-					.WidthOverride(1200)
-					.HeightOverride(900)
+					.WidthOverride_Lambda([this]()
+					{
+						const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
+						return parentSize.X * 0.8f;
+					})
+					.HeightOverride_Lambda([this]()
+					{
+						const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
+						return parentSize.Y * 0.8f;
+					})
 					[
 						SNew(SBorder)
 						.BorderImage(FAppStyle::GetBrush("ToolPanel.DarkGroupBorder"))
@@ -506,12 +514,14 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 FReply SMounteaInventoryTemplateEditor::ShowHelpModal()
 {
 	bIsHelpVisible = true;
+	HelpWidget->Start();
 	return FReply::Handled();
 }
 
 FReply SMounteaInventoryTemplateEditor::OnCloseHelp()
 {
 	bIsHelpVisible = false;
+	HelpWidget->Reset();
 	return FReply::Handled();
 }
 
