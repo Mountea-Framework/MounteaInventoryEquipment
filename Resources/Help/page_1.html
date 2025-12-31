@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Setting up Inventory Configuration</title>
+	</head>
+
+	<body>
+		<div class="doc-page">
+			<header>
+				<div class="version">Version · 1.0</div>
+				<h1>Setting up the Inventory Configuration</h1>
+				<p>
+					This page explains how to open the Inventory Configuration asset and
+					how to configure the most important systems: item rarities and item
+					categories.
+				</p>
+			</header>
+
+			<section>
+				<h2>Opening the Inventory Configuration</h2>
+				<p>
+					The plugin ships with a default configuration file. You should start
+					by duplicating this file instead of creating one manually.
+				</p>
+
+				<ol>
+					<li>Open the plugin menu in the toolbar.</li>
+					<li>Select <strong>Inventory Config</strong>.</li>
+				</ol>
+
+				<p>
+					This opens the configuration asset where all global inventory settings
+					are stored.
+				</p>				
+
+				<p>
+					<img
+						src="menu_inventory_config.webp"
+						alt="Open Inventory Config from the plugin menu"
+					/>
+				</p>
+
+				<p>
+					You can also open the Configuration file directly: 
+					<abbr title="Open Inventory Configuration which is stored in Project Settings."><a href="" data-type="inventory-configuration" >Inventory Configuration</a></abbr>.
+				</p>
+
+				<p>
+					If the button fails to open Configuration, you have to first set it up in
+					<abbr title="Open Project Settings directly to Mountea Inventory Equipment Category."><a href="" data-type="settings">Project Settings</a></abbr>.
+				</p>
+			</section>
+
+			<section>
+				<h2>Understanding the configuration layout</h2>
+				<p>
+					The configuration is structured into collapsible sections. For most
+					projects, the two most important sections to customize are:
+				</p>
+
+				<ul>
+					<li><strong>Rarities</strong> — defines quality tiers of items.</li>
+					<li>
+						<strong>Categories</strong> — defines how items are grouped and
+						filtered.
+					</li>
+				</ul>
+
+				<p>
+					<img
+						src="config_rarities_categories.webp"
+						alt="Rarities and Categories sections inside configuration"
+					/>
+				</p>
+			</section>
+
+			<section>
+				<h2>Rarities</h2>
+
+				<p>
+					Rarities define the quality and visual identity of items. Each rarity
+					entry controls how items appear in UI and how they may be prioritized
+					in systems such as loot, pricing, or sorting.
+				</p>
+
+				<ul>
+					<li>
+						<strong>Rarity Display Name</strong> — the readable name shown
+						across UI (e.g. Common, Rare, Epic).
+					</li>
+					<li>
+						<strong>Rarity Color</strong> — color highlight used in tooltips,
+						lists, and labels.
+					</li>
+					<li>
+						<strong>Rarity Priority</strong> — numeric value defining order and
+						comparisons (lower = more common, higher = more valuable).
+					</li>
+					<li>
+						<strong>Base Price Multiplier</strong> — affects economic value when
+						pricing is calculated from templates.
+					</li>
+					<li>
+						<strong>Rarity Tags</strong> — optional metadata used by gameplay
+						logic, filters, or advanced systems.
+					</li>
+				</ul>
+
+				<p>
+					Add or reorder rarities as needed, but avoid deleting rarities
+					actively used by existing items!
+				</p>
+			</section>
+
+			<section>
+				<h2>Categories</h2>
+
+				<p>
+					Categories determine how items are grouped, filtered, and processed.
+					They are used by inventory UI, rules systems, and gameplay logic to
+					decide where items belong.
+				</p>
+
+				<ul>
+					<li>
+						<strong>Category Display Name</strong> — label shown in UI (e.g.
+						Weapons, Consumables).
+					</li>
+					<li>
+						<strong>Category Priority</strong> — controls ordering inside lists
+						and menus.
+					</li>
+					<li>
+						<strong>Category Tags</strong> — identifiers for filters and
+						gameplay checks.
+					</li>
+					<li>
+						<strong>Display Icon</strong> — optional icon for UI elements.
+					</li>
+					<li>
+						<strong>Category Flags</strong> — behavior modifiers such as
+						stackable types or special handling.
+					</li>
+					<li>
+						<strong>Allowed Actions</strong> — defines what interactions are
+						legal (e.g. consume, equip, drop).
+					</li>
+				</ul>
+
+				<h3>Sub-categories</h3>
+
+				<p>
+					Categories may contain nested sub-categories. These inherit high-level
+					behavior but allow finer organization, such as:
+				</p>
+
+				<ul>
+					<li>Consumables → Food</li>
+					<li>Weapons → Ranged / Melee</li>
+				</ul>
+
+				<p>
+					Every item must belong to an category to ensure proper behavior.
+				</p>
+			</section>
+
+			<section>
+				<h2>After configuring</h2>
+				<p>
+					Once your rarities and categories are defined, they immediately become
+					available in editors, templates, and runtime systems. New items will
+					automatically use them.
+				</p>
+			</section>
+
+			<section>
+				<h2>Next steps</h2>
+				<p>
+					Once you are comfortable with navigating the editor, you can start
+					creating new item templates, assigning icons and meshes, and filling
+					in gameplay data. Next page will demonstrate how to create your first
+					item template.
+				</p>
+			</section>
+
+			<footer>
+				<span class="tag">inventory</span>
+				<span class="tag">configuration</span>
+				<span class="tag">setup</span>
+				·
+				<a href="#top">Back to top</a>
+			</footer>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>How to Create New Template</title>
+	</head>
+	<body>
+		<div class="doc-page">
+			<header>
+				<div class="version">Reporting API · v1</div>
+				<h1>Reporting API Documentation</h1>
+				<p>
+					A compact reference for generating analytics and exportable reports.
+				</p>
+			</header>
+
+			<section>
+				<h2>Overview</h2>
+				<p>
+					The Reporting API aggregates usage data and delivers summarized
+					results in JSON or CSV.
+				</p>
+				<p>Base URL: <code>https://api.example.com/reporting</code></p>
+			</section>
+
+			<section>
+				<h2>Authentication</h2>
+				<p>Provide an API key via the <code>X-API-Key</code> header.</p>
+				<pre><code>X-API-Key: YOUR_API_KEY</code></pre>
+			</section>
+
+			<section>
+				<h2>Endpoints</h2>
+
+				<div class="endpoint" data-endpoint>
+					<div class="endpoint-header">
+						<div>
+							<span class="method get">GET</span>
+							<span class="path">/summary</span>
+						</div>
+						<button class="endpoint-toggle" type="button" data-toggle>
+							Show details
+						</button>
+					</div>
+					<div class="endpoint-body">
+						<p>Returns a time-bounded usage summary.</p>
+						<h3>Query parameters</h3>
+						<dl>
+							<dt>from</dt>
+							<dd>ISO timestamp marking the start of the window.</dd>
+							<dt>to</dt>
+							<dd>ISO timestamp marking the end of the window.</dd>
+						</dl>
+						<h3>Example</h3>
+						<pre><code>GET /reporting/summary?from=2025-01-01&amp;to=2025-02-01
+X-API-Key: YOUR_API_KEY</code></pre>
+					</div>
+				</div>
+
+				<div class="endpoint" data-endpoint>
+					<div class="endpoint-header">
+						<div>
+							<span class="method post">POST</span>
+							<span class="path">/exports</span>
+						</div>
+						<button class="endpoint-toggle" type="button" data-toggle>
+							Show details
+						</button>
+					</div>
+					<div class="endpoint-body">
+						<p>Creates a downloadable export.</p>
+						<h3>Request body</h3>
+						<pre><code>{
+  "format": "csv",
+  "range": { "from": "2025-01-01", "to": "2025-02-01" }
+}</code></pre>
+						<h3>Response</h3>
+						<pre><code>{
+  "export_id": "exp_987",
+  "status": "processing"
+}</code></pre>
+					</div>
+				</div>
+			</section>
+
+			<section>
+				<h2>Status Codes</h2>
+				<ul>
+					<li><code>200</code> – Success</li>
+					<li><code>403</code> – Invalid or missing key</li>
+					<li><code>429</code> – Rate limit exceeded</li>
+				</ul>
+			</section>
+
+			<footer>
+				<span class="tag">reports</span>
+				<span class="tag">api</span>
+				<span class="tag">docs</span>
+				·
+				<a href="#top">Back to top</a>
+			</footer>
+		</div>
+
+		<script>
+			(function () {
+				var toggles = document.querySelectorAll("[data-toggle]");
+				toggles.forEach(function (toggle) {
+					toggle.addEventListener("click", function () {
+						var endpoint = toggle.closest("[data-endpoint]");
+						var body = endpoint.querySelector(".endpoint-body");
+						var isOpen = body.classList.contains("open");
+						body.classList.toggle("open", !isOpen);
+						toggle.textContent = isOpen ? "Show details" : "Hide details";
+					});
+				});
+			})();
+		</script>
+	</body>
+</html>

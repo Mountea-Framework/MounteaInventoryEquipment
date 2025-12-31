@@ -69,8 +69,12 @@ private:
 	FReply CloseTemplate();
 	FReply SaveNewTemplate();
 	FReply SaveExistingTemplate();
+	
 	FReply DeleteTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template);
 	FReply DuplicateTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template);
+	
+	FReply ShowHelpModal();
+	FReply OnCloseHelp();
 
 	void ImportTemplate();
 	void ExportTemplate();
@@ -94,6 +98,10 @@ private:
 
 private:
 	FOnTemplateChanged OnTemplateChanged;
+	
+	TSharedPtr<SOverlay> RootOverlay;
+	TSharedPtr<class SMounteaItemTemplatesEditorHelp> HelpWidget;
+	TSharedPtr<SWidget> HelpModalContent;
 	
 	TSharedPtr<IDetailsView> PropertyDetailsView;
 	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;

@@ -13,6 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
+#include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
 #include "MounteaAdvancedInventorySettingsEditor.generated.h"
 
 /**
@@ -30,6 +31,24 @@ public:
 	// If True, Icons will display Text next to icons.
 	UPROPERTY(Config, EditAnywhere, Category="Config")
 	uint8 bDisplayEditorButtonText : 1;
+	
+	// Shared styling for all documentation pages.
+	UPROPERTY(Config, EditAnywhere, Category = "Editor Templates",
+		AdvancedDisplay, meta = (FilePathFilter = "css"))
+	FFilePath SharedStylesheetPath;
+	
+	// Shared script for all documentation pages.
+	UPROPERTY(Config, EditAnywhere, Category = "Editor Templates",
+		AdvancedDisplay, meta = (FilePathFilter = "js"))
+	FFilePath SharedScriptPath;
+
+	/**
+	 * Defines the list of tutorial pages.
+	 * You can easily extend those if needed for your colleagues.
+	 */
+	UPROPERTY(Config, EditAnywhere, Category="Editor Templates",
+		AdvancedDisplay)
+	TMap<int32, FItemTemplateEditorPageConfig> EditorTemplatePages;
 
 public:
 

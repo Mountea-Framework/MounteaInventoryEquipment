@@ -46,6 +46,7 @@
 
 #include "AssetToolsModule.h"
 #include "DesktopPlatformModule.h"
+#include "MounteaItemTemplatesEditorHelp.h"
 #include "Algo/ForEach.h"
 #include "Search/MounteaInventoryTemplateSearchFilter.h"
 #include "Settings/EditorStyleSettings.h"
@@ -58,7 +59,6 @@
 
 SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 {
-	// Clean up transient template on destruction
 	CleanupTransientTemplate();
 	
 	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
@@ -67,26 +67,30 @@ SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 
 void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 {
-	OnTemplateChanged = InArgs._OnTemplateChanged;
-	
+	OnTemplateChanged = InArgs._OnTemplateChanged;	
 	FilteredTemplates = AvailableTemplates;
 	
 	ChildSlot
 	[
-		SNew(SVerticalBox)
+		SAssignNew(RootOverlay, SOverlay)
 		
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.MinHeight(36.f)
+		+ SOverlay::Slot()
 		[
-			CreateToolbar()
-		]
-		
-		+ SVerticalBox::Slot()
-		.FillHeight(1.0f)
-		[
-			CreatePropertyMatrix()
-		]
+			SNew(SVerticalBox)
+			
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.MinHeight(36.f)
+			[
+				CreateToolbar()
+			]
+			
+			+ SVerticalBox::Slot()
+			.FillHeight(1.0f)
+			[
+				CreatePropertyMatrix()
+			]
+		]		
 	];
 	
 	if (AvailableTemplates.Num() == 0 || !SelectedTemplates.Num())
@@ -436,6 +440,95 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 	return FReply::Unhandled();
 }
 
+FReply SMounteaInventoryTemplateEditor::ShowHelpModal()
+{
+	if (HelpWidget.IsValid())
+		return FReply::Handled();
+	
+	RootOverlay->AddSlot()
+	.HAlign(HAlign_Fill)
+	.VAlign(VAlign_Fill)
+	[
+		SAssignNew(HelpModalContent, SBox)
+		[
+			SNew(SOverlay)
+			
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)
+			[
+				SNew(SBorder)
+				.BorderImage(FAppStyle::GetBrush("WhiteBrush"))
+				.BorderBackgroundColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.75f))
+			]
+			
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride_Lambda([this]()
+				{
+					const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
+					return parentSize.X * 0.8f;
+				})
+				.HeightOverride_Lambda([this]()
+				{
+					const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
+					return parentSize.Y * 0.8f;
+				})
+				[
+					SNew(SBorder)
+					.BorderImage(FAppStyle::GetBrush("ToolPanel.DarkGroupBorder"))
+					.BorderBackgroundColor(FAppStyle::GetSlateColor("DefaultForeground"))
+					.Padding(0)
+					[
+						SNew(SOverlay)
+						
+						+ SOverlay::Slot()
+						[
+							SAssignNew(HelpWidget, SMounteaItemTemplatesEditorHelp)
+						]
+						
+						+ SOverlay::Slot()
+						.HAlign(HAlign_Right)
+						.VAlign(VAlign_Top)
+						.Padding(0)
+						[
+							SNew(SButton)
+							.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+							.ContentPadding(FMargin(2))
+							.RenderTransformPivot(FVector2f(1.f, 1.f))
+							.RenderTransform(FSlateRenderTransform(FVector2f(25.f, 0.f)))
+							.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCloseHelp)
+							[
+								SNew(SImage)
+								.Image(FAppStyle::GetBrush("MAISStyleSet.Close"))
+								.ColorAndOpacity(FSlateColor::UseForeground())
+								.DesiredSizeOverride(FVector2D(16, 16))
+							]
+						]
+					]
+				]
+			]
+		]
+	];
+	
+	HelpWidget->Start();
+	return FReply::Handled();
+}
+
+FReply SMounteaInventoryTemplateEditor::OnCloseHelp()
+{
+	if (RootOverlay.IsValid() && HelpModalContent.IsValid())
+	{
+		HelpWidget->Reset();
+		HelpWidget.Reset();
+		RootOverlay->RemoveSlot(HelpModalContent.ToSharedRef());
+	}	
+	return FReply::Handled();
+}
+
 FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 {
 	FString selectedPath = ShowSaveAssetDialog();
@@ -466,7 +559,6 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 	
 	if (UMounteaInventoryItemTemplate* newTemplate = Cast<UMounteaInventoryItemTemplate>(newAsset))
 	{
-		// TODO: Copy properties from transient to new template
 		newTemplate->Guid = transientTemplate->Guid;
 		newTemplate->DisplayName = transientTemplate->DisplayName;
 		newTemplate->ItemCategory = transientTemplate->ItemCategory;
@@ -1027,6 +1119,63 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				[
 					SNew(STextBlock)
 					.Text(LOCTEXT("CloseTemplate", "Close Template"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+					.Visibility_Lambda([this]()
+					{
+						const uint8 bMounteaAllowed = GetDefault<UMounteaAdvancedInventorySettingsEditor>()->bDisplayEditorButtonText;
+						if (!bMounteaAllowed)
+							return EVisibility::Collapsed;
+						return GetDefault<UEditorStyleSettings>()->bUseSmallToolBarIcons ? EVisibility::Collapsed : EVisibility::Visible;
+					})
+				]
+			]
+		]
+
+		// Vertical separator
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(8.0f, 4.0f)
+		[
+			SNew(SSeparator)
+			.SeparatorImage(FAppStyle::Get().GetBrush("Separator"))
+			.Thickness(1.0f)
+			.Orientation(Orient_Vertical)
+		]
+
+		// Help
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.Padding(2.0f)
+		[
+			SNew(SButton)
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ForegroundColor(FSlateColor::UseForeground())
+			.ToolTipText(LOCTEXT("HelpTooltip", "Show a quick help window explaining how to work with the Item Template Editor."))
+			.OnClicked(this, &SMounteaInventoryTemplateEditor::ShowHelpModal)
+			.IsEnabled_Lambda([this]() 
+			{ 
+				return true;
+			})
+			[
+				SNew(SHorizontalBox)
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(4, 0)
+				[
+					SNew(SImage)
+					.Image(FAppStyle::GetBrush("MAISStyleSet.Help"))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(0, 0, 4, 0)
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("Help", "Show Help"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{
