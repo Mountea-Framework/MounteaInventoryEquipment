@@ -67,8 +67,7 @@ SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 
 void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 {
-	OnTemplateChanged = InArgs._OnTemplateChanged;
-	
+	OnTemplateChanged = InArgs._OnTemplateChanged;	
 	FilteredTemplates = AvailableTemplates;
 	
 	ChildSlot
@@ -91,77 +90,7 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 			[
 				CreatePropertyMatrix()
 			]
-		]
-
-		+ SOverlay::Slot()
-		.HAlign(HAlign_Fill)
-		.VAlign(VAlign_Fill)
-		[
-			SNew(SBox)
-			.Visibility_Lambda([this]() { return bIsHelpVisible ? EVisibility::Visible : EVisibility::Collapsed; })
-			[
-				SNew(SOverlay)
-				
-				+ SOverlay::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Fill)
-				[
-					SNew(SBorder)
-					.BorderImage(FAppStyle::GetBrush("WhiteBrush"))
-					.BorderBackgroundColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.75f))
-				]
-				
-				+ SOverlay::Slot()
-				.HAlign(HAlign_Center)
-				.VAlign(VAlign_Center)
-				[
-					SNew(SBox)
-					.WidthOverride_Lambda([this]()
-					{
-						const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
-						return parentSize.X * 0.8f;
-					})
-					.HeightOverride_Lambda([this]()
-					{
-						const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
-						return parentSize.Y * 0.8f;
-					})
-					[
-						SNew(SBorder)
-						.BorderImage(FAppStyle::GetBrush("ToolPanel.DarkGroupBorder"))
-						.BorderBackgroundColor(FAppStyle::GetSlateColor("DefaultForeground"))
-						.Padding(0)
-						[
-							SNew(SOverlay)
-							
-							+ SOverlay::Slot()
-							[
-								SAssignNew(HelpWidget, SMounteaItemTemplatesEditorHelp)
-							]
-							
-							+ SOverlay::Slot()
-							.HAlign(HAlign_Right)
-							.VAlign(VAlign_Top)
-							.Padding(0)
-							[
-								SNew(SButton)
-								.ButtonStyle(FAppStyle::Get(), "SimpleButton")
-								.ContentPadding(FMargin(2))
-								.RenderTransformPivot(FVector2f(1.f, 1.f))
-								.RenderTransform(FSlateRenderTransform(FVector2f(25.f, 0.f)))
-								.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCloseHelp)
-								[
-									SNew(SImage)
-									.Image(FAppStyle::GetBrush("MAISStyleSet.Close"))
-									.ColorAndOpacity(FSlateColor::UseForeground())
-									.DesiredSizeOverride(FVector2D(16, 16))
-								]
-							]
-						]
-					]
-				]
-			]
-		]
+		]		
 	];
 	
 	if (AvailableTemplates.Num() == 0 || !SelectedTemplates.Num())
@@ -513,15 +442,90 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 
 FReply SMounteaInventoryTemplateEditor::ShowHelpModal()
 {
-	bIsHelpVisible = true;
+	if (HelpWidget.IsValid())
+		return FReply::Handled();
+	
+	RootOverlay->AddSlot()
+	.HAlign(HAlign_Fill)
+	.VAlign(VAlign_Fill)
+	[
+		SAssignNew(HelpModalContent, SBox)
+		[
+			SNew(SOverlay)
+			
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)
+			[
+				SNew(SBorder)
+				.BorderImage(FAppStyle::GetBrush("WhiteBrush"))
+				.BorderBackgroundColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.75f))
+			]
+			
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride_Lambda([this]()
+				{
+					const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
+					return parentSize.X * 0.8f;
+				})
+				.HeightOverride_Lambda([this]()
+				{
+					const FVector2D parentSize = GetCachedGeometry().GetLocalSize();
+					return parentSize.Y * 0.8f;
+				})
+				[
+					SNew(SBorder)
+					.BorderImage(FAppStyle::GetBrush("ToolPanel.DarkGroupBorder"))
+					.BorderBackgroundColor(FAppStyle::GetSlateColor("DefaultForeground"))
+					.Padding(0)
+					[
+						SNew(SOverlay)
+						
+						+ SOverlay::Slot()
+						[
+							SAssignNew(HelpWidget, SMounteaItemTemplatesEditorHelp)
+						]
+						
+						+ SOverlay::Slot()
+						.HAlign(HAlign_Right)
+						.VAlign(VAlign_Top)
+						.Padding(0)
+						[
+							SNew(SButton)
+							.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+							.ContentPadding(FMargin(2))
+							.RenderTransformPivot(FVector2f(1.f, 1.f))
+							.RenderTransform(FSlateRenderTransform(FVector2f(25.f, 0.f)))
+							.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCloseHelp)
+							[
+								SNew(SImage)
+								.Image(FAppStyle::GetBrush("MAISStyleSet.Close"))
+								.ColorAndOpacity(FSlateColor::UseForeground())
+								.DesiredSizeOverride(FVector2D(16, 16))
+							]
+						]
+					]
+				]
+			]
+		]
+	];
+	
 	HelpWidget->Start();
 	return FReply::Handled();
 }
 
 FReply SMounteaInventoryTemplateEditor::OnCloseHelp()
 {
-	bIsHelpVisible = false;
-	HelpWidget->Reset();
+	if (RootOverlay.IsValid() && HelpModalContent.IsValid())
+	{
+		HelpWidget->Reset();
+		HelpWidget.Reset();
+		RootOverlay->RemoveSlot(HelpModalContent.ToSharedRef());
+	}	
 	return FReply::Handled();
 }
 
