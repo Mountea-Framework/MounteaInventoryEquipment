@@ -46,6 +46,7 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+#include "Slate/MounteaInventoryScrollBox.h"
 #include "Statics/MounteaInventoryStatics.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
@@ -399,6 +400,18 @@ UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUI
 	UMounteaAdvancedInventoryUISubsystem* localSubsystem = FromPlayerController->GetLocalPlayer()->GetSubsystem<
 		UMounteaAdvancedInventoryUISubsystem>();
 	return localSubsystem;
+}
+
+int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetActiveIndex(const UMounteaInventoryScrollBox* ScrollBox)
+{
+	return ScrollBox ? ScrollBox->GetActiveIndex() : INDEX_NONE;
+}
+
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_SetActiveIndex(UMounteaInventoryScrollBox* ScrollBox,
+	const int32 NewActiveIndex)
+{
+	if (ScrollBox)
+		ScrollBox->SetActiveIndex(NewActiveIndex);
 }
 
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)

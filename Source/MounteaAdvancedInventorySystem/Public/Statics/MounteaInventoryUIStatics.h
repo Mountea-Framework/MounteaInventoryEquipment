@@ -17,11 +17,13 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
-class UMounteaAdvancedInventoryUISubsystem;
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
 struct FMounteaItemActionData;
 
+class UMounteaAdvancedInventoryUISubsystem;
+
+class UMounteaInventoryScrollBox;
 class UWidget;
 class UTextBlock;
 class UMounteaInventoryItemAction;
@@ -127,9 +129,10 @@ public:
 	 * @note Requires uniform item heights. Uses the first child's height for calculations.
 	 * @note Cached geometry must be valid (call after first frame/tick).
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
+		meta=(CustomTag="MounteaK2Getter"), DisplayName="Calculate Centered List Translation")
 	static FVector2D CalculateCenteredListTranslation(UPanelWidget* ListWidget, int32 SelectedIndex);
-
+	
 	/**
 	 * Applies size to font.
 	 * 
@@ -288,6 +291,30 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventoryUISubsystem* GetInventoryUISubsystem(APlayerController* FromPlayerController);
 
+#pragma endregion
+	
+	// --- UMounteaInventoryScrollBox
+	
+#pragma region MounteaInventoryScrollBox
+
+	/**
+	 * 
+	 * @param ScrollBox 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Scrollbox", 
+		meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Active Index")
+	static int32 MounteaInventoryScrollBox_GetActiveIndex(const UMounteaInventoryScrollBox* ScrollBox);
+
+	/**
+	 * 
+	 * @param ScrollBox 
+	 * @param NewActiveIndex 
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox", 
+		meta=(CustomTag="MounteaK2Setter"), DisplayName="Set Active Index")
+	static void MounteaInventoryScrollBox_SetActiveIndex(UMounteaInventoryScrollBox* ScrollBox, const int32 NewActiveIndex);
+	
 #pragma endregion
 	
 	// --- Theme  ------------------------------
