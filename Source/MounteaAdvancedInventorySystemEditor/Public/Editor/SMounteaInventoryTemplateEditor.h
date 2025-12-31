@@ -101,7 +101,7 @@ private:
 	
 	TSharedPtr<SOverlay> RootOverlay;
 	TSharedPtr<class SMounteaItemTemplatesEditorHelp> HelpWidget;
-	bool bIsHelpVisible = false;
+	TSharedPtr<SWidget> HelpModalContent;
 	
 	TSharedPtr<IDetailsView> PropertyDetailsView;
 	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;
