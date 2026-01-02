@@ -1,0 +1,394 @@
+{
+	"items": [
+		{
+			"guid": "A8D2E3A9B6D442A3A0E9E3E5F9F30111",
+			"displayName": "Revitalizing Herb Tea",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Common",
+			"flags": 0,
+			"maxQuantity": 20,
+			"maxStackSize": 5,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A soothing herbal brew that slightly restores health.",
+				"long": "Brewed from mountain herbs, this tea calms nerves and gently restores vitality after battle."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 4,
+				"sellCoefficient": 0.8
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.1
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "C74C8A2B9FAF4EBAAD9B25A46E4D5E21",
+			"displayName": "Hunter's Jerky",
+			"category": "Consumables",
+			"subCategory": "Food",
+			"rarity": "Common",
+			"flags": 0,
+			"maxQuantity": 25,
+			"maxStackSize": 10,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Dried meat that restores a small amount of stamina.",
+				"long": "Lean strips of spiced meat favored by travelers. Keeps you going on long journeys."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 3,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.12
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "2A7B2D8AF8A4487F9B6BFA3C5124C0B3",
+			"displayName": "Minor Rejuvenation Elixir",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Uncommon",
+			"flags": 0,
+			"maxQuantity": 15,
+			"maxStackSize": 5,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Gradually restores health over time.",
+				"long": "A carefully mixed elixir that promotes slow but steady regeneration, prized in drawn-out fights."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 8,
+				"sellCoefficient": 0.85
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.09
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "86F8F0D2D8E44DB49D793D69DE56B65C",
+			"displayName": "Scholar's Mind Tonic",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Uncommon",
+			"flags": 0,
+			"maxQuantity": 15,
+			"maxStackSize": 5,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Restores a modest amount of mana.",
+				"long": "Favored by apprentices, this tonic clears the mind and replenishes arcane reserves."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 9,
+				"sellCoefficient": 0.85
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.08
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "9C6E0C71B5B2492F9A1A4F34FA4AD0B1",
+			"displayName": "Irongut Brew",
+			"category": "Consumables",
+			"subCategory": "Drinks",
+			"rarity": "Rare",
+			"flags": 0,
+			"maxQuantity": 10,
+			"maxStackSize": 3,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Reduces incoming poison effects.",
+				"long": "A potent dwarven brew that fortifies the stomach and dulls the effects of most toxins."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 15,
+				"sellCoefficient": 0.9
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.14
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "F7F59F3B6E3848FD8BFEAFB3C19D26F4",
+			"displayName": "Phoenix Ash Tincture",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Rare",
+			"flags": 0,
+			"maxQuantity": 8,
+			"maxStackSize": 3,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Greatly restores health in emergencies.",
+				"long": "Infused with magically preserved phoenix ash, this tincture pulls warriors back from the brink."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 30,
+				"sellCoefficient": 0.9
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.1
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "DA0C4A9C0B75493D9C43E1A3AF65C3E8",
+			"displayName": "Elixir of Fleet Steps",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Epic",
+			"flags": 0,
+			"maxQuantity": 6,
+			"maxStackSize": 2,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Temporarily increases movement speed.",
+				"long": "A bright, crackling elixir that sharpens reflexes and lightens the body for a short time."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 45,
+				"sellCoefficient": 0.9
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.09
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "3F8E03D1C4B747FBB153E1C8FB91F4C1",
+			"displayName": "Draught of Stone Skin",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Epic",
+			"flags": 0,
+			"maxQuantity": 5,
+			"maxStackSize": 2,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Temporarily boosts physical defense.",
+				"long": "This thick, gritty draught hardens the drinker's skin like rough stone for a limited duration."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 55,
+				"sellCoefficient": 0.92
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.11
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "D3C1F3E2B8774B8DB1A5955BE2A6F7D7",
+			"displayName": "Dragonfire Remedy",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Legendary",
+			"flags": 0,
+			"maxQuantity": 3,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Massively restores health and cures most ailments.",
+				"long": "A near-mythical concoction brewed with dragonfire essence, said to save heroes destined to die."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 120,
+				"sellCoefficient": 0.95
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.12
+			},
+			"specialAffects": []
+		},
+		{
+			"guid": "4B6D22E7B4A04D1F9A2AB65E3E0C3C6C",
+			"displayName": "Celestial Nectar",
+			"category": "Consumables",
+			"subCategory": "Potions",
+			"rarity": "Legendary",
+			"flags": 0,
+			"maxQuantity": 2,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Consumables"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "Revives the fallen with a burst of vitality.",
+				"long": "Said to be distilled from starlight, this nectar brings mortals back from the threshold of death."
+			},
+			"visuals": {},
+			"durability": {
+				"enabled": false,
+				"max": 0,
+				"base": 0,
+				"penalization": 0,
+				"priceCoefficient": 0
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 150,
+				"sellCoefficient": 0.95
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.1
+			},
+			"specialAffects": []
+		}
+	]
+}
