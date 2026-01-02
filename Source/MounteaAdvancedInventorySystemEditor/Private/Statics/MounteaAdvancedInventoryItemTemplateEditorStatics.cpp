@@ -328,7 +328,26 @@ FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(
 
     FString displayName;
     if (jsonObject->TryGetStringField(TEXT("displayName"), displayName))
-        return displayName;
+    {
+        displayName.RemoveSpacesInline();
+
+        const FRegexPattern InvalidCharsPattern(TEXT("[\\\\:\\*\\?\"<>\\| ,.&!~@#']"));
+        FRegexMatcher Matcher(InvalidCharsPattern, displayName);
+
+        FString Sanitized;
+        Sanitized.Reserve(displayName.Len());
+
+        int32 LastIndex = 0;
+        while (Matcher.FindNext())
+        {
+            const int32 MatchBegin = Matcher.GetMatchBeginning();
+            Sanitized += displayName.Mid(LastIndex, MatchBegin - LastIndex);
+            LastIndex = Matcher.GetMatchEnding();
+        }
+        Sanitized += displayName.Mid(LastIndex);
+
+        return Sanitized;
+    }
 
     return TEXT("");
 }
