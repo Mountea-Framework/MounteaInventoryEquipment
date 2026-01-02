@@ -45,6 +45,7 @@ public:
 
 public:
 	
+	// When you scroll/move in the list, this event will provide you next active index without setting it automatically.
 	UPROPERTY(BlueprintAssignable, Category = "Scroll Box")
 	FOnNewIndexCalculated OnNewIndexCalculated;
 	
@@ -78,6 +79,8 @@ protected:
 
 
 protected:
+	
+	// If set to false scrolling will be disabled.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box")
 	bool bCaptureInput = true;
 

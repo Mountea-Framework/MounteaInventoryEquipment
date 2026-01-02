@@ -101,8 +101,8 @@ void UMounteaInventoryScrollBox::BroadcastIndexChange(const int32 Delta) const
 	if (bWrapAround)
 	{
 		if (newIndex < 0)
-			newIndex = VerticalBox->GetChildrenCount() - 1 - 1;
-		else if (newIndex > VerticalBox->GetChildrenCount() - 1 - 1)
+			newIndex = VerticalBox->GetChildrenCount() - 1 ;
+		else if (newIndex > VerticalBox->GetChildrenCount() - 1)
 			newIndex = 0;
 	}
 	else
