@@ -140,6 +140,31 @@ FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWid
 	return FVector2D(0.0f, translationY);
 }
 
+FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(const TSharedPtr<SWidget>& ListWidget, const FGeometry& ListGeometry, const int32 SelectedIndex)
+{
+	TSharedPtr<SPanel> panel = StaticCastSharedPtr<SPanel>(ListWidget);
+	
+	if (!panel.IsValid() || SelectedIndex < 0)
+		return FVector2D::ZeroVector;
+
+	FChildren* children = panel->GetChildren();
+	if (!children || children->Num() == 0 || SelectedIndex >= children->Num())
+		return FVector2D::ZeroVector;
+
+	const TSharedRef<SWidget> firstChild = children->GetChildAt(0);
+	const float itemHeight = firstChild->GetDesiredSize().Y;
+	const float viewportHeight = ListGeometry.GetLocalSize().Y;
+    
+	if (viewportHeight <= 0.0f || itemHeight <= 0.0f)
+		return FVector2D::ZeroVector;
+    
+	const float viewportCenter = viewportHeight * 0.5f;
+	const float itemCenter = (SelectedIndex * itemHeight) + (itemHeight * 0.5f);
+	const float translationY = viewportCenter - itemCenter;
+    
+	return FVector2D(0.0f, translationY);
+}
+
 FSlateFontInfo UMounteaInventoryUIStatics::SetFontSize(const FSlateFontInfo& Font, const int32 NewSize)
 {
 	auto returnValue = Font;
@@ -412,6 +437,13 @@ void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_SetActiveIndex(UMount
 {
 	if (ScrollBox)
 		ScrollBox->SetActiveIndex(NewActiveIndex);
+}
+
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_AddChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content)
+{
+	if (!ScrollBox || !Content)
+		return;
+	ScrollBox->AddChild(Content);
 }
 
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)

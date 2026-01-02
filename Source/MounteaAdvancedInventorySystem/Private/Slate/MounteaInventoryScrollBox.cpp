@@ -12,69 +12,112 @@
 
 #include "Slate/MounteaInventoryScrollBox.h"
 
+#include "Components/VerticalBox.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
-void UMounteaInventoryScrollBox::SetActiveIndex(const int32 NewIndex)
+void UMounteaInventoryScrollBox::AddChild(UWidget* Content)
 {
-	if (ActiveIndex != NewIndex)
+	if (!Content || !VerticalBox)
+		return;
+	VerticalBox->AddChild(Content);
+}
+
+void UMounteaInventoryScrollBox::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+	InterpolateToTarget(InDeltaTime);
+}
+
+FReply UMounteaInventoryScrollBox::NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	const float wheelDelta = InMouseEvent.GetWheelDelta();
+	BroadcastIndexChange(wheelDelta > 0 ? -1 : 1);
+	return FReply::Handled();
+}
+
+FReply UMounteaInventoryScrollBox::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+{
+	const FKey key = InKeyEvent.GetKey();
+	
+	if (key == EKeys::Up || key == EKeys::W || key == EKeys::Gamepad_DPad_Up)
 	{
-		ActiveIndex = FMath::Clamp(NewIndex, 0, GetChildrenCount() - 1);
-		CalculateDesiredTransform();
-		StartInterpolation();
+		BroadcastIndexChange(-1);
+		return FReply::Handled();
 	}
+	else if (key == EKeys::Down || key == EKeys::S || key == EKeys::Gamepad_DPad_Down)
+	{
+		BroadcastIndexChange(1);
+		return FReply::Handled();
+	}
+	
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+}
+
+FReply UMounteaInventoryScrollBox::NativeOnAnalogValueChanged(const FGeometry& InGeometry,
+	const FAnalogInputEvent& InAnalogEvent)
+{
+	const FKey key = InAnalogEvent.GetKey();
+	const float value = InAnalogEvent.GetAnalogValue();
+	
+	if (key == EKeys::Gamepad_LeftY && FMath::Abs(value) > 0.5f)
+	{
+		BroadcastIndexChange(value > 0 ? -1 : 1);
+		return FReply::Handled();
+	}
+	
+	return Super::NativeOnAnalogValueChanged(InGeometry, InAnalogEvent);
+}
+
+void UMounteaInventoryScrollBox::SetActiveIndex(int32 NewIndex)
+{
+	if (!VerticalBox)
+		return;
+	
+	const int32 maxIndex = VerticalBox->GetChildrenCount() - 1;
+	ActiveIndex = FMath::Clamp(NewIndex, 0, maxIndex);
+	CalculateDesiredTransform();
+}
+
+void UMounteaInventoryScrollBox::BroadcastIndexChange(const int32 Delta) const
+{
+	int32 newIndex = ActiveIndex + Delta;
+	
+	if (bWrapAround)
+	{
+		if (newIndex < 0)
+			newIndex = VerticalBox->GetChildrenCount() - 1 - 1;
+		else if (newIndex > VerticalBox->GetChildrenCount() - 1 - 1)
+			newIndex = 0;
+	}
+	else
+		newIndex = FMath::Clamp(newIndex, 0, VerticalBox->GetChildrenCount() - 1);
+	
+	if (newIndex != ActiveIndex)
+		OnNewIndexCalculated.Broadcast(newIndex);
 }
 
 void UMounteaInventoryScrollBox::CalculateDesiredTransform()
 {
+	if (!VerticalBox)
+		return;
+	
 	TargetTranslation = UMounteaInventoryUIStatics::CalculateCenteredListTranslation(
-		this,
+		VerticalBox,
 		ActiveIndex
 	);
 }
 
-void UMounteaInventoryScrollBox::StartInterpolation()
+void UMounteaInventoryScrollBox::InterpolateToTarget(float DeltaTime)
 {
-	if (const UWorld* world = GetWorld())
-	{
-		world->GetTimerManager().SetTimer(
-			InterpolationTimer,
-			this,
-			&UMounteaInventoryScrollBox::InterpolateToTarget,
-			0.016f,
-			true
-		);
-	}
-}
-
-void UMounteaInventoryScrollBox::StopInterpolation()
-{
-	if (const UWorld* world = GetWorld())
-		world->GetTimerManager().ClearTimer(InterpolationTimer);
-}
-
-void UMounteaInventoryScrollBox::InterpolateToTarget()
-{
+	if (!VerticalBox)
+		return;
+	
 	const float currentLength = CurrentTranslation.Size();
 	const float targetLength = TargetTranslation.Size();
 	
 	if (FMath::IsNearlyEqual(currentLength, targetLength, 0.1f))
-	{
-		StopInterpolation();
 		return;
-	}
 	
-	CurrentTranslation = FMath::Vector2DInterpTo(
-		CurrentTranslation,
-		TargetTranslation,
-		0.016f,
-		InterpolationSpeed
-	);
-	
-	SetRenderTranslation(CurrentTranslation);
-}
-
-void UMounteaInventoryScrollBox::ReleaseSlateResources(const bool bReleaseChildren)
-{
-	Super::ReleaseSlateResources(bReleaseChildren);
-	StopInterpolation();
+	CurrentTranslation = FMath::Vector2DInterpTo(CurrentTranslation, TargetTranslation, DeltaTime, InterpolationSpeed);
+	VerticalBox->SetRenderTranslation(TargetTranslation);
 }

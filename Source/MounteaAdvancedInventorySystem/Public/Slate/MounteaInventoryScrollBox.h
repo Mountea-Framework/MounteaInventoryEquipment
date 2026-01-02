@@ -12,11 +12,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/VerticalBox.h"
+#include "Blueprint/UserWidget.h"
 #include "MounteaInventoryScrollBox.generated.h"
 
+class UVerticalBox;
+class UVerticalBoxSlot;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNewIndexCalculated, int32, NewIndex);
+
 UCLASS()
-class UMounteaInventoryScrollBox : public UVerticalBox
+class UMounteaInventoryScrollBox : public UUserWidget
 {
 	GENERATED_BODY()
 	
@@ -32,25 +37,48 @@ public:
 
 public:
 	
+	UPROPERTY(BlueprintAssignable, Category = "Scroll Box")
+	FOnNewIndexCalculated OnNewIndexCalculated;
+	
 	// How much time the Animation takes. Higher the value, slower it is.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box",
 		meta=(NoResetToDefault))
 	float InterpolationSpeed = 10.0f;
 	
+	// If false, scroll/move will stop by the end of the child widgets, otherwise it will go back to infinity.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box",
+		meta=(NoResetToDefault))
+	bool bWrapAround = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box",
+		meta=(BindWidget))
+	TObjectPtr<UVerticalBox> VerticalBox;
+	
+public:	
 	void SetActiveIndex(int32 NewIndex);
 	int32 GetActiveIndex() const { return ActiveIndex; }
+	
+	void AddChild(UWidget* Content);
+
+protected:	
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
+	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	virtual FReply NativeOnAnalogValueChanged(const FGeometry& InGeometry, const FAnalogInputEvent& InAnalogEvent) override;
+
 
 protected:
-	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box")
+	bool bCaptureInput = true;
 
 private:
+	void BroadcastIndexChange(int32 Delta) const;
 	void CalculateDesiredTransform();
-	void InterpolateToTarget();
-	void StartInterpolation();
-	void StopInterpolation();
+	void InterpolateToTarget(const float InDeltaTime);
 
+private:	
 	int32 ActiveIndex = INDEX_NONE;
 	FVector2D CurrentTranslation = FVector2D::ZeroVector;
 	FVector2D TargetTranslation = FVector2D::ZeroVector;
-	FTimerHandle InterpolationTimer;
 };

@@ -86,15 +86,28 @@ void UMounteaInventoryUIComponent::BeginPlay()
 
 void UMounteaInventoryUIComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (GetOwner() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
-	{
-		const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
-			UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
-		if (!inventoryUISubsystem)
-			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will UNREGISTER properly!"))
-		else
-			inventoryUISubsystem->UnregisterInventoryUIManager(this);
+	switch (EndPlayReason)
+	{		
+		case EEndPlayReason::EndPlayInEditor:
+			break;
+		case EEndPlayReason::RemovedFromWorld:
+		case EEndPlayReason::Destroyed:
+		case EEndPlayReason::LevelTransition:
+		case EEndPlayReason::Quit:
+			{
+				if (GetOwner() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+				{
+					const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
+						UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
+					if (!inventoryUISubsystem)
+						LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will UNREGISTER properly!"))
+					else
+						inventoryUISubsystem->UnregisterInventoryUIManager(this);
+				}
+			}
+			break;
 	}
+	
 	Super::EndPlay(EndPlayReason);
 }
 

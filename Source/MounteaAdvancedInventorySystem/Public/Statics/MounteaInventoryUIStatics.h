@@ -24,6 +24,7 @@ struct FMounteaItemActionData;
 class UMounteaAdvancedInventoryUISubsystem;
 
 class UMounteaInventoryScrollBox;
+class UVerticalBoxSlot;
 class UWidget;
 class UTextBlock;
 class UMounteaInventoryItemAction;
@@ -132,6 +133,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
 		meta=(CustomTag="MounteaK2Getter"), DisplayName="Calculate Centered List Translation")
 	static FVector2D CalculateCenteredListTranslation(UPanelWidget* ListWidget, int32 SelectedIndex);
+	static FVector2D CalculateCenteredListTranslation(const TSharedPtr<SWidget>& ListWidget, const FGeometry& ListGeometry, const int32 SelectedIndex);
 	
 	/**
 	 * Applies size to font.
@@ -314,6 +316,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox", 
 		meta=(CustomTag="MounteaK2Setter"), DisplayName="Set Active Index")
 	static void MounteaInventoryScrollBox_SetActiveIndex(UMounteaInventoryScrollBox* ScrollBox, const int32 NewActiveIndex);
+
+	/**
+	 * 
+	 * @param ScrollBox
+	 * @param Content 
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox", 
+		meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Child")
+	static void MounteaInventoryScrollBox_AddChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content);
 	
 #pragma endregion
 	
