@@ -15,12 +15,22 @@
 #include "Blueprint/UserWidget.h"
 #include "MounteaInventoryScrollBox.generated.h"
 
+class UOverlay;
 class UVerticalBox;
 class UVerticalBoxSlot;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNewIndexCalculated, int32, NewIndex);
 
-UCLASS()
+/**
+ * UMounteaInventoryScrollBox is a User Widget which behaves as scrollbox
+ * with specific visual behaviour which mimics some of the most famous RPG
+ * Inventory components.
+ *
+ * @see [Inventory Scroll Box](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface/MounteaInventoryScrollBox/)
+ * @see FInventoryItem
+ * @see UMounteaInventoryManagerComponent
+ */
+UCLASS(ClassGroup=(Mountea), NotBlueprintable, BlueprintType)
 class UMounteaInventoryScrollBox : public UUserWidget
 {
 	GENERATED_BODY()
@@ -60,7 +70,8 @@ public:
 	
 	void AddChild(UWidget* Content);
 
-protected:	
+protected:
+	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
 	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

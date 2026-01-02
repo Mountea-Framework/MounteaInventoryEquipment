@@ -12,6 +12,8 @@
 
 #include "Slate/MounteaInventoryScrollBox.h"
 
+#include "Blueprint/WidgetTree.h"
+#include "Components/Overlay.h"
 #include "Components/VerticalBox.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
@@ -20,6 +22,20 @@ void UMounteaInventoryScrollBox::AddChild(UWidget* Content)
 	if (!Content || !VerticalBox)
 		return;
 	VerticalBox->AddChild(Content);
+}
+
+TSharedRef<SWidget> UMounteaInventoryScrollBox::RebuildWidget()
+{
+	if (WidgetTree && !VerticalBox)
+	{
+		VerticalBox = WidgetTree->ConstructWidget<UVerticalBox>(
+			UVerticalBox::StaticClass(),
+			TEXT("VerticalBox")
+			);
+		WidgetTree->RootWidget = VerticalBox;
+	}
+	
+	return Super::RebuildWidget();
 }
 
 void UMounteaInventoryScrollBox::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
