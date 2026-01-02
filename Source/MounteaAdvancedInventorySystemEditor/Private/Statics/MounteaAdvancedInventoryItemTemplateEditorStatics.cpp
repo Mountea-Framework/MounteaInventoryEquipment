@@ -96,7 +96,9 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
                 }
             }
 
-            const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"), *itemGuid.ToString(EGuidFormats::Short));
+            const FString itemDisplayName = ExtractNameFromJson(itemJson);
+            const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"),  itemDisplayName.IsEmpty() ?
+                *itemGuid.ToString(EGuidFormats::Short) : *itemDisplayName);
             UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(folderToUse, assetName, OutErrorMessage);
             
             if (!newTemplate)
@@ -314,6 +316,21 @@ FGuid UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(co
     }
 
     return FGuid();
+}
+
+FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(const FString& JsonString)
+{
+    TSharedPtr<FJsonObject> jsonObject;
+    TSharedRef<TJsonReader<>> jsonReader = TJsonReaderFactory<>::Create(JsonString);
+
+    if (!FJsonSerializer::Deserialize(jsonReader, jsonObject) || !jsonObject.IsValid())
+        return TEXT("");
+
+    FString displayName;
+    if (jsonObject->TryGetStringField(TEXT("displayName"), displayName))
+        return displayName;
+
+    return TEXT("");
 }
 
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(
