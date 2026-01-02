@@ -1,0 +1,209 @@
+openapi: 3.0.3
+info:
+  title: Inventory Item
+  version: 1.0.0
+
+paths:
+  /inventory-items/{guid}:
+    get:
+      summary: Get inventory item by GUID
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Inventory item manifest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemManifest'
+              examples:
+                exampleItem:
+                  value:
+                    guid: "6F0B3F994186DEB5D76811834602D906"
+                    displayName: "Healing Potion"
+                    category: "Consumables"
+                    subCategory: "Potions"
+                    rarity: "Rare"
+                    flags: 18
+                    maxQuantity: 15
+                    maxStackSize: 2
+                    tags:
+                      - "Mountea_Inventory.Category.Consumables"
+                    spawnActor:
+                      name: ""
+                      path: ""
+                    description:
+                      short: "A magically brewed potion that restores health. Sold exclusively by the Mage Guild."
+                      long: "This crystal vial contains a shimmering crimson liquid, infused with restorative arcane energies. Carefully concocted by certified alchemists of the Mage Guild, the potion rapidly mends wounds and restores vitality when consumed. Though common among spellcasters and warriors alike, its formula remains a closely guarded guild secret. Only members in good standing—or those with the coin—can access this reliable lifesaver."
+                    visuals:
+                      thumbnail:
+                        name: "T_HealingPotion"
+                        path: "/MounteaAdvancedInventorySystem/Inventory/Textures/Items/Consumables/T_HealingPotion.T_HealingPotion"
+                      cover:
+                        name: "T_HealingPotion"
+                        path: "/MounteaAdvancedInventorySystem/Inventory/Textures/Items/Consumables/T_HealingPotion.T_HealingPotion"
+                      mesh:
+                        name: "SM_HealingFlask"
+                        path: "/MounteaAdvancedInventorySystem/Meshes/SM_HealingFlask.SM_HealingFlask"
+                    durability:
+                      enabled: false
+                      max: 0
+                      base: 0
+                      penalization: 0
+                      priceCoefficient: 0
+                    economy:
+                      enabled: true
+                      basePrice: 10
+                      sellCoefficient: 1
+                    weight:
+                      enabled: true
+                      value: 0.10000000149011612
+                    attachmentSlots:
+                      - "Mountea_Inventory.AttachmentSlots.Right_Hand"
+                    specialAffects:
+                      - name: "BP_ItemAction_Split_C"
+                        path: "/MounteaAdvancedInventorySystem/Data/ItemActions/BP_ItemAction_Split.BP_ItemAction_Split_C"
+
+components:
+  schemas:
+    InventoryItemManifest:
+      type: object
+      description: Manifest describing an inventory item.
+      required:
+        - guid
+        - displayName
+        - category
+        - rarity
+      properties:
+        guid:
+          type: string
+          description: Unique identifier of the item.
+          example: "6F0B3F994186DEB5D76811834602D906"
+        displayName:
+          type: string
+          description: Human-readable item name.
+          example: "Healing Potion"
+        category:
+          type: string
+          description: High-level category of the item.
+          example: "Consumables"
+        subCategory:
+          type: string
+          description: More specific category of the item.
+          example: "Potions"
+        rarity:
+          type: string
+          description: Rarity label of the item.
+          example: "Rare"
+        flags:
+          type: integer
+          format: int32
+          description: Bit flags representing item properties.
+          example: 18
+        maxQuantity:
+          type: integer
+          format: int32
+          description: Maximum number of this item allowed in inventory.
+          example: 15
+        maxStackSize:
+          type: integer
+          format: int32
+          description: Maximum number of units per stack.
+          example: 2
+        tags:
+          type: array
+          description: Additional classification tags.
+          items:
+            type: string
+          example:
+            - "Mountea_Inventory.Category.Consumables"
+        spawnActor:
+          type: object
+          description: Actor asset used to spawn this item.
+          properties:
+            spawnActor:
+              $ref: '#/components/schemas/InventoryAssetReference'
+        description:
+          type: object
+          description: Localized or structured descriptions of the item.
+          properties:
+            short:
+              type: string
+              description: Short description.
+            long:
+              type: string
+              description: Long description.
+        visuals:
+          type: object
+          description: Visual representation assets of the item.
+          properties:
+            thumbnail:
+              $ref: '#/components/schemas/InventoryAssetReference'
+            cover:
+              $ref: '#/components/schemas/InventoryAssetReference'
+            mesh:
+              $ref: '#/components/schemas/InventoryAssetReference'
+        durability:
+          type: object
+          description: Durability configuration of the item.
+          properties:
+            enabled:
+              type: boolean
+            max:
+              type: integer
+              format: int32
+            base:
+              type: integer
+              format: int32
+            penalization:
+              type: integer
+              format: int32
+            priceCoefficient:
+              type: number
+              format: float
+        economy:
+          type: object
+          description: Economy configuration of the item.
+          properties:
+            enabled:
+              type: boolean
+            basePrice:
+              type: number
+              format: float
+            sellCoefficient:
+              type: number
+              format: float
+        weight:
+          type: object
+          description: Weight configuration of the item.
+          properties:
+            enabled:
+              type: boolean
+            value:
+              type: number
+              format: double
+        attachmentSlots:
+          type: array
+          description: Valid attachment slot identifiers for equipping this item.
+          items:
+            type: string
+        specialAffects:
+          type: array
+          description: Special effects/actions applicable to this item.
+          items:
+            $ref: '#/components/schemas/InventoryAssetReference'
+
+    InventoryAssetReference:
+      type: object
+      description: Generic asset reference structure.
+      properties:
+        name:
+          type: string
+          example: "T_HealingPotion"
+        path:
+          type: string
+          example: "/MounteaAdvancedInventorySystem/Inventory/Textures/Items/Consumables/T_HealingPotion.T_HealingPotion"
