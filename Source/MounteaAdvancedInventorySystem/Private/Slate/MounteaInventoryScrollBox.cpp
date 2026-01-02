@@ -84,7 +84,7 @@ FReply UMounteaInventoryScrollBox::NativeOnAnalogValueChanged(const FGeometry& I
 	return Super::NativeOnAnalogValueChanged(InGeometry, InAnalogEvent);
 }
 
-void UMounteaInventoryScrollBox::SetActiveIndex(int32 NewIndex)
+void UMounteaInventoryScrollBox::SetActiveIndex(const int32 NewIndex)
 {
 	if (!VerticalBox)
 		return;
@@ -123,7 +123,7 @@ void UMounteaInventoryScrollBox::CalculateDesiredTransform()
 	);
 }
 
-void UMounteaInventoryScrollBox::InterpolateToTarget(float DeltaTime)
+void UMounteaInventoryScrollBox::InterpolateToTarget(const float DeltaTime)
 {
 	if (!VerticalBox)
 		return;
@@ -135,5 +135,5 @@ void UMounteaInventoryScrollBox::InterpolateToTarget(float DeltaTime)
 		return;
 	
 	CurrentTranslation = FMath::Vector2DInterpTo(CurrentTranslation, TargetTranslation, DeltaTime, InterpolationSpeed);
-	VerticalBox->SetRenderTranslation(TargetTranslation);
+	VerticalBox->SetRenderTranslation(CurrentTranslation);
 }

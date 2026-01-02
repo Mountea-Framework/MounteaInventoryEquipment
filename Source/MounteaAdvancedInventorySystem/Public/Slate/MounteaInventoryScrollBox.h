@@ -15,9 +15,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MounteaInventoryScrollBox.generated.h"
 
-class UOverlay;
 class UVerticalBox;
-class UVerticalBoxSlot;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNewIndexCalculated, int32, NewIndex);
 
@@ -60,8 +58,8 @@ public:
 		meta=(NoResetToDefault))
 	bool bWrapAround = false;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box",
-		meta=(BindWidget))
+	// Vertical Box which contains all child elements.
+	UPROPERTY(BlueprintReadWrite, Category = "Scroll Box")
 	TObjectPtr<UVerticalBox> VerticalBox;
 	
 public:	
