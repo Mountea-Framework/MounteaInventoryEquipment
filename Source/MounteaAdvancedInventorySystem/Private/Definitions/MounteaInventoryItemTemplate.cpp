@@ -12,8 +12,6 @@
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
-#include "Definitions/MounteaInventoryBaseEnums.h"
-#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
@@ -63,8 +61,7 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedCategories()
 	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
 	TArray<FString> returnValues;
 	if (!IsValid(inventorySettings))
-	{
-		
+	{		
 		returnValues.Add(TEXT("Miscellaneous"));
 		return returnValues;
 	}
