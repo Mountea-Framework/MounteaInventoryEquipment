@@ -446,6 +446,13 @@ void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_AddChild(UMounteaInve
 	ScrollBox->AddChild(Content);
 }
 
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_ResetChildren(UMounteaInventoryScrollBox* ScrollBox)
+{
+	if (!ScrollBox)
+		return;
+	ScrollBox->ResetChildren();
+}
+
 bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
 {
 	return IsInputAllowed(MouseEvent.GetEffectingButton(), InputName);

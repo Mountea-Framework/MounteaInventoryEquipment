@@ -326,6 +326,10 @@ public:
 		meta=(CustomTag="MounteaK2Setter"), DisplayName="Add Child")
 	static void MounteaInventoryScrollBox_AddChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content);
 	
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox", 
+		meta=(CustomTag="MounteaK2Setter"), DisplayName="Reset Children")
+	static void MounteaInventoryScrollBox_ResetChildren(UMounteaInventoryScrollBox* ScrollBox);
+	
 #pragma endregion
 	
 	// --- Theme  ------------------------------

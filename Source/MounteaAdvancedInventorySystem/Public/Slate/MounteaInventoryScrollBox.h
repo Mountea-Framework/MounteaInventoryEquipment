@@ -68,8 +68,10 @@ public:
 	int32 GetActiveIndex() const { return ActiveIndex; }
 	
 	void AddChild(UWidget* Content);
+	void ResetChildren();
 
 protected:
+	virtual void NativeConstruct() override;
 	virtual TSharedRef<SWidget> RebuildWidget() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	

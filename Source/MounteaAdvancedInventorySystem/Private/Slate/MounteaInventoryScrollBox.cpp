@@ -17,11 +17,27 @@
 #include "Components/VerticalBox.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
+void UMounteaInventoryScrollBox::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	SetIsFocusable(true);
+}
+
 void UMounteaInventoryScrollBox::AddChild(UWidget* Content)
 {
 	if (!Content || !VerticalBox)
 		return;
 	VerticalBox->AddChild(Content);
+}
+
+void UMounteaInventoryScrollBox::ResetChildren()
+{
+	if (VerticalBox)
+	{
+		ActiveIndex = INDEX_NONE;
+		VerticalBox->ClearChildren();
+	}
 }
 
 TSharedRef<SWidget> UMounteaInventoryScrollBox::RebuildWidget()
