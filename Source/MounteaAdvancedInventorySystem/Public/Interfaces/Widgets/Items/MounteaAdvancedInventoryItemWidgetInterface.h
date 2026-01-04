@@ -49,6 +49,25 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemWidgetInte
 public:
 	
 	/**
+	 * Initializes the item widget with the provided inventory item and quantity.
+	 *
+	 * Implementations should:
+	 * - Store the passed item and quantity internally (e.g. into FInventoryItemData).
+	 * - Set up any initial visuals (icon, name, rarity, etc.).
+	 * - Optionally call RefreshItemWidget or similar logic to ensure the UI is up to date.
+	 *
+	 * This is typically called when the widget is first created or when it is
+	 * re-bound to a different inventory entry.
+	 *
+	 * @param Item     Inventory item to be represented by this widget.
+	 * @param Quantity Initial quantity of the item to display.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	void InitializeItemWidget(const FInventoryItem& Item, const int32 Quantity);
+	virtual void InitializeItemWidget_Implementation(const FInventoryItem& Item, const int32 Quantity) = 0;
+
+	
+	/**
 	 * Retrieves the logical data currently represented by this item widget.
 	 *
 	 * Implementations should always return the latest data that the UI reflects.

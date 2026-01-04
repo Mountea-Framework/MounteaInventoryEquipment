@@ -297,8 +297,8 @@ public:
 	
 	// --- UMounteaInventoryScrollBox
 	
-#pragma region MounteaInventoryScrollBox
-
+#pragma region MounteaScrollBox
+	
 	/**
 	 * 
 	 * @param ScrollBox 
@@ -710,6 +710,28 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
 	static FGuid GetSelectedItemGuid(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	
+	/**
+	 * Retrieves the currently active item widget in the inventory UI.
+	 *
+	 * This function returns a pointer to the active item widget currently being displayed or interacted with.
+	 *
+	 * @param Target 
+	 * @return A pointer to the UUserWidget representing the active item widget, or nullptr if no widget is active.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
+		meta=(CustomTag="MounteaK2Getter"))
+	static UUserWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+
+	/**
+	 * Sets the active item widget in the UI.
+	 *
+	 * @param Target 
+	 * @param NewActiveItemWidget The new widget to be set as the active item widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
+		meta=(CustomTag="MounteaK2Setter"))
+	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewActiveItemWidget);
 
 #pragma endregion
 
@@ -829,29 +851,7 @@ public:
 	
 	// --- Item Widget ------------------------------
 #pragma region Item
-
-	/**
-	 * Retrieves the currently active item widget in the inventory UI.
-	 *
-	 * This function returns a pointer to the active item widget currently being displayed or interacted with.
-	 *
-	 * @param Target 
-	 * @return A pointer to the UUserWidget representing the active item widget, or nullptr if no widget is active.
-	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
-		meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
-
-	/**
-	 * Sets the active item widget in the UI.
-	 *
-	 * @param Target 
-	 * @param NewActiveItemWidget The new widget to be set as the active item widget.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
-		meta=(CustomTag="MounteaK2Setter"))
-	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewActiveItemWidget);
-
+	
 	/**
 	 * Sets the inventory item ID for the specified widget.
 	 *
@@ -891,6 +891,52 @@ public:
 		meta=(CustomTag="MounteaK2Setter"))
 	static void SetItemOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
 
+	/**
+	 * Initializes the item widget with the provided inventory item and quantity.
+	 *
+	 * Implementations should:
+	 * - Store the passed item and quantity internally (e.g. into FInventoryItemData).
+	 * - Set up any initial visuals (icon, name, rarity, etc.).
+	 * - Optionally call RefreshItemWidget or similar logic to ensure the UI is up to date.
+	 *
+	 * This is typically called when the widget is first created or when it is
+	 * re-bound to a different inventory entry.
+	 *
+	 * @param Target Inventory Item Widget.
+	 * @param Item     Inventory item to be represented by this widget.
+	 * @param Quantity Initial quantity of the item to display.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Item - Initialize Item Widget")
+	static void ItemWidget_InitializeItemWidget(UWidget* Target, const FInventoryItem& Item, const int32 Quantity);
+	
+	/**
+	 * Retrieves the logical data currently represented by this item widget.
+	 *
+	 * Implementations should always return the latest data that the UI reflects.
+	 *
+	 * @param Target Inventory Item Widget.
+	 * @return A copy of the item’s data structure describing quantity and contained item state.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+			meta=(CustomTag="MounteaK2Getter"),
+			DisplayName="Item - Get Item Widget Data")
+	static FInventoryItemData ItemWidget_GetInventoryData(UWidget* Target);
+
+	/**
+	 * Assigns new inventory data to this widget.
+	 *
+	 * Implementations should update visuals immediately or trigger an internal refresh.
+	 * 
+	 * @param Target Inventory Item Widget.
+	 * @param InventoryItemData Data describing the item and its quantity.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+			meta=(CustomTag="MounteaK2Setter"),
+			DisplayName="Item - Set Item Widget Data")
+	static void ItemWidget_SetInventoryData(UWidget* Target, const FInventoryItemData& InventoryItemData);
+	
 	/**
 	 * Refreshes the provided widget to reflect item changes.
 	 *

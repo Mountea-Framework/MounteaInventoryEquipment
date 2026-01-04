@@ -1043,6 +1043,26 @@ void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UWidget* Target,
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
+void UMounteaInventoryUIStatics::ItemWidget_InitializeItemWidget(UWidget* Target, const FInventoryItem& Item,
+	const int32 Quantity)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_InitializeItemWidget(Target, Item, Quantity);
+}
+
+FInventoryItemData UMounteaInventoryUIStatics::ItemWidget_GetInventoryData(UWidget* Target)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		return IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryData(Target);
+	return FInventoryItemData();
+}
+
+void UMounteaInventoryUIStatics::ItemWidget_SetInventoryData(UWidget* Target, const FInventoryItemData& InventoryItemData)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetInventoryData(Target, InventoryItemData);
+}
+
 void UMounteaInventoryUIStatics::Item_RefreshWidget(UWidget* Target, const int32 Quantity)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
