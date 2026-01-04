@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemWidgetInterface.generated.h"
 
@@ -40,11 +41,19 @@ public:
 	
 	/**
 	 * 
-	 * @param ItemGuid 
+	 * @return 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
-	void SetInventoryItemId(const FGuid& ItemGuid);
-	virtual void SetInventoryItemId_Implementation(const FGuid& ItemGuid) = 0;
+	FInventoryItemData GetInventoryData() const;
+	virtual FInventoryItemData GetInventoryData_Implementation() const = 0;
+
+	/**
+	 * 
+	 * @param InventoryData 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	void SetInventoryData(const FInventoryItemData& InventoryData);
+	virtual void SetInventoryData_Implementation(const FInventoryItemData& InventoryData);
 
 	/**
 	 * 
@@ -62,12 +71,12 @@ public:
 	virtual void RefreshItemWidget_Implementation(const int32 Quantity) = 0;
 
 	/**
-	 * Retrieves the data associated with the inventory slot.
-	 * @return The inventory slot data.
+	 * Retrieves the associated parent inventory slot.
+	 * @return The inventory slot.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
-	FInventorySlot GetSlotData() const;
-	virtual FInventorySlot GetSlotData_Implementation() const = 0;
+	UUserWidget* GetParentSlot() const;
+	virtual UUserWidget* GetParentSlot_Implementation() const = 0;
 	
 	/**
 	 *

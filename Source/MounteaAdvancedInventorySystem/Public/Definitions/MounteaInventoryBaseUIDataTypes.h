@@ -12,126 +12,189 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventoryItem.h"
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
+// ============================================================================
+//  Inventory Slot & Item Widget Data
+//  Responsibility:
+//  - FInventorySlot: purely inventory/model-side container information.
+//  - FMounteaInventoryGridSlot: adds grid position on top of FInventorySlot.
+//  - FItemWidgetData: all data a UI widget needs to render an item/slot.
+// ============================================================================
+
+class UUserWidget;
+
 /**
- * FInventorySlot is the base structure for all inventory slot UI representations.
- * Inventory slots encapsulate core properties shared across different slot types including
- * item identification, quantity tracking, and widget associations for UI management.
+ * FInventoryItemData represents the pure logical data of a single inventory entry.
  *
- * @see [Inventory UI System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryUI)
+ * This structure contains no references to widgets or other UI-specific types.
+ * It is suitable for use in both runtime logic and UI data binding, and can be
+ * shared between inventory systems and UI presentation layers.
+ *
+ * @see FInventorySlot
  * @see FMounteaInventoryGridSlot
- * @see FInventoryItem
+ */
+USTRUCT(BlueprintType)
+struct FInventoryItemData
+{
+	GENERATED_BODY()
+
+public:
+
+	/**
+	 * Quantity of the item represented by this data.
+	 *
+	 * If the data represents an empty slot, this will typically be INDEX_NONE or 0,
+	 * depending on your stack logic. INDEX_NONE can be used to signify “no valid quantity”.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Data")
+	int32 Quantity = INDEX_NONE;
+
+	/**
+	 * Inventory Item Data which is stored in this Widget.
+	 * 
+	 * This data is stored to simplify the search logic.
+	 * If this Item is invalid (IsItemValid() == false), the data is considered to
+	 * represent an empty slot.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Data")
+	FInventoryItem ContainingItem;
+
+public:
+
+	FInventoryItemData()
+		: Quantity(INDEX_NONE)
+		, ContainingItem(FInventoryItem())
+	{
+	}
+
+	FInventoryItemData(const int32 InQuantity, const FInventoryItem& InContainingItem)
+		: Quantity(InQuantity)
+		, ContainingItem(InContainingItem)
+	{
+	}
+
+	bool IsEmpty() const
+	{ return !ContainingItem.IsItemValid(); }
+
+	void Reset()
+	{
+		Quantity = INDEX_NONE;
+		ContainingItem = FInventoryItem();
+	}
+
+	FString ToString() const
+	{
+		const FString Item = ContainingItem.IsItemValid()
+			? ContainingItem.ToString()
+			: TEXT("None");
+		const FString QtyString = (Quantity >= 0)
+			? FString::FromInt(Quantity)
+			: TEXT("None");
+
+		return FString::Printf(
+			TEXT("ItemId: %s \n Quantity: %s"),
+			*Item,
+			*QtyString
+		);
+	}
+
+	bool operator==(const FInventoryItemData& Other) const
+	{ return ContainingItem == Other.ContainingItem; }
+
+	bool operator!=(const FInventoryItemData& Other) const
+	{ return !(*this == Other); }
+};
+
+/**
+ * FInventorySlot is the base structure for all inventory slot *UI* representations.
+ *
+ * A slot:
+ * - Maintains a reference to the child widget that visually represents the item,
+ *   which should implement UMounteaAdvancedInventoryItemWidgetInterface.
+ *
+ * In the chain:
+ *   UISlot (slot widget)
+ *     -> UISlotData (FInventorySlot)
+ *         -> UIItem (child widget implementing UMounteaAdvancedInventoryItemWidgetInterface)
+ *             -> UIItemData (FInventoryItemData)
+ *
+ * @see FInventoryItemData
+ * @see FMounteaInventoryGridSlot
  */
 USTRUCT(BlueprintType,
-    meta=(HasNativeMake="/Script/MounteaAdvancedInventorySystem.MounteaInventoryUIStatics.MakeInventorySlot"))
+	meta = (HasNativeMake = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryUIStatics.MakeInventorySlot"))
 struct FInventorySlot
 {
 	GENERATED_BODY()
 
 public:
 	virtual ~FInventorySlot() = default;
+	
+	// Unique Slot ID.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	FGuid SlotGuid;
 
 	/**
-	 * Represents the unique identifier for the item occupying this slot.
+	 * Child widget that visually represents the item inside this slot.
 	 *
-	 * This GUID is used to track which item (if any) is stored here.
-	 * If it’s invalid (IsValid() == false), the slot is considered empty.
+	 * This widget should implement UMounteaAdvancedInventoryItemWidgetInterface.
+	 * It may be null when the slot is not currently represented in the UI or
+	 * before initialization.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FGuid OccupiedItemId;
-
-	/**
-	 * The number of items stacked in this slot.
-	 *
-	 * If the slot is empty, this will typically be INDEX_NONE or 0,
-	 * depending on your stack‐logic. You can use INDEX_NONE to signify “no valid quantity.”
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
-	int32 SlotQuantity = INDEX_NONE;
-
-	/**
-	 * Optional reference to a UUserWidget used to visually represent this slot.
-	 *
-	 * You can assign a widget (e.g., a UUserWidget subclass) here so that
-	 * when the slot is rendered in the UI, it knows which widget to spawn or update.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
-	TObjectPtr<UUserWidget> SlotWidget;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UUserWidget> ItemWidget;
 
 public:
 
 	FInventorySlot()
-		: OccupiedItemId(FGuid())
-		, SlotQuantity(INDEX_NONE)
-		, SlotWidget(nullptr)
-	{}
-	
-	FInventorySlot(const struct FMounteaInventoryGridSlot& GridSlot);
-	
-	/**
-	 * Returns true if this slot currently holds no valid item (i.e., OccupiedItemId is invalid).
-	 */
-	virtual bool IsEmpty() const
+		: ItemWidget(nullptr)
+		, SlotGuid(FGuid())
 	{
-		return !OccupiedItemId.IsValid();
 	}
 
-	/**
-	 * Returns true if the slot has a valid widget assigned.
-	 * You can use this to check if the slot has been initialized/assigned a UI element.
-	 */
-	virtual bool IsValid() const
+	explicit FInventorySlot(UUserWidget* InItemWidget = nullptr)
+		: ItemWidget(InItemWidget)
+		, SlotGuid(FGuid())
 	{
-		return SlotWidget != nullptr;
 	}
 
-	/**
-	 * Clears this slot’s data, marking it as empty.
-	 * Resets OccupiedItemId to a fresh GUID (invalid), and SlotQuantity to INDEX_NONE.
-	 */
+	explicit FInventorySlot(const struct FMounteaInventoryGridSlot& GridSlot);
+
+	void OverrideGuid(const FGuid& InGuid)
+	{ SlotGuid = InGuid; }
+	
+	bool IsEmpty() const;
+	
+	/** Returns true if this slot currently has a child item widget assigned. */
+	bool HasItemWidget() const
+	{ return ItemWidget != nullptr; }
+	
 	virtual void ResetSlot()
-	{
-		OccupiedItemId = FGuid();
-		SlotQuantity = INDEX_NONE;
-		SlotWidget = nullptr;
-	}
-
-	/**
-	 * Converts this slot’s state into a human‐readable string.
-	 * Example format: “Item: 1234ABCD-... | Qty: 5”
-	 */
-	virtual FString ToString() const
-	{
-		const FString ItemIDString = OccupiedItemId.IsValid()
-			? OccupiedItemId.ToString()
-			: TEXT("None");
-		const FString QtyString = (SlotQuantity >= 0)
-			? FString::FromInt(SlotQuantity)
-			: TEXT("None");
-
-		return FString::Printf(TEXT("Quantity: %d | Qty: %s"), SlotQuantity, *QtyString);
-	}
+	{ ItemWidget = nullptr; }
+	
+	virtual FString ToString() const;
 
 	bool operator==(const FInventorySlot& Other) const
-	{
-		return OccupiedItemId == Other.OccupiedItemId;
-	}
+	{ return SlotGuid == Other.SlotGuid; }
 
 	bool operator!=(const FInventorySlot& Other) const
-	{
-		return !(*this == Other);
-	}
+	{ return !(*this == Other); }
 };
 
 /**
- * FMounteaInventoryGridSlot extends FInventorySlot with 2D grid positioning for grid-based inventory layouts.
- * Grid slots provide spatial positioning information for inventory items in grid-based UI systems,
- * enabling precise placement and collision detection within structured inventory grids.
+ * FMounteaInventoryGridSlot extends FInventorySlot with 2D grid positioning
+ * for grid-based inventory layouts.
  *
- * @see [Grid Inventory System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/GridInventory)
+ * Grid slots provide spatial positioning information for inventory items in
+ * grid-based systems, enabling precise placement and collision checks within
+ * structured inventory grids.
+ *
+ * Position is stored in the slot, not in item/widget data.
+ *
  * @see FInventorySlot
- * @see FInventoryItem
+ * @see FInventoryItemData
  */
 USTRUCT(BlueprintType)
 struct FMounteaInventoryGridSlot : public FInventorySlot
@@ -139,27 +202,35 @@ struct FMounteaInventoryGridSlot : public FInventorySlot
 	GENERATED_BODY()
 
 public:
-	FMounteaInventoryGridSlot();
-	FMounteaInventoryGridSlot(const FInventorySlot& SourceSlot);
+	FMounteaInventoryGridSlot()
+		: FInventorySlot(nullptr)
+		, SlotPosition(FIntPoint::ZeroValue)
+	{
+	}
+
+	explicit FMounteaInventoryGridSlot(const FInventorySlot& SourceSlot)
+	{
+		ItemWidget = SourceSlot.ItemWidget;
+		SlotPosition = FIntPoint::ZeroValue;
+	}
 
 public:
-	
+
 	/**
 	 * Defines the position of the slot in a grid.
 	 *
-	 * This property specifies the 2D position of the inventory slot, represented as an integer point
-	 * with X and Y coordinates. Typically used for inventory or grid-based UI layouts.
-	 *
-	 * Editable in the editor and accessible in Blueprints.
+	 * This property specifies the 2D position of the inventory slot, represented as an integer
+	 * point with X and Y coordinates. Typically used for inventory or grid-based UI layouts.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Primary Data")
 	FIntPoint SlotPosition = FIntPoint::ZeroValue;
 
 public:
 
 	bool operator==(const FMounteaInventoryGridSlot& Other) const
 	{
-		return SlotPosition == Other.SlotPosition;
+		return SlotPosition == Other.SlotPosition
+			&& static_cast<const FInventorySlot&>(*this) == static_cast<const FInventorySlot&>(Other);
 	}
 
 	bool operator!=(const FMounteaInventoryGridSlot& Other) const
@@ -167,20 +238,45 @@ public:
 		return !(*this == Other);
 	}
 
-	virtual FString ToString() const override;
+	virtual FString ToString() const override
+	{
+		return FString::Printf(
+			TEXT("%s\nGridPos: (%d, %d)"),
+			*FInventorySlot::ToString(),
+			SlotPosition.X,
+			SlotPosition.Y
+		);
+	}
 };
+
+inline FInventorySlot::FInventorySlot(const FMounteaInventoryGridSlot& GridSlot)
+{
+	ItemWidget = GridSlot.ItemWidget;
+}
+
+FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
+{
+	// Assuming FInventoryItem has GetTypeHash; otherwise hash Quantity as well.
+	return HashCombine(
+		GetTypeHash(Data.ContainingItem.GetGuid()),
+		GetTypeHash(Data.Quantity)
+	);
+}
 
 FORCEINLINE uint32 GetTypeHash(const FInventorySlot& Slot)
 {
-	return GetTypeHash(Slot.OccupiedItemId);
+	return GetTypeHash(Slot.SlotGuid);
 }
 
 FORCEINLINE uint32 GetTypeHash(const FMounteaInventoryGridSlot& Slot)
 {
-	return GetTypeHash(Slot.SlotPosition);
+	return HashCombine(
+		GetTypeHash(static_cast<const FInventorySlot&>(Slot)),
+		GetTypeHash(Slot.SlotPosition)
+	);
 }
 
 FORCEINLINE bool operator==(const FInventorySlot& LHS, const FMounteaInventoryGridSlot& RHS)
 {
-	return LHS.OccupiedItemId == RHS.OccupiedItemId;
+	return LHS.SlotGuid == RHS.SlotGuid;
 }

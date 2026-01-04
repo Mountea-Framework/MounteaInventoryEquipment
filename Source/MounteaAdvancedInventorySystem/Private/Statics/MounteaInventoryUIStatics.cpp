@@ -1272,34 +1272,8 @@ FString UMounteaInventoryUIStatics::ItemSlot_GetSlotTooltip(UUserWidget* Target)
 	return IsValid(Target) ? IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotTooltip(Target) : TEXT("none");
 }
 
-FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltip(UWidget* Target)
-{
-	if (!IsValid(Target)) return TEXT("none");
-	if (!Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()) return TEXT("none");
-	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>()) return TEXT("none");
-	
-	const auto slotInventory = IMounteaAdvancedBaseInventoryWidgetInterface::Execute_GetOwningInventoryUI(Target);
-	if (!IsValid(slotInventory.GetObject())) return TEXT("none");
-
-	const auto ownerInventory = slotInventory->Execute_GetParentInventory(slotInventory.GetObject());
-	if (!IsValid(ownerInventory.GetObject())) return TEXT("none");
-	
-	const auto slotData = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetSlotData(Target);
-	if (!slotData.IsValid()) return TEXT("none");
-	const int slotQuantity =slotData.SlotQuantity;
-	const FGuid itemGuid = slotData.OccupiedItemId;
-
-	const auto slotItem = ownerInventory->Execute_FindItem(ownerInventory.GetObject(), FInventoryItemSearchParams(itemGuid));
-	if (!slotItem.IsItemValid()) return TEXT("none");
-
-	const auto itemTemplate = slotItem.GetTemplate();
-	if (!IsValid(itemTemplate)) return TEXT("none");
-
-	return FString::Printf(TEXT("${quantityText}: %d | ${rarityText}: %s"), slotQuantity, *itemTemplate->ItemRarity);
-}
-
-void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UWidget* Target,
-															  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+void UMounteaInventoryUIStatics::ItemSlot_SetItemSlotOwningInventoryUI(UWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1316,13 +1290,13 @@ void UMounteaInventoryUIStatics::ItemSlot_RemoveItemFromSlot(UWidget* Target, co
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_RemoveItemFromSlot(Target, ItemId);
 }
 
-void UMounteaInventoryUIStatics::StoreGridSlotData(UWidget* Target, const FMounteaInventoryGridSlot& SlotData)
+void UMounteaInventoryUIStatics::ItemSlot_StoreGridSlotData(UWidget* Target, const FMounteaInventoryGridSlot& SlotData)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(Target, SlotData);
 }
 
-FMounteaInventoryGridSlot UMounteaInventoryUIStatics::GetGridSlotData(UWidget* Target)
+FMounteaInventoryGridSlot UMounteaInventoryUIStatics::ItemSlot_GetGridSlotData(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
 		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetGridSlotData(Target);
