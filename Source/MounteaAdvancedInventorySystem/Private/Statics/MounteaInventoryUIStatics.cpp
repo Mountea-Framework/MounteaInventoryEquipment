@@ -1006,7 +1006,12 @@ void UMounteaInventoryUIStatics::SetActiveState(UWidget* Target, const bool bIsA
 		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetActiveState(Target, bIsActive);
 }
 
-UUserWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
+FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity)
+{
+	return FInventoryItemData(Quantity, Item);
+}
+
+UWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
 	return (
@@ -1015,19 +1020,11 @@ UUserWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
 }
 
 void UMounteaInventoryUIStatics::SetActiveItemWidget(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewActiveItemWidget)
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UWidget* NewActiveItemWidget)
 {
 	if (!IsValid(Target.GetObject())) return;
 
 	Target->Execute_SetActiveItemWidget(Target.GetObject(), NewActiveItemWidget);
-}
-
-void UMounteaInventoryUIStatics::SetInventoryItemId(UWidget* Target, const FGuid& ItemGuid)
-{
-	/*
-	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
-		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetInventoryItemId(Target, ItemGuid);
-	*/
 }
 
 FGuid UMounteaInventoryUIStatics::GetInventoryItemId(UWidget* Target)

@@ -68,40 +68,11 @@ UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIStatics : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
-public:
-	template<typename ReturnType, typename Func, typename... Args>
-	static ReturnType ExecuteIfImplements(UObject* Target, const TCHAR* FunctionName, Func Function, Args&&... args)
-	{
-		if (!IsValid(Target))
-		{
-			LOG_ERROR(TEXT("[%s] Invalid Target provided!"), FunctionName);
-			if constexpr (!std::is_void_v<ReturnType>)
-				return ReturnType{};
-			else return;
-		}
-
-		if (Target->Implements<UMounteaAdvancedInventoryUIInterface>())
-		{
-			if constexpr (std::is_void_v<ReturnType>)
-			{
-				Function(Target, Forward<Args>(args)...);
-				return;
-			}
-			return Function(Target, Forward<Args>(args)...);
-		}
-
-		LOG_ERROR(TEXT("[%s] Target does not implement 'MounteaAdvancedInventoryUIInterface'!"), FunctionName);
-		if constexpr (!std::is_void_v<ReturnType>)
-			return ReturnType{};
-		else return;
-	}
 
 public:	
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
 	
-public:
 	// --- Helpers
 	
 #pragma region Helpers
@@ -295,7 +266,7 @@ public:
 
 #pragma endregion
 	
-	// --- UMounteaInventoryScrollBox
+	// --- MounteaInventoryScrollBox
 	
 #pragma region MounteaScrollBox
 	
@@ -332,7 +303,7 @@ public:
 	
 #pragma endregion
 	
-	// --- Theme  ------------------------------
+	// --- Theme
 #pragma region Theme
 
 	/**
@@ -556,7 +527,7 @@ public:
 
 #pragma endregion
 
-	// --- Generic Widget  ------------------------------
+	// --- Generic Widget
 #pragma region GenericWidget
 
 	/**
@@ -573,7 +544,7 @@ public:
 	
 #pragma endregion
 
-	// --- Base Widget  ------------------------------
+	// --- Base Widget
 #pragma region BaseWidget
 
 	/**
@@ -588,7 +559,7 @@ public:
 	
 #pragma endregion
 	
-	// --- Wrapper  ------------------------------
+	// --- Wrapper
 #pragma region Wrapper
 
 	/**
@@ -635,7 +606,7 @@ public:
 	
 #pragma endregion
 	
-	// --- Notification  ------------------------------
+	// --- Notification
 #pragma region Notification
 	
 	/**
@@ -671,7 +642,7 @@ public:
 
 #pragma endregion
 	
-	// --- InventoryUI  ------------------------------
+	// --- InventoryUI
 #pragma region InventoryUI
 	
 	/**
@@ -720,8 +691,9 @@ public:
 	 * @return A pointer to the UUserWidget representing the active item widget, or nullptr if no widget is active.
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
-		meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Inventory UI - Get Active Item Widget")
+	static UWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 
 	/**
 	 * Sets the active item widget in the UI.
@@ -730,8 +702,9 @@ public:
 	 * @param NewActiveItemWidget The new widget to be set as the active item widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
-		meta=(CustomTag="MounteaK2Setter"))
-	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewActiveItemWidget);
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI - Set Active Item Widget")
+	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UWidget* NewActiveItemWidget);
 
 #pragma endregion
 
@@ -764,7 +737,7 @@ public:
 	
 #pragma endregion
 
-	// --- Categories Wrapper Widget ------------------------------
+	// --- Categories Wrapper Widget
 #pragma region CategoriesWrapper
 
 	/**
@@ -801,7 +774,7 @@ public:
 	
 #pragma endregion
 	
-	// --- Category Widget ------------------------------
+	// --- Category Widget
 #pragma region Category
 
 	/**
@@ -849,22 +822,14 @@ public:
 	
 #pragma endregion	
 	
-	// --- Item Widget ------------------------------
+	// --- Item Widget
 #pragma region Item
 	
-	/**
-	 * Sets the inventory item ID for the specified widget.
-	 *
-	 * This method assigns a unique identifier to the target widget if it implements
-	 * the MounteaAdvancedInventoryItemWidgetInterface interface. The item ID
-	 * represented by the `ItemGuid` parameter is used to link the widget to a specific inventory item.
-	 *
-	 * @param Target A pointer to the widget that will have its inventory item ID set. This must be a valid widget instance.
-	 * @param ItemGuid The unique identifier of the inventory item to associate with the widget.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
-		meta=(CustomTag="MounteaK2Setter"))
-	static void SetInventoryItemId(UWidget* Target, const FGuid& ItemGuid);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Make New Inventory Inventory Item Widget Data",
+		meta=(NativeMakeFunc))
+	static FInventoryItemData MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity);
 
 	/**
 	 * Retrieves the Inventory Item ID associated with the given widget.
@@ -974,7 +939,7 @@ public:
 	
 #pragma endregion
 
-	// --- Item Action ------------------------------
+	// --- Item Action
 #pragma region ItemActions
 
 	/**
@@ -986,7 +951,8 @@ public:
 	 * @param ParentWidget Inventory Item widget which owns this item action widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Item Action - Initialize")
 	static void ItemAction_InitializeItemAction(UUserWidget* Target,
 		const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
 		const TSoftClassPtr<UObject>& ItemActionClass,
@@ -1062,7 +1028,7 @@ public:
 
 #pragma endregion
 
-	// --- Item Actions Container------------------------
+	// --- Item Actions Container
 #pragma region ItemActionsContainer
 
 	/**
@@ -1156,7 +1122,7 @@ public:
 	
 #pragma endregion
 	
-	// --- Item Tooltip ------------------------------
+	// --- Item Tooltip
 #pragma region ItemTooltip
 
 	/**
@@ -1177,7 +1143,7 @@ public:
 	
 #pragma endregion
 	
-	// --- Item Slot Widget ------------------------------
+	// --- Item Slot Widget
 #pragma region ItemSlot
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
@@ -1304,7 +1270,7 @@ public:
 	
 #pragma endregion
 
-	// --- Item Slots Wrapper ------------------------------
+	// --- Item Slots Wrapper
 #pragma region ItemSlotsWrapper
 
 	/**
@@ -1380,7 +1346,7 @@ public:
 	
 #pragma endregion
 
-// --- Items Grid ------------------------------
+// --- Items Grid
 #pragma region ItemsGrid
 
 	/**
@@ -1660,7 +1626,7 @@ public:
 	
 #pragma endregion
 
-// --- Items Preview ------------------------------
+// --- Items Preview
 #pragma region ItemsPreview
 
 	/**

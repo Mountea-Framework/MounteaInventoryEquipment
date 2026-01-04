@@ -41,7 +41,8 @@ class UUserWidget;
  * @see FInventorySlot
  * @see FMounteaInventoryGridSlot
  */
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType,
+	meta = (HasNativeMake = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryUIStatics.MakeInventorySlot"))
 struct FInventoryItemData
 {
 	GENERATED_BODY()

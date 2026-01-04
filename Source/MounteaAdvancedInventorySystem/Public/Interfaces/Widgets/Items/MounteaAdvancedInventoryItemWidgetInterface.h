@@ -65,7 +65,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void InitializeItemWidget(const FInventoryItem& Item, const int32 Quantity);
 	virtual void InitializeItemWidget_Implementation(const FInventoryItem& Item, const int32 Quantity) = 0;
-
 	
 	/**
 	 * Retrieves the logical data currently represented by this item widget.

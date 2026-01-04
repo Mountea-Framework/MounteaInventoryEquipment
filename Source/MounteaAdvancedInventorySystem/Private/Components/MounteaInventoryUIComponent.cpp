@@ -206,7 +206,7 @@ void UMounteaInventoryUIComponent::RemoveWrapperWidget_Implementation()
 	}
 }
 
-void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget)
+void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget)
 {
 	if (ActiveItemWidget != NewActiveItemWidget)
 	{
