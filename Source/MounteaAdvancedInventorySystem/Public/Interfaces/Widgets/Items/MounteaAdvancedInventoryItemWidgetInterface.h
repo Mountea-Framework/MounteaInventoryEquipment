@@ -53,7 +53,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void SetInventoryData(const FInventoryItemData& InventoryData);
-	virtual void SetInventoryData_Implementation(const FInventoryItemData& InventoryData);
+	virtual void SetInventoryData_Implementation(const FInventoryItemData& InventoryData) = 0;
 
 	/**
 	 * 

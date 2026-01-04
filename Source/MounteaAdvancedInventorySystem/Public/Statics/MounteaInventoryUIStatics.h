@@ -1150,14 +1150,13 @@ public:
 	 * Create new inventory slot widget with the specified parameters.
 	 * @param UserWidget The user widget that will contain the inventory slot.
 	 * @param ItemId The unique identifier of the item to be displayed in the slot.
-	 * @param Quantity The quantity of the item to be displayed in the slot.
 	 * @return A new FInventorySlot instance containing the item ID and quantity.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Make New Inventory Slot Data",
 		meta=(NativeMakeFunc))
-	static FInventorySlot MakeInventorySlot(UUserWidget* UserWidget, const FGuid& ItemId, const int32 Quantity);
+	static FInventorySlot MakeInventorySlot(UUserWidget* UserWidget, const FGuid& ItemId);
 
 	/**
 	 * Sets the owning inventory UI for a given item slot widget.
