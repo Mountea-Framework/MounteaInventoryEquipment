@@ -1331,7 +1331,7 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Slots Wrapper - Get Selected Item Widget")
-	static UUserWidget* SlotsWrapper_GetSelectedItemWidget(UWidget* Target);
+	static UWidget* SlotsWrapper_GetSelectedItemWidget(UWidget* Target);
 
 	/**
 	 * Attempts to set Item Widget as Selected one.
@@ -1342,7 +1342,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Slots Wrapper - Set Selected Item Widget")
-	static void SlotsWrapper_SetSelectedItemWidget(UWidget* Target, UUserWidget* NewSelectedItemWidget);
+	static void SlotsWrapper_SetSelectedItemWidget(UWidget* Target, UWidget* NewSelectedItemWidget);
 	
 #pragma endregion
 
