@@ -242,6 +242,62 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	{
 		RegisterTabSpawners();
 	}
+	
+	// Validate WebBrowserWidget
+	if (!FModuleManager::Get().IsModuleLoaded("WebBrowserWidget"))
+	{
+		FText errorTitle = NSLOCTEXT("MounteaInventory", "WebBrowserMissing", "⚠ Missing Plugin ⚠");
+		FText errorMessage = NSLOCTEXT("MounteaInventory", "WebBrowserMissingMessage", 
+			"The 'Web Browser Widget' plugin is required for the Item Template Editor system.\n\n"
+			"We need to enable the plugin and restart the Editor. Sorry for the inconvenience.");
+		
+		FMessageDialog::Open(EAppMsgType::Ok, errorMessage, errorTitle);
+		
+		FString projectFilePath = FPaths::ProjectDir() / FApp::GetProjectName() + TEXT(".uproject");			
+		FString jsonString;
+		if (FFileHelper::LoadFileToString(jsonString, *projectFilePath))
+		{
+			TSharedPtr<FJsonObject> jsonObject;
+			TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(jsonString);
+				
+			if (FJsonSerializer::Deserialize(reader, jsonObject) && jsonObject.IsValid())
+			{
+				TArray<TSharedPtr<FJsonValue>> pluginsArray;
+				if (jsonObject->HasField(TEXT("Plugins")))
+					pluginsArray = jsonObject->GetArrayField(TEXT("Plugins"));
+					
+				bool bExists = false;
+				for (const TSharedPtr<FJsonValue>& plugin : pluginsArray)
+				{
+					TSharedPtr<FJsonObject> pluginObj = plugin->AsObject();
+					if (pluginObj.IsValid() && pluginObj->GetStringField(TEXT("Name")) == TEXT("WebBrowserWidget"))
+					{
+						pluginObj->SetBoolField(TEXT("Enabled"), true);
+						bExists = true;
+						break;
+					}
+				}
+					
+				if (!bExists)
+				{
+					TSharedPtr<FJsonObject> newPlugin = MakeShareable(new FJsonObject());
+					newPlugin->SetStringField(TEXT("Name"), TEXT("WebBrowserWidget"));
+					newPlugin->SetBoolField(TEXT("Enabled"), true);
+					pluginsArray.Add(MakeShareable(new FJsonValueObject(newPlugin)));
+				}
+					
+				jsonObject->SetArrayField(TEXT("Plugins"), pluginsArray);
+					
+				FString outputString;
+				TSharedRef<TJsonWriter<>> writer = TJsonWriterFactory<>::Create(&outputString);
+				if (FJsonSerializer::Serialize(jsonObject.ToSharedRef(), writer))
+				{
+					if (FFileHelper::SaveStringToFile(outputString, *projectFilePath))
+						FUnrealEdMisc::Get().RestartEditor(false);
+				}
+			}
+		}
+	}
 }
 
 void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
