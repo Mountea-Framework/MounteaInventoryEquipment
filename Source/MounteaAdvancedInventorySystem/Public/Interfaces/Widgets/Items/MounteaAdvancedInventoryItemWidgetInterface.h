@@ -25,12 +25,21 @@ class UMounteaAdvancedInventoryItemWidgetInterface : public UInterface
 };
 
 /**
- * IMounteaAdvancedInventoryItemWidgetInterface manages individual inventory item widget presentation.
- * Item widget interfaces handle item identification, visual refresh, highlighting, and slot association
- * for individual item representations within inventory interfaces.
+ * Interface for widgets representing individual inventory items.
  *
- * @see [Item Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemWidgets)
+ * This interface defines the contract for UI widgets that visually display
+ * inventory items and react to changes in item state. Implementations are responsible for:
+ *
+ * - Displaying item metadata and quantity
+ * - Applying highlights, states, and visual refresh logic
+ * - Holding and exposing their associated inventory data
+ * - Maintaining an association with the parent inventory slot widget
+ *
+ * This keeps UI responsibilities isolated from inventory logic, while still allowing
+ * widgets to query and present relevant item details.
+ *
  * @see FInventoryItem
+ * @see FInventoryItemData
  * @see FInventorySlot
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemWidgetInterface
@@ -40,56 +49,78 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemWidgetInte
 public:
 	
 	/**
-	 * 
-	 * @return 
+	 * Retrieves the logical data currently represented by this item widget.
+	 *
+	 * Implementations should always return the latest data that the UI reflects.
+	 *
+	 * @return A copy of the item’s data structure describing quantity and contained item state.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	FInventoryItemData GetInventoryData() const;
 	virtual FInventoryItemData GetInventoryData_Implementation() const = 0;
 
 	/**
-	 * 
-	 * @param InventoryData 
+	 * Assigns new inventory data to this widget.
+	 *
+	 * Implementations should update visuals immediately or trigger an internal refresh.
+	 *
+	 * @param InventoryData Data describing the item and its quantity.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void SetInventoryData(const FInventoryItemData& InventoryData);
 	virtual void SetInventoryData_Implementation(const FInventoryItemData& InventoryData) = 0;
 
 	/**
-	 * 
-	 * @return 
+	 * Gets the GUID of the item currently bound to this widget.
+	 *
+	 * @return GUID identifying the item, or invalid GUID if no valid item exists.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	FGuid GetInventoryItemId() const;
 	virtual FGuid GetInventoryItemId_Implementation() const = 0;
 
 	/**
-	 * 
+	 * Forces the widget to visually refresh itself.
+	 *
+	 * Typical use cases:
+	 * - Quantity change
+	 * - State updates (cooldowns, durability, etc.)
+	 *
+	 * @param Quantity The current quantity to visually reflect.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void RefreshItemWidget(const int32 Quantity);
 	virtual void RefreshItemWidget_Implementation(const int32 Quantity) = 0;
 
 	/**
-	 * Retrieves the associated parent inventory slot.
-	 * @return The inventory slot.
+	 * Returns the UI widget representing the parent slot that owns this item widget.
+	 *
+	 * @return Widget representing the slot that contains this item instance.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	UUserWidget* GetParentSlot() const;
 	virtual UUserWidget* GetParentSlot_Implementation() const = 0;
 	
 	/**
+	 * Assigns the parent slot that visually contains this item widget.
 	 *
-	 * @param ParentSlot The parent slot to be assigned to the inventory item widget.
+	 * Intended to be called when this item is inserted or moved between slots.
+	 *
+	 * @param ParentSlot Widget representing the inventory slot owning this item.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void SetParentSlot(UUserWidget* ParentSlot);
 	virtual void SetParentSlot_Implementation(UUserWidget* ParentSlot) = 0;
 
 	/**
-	 * Highlights or un-highlights an inventory item within the UI by interacting with the provided widget.
+	 * Toggles visual highlighting for this item widget.
 	 *
-	 * @param bIsSelected A boolean indicating whether to highlight (true) or un-highlight (false) the item.
+	 * Useful for:
+	 * - Selection feedback
+	 * - Drag-and-drop feedback
+	 * - Interaction state changes
+	 *
+	 * @param bIsSelected Whether the widget should be rendered as highlighted.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	void HighlightItem(const bool bIsSelected = false);
