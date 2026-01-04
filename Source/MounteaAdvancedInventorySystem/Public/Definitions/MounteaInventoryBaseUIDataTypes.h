@@ -32,6 +32,12 @@ class UUserWidget;
  * It is suitable for use in both runtime logic and UI data binding, and can be
  * shared between inventory systems and UI presentation layers.
  *
+ * In the UI chain:
+ *   UISlot (slot widget)
+ *     -> UISlotData (FInventorySlot)
+ *         -> UIItem (child widget implementing UMounteaAdvancedInventoryItemWidgetInterface)
+ *             -> UIItemData (FInventoryItemData, this struct) -> FInventoryItem
+ *
  * @see FInventorySlot
  * @see FMounteaInventoryGridSlot
  */
@@ -108,11 +114,15 @@ public:
 };
 
 /**
- * FInventorySlot is the base structure for all inventory slot *UI* representations.
+ * FInventorySlot is the base structure for all inventory slot UI representations.
  *
  * A slot:
+ * - Has its own GUID (SlotGuid) to identify the slot instance.
  * - Maintains a reference to the child widget that visually represents the item,
  *   which should implement UMounteaAdvancedInventoryItemWidgetInterface.
+ *
+ * The slot does not own item data directly. Instead, it queries the child widget
+ * for FInventoryItemData via the interface.
  *
  * In the chain:
  *   UISlot (slot widget)
@@ -149,25 +159,22 @@ public:
 public:
 
 	FInventorySlot()
-		: ItemWidget(nullptr)
-		, SlotGuid(FGuid())
+		: SlotGuid(FGuid())
+		, ItemWidget(nullptr)
 	{
 	}
 
-	explicit FInventorySlot(UUserWidget* InItemWidget = nullptr)
-		: ItemWidget(InItemWidget)
-		, SlotGuid(FGuid())
+	FInventorySlot(UUserWidget* InItemWidget)
+		: SlotGuid(FGuid())
+		, ItemWidget(InItemWidget)
 	{
 	}
-
-	explicit FInventorySlot(const struct FMounteaInventoryGridSlot& GridSlot);
 
 	void OverrideGuid(const FGuid& InGuid)
 	{ SlotGuid = InGuid; }
 	
 	bool IsEmpty() const;
 	
-	/** Returns true if this slot currently has a child item widget assigned. */
 	bool HasItemWidget() const
 	{ return ItemWidget != nullptr; }
 	
@@ -203,12 +210,11 @@ struct FMounteaInventoryGridSlot : public FInventorySlot
 
 public:
 	FMounteaInventoryGridSlot()
-		: FInventorySlot(nullptr)
-		, SlotPosition(FIntPoint::ZeroValue)
+		: SlotPosition(FIntPoint::ZeroValue)
 	{
 	}
 
-	explicit FMounteaInventoryGridSlot(const FInventorySlot& SourceSlot)
+	FMounteaInventoryGridSlot(const FInventorySlot& SourceSlot)
 	{
 		ItemWidget = SourceSlot.ItemWidget;
 		SlotPosition = FIntPoint::ZeroValue;
@@ -249,14 +255,8 @@ public:
 	}
 };
 
-inline FInventorySlot::FInventorySlot(const FMounteaInventoryGridSlot& GridSlot)
-{
-	ItemWidget = GridSlot.ItemWidget;
-}
-
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {
-	// Assuming FInventoryItem has GetTypeHash; otherwise hash Quantity as well.
 	return HashCombine(
 		GetTypeHash(Data.ContainingItem.GetGuid()),
 		GetTypeHash(Data.Quantity)
