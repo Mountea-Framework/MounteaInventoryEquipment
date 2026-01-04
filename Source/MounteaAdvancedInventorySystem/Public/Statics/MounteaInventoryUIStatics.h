@@ -830,6 +830,19 @@ public:
 		DisplayName="Make New Inventory Inventory Item Widget Data",
 		meta=(NativeMakeFunc))
 	static FInventoryItemData MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity);
+	
+	/**
+	 * Selects this inventory item in the UI.
+	 * 
+	 * This method checks if the provided widget implements the MounteaAdvancedInventoryItemWidgetInterface and,
+	 * if so, calls to the Item Widget to process its selection.
+	 * 
+	 * @param Target The widget from which the Inventory Item ID is to be retrieved.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Item - Select Item")
+	static void ItemWidget_SelectItem(UWidget* Target);
 
 	/**
 	 * Retrieves the Inventory Item ID associated with the given widget.
@@ -844,7 +857,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
 		meta=(CustomTag="MounteaK2Getter"))
-	static FGuid GetInventoryItemId(UWidget* Target);
+	static FGuid ItemWidget_GetInventoryItemId(UWidget* Target);
 
 	/**
 	 * Sets the owning inventory UI interface for the specified widget.

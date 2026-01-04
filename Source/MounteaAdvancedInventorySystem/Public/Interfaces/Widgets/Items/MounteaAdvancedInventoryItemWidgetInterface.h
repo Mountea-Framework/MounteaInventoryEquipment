@@ -67,6 +67,13 @@ public:
 	virtual void InitializeItemWidget_Implementation(const FInventoryItem& Item, const int32 Quantity) = 0;
 	
 	/**
+	 * Selects this inventory item in the UI.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	void SelectItem();
+	virtual void SelectItem_Implementation() = 0;
+	
+	/**
 	 * Retrieves the logical data currently represented by this item widget.
 	 *
 	 * Implementations should always return the latest data that the UI reflects.

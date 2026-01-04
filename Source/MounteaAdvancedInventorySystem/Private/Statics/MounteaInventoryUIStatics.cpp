@@ -1027,7 +1027,13 @@ void UMounteaInventoryUIStatics::SetActiveItemWidget(
 	Target->Execute_SetActiveItemWidget(Target.GetObject(), NewActiveItemWidget);
 }
 
-FGuid UMounteaInventoryUIStatics::GetInventoryItemId(UWidget* Target)
+void UMounteaInventoryUIStatics::ItemWidget_SelectItem(UWidget* Target)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SelectItem(Target);
+}
+
+FGuid UMounteaInventoryUIStatics::ItemWidget_GetInventoryItemId(UWidget* Target)
 {
 	return (
 		IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()
