@@ -53,8 +53,8 @@ public:
 	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return InventoryWidget; };
 	virtual void RemoveWrapperWidget_Implementation() override;
 
-	virtual UUserWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
-	virtual void SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget) override;
+	virtual UWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
+	virtual void SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget) override;
 	
 	virtual UUserWidget* GetNotificationContainer_Implementation() const override;
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) override;
@@ -118,7 +118,7 @@ protected:
 	FGuid ActiveItemGuid;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
-	TObjectPtr<UUserWidget> ActiveItemWidget;
+	TObjectPtr<UWidget> ActiveItemWidget;
 
 	/**
 	 * Represents the set of saved inventory grid slots.

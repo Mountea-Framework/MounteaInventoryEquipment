@@ -20,6 +20,7 @@ struct FInventoryItem;
 struct FInventoryNotificationData;
 class IMounteaAdvancedInventoryInterface;
 class UCommonActivatableWidget;
+class UWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&, SelectedItemId);
@@ -143,11 +144,11 @@ public:
 	 *
 	 * This function returns a pointer to the active item widget currently being displayed or interacted with.
 	 *
-	 * @return A pointer to the UUserWidget representing the active item widget, or nullptr if no widget is active.
+	 * @return A pointer to the UWidget representing the active item widget, or nullptr if no widget is active.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Item")
-	UUserWidget* GetActiveItemWidget() const;
-	virtual UUserWidget* GetActiveItemWidget_Implementation() const = 0;
+	UWidget* GetActiveItemWidget() const;
+	virtual UWidget* GetActiveItemWidget_Implementation() const = 0;
 
 	/**
 	 * Sets the active item widget in the UI.
@@ -155,8 +156,8 @@ public:
 	 * @param NewActiveItemWidget The new widget to be set as the active item widget.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Item")
-	void SetActiveItemWidget(UUserWidget* NewActiveItemWidget);
-	virtual void SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget) = 0;
+	void SetActiveItemWidget(UWidget* NewActiveItemWidget);
+	virtual void SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget) = 0;
 
 	/**
 	 * Processes an item that has been added to the inventory.

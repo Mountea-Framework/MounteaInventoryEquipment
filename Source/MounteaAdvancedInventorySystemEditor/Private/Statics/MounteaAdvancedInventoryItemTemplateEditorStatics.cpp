@@ -96,7 +96,9 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
                 }
             }
 
-            const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"), *itemGuid.ToString(EGuidFormats::Short));
+            const FString itemDisplayName = ExtractNameFromJson(itemJson);
+            const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"),  itemDisplayName.IsEmpty() ?
+                *itemGuid.ToString(EGuidFormats::Short) : *itemDisplayName);
             UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(folderToUse, assetName, OutErrorMessage);
             
             if (!newTemplate)
@@ -314,6 +316,40 @@ FGuid UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(co
     }
 
     return FGuid();
+}
+
+FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(const FString& JsonString)
+{
+    TSharedPtr<FJsonObject> jsonObject;
+    TSharedRef<TJsonReader<>> jsonReader = TJsonReaderFactory<>::Create(JsonString);
+
+    if (!FJsonSerializer::Deserialize(jsonReader, jsonObject) || !jsonObject.IsValid())
+        return TEXT("");
+
+    FString displayName;
+    if (jsonObject->TryGetStringField(TEXT("displayName"), displayName))
+    {
+        displayName.RemoveSpacesInline();
+
+        const FRegexPattern InvalidCharsPattern(TEXT("[\\\\:\\*\\?\"<>\\| ,.&!~@#']"));
+        FRegexMatcher Matcher(InvalidCharsPattern, displayName);
+
+        FString Sanitized;
+        Sanitized.Reserve(displayName.Len());
+
+        int32 LastIndex = 0;
+        while (Matcher.FindNext())
+        {
+            const int32 MatchBegin = Matcher.GetMatchBeginning();
+            Sanitized += displayName.Mid(LastIndex, MatchBegin - LastIndex);
+            LastIndex = Matcher.GetMatchEnding();
+        }
+        Sanitized += displayName.Mid(LastIndex);
+
+        return Sanitized;
+    }
+
+    return TEXT("");
 }
 
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(
