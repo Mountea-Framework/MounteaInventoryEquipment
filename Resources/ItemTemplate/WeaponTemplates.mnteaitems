@@ -1,0 +1,946 @@
+{
+	"items": [
+		{
+			"guid": "A11F2F7D9A6241D09F0E3D21F2B1C001",
+			"displayName": "Rusty Shortsword",
+			"category": "Weapons",
+			"subCategory": "Shortsword",
+			"rarity": "Common",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Sword.Shortsword",
+				"Mountea_Inventory.Category.Weapons.OneHanded",
+				"Mountea_Inventory.Rarity.Common"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "An old, worn blade.",
+				"long": "A basic shortsword that has clearly seen better days. Still usable in desperate situations."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 70,
+				"base": 70,
+				"penalization": 0.12,
+				"priceCoefficient": 0.7
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 3,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.1
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "B22E3F8F8B6B4A1CB4E22A3C911C2002",
+			"displayName": "Wooden Club",
+			"category": "Weapons",
+			"subCategory": "Mace",
+			"rarity": "Common",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Mace.Light",
+				"Mountea_Inventory.Category.Weapons.OneHanded",
+				"Mountea_Inventory.Rarity.Common"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A crude wooden club.",
+				"long": "A simple blunt weapon carved from a tree branch. Cheap, heavy, and surprisingly effective."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 90,
+				"base": 90,
+				"penalization": 0.1,
+				"priceCoefficient": 0.8
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 4,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.6
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "C33D4C1A7B3E41E99BB3A12A4A9D3003",
+			"displayName": "Basic Longsword",
+			"category": "Weapons",
+			"subCategory": "Longsword",
+			"rarity": "Uncommon",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Sword.Longsword",
+				"Mountea_Inventory.Category.Weapons.OneHanded",
+				"Mountea_Inventory.Rarity.Uncommon"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A solid training longsword.",
+				"long": "A dependable longsword issued to militia and guards. Balanced enough for most situations."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 110,
+				"base": 110,
+				"penalization": 0.1,
+				"priceCoefficient": 0.9
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 12,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.4
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "D44A5E1F0A2B4E1C9E9E1122E11C4004",
+			"displayName": "Simple Spear",
+			"category": "Weapons",
+			"subCategory": "Short Spear",
+			"rarity": "Common",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Spear.Short",
+				"Mountea_Inventory.Category.Weapons.TwoHanded",
+				"Mountea_Inventory.Rarity.Common"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A basic wooden spear.",
+				"long": "A sharpened spear shafted with plain wood. Farmers often repurpose these for defense."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 95,
+				"base": 95,
+				"penalization": 0.1,
+				"priceCoefficient": 0.85
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 6,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.9
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "E55B6A9D9B4D4A43A2A3F2B5F55D5005",
+			"displayName": "Apprentice Wand",
+			"category": "Weapons",
+			"subCategory": "Wand",
+			"rarity": "Uncommon",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Wand.Simple",
+				"Mountea_Inventory.Rarity.Uncommon"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A simple magical focus.",
+				"long": "A lightly enchanted wand used by novice spellcasters to channel basic spells."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 80,
+				"base": 80,
+				"penalization": 0.12,
+				"priceCoefficient": 0.9
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 14,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.6
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "901A2E8C0D82428FA3A3E713C2219001",
+			"displayName": "Knight’s Longsword",
+			"category": "Weapons",
+			"subCategory": "Longsword",
+			"rarity": "Rare",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Sword.Longsword",
+				"Mountea_Inventory.Category.Weapons.OneHanded",
+				"Mountea_Inventory.Rarity.Rare"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A finely forged knight’s blade.",
+				"long": "A polished longsword forged from high-grade steel, prized for its reliability and cutting power."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 160,
+				"base": 160,
+				"penalization": 0.08,
+				"priceCoefficient": 1.1
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 28,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.5
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "A02B3F9F7C7F4D7AB9F3F12A77409002",
+			"displayName": "Greatsword of Resolve",
+			"category": "Weapons",
+			"subCategory": "Greatsword",
+			"rarity": "Rare",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Sword.Greatsword",
+				"Mountea_Inventory.Category.Weapons.TwoHanded",
+				"Mountea_Inventory.Rarity.Rare"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A massive two-handed sword.",
+				"long": "This imposing greatsword demands strength and discipline, delivering devastating sweeping strikes."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 180,
+				"base": 180,
+				"penalization": 0.09,
+				"priceCoefficient": 1.2
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 36,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 2.6
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "B13C4E7E8C5B45B48A4C1E4E5B3D9003",
+			"displayName": "Longbow of the Hunt",
+			"category": "Weapons",
+			"subCategory": "Longbow",
+			"rarity": "Rare",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Bow.Longbow",
+				"Mountea_Inventory.Category.Weapons.TwoHanded",
+				"Mountea_Inventory.Rarity.Rare"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A precision hunting bow.",
+				"long": "Crafted from layered yew, this longbow offers superior range and penetrating power."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 150,
+				"base": 150,
+				"penalization": 0.1,
+				"priceCoefficient": 1.1
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 30,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.3
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "C24D5A5D1F9B4C94A73D9E4B91199004",
+			"displayName": "War Mace",
+			"category": "Weapons",
+			"subCategory": "Heavy Mace",
+			"rarity": "Rare",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Mace.Heavy",
+				"Mountea_Inventory.Category.Weapons.TwoHanded",
+				"Mountea_Inventory.Rarity.Rare"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A brutal crushing weapon.",
+				"long": "A reinforced war mace designed to shatter shields and dent armor with overwhelming force."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 170,
+				"base": 170,
+				"penalization": 0.1,
+				"priceCoefficient": 1.15
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 32,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 2.8
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "D35E6B4A4C8C4A29A8B0B38F62229005",
+			"displayName": "Arcane Battlestaff",
+			"category": "Weapons",
+			"subCategory": "Magic Staff",
+			"rarity": "Epic",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Staff.Magic",
+				"Mountea_Inventory.Rarity.Epic"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A staff brimming with power.",
+				"long": "A mastercrafted arcane staff that amplifies spellcasting, etched with faintly glowing runes."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 140,
+				"base": 140,
+				"penalization": 0.08,
+				"priceCoefficient": 1.4
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 48,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.2
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "F11A2B3C4D5E46F7A8B9C0D1E2F30001",
+			"displayName": "Dragonsplitter Greatsword",
+			"category": "Weapons",
+			"subCategory": "Greatsword",
+			"rarity": "Legendary",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Sword.Greatsword",
+				"Mountea_Inventory.Category.Weapons.TwoHanded",
+				"Mountea_Inventory.Rarity.Legendary"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "An enormous blade forged to slay monsters.",
+				"long": "Said to be tempered in dragon fire, this greatsword carries immense momentum and crushing power."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 240,
+				"base": 240,
+				"penalization": 0.06,
+				"priceCoefficient": 1.8
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 120,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 3.2
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "F22B3C4D5E6F47A8B9C0D1E2F3A40002",
+			"displayName": "Stormpiercer Spear",
+			"category": "Weapons",
+			"subCategory": "Long Spear",
+			"rarity": "Epic",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Spear.Long",
+				"Mountea_Inventory.Category.Weapons.TwoHanded",
+				"Mountea_Inventory.Rarity.Epic"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A spear that crackles faintly with energy.",
+				"long": "Balanced and razor sharp, this spear is rumored to have been struck by lightning during its forging."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 200,
+				"base": 200,
+				"penalization": 0.07,
+				"priceCoefficient": 1.5
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 95,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 2.2
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "F33C4D5E6F7A48B9C0D1E2F3A4B50003",
+			"displayName": "Shadowstep Dagger",
+			"category": "Weapons",
+			"subCategory": "Dagger",
+			"rarity": "Epic",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Dagger.Standard",
+				"Mountea_Inventory.Category.Weapons.OneHanded",
+				"Mountea_Inventory.Rarity.Epic"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A dagger that seems to fade in and out of sight.",
+				"long": "Forged from dark alloy, its edge leaves wounds that take a long time to heal — if they heal at all."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 140,
+				"base": 140,
+				"penalization": 0.08,
+				"priceCoefficient": 1.4
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 85,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 0.7
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "F44D5E6F7A8B49C0D1E2F3A4B5C60004",
+			"displayName": "Sunforged Warhammer",
+			"category": "Weapons",
+			"subCategory": "Heavy Mace",
+			"rarity": "Legendary",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Mace.Heavy",
+				"Mountea_Inventory.Category.Weapons.TwoHanded",
+				"Mountea_Inventory.Rarity.Legendary"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A radiant hammer that glows with inner heat.",
+				"long": "Its head holds the warmth of a perpetual forge, crushing armor and igniting debris with each impact."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 260,
+				"base": 260,
+				"penalization": 0.06,
+				"priceCoefficient": 2
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 140,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 3.6
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		},
+		{
+			"guid": "F55E6F7A8B9C4AC1D2E3F4A5B6D70005",
+			"displayName": "Celestial Arcanist Staff",
+			"category": "Weapons",
+			"subCategory": "Magic Staff",
+			"rarity": "Legendary",
+			"flags": 137,
+			"maxQuantity": 1,
+			"maxStackSize": 1,
+			"tags": [
+				"Mountea_Inventory.Category.Weapons",
+				"Mountea_Inventory.Category.Weapons.Staff.Magic",
+				"Mountea_Inventory.Rarity.Legendary"
+			],
+			"spawnActor": {
+				"name": "",
+				"path": ""
+			},
+			"description": {
+				"short": "A staff infused with starlight.",
+				"long": "Bound with astral runes, this staff channels magic with extraordinary clarity and destructive force."
+			},
+			"visuals": {
+				"thumbnail": {
+					"name": "",
+					"path": ""
+				},
+				"cover": {
+					"name": "",
+					"path": ""
+				},
+				"mesh": {
+					"name": "",
+					"path": ""
+				}
+			},
+			"durability": {
+				"enabled": true,
+				"max": 200,
+				"base": 200,
+				"penalization": 0.05,
+				"priceCoefficient": 2.2
+			},
+			"economy": {
+				"enabled": true,
+				"basePrice": 160,
+				"sellCoefficient": 0.75
+			},
+			"weight": {
+				"enabled": true,
+				"value": 1.4
+			},
+			"attachmentSlots": [
+				"Mountea_Inventory.AttachmentSlots.Right_Hand"
+			],
+			"specialAffects": [
+				{
+					"name": "MounteaEquipItemAction",
+					"path": "/Script/MounteaAdvancedInventorySystem.MounteaEquipItemAction"
+				}
+			]
+		}
+	]
+}
