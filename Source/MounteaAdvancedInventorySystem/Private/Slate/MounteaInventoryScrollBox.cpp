@@ -24,6 +24,11 @@ void UMounteaInventoryScrollBox::NativeConstruct()
 	SetIsFocusable(true);
 }
 
+int32 UMounteaInventoryScrollBox::GetChildrenCount() const
+{
+	return VerticalBox ? VerticalBox->GetChildrenCount() : INDEX_NONE;
+}
+
 void UMounteaInventoryScrollBox::AddChild(UWidget* Content)
 {
 	if (!Content || !VerticalBox)

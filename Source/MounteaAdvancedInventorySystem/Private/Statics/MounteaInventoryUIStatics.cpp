@@ -426,6 +426,12 @@ UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUI
 	return localSubsystem;
 }
 
+int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetChildrenCount(
+	const UMounteaInventoryScrollBox* ScrollBox)
+{
+	return ScrollBox ? ScrollBox->GetChildrenCount() : INDEX_NONE;
+}
+
 int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetActiveIndex(const UMounteaInventoryScrollBox* ScrollBox)
 {
 	return ScrollBox ? ScrollBox->GetActiveIndex() : INDEX_NONE;

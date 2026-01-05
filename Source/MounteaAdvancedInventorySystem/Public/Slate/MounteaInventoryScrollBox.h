@@ -66,6 +66,7 @@ public:
 public:	
 	void SetActiveIndex(int32 NewIndex);
 	int32 GetActiveIndex() const { return ActiveIndex; }
+	int32 GetChildrenCount() const;
 	
 	void AddChild(UWidget* Content);
 	void ResetChildren();

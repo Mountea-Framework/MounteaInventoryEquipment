@@ -269,6 +269,16 @@ public:
 	// --- MounteaInventoryScrollBox
 	
 #pragma region MounteaScrollBox
+
+	/**
+	 * 
+	 * @param ScrollBox 
+	 * @return 
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Scrollbox", 
+		meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Children Count",
+		meta=(Keywords = "Num, Len, Lenght"))
+	static int32 MounteaInventoryScrollBox_GetChildrenCount(const UMounteaInventoryScrollBox* ScrollBox);
 	
 	/**
 	 * 
