@@ -13,7 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
-#include "Widgets/Views/SListView.h"
+#include "Widgets/Views/STreeView.h"
 #include "PropertyEditorModule.h"
 #include "IDetailsView.h"
 
@@ -41,6 +41,36 @@ struct FTemplateDisplayInfo
 	{}
 };
 
+enum class ETemplateTreeItemType : uint8
+{
+	Category,
+	Template
+};
+
+struct FTemplateTreeItem
+{
+	ETemplateTreeItemType Type;
+	FString CategoryName;
+	TWeakObjectPtr<UMounteaInventoryItemTemplate> Template;
+	TArray<TSharedPtr<FTemplateTreeItem>> Children;
+	
+	static TSharedPtr<FTemplateTreeItem> MakeCategory(const FString& InCategoryName)
+	{
+		TSharedPtr<FTemplateTreeItem> item = MakeShared<FTemplateTreeItem>();
+		item->Type = ETemplateTreeItemType::Category;
+		item->CategoryName = InCategoryName;
+		return item;
+	}
+	
+	static TSharedPtr<FTemplateTreeItem> MakeTemplate(TWeakObjectPtr<UMounteaInventoryItemTemplate> InTemplate)
+	{
+		TSharedPtr<FTemplateTreeItem> item = MakeShared<FTemplateTreeItem>();
+		item->Type = ETemplateTreeItemType::Template;
+		item->Template = InTemplate;
+		return item;
+	}
+};
+
 class SMounteaInventoryTemplateEditor : public SCompoundWidget, public FNotifyHook
 {
 public:
@@ -57,11 +87,14 @@ protected:
 private:
 	TSharedRef<SWidget> CreatePropertyMatrix();
 	TSharedRef<SWidget> CreateToolbar();
-	TSharedRef<ITableRow> GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable);
+	TSharedRef<ITableRow> GenerateTemplateTreeRow(TSharedPtr<FTemplateTreeItem> Item, const TSharedRef<STableViewBase>& OwnerTable);
+	
+	void GetChildrenForTree(TSharedPtr<FTemplateTreeItem> Item, TArray<TSharedPtr<FTemplateTreeItem>>& OutChildren);
+	void RebuildTreeStructure();
 
 	static TArray<UObject*> LoadAllTemplatesForMatrix();
 	void RefreshTemplateList();
-	void OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo);
+	void OnTreeSelectionChanged(TSharedPtr<FTemplateTreeItem> SelectedItem, ESelectInfo::Type SelectInfo);
 	
 	FReply OnCreateNewTemplate();
 	FReply SaveTemplate();
@@ -84,17 +117,18 @@ private:
 	bool ValidateTemplateData(FString& ErrorMessage) const;
 	static void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true);
 	
-	// New functions for tracking dirty assets
 	void TrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
 	void UntrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
 	bool HasUnsavedChanges() const;
 	bool CheckForUnsavedChanges();
 	
-	// Asset creation dialog
 	static FString ShowSaveAssetDialog();
 
-	static FTemplateDisplayInfo  GenerateTemplateDisplayInfo(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
-	                                                         const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates);
+	static FTemplateDisplayInfo GenerateTemplateDisplayInfo(
+		TWeakObjectPtr<UMounteaInventoryItemTemplate> Template,
+		const TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>>& AllDirtyTemplates);
+
+	TSharedPtr<FTemplateTreeItem> FindTreeItemForTemplate(const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template) const;
 
 private:
 	FOnTemplateChanged OnTemplateChanged;
@@ -104,20 +138,20 @@ private:
 	TSharedPtr<SWidget> HelpModalContent;
 	
 	TSharedPtr<IDetailsView> PropertyDetailsView;
-	TSharedPtr<SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>> TemplateListView;
+	TSharedPtr<STreeView<TSharedPtr<FTemplateTreeItem>>> TemplateTreeView;
 	TSharedPtr<SMounteaInventoryTemplateSearchFilter> SearchFilterWidget;
-	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> AvailableTemplates;
 	
-	// Track selected and dirty templates
-	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> SelectedTemplates;
+	TArray<TSharedPtr<FTemplateTreeItem>> TreeRootItems;
+	TArray<TSharedPtr<FTemplateTreeItem>> FilteredTreeRootItems;
+	TSet<FString> ExpandedCategories;
+	
+	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> AvailableTemplates;
 	TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>> DirtyTemplates;
 	
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> OriginalTemplate;
 	bool bIsEditingExisting = false;
 	bool bIsShowingTransient = false;
-	
-	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> FilteredTemplates;
 	
 	void ApplySearchFilter();
 	
