@@ -9,6 +9,8 @@
 //
 // For more information, visit: https://mountea.tools
 
+// SMounteaInventoryTemplateEditor.cpp
+
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 
 #include "Widgets/Layout/SScrollBox.h"
@@ -19,7 +21,7 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Layout/SBorder.h"
-#include "Widgets/Views/SListView.h"
+#include "Widgets/Views/STreeView.h"
 #include "Widgets/Views/STableViewBase.h"
 #include "Widgets/Views/STableRow.h"
 #include "Widgets/Notifications/SNotificationList.h"
@@ -67,8 +69,7 @@ SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 
 void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 {
-	OnTemplateChanged = InArgs._OnTemplateChanged;	
-	FilteredTemplates = AvailableTemplates;
+	OnTemplateChanged = InArgs._OnTemplateChanged;
 	
 	ChildSlot
 	[
@@ -93,13 +94,9 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 		]		
 	];
 	
-	if (AvailableTemplates.Num() == 0 || !SelectedTemplates.Num())
-	{
-		CreateTransientTemplate();
-		RefreshTemplateList();
-
-		OnTemplateSelectionChanged(nullptr, ESelectInfo::Direct);
-	}
+	CreateTransientTemplate();
+	RefreshTemplateList();
+	OnTreeSelectionChanged(nullptr, ESelectInfo::Direct);
 	
 	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
 		editorTemplateSubsystem->OnTemplatesChanged().AddRaw(this, &SMounteaInventoryTemplateEditor::RefreshTemplateList);
@@ -120,8 +117,8 @@ void SMounteaInventoryTemplateEditor::NotifyPostChange(const FPropertyChangedEve
 		else
 			TrackDirtyAsset(itemTemplate);
 
-		if (TemplateListView.IsValid())
-			TemplateListView->RequestListRefresh();
+		if (TemplateTreeView.IsValid())
+			TemplateTreeView->RequestTreeRefresh();
 	}
 }
 
@@ -141,14 +138,14 @@ TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 	Algo::TransformIf(
 		assetDataList,
 		filteredTemplates,
-		[](const FAssetData& AssetData)
+		[](const FAssetData& assetData)
 		{
-			const auto* Item = Cast<UMounteaInventoryItemTemplate>(AssetData.GetAsset());
-			return Item && !Item->HasAnyFlags(RF_Transient);
+			const auto* item = Cast<UMounteaInventoryItemTemplate>(assetData.GetAsset());
+			return item && !item->HasAnyFlags(RF_Transient);
 		},
-		[](const FAssetData& AssetData)
+		[](const FAssetData& assetData)
 		{
-			return Cast<UMounteaInventoryItemTemplate>(AssetData.GetAsset());
+			return Cast<UMounteaInventoryItemTemplate>(assetData.GetAsset());
 		}
 	);
 
@@ -162,7 +159,6 @@ TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 		if (!templateA || !templateB)
 			return templateA != nullptr;
 		
-		// Transient templates always come first
 		if (templateA->HasAnyFlags(RF_Transient))
 			return true;
 		if (templateB->HasAnyFlags(RF_Transient))
@@ -181,33 +177,99 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 {
 	TArray<UObject*> allTemplates = LoadAllTemplatesForMatrix();
 	
-	// Convert to TWeakObjectPtr for list view
 	AvailableTemplates.Empty();
 	Algo::TransformIf(
 		allTemplates,
 		AvailableTemplates,
-		[](UObject* Obj)
+		[](UObject* obj)
 		{
-			auto* ItemTemplate = Cast<UMounteaInventoryItemTemplate>(Obj);
-			return ItemTemplate && !ItemTemplate->HasAnyFlags(RF_Transient);
+			auto* itemTemplate = Cast<UMounteaInventoryItemTemplate>(obj);
+			return itemTemplate && !itemTemplate->HasAnyFlags(RF_Transient);
 		},
-		[](UObject* Obj)
+		[](UObject* obj)
 		{
-			return TWeakObjectPtr<UMounteaInventoryItemTemplate>(Cast<UMounteaInventoryItemTemplate>(Obj));
+			return TWeakObjectPtr<UMounteaInventoryItemTemplate>(Cast<UMounteaInventoryItemTemplate>(obj));
 		}
 	);
 	
+	RebuildTreeStructure();
 	ApplySearchFilter();
 	
-	if (TemplateListView.IsValid())
-		TemplateListView->RequestListRefresh();
+	if (TemplateTreeView.IsValid())
+		TemplateTreeView->RequestTreeRefresh();
+}
+
+void SMounteaInventoryTemplateEditor::RebuildTreeStructure()
+{
+	TreeRootItems.Empty();
+	
+	TMap<FString, TSharedPtr<FTemplateTreeItem>> categoryMap;
+	
+	for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& templatePtr : AvailableTemplates)
+	{
+		if (!templatePtr.IsValid())
+			continue;
+		
+		const FString category = templatePtr->ItemCategory;
+		
+		if (!categoryMap.Contains(category))
+		{
+			TSharedPtr<FTemplateTreeItem> categoryItem = FTemplateTreeItem::MakeCategory(category);
+			categoryMap.Add(category, categoryItem);
+			TreeRootItems.Add(categoryItem);
+		}
+		
+		TSharedPtr<FTemplateTreeItem> templateItem = FTemplateTreeItem::MakeTemplate(templatePtr);
+		categoryMap[category]->Children.Add(templateItem);
+	}
+	
+	TreeRootItems.Sort([](const TSharedPtr<FTemplateTreeItem>& A, const TSharedPtr<FTemplateTreeItem>& B)
+	{
+		return A->CategoryName < B->CategoryName;
+	});
+	
+	if (TemplateTreeView.IsValid())
+	{
+		for (const TSharedPtr<FTemplateTreeItem>& categoryItem : TreeRootItems)
+		{
+			if (ExpandedCategories.Contains(categoryItem->CategoryName))
+				TemplateTreeView->SetItemExpansion(categoryItem, true);
+		}
+	}
+}
+
+void SMounteaInventoryTemplateEditor::GetChildrenForTree(TSharedPtr<FTemplateTreeItem> Item,
+	TArray<TSharedPtr<FTemplateTreeItem>>& OutChildren)
+{
+	if (Item.IsValid() && Item->Type == ETemplateTreeItemType::Category)
+		OutChildren = Item->Children;
+}
+
+TSharedPtr<FTemplateTreeItem> SMounteaInventoryTemplateEditor::FindTreeItemForTemplate(
+	const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template) const
+{
+	if (!Template.IsValid())
+		return nullptr;
+	
+	for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
+	{
+		if (!rootItem.IsValid() || rootItem->Type != ETemplateTreeItemType::Category)
+			continue;
+		
+		for (const TSharedPtr<FTemplateTreeItem>& childItem : rootItem->Children)
+		{
+			if (childItem.IsValid() && childItem->Template == Template)
+				return childItem;
+		}
+	}
+	
+	return nullptr;
 }
 
 TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 {
 	TArray<UObject*> allTemplates = LoadAllTemplatesForMatrix();
 	
-	// Convert to TWeakObjectPtr for list view
 	AvailableTemplates.Empty();
 	Algo::TransformIf(
 		allTemplates,
@@ -221,6 +283,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 			return TWeakObjectPtr<UMounteaInventoryItemTemplate>(Cast<UMounteaInventoryItemTemplate>(obj));
 		}
 	);
+	
+	RebuildTreeStructure();
 	
 	FPropertyEditorModule& propertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
 	
@@ -246,11 +310,22 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 			.Padding(4.0f)
 			.BorderImage(FAppStyle::GetBrush("Brushes.Background"))
 			[
-				SAssignNew(TemplateListView, SListView<TWeakObjectPtr<UMounteaInventoryItemTemplate>>)
-				.ListItemsSource(&FilteredTemplates)
-				.OnGenerateRow(this, &SMounteaInventoryTemplateEditor::GenerateTemplateListRow)
-				.OnSelectionChanged(this, &SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged)
+				SAssignNew(TemplateTreeView, STreeView<TSharedPtr<FTemplateTreeItem>>)
+				.TreeItemsSource(&FilteredTreeRootItems)
+				.OnGenerateRow(this, &SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow)
+				.OnGetChildren(this, &SMounteaInventoryTemplateEditor::GetChildrenForTree)
+				.OnSelectionChanged(this, &SMounteaInventoryTemplateEditor::OnTreeSelectionChanged)
 				.SelectionMode(ESelectionMode::Multi)
+				.OnExpansionChanged_Lambda([this](TSharedPtr<FTemplateTreeItem> item, bool bExpanded)
+				{
+					if (item.IsValid() && item->Type == ETemplateTreeItemType::Category)
+					{
+						if (bExpanded)
+							ExpandedCategories.Add(item->CategoryName);
+						else
+							ExpandedCategories.Remove(item->CategoryName);
+					}
+				})
 			]
 		]
 		
@@ -261,7 +336,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 		];
 }
 
-void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(TWeakObjectPtr<UMounteaInventoryItemTemplate> SelectedTemplate, ESelectInfo::Type SelectInfo)
+void SMounteaInventoryTemplateEditor::OnTreeSelectionChanged(TSharedPtr<FTemplateTreeItem> SelectedItem, ESelectInfo::Type SelectInfo)
 {
 	if (!PropertyDetailsView.IsValid())
 		return;
@@ -271,33 +346,41 @@ void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(TWeakObjectPtr<
 
 	if (bHasTransient && bIsDirty && !CheckForUnsavedChanges())
 	{
-		TemplateListView->SetSelection(CurrentTemplate, ESelectInfo::Direct);
+		if (SelectedItem.IsValid())
+			TemplateTreeView->SetSelection(SelectedItem, ESelectInfo::Direct);
 		return;
 	}
 
-	SelectedTemplates = TemplateListView->GetSelectedItems();
+	TArray<TSharedPtr<FTemplateTreeItem>> allSelectedItems = TemplateTreeView->GetSelectedItems();
+	
+	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> selectedTemplates;
+	for (const TSharedPtr<FTemplateTreeItem>& item : allSelectedItems)
+	{
+		if (item.IsValid() && item->Type == ETemplateTreeItemType::Template && item->Template.IsValid())
+			selectedTemplates.Add(item->Template);
+	}
 
 	TArray<UObject*> selectedObjects;
 	bIsShowingTransient = false;
 	
 	Algo::TransformIf(
-		SelectedTemplates,
+		selectedTemplates,
 		selectedObjects,
-		[this](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& WeakTemplate)
+		[this](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& weakTemplate)
 		{
-			auto* Template = WeakTemplate.Get();
-			if (Template && Template->HasAnyFlags(RF_Transient))
+			auto* templatePtr = weakTemplate.Get();
+			if (templatePtr && templatePtr->HasAnyFlags(RF_Transient))
 				bIsShowingTransient = true;
-			return Template != nullptr;
+			return templatePtr != nullptr;
 		},
-		[](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& WeakTemplate)
+		[](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& weakTemplate)
 		{
-			return static_cast<UObject*>(WeakTemplate.Get());
+			return static_cast<UObject*>(weakTemplate.Get());
 		}
 	);
 
-	if (SelectedTemplates.Num() == 1)
-		CurrentTemplate = SelectedTemplates[0];
+	if (selectedTemplates.Num() == 1)
+		CurrentTemplate = selectedTemplates[0];
 	else
 		CurrentTemplate = nullptr;
 
@@ -308,7 +391,7 @@ void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(TWeakObjectPtr<
 		{
 			UObject* tempObject = subsystem->GetOrCreateTempTemplate();
 			selectedObjects.Add(tempObject);
-			CurrentTemplate = Cast<UMounteaInventoryItemTemplate>(tempObject);;
+			CurrentTemplate = Cast<UMounteaInventoryItemTemplate>(tempObject);
 			bIsShowingTransient = true;
 		}
 	}
@@ -318,7 +401,6 @@ void SMounteaInventoryTemplateEditor::OnTemplateSelectionChanged(TWeakObjectPtr<
 
 FReply SMounteaInventoryTemplateEditor::OnCreateNewTemplate()
 {
-	// Check for unsaved changes in current transient template
 	if (bIsShowingTransient && CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate))
 	{
 		if (!CheckForUnsavedChanges())
@@ -327,9 +409,8 @@ FReply SMounteaInventoryTemplateEditor::OnCreateNewTemplate()
 	
 	CreateTransientTemplate();
 	RefreshTemplateList();
-	//SelectTransientTemplateInList();
 
-	TemplateListView->ClearSelection();
+	TemplateTreeView->ClearSelection();
 	return FReply::Handled();
 }
 
@@ -410,7 +491,7 @@ FReply SMounteaInventoryTemplateEditor::CloseTemplate()
 			return FReply::Unhandled();
 	}
 
-	TemplateListView->ClearSelection();
+	TemplateTreeView->ClearSelection();
 	return FReply::Handled();
 }
 
@@ -580,7 +661,6 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 		newTemplate->bHasWeight = transientTemplate->bHasWeight;
 		newTemplate->Weight = transientTemplate->Weight;
 		
-		// Save the new asset
 		if (UPackage* package = newTemplate->GetPackage())
 		{
 			FString fileName = FPackageName::LongPackageNameToFilename(package->GetName(), FPackageName::GetAssetPackageExtension());
@@ -589,13 +669,29 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 			saveArgs.SaveFlags = SAVE_None;
 			if (UPackage::SavePackage(package, newTemplate, *fileName, saveArgs))
 			{
-				// Clean up transient template
 				UntrackDirtyAsset(transientTemplate);
 				CleanupTransientTemplate();
 				
-				// Refresh list and select the new asset
 				RefreshTemplateList();
-				TemplateListView->SetSelection(newTemplate, ESelectInfo::Direct);
+				
+				TSharedPtr<FTemplateTreeItem> foundItem = FindTreeItemForTemplate(newTemplate);
+				if (foundItem.IsValid())
+				{
+					TSharedPtr<FTemplateTreeItem> parentCategory;
+					for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
+					{
+						if (rootItem.IsValid() && rootItem->Children.Contains(foundItem))
+						{
+							parentCategory = rootItem;
+							break;
+						}
+					}
+					
+					if (parentCategory.IsValid())
+						TemplateTreeView->SetItemExpansion(parentCategory, true);
+					
+					TemplateTreeView->SetSelection(foundItem, ESelectInfo::Direct);
+				}
 				
 				ShowTemplateEditorNotification(TEXT("New template created successfully!"), true);
 				return FReply::Handled();
@@ -632,14 +728,14 @@ FTemplateDisplayInfo SMounteaInventoryTemplateEditor::GenerateTemplateDisplayInf
 	if (!Template.IsValid())
 		return returnInfo;
 
-	if (UMounteaInventoryItemTemplate* TemplatePtr = Template.Get())
+	if (UMounteaInventoryItemTemplate* templatePtr = Template.Get())
 	{
-		returnInfo.bIsTransient = TemplatePtr->HasAnyFlags(RF_Transient);
-		returnInfo.bIsDirty = AllDirtyTemplates.Contains(TemplatePtr);
+		returnInfo.bIsTransient = templatePtr->HasAnyFlags(RF_Transient);
+		returnInfo.bIsDirty = AllDirtyTemplates.Contains(templatePtr);
 
-		const FText baseName = TemplatePtr->DisplayName.IsEmpty()
-			? FText::FromString(TemplatePtr->GetName())
-			: TemplatePtr->DisplayName;
+		const FText baseName = templatePtr->DisplayName.IsEmpty()
+			? FText::FromString(templatePtr->GetName())
+			: templatePtr->DisplayName;
 
 		returnInfo.FullText = baseName;
 
@@ -654,15 +750,15 @@ FTemplateDisplayInfo SMounteaInventoryTemplateEditor::GenerateTemplateDisplayInf
 			truncatedName.Len() > 32 ? truncatedName.Left(32) + TEXT("...") : truncatedName
 		);
 
-		if (UPackage* assetPackage = TemplatePtr->GetPackage())
+		if (UPackage* assetPackage = templatePtr->GetPackage())
 			returnInfo.AssetPath = returnInfo.bIsTransient ? TEXT("Unsaved") : assetPackage->GetName();
 
 		returnInfo.TooltipText = FText::Format(
 			LOCTEXT("TemplateTooltip", "Name: {0}\nPath: {1}\nCategory: {2}\nRarity: {3}\nStatus: {4}"),
 			baseName,
 			FText::FromString(returnInfo.AssetPath),
-			FText::FromString(TemplatePtr->ItemCategory),
-			FText::FromString(TemplatePtr->ItemRarity),
+			FText::FromString(templatePtr->ItemCategory),
+			FText::FromString(templatePtr->ItemRarity),
 			returnInfo.bIsTransient
 				? LOCTEXT("UnsavedStatus", "Unsaved")
 				: (returnInfo.bIsDirty
@@ -690,35 +786,49 @@ bool SMounteaInventoryTemplateEditor::PassesFilters(const TWeakObjectPtr<UMounte
 		return false;
 	
 	return SearchFilterWidget->GetActiveFilters().PassesFilter(
-	DirtyTemplates.Contains(Template), Template->ItemCategory, Template->ItemRarity
+		DirtyTemplates.Contains(Template), Template->ItemCategory, Template->ItemRarity
 	);
 }
 
 void SMounteaInventoryTemplateEditor::ApplySearchFilter()
 {
-	FilteredTemplates.Empty();
+	FilteredTreeRootItems.Empty();
 	
 	if (!SearchFilterWidget.IsValid())
 	{
-		FilteredTemplates = AvailableTemplates;
-		if (TemplateListView.IsValid())
-			TemplateListView->RequestListRefresh();
+		FilteredTreeRootItems = TreeRootItems;
+		if (TemplateTreeView.IsValid())
+			TemplateTreeView->RequestTreeRefresh();
 		return;
 	}
 	
-	for (const TWeakObjectPtr<UMounteaInventoryItemTemplate>& Template : AvailableTemplates)
+	for (const TSharedPtr<FTemplateTreeItem>& categoryItem : TreeRootItems)
 	{
-		if (!PassesFilters(Template))
+		if (!categoryItem.IsValid() || categoryItem->Type != ETemplateTreeItemType::Category)
 			continue;
 		
-		if (!SearchFilterWidget->DoesTemplateMatchSearch(Template))
-			continue;
+		TSharedPtr<FTemplateTreeItem> filteredCategory = FTemplateTreeItem::MakeCategory(categoryItem->CategoryName);
 		
-		FilteredTemplates.Add(Template);
+		for (const TSharedPtr<FTemplateTreeItem>& templateItem : categoryItem->Children)
+		{
+			if (!templateItem.IsValid() || !templateItem->Template.IsValid())
+				continue;
+			
+			if (!PassesFilters(templateItem->Template))
+				continue;
+			
+			if (!SearchFilterWidget->DoesTemplateMatchSearch(templateItem->Template))
+				continue;
+			
+			filteredCategory->Children.Add(templateItem);
+		}
+		
+		if (filteredCategory->Children.Num() > 0)
+			FilteredTreeRootItems.Add(filteredCategory);
 	}
 	
-	if (TemplateListView.IsValid())
-		TemplateListView->RequestListRefresh();
+	if (TemplateTreeView.IsValid())
+		TemplateTreeView->RequestTreeRefresh();
 }
 
 FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)
@@ -761,11 +871,9 @@ FReply SMounteaInventoryTemplateEditor::DuplicateTemplate(const TWeakObjectPtr<U
 	
 	UMounteaInventoryItemTemplate* sourceTemplate = Template.Get();
 	
-	// Get the package path
 	FString packagePath = FPackageName::GetLongPackagePath(sourceTemplate->GetPackage()->GetName());
 	FString assetName = sourceTemplate->GetName() + TEXT("_Copy");
 	
-	// Create duplicate
 	FAssetToolsModule& assetToolsModule = FModuleManager::GetModuleChecked<FAssetToolsModule>("AssetTools");
 	UObject* duplicatedAsset = assetToolsModule.Get().DuplicateAsset(assetName, packagePath, sourceTemplate);
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> duplicatedTemplate = Cast<UMounteaInventoryItemTemplate>(duplicatedAsset);
@@ -773,7 +881,26 @@ FReply SMounteaInventoryTemplateEditor::DuplicateTemplate(const TWeakObjectPtr<U
 	if (duplicatedAsset)
 	{
 		RefreshTemplateList();
-		TemplateListView->SetSelection(duplicatedTemplate, ESelectInfo::Direct);
+		
+		TSharedPtr<FTemplateTreeItem> foundItem = FindTreeItemForTemplate(duplicatedTemplate);
+		if (foundItem.IsValid())
+		{
+			TSharedPtr<FTemplateTreeItem> parentCategory;
+			for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
+			{
+				if (rootItem.IsValid() && rootItem->Children.Contains(foundItem))
+				{
+					parentCategory = rootItem;
+					break;
+				}
+			}
+			
+			if (parentCategory.IsValid())
+				TemplateTreeView->SetItemExpansion(parentCategory, true);
+			
+			TemplateTreeView->SetSelection(foundItem, ESelectInfo::Direct);
+		}
+		
 		ShowTemplateEditorNotification(TEXT("Template duplicated successfully."), true);
 	}
 	else
@@ -800,11 +927,13 @@ void SMounteaInventoryTemplateEditor::ImportTemplate()
 
 void SMounteaInventoryTemplateEditor::ExportTemplate()
 {
+	TArray<TSharedPtr<FTemplateTreeItem>> selectedItems = TemplateTreeView->GetSelectedItems();
+	
 	TArray<UMounteaInventoryItemTemplate*> templatesToExport;
-	for (const auto& WeakTemplate : SelectedTemplates)
+	for (const TSharedPtr<FTemplateTreeItem>& item : selectedItems)
 	{
-		if (WeakTemplate.IsValid())
-			templatesToExport.Add(WeakTemplate.Get());
+		if (item.IsValid() && item->Type == ETemplateTreeItemType::Template && item->Template.IsValid())
+			templatesToExport.Add(item->Template.Get());
 	}
 
 	FString errorMessage;
@@ -831,7 +960,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 	[
 		SNew(SHorizontalBox)
 		
-		// New Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(2.0f)
@@ -877,7 +1005,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 			
-		// Save Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(2.0f)
@@ -928,7 +1055,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 		
-		// Save All
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(2.0f)
@@ -971,7 +1097,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 
-		// Vertical separator
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(8.0f, 4.0f)
@@ -982,7 +1107,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			.Orientation(Orient_Vertical)
 		]
 		
-		// Import Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(2.0f)
@@ -1028,7 +1152,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 		
-		// Export Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(2.0f)
@@ -1074,7 +1197,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 
-		// Vertical separator
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(8.0f, 4.0f)
@@ -1085,7 +1207,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			.Orientation(Orient_Vertical)
 		]
 		
-		// Close Template
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(2.0f)
@@ -1131,7 +1252,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 
-		// Vertical separator
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(8.0f, 4.0f)
@@ -1142,7 +1262,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			.Orientation(Orient_Vertical)
 		]
 
-		// Help
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(2.0f)
@@ -1188,7 +1307,6 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			]
 		]
 
-		// Vertical separator
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(8.0f, 4.0f)
@@ -1199,14 +1317,12 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			.Orientation(Orient_Vertical)
 		]
 		
-		// Spacer
 		+ SHorizontalBox::Slot()
 		.FillWidth(1.0f)
 		[
 			SNullWidget::NullWidget
 		]
 		
-		// Search box			
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(5.0f)
@@ -1222,69 +1338,116 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 	];
 }
 
-TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template, const TSharedRef<STableViewBase>& OwnerTable)
+TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(TSharedPtr<FTemplateTreeItem> Item,
+	const TSharedRef<STableViewBase>& OwnerTable)
 {
-	const FTemplateDisplayInfo templateInfo = GenerateTemplateDisplayInfo(Template, DirtyTemplates);
+	if (!Item.IsValid())
+	{
+		return SNew(STableRow<TSharedPtr<FTemplateTreeItem>>, OwnerTable)
+			[
+				SNullWidget::NullWidget
+			];
+	}
+	
+	if (Item->Type == ETemplateTreeItemType::Category)
+	{
+		return SNew(STableRow<TSharedPtr<FTemplateTreeItem>>, OwnerTable)
+			.Style(FAppStyle::Get(), "TableView.NoHoverTableRow")
+			.Padding(FMargin(0, 4, 0, 2))
+			.ShowSelection(false)
+			[
+				SNew(SBorder)
+				.BorderImage(FAppStyle::GetBrush("DetailsView.CategoryTop"))
+				.Padding(FMargin(8, 6))
+				[
+					SNew(STextBlock)
+					.Text(FText::FromString(Item->CategoryName))
+					.Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
+					.ColorAndOpacity(FSlateColor::UseForeground())
+				]
+			];
+	}
+	
+	const TWeakObjectPtr<UMounteaInventoryItemTemplate> templatePtr = Item->Template;
+	const FTemplateDisplayInfo templateInfo = GenerateTemplateDisplayInfo(templatePtr, DirtyTemplates);
 	const auto foregroundColor = FSlateColor::UseForeground();
 	
 	struct FButtonHolder { TWeakPtr<SButton> Button; };
-	TSharedRef<FButtonHolder> nuttonHolder = MakeShared<FButtonHolder>();
+	TSharedRef<FButtonHolder> buttonHolder = MakeShared<FButtonHolder>();
 	
 	TSharedPtr<SButton> interactionButton;
 	
-	auto Row = SNew(STableRow<TWeakObjectPtr<UMounteaInventoryItemTemplate>>, OwnerTable)
+	auto row = SNew(STableRow<TSharedPtr<FTemplateTreeItem>>, OwnerTable)
 		.Style(FAppStyle::Get(), "TableView.NoHoverTableRow")
 		.Padding(FMargin(4, 2))
 		.ShowSelection(false)
 		[
 			SAssignNew(interactionButton, SButton)
 			.ButtonStyle(FAppStyle::Get(), "NoBorder")
-			.OnClicked_Lambda([this, Template]() -> FReply
+			.OnClicked_Lambda([this, Item]() -> FReply
 			{
-				if (TemplateListView.IsValid())
+				if (TemplateTreeView.IsValid() && Item.IsValid() && Item->Type == ETemplateTreeItemType::Template)
 				{
 					const FModifierKeysState modifierKeys = FSlateApplication::Get().GetModifierKeys();
 					
 					if (modifierKeys.IsControlDown())
-						TemplateListView->SetItemSelection(Template, !TemplateListView->IsItemSelected(Template), ESelectInfo::OnMouseClick);
+						TemplateTreeView->SetItemSelection(Item, !TemplateTreeView->IsItemSelected(Item), ESelectInfo::OnMouseClick);
 					else if (modifierKeys.IsShiftDown())
 					{
-						TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> Selected = TemplateListView->GetSelectedItems();
-						if (Selected.Num() > 0)
+						TArray<TSharedPtr<FTemplateTreeItem>> selected = TemplateTreeView->GetSelectedItems();
+						if (selected.Num() > 0)
 						{
-							int32 lastIndex = AvailableTemplates.Find(Selected.Last());
-							int32 currentIndex = AvailableTemplates.Find(Template);
-							
-							if (lastIndex != INDEX_NONE && currentIndex != INDEX_NONE)
+							TSharedPtr<FTemplateTreeItem> lastSelected = selected.Last();
+							if (lastSelected.IsValid() && lastSelected->Type == ETemplateTreeItemType::Template)
 							{
-								int32 startIndex = FMath::Min(lastIndex, currentIndex);
-								int32 endIndex = FMath::Max(lastIndex, currentIndex);
-								
-								TemplateListView->ClearSelection();
-								for (int32 i = startIndex; i <= endIndex; ++i)
+								TSharedPtr<FTemplateTreeItem> parentCategory;
+								for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
 								{
-									TemplateListView->SetItemSelection(AvailableTemplates[i], true, ESelectInfo::OnMouseClick);
+									if (rootItem->Children.Contains(lastSelected) && rootItem->Children.Contains(Item))
+									{
+										parentCategory = rootItem;
+										break;
+									}
+								}
+								
+								if (parentCategory.IsValid())
+								{
+									int32 lastIndex = parentCategory->Children.Find(lastSelected);
+									int32 currentIndex = parentCategory->Children.Find(Item);
+									
+									if (lastIndex != INDEX_NONE && currentIndex != INDEX_NONE)
+									{
+										int32 startIndex = FMath::Min(lastIndex, currentIndex);
+										int32 endIndex = FMath::Max(lastIndex, currentIndex);
+										
+										TemplateTreeView->ClearSelection();
+										for (int32 i = startIndex; i <= endIndex; ++i)
+										{
+											TemplateTreeView->SetItemSelection(parentCategory->Children[i], true, ESelectInfo::OnMouseClick);
+										}
+									}
 								}
 							}
 						}
 						else
-							TemplateListView->SetSelection(Template, ESelectInfo::OnMouseClick);
+							TemplateTreeView->SetSelection(Item, ESelectInfo::OnMouseClick);
 					}
 					else
-						TemplateListView->SetSelection(Template, ESelectInfo::OnMouseClick);
+						TemplateTreeView->SetSelection(Item, ESelectInfo::OnMouseClick);
 				}
 				return FReply::Handled();
 			})
 			.ContentPadding(0)
+			.IsFocusable(false)
 			[
 				SNew(SBorder)
-				.BorderImage(TAttribute<const FSlateBrush*>::Create([this, Template, nuttonHolder]() -> const FSlateBrush*
+				.BorderImage(TAttribute<const FSlateBrush*>::Create([this, Item, buttonHolder]() -> const FSlateBrush*
 				{
-					bool bSelected = TemplateListView.IsValid() && TemplateListView->GetSelectedItems().Contains(Template);
+					bool bSelected = TemplateTreeView.IsValid() && TemplateTreeView->GetSelectedItems().Contains(Item);
 					bool bHovered = false;
 					
-					if (TSharedPtr<SButton> Button = nuttonHolder->Button.Pin())
-						bHovered = Button->IsHovered();
+					if (TSharedPtr<SButton> button = buttonHolder->Button.Pin())
+						bHovered = button->IsHovered();
 					
 					if (bSelected && bHovered)
 						return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.SelectedHovered");
@@ -1309,28 +1472,28 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 						[
 							SNew(STextBlock)
 							.Text(TAttribute<FText>::Create(
-								TAttribute<FText>::FGetter::CreateLambda([this, Template]()
+								TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
 								{
-									const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(Template, DirtyTemplates);
+									const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(templatePtr, DirtyTemplates);
 									return displayInfo.DisplayText;
 								})
 							))
 							.Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
 							.ToolTipText(TAttribute<FText>::Create(
-								TAttribute<FText>::FGetter::CreateLambda([this, Template]()
+								TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
 								{
-									const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(Template, DirtyTemplates);
+									const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(templatePtr, DirtyTemplates);
 									return displayInfo.TooltipText;
 								})
 							))
-							.ColorAndOpacity(TAttribute<FSlateColor>::Create(TAttribute<FSlateColor>::FGetter::CreateLambda([this, Template, foregroundColor]() 
+							.ColorAndOpacity(TAttribute<FSlateColor>::Create(TAttribute<FSlateColor>::FGetter::CreateLambda([this, templatePtr, foregroundColor]() 
 							{
-								if (Template.IsValid())
+								if (templatePtr.IsValid())
 								{
-									UMounteaInventoryItemTemplate* templatePtr = Template.Get();
-									if (templatePtr->HasAnyFlags(RF_Transient)) 
+									UMounteaInventoryItemTemplate* itemTemplate = templatePtr.Get();
+									if (itemTemplate->HasAnyFlags(RF_Transient)) 
 										return FSlateColor(FLinearColor(1.f, 1.f, 0.5f));
-									if (DirtyTemplates.Contains(Template)) 
+									if (DirtyTemplates.Contains(templatePtr)) 
 										return FSlateColor(FLinearColor(1.f, 0.7f, 0.7f));
 								}
 								return foregroundColor;
@@ -1364,12 +1527,12 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 							.ContentPadding(FMargin(2))
 							.ToolTipText(LOCTEXT("NavigateToFolderTooltip", "Navigate to folder in Content Browser"))
 							.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
-							.OnClicked_Lambda([Template]()
+							.OnClicked_Lambda([templatePtr]()
 							{
-								if (Template.IsValid() && !Template.Get()->HasAnyFlags(RF_Transient))
+								if (templatePtr.IsValid() && !templatePtr.Get()->HasAnyFlags(RF_Transient))
 								{
 									TArray<FAssetData> assetDataList;
-									assetDataList.Add(FAssetData(Template.Get()));
+									assetDataList.Add(FAssetData(templatePtr.Get()));
 									
 									FContentBrowserModule& contentBrowserModule = FModuleManager::Get().LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
 									contentBrowserModule.Get().SyncBrowserToAssets(assetDataList);
@@ -1393,7 +1556,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 							.ContentPadding(FMargin(2))
 							.ToolTipText(LOCTEXT("DuplicateTemplateTooltip", "Duplicate this template"))
 							.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
-							.OnClicked(this, &SMounteaInventoryTemplateEditor::DuplicateTemplate, Template)
+							.OnClicked(this, &SMounteaInventoryTemplateEditor::DuplicateTemplate, templatePtr)
 							[
 								SNew(SImage)
 								.Image(FAppStyle::GetBrush("Icons.Duplicate"))
@@ -1411,7 +1574,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 							.ContentPadding(FMargin(2))
 							.ToolTipText(LOCTEXT("DeleteTemplateTooltip", "Delete this template"))
 							.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
-							.OnClicked(this, &SMounteaInventoryTemplateEditor::DeleteTemplate, Template)
+							.OnClicked(this, &SMounteaInventoryTemplateEditor::DeleteTemplate, templatePtr)
 							[
 								SNew(SImage)
 								.Image(FAppStyle::GetBrush("Icons.Delete"))
@@ -1424,9 +1587,9 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateListRow(T
 			]
 		];
 	
-	nuttonHolder->Button = interactionButton;
+	buttonHolder->Button = interactionButton;
 	
-	return Row;
+	return row;
 }
 
 void SMounteaInventoryTemplateEditor::CreateTransientTemplate()
@@ -1517,20 +1680,17 @@ bool SMounteaInventoryTemplateEditor::CheckForUnsavedChanges()
 	
 	if (result == EAppReturnType::Yes)
 	{
-		// Save all dirty templates
 		SaveAllDirtyTemplates();
 		return true;
 	}
 	else if (result == EAppReturnType::No)
 	{
-		// Discard changes
 		DirtyTemplates.Empty();
 		CreateTransientTemplate();
-		TemplateListView->ClearSelection();
+		TemplateTreeView->ClearSelection();
 		return true;
 	}
 	
-	// Cancel
 	return false;
 }
 

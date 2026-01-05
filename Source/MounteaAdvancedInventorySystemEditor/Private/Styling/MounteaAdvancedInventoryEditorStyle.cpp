@@ -143,10 +143,10 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 		StyleSet->Set("MAISStyleSet.TemplateTableView", TemplatesViewStyle);
 	}
 
-	constexpr FLinearColor TemplateItemNormal = FLinearColor(0.05f, 0.05f, 0.05f, 1.0f);
-	constexpr FLinearColor TemplateItemHovered = FLinearColor(0.15f, 0.15f, 0.15f, 1.0f);
-	constexpr FLinearColor TemplateItemSelected = FLinearColor(0.10f, 0.35f, 0.65f, 1.0f);
-	constexpr FLinearColor TemplateItemSelectedHovered = FLinearColor(0.15f, 0.40f, 0.70f, 1.0f);
+	const FLinearColor TemplateItemNormal = FLinearColor(FColor::FromHex(TEXT("FFB81200")));
+	const FLinearColor TemplateItemHovered = FLinearColor(FColor::FromHex(TEXT("FFB81240")));
+	const FLinearColor TemplateItemSelected = FLinearColor(FColor::FromHex(TEXT("FFB81280")));
+	const FLinearColor TemplateItemSelectedHovered = FLinearColor(FColor::FromHex(TEXT("FFB812BF")));
 
 	StyleSet->Set("MAISStyleSet.TemplateItem.Normal", 
 		new FSlateRoundedBoxBrush(TemplateItemNormal, CornerRadiusSm));
