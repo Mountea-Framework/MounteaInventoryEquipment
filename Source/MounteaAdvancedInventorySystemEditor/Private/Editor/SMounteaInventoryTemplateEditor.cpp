@@ -175,6 +175,8 @@ TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 
 void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 {
+	SaveExpansionState();
+	
 	TArray<UObject*> allTemplates = LoadAllTemplatesForMatrix();
 	
 	AvailableTemplates.Empty();
@@ -196,11 +198,18 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 	ApplySearchFilter();
 	
 	if (TemplateTreeView.IsValid())
+	{
 		TemplateTreeView->RequestTreeRefresh();
+		RestoreExpansionState();
+	}
 }
 
 void SMounteaInventoryTemplateEditor::RebuildTreeStructure()
 {
+	SaveExpansionState();
+	
+	const bool bFirstLoad = ExpandedCategories.IsEmpty();
+	
 	TreeRootItems.Empty();
 	
 	TMap<FString, TSharedPtr<FTemplateTreeItem>> categoryMap;
@@ -217,6 +226,9 @@ void SMounteaInventoryTemplateEditor::RebuildTreeStructure()
 			TSharedPtr<FTemplateTreeItem> categoryItem = FTemplateTreeItem::MakeCategory(category);
 			categoryMap.Add(category, categoryItem);
 			TreeRootItems.Add(categoryItem);
+			
+			if (bFirstLoad)
+				ExpandedCategories.Add(category);
 		}
 		
 		TSharedPtr<FTemplateTreeItem> templateItem = FTemplateTreeItem::MakeTemplate(templatePtr);
@@ -227,15 +239,6 @@ void SMounteaInventoryTemplateEditor::RebuildTreeStructure()
 	{
 		return A->CategoryName < B->CategoryName;
 	});
-	
-	if (TemplateTreeView.IsValid())
-	{
-		for (const TSharedPtr<FTemplateTreeItem>& categoryItem : TreeRootItems)
-		{
-			if (ExpandedCategories.Contains(categoryItem->CategoryName))
-				TemplateTreeView->SetItemExpansion(categoryItem, true);
-		}
-	}
 }
 
 void SMounteaInventoryTemplateEditor::GetChildrenForTree(TSharedPtr<FTemplateTreeItem> Item,
@@ -399,6 +402,31 @@ void SMounteaInventoryTemplateEditor::OnTreeSelectionChanged(TSharedPtr<FTemplat
 	PropertyDetailsView->SetObjects(selectedObjects);
 }
 
+void SMounteaInventoryTemplateEditor::SaveExpansionState()
+{
+	if (!TemplateTreeView.IsValid())
+		return;
+	
+	ExpandedCategories.Empty();
+	for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
+	{
+		if (rootItem.IsValid() && TemplateTreeView->IsItemExpanded(rootItem))
+			ExpandedCategories.Add(rootItem->CategoryName);
+	}
+}
+
+void SMounteaInventoryTemplateEditor::RestoreExpansionState()
+{
+	if (!TemplateTreeView.IsValid())
+		return;
+	
+	for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
+	{
+		if (rootItem.IsValid() && ExpandedCategories.Contains(rootItem->CategoryName))
+			TemplateTreeView->SetItemExpansion(rootItem, true);
+	}
+}
+
 FReply SMounteaInventoryTemplateEditor::OnCreateNewTemplate()
 {
 	if (bIsShowingTransient && CurrentTemplate.IsValid() && DirtyTemplates.Contains(CurrentTemplate))
@@ -449,6 +477,7 @@ FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 		if (!itemTemplate || itemTemplate->HasAnyFlags(RF_Transient))
 			return;
 
+		itemTemplate->CalculateJson();
 		UPackage* package = itemTemplate->GetPackage();
 		if (!package)
 			return;
@@ -798,7 +827,10 @@ void SMounteaInventoryTemplateEditor::ApplySearchFilter()
 	{
 		FilteredTreeRootItems = TreeRootItems;
 		if (TemplateTreeView.IsValid())
+		{
 			TemplateTreeView->RequestTreeRefresh();
+			RestoreExpansionState();
+		}
 		return;
 	}
 	
@@ -828,7 +860,10 @@ void SMounteaInventoryTemplateEditor::ApplySearchFilter()
 	}
 	
 	if (TemplateTreeView.IsValid())
+	{
 		TemplateTreeView->RequestTreeRefresh();
+		RestoreExpansionState();
+	}
 }
 
 FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMounteaInventoryItemTemplate> Template)

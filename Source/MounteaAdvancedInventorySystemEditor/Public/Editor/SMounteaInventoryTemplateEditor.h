@@ -79,7 +79,7 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);	
-	virtual ~SMounteaInventoryTemplateEditor();
+	virtual ~SMounteaInventoryTemplateEditor() override;
 
 protected:
 	virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged) override;
@@ -95,6 +95,9 @@ private:
 	static TArray<UObject*> LoadAllTemplatesForMatrix();
 	void RefreshTemplateList();
 	void OnTreeSelectionChanged(TSharedPtr<FTemplateTreeItem> SelectedItem, ESelectInfo::Type SelectInfo);
+	
+	void SaveExpansionState();
+	void RestoreExpansionState();
 	
 	FReply OnCreateNewTemplate();
 	FReply SaveTemplate();
