@@ -1358,14 +1358,37 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(T
 			[
 				SNew(SBorder)
 				.BorderImage(FAppStyle::GetBrush("DetailsView.CategoryTop"))
-				.Padding(FMargin(8, 6))
+				.BorderBackgroundColor(FLinearColor::Transparent)
+				.Padding(FMargin(6, 4))
+			[
+				SNew(SHorizontalBox)
+				
+				+ SHorizontalBox::Slot()
+				.FillWidth(1.0f)
+				.VAlign(VAlign_Center)
 				[
 					SNew(STextBlock)
-					.Text(FText::FromString(Item->CategoryName))
+					.Text(FText::FromString(Item->CategoryName).ToUpper())
 					.Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
 					.ColorAndOpacity(FSlateColor::UseForeground())
+					.TextStyle(FAppStyle::Get(), "DetailsView.CategoryTextStyle")
 				]
-			];
+				
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(6, 0, 0, 0)
+				[
+					SNew(STextBlock)
+					.Text_Lambda([Item]()
+					{
+						return FText::AsNumber(Item->Children.Num());
+					})
+					.Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
+					.ColorAndOpacity(FSlateColor::UseSubduedForeground())
+				]
+			]
+		];
 	}
 	
 	const TWeakObjectPtr<UMounteaInventoryItemTemplate> templatePtr = Item->Template;
@@ -1380,6 +1403,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(T
 	auto row = SNew(STableRow<TSharedPtr<FTemplateTreeItem>>, OwnerTable)
 		.Style(FAppStyle::Get(), "TableView.NoHoverTableRow")
 		.Padding(FMargin(4, 2))
+		.ShowWires(true)
 		.ShowSelection(false)
 		[
 			SAssignNew(interactionButton, SButton)
@@ -1478,7 +1502,7 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(T
 									return displayInfo.DisplayText;
 								})
 							))
-							.Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))
+							.Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
 							.ToolTipText(TAttribute<FText>::Create(
 								TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
 								{
