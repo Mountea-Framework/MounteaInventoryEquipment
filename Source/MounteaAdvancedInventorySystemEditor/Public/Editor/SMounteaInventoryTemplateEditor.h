@@ -96,6 +96,9 @@ private:
 	void RefreshTemplateList();
 	void OnTreeSelectionChanged(TSharedPtr<FTemplateTreeItem> SelectedItem, ESelectInfo::Type SelectInfo);
 	
+	void SaveExpansionState();
+	void RestoreExpansionState();
+	
 	FReply OnCreateNewTemplate();
 	FReply SaveTemplate();
 	FReply SaveAllDirtyTemplates();
