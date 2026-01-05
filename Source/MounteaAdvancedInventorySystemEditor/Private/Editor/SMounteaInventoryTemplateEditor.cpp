@@ -308,6 +308,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 		
 		+ SSplitter::Slot()
 		.Value(0.3f)
+		.MinSize_Lambda([this]()
+		{
+			const float ParentWidth = this->GetCachedGeometry().GetLocalSize().X;
+			return ParentWidth * 0.20f;
+		})
 		[
 			SNew(SBorder)
 			.Padding(4.0f)
@@ -334,6 +339,11 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 		
 		+ SSplitter::Slot()
 		.Value(0.7f)
+		.MinSize_Lambda([this]()
+		{
+			const float ParentWidth = this->GetCachedGeometry().GetLocalSize().X;
+			return ParentWidth * 0.50f;
+		})
 		[
 			PropertyDetailsView.ToSharedRef()
 		];
@@ -1537,7 +1547,11 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(T
 									return displayInfo.DisplayText;
 								})
 							))
-							.Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
+							.Font_Lambda([this, Item]() -> const FSlateFontInfo
+							{
+								bool bSelected = TemplateTreeView.IsValid() && TemplateTreeView->GetSelectedItems().Contains(Item);
+								return FCoreStyle::GetDefaultFontStyle(bSelected ? "Bold" : "Regular", 10);
+							})
 							.ToolTipText(TAttribute<FText>::Create(
 								TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
 								{
