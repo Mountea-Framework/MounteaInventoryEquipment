@@ -477,6 +477,7 @@ FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 		if (!itemTemplate || itemTemplate->HasAnyFlags(RF_Transient))
 			return;
 
+		itemTemplate->CalculateJson();
 		UPackage* package = itemTemplate->GetPackage();
 		if (!package)
 			return;

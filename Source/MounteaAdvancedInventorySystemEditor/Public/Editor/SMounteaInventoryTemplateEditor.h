@@ -79,7 +79,7 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);	
-	virtual ~SMounteaInventoryTemplateEditor();
+	virtual ~SMounteaInventoryTemplateEditor() override;
 
 protected:
 	virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged) override;
