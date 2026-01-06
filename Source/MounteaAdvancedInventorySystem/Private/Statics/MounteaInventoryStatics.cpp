@@ -283,8 +283,11 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 
 TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
 {
-	if (Items.Num() <= 1 || SortingCriteria.Num() == 0)
+	if (Items.Num() < 1 || SortingCriteria.Num() == 0)
 		return TArray<FInventoryItem>();
+	
+	if (Items.Num() == 1)
+		return Items;
 
 	TArray<FInventoryItem> returnValue = Items;
 	enum class ESortKey : uint8 { Name, Value, Weight, Rarity, Unknown };
