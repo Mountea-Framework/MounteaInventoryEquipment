@@ -98,7 +98,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Clear Custom Items")
+		DisplayName="Inventory UI - Get Custom Items")
 	static TMap<FGameplayTag,FGuid> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 	/**

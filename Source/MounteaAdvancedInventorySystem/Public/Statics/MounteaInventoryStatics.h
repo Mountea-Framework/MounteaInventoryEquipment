@@ -417,9 +417,16 @@ public:
 	
 	/**
 	 * Sorts provided Inventory Items based on Sorting Criteria.
-	 * @param Target Inventory interface.
+	 * 
+	 * Defaults:
+	 * * Name
+	 * * Value
+	 * * Weight
+	 * * Rarity
+	 * 
 	 * @param Items List of cached Items. This is to avoid touching the "source" Items, so we rather sort temp. data.
 	 * @param SortingCriteria Defines what criteria are applied
+	 * @return Sorted Items.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static TArray<FInventoryItem> SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
