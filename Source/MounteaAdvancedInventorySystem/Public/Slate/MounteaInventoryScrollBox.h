@@ -86,14 +86,26 @@ protected:
 	// If set to false scrolling will be disabled.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box")
 	bool bCaptureInput = true;
+	
+	// Enable/disable a delay between scroll input events.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box|Delay")
+	bool bUseScrollDelay = true;
+
+	// Time (in seconds) to wait before processing another scroll input.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scroll Box|Delay", 
+		meta = (ClampMin = "0.0", UIMin = "0.0"))
+	float ScrollDelay = 0.15f;
 
 private:
 	void BroadcastIndexChange(int32 Delta) const;
 	void CalculateDesiredTransform();
 	void InterpolateToTarget(const float InDeltaTime);
+	void UnlockScroll();
 
 private:	
 	int32 ActiveIndex = INDEX_NONE;
+	bool bScrollLocked = false;
+	FTimerHandle ScrollDelayTimerHandle;
 	FVector2D CurrentTranslation = FVector2D::ZeroVector;
 	FVector2D TargetTranslation = FVector2D::ZeroVector;
 };

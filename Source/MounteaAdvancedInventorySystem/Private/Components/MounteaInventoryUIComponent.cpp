@@ -355,8 +355,25 @@ void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& Sele
 	OnItemSelected.Broadcast(SelectedItem);
 }
 
+void UMounteaInventoryUIComponent::AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	if (FInventoryUICustomData* customData = CustomItemsMap.Find(ItemTag))
+	{
+		if (!customData->StoredIds.Contains(ItemId))
+			customData->StoredIds.Add(ItemId);
+	}
+	else
+	{
+		FInventoryUICustomData newData;
+		newData.StoredIds.Add(ItemId);
+
+		CustomItemsMap.Add(ItemTag, MoveTemp(newData));
+	}	
+}
+
+
 void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability,
-	const float NewDurability)
+                                                                const float NewDurability)
 {
 	Execute_ProcessItemModified(this, Item);
 }

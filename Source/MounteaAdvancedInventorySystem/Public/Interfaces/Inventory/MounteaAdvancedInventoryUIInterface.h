@@ -47,7 +47,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryUIInterface
 
 public:
 	
-	// --- Inventory  ------------------------------
+	// --- Inventory
 
 	/**
 	 * Retrieves the parent inventory associated with this UI.
@@ -88,7 +88,7 @@ public:
 	void RemoveWrapperWidget();
 	virtual void RemoveWrapperWidget_Implementation() = 0;
 	
-	// --- Notification  ------------------------------
+	// --- Notification
 
 	/**
 	 * Retrieves the notification container widget.
@@ -138,6 +138,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Category")
 	FString GetSelectedCategoryId() const;
 	virtual FString GetSelectedCategoryId_Implementation() const = 0;
+	
+	// --- Item
 
 	/**
 	 * Retrieves the currently active item widget in the inventory UI.
@@ -198,6 +200,58 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
 	FGuid GetActiveItemGuid() const;
 	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
+	
+	// --- Items
+
+	/**
+	 * Retrieves local custom items map.
+	 * 
+	 * @return Custom Items Mpa if any specified.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap() const;
+	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const = 0;
+	
+	/**
+ * Adds (or replaces) a single entry in the custom items map.
+ *
+ * @param ItemTag   Gameplay tag representing the custom item key.
+ * @param ItemId    Guid value associated with the item.
+ */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void AddCustomItemToMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
+	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
+
+	/**
+	 * Appends entries from another map into the custom items map.
+	 * Existing keys will be overwritten with new values.
+	 *
+	 * @param OtherItems   Map of custom items to merge in.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void AppendCustomItemsMap(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
+	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) = 0;
+
+	/**
+	 * Clears all entries from the custom items map.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	void ClearCustomItemsMap();
+	virtual void ClearCustomItemsMap_Implementation() = 0;
+
+	/**
+	 * Removes a single entry from the custom items map.
+	 *
+	 * @param ItemTag   Gameplay tag representing the custom item key to remove.
+	 *
+	 * @return True if an entry was removed, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	bool RemoveCustomItemFromMap(const FGameplayTag& ItemTag);
+	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag) = 0;
+
+		
+	// --- Slots
 
 	/**
 	 * Retrieves the saved inventory grid slots.
@@ -266,6 +320,8 @@ public:
 	void UpdateSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 
+	// --- Events
+	
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() = 0;
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() = 0;
 };

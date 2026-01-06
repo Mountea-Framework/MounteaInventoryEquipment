@@ -69,7 +69,13 @@ public:
 	virtual FString GetSelectedCategoryId_Implementation() const override { return ActiveCategoryId; };
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) override;
 	virtual FGuid GetActiveItemGuid_Implementation() const override { return ActiveItemGuid; };
-
+	
+	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const override { return CustomItemsMap; };
+	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
+	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override { CustomItemsMap.Append(OtherItems); };
+	virtual void ClearCustomItemsMap_Implementation() override { CustomItemsMap.Reset(); };
+	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag) override { return CustomItemsMap.Remove(ItemTag) > 0; };
+	
 	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const override {return SavedGridSlots;};
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
 	virtual void RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
@@ -111,14 +117,23 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryItemSelected OnItemSelected;
 
+protected:
+	
+	// Currently active category in UI.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	FString ActiveCategoryId;
 
+	// Currently active item in UI.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	FGuid ActiveItemGuid;
 
+	// Currently active item Widget.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	TObjectPtr<UWidget> ActiveItemWidget;
+	
+	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
 
 	/**
 	 * Represents the set of saved inventory grid slots.

@@ -288,7 +288,7 @@ public:
 	 * * Weight
 	 * * Rarity
 	 */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString SortingKey;
 	
 };
