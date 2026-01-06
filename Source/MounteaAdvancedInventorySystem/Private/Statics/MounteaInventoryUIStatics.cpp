@@ -385,6 +385,41 @@ FInventoryItem UMounteaInventoryUIStatics::FindItem(
 	return inventory->Execute_FindItem(inventory.GetObject(), SearchParams);
 }
 
+TMap<FGameplayTag, FGuid> UMounteaInventoryUIStatics::GetCustomItemsMap(
+	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	return Target.GetObject() ? 
+		IMounteaAdvancedInventoryUIInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FGuid>();
+}
+
+void UMounteaInventoryUIStatics::AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIInterface::Execute_AddCustomItemToMap(Target.GetObject(), ItemTag, ItemId);
+}
+
+void UMounteaInventoryUIStatics::AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const TMap<FGameplayTag, FGuid>& OtherItems)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIInterface::Execute_AppendCustomItemsMap(Target.GetObject(), OtherItems);
+}
+
+void UMounteaInventoryUIStatics::ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIInterface::Execute_ClearCustomItemsMap(Target.GetObject());
+}
+
+bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const FGameplayTag& ItemTag)
+{
+	if (Target.GetObject())
+		return IMounteaAdvancedInventoryUIInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag);
+	return false;
+}
+
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
 {
 	if (!IsValid(ParentWidget))

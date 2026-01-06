@@ -73,6 +73,84 @@ public:
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
 	
+	// --- UI Component
+	
+	/**
+	 * Finds an item in the inventory using the provided search parameters.
+	 * This function retrieves the parent inventory from the target UI component
+	 * and searches for the item based on the specified search parameters.
+	 *
+	 * @param Target The target UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param SearchParams The parameters used to search for the item.
+	 * 
+	 * @return The found inventory item, or an invalid item if not found.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Inventory UI - Find Item")
+	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	
+	/**
+	 * Retrieves local custom items map.
+	 * 
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @return Custom Items Mpa if any specified.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI - Clear Custom Items")
+	static TMap<FGameplayTag,FGuid> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	
+	/**
+	 * Adds (or replaces) a custom item entry in the target UI component's custom items map.
+	 *
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param ItemTag    Gameplay tag representing the custom item key.
+	 * @param ItemId     Guid value associated with the item.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI - Add Custom Item")
+	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FGameplayTag& ItemTag,
+		const FGuid& ItemId);
+	
+	/**
+	 * Appends custom item entries to the target UI component's custom items map.
+	 * Existing keys will be overwritten.
+	 *
+	 * @param Target       UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param OtherItems   Map of custom items to append.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI - Append Custom Items")
+	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+		const TMap<FGameplayTag, FGuid>& OtherItems);
+
+	/**
+	 * Clears all custom items from the target UI component's custom items map.
+	 *
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI - Clear Custom Items")
+	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+
+	/**
+	 * Removes a single custom item from the target UI component's custom items map.
+	 *
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param ItemTag    Gameplay tag representing the custom item key to remove.
+	 *
+	 * @return True if an entry was removed, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Inventory UI - Remove Custom Item")
+	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+		const FGameplayTag& ItemTag);
+	
 	// --- Helpers
 	
 #pragma region Helpers
@@ -216,22 +294,6 @@ public:
 	static bool IsInputAllowed(const FKey& InputKey, const FName& InputName);
 
 	/**
-	 * Finds an item in the inventory using the provided search parameters.
-	 * This function retrieves the parent inventory from the target UI component
-	 * and searches for the item based on the specified search parameters.
-	 *
-	 * @param Target The target UI component implementing MounteaAdvancedInventoryUIInterface.
-	 * @param SearchParams The parameters used to search for the item.
-	 * 
-	 * @return The found inventory item, or an invalid item if not found.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Find Item (From UI Component)")
-	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
-
-
-	/**
 	 * Calculates the spawn location for an actions list based on the provided widget.
 	 *
 	 * @param ParentWidget The parent widget used for determining the spawn location. Must be a valid widget.
@@ -277,7 +339,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Scrollbox", 
 		meta=(CustomTag="MounteaK2Getter"), DisplayName="Get Children Count",
-		meta=(Keywords = "Num Len"))
+		meta=(Keywords = "num,len"))
 	static int32 MounteaInventoryScrollBox_GetChildrenCount(const UMounteaInventoryScrollBox* ScrollBox);
 	
 	/**

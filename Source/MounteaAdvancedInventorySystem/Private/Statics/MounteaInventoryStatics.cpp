@@ -20,6 +20,38 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
+FInventoryCategoryData UMounteaInventoryStatics::GetInventoryCategoryData(const FString& CategoryName, const FString ParentCategory, bool& bResult)
+{
+	bResult = false;
+	if (CategoryName.IsEmpty()) return FInventoryCategoryData();
+	
+	const auto inventoryConfig = GetInventorySettingsConfig();
+	if (!inventoryConfig) return FInventoryCategoryData();
+	
+	if (ParentCategory.IsEmpty())
+	{
+		bResult = inventoryConfig->AllowedCategories.Contains(CategoryName);
+		if (bResult)
+		{
+			auto inventoryCategory = *inventoryConfig->AllowedCategories.Find(CategoryName);
+			return inventoryCategory.CategoryData;
+		}
+		return FInventoryCategoryData();
+	}
+	
+	if (!inventoryConfig->AllowedCategories.Contains(ParentCategory)) return FInventoryCategoryData();
+
+	const FInventoryCategory parentCategory = *inventoryConfig->AllowedCategories.Find(ParentCategory);
+		
+	bResult = parentCategory.SubCategories.Contains(CategoryName);
+	if (bResult)
+	{
+		auto inventoryCategory = *parentCategory.SubCategories.Find(CategoryName);
+		return inventoryCategory;
+	}
+	return FInventoryCategoryData();
+}
+
 UMounteaAdvancedInventorySettings* UMounteaInventoryStatics::GetInventorySettings()
 {
 	return GetMutableDefault<UMounteaAdvancedInventorySettings>();

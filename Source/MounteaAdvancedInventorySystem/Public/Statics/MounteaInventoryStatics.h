@@ -52,6 +52,24 @@ public:
 
 public:
 	
+	// --- Category
+
+	/**
+	 * Returns Category Data if category exists.
+	 * You can search for 
+	 * 
+	 * @param CategoryName Category to search data for.
+	 * @param ParentCategory Optional parent category. If left empty, only first level categories are searched.
+	 * @param bResult Returns whether this operation was success or not.
+	 * @return Category data structure.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", 
+		meta=(CustomTag="MounteaK2Getter"))
+	static FInventoryCategoryData GetInventoryCategoryData(const FString& CategoryName, const FString ParentCategory, 
+		UPARAM(DisplayName="Success") bool& bResult);
+	
+	// --- Settings & Configuration
+	
 	/**
 	 * Retrieves the configuration settings for the Mountea Inventory System.
 	 * Provides access to inventory-related configurations such as inventory types, rarities, and categories.
@@ -73,6 +91,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", meta=(CustomTag="MounteaK2Getter"))
 	static UPrimaryDataAsset* GetTemplateConfig(const FString& Key);
 
+	//--- Inventory
+	
 	/**
 	 * Creates a new inventory item associated with the given unique identifier.
 	 * This item is NOT valid item! This is to simplify searching for item related data!
@@ -80,7 +100,9 @@ public:
 	 * @param ItemGuid - The globally unique identifier (GUID) for the new item
 	 * @return - A new inventory item initialized with the specified GUID
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta = (Keywords = "construct,build,make", NativeMakeFunc), meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", 
+		meta = (Keywords = "construct,build,make", NativeMakeFunc), 
+		meta=(CustomTag="MounteaK2Getter"))
 	static FInventoryItem NewInventoryItem(const FGuid& ItemGuid);
 
 	/**
@@ -89,7 +111,8 @@ public:
 	 * @param FlagMask - The flag(s) to check for
 	 * @return - True if all flags in the mask are set in the value
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static bool HasInventoryFlags(const uint8 Value, UPARAM(meta = (Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags")) const int32 FlagMask)
 	{
 		return (Value & FlagMask) == FlagMask;
@@ -100,7 +123,8 @@ public:
 	 * @param Target The inventory interface to execute on
 	 * @return The owning actor for this Dialogue Inventory Component.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static AActor* GetOwningActor(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
 
 	/**
@@ -109,7 +133,9 @@ public:
 	 * @param Item The item to add
 	 * @return True if item was added successfully
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool AddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item);
 
 	/**
@@ -118,7 +144,9 @@ public:
 	 * @param ItemGuid GUID of item to remove
 	 * @return True if item was removed
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool RemoveItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid);
 
 	/**
@@ -127,7 +155,8 @@ public:
 	 * @param Item Item to check
 	 * @return True if item can be added
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Validate"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Validate"))
 	static bool CanAddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item);
 
 	/**
@@ -138,8 +167,11 @@ public:
 	 * @param Durability Initial durability
 	 * @return True if item was added successfully
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool AddItemFromTemplate(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1, const float Durability = 1.f);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"))
+	static bool AddItemFromTemplate(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UMounteaInventoryItemTemplate* Template, 
+		const int32 Quantity = 1, const float Durability = 1.f);
 
 	/**
 	 * Removes items by template
@@ -148,8 +180,11 @@ public:
 	 * @param Quantity Amount to remove
 	 * @return True if items were removed
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool RemoveItemFromTemplate(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"))
+	static bool RemoveItemFromTemplate(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UMounteaInventoryItemTemplate* Template, 
+		const int32 Quantity = 1);
 
 	/**
 	 * Checks if can add item from template
@@ -158,8 +193,10 @@ public:
 	 * @param Quantity Amount to validate
 	 * @return True if item can be added
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Validate"))
-	static bool CanAddItemFromTemplate(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Validate"))
+	static bool CanAddItemFromTemplate(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UMounteaInventoryItemTemplate* Template, 
+		const int32 Quantity = 1);
 
 	/**
 	 * Finds item based on Search conditions.
@@ -167,7 +204,8 @@ public:
 	 * @param SearchParams Search params to search by.
 	 * @return Found item or nullptr
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
 	/**
@@ -176,7 +214,8 @@ public:
 	 * @param SearchParams Search params to search by.
 	 * @return Found item index or -1
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static int32 FindItemIndex(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
@@ -185,7 +224,8 @@ public:
 	 * @param SearchParams Search params to search by.
 	 * @return Found items or empty array
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static TArray<FInventoryItem> FindItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
 	/**
@@ -193,14 +233,16 @@ public:
 	 * @param Target The inventory interface to execute on
 	 * @return Array of inventory items
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static TArray<FInventoryItem> GetAllItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
 
 	/**
 	 * Clears all items from inventory
 	 * @param Target The inventory interface to execute on
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ClearInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
 
 	/**
@@ -210,7 +252,8 @@ public:
 	 * @param SearchParams The parameters to filter and match the desired item in the inventory.
 	 * @return True if the specified item exists in the inventory, False otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static bool HasItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
@@ -220,8 +263,11 @@ public:
 	 * @param Amount Amount to increase
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool IncreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, int32 Amount = 1);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"))
+	static bool IncreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
+		int32 Amount = 1);
 
 	/**
 	 * Decreases item quantity
@@ -230,8 +276,11 @@ public:
 	 * @param Amount Amount to decrease
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool DecreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, int32 Amount = 1);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"))
+	static bool DecreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
+		int32 Amount = 1);
 
 	/**
 	 * Modifies item durability
@@ -240,15 +289,19 @@ public:
 	 * @param DeltaDurability Change in durability
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Durability", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool ModifyItemDurability(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, float DeltaDurability);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Durability", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"))
+	static bool ModifyItemDurability(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
+		float DeltaDurability);
 
 	/**
 	 * Processes inventory notification
 	 * @param Target The inventory interface to execute on
 	 * @param Notification The notification to process
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Notifications", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Notifications", 
+		meta=(CustomTag="MounteaK2Setter"))
 	static void ProcessInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryNotificationData& Notification);
 
 	/**
@@ -258,8 +311,11 @@ public:
 	 * @param Target Inventory interface.
 	 * @return A message that provides details about inventory content.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static FString InventoryToString(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
+	
+	// --- Item
 	
 	/**
 	 * Translates Inventory Item to string.
@@ -357,6 +413,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
 	static TArray<TSoftClassPtr<UObject>> GetItemActions(const FInventoryItem& Item);
 
+	// --- Items
+	
 	/**
 	 * Sorts provided Inventory Items based on Sorting Criteria.
 	 * @param Target Inventory interface.
@@ -364,7 +422,8 @@ public:
 	 * @param SortingCriteria Defines what criteria are applied
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
-	static void SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UPARAM(ref) TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
+	static void SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UPARAM(ref) TArray<FInventoryItem>& Items, 
+		const TArray<FInventorySortCriteria>& SortingCriteria );
 
 	// --- Item Template
 	
