@@ -99,7 +99,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI - Get Custom Items")
-	static TMap<FGameplayTag,FGuid> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
 	
 	/**
 	 * Adds (or replaces) a custom item entry in the target UI component's custom items map.
@@ -125,7 +125,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI - Append Custom Items")
 	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
-		const TMap<FGameplayTag, FGuid>& OtherItems);
+		const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 
 	/**
 	 * Clears all custom items from the target UI component's custom items map.

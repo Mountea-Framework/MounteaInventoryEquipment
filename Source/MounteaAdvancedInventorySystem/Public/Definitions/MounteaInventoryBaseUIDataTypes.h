@@ -256,6 +256,27 @@ public:
 	}
 };
 
+/**
+ * FInventoryUICustomData stores UI-specific metadata associated with inventory elements.
+ *
+ * UI systems may read these values to reconstruct state, while gameplay systems should
+ * generally treat this data as optional and UI-only.
+ */
+USTRUCT(BlueprintType)
+struct FInventoryUICustomData
+{
+	GENERATED_BODY()
+	
+public:
+
+	/**
+	 * Collection of GUIDs used to store UI-specific identifiers.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TArray<FGuid> StoredIds;
+};
+
+
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {
 	return HashCombine(

@@ -385,11 +385,11 @@ FInventoryItem UMounteaInventoryUIStatics::FindItem(
 	return inventory->Execute_FindItem(inventory.GetObject(), SearchParams);
 }
 
-TMap<FGameplayTag, FGuid> UMounteaInventoryUIStatics::GetCustomItemsMap(
+TMap<FGameplayTag, FInventoryUICustomData> UMounteaInventoryUIStatics::GetCustomItemsMap(
 	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
 {
 	return Target.GetObject() ? 
-		IMounteaAdvancedInventoryUIInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FGuid>();
+		IMounteaAdvancedInventoryUIInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FInventoryUICustomData>();
 }
 
 void UMounteaInventoryUIStatics::AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
@@ -400,7 +400,7 @@ void UMounteaInventoryUIStatics::AddCustomItem(const TScriptInterface<IMounteaAd
 }
 
 void UMounteaInventoryUIStatics::AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
-	const TMap<FGameplayTag, FGuid>& OtherItems)
+	const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
 {
 	if (Target.GetObject())
 		IMounteaAdvancedInventoryUIInterface::Execute_AppendCustomItemsMap(Target.GetObject(), OtherItems);

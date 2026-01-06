@@ -209,8 +209,8 @@ public:
 	 * @return Custom Items Mpa if any specified.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
-	TMap<FGameplayTag,FGuid> GetCustomItemsMap() const;
-	virtual TMap<FGameplayTag,FGuid> GetCustomItemsMap_Implementation() const = 0;
+	TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap() const;
+	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const = 0;
 	
 	/**
  * Adds (or replaces) a single entry in the custom items map.
@@ -229,8 +229,8 @@ public:
 	 * @param OtherItems   Map of custom items to merge in.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
-	void AppendCustomItemsMap(const TMap<FGameplayTag, FGuid>& OtherItems);
-	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FGuid>& OtherItems) = 0;
+	void AppendCustomItemsMap(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
+	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) = 0;
 
 	/**
 	 * Clears all entries from the custom items map.
