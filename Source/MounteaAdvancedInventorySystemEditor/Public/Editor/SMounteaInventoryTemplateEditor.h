@@ -135,6 +135,10 @@ private:
 
 private:
 	FOnTemplateChanged OnTemplateChanged;
+	FDelegateHandle AssetRemovedHandle;
+	FDelegateHandle AssetRenamedHandle;
+	FDelegateHandle AssetAddedHandle;
+	FDelegateHandle AssetUpdatedHandle;
 	
 	TSharedPtr<SOverlay> RootOverlay;
 	TSharedPtr<class SMounteaItemTemplatesEditorHelp> HelpWidget;
@@ -156,11 +160,24 @@ private:
 	bool bIsEditingExisting = false;
 	bool bIsShowingTransient = false;
 	
+	TSet<FName> PendingRemovedObjectPaths;
+	TWeakPtr<FActiveTimerHandle> PendingRefreshTimer;
+	bool bPendingRefresh = false;
+	
 	void ApplySearchFilter();
 	
 	void OnSearchTextChanged(const FText& InSearchText);
 	void OnFiltersChanged();
 	bool PassesFilters(TWeakObjectPtr<UMounteaInventoryItemTemplate> Template) const;
+
+	static bool IsInventoryTemplateAsset(const FAssetData& AssetData);
+	void OnAssetRegistryRemoved(const FAssetData& AssetData);
+	void OnAssetRegistryRenamed(const FAssetData& AssetData, const FString& String);
+	void OnAssetRegistryAdded(const FAssetData& AssetData);
+	void OnAssetRegistryUpdated(const FAssetData& AssetData);
+	EActiveTimerReturnType HandleDeferredRefresh(double, float);
+	void BindAssetRegistry();
+	void UnbindAssetRegistry();
 };
 
 #undef LOCTEXT_NAMESPACE

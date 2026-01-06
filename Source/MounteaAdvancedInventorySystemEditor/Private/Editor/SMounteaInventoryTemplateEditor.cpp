@@ -55,12 +55,14 @@
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
+#include "Subsystems/EditorAssetSubsystem.h"
 #include "UObject/SavePackage.h"
 
 #define LOCTEXT_NAMESPACE "SMounteaInventoryTemplateEditor"
 
 SMounteaInventoryTemplateEditor::~SMounteaInventoryTemplateEditor()
 {
+	UnbindAssetRegistry();
 	CleanupTransientTemplate();
 	
 	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
@@ -97,6 +99,7 @@ void SMounteaInventoryTemplateEditor::Construct(const FArguments& InArgs)
 	CreateTransientTemplate();
 	RefreshTemplateList();
 	OnTreeSelectionChanged(nullptr, ESelectInfo::Direct);
+	BindAssetRegistry();
 	
 	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
 		editorTemplateSubsystem->OnTemplatesChanged().AddRaw(this, &SMounteaInventoryTemplateEditor::RefreshTemplateList);
@@ -827,6 +830,123 @@ bool SMounteaInventoryTemplateEditor::PassesFilters(const TWeakObjectPtr<UMounte
 	return SearchFilterWidget->GetActiveFilters().PassesFilter(
 		DirtyTemplates.Contains(Template), Template->ItemCategory, Template->ItemRarity
 	);
+}
+
+bool SMounteaInventoryTemplateEditor::IsInventoryTemplateAsset(const FAssetData& AssetData)
+{
+	return AssetData.AssetClassPath == UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName();
+}
+
+void SMounteaInventoryTemplateEditor::OnAssetRegistryRemoved(const FAssetData& AssetData)
+{
+	if (AssetData.AssetClassPath != UMounteaInventoryItemTemplate::StaticClass()->GetClassPathName())
+		return;
+
+	PendingRemovedObjectPaths.Add(*AssetData.GetObjectPathString());
+	bPendingRefresh = true;
+
+	if (!PendingRefreshTimer.IsValid())
+		PendingRefreshTimer = RegisterActiveTimer(0.f, FWidgetActiveTimerDelegate::CreateRaw(
+			this, &SMounteaInventoryTemplateEditor::HandleDeferredRefresh));
+}
+
+
+void SMounteaInventoryTemplateEditor::OnAssetRegistryRenamed(const FAssetData& AssetData, const FString& String)
+{
+	if (!IsInventoryTemplateAsset(AssetData))
+		return;
+
+	RefreshTemplateList();
+}
+
+void SMounteaInventoryTemplateEditor::OnAssetRegistryAdded(const FAssetData& AssetData)
+{
+	if (!IsInventoryTemplateAsset(AssetData))
+		return;
+
+	RefreshTemplateList();
+}
+
+void SMounteaInventoryTemplateEditor::OnAssetRegistryUpdated(const FAssetData& AssetData)
+{
+	if (!IsInventoryTemplateAsset(AssetData))
+		return;
+
+	RefreshTemplateList();
+}
+
+EActiveTimerReturnType SMounteaInventoryTemplateEditor::HandleDeferredRefresh(double, float)
+{
+	if (!bPendingRefresh || PendingRemovedObjectPaths.Num() == 0)
+	{
+		bPendingRefresh = false;
+		PendingRefreshTimer.Reset();
+		return EActiveTimerReturnType::Stop;
+	}
+
+	bool bAnyStillExists = false;
+
+	if (!GEditor)
+		return EActiveTimerReturnType::Stop;
+	
+	UEditorAssetSubsystem* editorAssetSubsystem = GEditor->GetEditorSubsystem<UEditorAssetSubsystem>();
+	if (!editorAssetSubsystem)
+		return EActiveTimerReturnType::Stop;
+	
+	for (const FName& objPathName : PendingRemovedObjectPaths)
+	{
+		const FString objPath = objPathName.ToString();
+		if (editorAssetSubsystem->DoesAssetExist(objPath))
+		{
+			bAnyStillExists = true;
+			break;
+		}
+	}
+
+	if (bAnyStillExists)
+		return EActiveTimerReturnType::Continue;
+
+	PendingRemovedObjectPaths.Reset();
+	bPendingRefresh = false;
+
+	RefreshTemplateList();
+
+	PendingRefreshTimer.Reset();
+	return EActiveTimerReturnType::Stop;
+}
+
+void SMounteaInventoryTemplateEditor::BindAssetRegistry()
+{
+	const FAssetRegistryModule& assetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	IAssetRegistry& assetRegistry = assetRegistryModule.Get();
+
+	AssetRemovedHandle	= assetRegistry.OnAssetRemoved().AddRaw(this, &SMounteaInventoryTemplateEditor::OnAssetRegistryRemoved);
+	AssetRenamedHandle	= assetRegistry.OnAssetRenamed().AddRaw(this, &SMounteaInventoryTemplateEditor::OnAssetRegistryRenamed);
+	AssetAddedHandle	= assetRegistry.OnAssetAdded().AddRaw(this, &SMounteaInventoryTemplateEditor::OnAssetRegistryAdded);
+	AssetUpdatedHandle	= assetRegistry.OnAssetUpdated().AddRaw(this, &SMounteaInventoryTemplateEditor::OnAssetRegistryUpdated);
+}
+
+void SMounteaInventoryTemplateEditor::UnbindAssetRegistry()
+{
+	if (!FModuleManager::Get().IsModuleLoaded("AssetRegistry"))
+		return;
+
+	FAssetRegistryModule& assetRegistryModule = FModuleManager::GetModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	IAssetRegistry& assetRegistry = assetRegistryModule.Get();
+
+	if (AssetRemovedHandle.IsValid()) 
+		assetRegistry.OnAssetRemoved().Remove(AssetRemovedHandle);
+	if (AssetRenamedHandle.IsValid()) 
+		assetRegistry.OnAssetRenamed().Remove(AssetRenamedHandle);
+	if (AssetAddedHandle.IsValid()) 
+		assetRegistry.OnAssetAdded().Remove(AssetAddedHandle);
+	if (AssetUpdatedHandle.IsValid()) 
+		assetRegistry.OnAssetUpdated().Remove(AssetUpdatedHandle);
+
+	AssetRemovedHandle.Reset();
+	AssetRenamedHandle.Reset();
+	AssetAddedHandle.Reset();
+	AssetUpdatedHandle.Reset();
 }
 
 void SMounteaInventoryTemplateEditor::ApplySearchFilter()
