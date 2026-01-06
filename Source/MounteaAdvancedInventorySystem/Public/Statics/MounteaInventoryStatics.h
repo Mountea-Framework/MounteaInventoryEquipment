@@ -422,8 +422,7 @@ public:
 	 * @param SortingCriteria Defines what criteria are applied
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
-	static void SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, UPARAM(ref) TArray<FInventoryItem>& Items, 
-		const TArray<FInventorySortCriteria>& SortingCriteria );
+	static TArray<FInventoryItem> SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
 
 	// --- Item Template
 	

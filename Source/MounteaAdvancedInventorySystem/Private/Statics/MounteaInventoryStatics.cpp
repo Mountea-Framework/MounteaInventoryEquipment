@@ -281,12 +281,12 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 	return validActions;
 }
 
-void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
-	TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
+TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
 {
 	if (Items.Num() <= 1 || SortingCriteria.Num() == 0)
-		return;
-	
+		return TArray<FInventoryItem>();
+
+	TArray<FInventoryItem> returnValue = Items;
 	enum class ESortKey : uint8 { Name, Value, Weight, Rarity, Unknown };
 	
 	auto getSortKey = [](const FString& Key) -> ESortKey
@@ -308,7 +308,7 @@ void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounte
 	{
 		const ESortKey sortKey = getSortKey(Criteria.SortingKey);
 		
-		Algo::StableSort(Items, [sortKey](const FInventoryItem& A, const FInventoryItem& B)
+		Algo::StableSort(returnValue, [sortKey](const FInventoryItem& A, const FInventoryItem& B)
 		{
 			switch (sortKey)
 			{
@@ -335,6 +335,8 @@ void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounte
 			}
 		});
 	}
+	
+	return returnValue;
 }
 
 FString UMounteaInventoryStatics::ItemTemplate_GetItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate)
