@@ -43,6 +43,8 @@ void UMounteaInventoryScrollBox::ResetChildren()
 		ActiveIndex = INDEX_NONE;
 		VerticalBox->ClearChildren();
 	}
+	
+	UnlockScroll();
 }
 
 TSharedRef<SWidget> UMounteaInventoryScrollBox::RebuildWidget()
@@ -67,43 +69,114 @@ void UMounteaInventoryScrollBox::NativeTick(const FGeometry& MyGeometry, float I
 
 FReply UMounteaInventoryScrollBox::NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
+	if (!bCaptureInput)
+		return Super::NativeOnMouseWheel(InGeometry, InMouseEvent);
+	
+	if (bUseScrollDelay && bScrollLocked)
+		return FReply::Handled();
+
+	if (bUseScrollDelay)
+	{
+		bScrollLocked = true;
+
+		if (UWorld* world = GetWorld())
+		{
+			world->GetTimerManager().SetTimer(
+				ScrollDelayTimerHandle,
+				this,
+				&UMounteaInventoryScrollBox::UnlockScroll,
+				ScrollDelay,
+				false
+			);
+		}
+	}
+
 	const float wheelDelta = InMouseEvent.GetWheelDelta();
 	BroadcastIndexChange(wheelDelta > 0 ? -1 : 1);
+
 	return FReply::Handled();
 }
 
+
 FReply UMounteaInventoryScrollBox::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
+	if (!bCaptureInput)
+		return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+	
 	const FKey key = InKeyEvent.GetKey();
-	
-	if (key == EKeys::Up || key == EKeys::W || key == EKeys::Gamepad_DPad_Up)
-	{
-		BroadcastIndexChange(-1);
+
+	// Keys that should move the selection
+	const bool bUpKey =
+		(key == EKeys::Up || key == EKeys::W || key == EKeys::Gamepad_DPad_Up);
+	const bool bDownKey =
+		(key == EKeys::Down || key == EKeys::S || key == EKeys::Gamepad_DPad_Down);
+
+	if (!bUpKey && !bDownKey)
+		return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+
+	// Delay
+	if (bUseScrollDelay && bScrollLocked)
 		return FReply::Handled();
-	}
-	else if (key == EKeys::Down || key == EKeys::S || key == EKeys::Gamepad_DPad_Down)
+
+	if (bUseScrollDelay)
 	{
-		BroadcastIndexChange(1);
-		return FReply::Handled();
+		bScrollLocked = true;
+
+		if (UWorld* world = GetWorld())
+		{
+			world->GetTimerManager().SetTimer(
+				ScrollDelayTimerHandle,
+				this,
+				&UMounteaInventoryScrollBox::UnlockScroll,
+				ScrollDelay,
+				false
+			);
+		}
 	}
-	
-	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+
+	const int32 deltaValue = bUpKey ? -1 : 1;
+	BroadcastIndexChange(deltaValue);
+
+	return FReply::Handled();
 }
+
 
 FReply UMounteaInventoryScrollBox::NativeOnAnalogValueChanged(const FGeometry& InGeometry,
 	const FAnalogInputEvent& InAnalogEvent)
 {
+	if (!bCaptureInput)
+		return Super::NativeOnAnalogValueChanged(InGeometry, InAnalogEvent);
+	
 	const FKey key = InAnalogEvent.GetKey();
 	const float value = InAnalogEvent.GetAnalogValue();
+
+	if (key != EKeys::Gamepad_LeftY || FMath::Abs(value) <= 0.5f)
+		return Super::NativeOnAnalogValueChanged(InGeometry, InAnalogEvent);
 	
-	if (key == EKeys::Gamepad_LeftY && FMath::Abs(value) > 0.5f)
-	{
-		BroadcastIndexChange(value > 0 ? -1 : 1);
+	if (bUseScrollDelay && bScrollLocked)
 		return FReply::Handled();
+
+	if (bUseScrollDelay)
+	{
+		bScrollLocked = true;
+
+		if (UWorld* world = GetWorld())
+		{
+			world->GetTimerManager().SetTimer(
+				ScrollDelayTimerHandle,
+				this,
+				&UMounteaInventoryScrollBox::UnlockScroll,
+				ScrollDelay,
+				false
+			);
+		}
 	}
-	
-	return Super::NativeOnAnalogValueChanged(InGeometry, InAnalogEvent);
+
+	BroadcastIndexChange(value > 0 ? -1 : 1);
+
+	return FReply::Handled();
 }
+
 
 void UMounteaInventoryScrollBox::SetActiveIndex(const int32 NewIndex)
 {
@@ -157,4 +230,9 @@ void UMounteaInventoryScrollBox::InterpolateToTarget(const float DeltaTime)
 	
 	CurrentTranslation = FMath::Vector2DInterpTo(CurrentTranslation, TargetTranslation, DeltaTime, InterpolationSpeed);
 	VerticalBox->SetRenderTranslation(CurrentTranslation);
+}
+
+void UMounteaInventoryScrollBox::UnlockScroll()
+{
+	bScrollLocked = false;
 }
