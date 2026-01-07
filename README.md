@@ -8,7 +8,7 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 [![Discord](https://badgen.net/discord/members/2vXWEEN?label=Discord&logo=discord&logoColor=ffffff&color=7389D8)](https://discord.com/invite/2vXWEEN)
 
 ## Discord Channel
-> [!NOTE]
+> [!TIP]
 > 
 > Join the [Discord Server](https://discord.gg/waYT2cn37z) where you can raise tickets, ask questions, get help or just share your progress.
 >
@@ -51,7 +51,7 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 > Allows in-editor bulk changes with options to export to `mnteaitem` or `mnteaitems` files for edits outside of Unreal Engine.
 > <p align="center" width="100%">
 >     <img width="32.5%" src="https://github.com/user-attachments/assets/557a0676-b974-4926-ab2b-5f85ca9788f2">
->     <img width="32.5%" src="https://github.com/user-attachments/assets/37e026d1-c0e2-4b70-9479-7dc06217b790">
+>     <img width="32.5%" src="https://github.com/user-attachments/assets/fa76e02d-3fed-4367-a5c5-786a1f4ba4da">
 > </p>
 
 ### Data-Driven Approach
