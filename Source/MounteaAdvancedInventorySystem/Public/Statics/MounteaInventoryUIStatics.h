@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interfaces/Inventory/MounteaAdvancedInventoryUIInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
@@ -71,16 +71,18 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIStatics : public UBl
 
 public:	
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
-	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
+	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI);
 	
-	// --- UI Component
+	// --- UI Manager
+	
+#pragma region UIManager
 	
 	/**
 	 * Finds an item in the inventory using the provided search parameters.
 	 * This function retrieves the parent inventory from the target UI component
 	 * and searches for the item based on the specified search parameters.
 	 *
-	 * @param Target The target UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param Target The target UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param SearchParams The parameters used to search for the item.
 	 * 
 	 * @return The found inventory item, or an invalid item if not found.
@@ -88,59 +90,59 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Inventory UI - Find Item")
-	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
 	 * Retrieves local custom items map.
 	 * 
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @return Custom Items Mpa if any specified.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI - Get Custom Items")
-	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
 	 * Adds (or replaces) a custom item entry in the target UI component's custom items map.
 	 *
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param ItemTag    Gameplay tag representing the custom item key.
 	 * @param ItemId     Guid value associated with the item.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI - Add Custom Item")
-	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FGameplayTag& ItemTag,
+	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FGameplayTag& ItemTag,
 		const FGuid& ItemId);
 	
 	/**
 	 * Appends custom item entries to the target UI component's custom items map.
 	 * Existing keys will be overwritten.
 	 *
-	 * @param Target       UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param Target       UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param OtherItems   Map of custom items to append.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI - Append Custom Items")
-	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 
 	/**
 	 * Clears all custom items from the target UI component's custom items map.
 	 *
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI - Clear Custom Items")
-	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
 	 * Removes a single custom item from the target UI component's custom items map.
 	 *
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIInterface.
+	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param ItemTag    Gameplay tag representing the custom item key to remove.
 	 *
 	 * @return True if an entry was removed, false otherwise.
@@ -148,8 +150,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Inventory UI - Remove Custom Item")
-	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FGameplayTag& ItemTag);
+	
+#pragma endregion
 	
 	// --- Helpers
 	
@@ -219,12 +223,12 @@ public:
 	 * Mountea Advanced Inventory UI Interface target is opened and
 	 * visible to the user by evaluating its visibility state.
 	 *
-	 * @param Target Reference to an object implementing the MounteaAdvancedInventoryUIInterface.
+	 * @param Target Reference to an object implementing the MounteaAdvancedInventoryUIManagerInterface.
 	 * @return True if the main UI is open and visible in any form (Visible, HitTestInvisible, or SelfHitTestInvisible);
 	 *         False if it is collapsed, hidden, or the target is invalid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Getter"))
-	static bool IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static bool IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
 	 * Updates the source inventory grid slot with the data from the target inventory grid slot.
@@ -374,6 +378,85 @@ public:
 	static void MounteaInventoryScrollBox_ResetChildren(UMounteaInventoryScrollBox* ScrollBox);
 	
 #pragma endregion
+	
+	// --- Wrapper
+	
+#pragma region Wrapper
+
+	/**
+	 * Creates and initializes the Main Viewport Widget which contains all
+	 * child widgets, like Inventory, Equipment, Health, Crafting and others.
+	 * This is the main UI screen/container which should handle all UI related
+	 * visual logic, like creating Inventory etc.
+	 * 
+	 * @param Target The UI Manager to create the Main Wrapper UI for
+	 * @return True if UI was successfully created and initialized, otherwise false
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(Keywords="container,viewport,make,add"),
+		DisplayName="Create Wrapper Widget")
+	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+
+	/**
+	 * Initializes the Wrapper widget for the Mountea inventory system.
+	 * UI Manager (IMounteaAdvancedInventoryUIManagerInterface) knows this wrapper/container
+	 * and knows it processes all internal logic.
+	 * 
+	 * This is the main UI screen/container which should handle all UI related
+	 * visual logic, like creating Inventory etc.
+	 *
+	 * @param Target The target widget that implements the IMounteaInventorySystemBaseWidgetInterface.
+	 * @param Parent The parent UI Manager that implements the IMounteaAdvancedInventoryUIManagerInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="container,viewport,start"),
+		DisplayName="Initialize Wrapper Widget")
+	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
+
+	/**
+	 * Returns the Main Wrapper Widget.
+	 * @param Target The UI Manager to get Wrapper widget from.
+	 * @return UI if UI exists, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(Keywords="container,viewport"),
+		DisplayName="Get Wrapper Widget")
+	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+
+	/**
+	 * Removes the Wrapper UI from the viewport and cleans up resources.
+	 * This will destroy all child UI elements inside the Main Wrapper!
+	 * 
+	 * @param Target The UI Manager to remove the Wrapper UI from
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="container,viewport,destroy"),
+		DisplayName="Remove Wrapper Widget")
+	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+
+	/**
+	 * Sets the source inventory for a given Wrapper widget.
+	 * This function should be used sparsely as it resets the Parent Inventory
+	 * for all children elements of this Wrapper!
+	 *
+	 * @param Target The target widget interface that will have its source inventory set.
+	 * @param ParentInventory The parent UI Manager to associate with the target widget.
+	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="container,viewport"),
+		DisplayName="Set Wrapper Widget Parent Manager")
+	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, 
+		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory);
+	
+#pragma endregion
+	
 	
 	// --- Theme
 #pragma region Theme
@@ -627,57 +710,10 @@ public:
 	 * @param NewOwningInventoryUI A TScriptInterface reference to the inventory UI interface that owns this widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Base", meta=(CustomTag="MounteaK2Setter"))
-	static void SetOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
+	static void SetOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI);
 	
 #pragma endregion
-	
-	// --- Wrapper
-#pragma region Wrapper
-
-	/**
-	 * Creates and initializes the inventory UI widgets.
-	 * @param Target The UI interface to create the inventory UI for
-	 * @return True if UI was successfully created and initialized, otherwise false
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"), meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
-
-	/**
-	 * Initializes theWrapper widget for the Mountea inventory system by linking it with a parent widget.
-	 *
-	 * @param Target The target widget that implements the IMounteaInventorySystemBaseWidgetInterface. This widget will have its main UI initialized.
-	 * @param Parent The parent widget that implements the IMounteaAdvancedInventoryUIInterface. This parent is used to provide context or linking to the target widget.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
-
-	/**
-	 * Returns the inventory UI.
-	 * @param Target The UI interface to get the inventory UI from
-	 * @return UI if UI exists, otherwise nullptr.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
-
-	/**
-	 * Removes the inventory UI from the viewport and cleans up resources.
-	 * @param Target The UI interface to remove the inventory UI from
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
-
-	/**
-	 * Sets the source inventory for a given target widget interface.
-	 *
-	 * @param Target The target widget interface that will have its source inventory set.
-	 * @param ParentInventory The parent inventory interface to associate with the target widget.
-	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory);
-	
-#pragma endregion
-	
+		
 	// --- Notification
 #pragma region Notification
 	
@@ -687,7 +723,7 @@ public:
 	 * @return A pointer to the user widget that serves as the notification container
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static UUserWidget* GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
 	 * Sets the widget that will contain and manage inventory notifications.
@@ -695,7 +731,7 @@ public:
 	 * @param NewNotificationContainer The user widget to use as the notification container
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Setter"))
-	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewNotificationContainer);
+	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewNotificationContainer);
 
 	/**
 	 * Creates and displays a new inventory notification based on the provided data.
@@ -703,14 +739,14 @@ public:
 	 * @param NotificationData The data structure containing all notification parameters (text, duration, etc.)
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Setter"))
-	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FInventoryNotificationData& NotificationData);
+	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryNotificationData& NotificationData);
 
 	/**
 	 * Removes all currently active inventory notifications from the UI.
 	 * @param Target The UI interface to remove notifications from
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", meta=(CustomTag="MounteaK2Setter"))
-	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 #pragma endregion
 	
@@ -720,11 +756,11 @@ public:
 	/**
 	 * Triggers the 'CategorySelected' functionality on a given target, indicating that a specific inventory category has been selected.
 	 *
-	 * @param Target The interface implementing the IMounteaAdvancedInventoryUIInterface, representing the inventory UI where the category selection operation should occur.
+	 * @param Target The interface implementing the IMounteaAdvancedInventoryUIManagerInterface, representing the inventory UI where the category selection operation should occur.
 	 * @param SelectedCategoryId The identifier of the selected category that needs to be processed by the target.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FString& SelectedCategoryId);
+	static void CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FString& SelectedCategoryId);
 
 	/**
 	 * Retrieves the selected category ID from the specified inventory UI target.
@@ -733,17 +769,17 @@ public:
 	 * @return The selected category ID as a string. Returns "none" if the target object is invalid or the operation fails.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
-	static FString GetSelectedCategoryId(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static FString GetSelectedCategoryId(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
 	 * Triggers the ItemSelected action on the specified inventory target.
 	 *
-	 * @param Target A TScriptInterface referencing the target implementing the IMounteaAdvancedInventoryUIInterface.
+	 * @param Target A TScriptInterface referencing the target implementing the IMounteaAdvancedInventoryUIManagerInterface.
 	 *               Represents the inventory UI on which the action will be executed.
 	 * @param ItemGuid A FGuid that uniquely identifies the item being selected within the inventory.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const FGuid& ItemGuid);
+	static void ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FGuid& ItemGuid);
 
 	/**
 	 * Retrieves the GUID of the currently selected item from the provided inventory UI interface.
@@ -752,7 +788,7 @@ public:
 	 * @return FGuid of the selected item if the interface is valid; otherwise, returns an empty FGuid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
-	static FGuid GetSelectedItemGuid(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static FGuid GetSelectedItemGuid(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
 	 * Retrieves the currently active item widget in the inventory UI.
@@ -765,7 +801,7 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Inventory UI - Get Active Item Widget")
-	static UWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static UWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
 	 * Sets the active item widget in the UI.
@@ -776,7 +812,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI - Set Active Item Widget")
-	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UWidget* NewActiveItemWidget);
+	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UWidget* NewActiveItemWidget);
 
 #pragma endregion
 
@@ -788,7 +824,7 @@ public:
 	 * @return The parent inventory interface that manages the items and slots
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
-	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target);
+	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
 	 * Sets the parent inventory for this UI.
@@ -796,7 +832,7 @@ public:
 	 * @param NewParentInventory The inventory interface to associate with this UI
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
+	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 
 	/**
 	 * Assigns an inventory UI owner to the given widget.
@@ -805,7 +841,7 @@ public:
 	 * @param OwningInventoryUI The owning inventory UI interface implementation to be set on the target widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
-	static void SetInventoryOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	static void SetInventoryOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 	
 #pragma endregion
 
@@ -819,7 +855,7 @@ public:
 	 * @param OwningInventoryUI The inventory UI interface to associate with the widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
-	static void SetCategoriesWrapperOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	static void SetCategoriesWrapperOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
 	/**
 	 * Sets the active category ID for the specified target widget.
@@ -881,7 +917,7 @@ public:
 	 * @param OwningInventoryUI The interface of the inventory UI that owns the specified widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
-	static void SetCategoryOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	static void SetCategoryOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
 	/**
 	 * Sets the active state of a target widget implementing the MounteaAdvancedInventoryCategoryWidgetInterface.
@@ -939,7 +975,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
 		meta=(CustomTag="MounteaK2Setter"))
-	static void SetItemOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	static void SetItemOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
 	/**
 	 * Initializes the item widget with the provided inventory item and quantity.
@@ -1039,7 +1075,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Action - Initialize")
 	static void ItemAction_InitializeItemAction(UUserWidget* Target,
-		const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
 		const TSoftClassPtr<UObject>& ItemActionClass,
 		UWidget* ParentWidget);
 
@@ -1264,7 +1300,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Slot - Set Item Slot Owning Inventory UI")
-	static void ItemSlot_SetItemSlotOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	static void ItemSlot_SetItemSlotOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
 	/**
 	 * Adds an item to the specified UI widget slot using the provided Item ID.
@@ -1366,7 +1402,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"))
-	static void SetItemSlotsWrapperOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI);
+	static void SetItemSlotsWrapperOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
 	/**
 	 * Adds an item to the specified Target widget, identified by the given ItemId.
@@ -1707,7 +1743,7 @@ public:
 	static bool Helper_ItemsGrid_UpdateItemInSlot(UUserWidget* GridWidget, 
 		const FGuid& ItemId, 
 		int32 SlotIndex,
-		TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent);
+		TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent);
 	
 #pragma endregion
 

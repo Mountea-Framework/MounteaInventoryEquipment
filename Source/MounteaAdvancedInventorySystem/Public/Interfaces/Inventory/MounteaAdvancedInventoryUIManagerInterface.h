@@ -14,7 +14,7 @@
 #include "CoreMinimal.h"
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "UObject/Interface.h"
-#include "MounteaAdvancedInventoryUIInterface.generated.h"
+#include "MounteaAdvancedInventoryUIManagerInterface.generated.h"
 
 struct FInventoryItem;
 struct FInventoryNotificationData;
@@ -27,13 +27,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
-class UMounteaAdvancedInventoryUIInterface : public UInterface
+class UMounteaAdvancedInventoryUIManagerInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 /**
- * IMounteaAdvancedInventoryUIInterface manages user interface operations for inventory systems.
+ * IMounteaAdvancedInventoryUIManagerInterface manages user interface operations for inventory systems.
  * UI interfaces handle widget creation, visibility management, category selection, item interaction,
  * notification display, and grid slot management for comprehensive inventory interface control.
  *
@@ -41,7 +41,7 @@ class UMounteaAdvancedInventoryUIInterface : public UInterface
  * @see UMounteaInventoryUIComponent
  * @see FMounteaInventoryGridSlot
  */
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryUIInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryUIManagerInterface
 {
 	GENERATED_BODY()
 

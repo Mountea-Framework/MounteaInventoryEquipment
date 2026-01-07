@@ -15,7 +15,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.generated.h"
 
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface : public UInterface

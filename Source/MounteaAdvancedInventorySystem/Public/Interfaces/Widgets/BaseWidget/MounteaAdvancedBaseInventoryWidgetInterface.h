@@ -15,7 +15,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedBaseInventoryWidgetInterface.generated.h"
 
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedBaseInventoryWidgetInterface : public UInterface
@@ -29,7 +29,7 @@ class UMounteaAdvancedBaseInventoryWidgetInterface : public UInterface
  * inventory UI systems for proper widget hierarchy and communication.
  *
  * @see [Base Inventory Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
- * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaAdvancedInventoryUIManagerInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedBaseInventoryWidgetInterface
 {
@@ -44,8 +44,8 @@ public:
 	 * @param NewOwningInventoryUI A TScriptInterface reference to the inventory UI interface that owns this widget.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Base")
-	void SetOwningInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI);
-	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI) = 0;
+	void SetOwningInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI);
+	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI) = 0;
 
 	/**
 	 * Retrieves the owning inventory UI interface for this widget.
@@ -54,6 +54,6 @@ public:
 	 * @return The TScriptInterface reference to the owning inventory UI interface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Base")
-	TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI() const;
-	virtual TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI_Implementation() const = 0;
+	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> GetOwningInventoryUI() const;
+	virtual TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> GetOwningInventoryUI_Implementation() const = 0;
 };

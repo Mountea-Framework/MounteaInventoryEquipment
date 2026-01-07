@@ -75,7 +75,7 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 }
 
 void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI)
 {
 	if (!IsValid(Target))
 	{
@@ -187,50 +187,50 @@ UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISet
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetParentInventory(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SetParentInventory(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
 	if (Target.GetObject())
 		Target->Execute_SetParentInventory(Target.GetObject(), NewParentInventory);
 }
 
-bool UMounteaInventoryUIStatics::CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+bool UMounteaInventoryUIStatics::CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_CreateWrapperWidget(Target.GetObject()) : false;
 }
 
-UUserWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+UUserWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetWrapperWidget(Target.GetObject()) : nullptr;
 }
 
-void UMounteaInventoryUIStatics::RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+void UMounteaInventoryUIStatics::RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	if (Target.GetObject())
 		Target->Execute_RemoveWrapperWidget(Target.GetObject());
 }
 
 UUserWidget* UMounteaInventoryUIStatics::GetNotificationContainer(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetNotificationContainer(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SetNotificationContainer(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewNotificationContainer)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewNotificationContainer)
 {
 	if (Target.GetObject())
 		Target->Execute_SetNotificationContainer(Target.GetObject(), NewNotificationContainer);
 }
 
 void UMounteaInventoryUIStatics::CreateInventoryNotification(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryNotificationData& NotificationData)
 {
 	if (Target.GetObject())
@@ -238,46 +238,46 @@ void UMounteaInventoryUIStatics::CreateInventoryNotification(
 }
 
 void UMounteaInventoryUIStatics::RemoveInventoryNotifications(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	if (Target.GetObject())
 		Target->Execute_RemoveInventoryNotifications(Target.GetObject());
 }
 
-void UMounteaInventoryUIStatics::CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+void UMounteaInventoryUIStatics::CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FString& SelectedCategoryId)
 {
 	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIInterface::Execute_CategorySelected(Target.GetObject(), SelectedCategoryId);
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_CategorySelected(Target.GetObject(), SelectedCategoryId);
 }
 
 FString UMounteaInventoryUIStatics::GetSelectedCategoryId(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetSelectedCategoryId(Target.GetObject()) : TEXT("none");
 }
 
-void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 											  const FGuid& ItemGuid)
 {
 	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
 }
 
 FGuid UMounteaInventoryUIStatics::GetSelectedItemGuid(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetActiveItemGuid(Target.GetObject()) : FGuid();
 }
 
 void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UWidget* Target,
-															   const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+															   const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::SetCategoriesWrapperOwningInventoryUI(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -294,7 +294,7 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryId(Target) : TEXT("none");
 }
 
-bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	//TODO: REWORK
 	return false;
@@ -372,7 +372,7 @@ bool UMounteaInventoryUIStatics::IsInputAllowed(const FKey& InputKey, const FNam
 }
 
 FInventoryItem UMounteaInventoryUIStatics::FindItem(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryItemSearchParams& SearchParams)
 {
 	if (!IsValid(Target.GetObject()))
@@ -386,37 +386,37 @@ FInventoryItem UMounteaInventoryUIStatics::FindItem(
 }
 
 TMap<FGameplayTag, FInventoryUICustomData> UMounteaInventoryUIStatics::GetCustomItemsMap(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? 
-		IMounteaAdvancedInventoryUIInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FInventoryUICustomData>();
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FInventoryUICustomData>();
 }
 
-void UMounteaInventoryUIStatics::AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+void UMounteaInventoryUIStatics::AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
 	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIInterface::Execute_AddCustomItemToMap(Target.GetObject(), ItemTag, ItemId);
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_AddCustomItemToMap(Target.GetObject(), ItemTag, ItemId);
 }
 
-void UMounteaInventoryUIStatics::AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+void UMounteaInventoryUIStatics::AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
 {
 	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIInterface::Execute_AppendCustomItemsMap(Target.GetObject(), OtherItems);
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_AppendCustomItemsMap(Target.GetObject(), OtherItems);
 }
 
-void UMounteaInventoryUIStatics::ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+void UMounteaInventoryUIStatics::ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIInterface::Execute_ClearCustomItemsMap(Target.GetObject());
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_ClearCustomItemsMap(Target.GetObject());
 }
 
-bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FGameplayTag& ItemTag)
 {
 	if (Target.GetObject())
-		return IMounteaAdvancedInventoryUIInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag);
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag);
 	return false;
 }
 
@@ -1001,14 +1001,14 @@ void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)
 }
 
 void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
-													  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI)
+													  const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::InitializeWrapperWidget(
 	UObject* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent)
 {
 	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
 		IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(Target, Parent);
@@ -1016,7 +1016,7 @@ void UMounteaInventoryUIStatics::InitializeWrapperWidget(
 
 void UMounteaInventoryUIStatics::SetSourceInventory(
 	const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory)
 {
 	if (Target.GetObject())
 		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
@@ -1036,7 +1036,7 @@ FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(UWidget* Target)
 }
 
 void UMounteaInventoryUIStatics::SetCategoryOwningInventoryUI(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1053,15 +1053,15 @@ FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const
 }
 
 UWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return (
 		IsValid(Target.GetObject()) )
-	? IMounteaAdvancedInventoryUIInterface::Execute_GetActiveItemWidget(Target.GetObject()) : nullptr;
+	? IMounteaAdvancedInventoryUIManagerInterface::Execute_GetActiveItemWidget(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SetActiveItemWidget(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UWidget* NewActiveItemWidget)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UWidget* NewActiveItemWidget)
 {
 	if (!IsValid(Target.GetObject())) return;
 
@@ -1082,7 +1082,7 @@ FGuid UMounteaInventoryUIStatics::ItemWidget_GetInventoryItemId(UWidget* Target)
 }
 
 void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1126,7 +1126,7 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 }
 
 void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UUserWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
 	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
@@ -1331,7 +1331,7 @@ FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlot(UUserWidget* UserWi
 }
 
 void UMounteaInventoryUIStatics::ItemSlot_SetItemSlotOwningInventoryUI(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1380,7 +1380,7 @@ void UMounteaInventoryUIStatics::ItemSlot_SetParentSlotsWrapper(UWidget* Target,
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UWidget* Target,
-																	  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+																	  const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1541,7 +1541,7 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	if (!ItemId.IsValid()) return INDEX_NONE;
 	if (!IsValid(ParentInventory)) return INDEX_NONE;
 
-	const bool bHasUIInterface = ParentInventory->Implements<UMounteaAdvancedInventoryUIInterface>();
+	const bool bHasUIInterface = ParentInventory->Implements<UMounteaAdvancedInventoryUIManagerInterface>();
 	const bool bHasInventoryInterface = ParentInventory->Implements<UMounteaAdvancedInventoryInterface>();
 	if (!bHasUIInterface && !bHasInventoryInterface) return INDEX_NONE;
 
@@ -1555,7 +1555,7 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	TScriptInterface<IMounteaAdvancedInventoryInterface> InventoryInterface = nullptr;
 	if (bHasUIInterface)
 	{
-		auto inventoryRef = IMounteaAdvancedInventoryUIInterface::Execute_GetParentInventory(ParentInventory);
+		auto inventoryRef = IMounteaAdvancedInventoryUIManagerInterface::Execute_GetParentInventory(ParentInventory);
 		inventoryObject = inventoryRef.GetObject();
 		InventoryInterface = inventoryRef;
 	}
@@ -1657,7 +1657,7 @@ bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(
 	UUserWidget* GridWidget, 
 	const FGuid& ItemId, 
 	int32 SlotIndex,
-	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent)
+	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent)
 {
 	return false;
 	/*

@@ -12,7 +12,7 @@
 
 #include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
 
-#include "Interfaces/Inventory/MounteaAdvancedInventoryUIInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 
 void UMounteaAdvancedInventoryUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -35,9 +35,9 @@ void UMounteaAdvancedInventoryUISubsystem::RegisterInventoryUIManager(UObject* N
 		return;
 	}
 
-	if (!NewInventoryUIManager->Implements<UMounteaAdvancedInventoryUIInterface>())
+	if (!NewInventoryUIManager->Implements<UMounteaAdvancedInventoryUIManagerInterface>())
 	{
-		LOG_ERROR(TEXT("[RegisterInventoryUIManager] Object does not implement IMounteaAdvancedInventoryUIInterface"))
+		LOG_ERROR(TEXT("[RegisterInventoryUIManager] Object does not implement IMounteaAdvancedInventoryUIManagerInterface"))
 		return;
 	}
 
@@ -47,7 +47,7 @@ void UMounteaAdvancedInventoryUISubsystem::RegisterInventoryUIManager(UObject* N
 	}
 
 	InventoryUIManager.SetObject(NewInventoryUIManager);
-	InventoryUIManager.SetInterface(Cast<IMounteaAdvancedInventoryUIInterface>(NewInventoryUIManager));
+	InventoryUIManager.SetInterface(Cast<IMounteaAdvancedInventoryUIManagerInterface>(NewInventoryUIManager));
 }
 
 void UMounteaAdvancedInventoryUISubsystem::UnregisterInventoryUIManager(const UObject* DirtyInventoryUIManager)

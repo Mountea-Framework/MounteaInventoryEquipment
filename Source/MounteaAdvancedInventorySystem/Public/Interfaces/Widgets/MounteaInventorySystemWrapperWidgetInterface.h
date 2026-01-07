@@ -16,7 +16,7 @@
 #include "MounteaInventorySystemWrapperWidgetInterface.generated.h"
 
 class IMounteaAdvancedInventoryInterface;
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventorySystemWrapperWidgetInterface : public UInterface
@@ -30,7 +30,7 @@ class UMounteaInventorySystemWrapperWidgetInterface : public UInterface
  * for top-level inventory UI wrappers and container widgets.
  *
  * @see [System Base Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
- * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaAdvancedInventoryUIManagerInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaInventorySystemWrapperWidgetInterface
 {
@@ -43,8 +43,8 @@ public:
 	 * @param Parent 
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
-	void InitializeWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent);
-	virtual void InitializeWrapperWidget_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent) = 0;
+	void InitializeWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
+	virtual void InitializeWrapperWidget_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent) = 0;
 
 	/**
 	 * 

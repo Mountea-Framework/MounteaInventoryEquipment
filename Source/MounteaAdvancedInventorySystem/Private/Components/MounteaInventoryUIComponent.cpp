@@ -176,34 +176,28 @@ bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 		return false;
 	}
 
-	InventoryWidget = newWidget;
+	WrapperWidget = newWidget;
 	
-	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
-	ensure(inventoryInterface.GetObject() != nullptr);
+	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> wrapperWidget = WrapperWidget;
+	ensure(wrapperWidget.GetObject() != nullptr);
 	
-	inventoryInterface->Execute_InitializeWrapperWidget(InventoryWidget, this);
+	wrapperWidget->Execute_InitializeWrapperWidget(WrapperWidget, this);
 	
-	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-	{
-		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Wrapper::Create, nullptr);
-	}
+	if (WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, InventoryUICommands::Wrapper::Create, nullptr);
 
 	return true;
 }
 
 void UMounteaInventoryUIComponent::RemoveWrapperWidget_Implementation()
 {
-	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> inventoryInterface = InventoryWidget;
-	ensure(inventoryInterface.GetObject() != nullptr);
+	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> wrapperInterface = WrapperWidget;
+	ensure(wrapperInterface.GetObject() != nullptr);
 	
-	inventoryInterface->Execute_RemoveWrapperWidget(InventoryWidget);
+	wrapperInterface->Execute_RemoveWrapperWidget(WrapperWidget);
 	
-	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-	{
-		TScriptInterface<IMounteaInventoryGenericWidgetInterface> genericWidget = InventoryWidget;
-		genericWidget->Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Wrapper::Remove, nullptr);
-	}
+	if (WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, InventoryUICommands::Wrapper::Remove, nullptr);
 }
 
 void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget)

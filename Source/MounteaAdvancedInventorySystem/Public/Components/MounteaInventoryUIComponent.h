@@ -15,7 +15,7 @@
 #include "Components/ActorComponent.h"
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
-#include "Interfaces/Inventory/MounteaAdvancedInventoryUIInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
 
 /**
@@ -24,13 +24,13 @@
  * notification display, and grid slot persistence for comprehensive inventory interface control.
  *
  * @see [Inventory UI System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
- * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaAdvancedInventoryUIManagerInterface
  * @see UMounteaInventoryComponent
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable, 
     AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
     meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface
 {
 	GENERATED_BODY()
 
@@ -157,6 +157,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess), meta=(ExposeOnSpawn))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	TObjectPtr<UUserWidget> WrapperWidget;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryWidget;
 
