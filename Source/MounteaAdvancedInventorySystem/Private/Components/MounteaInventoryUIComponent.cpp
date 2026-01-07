@@ -286,6 +286,15 @@ void UMounteaInventoryUIComponent::RemoveInventoryWidget_Implementation()
 	}
 }
 
+bool UMounteaInventoryUIComponent::SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget)
+{
+	if (InventoryWidget == NewInventoryWidget)
+		return false;
+	
+	InventoryWidget = NewInventoryWidget;
+	return true;
+}
+
 void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget)
 {
 	if (ActiveItemWidget != NewActiveItemWidget)

@@ -103,6 +103,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
 	UUserWidget* GetInventoryWidget() const;
 	virtual UUserWidget* GetInventoryWidget_Implementation() const = 0;
+	
+	/**
+	 * Sets the inventory UI from outside.
+	 * @return True if UI was successfully set, otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	bool SetInventoryWidget(UUserWidget* NewInventoryWidget);
+	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) = 0;
 
 	/**
 	 * Removes the inventory UI.

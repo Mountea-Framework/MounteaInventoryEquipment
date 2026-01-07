@@ -216,6 +216,31 @@ void UMounteaInventoryUIStatics::RemoveWrapperWidget(const TScriptInterface<IMou
 		Target->Execute_RemoveWrapperWidget(Target.GetObject());
 }
 
+bool UMounteaInventoryUIStatics::CreateInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return (Target.GetObject() ? Target->Execute_CreateInventoryWidget(Target.GetObject()) : false);
+}
+
+UUserWidget* UMounteaInventoryUIStatics::GetInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return Target.GetObject() ? Target->Execute_GetInventoryWidget(Target.GetObject()) : nullptr;
+}
+
+void UMounteaInventoryUIStatics::RemoveInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	if (Target.GetObject())
+		Target->Execute_RemoveInventoryWidget(Target.GetObject());
+}
+
+bool UMounteaInventoryUIStatics::SetInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewInventoryWidget)
+{
+	return (Target.GetObject() ? Target->Execute_SetInventoryWidget(Target.GetObject(), NewInventoryWidget) : false);
+}
+
 UUserWidget* UMounteaInventoryUIStatics::GetNotificationContainer(
 	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {

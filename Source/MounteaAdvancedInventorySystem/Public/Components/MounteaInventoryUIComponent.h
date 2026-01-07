@@ -50,12 +50,13 @@ public:
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
 	
 	virtual bool CreateWrapperWidget_Implementation() override;
-	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return InventoryWidget; };
+	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return WrapperWidget; };
 	virtual void RemoveWrapperWidget_Implementation() override;
 	
 	virtual bool CreateInventoryWidget_Implementation() override;
 	virtual UUserWidget* GetInventoryWidget_Implementation() const override { return InventoryWidget; };
 	virtual void RemoveInventoryWidget_Implementation() override;
+	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) override;
 
 	virtual UWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
 	virtual void SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget) override;

@@ -78,6 +78,113 @@ public:
 #pragma region UIManager
 	
 	/**
+	 * Creates and initializes the Main Viewport Widget which contains all
+	 * child widgets, like Inventory, Equipment, Health, Crafting and others.
+	 * This is the main UI screen/container which should handle all UI related
+	 * visual logic, like creating Inventory etc.
+	 * 
+	 * @param Target The UI Manager to create the Main Wrapper UI for
+	 * @return True if UI was successfully created and initialized, otherwise false
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(Keywords="container,viewport,make,add"),
+		DisplayName="Create Wrapper Widget")
+	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+
+	/**
+	 * Initializes the Wrapper widget for the Mountea inventory system.
+	 * UI Manager (IMounteaAdvancedInventoryUIManagerInterface) knows this wrapper/container
+	 * and knows it processes all internal logic.
+	 * 
+	 * This is the main UI screen/container which should handle all UI related
+	 * visual logic, like creating Inventory etc.
+	 *
+	 * @param Target The target widget that implements the IMounteaInventorySystemBaseWidgetInterface.
+	 * @param Parent The parent UI Manager that implements the IMounteaAdvancedInventoryUIManagerInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="container,viewport,start"),
+		DisplayName="Initialize Wrapper Widget")
+	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
+
+	/**
+	 * Returns the Main Wrapper Widget.
+	 * @param Target The UI Manager to get Wrapper widget from.
+	 * @return UI if UI exists, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(Keywords="container,viewport"),
+		DisplayName="Get Wrapper Widget")
+	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+
+	/**
+	 * Removes the Wrapper UI from the viewport and cleans up resources.
+	 * This will destroy all child UI elements inside the Main Wrapper!
+	 * 
+	 * @param Target The UI Manager to remove the Wrapper UI from
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="container,viewport,destroy"),
+		DisplayName="Remove Wrapper Widget")
+	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	
+	/**
+	 * Creates and initializes the Inventory Widget.
+	 * Inventory Widget should be always child to Wrapper Widget!
+	 * 
+	 * @param Target The UI Manager to create the Inventory UI for
+	 * @return True if UI was successfully created and initialized, otherwise false
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main|Inventory", 
+		meta=(CustomTag="MounteaK2Setter"), 
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(Keywords="make,add"),
+		DisplayName="Create Inventory Widget")
+	static bool CreateInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	
+	/**
+	 * Returns the Inventory Widget.
+	 * @param Target The UI Manager to get Inventory widget from.
+	 * @return UI if UI exists, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main|Inventory", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory Widget")
+	static UUserWidget* GetInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	
+	/**
+	 * Removes the Inventory UI from the viewport and cleans up resources.
+	 * This will destroy all child UI elements inside the Inventory Widget!
+	 * 
+	 * @param Target The UI Manager to remove the Inventory UI from
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main|Inventory", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="destroy"),
+		DisplayName="Remove Wrapper Widget")
+	static void RemoveInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	
+	/**
+	 * Attempts to override the Inventory Widget.
+	 * You can handle the logic inside your Manager, or if called from outside (like the Wrapper), you can call this function.
+	 * 
+	 * @param Target The UI Manager to set Inventory widget in.
+	 * @param NewInventoryWidget Widget to be the new Inventory. Can be null to reset the stored value.
+	 * @return False if attempting to set the same value.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main|Inventory", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Set Inventory Widget")
+	static bool SetInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UUserWidget* NewInventoryWidget);
+	
+	/**
 	 * Finds an item in the inventory using the provided search parameters.
 	 * This function retrieves the parent inventory from the target UI component
 	 * and searches for the item based on the specified search parameters.
@@ -382,63 +489,7 @@ public:
 	// --- Wrapper
 	
 #pragma region Wrapper
-
-	/**
-	 * Creates and initializes the Main Viewport Widget which contains all
-	 * child widgets, like Inventory, Equipment, Health, Crafting and others.
-	 * This is the main UI screen/container which should handle all UI related
-	 * visual logic, like creating Inventory etc.
-	 * 
-	 * @param Target The UI Manager to create the Main Wrapper UI for
-	 * @return True if UI was successfully created and initialized, otherwise false
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
-		meta=(CustomTag="MounteaK2Setter"), 
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		meta=(Keywords="container,viewport,make,add"),
-		DisplayName="Create Wrapper Widget")
-	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
-
-	/**
-	 * Initializes the Wrapper widget for the Mountea inventory system.
-	 * UI Manager (IMounteaAdvancedInventoryUIManagerInterface) knows this wrapper/container
-	 * and knows it processes all internal logic.
-	 * 
-	 * This is the main UI screen/container which should handle all UI related
-	 * visual logic, like creating Inventory etc.
-	 *
-	 * @param Target The target widget that implements the IMounteaInventorySystemBaseWidgetInterface.
-	 * @param Parent The parent UI Manager that implements the IMounteaAdvancedInventoryUIManagerInterface.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(Keywords="container,viewport,start"),
-		DisplayName="Initialize Wrapper Widget")
-	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
-
-	/**
-	 * Returns the Main Wrapper Widget.
-	 * @param Target The UI Manager to get Wrapper widget from.
-	 * @return UI if UI exists, otherwise nullptr.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Main", 
-		meta=(CustomTag="MounteaK2Getter"),
-		meta=(Keywords="container,viewport"),
-		DisplayName="Get Wrapper Widget")
-	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
-
-	/**
-	 * Removes the Wrapper UI from the viewport and cleans up resources.
-	 * This will destroy all child UI elements inside the Main Wrapper!
-	 * 
-	 * @param Target The UI Manager to remove the Wrapper UI from
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Main", 
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(Keywords="container,viewport,destroy"),
-		DisplayName="Remove Wrapper Widget")
-	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
-
+	
 	/**
 	 * Sets the source inventory for a given Wrapper widget.
 	 * This function should be used sparsely as it resets the Parent Inventory
