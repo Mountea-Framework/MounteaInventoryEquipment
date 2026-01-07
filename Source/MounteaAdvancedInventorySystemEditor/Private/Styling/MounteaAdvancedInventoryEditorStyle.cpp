@@ -159,6 +159,21 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 
 	StyleSet->Set("MAISStyleSet.TemplateItem.SelectedHovered", 
 		new FSlateRoundedBoxBrush(TemplateItemSelectedHovered, CornerRadiusSm));
+	
+	FTableRowStyle CustomTableRowStyle = FTableRowStyle()
+		.SetEvenRowBackgroundBrush(FSlateNoResource())
+		.SetOddRowBackgroundBrush(FSlateNoResource())
+		.SetEvenRowBackgroundHoveredBrush(FSlateNoResource())
+		.SetOddRowBackgroundHoveredBrush(FSlateNoResource())
+		.SetSelectorFocusedBrush(FSlateNoResource())
+		.SetActiveBrush(FSlateNoResource())
+		.SetActiveHoveredBrush(FSlateNoResource())
+		.SetInactiveBrush(FSlateNoResource())
+		.SetInactiveHoveredBrush(FSlateNoResource())
+		.SetTextColor(FSlateColor::UseForeground())
+		.SetSelectedTextColor(FSlateColor::UseForeground());
+
+	StyleSet->Set("MAISStyleSet.CustomTableRow", CustomTableRowStyle);
 }
 
 void FMounteaAdvancedInventoryEditorStyle::Initialize()

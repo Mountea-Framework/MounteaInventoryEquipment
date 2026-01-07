@@ -50,6 +50,7 @@
 #include "DesktopPlatformModule.h"
 #include "MounteaItemTemplatesEditorHelp.h"
 #include "Algo/ForEach.h"
+#include "Editor/STemplateTreeItemRow.h"
 #include "Search/MounteaInventoryTemplateSearchFilter.h"
 #include "Settings/EditorStyleSettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
@@ -305,7 +306,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 	
 	PropertyDetailsView = propertyEditorModule.CreateDetailView(detailsViewArgs);
 	
-	return SNew(SSplitter)
+	auto propertyMatrix = SNew(SSplitter)
 		.Orientation(Orient_Horizontal)
 		.PhysicalSplitterHandleSize(1.f)
 		
@@ -350,6 +351,8 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 		[
 			PropertyDetailsView.ToSharedRef()
 		];
+	
+	return propertyMatrix;
 }
 
 void SMounteaInventoryTemplateEditor::OnTreeSelectionChanged(TSharedPtr<FTemplateTreeItem> SelectedItem, ESelectInfo::Type SelectInfo)
@@ -1503,12 +1506,13 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 	];
 }
 
-TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(TSharedPtr<FTemplateTreeItem> Item,
+TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(
+	TSharedPtr<FTemplateTreeItem> Item,
 	const TSharedRef<STableViewBase>& OwnerTable)
 {
 	if (!Item.IsValid())
 	{
-		return SNew(STableRow<TSharedPtr<FTemplateTreeItem>>, OwnerTable)
+		return SNew(STemplateTreeItemRow, OwnerTable)
 			[
 				SNullWidget::NullWidget
 			];
@@ -1516,44 +1520,42 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(T
 	
 	if (Item->Type == ETemplateTreeItemType::Category)
 	{
-		return SNew(STableRow<TSharedPtr<FTemplateTreeItem>>, OwnerTable)
-			.Style(FAppStyle::Get(), "TableView.NoHoverTableRow")
+		return SNew(STemplateTreeItemRow, OwnerTable)
 			.Padding(FMargin(0, 4, 0, 2))
-			.ShowSelection(false)
 			[
 				SNew(SBorder)
 				.BorderImage(FAppStyle::GetBrush("DetailsView.CategoryTop"))
 				.BorderBackgroundColor(FLinearColor::Transparent)
 				.Padding(FMargin(6, 4))
-			[
-				SNew(SHorizontalBox)
-				
-				+ SHorizontalBox::Slot()
-				.FillWidth(1.0f)
-				.VAlign(VAlign_Center)
 				[
-					SNew(STextBlock)
-					.Text(FText::FromString(Item->CategoryName).ToUpper())
-					.Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
-					.ColorAndOpacity(FSlateColor::UseForeground())
-					.TextStyle(FAppStyle::Get(), "DetailsView.CategoryTextStyle")
+					SNew(SHorizontalBox)
+					
+					+ SHorizontalBox::Slot()
+					.FillWidth(1.0f)
+					.VAlign(VAlign_Center)
+					[
+						SNew(STextBlock)
+						.Text(FText::FromString(Item->CategoryName).ToUpper())
+						.Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
+						.ColorAndOpacity(FSlateColor::UseForeground())
+						.TextStyle(FAppStyle::Get(), "DetailsView.CategoryTextStyle")
+					]
+					
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.VAlign(VAlign_Center)
+					.Padding(6, 0, 0, 0)
+					[
+						SNew(STextBlock)
+						.Text_Lambda([Item]()
+						{
+							return FText::AsNumber(Item->Children.Num());
+						})
+						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
+						.ColorAndOpacity(FSlateColor::UseSubduedForeground())
+					]
 				]
-				
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.VAlign(VAlign_Center)
-				.Padding(6, 0, 0, 0)
-				[
-					SNew(STextBlock)
-					.Text_Lambda([Item]()
-					{
-						return FText::AsNumber(Item->Children.Num());
-					})
-					.Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
-					.ColorAndOpacity(FSlateColor::UseSubduedForeground())
-				]
-			]
-		];
+			];
 	}
 	
 	const TWeakObjectPtr<UMounteaInventoryItemTemplate> templatePtr = Item->Template;
@@ -1565,220 +1567,217 @@ TSharedRef<ITableRow> SMounteaInventoryTemplateEditor::GenerateTemplateTreeRow(T
 	
 	TSharedPtr<SButton> interactionButton;
 	
-	auto row = SNew(STableRow<TSharedPtr<FTemplateTreeItem>>, OwnerTable)
-		.Style(FAppStyle::Get(), "TableView.NoHoverTableRow")
-		.Padding(FMargin(4, 2))
-		.ShowWires(true)
-		.ShowSelection(false)
-		[
-			SAssignNew(interactionButton, SButton)
-			.ButtonStyle(FAppStyle::Get(), "NoBorder")
-			.OnClicked_Lambda([this, Item]() -> FReply
+	TSharedRef<ITableRow> row =  SNew(STemplateTreeItemRow, OwnerTable)
+	.Padding(FMargin(4, 2))
+	[
+		SAssignNew(interactionButton, SButton)
+		.ButtonStyle(FAppStyle::Get(), "NoBorder")
+		.OnClicked_Lambda([this, Item]() -> FReply
+		{
+			if (TemplateTreeView.IsValid() && Item.IsValid() && Item->Type == ETemplateTreeItemType::Template)
 			{
-				if (TemplateTreeView.IsValid() && Item.IsValid() && Item->Type == ETemplateTreeItemType::Template)
+				const FModifierKeysState modifierKeys = FSlateApplication::Get().GetModifierKeys();
+				
+				if (modifierKeys.IsControlDown())
+					TemplateTreeView->SetItemSelection(Item, !TemplateTreeView->IsItemSelected(Item), ESelectInfo::OnMouseClick);
+				else if (modifierKeys.IsShiftDown())
 				{
-					const FModifierKeysState modifierKeys = FSlateApplication::Get().GetModifierKeys();
-					
-					if (modifierKeys.IsControlDown())
-						TemplateTreeView->SetItemSelection(Item, !TemplateTreeView->IsItemSelected(Item), ESelectInfo::OnMouseClick);
-					else if (modifierKeys.IsShiftDown())
+					TArray<TSharedPtr<FTemplateTreeItem>> selected = TemplateTreeView->GetSelectedItems();
+					if (selected.Num() > 0)
 					{
-						TArray<TSharedPtr<FTemplateTreeItem>> selected = TemplateTreeView->GetSelectedItems();
-						if (selected.Num() > 0)
+						TSharedPtr<FTemplateTreeItem> lastSelected = selected.Last();
+						if (lastSelected.IsValid() && lastSelected->Type == ETemplateTreeItemType::Template)
 						{
-							TSharedPtr<FTemplateTreeItem> lastSelected = selected.Last();
-							if (lastSelected.IsValid() && lastSelected->Type == ETemplateTreeItemType::Template)
+							TSharedPtr<FTemplateTreeItem> parentCategory;
+							for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
 							{
-								TSharedPtr<FTemplateTreeItem> parentCategory;
-								for (const TSharedPtr<FTemplateTreeItem>& rootItem : FilteredTreeRootItems)
+								if (rootItem->Children.Contains(lastSelected) && rootItem->Children.Contains(Item))
 								{
-									if (rootItem->Children.Contains(lastSelected) && rootItem->Children.Contains(Item))
-									{
-										parentCategory = rootItem;
-										break;
-									}
+									parentCategory = rootItem;
+									break;
 								}
+							}
+							
+							if (parentCategory.IsValid())
+							{
+								int32 lastIndex = parentCategory->Children.Find(lastSelected);
+								int32 currentIndex = parentCategory->Children.Find(Item);
 								
-								if (parentCategory.IsValid())
+								if (lastIndex != INDEX_NONE && currentIndex != INDEX_NONE)
 								{
-									int32 lastIndex = parentCategory->Children.Find(lastSelected);
-									int32 currentIndex = parentCategory->Children.Find(Item);
+									int32 startIndex = FMath::Min(lastIndex, currentIndex);
+									int32 endIndex = FMath::Max(lastIndex, currentIndex);
 									
-									if (lastIndex != INDEX_NONE && currentIndex != INDEX_NONE)
+									TemplateTreeView->ClearSelection();
+									for (int32 i = startIndex; i <= endIndex; ++i)
 									{
-										int32 startIndex = FMath::Min(lastIndex, currentIndex);
-										int32 endIndex = FMath::Max(lastIndex, currentIndex);
-										
-										TemplateTreeView->ClearSelection();
-										for (int32 i = startIndex; i <= endIndex; ++i)
-										{
-											TemplateTreeView->SetItemSelection(parentCategory->Children[i], true, ESelectInfo::OnMouseClick);
-										}
+										TemplateTreeView->SetItemSelection(parentCategory->Children[i], true, ESelectInfo::OnMouseClick);
 									}
 								}
 							}
 						}
-						else
-							TemplateTreeView->SetSelection(Item, ESelectInfo::OnMouseClick);
 					}
 					else
 						TemplateTreeView->SetSelection(Item, ESelectInfo::OnMouseClick);
 				}
-				return FReply::Handled();
-			})
-			.ContentPadding(0)
-			.IsFocusable(false)
+				else
+					TemplateTreeView->SetSelection(Item, ESelectInfo::OnMouseClick);
+			}
+			return FReply::Handled();
+		})
+		.ContentPadding(0)
+		.IsFocusable(false)
+		[
+			SNew(SBorder)
+			.BorderImage(TAttribute<const FSlateBrush*>::Create([this, Item, buttonHolder]() -> const FSlateBrush*
+			{
+				bool bSelected = TemplateTreeView.IsValid() && TemplateTreeView->GetSelectedItems().Contains(Item);
+				bool bHovered = false;
+				
+				if (TSharedPtr<SButton> button = buttonHolder->Button.Pin())
+					bHovered = button->IsHovered();
+				
+				if (bSelected && bHovered)
+					return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.SelectedHovered");
+				if (bSelected)
+					return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Selected");
+				if (bHovered)
+					return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Hovered");
+				
+				return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Normal");
+			}))
+			.Padding(FMargin(8, 6))
 			[
-				SNew(SBorder)
-				.BorderImage(TAttribute<const FSlateBrush*>::Create([this, Item, buttonHolder]() -> const FSlateBrush*
-				{
-					bool bSelected = TemplateTreeView.IsValid() && TemplateTreeView->GetSelectedItems().Contains(Item);
-					bool bHovered = false;
+				SNew(SHorizontalBox)
+				
+				+ SHorizontalBox::Slot()
+				.FillWidth(1.0f)
+				[
+					SNew(SVerticalBox)
 					
-					if (TSharedPtr<SButton> button = buttonHolder->Button.Pin())
-						bHovered = button->IsHovered();
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					[
+						SNew(STextBlock)
+						.Text(TAttribute<FText>::Create(
+							TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
+							{
+								const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(templatePtr, DirtyTemplates);
+								return displayInfo.DisplayText;
+							})
+						))
+						.Font_Lambda([this, Item]() -> FSlateFontInfo
+						{
+							bool bSelected = TemplateTreeView.IsValid() && TemplateTreeView->GetSelectedItems().Contains(Item);
+							return FCoreStyle::GetDefaultFontStyle(bSelected ? "Bold" : "Regular", 10);
+						})
+						.ToolTipText(TAttribute<FText>::Create(
+							TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
+							{
+								const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(templatePtr, DirtyTemplates);
+								return displayInfo.TooltipText;
+							})
+						))
+						.ColorAndOpacity(TAttribute<FSlateColor>::Create(TAttribute<FSlateColor>::FGetter::CreateLambda([this, templatePtr, foregroundColor]() 
+						{
+							if (templatePtr.IsValid())
+							{
+								UMounteaInventoryItemTemplate* itemTemplate = templatePtr.Get();
+								if (itemTemplate->HasAnyFlags(RF_Transient)) 
+									return FSlateColor(FLinearColor(1.f, 1.f, 0.5f));
+								if (DirtyTemplates.Contains(templatePtr)) 
+									return FSlateColor(FLinearColor(1.f, 0.7f, 0.7f));
+							}
+							return foregroundColor;
+						})))
+					]
 					
-					if (bSelected && bHovered)
-						return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.SelectedHovered");
-					if (bSelected)
-						return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Selected");
-					if (bHovered)
-						return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Hovered");
-					
-					return FMounteaAdvancedInventoryEditorStyle::Get().GetBrush("MAISStyleSet.TemplateItem.Normal");
-				}))
-				.Padding(FMargin(8, 6))
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.Padding(0, 2, 0, 0)
+					[
+						SNew(STextBlock)
+						.Text(FText::FromString(templateInfo.AssetPath))
+						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
+						.ColorAndOpacity(FSlateColor::UseSubduedForeground())
+					]
+				]
+				
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(8, 0, 0, 0)
 				[
 					SNew(SHorizontalBox)
 					
 					+ SHorizontalBox::Slot()
-					.FillWidth(1.0f)
+					.AutoWidth()
+					.Padding(2, 0)
 					[
-						SNew(SVerticalBox)
-						
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						[
-							SNew(STextBlock)
-							.Text(TAttribute<FText>::Create(
-								TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
-								{
-									const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(templatePtr, DirtyTemplates);
-									return displayInfo.DisplayText;
-								})
-							))
-							.Font_Lambda([this, Item]() -> const FSlateFontInfo
+						SNew(SButton)
+						.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+						.ContentPadding(FMargin(2))
+						.ToolTipText(LOCTEXT("NavigateToFolderTooltip", "Navigate to folder in Content Browser"))
+						.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
+						.OnClicked_Lambda([templatePtr]()
+						{
+							if (templatePtr.IsValid() && !templatePtr.Get()->HasAnyFlags(RF_Transient))
 							{
-								bool bSelected = TemplateTreeView.IsValid() && TemplateTreeView->GetSelectedItems().Contains(Item);
-								return FCoreStyle::GetDefaultFontStyle(bSelected ? "Bold" : "Regular", 10);
-							})
-							.ToolTipText(TAttribute<FText>::Create(
-								TAttribute<FText>::FGetter::CreateLambda([this, templatePtr]()
-								{
-									const FTemplateDisplayInfo displayInfo = GenerateTemplateDisplayInfo(templatePtr, DirtyTemplates);
-									return displayInfo.TooltipText;
-								})
-							))
-							.ColorAndOpacity(TAttribute<FSlateColor>::Create(TAttribute<FSlateColor>::FGetter::CreateLambda([this, templatePtr, foregroundColor]() 
-							{
-								if (templatePtr.IsValid())
-								{
-									UMounteaInventoryItemTemplate* itemTemplate = templatePtr.Get();
-									if (itemTemplate->HasAnyFlags(RF_Transient)) 
-										return FSlateColor(FLinearColor(1.f, 1.f, 0.5f));
-									if (DirtyTemplates.Contains(templatePtr)) 
-										return FSlateColor(FLinearColor(1.f, 0.7f, 0.7f));
-								}
-								return foregroundColor;
-							})))
-						]
-						
-						+ SVerticalBox::Slot()
-						.AutoHeight()
-						.Padding(0, 2, 0, 0)
+								TArray<FAssetData> assetDataList;
+								assetDataList.Add(FAssetData(templatePtr.Get()));
+								
+								FContentBrowserModule& contentBrowserModule = FModuleManager::Get().LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+								contentBrowserModule.Get().SyncBrowserToAssets(assetDataList);
+							}
+							return FReply::Handled();
+						})
 						[
-							SNew(STextBlock)
-							.Text(FText::FromString(templateInfo.AssetPath))
-							.Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
-							.ColorAndOpacity(FSlateColor::UseSubduedForeground())
+							SNew(SImage)
+							.Image(FAppStyle::GetBrush("Icons.FolderOpen"))
+							.ColorAndOpacity(FSlateColor::UseForeground())
+							.DesiredSizeOverride(FVector2D(16, 16))
 						]
 					]
 					
 					+ SHorizontalBox::Slot()
 					.AutoWidth()
-					.VAlign(VAlign_Center)
-					.Padding(8, 0, 0, 0)
+					.Padding(2, 0)
 					[
-						SNew(SHorizontalBox)
-						
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						.Padding(2, 0)
+						SNew(SButton)
+						.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+						.ContentPadding(FMargin(2))
+						.ToolTipText(LOCTEXT("DuplicateTemplateTooltip", "Duplicate this template"))
+						.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
+						.OnClicked(this, &SMounteaInventoryTemplateEditor::DuplicateTemplate, templatePtr)
 						[
-							SNew(SButton)
-							.ButtonStyle(FAppStyle::Get(), "SimpleButton")
-							.ContentPadding(FMargin(2))
-							.ToolTipText(LOCTEXT("NavigateToFolderTooltip", "Navigate to folder in Content Browser"))
-							.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
-							.OnClicked_Lambda([templatePtr]()
-							{
-								if (templatePtr.IsValid() && !templatePtr.Get()->HasAnyFlags(RF_Transient))
-								{
-									TArray<FAssetData> assetDataList;
-									assetDataList.Add(FAssetData(templatePtr.Get()));
-									
-									FContentBrowserModule& contentBrowserModule = FModuleManager::Get().LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
-									contentBrowserModule.Get().SyncBrowserToAssets(assetDataList);
-								}
-								return FReply::Handled();
-							})
-							[
-								SNew(SImage)
-								.Image(FAppStyle::GetBrush("Icons.FolderOpen"))
-								.ColorAndOpacity(FSlateColor::UseForeground())
-								.DesiredSizeOverride(FVector2D(16, 16))
-							]
+							SNew(SImage)
+							.Image(FAppStyle::GetBrush("Icons.Duplicate"))
+							.ColorAndOpacity(FSlateColor::UseForeground())
+							.DesiredSizeOverride(FVector2D(16, 16))
 						]
-						
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						.Padding(2, 0)
+					]
+					
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.Padding(2, 0)
+					[
+						SNew(SButton)
+						.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+						.ContentPadding(FMargin(2))
+						.ToolTipText(LOCTEXT("DeleteTemplateTooltip", "Delete this template"))
+						.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
+						.OnClicked(this, &SMounteaInventoryTemplateEditor::DeleteTemplate, templatePtr)
 						[
-							SNew(SButton)
-							.ButtonStyle(FAppStyle::Get(), "SimpleButton")
-							.ContentPadding(FMargin(2))
-							.ToolTipText(LOCTEXT("DuplicateTemplateTooltip", "Duplicate this template"))
-							.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
-							.OnClicked(this, &SMounteaInventoryTemplateEditor::DuplicateTemplate, templatePtr)
-							[
-								SNew(SImage)
-								.Image(FAppStyle::GetBrush("Icons.Duplicate"))
-								.ColorAndOpacity(FSlateColor::UseForeground())
-								.DesiredSizeOverride(FVector2D(16, 16))
-							]
-						]
-						
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						.Padding(2, 0)
-						[
-							SNew(SButton)
-							.ButtonStyle(FAppStyle::Get(), "SimpleButton")
-							.ContentPadding(FMargin(2))
-							.ToolTipText(LOCTEXT("DeleteTemplateTooltip", "Delete this template"))
-							.Visibility_Lambda([templateInfo]() { return templateInfo.bIsTransient ? EVisibility::Collapsed : EVisibility::Visible; })
-							.OnClicked(this, &SMounteaInventoryTemplateEditor::DeleteTemplate, templatePtr)
-							[
-								SNew(SImage)
-								.Image(FAppStyle::GetBrush("Icons.Delete"))
-								.ColorAndOpacity(FSlateColor::UseForeground())
-								.DesiredSizeOverride(FVector2D(16, 16))
-							]
+							SNew(SImage)
+							.Image(FAppStyle::GetBrush("Icons.Delete"))
+							.ColorAndOpacity(FSlateColor::UseForeground())
+							.DesiredSizeOverride(FVector2D(16, 16))
 						]
 					]
 				]
 			]
-		];
+		]
+	];
 	
 	buttonHolder->Button = interactionButton;
 	
