@@ -87,6 +87,19 @@ public:
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemWidgetInterface"))
 	TSoftClassPtr<UUserWidget> ItemWidgetClass;
 	
+	// ---- Item
+	
+	/** Widget class used to detailed Item Information. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🏺 Item",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemPanelWidgetInterface"))
+	TSoftClassPtr<UUserWidget> ItemPanelWidgetClass;
+	
+	/** Widget class used to display Tooltip information of currently selected/hovered item. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🏺 Item",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryTooltipWidgetInterface"))
+	TSoftClassPtr<UUserWidget> ItemTooltipWidgetClass;
+	
+	
 	// ---- Fonts
 	
 	/** Default font settings used across the inventory user interface (labels, counters, titles). */
