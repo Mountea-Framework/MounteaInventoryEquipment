@@ -195,7 +195,11 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView()
 	BaseFitScale = FMath::Clamp(BaseFitScale, 0.01f, 100.0f);
 	
 	ApplyCombinedScale();
-	SetCameraHeight(bounds.Origin.Z * BaseFitScale);
+	
+	const FVector centerOffset = FVector(0.f, 0.f, -bounds.Origin.Z);
+	activeComp->SetRelativeLocation(centerOffset);
+	
+	SetCameraHeight(0.f);
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::ApplyCombinedScale() const
