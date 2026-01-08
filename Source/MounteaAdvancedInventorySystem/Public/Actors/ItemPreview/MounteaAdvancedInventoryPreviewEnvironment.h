@@ -15,6 +15,11 @@
 #include "GameFramework/Actor.h"
 #include "MounteaAdvancedInventoryPreviewEnvironment.generated.h"
 
+class UDirectionalLightComponent;
+class USkyLightComponent;
+class UPostProcessComponent;
+class UMounteaAdvancedInventoryPreviewEnvironmentSettings;
+
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API AMounteaAdvancedInventoryPreviewEnvironment : public AActor
 {
@@ -23,13 +28,24 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API AMounteaAdvancedInventoryPreviewEnviron
 public:
 	
 	AMounteaAdvancedInventoryPreviewEnvironment();
+	
+	void InitializeFromSettings(const UMounteaAdvancedInventoryPreviewEnvironmentSettings* Settings);
+	
+public:
     
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USceneComponent> RootSceneComponent;
-    
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Lighting")
 	TObjectPtr<UDirectionalLightComponent> DirectionalLight;
-    
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Lighting")
 	TObjectPtr<USkyLightComponent> SkyLight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="PostProcess")
+	TObjectPtr<UPostProcessComponent> PostProcessComponent;
+	
+private:
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> SpawnedExtraActors;
 };

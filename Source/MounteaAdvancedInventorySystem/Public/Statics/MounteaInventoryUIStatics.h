@@ -1518,7 +1518,7 @@ public:
 	
 #pragma endregion
 
-// --- Items Grid
+	// --- Items Grid
 #pragma region ItemsGrid
 
 	/**
@@ -1798,7 +1798,7 @@ public:
 	
 #pragma endregion
 
-// --- Items Preview
+	// --- Items Preview
 #pragma region ItemsPreview
 
 	/**

@@ -9,6 +9,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryInteractiveWidgetConfig.h"
+#include "Settings/TemplatesConfig/MounteaAdvancedInventoryPreviewEnvironmentSettings.h"
 #include "Statics/MounteaInventoryStatics.h"
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
@@ -75,6 +76,9 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 	
 	if (EnvironmentActorClass)
 		EnvironmentActor = previewWorld->SpawnActor<AMounteaAdvancedInventoryPreviewEnvironment>(EnvironmentActorClass);
+	
+	if (EnvironmentActor && interactiveConfig->EnvironmentSettings.IsValid())
+		EnvironmentActor->InitializeFromSettings(interactiveConfig->EnvironmentSettings.LoadSynchronous());
 	
 	RendererActor = previewWorld->SpawnActor<AMounteaAdvancedInventoryItemPreviewRenderer>(RendererActorClass);
 	if (!IsValid(RendererActor))

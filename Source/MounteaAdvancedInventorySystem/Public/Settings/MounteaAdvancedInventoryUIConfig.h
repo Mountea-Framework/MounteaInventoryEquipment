@@ -21,8 +21,8 @@
  *
  * @see [Settings Configuration](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings UI Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining visual components."))
-
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings UI Config", 
+	meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining visual components."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryUIConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

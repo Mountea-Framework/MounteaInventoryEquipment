@@ -24,6 +24,7 @@
 // ============================================================================
 
 class UUserWidget;
+class UTextureCube;
 
 /**
  * FInventoryItemData represents the pure logical data of a single inventory entry.
@@ -276,6 +277,53 @@ public:
 	TArray<FGuid> StoredIds;
 };
 
+USTRUCT(BlueprintType)
+struct FMounteaPreviewDirectionalLightSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnabled = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	float Intensity = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	FLinearColor LightColor = FLinearColor::White;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	FRotator Rotation = FRotator(-40.0f, -67.5f, 0.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	bool bCastShadows = false;
+};
+
+USTRUCT(BlueprintType)
+struct FMounteaPreviewSkyLightSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnabled = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	float Intensity = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	TSoftObjectPtr<UTextureCube> Cubemap;
+};
+
+USTRUCT(BlueprintType)
+struct FMounteaPreviewPostProcessSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnabled = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	FPostProcessSettings PostProcessSettings;
+};
 
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {

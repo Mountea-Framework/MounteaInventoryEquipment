@@ -52,7 +52,7 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	SpringArmComponent->TargetArmLength  = 300;
 	SpringArmComponent->bEnableCameraLag = false;
 	SpringArmComponent->bDoCollisionTest = false;
-	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
+	SpringArmComponent->SetRelativeRotation(FRotator::ZeroRotator);
 	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
 
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
@@ -120,7 +120,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh() const
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float Yaw, const float Pitch) const
 {
 	const float clampedPitch = FMath::Clamp(Pitch, -80.0f, 80.0f);
-	SpringArmComponent->SetRelativeRotation(FRotator(clampedPitch, Yaw, 0.0f));
+	PreviewPivotComponent->SetRelativeRotation(FRotator(clampedPitch, Yaw, 0.0f));
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(const float Distance) const
@@ -137,7 +137,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraHeight(const float Z
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::ResetToDefaults() const
 {
-	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
+	PreviewPivotComponent->SetRelativeRotation(FRotator::ZeroRotator);
 	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
 	SpringArmComponent->SetRelativeScale3D(FVector(1));
 	AutoFitMeshInView();
@@ -156,8 +156,8 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::GetCurrentValues(FVector4& Sc
 {
 	ScaleHeightPitchYaw.X = SpringArmComponent->GetRelativeScale3D().Z;
 	ScaleHeightPitchYaw.Y = SpringArmComponent->GetRelativeLocation().Z;
-	ScaleHeightPitchYaw.Z = SpringArmComponent->GetRelativeRotation().Yaw;
-	ScaleHeightPitchYaw.W = SpringArmComponent->GetRelativeRotation().Pitch;
+	ScaleHeightPitchYaw.Z = PreviewPivotComponent->GetRelativeRotation().Yaw;
+	ScaleHeightPitchYaw.W = PreviewPivotComponent->GetRelativeRotation().Pitch;
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView() const
