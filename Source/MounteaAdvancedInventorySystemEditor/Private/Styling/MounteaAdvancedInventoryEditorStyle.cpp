@@ -71,6 +71,10 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Config", new IMAGE_BRUSH(TEXT("configIcon"), Icon40x40));
 	StyleSet->Set("MAISStyleSet.Config.Small", new IMAGE_BRUSH(TEXT("configIcon"), Icon16x16));
 	StyleSet->Set("MAISStyleSet.Config.large", new IMAGE_BRUSH(TEXT("configIcon"), Icon64x64));
+	
+	StyleSet->Set("MAISStyleSet.Builder", new IMAGE_BRUSH(TEXT("unreal_builder"), Icon40x40));
+	StyleSet->Set("MAISStyleSet.Builder.Small", new IMAGE_BRUSH(TEXT("unreal_builder"), Icon16x16));
+	StyleSet->Set("MAISStyleSet.Builder.large", new IMAGE_BRUSH(TEXT("unreal_builder"), Icon64x64));
 
 	StyleSet->Set("MAISStyleSet.Level", new IMAGE_BRUSH(TEXT("LevelIcon"), Icon40x40));
 	StyleSet->Set("MAISStyleSet.Folder", new IMAGE_BRUSH(TEXT("FolderIcon"), Icon40x40));

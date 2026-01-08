@@ -632,7 +632,6 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 				})
 			)
 	);
-		MenuBuilder.EndSection();
 		
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_DialoguerButton_Label", "Mountea Dialoguer"),
@@ -645,20 +644,33 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 				})
 			)
 		);
-	}
-	
-	MenuBuilder.AddMenuEntry(
+		
+		MenuBuilder.AddMenuEntry(
 		LOCTEXT("MounteaSystemEditor_LauncherButton_Label", "Mountea Project Launcher"),
 		LOCTEXT("MounteaSystemEditor_LauncherButton_ToolTip", "🚀 Open Mountea Project Launcher\n\n❔ A versatile standalone tool for streamlined project testing and deployment. Launch your projects with customized configurations, test different build settings, and validate Advanced Inventory implementations in various environments.\n\n💡 Features include:\n- Multiple configuration profiles\n- Quick-launch presets\n- Custom command-line parameters\n- Integrated testing tools"),
-		FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Launcher"),
-		FUIAction(
-			FExecuteAction::CreateLambda([this]()-> void
-			{
-				FPlatformProcess::LaunchURL(
-					TEXT("https://github.com/Mountea-Framework/MounteaProjectLauncher"), nullptr, nullptr);						
-			})
-		)
-	);
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Launcher"),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://github.com/Mountea-Framework/MounteaProjectLauncher"), nullptr, nullptr);						
+				})
+			)
+		);
+		
+		MenuBuilder.AddMenuEntry(
+		LOCTEXT("MounteaSystemEditor_BuilderButton_Label", "Mountea Unreal builder"),
+		LOCTEXT("MounteaSystemEditor_BuilderButton_ToolTip", "🏗 Open Mountea Unreal Builder\n\n❔ A desktop application for automating Unreal Engine plugin and project builds across multiple engine versions and platforms."),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Builder"),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://github.com/Mountea-Framework/MounteaUnrealBuilder"), nullptr, nullptr);						
+				})
+			)
+		);
+	}	
 	MenuBuilder.EndSection();
 
 	return MenuBuilder.MakeWidget();
