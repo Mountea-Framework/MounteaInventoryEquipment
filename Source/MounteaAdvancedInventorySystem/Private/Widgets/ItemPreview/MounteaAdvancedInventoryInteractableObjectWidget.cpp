@@ -52,6 +52,8 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 
 	const auto previewMaterial = interactiveConfig->DefaultRenderTargetMaterial.LoadSynchronous();
 	if (!previewMaterial) return false;
+	
+	ControlSettings = interactiveConfig->PreviewCameraControlSettings;
 
 	if (!EnvironmentActorClass)
 		EnvironmentActorClass = interactiveConfig->EnvironmentActor.LoadSynchronous();
@@ -77,7 +79,8 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 	if (EnvironmentActorClass)
 		EnvironmentActor = previewWorld->SpawnActor<AMounteaAdvancedInventoryPreviewEnvironment>(EnvironmentActorClass);
 	
-	if (EnvironmentActor && interactiveConfig->EnvironmentSettings.IsValid())
+	const auto environmentalSettings = interactiveConfig->EnvironmentSettings.LoadSynchronous();
+	if (EnvironmentActor && environmentalSettings)
 		EnvironmentActor->InitializeFromSettings(interactiveConfig->EnvironmentSettings.LoadSynchronous());
 	
 	RendererActor = previewWorld->SpawnActor<AMounteaAdvancedInventoryItemPreviewRenderer>(RendererActorClass);
@@ -92,7 +95,7 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 	RendererActor->SetRenderTarget(PreviewRenderTarget);
 	PreviewImage->SetBrushFromMaterial(PreviewMaterialInstance);
 
-	if (bAutoStartTick)
+	if (ControlSettings.bAutoStartTick)
 		StartPreview();
 	
 	return true;
@@ -129,9 +132,9 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::StartPreview()
 	if (FMath::IsNearlyZero(LastInteractionTime))
 		LastInteractionTime = GetWorld()->GetTimeSeconds();
 		
-	if (!contextWorld->GetTimerManager().IsTimerActive(TimerHandle_PreviewTick) && !FMath::IsNearlyEqual(PreviewTickFrequency, 0.f, KINDA_SMALL_NUMBER))
+	if (!contextWorld->GetTimerManager().IsTimerActive(TimerHandle_PreviewTick) && !FMath::IsNearlyEqual(ControlSettings.PreviewTickFrequency, 0.f, KINDA_SMALL_NUMBER))
 	{
-		const float interval = 1.f / PreviewTickFrequency;
+		const float interval = 1.f / ControlSettings.PreviewTickFrequency;
 		contextWorld->GetTimerManager().SetTimer(
 			TimerHandle_PreviewTick,
 			this,
@@ -158,7 +161,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
 void UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview()
 {
 	const float currentTime = GetWorld()->GetTimeSeconds();
-	if ((currentTime - LastInteractionTime) > IdleThreshold)
+	if ((currentTime - LastInteractionTime) > ControlSettings.IdleThreshold)
 	{
 		PausePreview();
 		return;
@@ -197,12 +200,10 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ResetCameraToDefaults()
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraRotation(const FVector2D& MouseDelta)
 {
-	if (!RendererActor) return;
+	if (!RendererActor || !ControlSettings.bAllowRotation) return;
 	
-	const float rotationSensitivity = CameraRotationSensitivity; // * CurrentZoom;
-	
-	CurrentYaw += MouseDelta.X * rotationSensitivity;
-	CurrentPitch = FMath::Clamp(CurrentPitch - MouseDelta.Y * rotationSensitivity, -YawLimits, YawLimits);
+	CurrentYaw += MouseDelta.X * ControlSettings.CameraRotationSensitivity;
+	CurrentPitch = FMath::Clamp(CurrentPitch - MouseDelta.Y * ControlSettings.CameraRotationSensitivity, -ControlSettings.YawLimits, ControlSettings.YawLimits);
 	
 	RendererActor->SetCameraRotation(CurrentYaw, CurrentPitch);
 	UpdateLastInteractionAndStartPreview();
@@ -210,22 +211,22 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraRotation(con
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraHeight(const FVector2D& MouseDelta)
 {
-	if (!RendererActor) return;
+	if (!RendererActor || !ControlSettings.bAllowHeightAdjustment) return;
 	
-	const float heightSensitivity = CameraHeightSensitivity; // * CurrentZoom;
+	const float heightSensitivity = ControlSettings.CameraHeightSensitivity;
 	const float heightIncrement = (MouseDelta.Y > 0) ? heightSensitivity : -heightSensitivity;
 	
-	CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight + heightIncrement, -HeightLimit, HeightLimit);
+	CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight + heightIncrement, -ControlSettings.HeightLimit, ControlSettings.HeightLimit);
 	RendererActor->SetCameraHeight(CurrentCameraHeight);
 	UpdateLastInteractionAndStartPreview();
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraZoom(const float WheelDelta)
 {
-	if (!RendererActor) return;
+	if (!RendererActor || !ControlSettings.bAllowZoom) return;
 	
-	const float zoomDelta = WheelDelta * CameraZoomSensitivity;
-	CurrentZoom = FMath::Clamp(CurrentZoom + zoomDelta, ScaleLimits.X, ScaleLimits.Y);
+	const float zoomDelta = WheelDelta * ControlSettings.CameraZoomSensitivity;
+	CurrentZoom = FMath::Clamp(CurrentZoom + zoomDelta, ControlSettings.ScaleLimits.X, ControlSettings.ScaleLimits.Y);
 	
 	RendererActor->SetCameraDistance(CurrentZoom);
 	UpdateLastInteractionAndStartPreview();
@@ -235,8 +236,8 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::SetCameraRotationAbsolut
 {
 	if (!RendererActor) return;
 	
-	CurrentYaw = FMath::Lerp(-YawLimits, YawLimits, YawNormalized);
-	CurrentPitch = FMath::Lerp(-YawLimits, YawLimits, PitchNormalized);
+	CurrentYaw = FMath::Lerp(-ControlSettings.YawLimits, ControlSettings.YawLimits, YawNormalized);
+	CurrentPitch = FMath::Lerp(-ControlSettings.YawLimits, ControlSettings.YawLimits, PitchNormalized);
 	
 	RendererActor->SetCameraRotation(CurrentYaw, CurrentPitch);
 	UpdateLastInteractionAndStartPreview();
@@ -246,7 +247,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::SetCameraHeightAbsolute(
 {
 	if (!RendererActor) return;
 	
-	CurrentCameraHeight = FMath::Lerp(-HeightLimit, HeightLimit, HeightNormalized);
+	CurrentCameraHeight = FMath::Lerp(-ControlSettings.HeightLimit, ControlSettings.HeightLimit, HeightNormalized);
 	RendererActor->SetCameraHeight(CurrentCameraHeight);
 	UpdateLastInteractionAndStartPreview();
 }
@@ -255,20 +256,20 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::SetCameraZoomAbsolute(co
 {
 	if (!RendererActor) return;
 	
-	CurrentZoom = FMath::Lerp(ScaleLimits.X, ScaleLimits.Y, ZoomNormalized);
+	CurrentZoom = FMath::Lerp(ControlSettings.ScaleLimits.X, ControlSettings.ScaleLimits.Y, ZoomNormalized);
 	RendererActor->SetCameraDistance(CurrentZoom);
 	UpdateLastInteractionAndStartPreview();
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraRotationAnalog(const FVector2D& AnalogInput, const float DeltaTime)
 {
-	if (!RendererActor) return;
+	if (!RendererActor || !ControlSettings.bAllowRotation) return;
 	
-	const float rotationSpeed = YawLimits;
+	const float rotationSpeed = ControlSettings.YawLimits;
 	const float adjustedSpeed = rotationSpeed / FMath::Max(CurrentZoom, SMALL_NUMBER);
 	
 	CurrentYaw += AnalogInput.X * adjustedSpeed * DeltaTime;
-	CurrentPitch = FMath::Clamp(CurrentPitch - AnalogInput.Y * adjustedSpeed * DeltaTime, -YawLimits, YawLimits);
+	CurrentPitch = FMath::Clamp(CurrentPitch - AnalogInput.Y * adjustedSpeed * DeltaTime, -ControlSettings.YawLimits, ControlSettings.YawLimits);
 	
 	RendererActor->SetCameraRotation(CurrentYaw, CurrentPitch);
 	UpdateLastInteractionAndStartPreview();
@@ -276,22 +277,22 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraRotationAnal
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraHeightAnalog(const float AnalogInput, const float DeltaTime)
 {
-	if (!RendererActor) return;
+	if (!RendererActor || !ControlSettings.bAllowHeightAdjustment) return;
 	
-	const float heightSpeed = HeightLimit * (ScaleLimits.Y - ScaleLimits.X);
+	const float heightSpeed = ControlSettings.HeightLimit * (ControlSettings.ScaleLimits.Y - ControlSettings.ScaleLimits.X);
 	const float adjustedSpeed = heightSpeed / FMath::Max(CurrentZoom, SMALL_NUMBER);
 	
-	CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight + AnalogInput * adjustedSpeed * DeltaTime, -HeightLimit, HeightLimit);
+	CurrentCameraHeight = FMath::Clamp(CurrentCameraHeight + AnalogInput * adjustedSpeed * DeltaTime, -ControlSettings.HeightLimit, ControlSettings.HeightLimit);
 	RendererActor->SetCameraHeight(CurrentCameraHeight);
 	UpdateLastInteractionAndStartPreview();
 }
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraZoomAnalog(const float AnalogInput, const float DeltaTime)
 {
-	if (!RendererActor) return;
+	if (!RendererActor || !ControlSettings.bAllowZoom) return;
 	
-	const float zoomDelta = AnalogInput * CameraZoomSensitivity * DeltaTime * 10.0f;
-	CurrentZoom = FMath::Clamp(CurrentZoom + zoomDelta, ScaleLimits.X, ScaleLimits.Y);
+	const float zoomDelta = AnalogInput * ControlSettings.CameraZoomSensitivity * DeltaTime * 10.0f;
+	CurrentZoom = FMath::Clamp(CurrentZoom + zoomDelta, ControlSettings.ScaleLimits.X, ControlSettings.ScaleLimits.Y);
 	
 	RendererActor->SetCameraDistance(CurrentZoom);
 	UpdateLastInteractionAndStartPreview();

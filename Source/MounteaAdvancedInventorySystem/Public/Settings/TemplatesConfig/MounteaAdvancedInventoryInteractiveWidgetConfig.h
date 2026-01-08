@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryInteractiveWidgetConfig.generated.h"
 
@@ -56,4 +57,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material")
 	TSoftObjectPtr<UMounteaAdvancedInventoryPreviewEnvironmentSettings> EnvironmentSettings;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Controls")
+	FMounteaPreviewCameraControlSettings PreviewCameraControlSettings;
 };

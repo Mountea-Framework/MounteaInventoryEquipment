@@ -325,6 +325,61 @@ struct FMounteaPreviewPostProcessSettings
 	FPostProcessSettings PostProcessSettings;
 };
 
+/**
+ * FMounteaPreviewCameraControlSettings defines configuration for camera manipulation
+ * in preview environments. Controls sensitivity, limits, and enabled state for
+ * rotation, zoom, and height adjustment interactions.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaPreviewCameraControlSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
+	bool bAllowRotation = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowRotation", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"))
+	float CameraRotationSensitivity = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowRotation", UIMin="0.0", ClampMin="0.0", UIMax="180.0", ClampMax="180.0"))
+	float YawLimits = 180.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
+	bool bAllowZoom = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="5.0", ClampMax="5.0"))
+	float CameraZoomSensitivity = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"))
+	FVector2D ScaleLimits = FVector2D(0.1f, 10.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
+	bool bAllowHeightAdjustment = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"))
+	float CameraHeightSensitivity = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"))
+	float HeightLimit = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance", 
+		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"))
+	float PreviewTickFrequency = 30.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance")
+	uint8 bAutoStartTick : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance", 
+		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"))
+	float IdleThreshold = 3.f;
+};
+
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {
 	return HashCombine(
