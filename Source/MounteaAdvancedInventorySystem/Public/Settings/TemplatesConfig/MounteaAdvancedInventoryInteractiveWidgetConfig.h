@@ -17,6 +17,7 @@
 
 class UTextureRenderTarget2D;
 class UMaterialInterface;
+class AMounteaAdvancedInventoryPreviewEnvironment;
 class AMounteaAdvancedInventoryItemPreviewRenderer;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class UWorld;
@@ -40,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview Settings")
 	TSoftClassPtr<UMounteaAdvancedInventoryInteractableObjectWidget> InteractiveWidgetClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview Settings")
+	TSoftClassPtr<AMounteaAdvancedInventoryPreviewEnvironment> EnvironmentActor;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview Settings")
 	TSoftClassPtr<AMounteaAdvancedInventoryItemPreviewRenderer> RendererActor;
 

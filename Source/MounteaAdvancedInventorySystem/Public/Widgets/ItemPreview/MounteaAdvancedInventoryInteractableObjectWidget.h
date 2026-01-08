@@ -11,6 +11,7 @@ class UImage;
 class UTextureRenderTarget2D;
 class UStaticMesh;
 class USkeletalMesh;
+class AMounteaAdvancedInventoryPreviewEnvironment;
 class AMounteaAdvancedInventoryItemPreviewRenderer;
 
 /**
@@ -120,11 +121,16 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings")
 	TObjectPtr<UMaterialInstanceDynamic> PreviewMaterialInstance;
+	
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
+	TSubclassOf<AMounteaAdvancedInventoryPreviewEnvironment> EnvironmentActorClass;
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
 	TSubclassOf<AMounteaAdvancedInventoryItemPreviewRenderer> RendererActorClass;
 
 private:
+	UPROPERTY()
+	TObjectPtr<AMounteaAdvancedInventoryPreviewEnvironment> EnvironmentActor = nullptr;
 	UPROPERTY()
 	TObjectPtr<AMounteaAdvancedInventoryItemPreviewRenderer> RendererActor = nullptr;
 

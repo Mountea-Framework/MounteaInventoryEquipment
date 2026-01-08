@@ -3,6 +3,7 @@
 #include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
 #include "Actors/ItemPreview/MounteaAdvancedInventoryItemPreviewRenderer.h"
+#include "Actors/ItemPreview/MounteaAdvancedInventoryPreviewEnvironment.h"
 #include "Components/Image.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/SkeletalMesh.h"
@@ -18,11 +19,16 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::NativeConstruct()
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()
 {
-	if( PreviewScene && RendererActor )
-	{
+	if (!PreviewScene.IsValid())
+		return;
+	
+	if(RendererActor)
 		PreviewScene->GetWorld()->DestroyActor( RendererActor );
-		RendererActor = nullptr;
-	}
+	if(EnvironmentActor)
+		PreviewScene->GetWorld()->DestroyActor( EnvironmentActor );
+	
+	EnvironmentActor = nullptr;
+	RendererActor = nullptr;
 	PreviewScene.Reset();
 }
 
@@ -39,25 +45,37 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 
 	auto interactiveConfig = Cast<UMounteaAdvancedInventoryInteractiveWidgetConfig>(templateConfig);
 	if (!interactiveConfig) return false;
-
-	if (!RendererActorClass)
-		RendererActorClass = interactiveConfig->RendererActor.LoadSynchronous();
-	if (!RendererActorClass)
-		RendererActorClass = AMounteaAdvancedInventoryItemPreviewRenderer::StaticClass();
-
+	
 	PreviewRenderTarget = interactiveConfig->DefaultRenderTarget.LoadSynchronous();
 	if (!PreviewRenderTarget) return false;
 
 	const auto previewMaterial = interactiveConfig->DefaultRenderTargetMaterial.LoadSynchronous();
 	if (!previewMaterial) return false;
 
+	if (!EnvironmentActorClass)
+		EnvironmentActorClass = interactiveConfig->EnvironmentActor.LoadSynchronous();
+	if (!EnvironmentActorClass)
+		EnvironmentActorClass = AMounteaAdvancedInventoryPreviewEnvironment::StaticClass();
+	
+	if (!RendererActorClass)
+		RendererActorClass = interactiveConfig->RendererActor.LoadSynchronous();
+	if (!RendererActorClass)
+		RendererActorClass = AMounteaAdvancedInventoryItemPreviewRenderer::StaticClass();
+
 	PreviewRenderTarget->ClearColor = FLinearColor::Transparent;
 
 	PreviewMaterialInstance = UMaterialInstanceDynamic::Create(previewMaterial, this);
 	PreviewMaterialInstance->SetTextureParameterValue(TEXT("SceneCapture"), PreviewRenderTarget);
 	
-	PreviewScene = MakeUnique<FPreviewScene>( FPreviewScene::ConstructionValues() );
+	PreviewScene = MakeUnique<FPreviewScene>(FPreviewScene::ConstructionValues()
+		.SetLightBrightness(EnvironmentActorClass ? 0.0f : 3.0f)
+		.SetSkyBrightness(EnvironmentActorClass ? 0.0f : 1.0f)
+	);
 	UWorld* previewWorld = PreviewScene->GetWorld();
+	
+	if (EnvironmentActorClass)
+		EnvironmentActor = previewWorld->SpawnActor<AMounteaAdvancedInventoryPreviewEnvironment>(EnvironmentActorClass);
+	
 	RendererActor = previewWorld->SpawnActor<AMounteaAdvancedInventoryItemPreviewRenderer>(RendererActorClass);
 	if (!IsValid(RendererActor))
 	{
@@ -65,11 +83,9 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 		return false;
 	}
 	
-	PreviewScene->SetLightBrightness(3.0f);
-	PreviewScene->SetSkyBrightness(1.0f);
 	PreviewScene->UpdateCaptureContents();
 	
-	RendererActor->SetRenderTarget( PreviewRenderTarget );
+	RendererActor->SetRenderTarget(PreviewRenderTarget);
 	PreviewImage->SetBrushFromMaterial(PreviewMaterialInstance);
 
 	if (bAutoStartTick)
