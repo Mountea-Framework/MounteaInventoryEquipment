@@ -91,10 +91,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
 	bool bAutoStartTick = false;
 
-	/**
-	 * How many times per second to update the preview. The higher the value,
-	 * the more responsive the preview will be, yet the higher the performance cost.
-	 */
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.0", ClampMin = "0.0", UIMax = "60.0", ClampMax = "60.0"))
 	float PreviewTickFrequency = 30.f;
 
@@ -116,16 +112,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "10.0", ClampMax = "10.0"))
 	float CameraHeightSensitivity = 0.2f;
 
-	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings")
+	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings", meta=(UIMin = "0.01", ClampMin = "0.01", UIMax = "1.0", ClampMax = "1.0"))
+	float CameraZoomSensitivity = 0.1f;
+
+	UPROPERTY()
 	TObjectPtr<UTextureRenderTarget2D> PreviewRenderTarget;
 	
-	UPROPERTY(VisibleAnywhere, Category="Mountea|Preview Settings")
+	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> PreviewMaterialInstance;
 	
-	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
+	UPROPERTY()
 	TSubclassOf<AMounteaAdvancedInventoryPreviewEnvironment> EnvironmentActorClass;
 
-	UPROPERTY(EditAnywhere, Category="Mountea|Preview Settings")
+	UPROPERTY()
 	TSubclassOf<AMounteaAdvancedInventoryItemPreviewRenderer> RendererActorClass;
 
 private:
@@ -143,14 +142,14 @@ private:
 	bool bIsMiddleMousePressed = false;
 	bool bIsMousePressed = false;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadWrite, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	FGuid ActivePreviewItemGuid = FGuid();
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentYaw   = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentPitch = 0.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentZoom  = 1.0f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
 	float CurrentCameraHeight = 0.0f;
 };

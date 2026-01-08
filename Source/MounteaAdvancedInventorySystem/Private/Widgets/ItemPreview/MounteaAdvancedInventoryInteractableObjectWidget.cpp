@@ -224,9 +224,8 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraZoom(const f
 {
 	if (!RendererActor) return;
 	
-	const float zoomSensitivity = 1.f / CameraHeightSensitivity;
-	const float zoomFactor = 1.0f + WheelDelta * zoomSensitivity;
-	CurrentZoom = FMath::Clamp(CurrentZoom * zoomFactor, ScaleLimits.X, ScaleLimits.Y);
+	const float zoomDelta = WheelDelta * CameraZoomSensitivity;
+	CurrentZoom = FMath::Clamp(CurrentZoom + zoomDelta, ScaleLimits.X, ScaleLimits.Y);
 	
 	RendererActor->SetCameraDistance(CurrentZoom);
 	UpdateLastInteractionAndStartPreview();
@@ -291,10 +290,9 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateCameraZoomAnalog(c
 {
 	if (!RendererActor) return;
 	
-	const float zoomSpeed = ScaleLimits.Y - ScaleLimits.X;
-	const float zoomMultiplier = 1.0f + (AnalogInput * zoomSpeed * CameraHeightSensitivity * DeltaTime);
+	const float zoomDelta = AnalogInput * CameraZoomSensitivity * DeltaTime * 10.0f;
+	CurrentZoom = FMath::Clamp(CurrentZoom + zoomDelta, ScaleLimits.X, ScaleLimits.Y);
 	
-	CurrentZoom = FMath::Clamp(CurrentZoom * zoomMultiplier, ScaleLimits.X, ScaleLimits.Y);
 	RendererActor->SetCameraDistance(CurrentZoom);
 	UpdateLastInteractionAndStartPreview();
 }

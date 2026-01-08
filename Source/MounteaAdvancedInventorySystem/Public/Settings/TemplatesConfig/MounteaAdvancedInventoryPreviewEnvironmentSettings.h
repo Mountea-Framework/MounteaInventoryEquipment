@@ -34,8 +34,8 @@
  * @see AMounteaAdvancedInventoryPreviewEnvironment
  * @see UMounteaAdvancedInventoryInteractableObjectWidget
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings UI Config", 
-	meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining visual components."))
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Interactive Widget Environment Config", 
+	meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining visual style of Interactive Environment Widget."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryPreviewEnvironmentSettings : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
