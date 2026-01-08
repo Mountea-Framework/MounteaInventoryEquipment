@@ -486,6 +486,7 @@ FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 
 	int32 savedCount = 0;
 	TArray<FString> failedAssets;
+	TArray<UMounteaInventoryItemTemplate*> templatesToUntrack;
 
 	Algo::ForEach(DirtyTemplates, [&](const TWeakObjectPtr<UMounteaInventoryItemTemplate>& weakTemplate)
 	{
@@ -508,11 +509,16 @@ FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 		if (UPackage::SavePackage(package, itemTemplate, *fileName, saveArgs))
 		{
 			savedCount++;
-			UntrackDirtyAsset(itemTemplate);
+			templatesToUntrack.Add(itemTemplate);
 		}
 		else
 			failedAssets.Add(itemTemplate->DisplayName.ToString());
 	});
+
+	for (UMounteaInventoryItemTemplate* templateToUntrack : templatesToUntrack)
+	{
+		UntrackDirtyAsset(templateToUntrack);
+	}
 
 	if (!failedAssets.IsEmpty())
 	{
