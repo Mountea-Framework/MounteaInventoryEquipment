@@ -110,21 +110,32 @@ void SMounteaInventoryTemplateEditor::NotifyPostChange(const FPropertyChangedEve
 {
 	if (PropertyChangedEvent.ChangeType == EPropertyChangeType::Interactive)
 		return;
-	
-	if (auto itemTemplate = const_cast<UMounteaInventoryItemTemplate*>(Cast<UMounteaInventoryItemTemplate>(PropertyChangedEvent.GetObjectBeingEdited(0))))
-	{
-		if (!itemTemplate->HasAnyFlags(RF_Transient))
-		{
-			itemTemplate->GetPackage()->MarkPackageDirty();
-			TrackDirtyAsset(itemTemplate);
-		}
-		else
-			TrackDirtyAsset(itemTemplate);
 
-		if (TemplateTreeView.IsValid())
-			TemplateTreeView->RequestTreeRefresh();
+	const int32 editedObjectsNumber = PropertyChangedEvent.GetNumObjectsBeingEdited();
+	bool bAnyChanged = false;
+
+	for (int32 i = 0; i < editedObjectsNumber; ++i)
+	{
+		const UObject* editedObjConst = PropertyChangedEvent.GetObjectBeingEdited(i);
+		if (!editedObjConst)
+			continue;
+
+		UMounteaInventoryItemTemplate* itemTemplate = const_cast<UMounteaInventoryItemTemplate*>(Cast<UMounteaInventoryItemTemplate>(editedObjConst));
+		if (!itemTemplate)
+			continue;
+
+		if (!itemTemplate->HasAnyFlags(RF_Transient))
+			itemTemplate->GetPackage()->MarkPackageDirty();
+
+		TrackDirtyAsset(itemTemplate);
+
+		bAnyChanged = true;
 	}
+
+	if (bAnyChanged && TemplateTreeView.IsValid())
+		TemplateTreeView->RequestTreeRefresh();
 }
+
 
 TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 {
@@ -397,6 +408,8 @@ void SMounteaInventoryTemplateEditor::OnTreeSelectionChanged(TSharedPtr<FTemplat
 			return static_cast<UObject*>(weakTemplate.Get());
 		}
 	);
+	
+	UE_LOG(LogTemp, Error, TEXT("Selected Templates Num: %d"), selectedTemplates.Num())
 
 	if (selectedTemplates.Num() == 1)
 		CurrentTemplate = selectedTemplates[0];
@@ -858,7 +871,6 @@ void SMounteaInventoryTemplateEditor::OnAssetRegistryRemoved(const FAssetData& A
 		PendingRefreshTimer = RegisterActiveTimer(0.f, FWidgetActiveTimerDelegate::CreateRaw(
 			this, &SMounteaInventoryTemplateEditor::HandleDeferredRefresh));
 }
-
 
 void SMounteaInventoryTemplateEditor::OnAssetRegistryRenamed(const FAssetData& AssetData, const FString& String)
 {
