@@ -344,7 +344,7 @@ struct FMounteaPreviewCameraControlSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
 		meta=(EditCondition="bAllowRotation", UIMin="0.0", ClampMin="0.0", UIMax="180.0", ClampMax="180.0"))
-	float YawLimits = 180.f;
+	FVector3f RotationLimits = FVector3f(0.f, 180.f, 180.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
 	bool bAllowZoom = true;
@@ -355,7 +355,7 @@ struct FMounteaPreviewCameraControlSettings
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
 		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"))
-	FVector2D ScaleLimits = FVector2D(0.1f, 10.f);
+	FVector2f ZoomLimits = FVector2f(1.f, 5.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
 	bool bAllowHeightAdjustment = true;
