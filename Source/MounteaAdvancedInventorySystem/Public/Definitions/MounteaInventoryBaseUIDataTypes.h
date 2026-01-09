@@ -380,6 +380,33 @@ struct FMounteaPreviewCameraControlSettings
 	float IdleThreshold = 3.f;
 };
 
+/**
+ * FMounteaWidgetInputPayload represents a lightweight, UI-friendly container
+ * for input values forwarded from Player Controllers or Pawns to UI widgets.
+ *
+ * This struct intentionally avoids Enhanced Input–specific types to ensure
+ * widgets remain decoupled from input mapping contexts and gameplay systems.
+ *
+ * Only the relevant value for a given input should be populated.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputPayload
+{
+	GENERATED_BODY()
+
+	/** Scalar input value (e.g. mouse wheel delta, trigger axis, zoom amount). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
+	float FloatValue = 0.f;
+
+	/** Two-dimensional input value (e.g. mouse delta, analog stick rotation). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
+	FVector2D Vector2DValue = FVector2D::ZeroVector;
+
+	/** Boolean input value (e.g. confirm, cancel, toggle). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
+	bool bBoolValue = false;
+};
+
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {
 	return HashCombine(

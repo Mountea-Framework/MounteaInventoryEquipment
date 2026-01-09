@@ -17,6 +17,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+enum class EMounteaWidgetInputPhase : uint8;
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
 struct FMounteaItemActionData;
@@ -735,6 +736,27 @@ public:
 
 	// --- Generic Widget
 #pragma region GenericWidget
+	
+	/**
+	 * Consumes player input forwarded from gameplay classes.
+	 *
+	 * This method allows Player Controllers or Pawns to route Enhanced Input
+	 * actions into UI widgets without exposing input mapping logic to the UI layer.
+	 *
+	 * Input meaning is conveyed via Gameplay Tags, while values are provided
+	 * through a generic payload structure.
+	 *
+	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
+	 * @param InputTag A gameplay tag identifying the semantic meaning of the input
+	 *                 (e.g. UI.ItemPreview.Zoom, UI.Inventory.Navigate).
+	 * @param Phase The current lifecycle phase of the input action.
+	 * @param Payload A lightweight container holding the relevant input value.
+	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
+		meta=(CustomTag="MounteaK2Setter"))
+	static void ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag, EMounteaWidgetInputPhase Phase, 
+						const FMounteaWidgetInputPayload& Payload, float DeltaTime);
 
 	/**
 	 * Refreshes the provided UserWidget if it implements the MounteaInventoryGenericWidgetInterface.
@@ -745,7 +767,8 @@ public:
 	 *
 	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
+		meta=(CustomTag="MounteaK2Setter"))
 	static void RefreshWidget(UWidget* Target);
 	
 #pragma endregion

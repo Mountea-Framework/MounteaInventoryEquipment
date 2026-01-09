@@ -40,6 +40,8 @@ public:
 	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload = nullptr) override {};
 	virtual void ApplyTheme_Implementation() override {};
 	virtual void RefreshWidget_Implementation() override {};
+	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag, EMounteaWidgetInputPhase Phase,
+						const FMounteaWidgetInputPayload& Payload, float DeltaTime) override {};
 
 	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI) override
 	{
@@ -54,6 +56,8 @@ protected:
 	
 	/** Reference to the owning inventory UI interface.*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data",
-		AdvancedDisplay, meta=(DisplayThumbnail=false))
+		AdvancedDisplay, 
+		DisplayName="UI Manager",
+		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent = nullptr;
 };

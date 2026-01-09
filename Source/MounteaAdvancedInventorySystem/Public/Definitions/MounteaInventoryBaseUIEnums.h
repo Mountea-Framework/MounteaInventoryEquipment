@@ -35,3 +35,20 @@ enum class EInventoryItemActionCallback : uint8
 };
 ENUM_CLASS_FLAGS(EInventoryItemActionCallback)
 
+/**
+ * EMounteaWidgetInputPhase defines the lifecycle phase of an input action
+ * as it is processed by the Enhanced Input system.
+ *
+ * This enum mirrors Enhanced Input trigger phases but is UI-agnostic,
+ * allowing widgets to react to input meaningfully without depending
+ * directly on Enhanced Input types.
+ */
+UENUM(BlueprintType)
+enum class EMounteaWidgetInputPhase : uint8
+{
+	Started     UMETA(DisplayName = "Started",   Tooltip = "Input evaluation has begun (e.g. button pressed)."),
+	Triggered   UMETA(DisplayName = "Triggered", Tooltip = "Input action has successfully triggered."),
+	Ongoing     UMETA(DisplayName = "Ongoing",   Tooltip = "Input is continuously active (e.g. held or analog input)."),
+	Completed   UMETA(DisplayName = "Completed", Tooltip = "Input action has finished successfully."),
+	Canceled    UMETA(DisplayName = "Canceled",  Tooltip = "Input action was interrupted or canceled.")
+};

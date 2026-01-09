@@ -49,22 +49,35 @@ public:
 	void ResetCameraToDefaults();
 	
 public:
-	// Mouse delta-based functions
-	void UpdateCameraRotation(const FVector2D& MouseDelta);
-	void UpdateCameraHeight(const FVector2D& MouseDelta);
-	void UpdateCameraZoom(const float WheelDelta);
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
+	void ProcessRotationInput(const FVector2D& Delta);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
+	void ProcessHeightInput(const FVector2D& Delta);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
+	void ProcessZoomInput(const float Delta);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
+	void ProcessAnalogRotation(const FVector2D& AnalogInput, const float DeltaTime);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
+	void ProcessAnalogHeight(const float AnalogInput, const float DeltaTime);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
+	void ProcessAnalogZoom(const float AnalogInput, const float DeltaTime);
     
-	// Absolute value functions for sliders (0.0 to 1.0 range)
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
 	void SetCameraRotationAbsolute(const float YawNormalized, const float PitchNormalized);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
 	void SetCameraHeightAbsolute(const float HeightNormalized);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
 	void SetCameraZoomAbsolute(const float ZoomNormalized);
-    
-	// Analog input functions for gamepad (per-frame updates with -1.0 to 1.0 range)
-	void UpdateCameraRotationAnalog(const FVector2D& AnalogInput, const float DeltaTime);
-	void UpdateCameraHeightAnalog(const float AnalogInput, const float DeltaTime);
-	void UpdateCameraZoomAnalog(const float AnalogInput, const float DeltaTime);
 
 protected:
+	bool CanConsumeNativeInput() const;
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

@@ -1019,6 +1019,13 @@ void UMounteaInventoryUIStatics::ApplyTextBlockTheme(UTextBlock* TextBlock, cons
 	TextBlock->SetShadowColorAndOpacity(themedStyle.ShadowColorAndOpacity);
 }
 
+void UMounteaInventoryUIStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag,
+	const EMounteaWidgetInputPhase Phase, const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ConsumeUIInput(Target, InputTag, Phase, Payload, DeltaTime);
+}
+
 void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
@@ -1968,7 +1975,7 @@ void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoom(UMounteaAdvancedIn
 	const float WheelDelta)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraZoom(WheelDelta);
+		ItemPreview_UpdateCameraZoom(Target, WheelDelta);
 }
 
 void UMounteaInventoryUIStatics::ItemPreview_SetCameraRotationAbsolute(
@@ -1996,19 +2003,19 @@ void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotationAnalog(
 	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraRotationAnalog(AnalogInput, DeltaTime);
+		ItemPreview_UpdateCameraRotationAnalog(Target, AnalogInput, DeltaTime);
 }
 
 void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeightAnalog(
 	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraHeightAnalog(AnalogInput, DeltaTime);
+		ItemPreview_UpdateCameraHeightAnalog(Target, AnalogInput, DeltaTime);
 }
 
 void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoomAnalog(
 	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraZoomAnalog(AnalogInput, DeltaTime);
+		ItemPreview_UpdateCameraZoomAnalog(Target, AnalogInput, DeltaTime);
 }

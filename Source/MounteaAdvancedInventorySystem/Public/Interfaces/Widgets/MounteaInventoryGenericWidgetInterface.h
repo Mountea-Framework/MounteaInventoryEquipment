@@ -15,6 +15,10 @@
 #include "UObject/Interface.h"
 #include "MounteaInventoryGenericWidgetInterface.generated.h"
 
+struct FMounteaWidgetInputPayload;
+enum class EMounteaWidgetInputPhase : uint8;
+struct FGameplayTag;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventoryGenericWidgetInterface : public UInterface
 {
@@ -69,4 +73,24 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
 	void RefreshWidget();
 	virtual void RefreshWidget_Implementation() = 0;
+	
+	/**
+	 * Consumes player input forwarded from gameplay classes.
+	 *
+	 * This method allows Player Controllers or Pawns to route Enhanced Input
+	 * actions into UI widgets without exposing input mapping logic to the UI layer.
+	 *
+	 * Input meaning is conveyed via Gameplay Tags, while values are provided
+	 * through a generic payload structure.
+	 *
+	 * @param InputTag A gameplay tag identifying the semantic meaning of the input (e.g. UI.ItemPreview.Zoom, UI.Inventory.Navigate).
+	 * @param Phase The current lifecycle phase of the input action.
+	 * @param Payload A lightweight container holding the relevant input value.
+	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	void ConsumeUIInput(const FGameplayTag& InputTag, EMounteaWidgetInputPhase Phase, 
+						const FMounteaWidgetInputPayload& Payload, float DeltaTime);
+	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag, EMounteaWidgetInputPhase Phase,
+						const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
 };
