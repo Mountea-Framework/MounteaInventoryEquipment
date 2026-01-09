@@ -183,6 +183,9 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::UpdateLastInteractionAnd
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::ResetCameraToDefaults()
 {
+	if (!RendererActor)
+		return;
+	
 	if (RendererActor)
 	{
 		RendererActor->ResetToDefaults();
@@ -236,10 +239,6 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessZoomInput(const f
 	const float zoomDelta = Delta * stepPerUnit;
 	
 	CurrentZoom = FMath::Clamp(CurrentZoom + zoomDelta, ControlSettings.ZoomLimits.X, ControlSettings.ZoomLimits.Y);
-	
-	UE_LOG(LogTemp, Error, TEXT("Wheel: %f | Step: %f | Delta: %f | Old: %f | New: %f | Limits: [%f, %f]"),
-		WheelDelta, stepPerUnit, zoomDelta, oldZoom, CurrentZoom, 
-		ControlSettings.ZoomLimits.X, ControlSettings.ZoomLimits.Y);
 	
 	RendererActor->SetCameraDistance(CurrentZoom);
 	UpdateLastInteractionAndStartPreview();

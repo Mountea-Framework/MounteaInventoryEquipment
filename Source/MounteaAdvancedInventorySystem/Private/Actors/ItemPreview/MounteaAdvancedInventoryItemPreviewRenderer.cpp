@@ -74,7 +74,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
 	Super::BeginPlay();
 	
 	SetCameraRotation(0.f, 0.f);
-	CurrentUserZoom = 1.0f;
+	CurrentUserZoom = 0.5f;
 	AutoFitMeshInView();
 }
 
@@ -94,7 +94,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Me
 	{
 		StaticMeshComponent->SetStaticMesh(Mesh);
 		StaticMeshComponent->SetVisibility(true);
-		CurrentUserZoom = 1.0f;
+		CurrentUserZoom = 0.5f;
 		AutoFitMeshInView();
 	}
 }
@@ -106,7 +106,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh
 	{
 		SkeletalMeshComponent->SetSkeletalMesh(Mesh);
 		SkeletalMeshComponent->SetVisibility(true);
-		CurrentUserZoom = 1.0f;
+		CurrentUserZoom = 0.5f;
 		AutoFitMeshInView();
 	}
 }
@@ -118,7 +118,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh()
 	SkeletalMeshComponent->SetSkeletalMesh(nullptr);
 	SkeletalMeshComponent->SetVisibility(false);
 	BaseFitScale = 1.0f;
-	CurrentUserZoom = 1.0f;
+	CurrentUserZoom = 0.5f;
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float Yaw, const float Pitch) const
@@ -144,7 +144,7 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::ResetToDefaults()
 {
 	PreviewPivotComponent->SetRelativeRotation(FRotator::ZeroRotator);
 	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, InitialCameraHeight));
-	CurrentUserZoom = 1.0f;
+	CurrentUserZoom = 0.5f;
 	AutoFitMeshInView();
 }
 
