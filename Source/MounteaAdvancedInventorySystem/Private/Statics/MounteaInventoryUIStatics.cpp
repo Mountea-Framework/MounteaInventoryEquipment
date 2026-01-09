@@ -79,13 +79,13 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 {
 	if (!IsValid(Target))
 	{
-		UE_LOG(LogTemp, Error, TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI. Reason: Target is null."));
+		LOG_ERROR(TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI. Reason: Target is null."));
 		return;
 	}
 
 	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>())
 	{
-		UE_LOG(LogTemp, Error, TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI for %s. Reason: Target does not implement IMounteaAdvancedBaseInventoryWidgetInterface."),
+		LOG_ERROR(TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI for %s. Reason: Target does not implement IMounteaAdvancedBaseInventoryWidgetInterface."),
 			*Target->GetName());
 		return;
 	}

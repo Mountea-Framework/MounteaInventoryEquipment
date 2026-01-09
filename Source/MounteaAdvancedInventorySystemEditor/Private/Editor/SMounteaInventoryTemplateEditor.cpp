@@ -408,8 +408,6 @@ void SMounteaInventoryTemplateEditor::OnTreeSelectionChanged(TSharedPtr<FTemplat
 			return static_cast<UObject*>(weakTemplate.Get());
 		}
 	);
-	
-	UE_LOG(LogTemp, Error, TEXT("Selected Templates Num: %d"), selectedTemplates.Num())
 
 	if (selectedTemplates.Num() == 1)
 		CurrentTemplate = selectedTemplates[0];
