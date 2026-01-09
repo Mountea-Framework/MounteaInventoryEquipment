@@ -2003,19 +2003,19 @@ void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotationAnalog(
 	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		ItemPreview_UpdateCameraRotationAnalog(Target, AnalogInput, DeltaTime);
+		Target->ProcessAnalogRotation(AnalogInput, DeltaTime);
 }
 
 void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeightAnalog(
 	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		ItemPreview_UpdateCameraHeightAnalog(Target, AnalogInput, DeltaTime);
+		Target->ProcessAnalogHeight(AnalogInput, DeltaTime);
 }
 
 void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoomAnalog(
 	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		ItemPreview_UpdateCameraZoomAnalog(Target, AnalogInput, DeltaTime);
+		Target->ProcessAnalogZoom(AnalogInput, DeltaTime);
 }
