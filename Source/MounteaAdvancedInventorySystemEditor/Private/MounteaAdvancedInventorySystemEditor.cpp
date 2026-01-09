@@ -166,6 +166,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryUIConfig", InventoryUIConfigThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryUIConfig", InventoryUIConfigIcon);
 				}
+				
+				FSlateImageBrush* InteractiveWidgetEnvironmentConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PreviewEnvironmentSettingsIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InteractiveWidgetEnvironmentConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PreviewEnvironmentSettingsIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (InteractiveWidgetEnvironmentConfigThumb && InteractiveWidgetEnvironmentConfigIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
