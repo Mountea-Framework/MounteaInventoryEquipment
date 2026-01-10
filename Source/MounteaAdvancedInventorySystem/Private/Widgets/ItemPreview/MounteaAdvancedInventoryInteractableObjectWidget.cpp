@@ -161,6 +161,9 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview()
 {
+	if (!PreviewScene || !RendererActor)
+		return;
+	
 	const float currentTime = GetWorld()->GetTimeSeconds();
 	if ((currentTime - LastInteractionTime) > ControlSettings.IdleThreshold)
 	{
