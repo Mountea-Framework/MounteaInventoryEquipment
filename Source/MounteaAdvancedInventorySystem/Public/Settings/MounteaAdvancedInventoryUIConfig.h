@@ -15,6 +15,8 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryUIConfig.generated.h"
 
+struct FMounteaWidgetInputActionMapping;
+
 /**
  * UMounteaAdvancedInventoryUIConfig is a data asset managing comprehensive inventory system UI configuration.
  * Settings config defines visual parameters for complete inventory system customization and behavior control.
@@ -28,6 +30,13 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryUIConfig : pub
 	GENERATED_BODY()
 	
 public:
+	
+	// --- UI Inputs
+	
+	/** Discrete UI actions (Close, Confirm, ContextMenu, NextTab, PreviousTab, etc.). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|🎮 Inputs")
+	TArray<FMounteaWidgetInputActionMapping> UIActionMappings;
+	
 
 	// --- Wrapper
 	

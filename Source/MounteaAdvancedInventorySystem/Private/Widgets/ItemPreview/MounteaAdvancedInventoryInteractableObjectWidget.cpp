@@ -161,6 +161,9 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::PausePreview()
 
 void UMounteaAdvancedInventoryInteractableObjectWidget::TickPreview()
 {
+	if (!PreviewScene || !RendererActor)
+		return;
+	
 	const float currentTime = GetWorld()->GetTimeSeconds();
 	if ((currentTime - LastInteractionTime) > ControlSettings.IdleThreshold)
 	{
@@ -207,7 +210,7 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::CanConsumeNativeInput() 
 	return IsValid(RendererActor);
 }
 
-void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessRotationInput(const FVector2D& Delta)
+void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessRotationInput(const FVector2f& Delta)
 {
 	if (!RendererActor || !ControlSettings.bAllowRotation) return;
 	
@@ -218,7 +221,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessRotationInput(con
 	UpdateLastInteractionAndStartPreview();
 }
 
-void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessHeightInput(const FVector2D& Delta)
+void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessHeightInput(const FVector2f& Delta)
 {
 	if (!RendererActor || !ControlSettings.bAllowHeightAdjustment) return;
 	
@@ -244,7 +247,7 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessZoomInput(const f
 	UpdateLastInteractionAndStartPreview();
 }
 
-void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessAnalogRotation(const FVector2D& AnalogInput, const float DeltaTime)
+void UMounteaAdvancedInventoryInteractableObjectWidget::ProcessAnalogRotation(const FVector2f& AnalogInput, const float DeltaTime)
 {
 	if (!RendererActor || !ControlSettings.bAllowRotation) return;
 	
@@ -320,8 +323,8 @@ FReply UMounteaAdvancedInventoryInteractableObjectWidget::NativeOnMouseMove(
 {
 	if (!CanConsumeNativeInput()) return FReply::Unhandled();
 	
-	const FVector2D currentMousePos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	const FVector2D mouseDelta = currentMousePos - LastMousePosition;
+	const FVector2f currentMousePos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	const FVector2f mouseDelta = currentMousePos - LastMousePosition;
 	
 	if (bIsMousePressed)
 	{
