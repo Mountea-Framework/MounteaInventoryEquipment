@@ -50,16 +50,16 @@ public:
 	
 public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
-	void ProcessRotationInput(const FVector2D& Delta);
+	void ProcessRotationInput(const FVector2f& Delta);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
-	void ProcessHeightInput(const FVector2D& Delta);
+	void ProcessHeightInput(const FVector2f& Delta);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
 	void ProcessZoomInput(const float Delta);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
-	void ProcessAnalogRotation(const FVector2D& AnalogInput, const float DeltaTime);
+	void ProcessAnalogRotation(const FVector2f& AnalogInput, const float DeltaTime);
 	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Input Processing")
 	void ProcessAnalogHeight(const float AnalogInput, const float DeltaTime);
@@ -128,7 +128,7 @@ private:
 	FTimerHandle TimerHandle_PreviewTick;
 
 	float LastInteractionTime = 0.0f;
-	FVector2D LastMousePosition = FVector2D::ZeroVector;
+	FVector2f LastMousePosition = FVector2f::ZeroVector;
 	bool bIsMiddleMousePressed = false;
 	bool bIsMousePressed = false;
 

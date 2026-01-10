@@ -363,33 +363,6 @@ FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGri
 	return SourceData.ToString();
 }
 
-bool UMounteaInventoryUIStatics::IsInputAllowed(const FKey& InputKey, const FName& InputName)
-{
-	if (InputName.IsNone())
-		return false;
-    
-	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings))
-		return false;
-
-	const auto inputMapping = settings->AdvancedInventoryEquipmentInputMapping.LoadSynchronous();
-	if (!IsValid(inputMapping))
-		return false;
-
-	const auto inputActions = inputMapping->GetMappings();
-	if (inputActions.IsEmpty())
-		return false;
-	
-	const FText inputText = FText::FromName(InputName);
-
-	const auto* matchingAction = Algo::FindByPredicate(inputActions, [&](const auto& inputAction)
-	{
-		return inputAction.Action->GetFName().ToString() == InputName.ToString() && inputAction.Key == InputKey;
-	});
-
-	return matchingAction != nullptr;
-}
-
 bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
@@ -568,16 +541,6 @@ void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_ResetChildren(UMounte
 	if (!ScrollBox)
 		return;
 	ScrollBox->ResetChildren();
-}
-
-bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
-{
-	return IsInputAllowed(MouseEvent.GetEffectingButton(), InputName);
-}
-
-bool UMounteaInventoryUIStatics::KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName)
-{
-	return IsInputAllowed(InKeyEvent.GetKey(), InputName);
 }
 
 FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(
@@ -1085,7 +1048,7 @@ void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)
 }
 
 void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
-													  const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
@@ -2013,14 +1976,16 @@ void UMounteaInventoryUIStatics::ItemPreview_ResetPreview(UMounteaAdvancedInvent
 		Target->ResetCameraToDefaults();
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
 {
+	if (IsValid(Target))
+		Target->ProcessRotationInput(MouseDelta);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
 {
+	if (IsValid(Target))
+		Target->ProcessHeightInput(MouseDelta);
 }
 
 void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoom(UMounteaAdvancedInventoryInteractableObjectWidget* Target,
@@ -2030,43 +1995,42 @@ void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoom(UMounteaAdvancedIn
 		ItemPreview_UpdateCameraZoom(Target, WheelDelta);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraRotationAbsolute(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float YawNormalized, const float PitchNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraRotationAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float YawNormalized, const float PitchNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraRotationAbsolute(YawNormalized, PitchNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraHeightAbsolute(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float HeightNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraHeightAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float HeightNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraHeightAbsolute(HeightNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraZoomAbsolute(ZoomNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotationAnalog(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& AnalogInput, const float DeltaTime)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotationAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const FVector2f& AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
 		Target->ProcessAnalogRotation(AnalogInput, DeltaTime);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeightAnalog(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeightAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
 		Target->ProcessAnalogHeight(AnalogInput, DeltaTime);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoomAnalog(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoomAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
 		Target->ProcessAnalogZoom(AnalogInput, DeltaTime);
