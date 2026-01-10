@@ -89,8 +89,8 @@ public:
 	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
-	void ConsumeUIInput(const FGameplayTag& InputTag, EMounteaWidgetInputPhase Phase, 
+	void ConsumeUIInput(const FGameplayTag& InputTag, 
 						const FMounteaWidgetInputPayload& Payload, float DeltaTime);
-	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag, EMounteaWidgetInputPhase Phase,
+	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag,
 						const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
 };

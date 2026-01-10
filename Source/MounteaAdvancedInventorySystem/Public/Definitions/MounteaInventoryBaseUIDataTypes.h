@@ -23,6 +23,7 @@
 //  - FItemWidgetData: all data a UI widget needs to render an item/slot.
 // ============================================================================
 
+enum class EMounteaWidgetInputMethod : uint8;
 class UUserWidget;
 class UTextureCube;
 
@@ -393,6 +394,10 @@ USTRUCT(BlueprintType)
 struct FMounteaWidgetInputPayload
 {
 	GENERATED_BODY()
+	
+	/** Defines type of input to consume. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")
+	EMounteaWidgetInputMethod InputMethod;
 
 	/** Scalar input value (e.g. mouse wheel delta, trigger axis, zoom amount). */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
@@ -406,6 +411,67 @@ struct FMounteaWidgetInputPayload
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
 	bool bBoolValue = false;
 };
+
+/**
+ * FMounteaWidgetInputKeyChord represents a UI-friendly binding:
+ * - Primary Key
+ * - Optional Modifier Key
+ *
+ * If ModifierKey is invalid, no modifier is required.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputKeyChord
+{
+	GENERATED_BODY()
+
+public:
+	/** Primary key (e.g. I, Escape, Gamepad_FaceButton_Bottom). */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	FKey Key;
+
+	/** Optional modifier key (e.g. LeftControl, RightShift). If invalid => no modifier required. */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	FKey ModifierKey;
+};
+
+
+/**
+ * FMounteaWidgetInputActionMapping defines a UI action (identified by a gameplay tag)
+ * and its associated key bindings (simple keys and/or key chords).
+ *
+ * The tag describes WHAT action should be triggered, while the key lists describe
+ * WHICH physical inputs can trigger it.
+ *
+ * This struct is intentionally Enhanced Input–agnostic and can be evaluated from
+ * Slate key events or from gameplay-side input routing.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputActionMapping
+{
+	GENERATED_BODY()
+
+	/** 
+	 * Gameplay tag identifying the UI action (e.g. UI.Inventory.Close, UI.Inventory.Confirm). 
+	 * Limited to "Input" category only!
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(Categories="Input,Mountea_Inventory.Input"))
+	FGameplayTag ActionTag;
+
+	/** Keys that can trigger this action (Esc, Enter, Gamepad_FaceButton_Right, etc.). */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	TArray<FKey> Keys;
+
+	// TODO: Holding 2 buttons at the same time for example
+	/** Key chords (key + optional modifiers) that can trigger this action. */
+	//UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	//TArray<FMounteaWidgetInputKeyChord> Chords;
+
+	/** If true, the UI layer should consume the input when this mapping triggers. */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	bool bConsume = true;
+};
+
 
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {

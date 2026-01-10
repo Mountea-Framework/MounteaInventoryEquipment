@@ -319,12 +319,6 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryId(Target) : TEXT("none");
 }
 
-bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
-{
-	//TODO: REWORK
-	return false;
-}
-
 void UMounteaInventoryUIStatics::ApplyTheme(UWidget* Target)
 {
 	if (!IsValid(Target)) return;
@@ -394,6 +388,64 @@ bool UMounteaInventoryUIStatics::IsInputAllowed(const FKey& InputKey, const FNam
 	});
 
 	return matchingAction != nullptr;
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	return FindUIActionMappingByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), Mappings, OutMapping);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	return FindUIActionMappingByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), Mappings, OutMapping);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	// Wheel events (NativeOnMouseWheel) don't have an "effecting button".
+	// Convention: bind wheel mappings using EKeys::MouseWheelAxis.
+	const float WheelDelta = MouseEvent.GetWheelDelta();
+	const FKey PressedKey = !FMath::IsNearlyZero(WheelDelta)
+		? EKeys::MouseWheelAxis
+		: MouseEvent.GetEffectingButton();
+
+	return FindUIActionMappingByKey(PressedKey, MouseEvent.GetModifierKeys(), Mappings, OutMapping);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	if (!PressedKey.IsValid())
+	{
+		return false;
+	}
+
+	for (const FMounteaWidgetInputActionMapping& inputMapping : Mappings)
+	{
+		// 1) Simple keys.
+		if (inputMapping.Keys.Contains(PressedKey))
+		{
+			OutMapping = inputMapping;
+			return true;
+		}
+
+		// 2) Chords (Key + optional modifier).
+		/*
+		for (const FMounteaWidgetInputKeyChord& Chord : inputMapping.Chords)
+		{
+			if (Chord.Key == PressedKey && ModifiersMatchChord(Modifiers, Chord))
+			{
+				OutMapping = inputMapping;
+				return true;
+			}
+		}
+		*/
+	}
+
+	return false;
 }
 
 FInventoryItem UMounteaInventoryUIStatics::FindItem(
@@ -1020,10 +1072,10 @@ void UMounteaInventoryUIStatics::ApplyTextBlockTheme(UTextBlock* TextBlock, cons
 }
 
 void UMounteaInventoryUIStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag,
-	const EMounteaWidgetInputPhase Phase, const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
+	const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ConsumeUIInput(Target, InputTag, Phase, Payload, DeltaTime);
+		IMounteaInventoryGenericWidgetInterface::Execute_ConsumeUIInput(Target, InputTag, Payload, DeltaTime);
 }
 
 void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)
