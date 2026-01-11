@@ -34,6 +34,7 @@ public class MounteaAdvancedInventorySystemDeveloper : ModuleRules
 					"EditorStyle",
 					"BlueprintGraph",
 					"ApplicationCore",
+					"UnrealEd"
 				}
 			);
 		}
