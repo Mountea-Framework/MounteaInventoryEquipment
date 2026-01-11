@@ -25,8 +25,9 @@ class MOUNTEAADVANCEDINVENTORYSYSTEMDEVELOPER_API UK2Node_SwitchWidgetCommand : 
 	
 public:
 	
-	UPROPERTY(EditAnywhere, Category="PinOptions")
-	TArray<FName> PinNames;
+	UPROPERTY(EditAnywhere, Category="PinOptions", 
+		meta=(DisplayName="Widget Commands"))
+	TMap<FName, bool> PinNames;
 
 	UPROPERTY(EditAnywhere, Category="PinOptions")
 	uint32 bIsCaseSensitive : 1;
@@ -57,4 +58,5 @@ protected:
 	void SetupCaseSensitivityFunction();
 	void GetWidgetCommandsFromSettings(TArray<FName>& OutCommands) const;
 	bool IsPredefinedPin(const FName& PinName) const;
+	void GetVisiblePinNames(TArray<FName>& OutVisiblePins) const;
 };

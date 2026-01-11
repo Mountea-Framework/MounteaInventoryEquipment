@@ -24,6 +24,8 @@
 UK2Node_SwitchWidgetCommand::UK2Node_SwitchWidgetCommand(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	bCanRenameNode = false;
+	bHasDefaultPin = false;
 	bIsCaseSensitive = false;
 	SetupCaseSensitivityFunction();
 	FunctionClass = UKismetStringLibrary::StaticClass();
@@ -52,7 +54,11 @@ FEdGraphPinType UK2Node_SwitchWidgetCommand::GetPinType() const
 FName UK2Node_SwitchWidgetCommand::GetPinNameGivenIndex(int32 Index) const
 {
 	check(Index);
-	return PinNames[Index];
+	
+	TArray<FName> bisiblePins;
+	GetVisiblePinNames(bisiblePins);
+	
+	return bisiblePins[Index];
 }
 
 void UK2Node_SwitchWidgetCommand::CreateCasePins()
@@ -63,13 +69,16 @@ void UK2Node_SwitchWidgetCommand::CreateCasePins()
 	for (const FName& commandName : predefinedCommands)
 	{
 		if (!PinNames.Contains(commandName))
-			PinNames.Add(commandName);
+			PinNames.Add(commandName, false);
 	}
 	
-	for (const FName& PinName : PinNames)
+	for (const TPair<FName, bool>& pinPair : PinNames)
 	{
-		UEdGraphPin* uniquePin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, PinName);
-		uniquePin->bAllowFriendlyName = false;
+		if (pinPair.Value)
+		{
+			UEdGraphPin* newPin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, pinPair.Key);
+			newPin->bAllowFriendlyName = false;
+		}
 	}
 }
 
@@ -89,7 +98,7 @@ FName UK2Node_SwitchWidgetCommand::GetUniquePinName()
 void UK2Node_SwitchWidgetCommand::AddPinToSwitchNode()
 {
 	const FName pinName = GetUniquePinName();
-	PinNames.Add(pinName);
+	PinNames.Add(pinName, false);
 
 	UEdGraphPin* uniquePin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, pinName);
 	uniquePin->bAllowFriendlyName = false;
@@ -133,6 +142,17 @@ bool UK2Node_SwitchWidgetCommand::IsPredefinedPin(const FName& PinName) const
 	return predefinedCommands.Contains(PinName);
 }
 
+void UK2Node_SwitchWidgetCommand::GetVisiblePinNames(TArray<FName>& OutVisiblePins) const
+{
+	OutVisiblePins.Empty();
+	
+	for (const TPair<FName, bool>& pinPair : PinNames)
+	{
+		if (pinPair.Value)
+			OutVisiblePins.Add(pinPair.Key);
+	}
+}
+
 #if WITH_EDITOR
 
 void UK2Node_SwitchWidgetCommand::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
@@ -173,23 +193,26 @@ void UK2Node_SwitchWidgetCommand::ValidateNodeDuringCompilation(FCompilerResults
 {
 	Super::ValidateNodeDuringCompilation(MessageLog);
 	
+	TArray<FName> visiblePins;
+	GetVisiblePinNames(visiblePins);
+	
 	TArray<FString> uniquePinNames;
-	uniquePinNames.Reserve(PinNames.Num());
-	ESearchCase::Type CaseSensitivity = bIsCaseSensitive ? ESearchCase::CaseSensitive : ESearchCase::IgnoreCase;
+	uniquePinNames.Reserve(visiblePins.Num());
+	ESearchCase::Type caseSensitivity = bIsCaseSensitive ? ESearchCase::CaseSensitive : ESearchCase::IgnoreCase;
 
-	for (FName pinName : PinNames)
+	for (FName visiblePin : visiblePins)
 	{
-		FString PinStr = pinName.ToString();
+		FString pinNameString = visiblePin.ToString();
 
 		for (const FString& uniquePin : uniquePinNames)
 		{
-			if (PinStr.Equals(uniquePin, CaseSensitivity))
+			if (pinNameString.Equals(uniquePin, caseSensitivity))
 			{
 				MessageLog.Error(*LOCTEXT("SwitchWidgetCommand_DuplicateCases", "@@ contains duplicate cases.").ToString(), this);
 				return;
 			}
 		}
-		uniquePinNames.Emplace(MoveTemp(PinStr));
+		uniquePinNames.Emplace(MoveTemp(pinNameString));
 	}
 }
 
