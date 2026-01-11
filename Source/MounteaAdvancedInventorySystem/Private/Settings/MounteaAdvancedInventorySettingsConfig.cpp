@@ -20,7 +20,6 @@
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()
 	: Super()
 {
-	SetupWidgetCommands();
 	ValidateInventoryTypes();
 }
 
@@ -149,16 +148,6 @@ void UMounteaAdvancedInventorySettingsConfig::SetupSpecializedConfig(FInventoryT
 	Config.AccessFlags = static_cast<uint8>(EInventoryFlags::EIF_Private);
 	Config.SlotsRange = FIntPoint(20, 20);
 	Config.StartingSlots = 20;
-}
-
-void UMounteaAdvancedInventorySettingsConfig::SetupWidgetCommands()
-{
-	auto coreCommands = InventoryUICommands::GetAllCommandTypes();
-	for (const FString& command : InventoryUICommands::AllCommands)
-	{
-		if (!WidgetCommands.Contains(command))
-			WidgetCommands.Add(command);
-	}
 }
 
 TArray<FString> UMounteaAdvancedInventorySettingsConfig::GetNotificationTypes() const
@@ -337,11 +326,6 @@ void UMounteaAdvancedInventorySettingsConfig::SetDefaultNotificationConfig()
 void UMounteaAdvancedInventorySettingsConfig::PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeChainProperty(PropertyChangedEvent);
-
-	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, WidgetCommands))
-	{
-		SetupWidgetCommands();
-	}
 	
 	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventorySettingsConfig, AllowedInventoryTypes))
 	{

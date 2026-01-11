@@ -82,9 +82,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Theme")
 	TSoftObjectPtr<UMounteaAdvancedInventoryThemeConfig> BaseTheme;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Config", meta=(NoResetToDefault))
-	TSet<FString> WidgetCommands;
-	
 protected:
 
 	void ValidateInventoryTypes();
@@ -96,8 +93,6 @@ protected:
 	static void SetupMerchantConfig(FInventoryTypeConfig& Config);
 	static void SetupLootConfig(FInventoryTypeConfig& Config);
 	static void SetupSpecializedConfig(FInventoryTypeConfig& Config);
-
-	void SetupWidgetCommands();
 
 	UFUNCTION()
 	TArray<FString> GetNotificationTypes() const;

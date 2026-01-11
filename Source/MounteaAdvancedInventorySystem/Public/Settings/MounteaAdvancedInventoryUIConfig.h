@@ -134,6 +134,11 @@ public:
 	
 	// ---- Settings
 	
+	/** Defines list of available Widget Commands. Those are available using custom SwithOnWidgetCommand Node.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|Config", 
+		meta=(NoResetToDefault))
+	TSet<FString> WidgetCommands;
+	
 	/**
 	 * Determines if stackable items should always automatically stack together when added to the inventory.
 	 * If set to true, stackable items will occupy the same inventory slot until the maximum stack size is reached.
@@ -149,5 +154,16 @@ public:
 	/** Determines if the inventory system allows drag-and-drop operations for items. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|⚙ Settings")
 	uint8 bAllowDragAndDrop : 1;
+	
+public:
+	
+	void SetupWidgetCommands();
+	
+
+#if WITH_EDITOR
+protected:
+	virtual void PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent) override;
+#endif
+	
 };
 
