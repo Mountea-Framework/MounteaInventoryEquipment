@@ -19,8 +19,6 @@
 
 UMounteaAdvancedInventorySettingsConfig::UMounteaAdvancedInventorySettingsConfig()
 	: Super()
-	, bAlwaysStackStackableItems(true)
-	, bAllowDragAndDrop(true)
 {
 	SetupWidgetCommands();
 	ValidateInventoryTypes();

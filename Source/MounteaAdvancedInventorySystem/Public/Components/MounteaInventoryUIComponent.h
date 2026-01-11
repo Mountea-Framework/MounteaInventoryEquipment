@@ -15,7 +15,7 @@
 #include "Components/ActorComponent.h"
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
-#include "Interfaces/Inventory/MounteaAdvancedInventoryUIInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
 
 /**
@@ -24,13 +24,13 @@
  * notification display, and grid slot persistence for comprehensive inventory interface control.
  *
  * @see [Inventory UI System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
- * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaAdvancedInventoryUIManagerInterface
  * @see UMounteaInventoryComponent
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable, 
     AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
     meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface
 {
 	GENERATED_BODY()
 
@@ -50,11 +50,16 @@ public:
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
 	
 	virtual bool CreateWrapperWidget_Implementation() override;
-	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return InventoryWidget; };
+	virtual UUserWidget* GetWrapperWidget_Implementation() const override { return WrapperWidget; };
 	virtual void RemoveWrapperWidget_Implementation() override;
+	
+	virtual bool CreateInventoryWidget_Implementation() override;
+	virtual UUserWidget* GetInventoryWidget_Implementation() const override { return InventoryWidget; };
+	virtual void RemoveInventoryWidget_Implementation() override;
+	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) override;
 
-	virtual UUserWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
-	virtual void SetActiveItemWidget_Implementation(UUserWidget* NewActiveItemWidget) override;
+	virtual UWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
+	virtual void SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget) override;
 	
 	virtual UUserWidget* GetNotificationContainer_Implementation() const override;
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) override;
@@ -69,7 +74,13 @@ public:
 	virtual FString GetSelectedCategoryId_Implementation() const override { return ActiveCategoryId; };
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) override;
 	virtual FGuid GetActiveItemGuid_Implementation() const override { return ActiveItemGuid; };
-
+	
+	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const override { return CustomItemsMap; };
+	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
+	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override { CustomItemsMap.Append(OtherItems); };
+	virtual void ClearCustomItemsMap_Implementation() override { CustomItemsMap.Reset(); };
+	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag) override { return CustomItemsMap.Remove(ItemTag) > 0; };
+	
 	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const override {return SavedGridSlots;};
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
 	virtual void RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
@@ -111,14 +122,23 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryItemSelected OnItemSelected;
 
+protected:
+	
+	// Currently active category in UI.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	FString ActiveCategoryId;
 
+	// Currently active item in UI.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	FGuid ActiveItemGuid;
 
+	// Currently active item Widget.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
-	TObjectPtr<UUserWidget> ActiveItemWidget;
+	TObjectPtr<UWidget> ActiveItemWidget;
+	
+	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
 
 	/**
 	 * Represents the set of saved inventory grid slots.
@@ -142,6 +162,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess), meta=(ExposeOnSpawn))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	TObjectPtr<UUserWidget> WrapperWidget;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryWidget;
 

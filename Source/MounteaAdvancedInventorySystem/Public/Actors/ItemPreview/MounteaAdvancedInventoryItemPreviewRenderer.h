@@ -52,54 +52,49 @@ public:
 	AMounteaAdvancedInventoryItemPreviewRenderer();
 	
 	void SetRenderTarget(UTextureRenderTarget2D* NewRT) const;
-	void SetStaticMesh(UStaticMesh* Mesh) const;
-	void SetSkeletalMesh(USkeletalMesh* Mesh) const;
-	void ClearMesh() const;
+	void SetStaticMesh(UStaticMesh* Mesh);
+	void SetSkeletalMesh(USkeletalMesh* Mesh);
+	void ClearMesh();
 	void SetCameraRotation(const float Yaw, const float Pitch) const;
-	void SetCameraDistance(const float Distance) const;
+	void SetCameraDistance(const float ZoomLevel);
 	void SetCameraHeight(const float ZOffset) const;
-	void ResetToDefaults() const;
+	void ResetToDefaults();
 	void CaptureScene() const;
 
-	void GetCurrentValues(FVector4& ScaleHeightPitchYaw) const;
+	void GetCurrentValues(FVector4& ZoomHeightYawPitch) const;
 
 protected:
 	virtual void BeginPlay() override;
 
 public:
-	/** Scene root. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USceneComponent> RootSceneComponent;
 
-	/** Pivot for mesh rotation. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USceneComponent> PreviewPivotComponent;
 
-	/** Holds a static mesh. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-	/** Holds a skeletal mesh. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
-	/** Arm to position the camera. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USpringArmComponent> SpringArmComponent;
 
-	/** Scene capture that writes into the RT. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	TObjectPtr<USceneCaptureComponent2D> SceneCaptureComponent;
 
-	/** The render target to capture into. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rendering")
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 
 private:
-	float InitialCameraHeight = 0.f; //90.f;
-	float InitialCameraHeightSkeletalMesh = 90.f;
+	float InitialCameraHeight = 0.f;
+	float BaseFitScale = 1.0f;
+	float CurrentUserZoom = 1.0f;
 
 private:
-	void AutoFitMeshInView() const;
+	void AutoFitMeshInView();
+	void ApplyCombinedScale() const;
 	UPrimitiveComponent* GetActiveMeshComponent() const;
 };

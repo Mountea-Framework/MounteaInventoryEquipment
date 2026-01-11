@@ -15,7 +15,7 @@
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "MounteaAdvancedInventoryUISubsystem.generated.h"
 
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 /**
  * 
@@ -69,5 +69,5 @@ private:
 	// Reference to UI Manager, usually lives withing Player Pawn.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Managers",
 		meta=(AllowPrivateAccess))
-	TScriptInterface<IMounteaAdvancedInventoryUIInterface> InventoryUIManager;
+	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> InventoryUIManager;
 };

@@ -17,7 +17,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryNotificationsStatics.generated.h"
 
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 struct FInventoryNotificationData;
 class UUserWidget;
 

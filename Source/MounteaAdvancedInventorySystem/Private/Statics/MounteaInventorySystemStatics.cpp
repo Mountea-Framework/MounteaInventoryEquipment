@@ -12,7 +12,9 @@
 
 #include "Statics/MounteaInventorySystemStatics.h"
 
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
@@ -134,4 +136,42 @@ AActor* UMounteaInventorySystemStatics::GetOwningActor(const UObject* Target)
 		return resolveOwner(actor->GetOwner());
 
 	return resolveOwner(nullptr);
+}
+
+TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UObject> FilterClass)
+{
+	TArray<UObject*> returnValue;
+
+	if (!FilterClass)
+	{
+		LOG_WARNING(TEXT("GetAssets: FilterClass is null"))
+		return returnValue;
+	}
+
+	FAssetRegistryModule& assetRegistryModule =
+		FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	IAssetRegistry& assetRegistry = assetRegistryModule.Get();
+
+	FARFilter searchFilter;
+	searchFilter.bRecursiveClasses = true;
+	searchFilter.bRecursivePaths   = true;
+
+	searchFilter.ClassPaths.Add(FilterClass->GetClassPathName());
+	
+	if (searchFilter.IsEmpty())
+		LOG_ERROR(TEXT("GetAssets: searchFilter is empty"));
+
+	TArray<FAssetData> assetDataList;
+	assetRegistry.GetAssets(searchFilter, assetDataList);
+	
+	if (assetDataList.IsEmpty())
+		LOG_ERROR(TEXT("GetAssets: assetDataList is empty"));
+
+	for (const FAssetData& assetData : assetDataList)
+	{
+		if (UObject* loadedAsset = assetData.GetAsset())
+			returnValue.Add(loadedAsset);
+	}
+
+	return returnValue;
 }

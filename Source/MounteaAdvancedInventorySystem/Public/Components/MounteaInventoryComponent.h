@@ -155,8 +155,4 @@ private:
 		ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory",
 		meta=(AllowPrivateAccess))
 	FInventoryItemArray InventoryItems;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess))
-	TObjectPtr<UUserWidget> InventoryWidget;
 };

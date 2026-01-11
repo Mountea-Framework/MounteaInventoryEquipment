@@ -35,3 +35,17 @@ enum class EInventoryItemActionCallback : uint8
 };
 ENUM_CLASS_FLAGS(EInventoryItemActionCallback)
 
+/**
+ * Basically 1:1 copy of `EInputActionValueType` for now.
+ */
+UENUM(BlueprintType)
+enum class EMounteaWidgetInputMethod : uint8
+{
+	// Value types in increasing size order (used for type promotion)
+	// Name these Digital/Analog?
+
+	Boolean				UMETA(DisplayName = "Digital (bool)"),
+	Axis1D				UMETA(DisplayName = "Axis1D (float)"),
+	Axis2D				UMETA(DisplayName = "Axis2D (Vector2D)"),
+	Axis3D				UMETA(DisplayName = "Axis3D (Vector)"),
+};

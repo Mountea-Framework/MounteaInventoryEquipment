@@ -25,40 +25,30 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryGenericWidgetStatics :
 {
 	GENERATED_BODY()
 
-	/*************************************************************/
-	/********************* TEMPLATES **********************/
-	/*************************************************************/
 public:
-	template<typename ReturnType, typename Func, typename... Args>
-	static ReturnType ExecuteIfImplements(UObject* Target, const TCHAR* FunctionName, Func Function, Args&&... args)
-	{
-		if (!IsValid(Target))
-		{
-			LOG_ERROR(TEXT("[%s] Invalid Target provided!"), FunctionName);
-			if constexpr (!std::is_void_v<ReturnType>)
-				return ReturnType{};
-			else return;
-		}
-
-		if (Target->Implements<UMounteaInventoryGenericWidgetInterface>())
-		{
-			if constexpr (std::is_void_v<ReturnType>)
-			{
-				Function(Target, Forward<Args>(args)...);
-				return;
-			}
-			return Function(Target, Forward<Args>(args)...);
-		}
-
-		LOG_ERROR(TEXT("[%s] Target does not implement 'MounteaInventoryGenericWidgetInterface'!"), FunctionName);
-		if constexpr (!std::is_void_v<ReturnType>)
-			return ReturnType{};
-		else return;
-	}
-
-	/*************************************************************/
-	/******************* BLUEPRINTABLE *******************/
-	/*************************************************************/
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	
+	/**
+	 * Delegates command with optional payload to provided Generic Widget.
+	 * This allows sending logic commands across multiple levels and through multiple systems.
+	 * Example:
+	 * → Player picks up item
+	 * → Item is added to Inventory (database)
+	 * → Inventory (database) calls event OnItemAdded
+	 * → Inventory UI Manager calls to Inventory Widget command:
+	 * → → RefreshInventory
+	 * 
+	 * This way Widgets can always know what to do without need to create class-specific logic.
+	 * What would be great in near future:
+	 * → Create queue system to receive commands
+	 * → → Process queue command by command
+	 * → → This would solve issues with racing conditions
+	 * 
+	 * @param GenericWidget Object which must implement MounteaInventoryGenericWidgetInterface interface. For World Space widgets it can be even actor or component.
+	 * @param Command String command which defines what to do, eg.: CreateWidget, RefreshWidget, ProcessInput etc.
+	 * @param OptionalPayload Object-based optional payloads which can hold additional data around.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Process Widget Command")
 	static void ProcessInventoryWidgetCommand( UObject* GenericWidget, const FString& Command, UObject* OptionalPayload); 
 };

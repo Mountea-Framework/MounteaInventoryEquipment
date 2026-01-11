@@ -13,31 +13,41 @@
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 
-
-FInventorySlot::FInventorySlot(const struct FMounteaInventoryGridSlot& GridSlot)
+bool FInventorySlot::IsEmpty() const
 {
-	OccupiedItemId = GridSlot.OccupiedItemId;
-	SlotQuantity = GridSlot.SlotQuantity;
-	SlotWidget = GridSlot.SlotWidget;
+	if (!ItemWidget)
+		return true;
+	
+	if (!ItemWidget->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		return true;
+	
+	return IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryData(ItemWidget).IsEmpty();
 }
 
-FMounteaInventoryGridSlot::FMounteaInventoryGridSlot() : FInventorySlot()
+FString FInventorySlot::ToString() const
 {
-}
-
-FMounteaInventoryGridSlot::FMounteaInventoryGridSlot(const FInventorySlot& SourceSlot)
-{
-	OccupiedItemId = SourceSlot.OccupiedItemId;
-	SlotQuantity = SourceSlot.SlotQuantity;
-	SlotWidget = SourceSlot.SlotWidget;
-}
-
-FString FMounteaInventoryGridSlot::ToString() const
-{
-	FString returnString = TEXT("Slot: ");
-	returnString.Append(TEXT("SlotPosition: ")).Append(SlotPosition.ToString()).Append(TEXT(" | "));
-	returnString.Append(TEXT("OccupiedItemId: ")).Append(OccupiedItemId.ToString()).Append(TEXT(" | "));
-	returnString.Append(TEXT("SlotWidget: ")).Append( SlotWidget ? *SlotWidget->GetName() : TEXT("None") );
-	return returnString;
+	if (!ItemWidget)
+		return FString::Printf(
+			TEXT("ItemWidget: EMPTY")
+		);
+	
+	if (!ItemWidget->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		return FString::Printf(
+			TEXT("ItemWidget: Does not implement UMounteaAdvancedInventoryItemWidgetInterface.")
+		);
+	
+	const auto itemData = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryData(ItemWidget);
+	
+	if (!itemData.IsEmpty())
+		return FString::Printf(
+			TEXT("ItemWidget: Item Data INVALID.")
+		);
+	
+	return FString::Printf(
+		TEXT("%s\nItemWidget: %d"),
+		*itemData.ContainingItem.ToString(),
+		itemData.Quantity
+	);
 }

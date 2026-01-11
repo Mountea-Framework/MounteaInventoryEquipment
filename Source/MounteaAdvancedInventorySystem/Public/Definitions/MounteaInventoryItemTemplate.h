@@ -106,7 +106,7 @@ public:
 	/** A brief description of the item’s purpose or lore. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
 		meta=(NoResetToDefault))
-	FText ItemShortInfo=  LOCTEXT("MounteaInventoryItemTemplate_ItemShortInfo", "");;
+	FText ItemShortInfo = LOCTEXT("MounteaInventoryItemTemplate_ItemShortInfo", "");;
 
 	/** A detailed description providing additional lore or functionality. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
@@ -201,6 +201,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data", AdvancedDisplay,
 		meta=(Multiline), meta=(NoResetToDefault))
 	FString JsonManifest;
+	
+	// Asset path which defines source location where the item is located.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data", AdvancedDisplay,
+		meta=(NoResetToDefault))
+	FFilePath ImportFilePath;
 	
 public:
 	

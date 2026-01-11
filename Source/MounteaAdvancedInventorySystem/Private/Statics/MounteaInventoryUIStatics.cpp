@@ -46,6 +46,7 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+#include "Slate/MounteaInventoryScrollBox.h"
 #include "Statics/MounteaInventoryStatics.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
@@ -74,17 +75,17 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 }
 
 void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI)
 {
 	if (!IsValid(Target))
 	{
-		UE_LOG(LogTemp, Error, TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI. Reason: Target is null."));
+		LOG_ERROR(TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI. Reason: Target is null."));
 		return;
 	}
 
 	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>())
 	{
-		UE_LOG(LogTemp, Error, TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI for %s. Reason: Target does not implement IMounteaAdvancedBaseInventoryWidgetInterface."),
+		LOG_ERROR(TEXT("[SetOwningInventoryUI] Failed to set Owning Inventory UI for %s. Reason: Target does not implement IMounteaAdvancedBaseInventoryWidgetInterface."),
 			*Target->GetName());
 		return;
 	}
@@ -139,6 +140,31 @@ FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWid
 	return FVector2D(0.0f, translationY);
 }
 
+FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(const TSharedPtr<SWidget>& ListWidget, const FGeometry& ListGeometry, const int32 SelectedIndex)
+{
+	TSharedPtr<SPanel> panel = StaticCastSharedPtr<SPanel>(ListWidget);
+	
+	if (!panel.IsValid() || SelectedIndex < 0)
+		return FVector2D::ZeroVector;
+
+	FChildren* children = panel->GetChildren();
+	if (!children || children->Num() == 0 || SelectedIndex >= children->Num())
+		return FVector2D::ZeroVector;
+
+	const TSharedRef<SWidget> firstChild = children->GetChildAt(0);
+	const float itemHeight = firstChild->GetDesiredSize().Y;
+	const float viewportHeight = ListGeometry.GetLocalSize().Y;
+    
+	if (viewportHeight <= 0.0f || itemHeight <= 0.0f)
+		return FVector2D::ZeroVector;
+    
+	const float viewportCenter = viewportHeight * 0.5f;
+	const float itemCenter = (SelectedIndex * itemHeight) + (itemHeight * 0.5f);
+	const float translationY = viewportCenter - itemCenter;
+    
+	return FVector2D(0.0f, translationY);
+}
+
 FSlateFontInfo UMounteaInventoryUIStatics::SetFontSize(const FSlateFontInfo& Font, const int32 NewSize)
 {
 	auto returnValue = Font;
@@ -161,50 +187,75 @@ UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISet
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetParentInventory(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SetParentInventory(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
 	if (Target.GetObject())
 		Target->Execute_SetParentInventory(Target.GetObject(), NewParentInventory);
 }
 
-bool UMounteaInventoryUIStatics::CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+bool UMounteaInventoryUIStatics::CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_CreateWrapperWidget(Target.GetObject()) : false;
 }
 
-UUserWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+UUserWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetWrapperWidget(Target.GetObject()) : nullptr;
 }
 
-void UMounteaInventoryUIStatics::RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+void UMounteaInventoryUIStatics::RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	if (Target.GetObject())
 		Target->Execute_RemoveWrapperWidget(Target.GetObject());
 }
 
+bool UMounteaInventoryUIStatics::CreateInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return (Target.GetObject() ? Target->Execute_CreateInventoryWidget(Target.GetObject()) : false);
+}
+
+UUserWidget* UMounteaInventoryUIStatics::GetInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return Target.GetObject() ? Target->Execute_GetInventoryWidget(Target.GetObject()) : nullptr;
+}
+
+void UMounteaInventoryUIStatics::RemoveInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	if (Target.GetObject())
+		Target->Execute_RemoveInventoryWidget(Target.GetObject());
+}
+
+bool UMounteaInventoryUIStatics::SetInventoryWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewInventoryWidget)
+{
+	return (Target.GetObject() ? Target->Execute_SetInventoryWidget(Target.GetObject(), NewInventoryWidget) : false);
+}
+
 UUserWidget* UMounteaInventoryUIStatics::GetNotificationContainer(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetNotificationContainer(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SetNotificationContainer(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewNotificationContainer)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewNotificationContainer)
 {
 	if (Target.GetObject())
 		Target->Execute_SetNotificationContainer(Target.GetObject(), NewNotificationContainer);
 }
 
 void UMounteaInventoryUIStatics::CreateInventoryNotification(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryNotificationData& NotificationData)
 {
 	if (Target.GetObject())
@@ -212,46 +263,46 @@ void UMounteaInventoryUIStatics::CreateInventoryNotification(
 }
 
 void UMounteaInventoryUIStatics::RemoveInventoryNotifications(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	if (Target.GetObject())
 		Target->Execute_RemoveInventoryNotifications(Target.GetObject());
 }
 
-void UMounteaInventoryUIStatics::CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+void UMounteaInventoryUIStatics::CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FString& SelectedCategoryId)
 {
 	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIInterface::Execute_CategorySelected(Target.GetObject(), SelectedCategoryId);
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_CategorySelected(Target.GetObject(), SelectedCategoryId);
 }
 
 FString UMounteaInventoryUIStatics::GetSelectedCategoryId(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetSelectedCategoryId(Target.GetObject()) : TEXT("none");
 }
 
-void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 											  const FGuid& ItemGuid)
 {
 	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
 }
 
 FGuid UMounteaInventoryUIStatics::GetSelectedItemGuid(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetActiveItemGuid(Target.GetObject()) : FGuid();
 }
 
 void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UWidget* Target,
-															   const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+															   const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::SetCategoriesWrapperOwningInventoryUI(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -266,12 +317,6 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 {
 	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface>())
 		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryId(Target) : TEXT("none");
-}
-
-bool UMounteaInventoryUIStatics::IsMainUIOpen(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
-{
-	//TODO: REWORK
-	return false;
 }
 
 void UMounteaInventoryUIStatics::ApplyTheme(UWidget* Target)
@@ -303,10 +348,9 @@ void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& Sour
 	SourceData = TargetData;
 }
 
-void UMounteaInventoryUIStatics::StoreItem(FMounteaInventoryGridSlot& SourceData,
-										   const FGuid& ItemId)
+void UMounteaInventoryUIStatics::StoreItem(FMounteaInventoryGridSlot& SourceData, const FGuid& ItemId)
 {
-	SourceData.OccupiedItemId = ItemId;
+	//SourceData.OccupiedItemId = ItemId;
 }
 
 void UMounteaInventoryUIStatics::ResetItem(FMounteaInventoryGridSlot& SourceData)
@@ -319,35 +363,66 @@ FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGri
 	return SourceData.ToString();
 }
 
-bool UMounteaInventoryUIStatics::IsInputAllowed(const FKey& InputKey, const FName& InputName)
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
-	if (InputName.IsNone())
-		return false;
-    
-	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings))
-		return false;
+	return FindUIActionMappingByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), Mappings, OutMapping);
+}
 
-	const auto inputMapping = settings->AdvancedInventoryEquipmentInputMapping.LoadSynchronous();
-	if (!IsValid(inputMapping))
-		return false;
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	return FindUIActionMappingByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), Mappings, OutMapping);
+}
 
-	const auto inputActions = inputMapping->GetMappings();
-	if (inputActions.IsEmpty())
-		return false;
-	
-	const FText inputText = FText::FromName(InputName);
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	// Wheel events (NativeOnMouseWheel) don't have an "effecting button".
+	// Convention: bind wheel mappings using EKeys::MouseWheelAxis.
+	const float WheelDelta = MouseEvent.GetWheelDelta();
+	const FKey PressedKey = !FMath::IsNearlyZero(WheelDelta)
+		? EKeys::MouseWheelAxis
+		: MouseEvent.GetEffectingButton();
 
-	const auto* matchingAction = Algo::FindByPredicate(inputActions, [&](const auto& inputAction)
+	return FindUIActionMappingByKey(PressedKey, MouseEvent.GetModifierKeys(), Mappings, OutMapping);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	if (!PressedKey.IsValid())
 	{
-		return inputAction.Action->GetFName().ToString() == InputName.ToString() && inputAction.Key == InputKey;
-	});
+		return false;
+	}
 
-	return matchingAction != nullptr;
+	for (const FMounteaWidgetInputActionMapping& inputMapping : Mappings)
+	{
+		// 1) Simple keys.
+		if (inputMapping.Keys.Contains(PressedKey))
+		{
+			OutMapping = inputMapping;
+			return true;
+		}
+
+		// 2) Chords (Key + optional modifier).
+		/*
+		for (const FMounteaWidgetInputKeyChord& Chord : inputMapping.Chords)
+		{
+			if (Chord.Key == PressedKey && ModifiersMatchChord(Modifiers, Chord))
+			{
+				OutMapping = inputMapping;
+				return true;
+			}
+		}
+		*/
+	}
+
+	return false;
 }
 
 FInventoryItem UMounteaInventoryUIStatics::FindItem(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryItemSearchParams& SearchParams)
 {
 	if (!IsValid(Target.GetObject()))
@@ -358,6 +433,41 @@ FInventoryItem UMounteaInventoryUIStatics::FindItem(
 		return {};
 
 	return inventory->Execute_FindItem(inventory.GetObject(), SearchParams);
+}
+
+TMap<FGameplayTag, FInventoryUICustomData> UMounteaInventoryUIStatics::GetCustomItemsMap(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return Target.GetObject() ? 
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FInventoryUICustomData>();
+}
+
+void UMounteaInventoryUIStatics::AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_AddCustomItemToMap(Target.GetObject(), ItemTag, ItemId);
+}
+
+void UMounteaInventoryUIStatics::AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_AppendCustomItemsMap(Target.GetObject(), OtherItems);
+}
+
+void UMounteaInventoryUIStatics::ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_ClearCustomItemsMap(Target.GetObject());
+}
+
+bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	const FGameplayTag& ItemTag)
+{
+	if (Target.GetObject())
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag);
+	return false;
 }
 
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
@@ -401,505 +511,43 @@ UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUI
 	return localSubsystem;
 }
 
-bool UMounteaInventoryUIStatics::MouseEvent_IsInputAllowed(const FPointerEvent& MouseEvent, const FName& InputName)
+int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetChildrenCount(
+	const UMounteaInventoryScrollBox* ScrollBox)
 {
-	return IsInputAllowed(MouseEvent.GetEffectingButton(), InputName);
+	return ScrollBox ? ScrollBox->GetChildrenCount() : INDEX_NONE;
 }
 
-bool UMounteaInventoryUIStatics::KeyEvent_IsInputAllowed(const FKeyEvent& InKeyEvent, const FName& InputName)
+int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetActiveIndex(const UMounteaInventoryScrollBox* ScrollBox)
 {
-	return IsInputAllowed(InKeyEvent.GetKey(), InputName);
+	return ScrollBox ? ScrollBox->GetActiveIndex() : INDEX_NONE;
 }
 
-FButtonStyle UMounteaInventoryUIStatics::MakeButtonStyle(
-	const FButtonStyle& BaseBrush,
-	const EMounteaThemeLevel Level)
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_SetActiveIndex(UMounteaInventoryScrollBox* ScrollBox,
+	const int32 NewActiveIndex)
 {
-	FButtonStyle returnValue;
-	returnValue.Normal = MakeSlateBrush(BaseBrush.Normal, Level, EMounteaThemeState::Normal, EMounteaThemeType::Background);
-	returnValue.Hovered = MakeSlateBrush(BaseBrush.Hovered, Level, EMounteaThemeState::Hovered, EMounteaThemeType::Background);
-	returnValue.Pressed = MakeSlateBrush(BaseBrush.Pressed, Level, EMounteaThemeState::Active, EMounteaThemeType::Background);
-	returnValue.Disabled = MakeSlateBrush(BaseBrush.Disabled, Level, EMounteaThemeState::Disabled, EMounteaThemeType::Background);
-
-	FSlateBrushOutlineSettings OutlineSettings;
-	OutlineSettings = MakeSlateBrushOutline(OutlineSettings, Level, EMounteaThemeState::Hovered, true, true, true, true);
-	returnValue.Hovered.OutlineSettings = OutlineSettings;
-
-	// Optional: Customize padding or text alignment
-	returnValue.PressedPadding = BaseBrush.PressedPadding;
-	returnValue.NormalPadding = BaseBrush.NormalPadding;
-	returnValue.PressedSlateSound = FSlateSound();
-	returnValue.HoveredSlateSound = FSlateSound();
-
-	return returnValue;
+	if (ScrollBox)
+		ScrollBox->SetActiveIndex(NewActiveIndex);
 }
 
-FScrollBarStyle UMounteaInventoryUIStatics::MakeScrollBarStyle(const FScrollBarStyle& SourceStyle,
-	const EMounteaThemeLevel Level,
-	const EMounteaThemeState State)
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_AddChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content)
 {
-	auto returnValue = SourceStyle;
-	switch (State)
-	{
-		case EMounteaThemeState::Normal:
-			returnValue.NormalThumbImage = MakeSlateBrush(SourceStyle.NormalThumbImage, Level, State, EMounteaThemeType::Background);
-			break;
-		case EMounteaThemeState::Hovered:
-			returnValue.HoveredThumbImage = MakeSlateBrush(SourceStyle.NormalThumbImage, Level, State, EMounteaThemeType::Background);
-			break;
-		case EMounteaThemeState::Active:
-			returnValue.DraggedThumbImage = MakeSlateBrush(SourceStyle.NormalThumbImage, Level, State, EMounteaThemeType::Background);
-			break;
-		case EMounteaThemeState::Disabled:
-			break;
-	}
-	return returnValue;
-}
-
-FScrollBarStyle UMounteaInventoryUIStatics::ApplyScrollBarStyle(const FScrollBarStyle& SourceStyle,
-	const EMounteaThemeLevel Level)
-{
-	auto returnValue = SourceStyle;
-	returnValue.NormalThumbImage = ApplySlateBrush(SourceStyle.NormalThumbImage, Level, EMounteaThemeState::Normal, EMounteaThemeType::Background);
-	returnValue.HoveredThumbImage = ApplySlateBrush(SourceStyle.NormalThumbImage, Level, EMounteaThemeState::Hovered, EMounteaThemeType::Background);
-	returnValue.DraggedThumbImage = ApplySlateBrush(SourceStyle.NormalThumbImage, Level, EMounteaThemeState::Active, EMounteaThemeType::Background);
-	return returnValue;
-}
-
-FButtonStyle UMounteaInventoryUIStatics::ApplyButtonStyle(const FButtonStyle& BaseBrush, EMounteaThemeLevel Level,
-														  const bool bApplyCorner1, const bool bApplyCorner2, const bool bApplyCorner3, const bool bApplyCorner4)
-{
-	FButtonStyle returnValue;
-	returnValue.Normal = ApplySlateBrush(BaseBrush.Normal, Level, EMounteaThemeState::Normal, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
-	returnValue.Hovered = ApplySlateBrush(BaseBrush.Hovered, Level, EMounteaThemeState::Hovered, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
-	returnValue.Pressed = ApplySlateBrush(BaseBrush.Pressed, Level, EMounteaThemeState::Active, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
-	returnValue.Disabled = ApplySlateBrush(BaseBrush.Disabled, Level, EMounteaThemeState::Disabled, EMounteaThemeType::Background, bApplyCorner1, bApplyCorner2, bApplyCorner3, bApplyCorner4);
-
-	// Optional: Customize padding or text alignment
-	returnValue.PressedPadding = BaseBrush.PressedPadding;
-	returnValue.NormalPadding = BaseBrush.NormalPadding;
-	returnValue.PressedSlateSound = FSlateSound();
-	returnValue.HoveredSlateSound = FSlateSound();
-
-	return returnValue;
-}
-
-FSlateBrush UMounteaInventoryUIStatics::MakeSlateBrush(const FSlateBrush& SourceBrush, const EMounteaThemeLevel Level,
-													   const EMounteaThemeState State, const EMounteaThemeType Type)
-{
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings)) return SourceBrush;
-
-	auto config = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(config)) return SourceBrush;
-
-	auto theme = config->BaseTheme.LoadSynchronous();
-	if (!IsValid(theme)) return SourceBrush;
-
-	FSlateBrush returnValue = SourceBrush;
-
-	switch (Type)
-	{
-	case EMounteaThemeType::Text:
-		switch (Level)
-		{
-		case EMounteaThemeLevel::Primary:
-			returnValue.TintColor = theme->PrimaryText;
-			break;
-		case EMounteaThemeLevel::Secondary:
-			returnValue.TintColor = theme->SecondaryText;
-			break;
-		case EMounteaThemeLevel::Tertiary:
-			returnValue.TintColor = theme->TertiaryText;
-			break;
-		}
-		break;
-
-	case EMounteaThemeType::Background:
-		switch (Level)
-		{
-		case EMounteaThemeLevel::Primary:
-			switch (State)
-			{
-			case EMounteaThemeState::Normal:
-				returnValue.TintColor = theme->BackgroundPrimary;
-				break;
-			case EMounteaThemeState::Hovered:
-				returnValue.TintColor = theme->PrimaryHovered;
-				break;
-			case EMounteaThemeState::Active:
-				returnValue.TintColor = theme->PrimaryActive;
-				break;
-			case EMounteaThemeState::Disabled:
-				returnValue.TintColor = theme->BackgroundDisabled;
-				break;
-			}
-			break;
-
-		case EMounteaThemeLevel::Secondary:
-			switch (State)
-			{
-			case EMounteaThemeState::Normal:
-				returnValue.TintColor = theme->BackgroundSecondary;
-				break;
-			case EMounteaThemeState::Hovered:
-				returnValue.TintColor = theme->SecondaryHovered;
-				break;
-			case EMounteaThemeState::Active:
-				returnValue.TintColor = theme->SecondaryActive;
-				break;
-			case EMounteaThemeState::Disabled:
-				returnValue.TintColor = theme->BackgroundDisabled;
-				break;
-			}
-			break;
-
-		case EMounteaThemeLevel::Tertiary:
-			switch (State)
-			{
-			case EMounteaThemeState::Normal:
-				returnValue.TintColor = theme->BackgroundTertiary;
-				break;
-			case EMounteaThemeState::Hovered:
-				returnValue.TintColor = theme->TertiaryHovered;
-				break;
-			case EMounteaThemeState::Active:
-				returnValue.TintColor = theme->TertiaryActive;
-				break;
-			case EMounteaThemeState::Disabled:
-				returnValue.TintColor = theme->BackgroundDisabled;
-				break;
-			}
-			break;
-		}
-		break;
-
-	case EMounteaThemeType::Default:
-		switch (Level)
-		{
-		case EMounteaThemeLevel::Primary:
-			switch (State)
-			{
-			case EMounteaThemeState::Normal:
-				returnValue.TintColor = theme->PrimaryNormal;
-				break;
-			case EMounteaThemeState::Hovered:
-				returnValue.TintColor = theme->PrimaryHovered;
-				break;
-			case EMounteaThemeState::Active:
-				returnValue.TintColor = theme->PrimaryActive;
-				break;
-			case EMounteaThemeState::Disabled:
-				returnValue.TintColor = theme->PrimaryDisabled;
-				break;
-			}
-			break;
-
-		case EMounteaThemeLevel::Secondary:
-			switch (State)
-			{
-			case EMounteaThemeState::Normal:
-				returnValue.TintColor = theme->SecondaryNormal;
-				break;
-			case EMounteaThemeState::Hovered:
-				returnValue.TintColor = theme->SecondaryHovered;
-				break;
-			case EMounteaThemeState::Active:
-				returnValue.TintColor = theme->SecondaryActive;
-				break;
-			case EMounteaThemeState::Disabled:
-				returnValue.TintColor = theme->SecondaryDisabled;
-				break;
-			}
-			break;
-
-		case EMounteaThemeLevel::Tertiary:
-			switch (State)
-			{
-			case EMounteaThemeState::Normal:
-				returnValue.TintColor = theme->TertiaryNormal;
-				break;
-			case EMounteaThemeState::Hovered:
-				returnValue.TintColor = theme->TertiaryHovered;
-				break;
-			case EMounteaThemeState::Active:
-				returnValue.TintColor = theme->TertiaryActive;
-				break;
-			case EMounteaThemeState::Disabled:
-				returnValue.TintColor = theme->TertiaryDisabled;
-				break;
-			}
-			break;
-		}
-		break;
-	}
-
-	return returnValue;
-}
-
-FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrush(const FSlateBrush& SourceBrush, const EMounteaThemeLevel Level,
-	const EMounteaThemeState State, const EMounteaThemeType Type, const bool bApplyCorner1, const bool bApplyCorner2,
-	const bool bApplyCorner3, const bool bApplyCorner4)
-{
-	FSlateBrush returnValue = MakeSlateBrush(SourceBrush, Level, State, Type);
-	returnValue.OutlineSettings = MakeSlateBrushOutline(returnValue.OutlineSettings, Level, State, bApplyCorner1,bApplyCorner2, bApplyCorner3, bApplyCorner4);
-	return returnValue;
-}
-
-FSlateBrushOutlineSettings UMounteaInventoryUIStatics::MakeSlateBrushOutline(
-	const FSlateBrushOutlineSettings& SourceOutline, const EMounteaThemeLevel Level, const EMounteaThemeState State,
-	const bool bApplyCorner1, const bool bApplyCorner2,
-	const bool bApplyCorner3, const bool bApplyCorner4)
-{
-	FSlateBrushOutlineSettings returnValue = SourceOutline;
-
-	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings)) return returnValue;
-
-	const auto config = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(config)) return returnValue;
-
-	const auto theme = config->BaseTheme.LoadSynchronous();
-	if (!IsValid(theme)) return returnValue;
-
-	switch (Level)
-	{
-		case EMounteaThemeLevel::Primary:
-			switch (State)
-			{
-				case EMounteaThemeState::Normal:
-					returnValue.Color = theme->PrimaryNormal;
-					break;
-				case EMounteaThemeState::Hovered:
-					returnValue.Color = theme->PrimaryHoverBorder;
-					break;
-				case EMounteaThemeState::Active:
-					returnValue.Color = theme->PrimaryFocus;
-					break;
-				case EMounteaThemeState::Disabled:
-					returnValue.Color = theme->PrimaryDisabled;
-					break;
-			}
-			break;
-
-		case EMounteaThemeLevel::Secondary:
-			switch (State)
-			{
-				case EMounteaThemeState::Normal:
-					returnValue.Color = theme->SecondaryNormal;
-					break;
-				case EMounteaThemeState::Hovered:
-					returnValue.Color = theme->SecondaryHoverBorder;
-					break;
-				case EMounteaThemeState::Active:
-					returnValue.Color = theme->SecondaryFocus;
-					break;
-				case EMounteaThemeState::Disabled:
-					returnValue.Color = theme->SecondaryDisabled;
-					break;
-			}
-			break;
-
-		case EMounteaThemeLevel::Tertiary:
-			switch (State)
-			{
-				case EMounteaThemeState::Normal:
-					returnValue.Color = theme->TertiaryNormal;
-					break;
-				case EMounteaThemeState::Hovered:
-					returnValue.Color = theme->TertiaryHoverBorder;
-					break;
-				case EMounteaThemeState::Active:
-					returnValue.Color = theme->TertiaryFocus;
-					break;
-				case EMounteaThemeState::Disabled:
-					returnValue.Color = theme->TertiaryDisabled;
-					break;
-			}
-			break;
-	}
-
-	FVector4 Radius = returnValue.CornerRadii;
-
-	if (bApplyCorner1) Radius.X = config->BaseBorderRadius.X;
-	if (bApplyCorner2) Radius.Y = config->BaseBorderRadius.Y;
-	if (bApplyCorner3) Radius.Z = config->BaseBorderRadius.Z;
-	if (bApplyCorner4) Radius.W = config->BaseBorderRadius.W;
-
-	returnValue.CornerRadii = Radius;
-	returnValue.Width = config->BaseBorderWidth;
-
-	return returnValue;
-}
-
-FSlateBrush UMounteaInventoryUIStatics::ApplySlateBrushOutline(const FSlateBrush& SourceBrush,
-	EMounteaThemeLevel Level, EMounteaThemeState State, const bool bApplyCorner1, const bool bApplyCorner2,
-	const bool bApplyCorner3, const bool bApplyCorner4)
-{
-	FSlateBrush returnValue = SourceBrush;
-	returnValue.OutlineSettings = MakeSlateBrushOutline(SourceBrush.OutlineSettings, Level, State, bApplyCorner1,
-														bApplyCorner2, bApplyCorner3, bApplyCorner4);
-	return returnValue;
-}
-
-FSlateFontInfo UMounteaInventoryUIStatics::ApplySlateFontInfo(const FSlateFontInfo& SourceFont,
-	const EMounteaThemeLevel Level, const EMounteaThemeState State)
-{
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings)) return SourceFont;
-
-	auto config = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(config)) return SourceFont;
-
-	auto theme = config->BaseTheme.LoadSynchronous();
-	if (!IsValid(theme)) return SourceFont;
-
-	FSlateFontInfo returnValue = SourceFont;
-
-	float sizeMultiplier = 1.0f;
-	switch (Level)
-	{
-		case EMounteaThemeLevel::Primary:
-			sizeMultiplier = 1.0f;
-			break;
-		case EMounteaThemeLevel::Secondary:
-			sizeMultiplier = 0.9f;
-			break;
-		case EMounteaThemeLevel::Tertiary:
-			sizeMultiplier = 0.8f;
-			break;
-	}
-
-	switch (State)
-	{
-		case EMounteaThemeState::Normal:
-			break;
-		case EMounteaThemeState::Hovered:
-			sizeMultiplier *= 1.05f;
-			break;
-		case EMounteaThemeState::Active:
-			sizeMultiplier *= 1.1f;
-			break;
-		case EMounteaThemeState::Disabled:
-			sizeMultiplier *= 0.95f;
-			break;
-	}
-
-	returnValue.Size = FMath::RoundToInt(SourceFont.Size * sizeMultiplier);
-
-	if (State == EMounteaThemeState::Disabled)
-	{
-		returnValue.OutlineSettings.OutlineSize = 0;
-	}
-
-	return returnValue;
-}
-
-FTextBlockStyle UMounteaInventoryUIStatics::ApplyTextBlockStyle(const FTextBlockStyle& SourceStyle,
-	const EMounteaThemeLevel Level, const EMounteaThemeState State)
-{
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings)) return SourceStyle;
-
-	auto config = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(config)) return SourceStyle;
-
-	auto theme = config->BaseTheme.LoadSynchronous();
-	if (!IsValid(theme)) return SourceStyle;
-
-	FTextBlockStyle returnValue = SourceStyle;
-
-	FLinearColor textColor;
-	switch (Level)
-	{
-		case EMounteaThemeLevel::Primary:
-			textColor = theme->PrimaryText;
-			returnValue.Font.Size = theme->PrimaryTextSize;
-			break;
-		case EMounteaThemeLevel::Secondary:
-			textColor = theme->SecondaryText;
-			returnValue.Font.Size = theme->SecondaryTextSize;
-			break;
-		case EMounteaThemeLevel::Tertiary:
-			textColor = theme->TertiaryText;
-			returnValue.Font.Size = theme->TertiaryTextSize;
-			break;
-		default:
-			textColor = theme->PrimaryText;
-			break;
-	}
-
-	switch (State)
-	{
-		case EMounteaThemeState::Normal:
-			break;
-		case EMounteaThemeState::Hovered:
-			textColor = FLinearColor(
-				FMath::Min(textColor.R * 1.1f, 1.0f),
-				FMath::Min(textColor.G * 1.1f, 1.0f),
-				FMath::Min(textColor.B * 1.1f, 1.0f),
-				textColor.A
-			);
-			break;
-		case EMounteaThemeState::Active:
-			textColor = theme->Accent;
-			break;
-		case EMounteaThemeState::Disabled:
-			textColor = FLinearColor(textColor.R, textColor.G, textColor.B, textColor.A * 0.5f);
-			break;
-	}
-
-	returnValue.ColorAndOpacity = textColor;
-
-	returnValue.ShadowOffset = FVector2D(1.0f, 1.0f);
-	returnValue.ShadowColorAndOpacity = FLinearColor(0.0f, 0.0f, 0.0f, 0.3f);
-
-	return returnValue;
-}
-
-void UMounteaInventoryUIStatics::ApplyTextBlockTheme(UTextBlock* TextBlock, const EMounteaThemeLevel Level,
-	const EMounteaThemeState State)
-{
-	if (!IsValid(TextBlock))
-	{
-		LOG_WARNING(TEXT("[ApplyTextBlockTheme] Invalid TextBlock provided!"))
+	if (!ScrollBox || !Content)
 		return;
-	}
+	ScrollBox->AddChild(Content);
+}
 
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings)) return;
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_ResetChildren(UMounteaInventoryScrollBox* ScrollBox)
+{
+	if (!ScrollBox)
+		return;
+	ScrollBox->ResetChildren();
+}
 
-	auto config = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(config)) return;
-
-	auto theme = config->BaseTheme.LoadSynchronous();
-	if (!IsValid(theme)) return;
-	
-	FSlateFontInfo currentFont = TextBlock->GetFont();
-	FSlateFontInfo themedFont = ApplySlateFontInfo(currentFont, Level, State);
-	switch (Level)
-	{
-		case EMounteaThemeLevel::Primary:
-			themedFont.Size = theme->PrimaryTextSize;
-			break;
-		case EMounteaThemeLevel::Secondary:
-			themedFont.Size = theme->SecondaryTextSize;
-			break;
-		case EMounteaThemeLevel::Tertiary:
-			themedFont.Size = theme->TertiaryTextSize;
-			break;
-	}
-	TextBlock->SetFont(themedFont);
-
-	FTextBlockStyle currentStyle;
-	currentStyle.ColorAndOpacity = TextBlock->GetColorAndOpacity();
-	currentStyle.ShadowOffset = TextBlock->GetShadowOffset();
-	currentStyle.ShadowColorAndOpacity = TextBlock->GetShadowColorAndOpacity();
-	
-	FTextBlockStyle themedStyle = ApplyTextBlockStyle(currentStyle, Level, State);
-	TextBlock->SetColorAndOpacity(themedStyle.ColorAndOpacity);
-	TextBlock->SetShadowOffset(themedStyle.ShadowOffset);
-	TextBlock->SetShadowColorAndOpacity(themedStyle.ShadowColorAndOpacity);
+void UMounteaInventoryUIStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag,
+	const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ConsumeUIInput(Target, InputTag, Payload, DeltaTime);
 }
 
 void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)
@@ -909,14 +557,14 @@ void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)
 }
 
 void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
-													  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
 void UMounteaInventoryUIStatics::InitializeWrapperWidget(
 	UObject* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Parent)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent)
 {
 	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
 		IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(Target, Parent);
@@ -924,7 +572,7 @@ void UMounteaInventoryUIStatics::InitializeWrapperWidget(
 
 void UMounteaInventoryUIStatics::SetSourceInventory(
 	const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentInventory)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory)
 {
 	if (Target.GetObject())
 		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
@@ -944,7 +592,7 @@ FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(UWidget* Target)
 }
 
 void UMounteaInventoryUIStatics::SetCategoryOwningInventoryUI(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -955,29 +603,34 @@ void UMounteaInventoryUIStatics::SetActiveState(UWidget* Target, const bool bIsA
 		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetActiveState(Target, bIsActive);
 }
 
-UUserWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target)
+FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity)
+{
+	return FInventoryItemData(Quantity, Item);
+}
+
+UWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return (
 		IsValid(Target.GetObject()) )
-	? IMounteaAdvancedInventoryUIInterface::Execute_GetActiveItemWidget(Target.GetObject()) : nullptr;
+	? IMounteaAdvancedInventoryUIManagerInterface::Execute_GetActiveItemWidget(Target.GetObject()) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SetActiveItemWidget(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& Target, UUserWidget* NewActiveItemWidget)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UWidget* NewActiveItemWidget)
 {
 	if (!IsValid(Target.GetObject())) return;
 
 	Target->Execute_SetActiveItemWidget(Target.GetObject(), NewActiveItemWidget);
 }
 
-void UMounteaInventoryUIStatics::SetInventoryItemId(UWidget* Target, const FGuid& ItemGuid)
+void UMounteaInventoryUIStatics::ItemWidget_SelectItem(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
-		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetInventoryItemId(Target, ItemGuid);
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SelectItem(Target);
 }
 
-FGuid UMounteaInventoryUIStatics::GetInventoryItemId(UWidget* Target)
+FGuid UMounteaInventoryUIStatics::ItemWidget_GetInventoryItemId(UWidget* Target)
 {
 	return (
 		IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()
@@ -985,9 +638,29 @@ FGuid UMounteaInventoryUIStatics::GetInventoryItemId(UWidget* Target)
 }
 
 void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
+}
+
+void UMounteaInventoryUIStatics::ItemWidget_InitializeItemWidget(UWidget* Target, const FInventoryItem& Item,
+	const int32 Quantity)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_InitializeItemWidget(Target, Item, Quantity);
+}
+
+FInventoryItemData UMounteaInventoryUIStatics::ItemWidget_GetInventoryData(UWidget* Target)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		return IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryData(Target);
+	return FInventoryItemData();
+}
+
+void UMounteaInventoryUIStatics::ItemWidget_SetInventoryData(UWidget* Target, const FInventoryItemData& InventoryItemData)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
+		IMounteaAdvancedInventoryItemWidgetInterface::Execute_SetInventoryData(Target, InventoryItemData);
 }
 
 void UMounteaInventoryUIStatics::Item_RefreshWidget(UWidget* Target, const int32 Quantity)
@@ -1009,7 +682,7 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 }
 
 void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UUserWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
 	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
@@ -1203,51 +876,18 @@ FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlotData(const FMounteaI
 	return FInventorySlot(GridSlotData);
 }
 
-FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlot(UUserWidget* UserWidget, const FGuid& ItemId,
-															 const int32 Quantity)
+FInventorySlot UMounteaInventoryUIStatics::MakeInventorySlot(UUserWidget* UserWidget, const FGuid& ItemId)
 {
 	FInventorySlot returnValue;
 	{
-		returnValue.OccupiedItemId = ItemId;
-		returnValue.SlotQuantity = Quantity;
-		returnValue.SlotWidget = UserWidget;
+		returnValue.OverrideGuid(ItemId);
+		returnValue.ItemWidget = UserWidget;
 	}
 	return returnValue;
 }
 
-FString UMounteaInventoryUIStatics::ItemSlot_GetSlotTooltip(UUserWidget* Target)
-{
-	return IsValid(Target) ? IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetSlotTooltip(Target) : TEXT("none");
-}
-
-FString UMounteaInventoryUIStatics::ItemSlot_GenerateSlotTooltip(UWidget* Target)
-{
-	if (!IsValid(Target)) return TEXT("none");
-	if (!Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>()) return TEXT("none");
-	if (!Target->Implements<UMounteaAdvancedBaseInventoryWidgetInterface>()) return TEXT("none");
-	
-	const auto slotInventory = IMounteaAdvancedBaseInventoryWidgetInterface::Execute_GetOwningInventoryUI(Target);
-	if (!IsValid(slotInventory.GetObject())) return TEXT("none");
-
-	const auto ownerInventory = slotInventory->Execute_GetParentInventory(slotInventory.GetObject());
-	if (!IsValid(ownerInventory.GetObject())) return TEXT("none");
-	
-	const auto slotData = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetSlotData(Target);
-	if (!slotData.IsValid()) return TEXT("none");
-	const int slotQuantity =slotData.SlotQuantity;
-	const FGuid itemGuid = slotData.OccupiedItemId;
-
-	const auto slotItem = ownerInventory->Execute_FindItem(ownerInventory.GetObject(), FInventoryItemSearchParams(itemGuid));
-	if (!slotItem.IsItemValid()) return TEXT("none");
-
-	const auto itemTemplate = slotItem.GetTemplate();
-	if (!IsValid(itemTemplate)) return TEXT("none");
-
-	return FString::Printf(TEXT("${quantityText}: %d | ${rarityText}: %s"), slotQuantity, *itemTemplate->ItemRarity);
-}
-
-void UMounteaInventoryUIStatics::SetItemSlotOwningInventoryUI(UWidget* Target,
-															  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+void UMounteaInventoryUIStatics::ItemSlot_SetItemSlotOwningInventoryUI(UWidget* Target,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1264,13 +904,13 @@ void UMounteaInventoryUIStatics::ItemSlot_RemoveItemFromSlot(UWidget* Target, co
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_RemoveItemFromSlot(Target, ItemId);
 }
 
-void UMounteaInventoryUIStatics::StoreGridSlotData(UWidget* Target, const FMounteaInventoryGridSlot& SlotData)
+void UMounteaInventoryUIStatics::ItemSlot_StoreGridSlotData(UWidget* Target, const FMounteaInventoryGridSlot& SlotData)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_StoreGridSlotData(Target, SlotData);
 }
 
-FMounteaInventoryGridSlot UMounteaInventoryUIStatics::GetGridSlotData(UWidget* Target)
+FMounteaInventoryGridSlot UMounteaInventoryUIStatics::ItemSlot_GetGridSlotData(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>())
 		return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetGridSlotData(Target);
@@ -1296,7 +936,7 @@ void UMounteaInventoryUIStatics::ItemSlot_SetParentSlotsWrapper(UWidget* Target,
 }
 
 void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UWidget* Target,
-																	  const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& OwningInventoryUI)
+																	  const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1319,14 +959,14 @@ void UMounteaInventoryUIStatics::SlotsWrapper_RemoveItem(UWidget* Target, const 
 		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_RemoveItem(Target, ItemId, Quantity);
 }
 
-UUserWidget* UMounteaInventoryUIStatics::SlotsWrapper_GetSelectedItemWidget(UWidget* Target)
+UWidget* UMounteaInventoryUIStatics::SlotsWrapper_GetSelectedItemWidget(UWidget* Target)
 {
 	return (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
 	? IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_GetSelectedItemWidget(Target) : nullptr;
 }
 
 void UMounteaInventoryUIStatics::SlotsWrapper_SetSelectedItemWidget(UWidget* Target,
-	UUserWidget* NewSelectedItemWidget)
+	UWidget* NewSelectedItemWidget)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface>())
 		IMounteaAdvancedInventoryItemSlotsWrapperWidgetInterface::Execute_SetSelectedItemWidget(
@@ -1457,7 +1097,7 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	if (!ItemId.IsValid()) return INDEX_NONE;
 	if (!IsValid(ParentInventory)) return INDEX_NONE;
 
-	const bool bHasUIInterface = ParentInventory->Implements<UMounteaAdvancedInventoryUIInterface>();
+	const bool bHasUIInterface = ParentInventory->Implements<UMounteaAdvancedInventoryUIManagerInterface>();
 	const bool bHasInventoryInterface = ParentInventory->Implements<UMounteaAdvancedInventoryInterface>();
 	if (!bHasUIInterface && !bHasInventoryInterface) return INDEX_NONE;
 
@@ -1471,7 +1111,7 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	TScriptInterface<IMounteaAdvancedInventoryInterface> InventoryInterface = nullptr;
 	if (bHasUIInterface)
 	{
-		auto inventoryRef = IMounteaAdvancedInventoryUIInterface::Execute_GetParentInventory(ParentInventory);
+		auto inventoryRef = IMounteaAdvancedInventoryUIManagerInterface::Execute_GetParentInventory(ParentInventory);
 		inventoryObject = inventoryRef.GetObject();
 		InventoryInterface = inventoryRef;
 	}
@@ -1490,13 +1130,15 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	if (gridSlots.Num() == 0) return INDEX_NONE;
 	
 	const bool bIsStackable = UMounteaInventorySystemStatics::HasFlag(inventoryItem.Template->ItemFlags, EInventoryItemFlags::EIIF_Stackable);
-	const bool bAlwaysStack = config->bAlwaysStackStackableItems;
+	const bool bAlwaysStack = true; //config->bAlwaysStackStackableItems; This is now in UI config! And it should be in specific UI config class!
 	
 	return FindEmptyGridSlotRecursive(InventoryInterface, inventoryItem, gridSlots, bIsStackable, bAlwaysStack);
 }
 
 int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems)
 {
+	return INDEX_NONE;
+	/*
 	// For non-stackable items, just find first empty slot
 	if (!bIsStackable || !bAlwaysStackItems)
 	{
@@ -1564,14 +1206,17 @@ int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IM
 	if (bAlwaysStackItems && leastFilledStackIndex != INDEX_NONE)
 		return leastFilledStackIndex;
 	return firstEmptySlotIndex;
+	*/
 }
 
 bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(
 	UUserWidget* GridWidget, 
 	const FGuid& ItemId, 
 	int32 SlotIndex,
-	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent)
+	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent)
 {
+	return false;
+	/*
 	if (!ItemId.IsValid() || !IsValid(GridWidget)) return false;
 	if (!GridWidget->Implements<UMounteaAdvancedInventoryItemsGridWidgetInterface>()) return false;
 	if (!IsValid(ParentUIComponent.GetObject())) return false;
@@ -1806,6 +1451,7 @@ bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(
 	}
 
 	return bAnySlotUpdated;
+	*/
 }
 
 bool UMounteaInventoryUIStatics::ItemPreview_InitializeInteractableWidget(UMounteaAdvancedInventoryInteractableObjectWidget* Target)
@@ -1839,61 +1485,62 @@ void UMounteaInventoryUIStatics::ItemPreview_ResetPreview(UMounteaAdvancedInvent
 		Target->ResetCameraToDefaults();
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
 {
+	if (IsValid(Target))
+		Target->ProcessRotationInput(MouseDelta);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
 {
+	if (IsValid(Target))
+		Target->ProcessHeightInput(MouseDelta);
 }
 
 void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoom(UMounteaAdvancedInventoryInteractableObjectWidget* Target,
 	const float WheelDelta)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraZoom(WheelDelta);
+		ItemPreview_UpdateCameraZoom(Target, WheelDelta);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraRotationAbsolute(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float YawNormalized, const float PitchNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraRotationAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float YawNormalized, const float PitchNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraRotationAbsolute(YawNormalized, PitchNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraHeightAbsolute(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float HeightNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraHeightAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float HeightNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraHeightAbsolute(HeightNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraZoomAbsolute(ZoomNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotationAnalog(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2D& AnalogInput, const float DeltaTime)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotationAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const FVector2f& AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraRotationAnalog(AnalogInput, DeltaTime);
+		Target->ProcessAnalogRotation(AnalogInput, DeltaTime);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeightAnalog(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeightAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraHeightAnalog(AnalogInput, DeltaTime);
+		Target->ProcessAnalogHeight(AnalogInput, DeltaTime);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoomAnalog(
-	UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float AnalogInput, const float DeltaTime)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraZoomAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float AnalogInput, const float DeltaTime)
 {
 	if (IsValid(Target))
-		Target->UpdateCameraZoomAnalog(AnalogInput, DeltaTime);
+		Target->ProcessAnalogZoom(AnalogInput, DeltaTime);
 }

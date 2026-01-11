@@ -15,10 +15,43 @@
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
+
+FInventoryCategoryData UMounteaInventoryStatics::GetInventoryCategoryData(const FString& CategoryName, const FString ParentCategory, bool& bResult)
+{
+	bResult = false;
+	if (CategoryName.IsEmpty()) return FInventoryCategoryData();
+	
+	const auto inventoryConfig = GetInventorySettingsConfig();
+	if (!inventoryConfig) return FInventoryCategoryData();
+	
+	if (ParentCategory.IsEmpty())
+	{
+		bResult = inventoryConfig->AllowedCategories.Contains(CategoryName);
+		if (bResult)
+		{
+			auto inventoryCategory = *inventoryConfig->AllowedCategories.Find(CategoryName);
+			return inventoryCategory.CategoryData;
+		}
+		return FInventoryCategoryData();
+	}
+	
+	if (!inventoryConfig->AllowedCategories.Contains(ParentCategory)) return FInventoryCategoryData();
+
+	const FInventoryCategory parentCategory = *inventoryConfig->AllowedCategories.Find(ParentCategory);
+		
+	bResult = parentCategory.SubCategories.Contains(CategoryName);
+	if (bResult)
+	{
+		auto inventoryCategory = *parentCategory.SubCategories.Find(CategoryName);
+		return inventoryCategory;
+	}
+	return FInventoryCategoryData();
+}
 
 UMounteaAdvancedInventorySettings* UMounteaInventoryStatics::GetInventorySettings()
 {
@@ -218,7 +251,7 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
-TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
 {
 	if (!Item.IsItemValid()) return {};
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -236,25 +269,39 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 		return {};
 	}
     
-	TSet<TSoftClassPtr<UObject>> uniqueActions = categoryDefinition.CategoryData.AllowedActions;
+	TArray<FInventoryItemActionDefinition> uniqueActions = categoryDefinition.CategoryData.AllowedActions;
 	if (!itemSubCategory.IsEmpty())
 		uniqueActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
 
-	TArray<TSoftClassPtr<UObject>> validActions = uniqueActions.Array();
-	validActions.RemoveAll([](const TSoftClassPtr<UObject>& actionClass)
+	TArray<FInventoryItemActionDefinition> validActions = uniqueActions;
+	validActions.RemoveAll([](const FInventoryItemActionDefinition& actionData)
 	{
-		return actionClass.IsNull() || !actionClass.ToSoftObjectPath().IsValid();
+		return actionData.IsValidAction();
 	});
 
 	return validActions;
 }
 
-void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
-	TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
+TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
 {
-	if (Items.Num() <= 1 || SortingCriteria.Num() == 0)
-		return;
+	TArray<FInventoryItemActionDefinition> returnValue = GetItemActions(Item);
+	returnValue.RemoveAll([](const FInventoryItemActionDefinition& actionData)
+	{
+		return actionData.bIsUIAction != true;
+	});
+
+	return returnValue;
+}
+
+TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
+{
+	if (Items.Num() < 1 || SortingCriteria.Num() == 0)
+		return TArray<FInventoryItem>();
 	
+	if (Items.Num() == 1)
+		return Items;
+
+	TArray<FInventoryItem> returnValue = Items;
 	enum class ESortKey : uint8 { Name, Value, Weight, Rarity, Unknown };
 	
 	auto getSortKey = [](const FString& Key) -> ESortKey
@@ -276,7 +323,7 @@ void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounte
 	{
 		const ESortKey sortKey = getSortKey(Criteria.SortingKey);
 		
-		Algo::StableSort(Items, [sortKey](const FInventoryItem& A, const FInventoryItem& B)
+		Algo::StableSort(returnValue, [sortKey](const FInventoryItem& A, const FInventoryItem& B)
 		{
 			switch (sortKey)
 			{
@@ -303,6 +350,8 @@ void UMounteaInventoryStatics::SortInventoryItems(const TScriptInterface<IMounte
 			}
 		});
 	}
+	
+	return returnValue;
 }
 
 FString UMounteaInventoryStatics::ItemTemplate_GetItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate)

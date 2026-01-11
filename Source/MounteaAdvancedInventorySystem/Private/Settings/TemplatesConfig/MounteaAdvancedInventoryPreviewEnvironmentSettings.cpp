@@ -10,7 +10,4 @@
 // For more information, visit: https://mountea.tools
 
 
-#include "Interfaces/Inventory/MounteaAdvancedInventoryUIInterface.h"
-
-
-// Add default functionality here for any IMounteaAdvancedInventoryUIInterface functions that are not pure virtual.
+#include "Settings/TemplatesConfig/MounteaAdvancedInventoryPreviewEnvironmentSettings.h"

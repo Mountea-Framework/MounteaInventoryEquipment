@@ -112,8 +112,20 @@ public:
 	 * @param Target The object for which to retrieve the owning actor.
 	 * @return The actor that owns the specified component, or nullptr if the component is invalid.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Owner")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Owner",
+		meta=(CustomTag="MounteaK2Getter"))
 	static AActor* GetOwningActor(const UObject* Target);
+
+	/**
+	 * Loads all assets of given class.
+	 * 
+	 * @param FilterClass Class to filter by.
+	 * @return All assets of given class if any exist.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Assets", 
+		meta = (DeterminesOutputType = "FilterClass"),
+		meta=(CustomTag="MounteaK2Getter"))
+	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
 	
 	template<typename TEnum>
 	static constexpr bool HasFlag(uint8 value, TEnum flag)

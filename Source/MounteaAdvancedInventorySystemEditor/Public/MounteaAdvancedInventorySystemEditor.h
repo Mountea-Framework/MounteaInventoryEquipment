@@ -34,13 +34,7 @@ private:
 	TSharedRef<SDockTab> SpawnInventoryTemplateEditorTab(const FSpawnTabArgs& Args);
 
 	static const FName InventoryTemplateEditorTabId;
-
-	void InventoryManagerButtonClicked() const;
-	void LauncherButtonClicked() const;
-	void DialoguerButtonClicked() const;
-	void YoutubeButtonClicked() const;
-	void WikiButtonClicked() const;
-	void PluginButtonClicked() const;
+	
 	void RegisterMenus();
 	void SettingsButtonClicked() const;
 	void ConfigButtonClicked() const;

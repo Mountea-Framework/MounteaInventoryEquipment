@@ -31,6 +31,8 @@ bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToEmptySlot_Implementation
 
 bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex)
 {
+	return false; 
+	/*
 	if (!Execute_IsSlotEmpty(this, SlotIndex)) return false;
 	const auto parentInventory = ParentUIComponent->Execute_GetParentInventory(ParentUIComponent.GetObject());
 	if (parentInventory.GetObject() == nullptr) return false;
@@ -55,10 +57,13 @@ bool UMounteaAdvancedInventoryItemsGridWidget::AddItemToSlot_Implementation(cons
 	IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(slotWidget);
 
 	return true;
+	*/
 }
 
 bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromSlot_Implementation(const int32 SlotIndex)
 {
+	return false;
+	/*
 	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return false;
 
 	FMounteaInventoryGridSlot tempGridSlot = GridSlots.Array()[SlotIndex];
@@ -84,10 +89,13 @@ bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromSlot_Implementation
 	tempGridSlot.ResetSlot();
 
 	return true;
+	*/
 }
 
 bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromGrid_Implementation(const FGuid& ItemId, const int32 Quantity)
 {
+	return false;
+	/*
 	if (!ItemId.IsValid()) return false;
 	
 	auto allSlots = Execute_GetGridSlotsDataForItem(this, ItemId);
@@ -151,17 +159,23 @@ bool UMounteaAdvancedInventoryItemsGridWidget::RemoveItemFromGrid_Implementation
 	}
 	
 	return bAnyRemoved;
+	*/
 }
 
 FGuid UMounteaAdvancedInventoryItemsGridWidget::GetItemInSlot_Implementation(const int32 SlotIndex) const
 {
+	return FGuid();
+	/*
 	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return FGuid();
 	const FMounteaInventoryGridSlot gridSlot = GridSlots.Array()[SlotIndex];
 	return gridSlot.OccupiedItemId;
+	*/
 }
 
 bool UMounteaAdvancedInventoryItemsGridWidget::SwapItemsBetweenSlots_Implementation(const int32 SlotIndex1, const int32 SlotIndex2)
 {
+	return false;
+	/*
 	if (!GridSlots.Array().IsValidIndex(SlotIndex1) || !GridSlots.Array().IsValidIndex(SlotIndex2))
 		return false;
 
@@ -183,10 +197,13 @@ bool UMounteaAdvancedInventoryItemsGridWidget::SwapItemsBetweenSlots_Implementat
 		IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(tempSlot2.SlotWidget);
 
 	return true;
+	*/
 }
 
 void UMounteaAdvancedInventoryItemsGridWidget::ClearAllSlots_Implementation()
 {
+	return;
+	/*
 	TSet<FMounteaInventoryGridSlot> clearGridSlots;
 	for (const auto& gridSlot : GridSlots)
 	{
@@ -200,6 +217,7 @@ void UMounteaAdvancedInventoryItemsGridWidget::ClearAllSlots_Implementation()
 
 	GridSlots.Empty();
 	GridSlots.Append(clearGridSlots);
+	*/
 }
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::GetTotalSlots_Implementation() const
@@ -216,6 +234,8 @@ bool UMounteaAdvancedInventoryItemsGridWidget::IsSlotEmpty_Implementation(const 
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::GetSlotIndexByItem_Implementation(const FGuid& ItemId) const
 {
+	return INDEX_NONE;
+	/*
 	const TArray<FMounteaInventoryGridSlot>& Slots = GridSlots.Array();
 
 	const FMounteaInventoryGridSlot* FoundSlot = Algo::FindByPredicate(Slots,
@@ -224,7 +244,8 @@ int32 UMounteaAdvancedInventoryItemsGridWidget::GetSlotIndexByItem_Implementatio
 			return checkedSlot.OccupiedItemId == ItemId;
 		});
 
-	return FoundSlot ? Slots.IndexOfByKey(*FoundSlot) : -1;
+	return FoundSlot ? Slots.IndexOfByKey(*FoundSlot) : INDEX_NONE;
+	*/
 }
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::GetGridSlotIndexByCoords_Implementation(
@@ -241,11 +262,14 @@ int32 UMounteaAdvancedInventoryItemsGridWidget::GetGridSlotIndexByCoords_Impleme
 
 bool UMounteaAdvancedInventoryItemsGridWidget::IsItemInGrid_Implementation(const FGuid& ItemId) const
 {
+	return false;
+	/*
 	return Algo::AnyOf(GridSlots,
 		[&ItemId](const FMounteaInventoryGridSlot& checkedSlot)
 		{
 			return checkedSlot.OccupiedItemId == ItemId;
 		});
+	*/
 }
 
 FMounteaInventoryGridSlot UMounteaAdvancedInventoryItemsGridWidget::GetGridSlotData_Implementation(
@@ -263,6 +287,8 @@ TSet<FMounteaInventoryGridSlot> UMounteaAdvancedInventoryItemsGridWidget::GetGri
 
 UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::FindEmptyWidgetSlot_Implementation() const
 {
+	return nullptr;
+	/*
 	const FMounteaInventoryGridSlot* EmptySlot = Algo::FindByPredicate(GridSlots,
 		[](const FMounteaInventoryGridSlot& checkedSlot)
 		{
@@ -270,6 +296,7 @@ UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::FindEmptyWidgetSlot_Imple
 		});
 
 	return EmptySlot ? EmptySlot->SlotWidget : nullptr;
+	*/
 }
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::FindEmptySlotIndex_Implementation(const FGuid& ItemId) const
@@ -279,13 +306,18 @@ int32 UMounteaAdvancedInventoryItemsGridWidget::FindEmptySlotIndex_Implementatio
 
 UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemSlotWidget_Implementation(const int32 SlotIndex) const
 {
+	return nullptr;
+	/*
 	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return nullptr;
 
 	return GridSlots.Array()[SlotIndex].SlotWidget;
+	*/
 }
 
 UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemWidgetInSlot_Implementation(const int32 SlotIndex) const
 {
+	return nullptr;
+	/*
 	if (!GridSlots.Array().IsValidIndex(SlotIndex)) return nullptr;
 
 	const TArray<FMounteaInventoryGridSlot> slotsArray = GridSlots.Array();
@@ -296,6 +328,7 @@ UUserWidget* UMounteaAdvancedInventoryItemsGridWidget::GetItemWidgetInSlot_Imple
 	if (!checkedSlot.SlotWidget->Implements<UMounteaAdvancedInventoryItemSlotWidgetInterface>()) return nullptr;
 
 	return IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_GetItemWidgetInSlot(checkedSlot.SlotWidget);
+	*/
 }
 
 void UMounteaAdvancedInventoryItemsGridWidget::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
@@ -310,18 +343,23 @@ bool UMounteaAdvancedInventoryItemsGridWidget::UpdateItemInSlot_Implementation(c
 
 int32 UMounteaAdvancedInventoryItemsGridWidget::GetStacksSizeForItem_Implementation(const FGuid& ItemId)
 {
+	return INDEX_NONE;
+	/*
 	if (!ItemId.IsValid()) return INDEX_NONE;
 	auto allSlots = Execute_GetGridSlotsDataForItem(this, ItemId);
 	
 	return Algo::Accumulate(allSlots, 0, [&ItemId](const int32 Sum, const FMounteaInventoryGridSlot& gridSlot) {
 		return Sum + (gridSlot.OccupiedItemId == ItemId ? gridSlot.SlotQuantity : 0);
 	});
+	*/
 }
 
 TSet<FMounteaInventoryGridSlot> UMounteaAdvancedInventoryItemsGridWidget::GetGridSlotsDataForItem_Implementation(
 	const FGuid& ItemId)
 {
 	TSet<FMounteaInventoryGridSlot> returnValue;
+	return returnValue;
+	/*
 	returnValue.Reserve(GridSlots.Num());
 	
 	Algo::CopyIf(GridSlots, returnValue, [&ItemId](const FMounteaInventoryGridSlot& gridSlot) {
@@ -329,4 +367,5 @@ TSet<FMounteaInventoryGridSlot> UMounteaAdvancedInventoryItemsGridWidget::GetGri
 	});
 	
 	return returnValue;
+	*/
 }

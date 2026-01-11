@@ -61,8 +61,13 @@
 			"Enabled": true
 		},
 		{
-			"Name": "WebBrowserNativeProxy",
+			"Name": "EditorScriptingUtilities",
 			"Enabled": true
+		},
+		{
+			"Name": "WebBrowserWidget",
+			"Enabled": false,
+			"Optional": true
 		}
 	]
 }

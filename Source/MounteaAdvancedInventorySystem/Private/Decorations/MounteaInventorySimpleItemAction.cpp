@@ -65,9 +65,9 @@ bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventor
 
 	auto allowedActions = UMounteaInventoryStatics::GetItemActions(CurrentTargetItem);
 
-	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const TSoftClassPtr<UObject>& action)
+	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const FInventoryItemActionDefinition& action)
 	{
-		return action == GetClass();
+		return action.ItemActionClass.LoadSynchronous() == GetClass();
 	}) != nullptr;
 
 	return bFound;

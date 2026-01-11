@@ -25,14 +25,14 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 	PrimaryActorTick.bCanEverTick = false;
 
 	RootSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootScene"));
-	RootComponent	  = RootSceneComponent;
+	RootComponent = RootSceneComponent;
 
 	PreviewPivotComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Pivot"));
 	PreviewPivotComponent->SetupAttachment(RootComponent);
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComponent->SetupAttachment(PreviewPivotComponent);
-	StaticMeshComponent->SetVisibility(false);	
+	StaticMeshComponent->SetVisibility(false);
 	StaticMeshComponent->bVisibleInRayTracing = false;
 	StaticMeshComponent->bVisibleInRealTimeSkyCaptures = false;
 	StaticMeshComponent->bVisibleInReflectionCaptures = false;
@@ -49,17 +49,17 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArmComponent->SetupAttachment(RootSceneComponent);
-	SpringArmComponent->TargetArmLength  = 300;
+	SpringArmComponent->TargetArmLength = 300.f;
 	SpringArmComponent->bEnableCameraLag = false;
 	SpringArmComponent->bDoCollisionTest = false;
-	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
-	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
+	SpringArmComponent->SetRelativeRotation(FRotator::ZeroRotator);
+	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, InitialCameraHeight));
 
 	SceneCaptureComponent = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("SceneCapture"));
 	SceneCaptureComponent->SetupAttachment(SpringArmComponent);
 	SceneCaptureComponent->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
-	SceneCaptureComponent->CaptureSource	  = SCS_SceneColorHDR;
-	SceneCaptureComponent->ProjectionType	 = ECameraProjectionMode::Perspective;
+	SceneCaptureComponent->CaptureSource = SCS_SceneColorHDR;
+	SceneCaptureComponent->ProjectionType = ECameraProjectionMode::Perspective;
 	SceneCaptureComponent->FOVAngle = 45.0f;
 	SceneCaptureComponent->bCaptureEveryFrame = false;
 	SceneCaptureComponent->bCaptureOnMovement = false;
@@ -72,10 +72,10 @@ AMounteaAdvancedInventoryItemPreviewRenderer::AMounteaAdvancedInventoryItemPrevi
 void AMounteaAdvancedInventoryItemPreviewRenderer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	SetCameraRotation(0.f, 0.f);
+	CurrentUserZoom = 0.5f;
 	AutoFitMeshInView();
-	SetCameraRotation(0, 0);
-	SetCameraDistance(300.f);
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRenderTarget2D* NewRT) const
@@ -87,99 +87,125 @@ void AMounteaAdvancedInventoryItemPreviewRenderer::SetRenderTarget(UTextureRende
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh) const
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetStaticMesh(UStaticMesh* Mesh)
 {
 	ClearMesh();
 	if (Mesh)
 	{
 		StaticMeshComponent->SetStaticMesh(Mesh);
 		StaticMeshComponent->SetVisibility(true);
+		CurrentUserZoom = 0.5f;
 		AutoFitMeshInView();
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh) const
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetSkeletalMesh(USkeletalMesh* Mesh)
 {
 	ClearMesh();
 	if (Mesh)
 	{
 		SkeletalMeshComponent->SetSkeletalMesh(Mesh);
 		SkeletalMeshComponent->SetVisibility(true);
+		CurrentUserZoom = 0.5f;
 		AutoFitMeshInView();
 	}
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh() const
+void AMounteaAdvancedInventoryItemPreviewRenderer::ClearMesh()
 {
 	StaticMeshComponent->SetStaticMesh(nullptr);
 	StaticMeshComponent->SetVisibility(false);
 	SkeletalMeshComponent->SetSkeletalMesh(nullptr);
 	SkeletalMeshComponent->SetVisibility(false);
+	BaseFitScale = 1.0f;
+	CurrentUserZoom = 0.5f;
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraRotation(const float Yaw, const float Pitch) const
 {
 	const float clampedPitch = FMath::Clamp(Pitch, -80.0f, 80.0f);
-	SpringArmComponent->SetRelativeRotation(FRotator(clampedPitch, Yaw, 0.0f));
+	PreviewPivotComponent->SetRelativeRotation(FRotator(clampedPitch, Yaw, 0.0f));
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(const float Distance) const
+void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraDistance(const float ZoomLevel)
 {
-	SpringArmComponent->SetRelativeScale3D(FVector(Distance));
+	CurrentUserZoom = ZoomLevel;
+	ApplyCombinedScale();
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::SetCameraHeight(const float ZOffset) const
 {
-	FVector baseLocation = SpringArmComponent->GetRelativeLocation();
-	baseLocation.Z = InitialCameraHeight + ZOffset;
-	SpringArmComponent->SetRelativeLocation(baseLocation);
+	FVector location = SpringArmComponent->GetRelativeLocation();
+	location.Z = InitialCameraHeight + ZOffset;
+	SpringArmComponent->SetRelativeLocation(location);
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::ResetToDefaults() const
+void AMounteaAdvancedInventoryItemPreviewRenderer::ResetToDefaults()
 {
-	SpringArmComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.0f));
-	SpringArmComponent->SetRelativeLocation(FVector(0, 0, InitialCameraHeight));
-	SpringArmComponent->SetRelativeScale3D(FVector(1));
+	PreviewPivotComponent->SetRelativeRotation(FRotator::ZeroRotator);
+	SpringArmComponent->SetRelativeLocation(FVector(0.f, 0.f, InitialCameraHeight));
+	CurrentUserZoom = 0.5f;
 	AutoFitMeshInView();
 }
 
 void AMounteaAdvancedInventoryItemPreviewRenderer::CaptureScene() const
 {
 	if (!IsValid(SceneCaptureComponent)) return;
-
 	if (SceneCaptureComponent->bCaptureEveryFrame) return;
 	
- 	SceneCaptureComponent->CaptureScene();
+	SceneCaptureComponent->CaptureScene();
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::GetCurrentValues(FVector4& ScaleHeightPitchYaw) const
+void AMounteaAdvancedInventoryItemPreviewRenderer::GetCurrentValues(FVector4& ZoomHeightYawPitch) const
 {
-	ScaleHeightPitchYaw.X = SpringArmComponent->GetRelativeScale3D().Z;
-	ScaleHeightPitchYaw.Y = SpringArmComponent->GetRelativeLocation().Z;
-	ScaleHeightPitchYaw.Z = SpringArmComponent->GetRelativeRotation().Yaw;
-	ScaleHeightPitchYaw.W = SpringArmComponent->GetRelativeRotation().Pitch;
+	ZoomHeightYawPitch.X = CurrentUserZoom;
+	ZoomHeightYawPitch.Y = SpringArmComponent->GetRelativeLocation().Z;
+	ZoomHeightYawPitch.Z = PreviewPivotComponent->GetRelativeRotation().Yaw;
+	ZoomHeightYawPitch.W = PreviewPivotComponent->GetRelativeRotation().Pitch;
 }
 
-void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView() const
+void AMounteaAdvancedInventoryItemPreviewRenderer::AutoFitMeshInView()
 {
 	UPrimitiveComponent* activeComp = GetActiveMeshComponent();
 	if (!activeComp)
+	{
+		BaseFitScale = 1.0f;
+		ApplyCombinedScale();
 		return;
+	}
 
-	const float meshRadius = activeComp->GetLocalBounds().SphereRadius;
-	PreviewPivotComponent->SetRelativeScale3D(FVector::OneVector);
+	const FBoxSphereBounds bounds = activeComp->GetLocalBounds();
+	const float meshRadius = bounds.SphereRadius;
+	
+	if (FMath::IsNearlyZero(meshRadius, 0.001f))
+	{
+		BaseFitScale = 1.0f;
+		ApplyCombinedScale();
+		return;
+	}
+
 	const float halfFOV = FMath::DegreesToRadians(SceneCaptureComponent->FOVAngle * 0.5f);
-	const float baseDistance = SpringArmComponent->TargetArmLength;
-	const float viewRadius = baseDistance * FMath::Tan(halfFOV);
-    
+	const float cameraDistance = SpringArmComponent->TargetArmLength;
+	const float viewRadius = cameraDistance * FMath::Tan(halfFOV);
+	
 	const float desiredScreenRatio = 0.8f;
 	const float targetViewRadius = viewRadius * desiredScreenRatio;
-	const float requiredScale = meshRadius / targetViewRadius;
-	const float clampedScale = FMath::Clamp(requiredScale, 0.1f, 10.0f);
+	
+	BaseFitScale = targetViewRadius / meshRadius;
+	BaseFitScale = FMath::Clamp(BaseFitScale, 0.01f, 100.0f);
+	
+	ApplyCombinedScale();
+	
+	const FVector centerOffset = FVector(0.f, 0.f, -bounds.Origin.Z);
+	activeComp->SetRelativeLocation(centerOffset);
+	
+	SetCameraHeight(0.f);
+}
 
-	SetCameraDistance(clampedScale);
-	const FBoxSphereBounds meshBounds = activeComp->GetLocalBounds();
-	SetCameraHeight(meshBounds.Origin.Z);
+void AMounteaAdvancedInventoryItemPreviewRenderer::ApplyCombinedScale() const
+{
+	const float finalScale = BaseFitScale * CurrentUserZoom;
+	PreviewPivotComponent->SetRelativeScale3D(FVector(finalScale));
 }
 
 UPrimitiveComponent* AMounteaAdvancedInventoryItemPreviewRenderer::GetActiveMeshComponent() const
