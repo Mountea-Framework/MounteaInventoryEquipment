@@ -10,8 +10,8 @@
 // For more information, visit: https://mountea.tools
 
 
-#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 
 UMounteaAdvancedInventoryUIConfig::UMounteaAdvancedInventoryUIConfig() : Super()
 	, bAlwaysStackStackableItems(true)
