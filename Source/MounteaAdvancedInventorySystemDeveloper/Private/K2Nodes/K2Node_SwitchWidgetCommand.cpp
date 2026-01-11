@@ -154,6 +154,11 @@ void UK2Node_SwitchWidgetCommand::PostEditChangeProperty(struct FPropertyChanged
 	GetGraph()->NotifyNodeChanged(this);
 }
 
+FText UK2Node_SwitchWidgetCommand::GetToolTipHeading() const
+{
+	return LOCTEXT("SwitchWidgetCommand_ToolTipHeading", "Mountea Advanced Inventory System");
+}
+
 FText UK2Node_SwitchWidgetCommand::GetTooltipText() const
 {
 	return LOCTEXT("SwitchWidgetCommand_ToolTip", "Selects an output based on Widget Command from Project Settings");
@@ -218,7 +223,7 @@ FSlateIcon UK2Node_SwitchWidgetCommand::GetIconAndTint(FLinearColor& OutColor) c
 {
 	OutColor = FLinearColor(.823f, .823f, .823f);
 	
-	return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_ValidateIcon.small");
+	return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_SwitchIcon.small");
 }
 
 #endif
