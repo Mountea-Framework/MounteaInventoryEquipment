@@ -31,17 +31,17 @@ public:
 	 * Delegates command with optional payload to provided Generic Widget.
 	 * This allows sending logic commands across multiple levels and through multiple systems.
 	 * Example:
-	 * * Player picks up item
-	 * * Item is added to Inventory (database)
-	 * * Inventory (database) calls event OnItemAdded
-	 * * Inventory UI Manager calls to Inventory Widget command:
-	 * * * RefreshInventory
+	 * → Player picks up item
+	 * → Item is added to Inventory (database)
+	 * → Inventory (database) calls event OnItemAdded
+	 * → Inventory UI Manager calls to Inventory Widget command:
+	 * → → RefreshInventory
 	 * 
 	 * This way Widgets can always know what to do without need to create class-specific logic.
 	 * What would be great in near future:
-	 * * Create queue system to receive commands
-	 * * * Process queue command by command
-	 * * * This would solve issues with racing conditions
+	 * → Create queue system to receive commands
+	 * → → Process queue command by command
+	 * → → This would solve issues with racing conditions
 	 * 
 	 * @param GenericWidget Object which must implement MounteaInventoryGenericWidgetInterface interface. For World Space widgets it can be even actor or component.
 	 * @param Command String command which defines what to do, eg.: CreateWidget, RefreshWidget, ProcessInput etc.
