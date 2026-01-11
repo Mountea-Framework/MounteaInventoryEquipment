@@ -166,6 +166,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryUIConfig", InventoryUIConfigThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryUIConfig", InventoryUIConfigIcon);
 				}
+				
+				FSlateImageBrush* InteractiveWidgetEnvironmentConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PreviewEnvironmentSettingsIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InteractiveWidgetEnvironmentConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PreviewEnvironmentSettingsIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (InteractiveWidgetEnvironmentConfigThumb && InteractiveWidgetEnvironmentConfigIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
@@ -386,54 +394,6 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 	return newTab;
 }
 
-void FMounteaAdvancedInventorySystemEditor::InventoryManagerButtonClicked() const
-{
-	const FString URL = "https://mountea-framework.github.io/InventoryManager/";
-
-	if (!URL.IsEmpty())
-		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
-}
-
-void FMounteaAdvancedInventorySystemEditor::LauncherButtonClicked() const
-{
-	const FString URL = "https://github.com/Mountea-Framework/MounteaProjectLauncher";
-
-	if (!URL.IsEmpty())
-		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
-}
-
-void FMounteaAdvancedInventorySystemEditor::DialoguerButtonClicked() const
-{
-	const FString URL = "https://mountea-framework.github.io/MounteaDialoguer/";
-
-	if (!URL.IsEmpty())
-		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
-}
-
-void FMounteaAdvancedInventorySystemEditor::YoutubeButtonClicked() const
-{
-	const FString URL = "https://www.youtube.com/playlist?list=PLIU53wA8zZmgc1ty7R8WDHkYg037xT503";
-
-	if (!URL.IsEmpty())
-		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
-}
-
-void FMounteaAdvancedInventorySystemEditor::WikiButtonClicked() const
-{
-	const FString URL = "https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Getting-Started";
-
-	if (!URL.IsEmpty())
-		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
-}
-
-void FMounteaAdvancedInventorySystemEditor::PluginButtonClicked() const
-{
-	const FString URL = "https://discord.gg/waYT2cn37z";
-
-	if (!URL.IsEmpty())
-		FPlatformProcess::LaunchURL(*URL, nullptr, nullptr);
-}
-
 void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 {
 	// Owner will be used for cleanup in call to UToolMenus::UnregisterOwner
@@ -632,7 +592,11 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 			LOCTEXT("MounteaSystemEditor_SupportButton_ToolTip", "🆘 Open Mountea Framework Support Channel\n\n❔ Get direct assistance from our support team and community. Find solutions to common issues, share your experiences, and get help with implementation challenges. Join our active community of developers!"),
 			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Help"),
 			FUIAction(
-				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::PluginButtonClicked)
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://discord.gg/waYT2cn37z"), nullptr, nullptr);						
+				})
 			)
 		);
 		MenuBuilder.AddMenuEntry(
@@ -640,7 +604,11 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 			LOCTEXT("MounteaSystemEditor_WikiButton_ToolTip", "📖 Open Mountea Advanced Inventory Documentation\n\n❔ Access comprehensive guides, tutorials, and API references. Find detailed examples, best practices, and advanced features to master the Mountea Advanced Inventory System. Your one-stop resource for all documentation needs."),
 			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Wiki"),
 			FUIAction(
-				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::WikiButtonClicked)
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Getting-Started"), nullptr, nullptr);						
+				})
 			)
 		);
 		MenuBuilder.AddMenuEntry(
@@ -648,7 +616,11 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 			LOCTEXT("MounteaSystemEditor_YoutubeButton_ToolTip", "👁️ Watch Mountea Advanced Inventory Youtube Videos\n\n❔ Visual learning resources featuring step-by-step tutorials, implementation guides, and practical examples. Perfect for both beginners and advanced users looking to expand their knowledge through video content."),
 			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Youtube"),
 			FUIAction(
-				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::YoutubeButtonClicked)
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://www.youtube.com/playlist?list=PLIU53wA8zZmgc1ty7R8WDHkYg037xT503"), nullptr, nullptr);						
+				})
 			)
 		);
 	}
@@ -661,29 +633,52 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 		LOCTEXT("MounteaSystemEditor_InventoryManagerButton_ToolTip", "💼 Open Mountea Inventory Manager Tool\n\n❔ A browser-based Inventory Template Editor for Unreal Engine projects — manage item templates online from any device. Simple, fast, and accessible.\n\n💡 Features include:\n- Create and edit item templates\n- Manage item properties and categories\n- Export templates for use in Unreal Engine projects"),
 		FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventoryManager"),
 		FUIAction(
-			FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::InventoryManagerButtonClicked)
-		)
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://mountea-framework.github.io/InventoryManager/"), nullptr, nullptr);						
+				})
+			)
 	);
-		MenuBuilder.EndSection();
 		
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_DialoguerButton_Label", "Mountea Dialoguer"),
 			LOCTEXT("MounteaSystemEditor_DialoguerButton_ToolTip", "⛰ Open Mountea Dialoguer Standalone Tool\n\n❔ A powerful standalone Advanced Inventory crafting tool designed for narrative designers and writers. Create, edit, and manage complex Advanced Inventory trees with an intuitive interface. Seamlessly import your `.mnteadlg` files directly into the Mountea Advanced Inventory System.\n\n💡 Perfect for teams wanting to separate Advanced Inventory content creation from engine implementation."),
 			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Dialoguer"),
 			FUIAction(
-				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::DialoguerButtonClicked)
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(TEXT("https://mountea.tools/dialoguer"), nullptr, nullptr);						
+				})
 			)
 		);
-	}
-	
-	MenuBuilder.AddMenuEntry(
+		
+		MenuBuilder.AddMenuEntry(
 		LOCTEXT("MounteaSystemEditor_LauncherButton_Label", "Mountea Project Launcher"),
 		LOCTEXT("MounteaSystemEditor_LauncherButton_ToolTip", "🚀 Open Mountea Project Launcher\n\n❔ A versatile standalone tool for streamlined project testing and deployment. Launch your projects with customized configurations, test different build settings, and validate Advanced Inventory implementations in various environments.\n\n💡 Features include:\n- Multiple configuration profiles\n- Quick-launch presets\n- Custom command-line parameters\n- Integrated testing tools"),
-		FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Launcher"),
-		FUIAction(
-			FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::LauncherButtonClicked)
-		)
-	);
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Launcher"),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://github.com/Mountea-Framework/MounteaProjectLauncher"), nullptr, nullptr);						
+				})
+			)
+		);
+		
+		MenuBuilder.AddMenuEntry(
+		LOCTEXT("MounteaSystemEditor_BuilderButton_Label", "Mountea Unreal builder"),
+		LOCTEXT("MounteaSystemEditor_BuilderButton_ToolTip", "🏗 Open Mountea Unreal Builder\n\n❔ A desktop application for automating Unreal Engine plugin and project builds across multiple engine versions and platforms."),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Builder"),
+			FUIAction(
+				FExecuteAction::CreateLambda([this]()-> void
+				{
+					FPlatformProcess::LaunchURL(
+						TEXT("https://github.com/Mountea-Framework/MounteaUnrealBuilder"), nullptr, nullptr);						
+				})
+			)
+		);
+	}	
 	MenuBuilder.EndSection();
 
 	return MenuBuilder.MakeWidget();

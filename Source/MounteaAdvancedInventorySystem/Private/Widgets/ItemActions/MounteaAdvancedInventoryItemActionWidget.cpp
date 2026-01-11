@@ -19,7 +19,7 @@
 #include "Statics/MounteaInventoryUIStatics.h"
 
 void UMounteaAdvancedInventoryItemActionWidget::InitializeItemAction_Implementation(
-	const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
 	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
 {
 	ParentUIComponent = ParentUI;

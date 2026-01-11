@@ -17,7 +17,7 @@
 
 struct FInventorySlot;
 struct FMounteaInventoryGridSlot;
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemSlotWidgetInterface : public UInterface

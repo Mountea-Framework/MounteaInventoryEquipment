@@ -19,7 +19,7 @@ struct FMounteaItemActionData;
 
 class UWidget;
 class UMounteaInventoryItemAction;
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemActionSelected, const UUserWidget*, SelectedItemActionWidget);
 
@@ -51,9 +51,9 @@ public:
 	 * @param ParentWidget Inventory Item widget which owns this item action widget.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
-	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
 		const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget);
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& ParentUI,
+	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
 		const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget) = 0;
 
 	/**

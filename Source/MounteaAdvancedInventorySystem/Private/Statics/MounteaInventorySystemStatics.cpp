@@ -14,6 +14,7 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
@@ -143,7 +144,7 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 
 	if (!FilterClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GetAssets: FilterClass is null"));
+		LOG_WARNING(TEXT("GetAssets: FilterClass is null"))
 		return returnValue;
 	}
 
@@ -158,13 +159,13 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 	searchFilter.ClassPaths.Add(FilterClass->GetClassPathName());
 	
 	if (searchFilter.IsEmpty())
-		UE_LOG(LogTemp, Error, TEXT("GetAssets: searchFilter is empty"));
+		LOG_ERROR(TEXT("GetAssets: searchFilter is empty"));
 
 	TArray<FAssetData> assetDataList;
 	assetRegistry.GetAssets(searchFilter, assetDataList);
 	
 	if (assetDataList.IsEmpty())
-		UE_LOG(LogTemp, Error, TEXT("GetAssets: assetDataList is empty"));
+		LOG_ERROR(TEXT("GetAssets: assetDataList is empty"));
 
 	for (const FAssetData& assetData : assetDataList)
 	{

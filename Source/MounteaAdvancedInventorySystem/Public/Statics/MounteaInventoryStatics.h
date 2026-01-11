@@ -404,14 +404,25 @@ public:
 
 	/**
 	 * Retrieves the actions associated with a specified inventory item.
-	 * This function returns an array of soft class pointers representing the actions that can be performed on the item.
+	 * This function returns an array of Inventory Action data representing the actions that can be performed on the item.
 	 * Actions must implement the `MounteaAdvancedInventoryItemActionInterface` interface.
 	 *
 	 * @param Item - The inventory item for which to retrieve the associated actions
-	 * @return - An array of TSoftClassPtr<UObject> containing the item actions
+	 * @return - An array of Inventory Action data containing the item actions
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
-	static TArray<TSoftClassPtr<UObject>> GetItemActions(const FInventoryItem& Item);
+	static TArray<FInventoryItemActionDefinition> GetItemActions(const FInventoryItem& Item);
+	
+	/**
+	 * Retrieves the actions associated with a specified inventory item which are allowed to be displayed in UI.
+	 * This function returns an array of Inventory Action data representing the actions that can be performed on the item.
+	 * Actions must implement the `MounteaAdvancedInventoryItemActionInterface` interface.
+	 *
+	 * @param Item - The inventory item for which to retrieve the associated actions
+	 * @return - An array of Inventory Action data containing the item actions which can be displayed in UI
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
+	static TArray<FInventoryItemActionDefinition> GetDisplayableItemActions(const FInventoryItem& Item);
 
 	// --- Items
 	

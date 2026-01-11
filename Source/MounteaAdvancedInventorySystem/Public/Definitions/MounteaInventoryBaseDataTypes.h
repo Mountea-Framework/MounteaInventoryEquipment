@@ -67,6 +67,51 @@ struct FInventoryRarity
 
 #undef LOCTEXT_NAMESPACE
 
+/**
+ * FInventoryItemActionDefinition contains the definition of Inventory item Action.
+ * Item Actions are usually 2 types:
+ * → UI Actions
+ * → Technical Actions
+ *
+ * @see [Item Categories](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
+ * @see FInventoryCategory
+ * @see UMounteaInventoryItemAction
+ */
+USTRUCT(BlueprintType)
+struct FInventoryItemActionDefinition
+{
+	GENERATED_BODY()
+	
+public:
+	
+	/** 
+	 * Defines whether the Action should be shown to UI or whether is purely technical one.
+	 * Example of UI Actions:
+	 * → Split Item (UI with quantity)
+	 * → Drop Item (UI with quantity)
+	 * 
+	 * Example of non-UI Actions:
+	 * → Drop Item (perform removal of Item from Inventory)
+	 * → Equip Item (calls to Equipment System to process Equipment)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action")
+	uint8 bIsUIAction : 1;
+	
+	/**
+	 * Defines a class of allowed Action.
+	 * Each Item of this category can perform selected Action.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
+	TSoftClassPtr<UObject> ItemActionClass;
+	
+public:
+	bool IsValidAction() const;
+	
+	TSoftClassPtr<UObject> GetItemActionClass() const
+	{ return ItemActionClass; };
+};
+
 #define LOCTEXT_NAMESPACE "InventoryCategory"
 
 /**
@@ -99,8 +144,14 @@ struct FInventoryCategoryData
 
 	/**
 	 * Tags that define this Category.
+	 * By default filtered for:
+	 * → Mountea_Inventory.Categories
+	 * → Mountea_Inventory.Category
+	 * → Categories
+	 * → Category
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
+		meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category"))
 	FGameplayTagContainer CategoryTags;
 
 	/**
@@ -112,16 +163,17 @@ struct FInventoryCategoryData
 	/**
 	 * Optional bitmask for category-specific behaviors (e.g., Craftable, Equipable).
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags"))
 	uint8 CategoryFlags;
 
 	/**
 	 * Defines a list of allowed Actions.
-	 * Each Item of this category can perform those Actions.
+	 * Each Item of this category can perform those Actions. Some Actions are not allowed in User Interface!
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TSet<TSoftClassPtr<UObject>> AllowedActions;
+	TArray<FInventoryItemActionDefinition> AllowedActions;
 };
 
 /**
@@ -144,14 +196,16 @@ struct FInventoryCategory
 	 * Represents inventory category data, providing properties and metadata
 	 * for managing and representing inventory category.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, 
+		meta=(ShowOnlyInnerProperties))
 	FInventoryCategoryData CategoryData;
 		
 	/**
 	 * Array of localized subcategory names associated with the inventory category.
 	 * Used for further categorization within a primary category, allowing more detailed item classification.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ForceInlineRow, ShowOnlyInnerProperties))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, 
+		meta=(ForceInlineRow, ShowOnlyInnerProperties))
 	TMap<FString,FInventoryCategoryData> SubCategories;
 };
 
@@ -180,39 +234,48 @@ struct FInventoryTypeConfig
 	FText InventoryDisplayName = LOCTEXT("InventoryType_DisplayName", "");
 
 	/** Widget class to use for this inventory type */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="User Interface", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="User Interface", 
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
 	TSoftClassPtr<UUserWidget> WidgetClass;
 
 	/** Configuration flags for this inventory type */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryTypeFlags"))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryTypeFlags"))
 	uint8 ConfigFlags;
 
 	/** Access and behavior flags for this inventory */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryFlags"))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryFlags"))
 	uint8 AccessFlags;
 
 	/** Range of allowed slots (X = Min, Y = Max) */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", meta=(ClampMin=1))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
+		meta=(ClampMin=1))
 	FIntPoint SlotsRange = FIntPoint(10, 20);
 
 	/** Starting number of slots (must be within SlotsRange) */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", meta=(ClampMin=1, UIMin=1))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
+		meta=(ClampMin=1, UIMin=1))
 	int32 StartingSlots = 10;
 	
 	/** Maximum weight this inventory can hold */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", meta=(ClampMin=0.0, Units="kg"))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
+		meta=(ClampMin=0.0, Units="kg"))
 	float MaxWeight = 100.0f;
 
 	/** Thresholds for weight-based effects (in percentages) */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
+		meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
 	FVector4 WeightThresholds = FVector4(0.3f, 0.5f, 0.7f, 0.9f);
 
 	/** Movement speed multipliers for each weight threshold */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
+		meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
 	FVector4 WeightSpeedMultipliers = FVector4(1.0f, 0.8f, 0.6f, 0.4f);
 
 	/** Maximum total value this inventory can hold */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", meta=(ClampMin=0.0))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
+		meta=(ClampMin=0.0))
 	float MaxValue = 1000.0f;
 
 	/** Tags defining special properties or restrictions for this inventory type */

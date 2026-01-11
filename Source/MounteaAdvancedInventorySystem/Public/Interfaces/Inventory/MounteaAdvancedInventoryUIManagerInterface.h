@@ -14,7 +14,7 @@
 #include "CoreMinimal.h"
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "UObject/Interface.h"
-#include "MounteaAdvancedInventoryUIInterface.generated.h"
+#include "MounteaAdvancedInventoryUIManagerInterface.generated.h"
 
 struct FInventoryItem;
 struct FInventoryNotificationData;
@@ -27,13 +27,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
-class UMounteaAdvancedInventoryUIInterface : public UInterface
+class UMounteaAdvancedInventoryUIManagerInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 /**
- * IMounteaAdvancedInventoryUIInterface manages user interface operations for inventory systems.
+ * IMounteaAdvancedInventoryUIManagerInterface manages user interface operations for inventory systems.
  * UI interfaces handle widget creation, visibility management, category selection, item interaction,
  * notification display, and grid slot management for comprehensive inventory interface control.
  *
@@ -41,7 +41,7 @@ class UMounteaAdvancedInventoryUIInterface : public UInterface
  * @see UMounteaInventoryUIComponent
  * @see FMounteaInventoryGridSlot
  */
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryUIInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryUIManagerInterface
 {
 	GENERATED_BODY()
 
@@ -88,13 +88,44 @@ public:
 	void RemoveWrapperWidget();
 	virtual void RemoveWrapperWidget_Implementation() = 0;
 	
+	/**
+	 * Creates the inventory UI.
+	 * @return True if UI was successfully created, otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	bool CreateInventoryWidget();
+	virtual bool CreateInventoryWidget_Implementation() = 0;
+
+	/**
+	 * Returns the inventory UI.
+	 * @return UI if UI exists, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	UUserWidget* GetInventoryWidget() const;
+	virtual UUserWidget* GetInventoryWidget_Implementation() const = 0;
+	
+	/**
+	 * Sets the inventory UI from outside.
+	 * @return True if UI was successfully set, otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	bool SetInventoryWidget(UUserWidget* NewInventoryWidget);
+	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) = 0;
+
+	/**
+	 * Removes the inventory UI.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	void RemoveInventoryWidget();
+	virtual void RemoveInventoryWidget_Implementation() = 0;
+	
 	// --- Notification
 
 	/**
 	 * Retrieves the notification container widget.
 	 * @return A pointer to the notification container widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
 	UUserWidget* GetNotificationContainer() const;
 	virtual UUserWidget* GetNotificationContainer_Implementation() const = 0;
 
@@ -102,7 +133,7 @@ public:
 	 * Sets the notification container widget.
 	 * @param NewNotificationContainer - The new notification container widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
 	void SetNotificationContainer(UUserWidget* NewNotificationContainer);
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) = 0;
 
@@ -110,14 +141,14 @@ public:
 	 * Creates a new inventory notification.
 	 * @param NotificationData - The data defining the notification.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
 	void CreateInventoryNotification(const FInventoryNotificationData& NotificationData);
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;
 
 	/**
 	 * Removes all active inventory notifications.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
 	void RemoveInventoryNotifications();
 	virtual void RemoveInventoryNotifications_Implementation() = 0;
 

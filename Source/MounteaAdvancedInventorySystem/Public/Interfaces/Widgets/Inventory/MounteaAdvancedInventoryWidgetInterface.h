@@ -15,7 +15,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryWidgetInterface.generated.h"
 
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryWidgetInterface : public UInterface
@@ -29,7 +29,7 @@ class UMounteaAdvancedInventoryWidgetInterface : public UInterface
  * inventory management and presentation capabilities for the main inventory interface.
  *
  * @see [Inventory Widgets](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/UserInterface)
- * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaAdvancedInventoryUIManagerInterface
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryWidgetInterface
 {

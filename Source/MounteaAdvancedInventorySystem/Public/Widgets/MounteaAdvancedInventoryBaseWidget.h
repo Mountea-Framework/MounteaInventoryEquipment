@@ -23,7 +23,7 @@
  * and parent UI component management for consistent inventory interface behavior.
  *
  * @see [Inventory UI System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventoryUI)
- * @see IMounteaAdvancedInventoryUIInterface
+ * @see IMounteaAdvancedInventoryUIManagerInterface
  * @see IMounteaInventoryGenericWidgetInterface
  */
 UCLASS()
@@ -40,20 +40,23 @@ public:
 	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload = nullptr) override {};
 	virtual void ApplyTheme_Implementation() override {};
 	virtual void RefreshWidget_Implementation() override {};
+	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime) override {};
 
-	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIInterface>& NewOwningInventoryUI) override
+	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI) override
 	{
 		if (ParentUIComponent != NewOwningInventoryUI)
 			ParentUIComponent = NewOwningInventoryUI;
 	};
 
-	virtual TScriptInterface<IMounteaAdvancedInventoryUIInterface> GetOwningInventoryUI_Implementation() const override
+	virtual TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> GetOwningInventoryUI_Implementation() const override
 	{ return ParentUIComponent; };
 
 protected:
 	
 	/** Reference to the owning inventory UI interface.*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data",
-		AdvancedDisplay, meta=(DisplayThumbnail=false))
-	TScriptInterface<IMounteaAdvancedInventoryUIInterface> ParentUIComponent = nullptr;
+		AdvancedDisplay, 
+		DisplayName="UI Manager",
+		meta=(DisplayThumbnail=false))
+	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent = nullptr;
 };

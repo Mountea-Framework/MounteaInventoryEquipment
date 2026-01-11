@@ -17,6 +17,11 @@ FInventoryRarity::FInventoryRarity() : RarityColor(FColor::Silver)
 {
 }
 
+bool FInventoryItemActionDefinition::IsValidAction() const
+{
+	return ItemActionClass.IsNull() || ItemActionClass.ToSoftObjectPath().IsValid();
+}
+
 FInventoryCategoryData::FInventoryCategoryData(): DisplayIcon(nullptr), CategoryFlags(0)
 {
 }

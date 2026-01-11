@@ -10,4 +10,11 @@
 // For more information, visit: https://mountea.tools
 
 
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
+
+UMounteaAdvancedInventoryUIConfig::UMounteaAdvancedInventoryUIConfig() : Super()
+	, bAlwaysStackStackableItems(true)
+	, bAllowDragAndDrop(true)
+{
+}

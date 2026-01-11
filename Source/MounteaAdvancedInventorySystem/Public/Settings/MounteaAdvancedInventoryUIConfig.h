@@ -15,23 +15,38 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryUIConfig.generated.h"
 
+struct FMounteaWidgetInputActionMapping;
+
 /**
  * UMounteaAdvancedInventoryUIConfig is a data asset managing comprehensive inventory system UI configuration.
  * Settings config defines visual parameters for complete inventory system customization and behavior control.
  *
  * @see [Settings Configuration](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings UI Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining visual components."))
-
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings UI Config", 
+	meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining visual components."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryUIConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	
 public:
+	
+	UMounteaAdvancedInventoryUIConfig();
+	
+public:
+	
+	// --- UI Inputs
+	
+	/** Discrete UI actions (Close, Confirm, ContextMenu, NextTab, PreviousTab, etc.). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|🎮 Inputs")
+	TArray<FMounteaWidgetInputActionMapping> UIActionMappings;
+	
 
 	// --- Wrapper
 	
-	/** Widget class used as the main inventory user interface wrapper (root HUD panel, container for other widgets). */
+	/** Widget class used as the main user interface wrapper (root HUD panel, container for other widgets, 
+	 * like Inventory, Equipment, Crafting menu etc.). This Wrapper should be used for other UI systems to
+	 * avoid Z-oder fighting.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🧩 Wrapper",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"))
 	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
@@ -87,10 +102,52 @@ public:
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemWidgetInterface"))
 	TSoftClassPtr<UUserWidget> ItemWidgetClass;
 	
+	// ---- Item
+	
+	/** Widget class used to detailed Item Information. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🏺 Item",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemPanelWidgetInterface"))
+	TSoftClassPtr<UUserWidget> ItemPanelWidgetClass;
+	
+	/** Widget class used to display Tooltip information of currently selected/hovered item. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🏺 Item",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryTooltipWidgetInterface"))
+	TSoftClassPtr<UUserWidget> ItemTooltipWidgetClass;
+	
+	// ---- Item Actions
+	
+	/** Widget class used display list of available Item Actions. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🎛 Item Action",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionsContainerWidgetInterface"))
+	TSoftClassPtr<UUserWidget> ItemActionsContainerWidgetClass;
+	
+	/** Widget class used to display individual Item Actions. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🎛 Item Action",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionWidgetInterface"))
+	TSoftClassPtr<UUserWidget> ItemActionWidgetClass;
+	
 	// ---- Fonts
 	
 	/** Default font settings used across the inventory user interface (labels, counters, titles). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🔤 Font")
 	FSlateFontInfo DefaultFont;
+	
+	// ---- Settings
+	
+	/**
+	 * Determines if stackable items should always automatically stack together when added to the inventory.
+	 * If set to true, stackable items will occupy the same inventory slot until the maximum stack size is reached.
+	 * Then other non-filled slot will be found and so on, until no empty slots are available and/or input quantity if reached.
+	 * Improves inventory organization by reducing the number of individual item slots occupied.
+	 *
+	 * ⚠ Can result in performance impact on lower-end machines, especially with huge amounts of items!
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|⚙ Settings", 
+		DisplayName="⚠ Always Stack Stackable Items")
+	uint8 bAlwaysStackStackableItems : 1;
+
+	/** Determines if the inventory system allows drag-and-drop operations for items. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|⚙ Settings")
+	uint8 bAllowDragAndDrop : 1;
 };
 

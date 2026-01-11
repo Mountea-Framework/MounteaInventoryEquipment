@@ -23,7 +23,9 @@
 //  - FItemWidgetData: all data a UI widget needs to render an item/slot.
 // ============================================================================
 
+enum class EMounteaWidgetInputMethod : uint8;
 class UUserWidget;
+class UTextureCube;
 
 /**
  * FInventoryItemData represents the pure logical data of a single inventory entry.
@@ -274,6 +276,200 @@ public:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
 	TArray<FGuid> StoredIds;
+};
+
+USTRUCT(BlueprintType)
+struct FMounteaPreviewDirectionalLightSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnabled = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	float Intensity = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	FLinearColor LightColor = FLinearColor::White;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	FRotator Rotation = FRotator(-40.0f, -67.5f, 0.0f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	bool bCastShadows = false;
+};
+
+USTRUCT(BlueprintType)
+struct FMounteaPreviewSkyLightSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnabled = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	float Intensity = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	TSoftObjectPtr<UTextureCube> Cubemap;
+};
+
+USTRUCT(BlueprintType)
+struct FMounteaPreviewPostProcessSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnabled = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	FPostProcessSettings PostProcessSettings;
+};
+
+/**
+ * FMounteaPreviewCameraControlSettings defines configuration for camera manipulation
+ * in preview environments. Controls sensitivity, limits, and enabled state for
+ * rotation, zoom, and height adjustment interactions.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaPreviewCameraControlSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
+	bool bAllowRotation = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowRotation", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"))
+	float CameraRotationSensitivity = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowRotation", UIMin="0.0", ClampMin="0.0", UIMax="180.0", ClampMax="180.0"))
+	FVector3f RotationLimits = FVector3f(0.f, 180.f, 180.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
+	bool bAllowZoom = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="5.0", ClampMax="5.0"))
+	float CameraZoomSensitivity = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"))
+	FVector2f ZoomLimits = FVector2f(1.f, 5.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
+	bool bAllowHeightAdjustment = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"))
+	float CameraHeightSensitivity = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"))
+	float HeightLimit = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance", 
+		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"))
+	float PreviewTickFrequency = 30.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance")
+	uint8 bAutoStartTick : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance", 
+		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"))
+	float IdleThreshold = 3.f;
+};
+
+/**
+ * FMounteaWidgetInputPayload represents a lightweight, UI-friendly container
+ * for input values forwarded from Player Controllers or Pawns to UI widgets.
+ *
+ * This struct intentionally avoids Enhanced Input–specific types to ensure
+ * widgets remain decoupled from input mapping contexts and gameplay systems.
+ *
+ * Only the relevant value for a given input should be populated.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputPayload
+{
+	GENERATED_BODY()
+	
+	/** Defines type of input to consume. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")
+	EMounteaWidgetInputMethod InputMethod;
+
+	/** Scalar input value (e.g. mouse wheel delta, trigger axis, zoom amount). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
+	float FloatValue = 0.f;
+
+	/** Two-dimensional input value (e.g. mouse delta, analog stick rotation). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
+	FVector2D Vector2DValue = FVector2D::ZeroVector;
+
+	/** Boolean input value (e.g. confirm, cancel, toggle). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
+	bool bBoolValue = false;
+};
+
+/**
+ * FMounteaWidgetInputKeyChord represents a UI-friendly binding:
+ * - Primary Key
+ * - Optional Modifier Key
+ *
+ * If ModifierKey is invalid, no modifier is required.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputKeyChord
+{
+	GENERATED_BODY()
+
+public:
+	/** Primary key (e.g. I, Escape, Gamepad_FaceButton_Bottom). */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	FKey Key;
+
+	/** Optional modifier key (e.g. LeftControl, RightShift). If invalid => no modifier required. */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	FKey ModifierKey;
+};
+
+
+/**
+ * FMounteaWidgetInputActionMapping defines a UI action (identified by a gameplay tag)
+ * and its associated key bindings (simple keys and/or key chords).
+ *
+ * The tag describes WHAT action should be triggered, while the key lists describe
+ * WHICH physical inputs can trigger it.
+ *
+ * This struct is intentionally Enhanced Input–agnostic and can be evaluated from
+ * Slate key events or from gameplay-side input routing.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputActionMapping
+{
+	GENERATED_BODY()
+
+	/** 
+	 * Gameplay tag identifying the UI action (e.g. UI.Inventory.Close, UI.Inventory.Confirm). 
+	 * Limited to "Input" category only!
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(Categories="Input,Mountea_Inventory.Input"))
+	FGameplayTag ActionTag;
+
+	/** Keys that can trigger this action (Esc, Enter, Gamepad_FaceButton_Right, etc.). */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	TArray<FKey> Keys;
+
+	// TODO: Holding 2 buttons at the same time for example
+	/** Key chords (key + optional modifiers) that can trigger this action. */
+	//UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	//TArray<FMounteaWidgetInputKeyChord> Chords;
+
+	/** If true, the UI layer should consume the input when this mapping triggers. */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	bool bConsume = true;
 };
 
 

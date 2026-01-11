@@ -16,7 +16,7 @@
 #include "Widgets/MounteaAdvancedInventoryBaseWidget.h"
 #include "MounteaAdvancedInventoryItemsGridWidget.generated.h"
 
-class IMounteaAdvancedInventoryUIInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 /**
  * UMounteaAdvancedInventoryItemsGridWidget implements grid-based inventory layout and item management.

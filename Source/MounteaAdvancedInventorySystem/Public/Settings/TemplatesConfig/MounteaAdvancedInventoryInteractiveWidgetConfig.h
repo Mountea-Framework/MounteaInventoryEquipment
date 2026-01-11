@@ -12,13 +12,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryInteractiveWidgetConfig.generated.h"
 
 class UTextureRenderTarget2D;
 class UMaterialInterface;
+class AMounteaAdvancedInventoryPreviewEnvironment;
 class AMounteaAdvancedInventoryItemPreviewRenderer;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
+class UMounteaAdvancedInventoryPreviewEnvironmentSettings;
 class UWorld;
 
 /**
@@ -37,15 +40,24 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryInteractiveWid
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
 	TSoftClassPtr<UMounteaAdvancedInventoryInteractableObjectWidget> InteractiveWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview Settings")
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering Context")
+	TSoftClassPtr<AMounteaAdvancedInventoryPreviewEnvironment> EnvironmentActor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rendering Context")
 	TSoftClassPtr<AMounteaAdvancedInventoryItemPreviewRenderer> RendererActor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material")
 	TSoftObjectPtr<UMaterialInterface> DefaultRenderTargetMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Preview Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material")
 	TSoftObjectPtr<UTextureRenderTarget2D> DefaultRenderTarget;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Material")
+	TSoftObjectPtr<UMounteaAdvancedInventoryPreviewEnvironmentSettings> EnvironmentSettings;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Controls")
+	FMounteaPreviewCameraControlSettings PreviewCameraControlSettings;
 };
