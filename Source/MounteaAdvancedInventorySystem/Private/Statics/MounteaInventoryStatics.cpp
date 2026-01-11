@@ -15,6 +15,7 @@
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
@@ -250,7 +251,7 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
-TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
 {
 	if (!Item.IsItemValid()) return {};
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -268,17 +269,28 @@ TArray<TSoftClassPtr<UObject>> UMounteaInventoryStatics::GetItemActions(const FI
 		return {};
 	}
     
-	TSet<TSoftClassPtr<UObject>> uniqueActions = categoryDefinition.CategoryData.AllowedActions;
+	TArray<FInventoryItemActionDefinition> uniqueActions = categoryDefinition.CategoryData.AllowedActions;
 	if (!itemSubCategory.IsEmpty())
 		uniqueActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
 
-	TArray<TSoftClassPtr<UObject>> validActions = uniqueActions.Array();
-	validActions.RemoveAll([](const TSoftClassPtr<UObject>& actionClass)
+	TArray<FInventoryItemActionDefinition> validActions = uniqueActions;
+	validActions.RemoveAll([](const FInventoryItemActionDefinition& actionData)
 	{
-		return actionClass.IsNull() || !actionClass.ToSoftObjectPath().IsValid();
+		return actionData.IsValidAction();
 	});
 
 	return validActions;
+}
+
+TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
+{
+	TArray<FInventoryItemActionDefinition> returnValue = GetItemActions(Item);
+	returnValue.RemoveAll([](const FInventoryItemActionDefinition& actionData)
+	{
+		return actionData.bIsUIAction != true;
+	});
+
+	return returnValue;
 }
 
 TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
