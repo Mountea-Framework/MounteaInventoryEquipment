@@ -55,14 +55,16 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 > </p>
 
 ### Data-Driven Approach
-> Import Data Tables, use Data Tables to define Items. Easy to manage system with extreme flexibility.
-
-### Flexible Configuration
-> In-line editable configuration with the ability to extend logic in Blueprints.
-
-
-### Editor Extensions
-> Multiple tools aiming at as easy as possible management, simple management and data composition.
+> The whole system is driven by configuration, which is designed to natually follow order of things:
+> * Project Settings to define global configuration files
+> * * Inventory Configuration to define gameplay variables
+> * * Inventory UI Configuration to define User Interface settings
+> * Etc.
+> <p align="center" width="100%">
+>     <img width="32.5%" src="https://github.com/user-attachments/assets/bd88891d-d1d9-4bce-b74f-2a52b05d2809">
+>     <img width="32.5%" src="https://github.com/user-attachments/assets/05ddd769-9784-4974-ad1e-75ea7522b7f3">
+>     <img width="32.5%" src="https://github.com/user-attachments/assets/59889a6c-1e04-4916-ac44-846bf7e22ef4">
+> </p> 
 
 ### Inventory/Equipment Actions
 > In-line editable configuration with the ability to extend logic in Blueprints.</p>
