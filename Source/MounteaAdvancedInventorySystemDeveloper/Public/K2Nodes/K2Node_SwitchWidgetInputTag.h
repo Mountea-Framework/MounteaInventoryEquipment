@@ -46,10 +46,12 @@ public:
 	virtual FText GetTooltipText() const override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual bool ShouldShowNodeProperties() const override { return true; }
+	virtual bool SupportsAddPinButton() const override { return false; };
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FName GetCornerIcon() const override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
+	static FString GetTagComment(const FGameplayTag& Tag);
 #endif
 
 	virtual void AddPinToSwitchNode() override;

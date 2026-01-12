@@ -19,6 +19,10 @@
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
+#if WITH_EDITOR
+#include "GameplayTagsManager.h"
+#endif
+
 #define LOCTEXT_NAMESPACE "K2Node_SwitchWidgetInputTag"
 
 UK2Node_SwitchWidgetInputTag::UK2Node_SwitchWidgetInputTag(const FObjectInitializer& ObjectInitializer)
@@ -78,6 +82,9 @@ void UK2Node_SwitchWidgetInputTag::CreateCasePins()
 		{
 			UEdGraphPin* newPin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, pinPair.Key.GetTagName());
 			newPin->bAllowFriendlyName = false;
+#if WITH_EDITOR
+			newPin->PinToolTip = GetTagComment(pinPair.Key);
+#endif
 		}
 	}
 }
@@ -225,6 +232,14 @@ FSlateIcon UK2Node_SwitchWidgetInputTag::GetIconAndTint(FLinearColor& OutColor) 
 	OutColor = FLinearColor(.823f, .823f, .823f);
 	
 	return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_SwitchIcon.small");
+}
+
+FString UK2Node_SwitchWidgetInputTag::GetTagComment(const FGameplayTag& Tag)
+{
+	UGameplayTagsManager& tagsManager = UGameplayTagsManager::Get();
+	if (tagsManager.FindTagNode(Tag).Get())
+		return tagsManager.FindTagNode(Tag).Get()->GetDevComment();
+	return TEXT("");
 }
 
 #endif
