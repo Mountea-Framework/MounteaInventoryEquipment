@@ -134,7 +134,7 @@ public:
 	
 	// ---- Settings
 	
-	/** Defines list of available Widget Commands. Those are available using custom SwithOnWidgetCommand Node.*/
+	/** Defines list of available Widget Commands. Those are available using custom ProcessWidgetCommand Node.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|🎚 Config", 
 		meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;

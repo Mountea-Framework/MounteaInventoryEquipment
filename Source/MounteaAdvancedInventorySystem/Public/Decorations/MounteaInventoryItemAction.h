@@ -31,7 +31,7 @@ class UGameplayEffect;
  * @see IMounteaAdvancedInventoryItemActionInterface
  * @see UMounteaInventorySimpleItemAction
  */
-UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable,
+UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, EditInlineNew,
 	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
 	HideCategories=("Cooking","Collision"),
 	meta=(DisplayName="Mountea GAS Inventory Action"))

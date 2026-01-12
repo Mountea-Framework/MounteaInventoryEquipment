@@ -47,59 +47,59 @@ public:
 	/**
 	 * Display name of the action shown in the user interface.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
 	FText ActionDisplayName;
 
 	/**
 	 * Brief description explaining what this action does.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
 	FText ActionDescription;
 
 	/**
 	 * Icon representing this action in the user interface.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
 	TSoftObjectPtr<UTexture2D> Icon;
 
 	/**
 	 * Priority value used for sorting actions in UI elements.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
-	int32 ActionPriority = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
+	int32 ActionPriority = INDEX_NONE;
 
 	/**
 	 * Whether this action should be visible by default in the UI.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration")
 	uint8 bIsVisibleByDefault : 1;
 
 	/**
 	 * Whether this action requires confirmation before execution.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration")
 	uint8 bRequiresConfirmation : 1;
 
 	/**
 	 * The tag used to identify this action in the gameplay ability system.
 	 * This tag is used for filtering and identifying actions in the UI and logic.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration")
 	FGameplayTag ItemActionTag;
 
 	/**
 	 * Callback type for this action, used to determine how the action is processed.
 	 * This can be used to trigger different behaviors based on the action type.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action",
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
 		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback"))
 	uint8 InventoryItemActionCallback;
 
 	/**
 	 * Gameplay effects to apply when this action is successfully executed.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action",
-		DisplayName="(Optional) Action Effects")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
+		DisplayName="Action Effects (GAS)")
 	TArray<TSoftClassPtr<UGameplayEffect>> ActionEffects;
 };
 

@@ -27,7 +27,7 @@
  * @see IMounteaAdvancedInventoryItemActionInterface
  * @see UMounteaInventoryItemAction
  */
-UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable,
+UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, DefaultToInstanced, EditInlineNew,
 	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
 	HideCategories=("Cooking","Collision"),
 	meta=(DisplayName="Mountea Simple Inventory Action"))
@@ -79,14 +79,24 @@ private:
 	 * The parent widget that owns this item action.
 	 * Used for UI context and interaction.
 	 */
-	UPROPERTY(Transient, BlueprintReadOnly, meta=(ExposeOnSpawn, AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, 
+		meta=(ExposeOnSpawn),
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> ParentItemWidget;
 	
 	/**
 	 * The inventory item currently being processed by this action.
 	 */
-	UPROPERTY(Transient, BlueprintReadOnly, meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, 
+		meta=(AllowPrivateAccess))
 	FInventoryItem CurrentTargetItem;
+	
+	/**
+	 * The inventory manager currently processing this action.
+	 */
+	UPROPERTY(BlueprintReadOnly, 
+		meta=(AllowPrivateAccess))
+	TObjectPtr<UObject> CurrentInventoryManager;
 	
 #pragma endregion
 };

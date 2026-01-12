@@ -105,6 +105,15 @@ public:
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
 	TSoftClassPtr<UObject> ItemActionClass;
 	
+	/**
+	 * Defines a single allowed Action.
+	 * Each Item of this category can perform selected Action.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action",
+		meta=(Instanced),
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
+	TSoftObjectPtr<UObject> ItemAction;
+	
 public:
 	bool IsValidAction() const;
 	
@@ -174,6 +183,17 @@ struct FInventoryCategoryData
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
 	TArray<FInventoryItemActionDefinition> AllowedActions;
+	
+	// TODO: Maybe in Category only contain classes and instances have per-item?
+	/**
+	 * Definition of allowed Actions for specific Category.
+	 * Each Item of this category can perform selected Action.
+	 * 
+	 * Item can disabled specific Actions in their configuration.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action", Instanced,
+		meta=(AllowedClasses="/Script/MounteaAdvancedInventorySystem.MounteaInventoryItemAction, /Script/MounteaAdvancedInventorySystem.MounteaInventorySimpleItemAction"))
+	TArray<TObjectPtr<UObject>> Actions;
 };
 
 /**
