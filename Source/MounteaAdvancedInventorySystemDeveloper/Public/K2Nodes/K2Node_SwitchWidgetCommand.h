@@ -25,8 +25,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEMDEVELOPER_API UK2Node_SwitchWidgetCommand : 
 	
 public:
 	
+	/** 
+	 * List of available Commands.
+	 * All from UI Config are added automatically. You can add more manually.
+	 * UI Config based data are not possible to delete or modify.
+	 */
 	UPROPERTY(EditAnywhere, Category="PinOptions", 
-		meta=(DisplayName="Widget Commands"))
+		meta=(DisplayName="Widget Commands"),
+		meta=(NoResetToDefault))
 	TMap<FName, bool> PinNames;
 
 	UPROPERTY(EditAnywhere, Category="PinOptions")
@@ -43,6 +49,8 @@ public:
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FName GetCornerIcon() const override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
+	virtual bool SupportsAddPinButton() const override { return false; };
+	virtual bool CanEverRemoveExecutionPin() const override { return false; };
 #endif
 
 	virtual void AddPinToSwitchNode() override;
