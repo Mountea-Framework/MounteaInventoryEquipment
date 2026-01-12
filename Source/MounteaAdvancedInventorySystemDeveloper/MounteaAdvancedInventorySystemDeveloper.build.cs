@@ -21,7 +21,9 @@ public class MounteaAdvancedInventorySystemDeveloper : ModuleRules
 				"Projects",
 				"Engine",
 				"Slate",
-				"SlateCore", 
+				"SlateCore",
+				"GameplayTags",
+				
 				"MounteaAdvancedInventorySystem", 
 			}
 		);
