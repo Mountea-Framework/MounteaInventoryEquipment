@@ -16,8 +16,6 @@
 #include "GameplayTagContainer.h"
 #include "K2Node_SwitchWidgetInputTag.generated.h"
 
-class FBlueprintActionDatabaseRegistrar;
-
 /**
  * 
  */
@@ -35,8 +33,9 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, Category="PinOptions", 
 		meta=(Categories="Input,Mountea_Inventory.Input"),
+		meta=(ForceInlineRow),
 		meta=(NoResetToDefault))
-	TArray<FGameplayTag> PinTags;
+	TMap<FGameplayTag, bool> PinTags;
 
 	UPROPERTY()
 	TArray<FName> PinNames;
@@ -65,6 +64,7 @@ protected:
 	virtual void RemovePin(UEdGraphPin* TargetPin) override;
 
 private:
+	static bool IsPredefinedPin(const FName& PinName);
+	void GetVisiblePinNames(TArray<FName>& OutPinNames) const;
 	static void GetAvailableUIActionTags(TArray<FGameplayTag>& OutTags);
-	static bool IsValidUIActionTag(const FGameplayTag& Tag);
 };

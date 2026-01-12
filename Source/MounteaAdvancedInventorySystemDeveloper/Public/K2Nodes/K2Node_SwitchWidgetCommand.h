@@ -32,6 +32,7 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, Category="PinOptions", 
 		meta=(DisplayName="Widget Commands"),
+		meta=(ForceInlineRow),
 		meta=(NoResetToDefault))
 	TMap<FName, bool> PinNames;
 
