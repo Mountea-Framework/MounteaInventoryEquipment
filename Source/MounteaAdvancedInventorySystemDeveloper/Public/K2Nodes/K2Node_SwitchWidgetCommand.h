@@ -64,7 +64,7 @@ protected:
 	virtual void RemovePin(UEdGraphPin* TargetPin) override;
 
 	void SetupCaseSensitivityFunction();
-	void GetWidgetCommandsFromSettings(TArray<FName>& OutCommands) const;
-	bool IsPredefinedPin(const FName& PinName) const;
+	static void GetWidgetCommandsFromSettings(TArray<FName>& OutCommands);
+	static bool IsPredefinedPin(const FName& PinName);
 	void GetVisiblePinNames(TArray<FName>& OutVisiblePins) const;
 };

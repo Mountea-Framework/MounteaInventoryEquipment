@@ -51,7 +51,7 @@ FEdGraphPinType UK2Node_SwitchWidgetCommand::GetPinType() const
 	return pinType;
 }
 
-FName UK2Node_SwitchWidgetCommand::GetPinNameGivenIndex(int32 Index) const
+FName UK2Node_SwitchWidgetCommand::GetPinNameGivenIndex(const int32 Index) const
 {
 	check(Index);
 	
@@ -114,7 +114,7 @@ void UK2Node_SwitchWidgetCommand::RemovePin(UEdGraphPin* TargetPin)
 	PinNames.Remove(TargetPin->PinName);
 }
 
-void UK2Node_SwitchWidgetCommand::GetWidgetCommandsFromSettings(TArray<FName>& OutCommands) const
+void UK2Node_SwitchWidgetCommand::GetWidgetCommandsFromSettings(TArray<FName>& OutCommands)
 {
 	OutCommands.Empty();
 	
@@ -134,7 +134,7 @@ void UK2Node_SwitchWidgetCommand::GetWidgetCommandsFromSettings(TArray<FName>& O
 	}
 }
 
-bool UK2Node_SwitchWidgetCommand::IsPredefinedPin(const FName& PinName) const
+bool UK2Node_SwitchWidgetCommand::IsPredefinedPin(const FName& PinName)
 {
 	TArray<FName> predefinedCommands;
 	GetWidgetCommandsFromSettings(predefinedCommands);
