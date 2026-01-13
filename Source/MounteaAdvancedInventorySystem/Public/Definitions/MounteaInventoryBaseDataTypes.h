@@ -16,7 +16,7 @@
 #include "MounteaInventoryBaseEnums.h"
 #include "MounteaInventoryBaseDataTypes.generated.h"
 
-class UMounteaInventoryItemAction;
+class UMounteaInventorySimpleItemAction;
 class UTexture;
 
 #define LOCTEXT_NAMESPACE "InventoryRarity"
@@ -66,60 +66,6 @@ struct FInventoryRarity
 };
 
 #undef LOCTEXT_NAMESPACE
-
-/**
- * FInventoryItemActionDefinition contains the definition of Inventory item Action.
- * Item Actions are usually 2 types:
- * → UI Actions
- * → Technical Actions
- *
- * @see [Item Categories](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
- * @see FInventoryCategory
- * @see UMounteaInventoryItemAction
- */
-USTRUCT(BlueprintType)
-struct FInventoryItemActionDefinition
-{
-	GENERATED_BODY()
-	
-public:
-	
-	/** 
-	 * Defines whether the Action should be shown to UI or whether is purely technical one.
-	 * Example of UI Actions:
-	 * → Split Item (UI with quantity)
-	 * → Drop Item (UI with quantity)
-	 * 
-	 * Example of non-UI Actions:
-	 * → Drop Item (perform removal of Item from Inventory)
-	 * → Equip Item (calls to Equipment System to process Equipment)
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action")
-	uint8 bIsUIAction : 1;
-	
-	/**
-	 * Defines a class of allowed Action.
-	 * Each Item of this category can perform selected Action.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TSoftClassPtr<UObject> ItemActionClass;
-	
-	/**
-	 * Defines a single allowed Action.
-	 * Each Item of this category can perform selected Action.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action",
-		meta=(Instanced),
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TSoftObjectPtr<UObject> ItemAction;
-	
-public:
-	bool IsValidAction() const;
-	
-	TSoftClassPtr<UObject> GetItemActionClass() const
-	{ return ItemActionClass; };
-};
 
 #define LOCTEXT_NAMESPACE "InventoryCategory"
 
@@ -182,18 +128,7 @@ struct FInventoryCategoryData
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TArray<FInventoryItemActionDefinition> AllowedActions;
-	
-	// TODO: Maybe in Category only contain classes and instances have per-item?
-	/**
-	 * Definition of allowed Actions for specific Category.
-	 * Each Item of this category can perform selected Action.
-	 * 
-	 * Item can disabled specific Actions in their configuration.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action", Instanced,
-		meta=(AllowedClasses="/Script/MounteaAdvancedInventorySystem.MounteaInventoryItemAction, /Script/MounteaAdvancedInventorySystem.MounteaInventorySimpleItemAction"))
-	TArray<TObjectPtr<UObject>> Actions;
+	TArray<TSoftClassPtr<UMounteaInventorySimpleItemAction>> AllowedActions;	
 };
 
 /**

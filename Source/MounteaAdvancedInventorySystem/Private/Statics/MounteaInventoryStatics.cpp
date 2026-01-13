@@ -12,6 +12,7 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
+#include "Decorations/MounteaInventorySimpleItemAction.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -251,43 +252,34 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
-TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+TArray<UMounteaInventorySimpleItemAction*> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
 {
 	if (!Item.IsItemValid()) return {};
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return {};
 	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
 	if (!inventorySettingsConfig) return {};
+	
+	const auto itemTemplate = Item.GetTemplate();
+	if (!itemTemplate) return {};
     
-	const auto itemCategory = Item.GetTemplate()->ItemCategory;
-	const auto itemSubCategory = Item.GetTemplate()->ItemSubCategory;
-    
-	const auto categoryDefinition = inventorySettingsConfig->AllowedCategories.FindRef(itemCategory);
-	if (categoryDefinition.CategoryData.AllowedActions.Num() <= 0)
-	{
-		LOG_WARNING(TEXT("No actions defined for category '%s'!"), *itemCategory);
-		return {};
-	}
-    
-	TArray<FInventoryItemActionDefinition> uniqueActions = categoryDefinition.CategoryData.AllowedActions;
-	if (!itemSubCategory.IsEmpty())
-		uniqueActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
+	TArray<UMounteaInventorySimpleItemAction*> uniqueActions =itemTemplate->ItemActions;
 
-	TArray<FInventoryItemActionDefinition> validActions = uniqueActions;
-	validActions.RemoveAll([](const FInventoryItemActionDefinition& actionData)
+	TArray<UMounteaInventorySimpleItemAction*> validActions = uniqueActions;
+	validActions.RemoveAll([Item](const UMounteaInventorySimpleItemAction* actionData)
 	{
-		return actionData.IsValidAction();
+		return actionData && actionData->Execute_IsAllowed(actionData, Item) != true;
 	});
 
 	return validActions;
 }
 
-TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
+TArray<UMounteaInventorySimpleItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
 {
-	TArray<FInventoryItemActionDefinition> returnValue = GetItemActions(Item);
-	returnValue.RemoveAll([](const FInventoryItemActionDefinition& actionData)
+	TArray<UMounteaInventorySimpleItemAction*> returnValue = GetItemActions(Item);
+	returnValue.RemoveAll([Item](const UMounteaInventorySimpleItemAction* actionData)
 	{
-		return actionData.bIsUIAction != true;
+		return actionData && actionData->Execute_IsActionVisible(actionData, Item) != true;
 	});
 
 	return returnValue;

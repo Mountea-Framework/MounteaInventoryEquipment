@@ -22,7 +22,7 @@
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemTemplate"
 
 class UTexture;
-class UMounteaInventoryItemAction;
+class UMounteaInventorySimpleItemAction;
 enum class EInventoryItemFlags : uint8;
 
 /**
@@ -188,6 +188,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
 		meta=(NoResetToDefault))
 	FGameplayTagContainer AttachmentSlots;
+	
+	/**
+	 * Definition of allowed Actions for specific Category.
+	 * Each Item of this category can perform selected Action.
+	 * 
+	 * When Item is created, all Actions based on Item Category are pre-defined.
+	 * When Category/Subcategory is changed, all Item Actions are removed!
+	 * 
+	 * Future enhancement:
+	 * → Do not delete shared Item Actions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action", Instanced)
+	TArray<TObjectPtr<UMounteaInventorySimpleItemAction>> ItemActions;
 
 	/** A reference to a special gameplay abilities or effects triggered by this item. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",

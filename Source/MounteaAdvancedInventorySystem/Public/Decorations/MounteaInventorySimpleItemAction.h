@@ -51,8 +51,6 @@ public:
 	virtual bool InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory,
 		UObject* ContextPayload = nullptr) override;
-	virtual FInventoryItem GetTargetItem_Implementation() const override
-	{ return CurrentTargetItem; };
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory_Implementation() const override;
 	virtual FMounteaItemActionData GetActionData_Implementation() const override
 	{ return ItemActionData; };
@@ -70,33 +68,5 @@ public:
 	virtual void ClearAllActionFlags_Implementation() override;
 	virtual EInventoryItemActionCallback GetInventoryItemActionCallback_Implementation() const override;
 
-#pragma endregion
-
-#pragma region Private Data
-private:
-
-	/**
-	 * The parent widget that owns this item action.
-	 * Used for UI context and interaction.
-	 */
-	UPROPERTY(BlueprintReadOnly, 
-		meta=(ExposeOnSpawn),
-		meta=(AllowPrivateAccess))
-	TObjectPtr<UUserWidget> ParentItemWidget;
-	
-	/**
-	 * The inventory item currently being processed by this action.
-	 */
-	UPROPERTY(BlueprintReadOnly, 
-		meta=(AllowPrivateAccess))
-	FInventoryItem CurrentTargetItem;
-	
-	/**
-	 * The inventory manager currently processing this action.
-	 */
-	UPROPERTY(BlueprintReadOnly, 
-		meta=(AllowPrivateAccess))
-	TObjectPtr<UObject> CurrentInventoryManager;
-	
 #pragma endregion
 };

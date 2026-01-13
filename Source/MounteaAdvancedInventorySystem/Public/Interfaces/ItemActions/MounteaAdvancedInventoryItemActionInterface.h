@@ -136,46 +136,6 @@ public:
 		UObject* ContextPayload = nullptr) = 0;
 
 	/**
-	 * Checks if this action has been properly initialized and is ready for execution.
-	 * 
-	 * @return True if Initialize() was called successfully, false if action needs setup.
-	 */
-	/*
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool IsItemActionInitialized() const;
-	virtual bool IsItemActionInitialized_Implementation() const = 0;
-	*/
-
-	/**
-	 * Resets the action to uninitialized state, clearing target item and inventory references.
-	 */
-	/*
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	void ResetItemAction();
-	virtual void ResetItemAction_Implementation() = 0;
-	*/
-
-	/**
-	 * Gets the inventory item currently being processed by this action.
-	 * 
-	 * @return The target item this action is operating on.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	FInventoryItem GetTargetItem() const;
-	virtual FInventoryItem GetTargetItem_Implementation() const = 0;
-
-	/**
-	 * Sets the target item for this action to operate on.
-	 * 
-	 * @param TargetItem The inventory item to set as the target.
-	 */
-	/*
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	void SetTargetItem(const FInventoryItem& TargetItem);
-	virtual void SetTargetItem_Implementation(const FInventoryItem& TargetItem) = 0;
-	*/
-
-	/**
 	 * Gets the inventory interface that owns the target item.
 	 * 
 	 * @return Script interface to the inventory containing the target item.

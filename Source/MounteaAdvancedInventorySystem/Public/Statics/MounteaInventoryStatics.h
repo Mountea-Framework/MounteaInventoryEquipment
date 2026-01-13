@@ -411,7 +411,7 @@ public:
 	 * @return - An array of Inventory Action data containing the item actions
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
-	static TArray<FInventoryItemActionDefinition> GetItemActions(const FInventoryItem& Item);
+	static TArray<UMounteaInventorySimpleItemAction*> GetItemActions(const FInventoryItem& Item);
 	
 	/**
 	 * Retrieves the actions associated with a specified inventory item which are allowed to be displayed in UI.
@@ -422,7 +422,7 @@ public:
 	 * @return - An array of Inventory Action data containing the item actions which can be displayed in UI
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", meta=(CustomTag="MounteaK2Getter"))
-	static TArray<FInventoryItemActionDefinition> GetDisplayableItemActions(const FInventoryItem& Item);
+	static TArray<UMounteaInventorySimpleItemAction*> GetDisplayableItemActions(const FInventoryItem& Item);
 
 	// --- Items
 	

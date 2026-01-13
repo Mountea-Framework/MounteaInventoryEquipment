@@ -38,7 +38,6 @@
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Guid.h"
-#include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"

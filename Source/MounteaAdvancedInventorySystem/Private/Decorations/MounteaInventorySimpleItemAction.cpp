@@ -25,22 +25,12 @@ bool UMounteaInventorySimpleItemAction::InitializeItemAction_Implementation(cons
 	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
 		return false;
 	
-	CurrentTargetItem = NewTargetItem;
-
-	if (TObjectPtr<UUserWidget> payloadWidget = Cast<UUserWidget>(ContextPayload))
-		ParentItemWidget = payloadWidget;
-	else
-		LOG_WARNING(TEXT("[%s] Invalid context payload for item action!"), *GetName())
-	
 	return true;
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventorySimpleItemAction::
 GetOwningInventory_Implementation() const
 {
-	if (CurrentTargetItem.IsItemValid())
-		return CurrentTargetItem.GetOwningInventory();
-
 	return nullptr;
 }
 
@@ -63,11 +53,11 @@ bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventor
 	if (!IsValid(TargetItem.Template))
 		return false;
 
-	auto allowedActions = UMounteaInventoryStatics::GetItemActions(CurrentTargetItem);
+	auto allowedActions = UMounteaInventoryStatics::GetItemActions(TargetItem);
 
-	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const FInventoryItemActionDefinition& action)
+	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const UMounteaInventorySimpleItemAction* action)
 	{
-		return action.ItemActionClass.LoadSynchronous() == GetClass();
+		return action && action->GetClass() == GetClass();
 	}) != nullptr;
 
 	return bFound;
