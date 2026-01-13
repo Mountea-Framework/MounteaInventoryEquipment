@@ -20,9 +20,30 @@ class UMounteaCallbackInventoryItemAction;
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemActionData"
 
 /**
- * 
+ * UMounteaSelectableInventoryItemAction provides lightweight inventory actions intended purely for
+ * local "UI-level" operations.
+ *
+ * Selectable Actions are executed directly inside the UI layer and should only handle presentation and
+ * interaction flow — for example opening a modal window to select a quantity (eg. when consuming an item),
+ * toggling an item as Favorite, showing a confirmation dialog, or previewing action details.
+ *
+ * ⚠ These actions must never perform gameplay logic or cross-system changes by themselves.
+ *
+ * If the action requires any execution logic (Inventory updates, Equipment changes, GAS interaction, etc.),
+ * use the "CallbackAction" property, which defines the "Callable" sibling of this class:
+ * "UMounteaCallbackInventoryItemAction".
+ *
+ * Example workflow:
+ * → Selectable Action requests "Consume" and spawns a modal window to pick quantity
+ * → Once confirmed, Selectable Action forwards the request to its "CallbackAction"
+ * → Callback Action performs the actual Inventory System operation and any other runtime logic
+ *
+ * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/SimpleActions)
+ * @see UMounteaCallbackInventoryItemAction
+ * @see UMounteaInventoryItemAction
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, meta=(DisplayName="Selectable Item Action"))
+
+UCLASS(ClassGroup=(Mountea), Abstract, Blueprintable, meta=(DisplayName="Selectable Item Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaSelectableInventoryItemAction : public UMounteaInventoryItemAction
 {
 	GENERATED_BODY()

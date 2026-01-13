@@ -118,7 +118,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	FGameplayTagContainer GetItemActionTags() const;
-	virtual FGameplayTagContainer GetItemActionTags_Implementation() const { return FGameplayTagContainer(); };
+	virtual FGameplayTagContainer GetItemActionTags_Implementation() const { return ItemActionTags; };
 
 protected:
 	
