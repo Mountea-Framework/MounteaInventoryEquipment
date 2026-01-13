@@ -12,9 +12,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Definitions/MounteaInventoryItem.h"
-#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "UObject/Object.h"
+
+#include "Definitions/MounteaInventoryBaseDataTypes.h"
+#include "Definitions/MounteaInventoryItem.h"
+
+#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
+
 #include "MounteaInventorySimpleItemAction.generated.h"
 
 /**
