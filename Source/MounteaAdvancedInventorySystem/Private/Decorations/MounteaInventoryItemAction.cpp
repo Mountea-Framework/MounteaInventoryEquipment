@@ -34,33 +34,15 @@ GetOwningInventory_Implementation() const
 	return nullptr;
 }
 
-bool UMounteaInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
-{
-	if (!TargetItem.IsItemValid())
-		return false;
-
-	return ItemActionData.bIsVisibleByDefault;
-}
-
 bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
 {
 	if (!TargetItem.IsItemValid())
 		return false;
 
-	if (!IsActionVisible(TargetItem))
-		return false;
-
 	if (!IsValid(TargetItem.Template))
 		return false;
 
-	auto allowedActions = UMounteaInventoryStatics::GetItemActions(TargetItem);
-
-	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const UMounteaInventoryItemAction* action)
-	{
-		return action && action->GetClass() == GetClass();
-	}) != nullptr;
-
-	return bFound;
+	return false;
 }
 
 FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
@@ -79,33 +61,7 @@ bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const FI
 		return false;
 	}
 	
-	return ProcessAction(this, TargetItem);
-}
-
-bool UMounteaInventoryItemAction::ProcessAction_Implementation(UObject* ActionInitiator,
-	const FInventoryItem& TargetItem)
-{
-	LOG_WARNING(TEXT("[ProcessAction] Called on base simple action class for %s!"), *GetName())
-	return false;
-}
-
-EInventoryItemActionCallback UMounteaInventoryItemAction::GetInventoryItemActionCallback_Implementation() const
-{
-	return static_cast<EInventoryItemActionCallback>(ItemActionData.InventoryItemActionCallback);
-}
-
-void UMounteaInventoryItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
-{
-	ItemActionData.InventoryItemActionCallback |= static_cast<uint8>(FlagToAdd);
-}
-
-void UMounteaInventoryItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
-{
-	ItemActionData.InventoryItemActionCallback &= ~static_cast<uint8>(FlagToRemove);
-}
-
-void UMounteaInventoryItemAction::ClearAllActionFlags_Implementation()
-{
-	ItemActionData.InventoryItemActionCallback = 0;
+	LOG_WARNING(TEXT("[ExecuteInventoryAction] Called on action class for %s!"), *GetName())
+	return true;
 }
 

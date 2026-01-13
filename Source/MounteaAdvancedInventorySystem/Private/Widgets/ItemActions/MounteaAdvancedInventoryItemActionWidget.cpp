@@ -13,15 +13,17 @@
 #include "Widgets/ItemActions/MounteaAdvancedInventoryItemActionWidget.h"
 
 #include "Decorations/MounteaInventoryItemAction.h"
-#include "Definitions/MounteaInventoryBaseDataTypes.h"
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
+
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
+
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
 void UMounteaAdvancedInventoryItemActionWidget::InitializeItemAction_Implementation(
 	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
+	const TSoftClassPtr<UMounteaSelectableInventoryItemAction>& ItemActionClass, UWidget* ParentWidget)
 {
 	ParentUIComponent = ParentUI;
 	ActionClass = ItemActionClass;
@@ -78,22 +80,4 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItemId));
 
 	actionInstance->ExecuteInventoryAction(inventoryItem);
-}
-
-FMounteaItemActionData UMounteaAdvancedInventoryItemActionWidget::GetItemActionData_Implementation() const
-{
-	if (ActionClass.IsNull())
-	{
-		LOG_ERROR(TEXT("[GetItemActionData] Invalid or empty `ActionClass` for widget '%s'"), *GetName());
-		return FMounteaItemActionData();
-	}
-	const auto actionClass = ActionClass.LoadSynchronous();
-	if (!IsValid(actionClass))
-	{
-		LOG_ERROR(TEXT("[GetItemActionData] Invalid or empty `ActionClass` for widget '%s'"), *GetName());
-		return FMounteaItemActionData();
-	}
-
-	const auto actionDefault =  GetDefault<UMounteaInventoryItemAction>(actionClass);
-	return actionDefault->GetActionData();
 }

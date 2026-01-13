@@ -11,3 +11,48 @@
 
 
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
+
+#include "Statics/MounteaInventoryStatics.h"
+
+bool UMounteaSelectableInventoryItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
+{
+	if (!Super::IsAllowed_Implementation(TargetItem) && IsActionVisible(TargetItem))
+		return false;
+	
+	TArray<UMounteaSelectableInventoryItemAction*> allowedActions = UMounteaInventoryStatics::GetDisplayableItemActions(TargetItem);
+
+	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const UMounteaSelectableInventoryItemAction* action)
+	{
+		return action && action->GetClass() == GetClass();
+	}) != nullptr;
+
+	return bFound;
+}
+
+bool UMounteaSelectableInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
+{
+	return bIsVisibleByDefault;
+}
+
+EInventoryItemActionCallback UMounteaSelectableInventoryItemAction::GetInventoryItemActionCallback_Implementation() const
+{
+	return static_cast<EInventoryItemActionCallback>(InventoryItemActionCallback);
+}
+
+bool UMounteaSelectableInventoryItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
+{
+	InventoryItemActionCallback |= static_cast<uint8>(FlagToAdd);
+	return true;
+}
+
+bool UMounteaSelectableInventoryItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
+{
+	InventoryItemActionCallback &= ~static_cast<uint8>(FlagToRemove);
+	return true;
+}
+
+bool UMounteaSelectableInventoryItemAction::ClearAllActionFlags_Implementation()
+{
+	InventoryItemActionCallback = 0;
+	return true;
+}

@@ -22,7 +22,7 @@ class UMounteaCallbackInventoryItemAction;
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup=(Mountea), Blueprintable, meta=(DisplayName="Selectable Item Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaSelectableInventoryItemAction : public UMounteaInventoryItemAction
 {
 	GENERATED_BODY()
@@ -69,15 +69,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
 		DisplayName="Available for UI")
 	uint8 bIsVisibleByDefault : 1;
-
-	/**
-	 * The tag used to identify this action in the gameplay ability system.
-	 * This tag is used for filtering and identifying actions in the UI and logic.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
-		meta=(Categories="Mountea_Inventory.ItemAction,Mountea_Inventory.ItemActions,ItemAction,Action"))
-	FGameplayTagContainer ItemActionTag;
-
+	
 	/**
 	 * Callback type for this action, used to determine how the action is processed.
 	 * This can be used to trigger different behaviors based on the action type.
@@ -92,6 +84,72 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
 		Instanced)
 	TObjectPtr<UMounteaCallbackInventoryItemAction> CallbackAction;
+	
+	/**
+	 * List of tags which are disabling the action.
+	 * If Item has `QuestItem` tag (temp. quest item), then `Use` would be disabled to avoid soft-locking of the quest.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration")
+	FGameplayTagContainer ItemActionBlockingTags;
+	
+public:
+	
+	/**
+	 * Determines whether this action should be visible in the UI for the given item.
+	 * 
+	 * @param TargetItem The inventory item to check visibility for.
+	 * 
+	 * @return True if the action should be shown in the user interface, false otherwise.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool IsActionVisible(const FInventoryItem& TargetItem) const;
+	virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const;
+	
+	/**
+	 * Gets the callback type for this inventory item action.
+	 * 
+	 * This defines how the action interacts with the inventory system and UI.
+	 * 
+	 * @return The callback type indicating how this action should be processed.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	EInventoryItemActionCallback GetInventoryItemActionCallback() const;
+	virtual EInventoryItemActionCallback GetInventoryItemActionCallback_Implementation() const;
+	
+	/**
+	 * Adds a specified action flag to an inventory item action.
+	 * Designed to modify the behavior of item actions by appending a predefined flag.
+	 *
+	 * @param FlagToAdd The action flag to be added to the item action.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool AddActionFlag(const EInventoryItemActionCallback FlagToAdd);
+	virtual bool AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd);
+	
+	/**
+	 * Removes a specific action flag from the item.
+	 * Allows modification of action flags associated with inventory items.
+	 *
+	 * @param FlagToRemove The flag to be removed from the item's action flags.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool RemoveActionFlag(const EInventoryItemActionCallback FlagToRemove);
+	virtual bool RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove);
+
+	/**
+	 * Clears all action flags associated with the item.
+	 * Designed to reset the item's action state for further configuration or reinitialization.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool ClearAllActionFlags();
+	virtual bool ClearAllActionFlags_Implementation();
+	
+	UMounteaCallbackInventoryItemAction* GetCallbackItemAction() const
+	{ return CallbackAction; };
+	
+public:
+	
+	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const override;
 };
 
 #undef LOCTEXT_NAMESPACE

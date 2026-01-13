@@ -18,7 +18,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup=(Mountea), Blueprintable, meta=(DisplayName="Callback Item Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCallbackInventoryItemAction : public UMounteaInventoryItemAction
 {
 	GENERATED_BODY()

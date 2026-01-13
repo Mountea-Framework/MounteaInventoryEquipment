@@ -12,7 +12,9 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
+#include "Decorations/MounteaCallbackInventoryItemAction.h"
 #include "Decorations/MounteaInventoryItemAction.h"
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -251,37 +253,44 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
-TArray<UMounteaInventoryItemAction*> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
-{
-	if (!Item.IsItemValid()) return {};
-	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!settings) return {};
-	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!inventorySettingsConfig) return {};
-	
+TArray<UMounteaCallbackInventoryItemAction*> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+{	
 	const auto itemTemplate = Item.GetTemplate();
 	if (!itemTemplate) return {};
     
-	TArray<UMounteaInventoryItemAction*> uniqueActions =itemTemplate->ItemActions;
+	TArray<UMounteaCallbackInventoryItemAction*> validActions;
+	const TArray<UMounteaSelectableInventoryItemAction*> uniqueActions = GetDisplayableItemActions(Item);
 
-	TArray<UMounteaInventoryItemAction*> validActions = uniqueActions;
-	validActions.RemoveAll([Item](const UMounteaInventoryItemAction* actionData)
-	{
-		return actionData && actionData->IsAllowed(Item) != true;
-	});
+	Algo::TransformIf(
+		uniqueActions,
+		validActions,
+		[](const UMounteaSelectableInventoryItemAction* A)
+		{
+			return A && A->GetCallbackItemAction() != nullptr;
+		},
+		[](const UMounteaSelectableInventoryItemAction* A)
+		{
+			return A->GetCallbackItemAction();
+		}
+	);
 
 	return validActions;
 }
 
-TArray<UMounteaInventoryItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
-{
-	TArray<UMounteaInventoryItemAction*> returnValue = GetItemActions(Item);
-	returnValue.RemoveAll([Item](const UMounteaInventoryItemAction* actionData)
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
+{	
+	const auto itemTemplate = Item.GetTemplate();
+	if (!itemTemplate) return {};
+	
+	const TArray<UMounteaSelectableInventoryItemAction*> uniqueActions = itemTemplate->ItemActions;
+	TArray<UMounteaSelectableInventoryItemAction*> validActions = uniqueActions;
+	
+	validActions.RemoveAll([Item](const UMounteaSelectableInventoryItemAction* actionData)
 	{
-		return actionData && actionData->IsActionVisible(Item) != true;
+		return actionData && actionData->IsAllowed(Item) != true && actionData->IsActionVisible(Item) != true;
 	});
 
-	return returnValue;
+	return validActions;
 }
 
 TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
@@ -448,7 +457,7 @@ bool UMounteaInventoryStatics::ItemTemplate_CalculateItemTemplateJson(UMounteaIn
     return false;
 }
 
-EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UMounteaInventoryItemAction* Target)
+EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UMounteaSelectableInventoryItemAction* Target)
 {
 	if (!IsValid(Target))
 	{
@@ -458,7 +467,7 @@ EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const 
 	return Target->GetInventoryItemActionCallback();
 }
 
-bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck)
+bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck)
 {
 	if (!IsValid(Target))
 	{
@@ -469,7 +478,7 @@ bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaInventoryItemAct
 		& static_cast<uint8>(FlagToCheck)) != 0;
 }
 
-void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd)
+void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaSelectableInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd)
 {
 	if (!IsValid(Target))
 	{
@@ -479,7 +488,7 @@ void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaInventoryItemAct
 	Target->AddActionFlag(FlagToAdd);	
 }
 
-void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove)
+void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove)
 {
 	if (!IsValid(Target))
 	{
@@ -489,7 +498,7 @@ void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaInventoryItem
 	Target->RemoveActionFlag(FlagToRemove);
 }
 
-void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UMounteaInventoryItemAction* Target)
+void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target)
 {
 	if (!IsValid(Target))
 	{

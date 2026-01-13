@@ -682,7 +682,7 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 
 void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UUserWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
+	const TSoftClassPtr<UMounteaSelectableInventoryItemAction>& ItemActionClass, UWidget* ParentWidget)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeItemAction(
@@ -713,7 +713,7 @@ void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UUserWidget* Targe
 		LOG_ERROR(TEXT("[ExecuteItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
 }
 
-TSoftClassPtr<UObject> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUserWidget* Target)
+TSoftClassPtr<UMounteaSelectableInventoryItemAction> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUserWidget* Target)
 {
 	if (!IsValid(Target))
 	{
@@ -728,23 +728,6 @@ TSoftClassPtr<UObject> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUse
 	}
 
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
-}
-
-FMounteaItemActionData UMounteaInventoryUIStatics::ItemAction_GetActionData(UWidget* Target)
-{
-	if (!IsValid(Target))
-	{
-		LOG_ERROR(TEXT("[GetActionData] Invalid Target!"));
-		return FMounteaItemActionData();
-	}
-
-	if (!Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
-	{
-		LOG_ERROR(TEXT("[GetActionData] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
-		return FMounteaItemActionData();
-	}
-
-	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemActionData(Target);
 }
 
 void UMounteaInventoryUIStatics::ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget)
