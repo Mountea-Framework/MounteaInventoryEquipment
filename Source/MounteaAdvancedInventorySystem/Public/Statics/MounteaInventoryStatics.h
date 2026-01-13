@@ -468,12 +468,12 @@ public:
 	 * Retrieves the item action flags for the specified target.
 	 * This function returns the current set of flags that indicate which item actions are available for the target.
 	 *
-	 * @param Target The object for which to retrieve the item action flags.
+	 * @param Target The Item Action for which to retrieve the item action flags.
 	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(CustomTag="MounteaK2Getter"))
-	static EInventoryItemActionCallback GetItemActionFlags(const UObject* Target);
+	static EInventoryItemActionCallback GetItemActionFlags(const UMounteaInventorySimpleItemAction* Target);
 	
 	/**
 	 * Checks if a specific flag is set in the given flag container.
@@ -484,7 +484,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(CustomTag="MounteaK2Validate"))
-	static bool ItemAction_HasActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToCheck);
+	static bool ItemAction_HasActionFlag(UMounteaInventorySimpleItemAction* Target, const EInventoryItemActionCallback FlagToCheck);
 
 	/**
 	 * Adds a specific flag to the flag container.
@@ -495,7 +495,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(CustomTag="MounteaK2Setter"))
-	static void ItemAction_AddActionFlag(UObject* Target, EInventoryItemActionCallback FlagToAdd);
+	static void ItemAction_AddActionFlag(UMounteaInventorySimpleItemAction* Target, EInventoryItemActionCallback FlagToAdd);
 
 	/**
 	 * Removes a specific flag from the flag container.
@@ -505,7 +505,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(CustomTag="MounteaK2Setter"))
-	static void ItemAction_RemoveActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToRemove);
+	static void ItemAction_RemoveActionFlag(UMounteaInventorySimpleItemAction* Target, const EInventoryItemActionCallback FlagToRemove);
 
 	/**
 	 * Clears all flags.
@@ -514,7 +514,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(CustomTag="MounteaK2Setter"))
-	static void ItemAction_ClearAllActionFlags(UObject* Target);
+	static void ItemAction_ClearAllActionFlags(UMounteaInventorySimpleItemAction* Target);
 
 #pragma endregion
 	
