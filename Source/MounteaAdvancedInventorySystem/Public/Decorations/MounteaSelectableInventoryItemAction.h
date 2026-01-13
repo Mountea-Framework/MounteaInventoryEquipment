@@ -33,7 +33,6 @@ public:
 		ActionDisplayName(LOCTEXT("DefaultActionName", "Default Action")),
 		ActionDescription(LOCTEXT("DefaultActionDescription", "A basic inventory item action")),
 		ActionPriority(0),
-		bIsVisibleByDefault(true),
 		InventoryItemActionCallback(0)
 	{};
 	
@@ -62,13 +61,6 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
 	int32 ActionPriority = INDEX_NONE;
-
-	/**
-	 * Whether this action should be visible by default in the UI.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
-		DisplayName="Available for UI")
-	uint8 bIsVisibleByDefault : 1;
 	
 	/**
 	 * Callback type for this action, used to determine how the action is processed.

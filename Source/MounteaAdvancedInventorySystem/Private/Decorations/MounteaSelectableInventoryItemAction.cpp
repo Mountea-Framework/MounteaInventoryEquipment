@@ -31,7 +31,7 @@ bool UMounteaSelectableInventoryItemAction::IsAllowed_Implementation(const FInve
 
 bool UMounteaSelectableInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
 {
-	return bIsVisibleByDefault;
+	return true;
 }
 
 EInventoryItemActionCallback UMounteaSelectableInventoryItemAction::GetInventoryItemActionCallback_Implementation() const
