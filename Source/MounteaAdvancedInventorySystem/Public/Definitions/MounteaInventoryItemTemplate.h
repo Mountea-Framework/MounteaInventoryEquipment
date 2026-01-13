@@ -22,7 +22,7 @@
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemTemplate"
 
 class UTexture;
-class UMounteaInventorySimpleItemAction;
+class UMounteaInventoryItemAction;
 enum class EInventoryItemFlags : uint8;
 
 /**
@@ -200,7 +200,7 @@ public:
 	 * → Do not delete shared Item Actions
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action", Instanced)
-	TArray<TObjectPtr<UMounteaInventorySimpleItemAction>> ItemActions;
+	TArray<TObjectPtr<UMounteaInventoryItemAction>> ItemActions;
 
 	/** A reference to a special gameplay abilities or effects triggered by this item. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",

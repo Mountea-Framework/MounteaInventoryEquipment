@@ -16,7 +16,6 @@
 #include "MounteaAdvancedInventoryItemActionsContainerWidgetInterface.generated.h"
 
 class UWidget;
-class UMounteaInventoryItemAction;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemActionsContainerWidgetInterface : public UInterface

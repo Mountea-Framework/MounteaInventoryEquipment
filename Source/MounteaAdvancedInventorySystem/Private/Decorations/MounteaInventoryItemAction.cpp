@@ -10,7 +10,7 @@
 // For more information, visit: https://mountea.tools
 
 
-#include "Decorations/MounteaInventorySimpleItemAction.h"
+#include "Decorations/MounteaInventoryItemAction.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
@@ -19,7 +19,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaInventoryStatics.h"
 
-bool UMounteaInventorySimpleItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
+bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
  const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory, UObject* ContextPayload)
 {
 	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
@@ -28,13 +28,13 @@ bool UMounteaInventorySimpleItemAction::InitializeItemAction_Implementation(cons
 	return true;
 }
 
-TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventorySimpleItemAction::
+TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::
 GetOwningInventory_Implementation() const
 {
 	return nullptr;
 }
 
-bool UMounteaInventorySimpleItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
+bool UMounteaInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
 {
 	if (!TargetItem.IsItemValid())
 		return false;
@@ -42,12 +42,12 @@ bool UMounteaInventorySimpleItemAction::IsActionVisible_Implementation(const FIn
 	return ItemActionData.bIsVisibleByDefault;
 }
 
-bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
+bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
 {
 	if (!TargetItem.IsItemValid())
 		return false;
 
-	if (!Execute_IsActionVisible(this, TargetItem))
+	if (!IsActionVisible(TargetItem))
 		return false;
 
 	if (!IsValid(TargetItem.Template))
@@ -55,7 +55,7 @@ bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventor
 
 	auto allowedActions = UMounteaInventoryStatics::GetItemActions(TargetItem);
 
-	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const UMounteaInventorySimpleItemAction* action)
+	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const UMounteaInventoryItemAction* action)
 	{
 		return action && action->GetClass() == GetClass();
 	}) != nullptr;
@@ -63,7 +63,7 @@ bool UMounteaInventorySimpleItemAction::IsAllowed_Implementation(const FInventor
 	return bFound;
 }
 
-FText UMounteaInventorySimpleItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
+FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
 {
 	if (!TargetItem.IsItemValid())
 		return FText::FromString(TEXT("Invalid target item"));
@@ -71,40 +71,40 @@ FText UMounteaInventorySimpleItemAction::GetDisallowedReason_Implementation(cons
 	return FText::FromString(TEXT("Action is not currently available"));
 }
 
-bool UMounteaInventorySimpleItemAction::ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem)
+bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem)
 {
-	if (!Execute_IsAllowed(this, TargetItem))
+	if (!IsAllowed(TargetItem))
 	{
-		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *Execute_GetDisallowedReason(this, TargetItem).ToString())
+		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *GetDisallowedReason(TargetItem).ToString())
 		return false;
 	}
 	
-	return Execute_ProcessAction(this, this, TargetItem);
+	return ProcessAction(this, TargetItem);
 }
 
-bool UMounteaInventorySimpleItemAction::ProcessAction_Implementation(UObject* ActionInitiator,
+bool UMounteaInventoryItemAction::ProcessAction_Implementation(UObject* ActionInitiator,
 	const FInventoryItem& TargetItem)
 {
 	LOG_WARNING(TEXT("[ProcessAction] Called on base simple action class for %s!"), *GetName())
 	return false;
 }
 
-EInventoryItemActionCallback UMounteaInventorySimpleItemAction::GetInventoryItemActionCallback_Implementation() const
+EInventoryItemActionCallback UMounteaInventoryItemAction::GetInventoryItemActionCallback_Implementation() const
 {
 	return static_cast<EInventoryItemActionCallback>(ItemActionData.InventoryItemActionCallback);
 }
 
-void UMounteaInventorySimpleItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
+void UMounteaInventoryItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
 {
 	ItemActionData.InventoryItemActionCallback |= static_cast<uint8>(FlagToAdd);
 }
 
-void UMounteaInventorySimpleItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
+void UMounteaInventoryItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
 {
 	ItemActionData.InventoryItemActionCallback &= ~static_cast<uint8>(FlagToRemove);
 }
 
-void UMounteaInventorySimpleItemAction::ClearAllActionFlags_Implementation()
+void UMounteaInventoryItemAction::ClearAllActionFlags_Implementation()
 {
 	ItemActionData.InventoryItemActionCallback = 0;
 }

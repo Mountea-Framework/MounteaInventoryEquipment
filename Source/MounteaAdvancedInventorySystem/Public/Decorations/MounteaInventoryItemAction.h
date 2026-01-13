@@ -17,10 +17,10 @@
 #include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
 
-#include "MounteaInventorySimpleItemAction.generated.h"
+#include "MounteaInventoryItemAction.generated.h"
 
 /**
- * UMounteaInventorySimpleItemAction provides lightweight inventory actions for local UI operations.
+ * UMounteaInventoryItemAction provides lightweight inventory actions for local UI operations.
  * Simple actions execute directly without Gameplay Ability System overhead, making them ideal
  * for non-gameplay inventory operations like splitting stacks, moving items, or UI-only modifications
  * with immediate execution and minimal performance impact for inventory management tasks.
@@ -32,7 +32,7 @@ UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable, DefaultToIn
 	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
 	HideCategories=("Cooking","Collision"),
 	meta=(DisplayName="Mountea Inventory Action"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventorySimpleItemAction : public UObject
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UObject
 {
 	GENERATED_BODY()
 
@@ -72,7 +72,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	bool CanModifyTargetItem() const;
-	virtual bool CanModifyTargetItem_Implementation() const;
+	virtual bool CanModifyTargetItem_Implementation() const { return true; };
 	
 	/**
 	 * Gets the action data containing display information and configuration.
@@ -81,7 +81,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	FMounteaItemActionData GetActionData() const;
-	virtual FMounteaItemActionData GetActionData_Implementation() const;
+	virtual FMounteaItemActionData GetActionData_Implementation() const { return ItemActionData;};
 
 	/**
 	 * Determines whether this action should be visible in the UI for the given item.
@@ -159,7 +159,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	FGameplayTag GetInventoryItemTag() const;
-	virtual FGameplayTag GetInventoryItemTag_Implementation() const;
+	virtual FGameplayTag GetInventoryItemTag_Implementation() const { return FGameplayTag(); };
 
 	/**
 	 * Gets the callback type for this inventory item action.

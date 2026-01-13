@@ -29,7 +29,6 @@ class UMounteaInventoryScrollBox;
 class UVerticalBoxSlot;
 class UWidget;
 class UTextBlock;
-class UMounteaInventoryItemAction;
 class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
 class UMounteaAdvancedInventoryUIConfig;
@@ -1155,7 +1154,7 @@ public:
 	 *
 	 * @param Target The target widget from which to retrieve the item action class. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
 	 * 
-	 * @return A TSoftClassPtr to the UMounteaInventoryItemAction class if available; otherwise, returns nullptr.
+	 * @return A TSoftClassPtr to the UMounteaInventorySimpleItemAction class if available; otherwise, returns nullptr.
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
 		meta=(CustomTag="MounteaK2Getter"),

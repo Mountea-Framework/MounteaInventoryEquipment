@@ -18,7 +18,6 @@
 struct FMounteaItemActionData;
 
 class UWidget;
-class UMounteaInventoryItemAction;
 class IMounteaAdvancedInventoryUIManagerInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemActionSelected, const UUserWidget*, SelectedItemActionWidget);

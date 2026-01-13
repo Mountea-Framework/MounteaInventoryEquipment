@@ -12,6 +12,7 @@
 
 #include "Widgets/ItemActions/MounteaAdvancedInventoryItemActionWidget.h"
 
+#include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
@@ -67,7 +68,7 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 		return;
 	}
 
-	UObject* actionInstance = NewObject<UObject>(this, ActionClass.LoadSynchronous());
+	UMounteaInventoryItemAction* actionInstance = NewObject<UMounteaInventoryItemAction>(this, ActionClass.LoadSynchronous());
 	if (!actionInstance)
 	{
 		LOG_ERROR(TEXT("[ExecuteItemAction] Failed to Initialize Item Action for widget '%s'"), *GetName());
@@ -77,7 +78,7 @@ void UMounteaAdvancedInventoryItemActionWidget::ExecuteItemAction_Implementation
 	FGuid inventoryItemId = IMounteaAdvancedInventoryItemWidgetInterface::Execute_GetInventoryItemId(ParentItemWidget);
 	const auto inventoryItem = UMounteaInventoryUIStatics::FindItem(ParentUIComponent, FInventoryItemSearchParams(inventoryItemId));
 
-	IMounteaAdvancedInventoryItemActionInterface::Execute_ExecuteInventoryAction(actionInstance, inventoryItem);
+	actionInstance->ExecuteInventoryAction(inventoryItem);
 }
 
 FMounteaItemActionData UMounteaAdvancedInventoryItemActionWidget::GetItemActionData_Implementation() const
@@ -94,6 +95,6 @@ FMounteaItemActionData UMounteaAdvancedInventoryItemActionWidget::GetItemActionD
 		return FMounteaItemActionData();
 	}
 
-	const auto actionDefault =  GetDefault<UObject>(actionClass);
-	return IMounteaAdvancedInventoryItemActionInterface::Execute_GetActionData(actionDefault);
+	const auto actionDefault =  GetDefault<UMounteaInventoryItemAction>(actionClass);
+	return actionDefault->GetActionData();
 }

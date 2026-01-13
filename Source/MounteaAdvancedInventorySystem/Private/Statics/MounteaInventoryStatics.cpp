@@ -12,7 +12,7 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
-#include "Decorations/MounteaInventorySimpleItemAction.h"
+#include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -252,7 +252,7 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
-TArray<UMounteaInventorySimpleItemAction*> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+TArray<UMounteaInventoryItemAction*> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
 {
 	if (!Item.IsItemValid()) return {};
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -263,10 +263,10 @@ TArray<UMounteaInventorySimpleItemAction*> UMounteaInventoryStatics::GetItemActi
 	const auto itemTemplate = Item.GetTemplate();
 	if (!itemTemplate) return {};
     
-	TArray<UMounteaInventorySimpleItemAction*> uniqueActions =itemTemplate->ItemActions;
+	TArray<UMounteaInventoryItemAction*> uniqueActions =itemTemplate->ItemActions;
 
-	TArray<UMounteaInventorySimpleItemAction*> validActions = uniqueActions;
-	validActions.RemoveAll([Item](const UMounteaInventorySimpleItemAction* actionData)
+	TArray<UMounteaInventoryItemAction*> validActions = uniqueActions;
+	validActions.RemoveAll([Item](const UMounteaInventoryItemAction* actionData)
 	{
 		return actionData && actionData->IsAllowed(Item) != true;
 	});
@@ -274,10 +274,10 @@ TArray<UMounteaInventorySimpleItemAction*> UMounteaInventoryStatics::GetItemActi
 	return validActions;
 }
 
-TArray<UMounteaInventorySimpleItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
+TArray<UMounteaInventoryItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
 {
-	TArray<UMounteaInventorySimpleItemAction*> returnValue = GetItemActions(Item);
-	returnValue.RemoveAll([Item](const UMounteaInventorySimpleItemAction* actionData)
+	TArray<UMounteaInventoryItemAction*> returnValue = GetItemActions(Item);
+	returnValue.RemoveAll([Item](const UMounteaInventoryItemAction* actionData)
 	{
 		return actionData && actionData->IsActionVisible(Item) != true;
 	});
@@ -449,7 +449,7 @@ bool UMounteaInventoryStatics::ItemTemplate_CalculateItemTemplateJson(UMounteaIn
     return false;
 }
 
-EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UMounteaInventorySimpleItemAction* Target)
+EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UMounteaInventoryItemAction* Target)
 {
 	if (!IsValid(Target))
 	{
@@ -459,7 +459,7 @@ EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const 
 	return Target->GetInventoryItemActionCallback();
 }
 
-bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaInventorySimpleItemAction* Target, const EInventoryItemActionCallback FlagToCheck)
+bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck)
 {
 	if (!IsValid(Target))
 	{
@@ -470,7 +470,7 @@ bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaInventorySimpleI
 		& static_cast<uint8>(FlagToCheck)) != 0;
 }
 
-void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaInventorySimpleItemAction* Target, EInventoryItemActionCallback FlagToAdd)
+void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd)
 {
 	if (!IsValid(Target))
 	{
@@ -480,7 +480,7 @@ void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaInventorySimpleI
 	Target->AddActionFlag(FlagToAdd);	
 }
 
-void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaInventorySimpleItemAction* Target, const EInventoryItemActionCallback FlagToRemove)
+void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove)
 {
 	if (!IsValid(Target))
 	{
@@ -490,7 +490,7 @@ void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaInventorySimp
 	Target->RemoveActionFlag(FlagToRemove);
 }
 
-void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UMounteaInventorySimpleItemAction* Target)
+void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UMounteaInventoryItemAction* Target)
 {
 	if (!IsValid(Target))
 	{

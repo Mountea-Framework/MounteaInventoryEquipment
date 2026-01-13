@@ -16,7 +16,7 @@
 #include "MounteaInventoryBaseEnums.h"
 #include "MounteaInventoryBaseDataTypes.generated.h"
 
-class UMounteaInventorySimpleItemAction;
+class UMounteaInventoryItemAction;
 class UTexture;
 class UTexture2D;
 class UGameplayEffect;
@@ -135,7 +135,7 @@ struct FInventoryCategoryData
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TArray<TSoftClassPtr<UMounteaInventorySimpleItemAction>> AllowedActions;	
+	TArray<TSoftClassPtr<UMounteaInventoryItemAction>> AllowedActions;	
 };
 
 /**
