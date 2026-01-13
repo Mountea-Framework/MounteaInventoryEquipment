@@ -29,7 +29,6 @@
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
-#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Interfaces/Widgets/BaseWidget/MounteaAdvancedBaseInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"

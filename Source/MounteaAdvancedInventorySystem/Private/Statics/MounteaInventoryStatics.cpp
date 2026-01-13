@@ -17,7 +17,6 @@
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaEquipmentBaseDataTypes.h"
-#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"

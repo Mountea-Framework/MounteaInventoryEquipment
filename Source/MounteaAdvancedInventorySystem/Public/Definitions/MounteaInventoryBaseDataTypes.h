@@ -292,7 +292,6 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaItemActionData
 		ActionDescription(LOCTEXT("DefaultActionDescription", "A basic inventory item action")),
 		ActionPriority(0),
 		bIsVisibleByDefault(true),
-		bRequiresConfirmation(false),
 		InventoryItemActionCallback(0)
 	{}
 
@@ -314,7 +313,7 @@ public:
 	 * Icon representing this action in the user interface.
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
-	TSoftObjectPtr<UTexture2D> Icon;
+	TSoftObjectPtr<UTexture2D> Icon = nullptr;
 
 	/**
 	 * Priority value used for sorting actions in UI elements.
@@ -325,21 +324,17 @@ public:
 	/**
 	 * Whether this action should be visible by default in the UI.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
+		DisplayName="Available for UI")
 	uint8 bIsVisibleByDefault : 1;
-
-	/**
-	 * Whether this action requires confirmation before execution.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration")
-	uint8 bRequiresConfirmation : 1;
 
 	/**
 	 * The tag used to identify this action in the gameplay ability system.
 	 * This tag is used for filtering and identifying actions in the UI and logic.
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration")
-	FGameplayTag ItemActionTag;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
+		meta=(Categories="Mountea_Inventory.ItemAction,Mountea_Inventory.ItemActions,ItemAction,Action"))
+	FGameplayTagContainer ItemActionTag;
 
 	/**
 	 * Callback type for this action, used to determine how the action is processed.
@@ -348,6 +343,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
 		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback"))
 	uint8 InventoryItemActionCallback;
+
+	/**
+	 * Action which will be called if Inventory Item Action is required.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
+		Instanced)
+	TObjectPtr<UMounteaInventoryItemAction> CallbackAction;
 
 	/**
 	 * Gameplay effects to apply when this action is successfully executed.

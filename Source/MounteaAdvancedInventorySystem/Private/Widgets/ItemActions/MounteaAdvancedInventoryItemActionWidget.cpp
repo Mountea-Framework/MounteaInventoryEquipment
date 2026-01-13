@@ -15,7 +15,6 @@
 #include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
-#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaInventoryUIStatics.h"
