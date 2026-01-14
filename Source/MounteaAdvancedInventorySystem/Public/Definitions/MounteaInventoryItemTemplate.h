@@ -240,7 +240,11 @@ protected:
 public:
 	
 	/**
+	 * Request default Item Actions from Category.
+	 * This will delete all current actions and will create new ones based on selected Category.
 	 * 
+	 * This function is called anytime you change Category for the Item Template, press the button only
+	 * if you messed up and need to re-load Item Actions!
 	 */
 	UFUNCTION(CallInEditor, Category="Edit Actions")
 	virtual void ReloadItemActions();

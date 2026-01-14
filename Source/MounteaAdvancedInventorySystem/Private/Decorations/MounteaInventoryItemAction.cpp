@@ -12,8 +12,6 @@
 
 #include "Decorations/MounteaInventoryItemAction.h"
 
-#include "Blueprint/UserWidget.h"
-#include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"

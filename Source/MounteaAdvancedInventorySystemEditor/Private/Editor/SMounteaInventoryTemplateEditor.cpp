@@ -990,18 +990,39 @@ void SMounteaInventoryTemplateEditor::UnbindItemChanged()
 void SMounteaInventoryTemplateEditor::OnItemChanged(UMounteaInventoryItemTemplate* Template)
 {
 	if (!Template)
-	{
-		RefreshTemplateList();
 		return;
-	}
 
 	UPackage* itemPackage = Template->GetOutermost();
-	if (itemPackage && itemPackage->IsDirty())
-		TrackDirtyAsset(Template);
-
-	RefreshTemplateList();
+	if (itemPackage && itemPackage->IsDirty() && !PendingChanges.Contains(Template))
+	{
+		PendingChanges.Add(Template);
+        
+		if (ProcessChangesTimer.IsValid())
+			GEditor->GetTimerManager()->ClearTimer(ProcessChangesTimer);
+        
+		GEditor->GetTimerManager()->SetTimer(
+			ProcessChangesTimer,
+			FTimerDelegate::CreateSP(this, &SMounteaInventoryTemplateEditor::ProcessPendingChanges),
+			ChangeDebounceDelay,
+			false
+		);
+	}
 }
 
+void SMounteaInventoryTemplateEditor::ProcessPendingChanges()
+{
+	if (PendingChanges.Num() == 0)
+		return;
+
+	for (UMounteaInventoryItemTemplate* itemTemplate : PendingChanges)
+	{
+		if (itemTemplate)
+			TrackDirtyAsset(itemTemplate);
+	}
+    
+	PendingChanges.Empty();
+	RefreshTemplateList();
+}
 
 void SMounteaInventoryTemplateEditor::ApplySearchFilter()
 {
