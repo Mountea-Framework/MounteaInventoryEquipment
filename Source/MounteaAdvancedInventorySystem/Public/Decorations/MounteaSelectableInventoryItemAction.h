@@ -38,12 +38,13 @@ class UMounteaCallbackInventoryItemAction;
  * → Once confirmed, Selectable Action forwards the request to its "CallbackAction"
  * → Callback Action performs the actual Inventory System operation and any other runtime logic
  *
- * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/SimpleActions)
+ * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
  * @see UMounteaCallbackInventoryItemAction
  * @see UMounteaInventoryItemAction
  */
-
-UCLASS(ClassGroup=(Mountea), Abstract, Blueprintable, meta=(DisplayName="Selectable Item Action"))
+UCLASS(ClassGroup=(Mountea), Abstract, Blueprintable, 
+	HideCategories=("Cooking","Collision","Private"),
+	meta=(DisplayName="Selectable Item Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaSelectableInventoryItemAction : public UMounteaInventoryItemAction
 {
 	GENERATED_BODY()
@@ -86,12 +87,6 @@ protected:
 		meta=(TitleProperty="ActionTag"),
 		meta=(NoResetToDefault))
 	FGameplayTagContainer PreferredSelectionKeys;
-
-	/**
-	 * Icon representing this action in the user interface.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
-	TSoftObjectPtr<UTexture2D> Icon = nullptr;
 
 	/**
 	 * Priority value used for sorting actions in UI elements.

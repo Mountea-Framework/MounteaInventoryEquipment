@@ -31,12 +31,13 @@
  * execution flow (typically through GAS), allowing actions like Consume/Equip/Use to grant buffs, debuffs,
  * cooldowns, or any other effect-driven consequences.
  *
- * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/SimpleActions)
+ * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
  * @see UMounteaSelectableInventoryItemAction
  * @see UMounteaInventoryItemAction
  */
-
-UCLASS(ClassGroup=(Mountea), Abstract, Blueprintable, meta=(DisplayName="Callback Item Action"))
+UCLASS(ClassGroup=(Mountea), Abstract, Blueprintable,
+	HideCategories=("Cooking","Collision","Private"),
+	meta=(DisplayName="Callback Item Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCallbackInventoryItemAction : public UMounteaInventoryItemAction
 {
 	GENERATED_BODY()

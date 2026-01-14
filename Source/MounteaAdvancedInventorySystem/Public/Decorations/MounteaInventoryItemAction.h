@@ -25,12 +25,12 @@
  * for non-gameplay inventory operations like splitting stacks, moving items, or UI-only modifications
  * with immediate execution and minimal performance impact for inventory management tasks.
  *
- * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/SimpleActions)
+ * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
  * @see UMounteaInventoryItemAction
  */
 UCLASS(ClassGroup=(Mountea), Abstract, NotBlueprintable, BlueprintType, DefaultToInstanced, EditInlineNew,
 	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
-	HideCategories=("Cooking","Collision"),
+	HideCategories=("Cooking","Collision","Private"),
 	meta=(DisplayName="Mountea Inventory Action"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UObject
 {
