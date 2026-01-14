@@ -199,7 +199,7 @@ public:
 	 * Future enhancement:
 	 * → Do not delete shared Item Actions
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action", Instanced)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Actions", Instanced)
 	TArray<TObjectPtr<UMounteaSelectableInventoryItemAction>> ItemActions;
 
 	/** A reference to a special gameplay abilities or effects triggered by this item. */
@@ -236,6 +236,17 @@ protected:
 	static TArray<FString> GetAllowedRarities();
 
 #if WITH_EDITOR
+	
+public:
+	
+	/**
+	 * 
+	 */
+	UFUNCTION(CallInEditor, Category="Edit Actions")
+	virtual void ReloadItemActions();
+	
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemTemplateChanged, UMounteaInventoryItemTemplate*);
+	FOnItemTemplateChanged TemplateChangedDelegate;
 	
 protected:
 

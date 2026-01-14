@@ -12,6 +12,7 @@
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
@@ -104,6 +105,38 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedRarities()
 
 #if WITH_EDITOR
 
+void UMounteaInventoryItemTemplate::ReloadItemActions()
+{
+	const auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	if (!inventorySettings)
+		return;
+
+	if (const auto inventorySettingsConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous())
+	{
+		auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory);
+		if (categoryConfiguration->CategoryData.AllowedActions.Num() > 0)
+		{
+			const auto categoryActionClasses = categoryConfiguration->CategoryData.AllowedActions;
+			const auto currentItemActions = ItemActions;
+			for (const auto& currentItemAction : currentItemActions)
+			{
+				if (currentItemAction)
+					currentItemAction->MarkAsGarbage();
+			}
+			ItemActions.Empty();
+			
+			for (const auto& categoryActionClass : categoryActionClasses)
+			{
+				UMounteaSelectableInventoryItemAction* newAction = NewObject<UMounteaSelectableInventoryItemAction>(this, categoryActionClass.LoadSynchronous());
+				ItemActions.Add(newAction);
+			}
+		}
+	}
+	
+	MarkPackageDirty();
+	TemplateChangedDelegate.Broadcast(this);
+}
+
 void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -119,6 +152,8 @@ void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChang
 		{
 			auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory);
 			ItemFlags = categoryConfiguration->CategoryData.CategoryFlags;
+			
+			ReloadItemActions();
 		}
 
 		ItemSubCategory = TEXT("");

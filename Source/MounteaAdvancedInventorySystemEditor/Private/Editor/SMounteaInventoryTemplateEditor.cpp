@@ -135,7 +135,6 @@ void SMounteaInventoryTemplateEditor::NotifyPostChange(const FPropertyChangedEve
 		TemplateTreeView->RequestTreeRefresh();
 }
 
-
 TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 {
 	TArray<UObject*> allTemplates;
@@ -194,6 +193,8 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 	TArray<UObject*> allTemplates = LoadAllTemplatesForMatrix();
 	
 	AvailableTemplates.Empty();
+	UnbindItemChanged();
+	
 	Algo::TransformIf(
 		allTemplates,
 		AvailableTemplates,
@@ -207,6 +208,7 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 			return TWeakObjectPtr<UMounteaInventoryItemTemplate>(Cast<UMounteaInventoryItemTemplate>(obj));
 		}
 	);
+	BindItemChanged();
 	
 	RebuildTreeStructure();
 	ApplySearchFilter();
@@ -966,6 +968,40 @@ void SMounteaInventoryTemplateEditor::UnbindAssetRegistry()
 	AssetAddedHandle.Reset();
 	AssetUpdatedHandle.Reset();
 }
+
+void SMounteaInventoryTemplateEditor::BindItemChanged()
+{
+	for (auto itemTemplate : AvailableTemplates)
+	{
+		if (itemTemplate.IsValid())
+			itemTemplate->TemplateChangedDelegate.AddRaw(this, &SMounteaInventoryTemplateEditor::OnItemChanged);
+	}
+}
+
+void SMounteaInventoryTemplateEditor::UnbindItemChanged()
+{
+	for (auto itemTemplate : AvailableTemplates)
+	{
+		if (itemTemplate.IsValid())
+			itemTemplate->TemplateChangedDelegate.RemoveAll(this);
+	}
+}
+
+void SMounteaInventoryTemplateEditor::OnItemChanged(UMounteaInventoryItemTemplate* Template)
+{
+	if (!Template)
+	{
+		RefreshTemplateList();
+		return;
+	}
+
+	UPackage* itemPackage = Template->GetOutermost();
+	if (itemPackage && itemPackage->IsDirty())
+		TrackDirtyAsset(Template);
+
+	RefreshTemplateList();
+}
+
 
 void SMounteaInventoryTemplateEditor::ApplySearchFilter()
 {

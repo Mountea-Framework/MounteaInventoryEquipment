@@ -178,6 +178,10 @@ private:
 	EActiveTimerReturnType HandleDeferredRefresh(double, float);
 	void BindAssetRegistry();
 	void UnbindAssetRegistry();
+	
+	void BindItemChanged();
+	void UnbindItemChanged();
+	void OnItemChanged(UMounteaInventoryItemTemplate* Template);
 };
 
 #undef LOCTEXT_NAMESPACE
