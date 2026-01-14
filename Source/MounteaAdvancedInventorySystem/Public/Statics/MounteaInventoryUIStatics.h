@@ -1093,20 +1093,17 @@ public:
 #pragma region ItemActions
 
 	/**
-	 * Initializes the item action widget with the parent UI and item action data.
-	 *
-	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
-	 * @param ParentUI The parent UI interface that owns this item action widget.
-	 * @param ItemActionClass The item action class associated with this widget.
-	 * @param ParentWidget Inventory Item widget which owns this item action widget.
+	 * Initializes the item action widget with the Initiator UI and item action data.
+	 * 
+	 * @param Target Widget object which implements MounteaAdvancedInventoryItemActionWidgetInterface
+	 * @param ItemAction The item action associated with this widget.
+	 * @param SelectedItem Inventory Item which this action affects.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Action - Initialize")
-	static void ItemAction_InitializeItemAction(UUserWidget* Target,
-		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-		const TSoftClassPtr<UMounteaSelectableInventoryItemAction>& ItemActionClass,
-		UWidget* ParentWidget);
+	static void ItemAction_InitializeItemAction(UWidget* Target,
+		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
 
 	/**
 	 * Checks if the item action associated with the specified target widget is enabled.
@@ -1166,17 +1163,6 @@ public:
 
 	// --- Item Actions Container
 #pragma region ItemActionsContainer
-
-	/**
-	 * Sets the parent item widget for the item actions container.
-	 *
-	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
-	 * @param ParentItemWidget The parent item widget to be set for the item actions container.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set Parent Item Widget")
-	static void ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget);
 
 	/**
 	 * Constructs the item actions container from a list of item action classes.

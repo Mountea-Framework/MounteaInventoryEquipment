@@ -44,17 +44,16 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionWidg
 public:
 
 	/**
-	 * Initializes the item action widget with the parent UI and item action data.
+	 * Initializes the item action widget with the Initiator UI and item action data.
 	 * 
-	 * @param ParentUI The parent UI interface that owns this item action widget.
-	 * @param ItemActionClass The item action class associated with this widget.
-	 * @param ParentWidget Inventory Item widget which owns this item action widget.
+	 * @param ItemAction The item action associated with this widget.
+	 * @param SelectedItem Inventory Item which this action affects.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
-	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-		const TSoftClassPtr<UMounteaSelectableInventoryItemAction>& ItemActionClass, UWidget* ParentWidget);
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-		const TSoftClassPtr<UMounteaSelectableInventoryItemAction>& ItemActionClass, UWidget* ParentWidget) = 0;
+	void InitializeItemAction(
+		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
+	virtual void InitializeItemAction_Implementation(
+		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.
@@ -92,6 +91,4 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
 	TSoftClassPtr<UMounteaSelectableInventoryItemAction> GetItemAction() const;
 	virtual TSoftClassPtr<UMounteaSelectableInventoryItemAction> GetItemAction_Implementation() const = 0;
-
-	virtual FOnItemActionSelected& GetOnItemActionSelectedEventHandle() = 0;
 };

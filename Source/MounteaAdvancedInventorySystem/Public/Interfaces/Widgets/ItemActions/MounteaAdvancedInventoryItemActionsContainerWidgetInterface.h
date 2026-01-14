@@ -38,18 +38,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionsCon
 public:
 
 	/**
-	 * Sets the parent item widget for this item actions container.
-	 * 
-	 * @param ParentItemWidget The parent widget that owns this item actions container.
-	 * 
-	 * This function is typically called to establish the relationship between the item actions container
-	 * and the item widget it is associated with, allowing for proper context and interaction.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
-	void SetParentItemWidget(UWidget* ParentItemWidget);
-	virtual void SetParentItemWidget_Implementation(UWidget* ParentItemWidget) = 0;
-
-	/**
 	 * Constructs the item actions container from a list of item action classes.
 	 * 
 	 * @param ItemActionsList An array of TSoftClassPtr<UObject> representing the item actions to be added to the container.
