@@ -402,8 +402,55 @@ public:
 	static bool FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent,
 		const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping);
 	
+	/**
+	 * Tries to resolve UI action mappings from a Slate key event.
+	 *
+	 * @param KeyEvent Event to read data from. Keyboard event most of the time.
+	 * @param Mappings Stored mappings to search in.
+	 * @param OutMappings Returns found mappings sorted by InputPriority (highest first).
+	 * @return Returns true if at least one mapping was found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Input",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mappings (Key Event)")
+	static bool FindUIActionMappingsFromKeyEvent(const FKeyEvent& KeyEvent,
+		const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
+	
+	/**
+	 * Tries to resolve UI action mappings from a Slate analog input event.
+	 *
+	 * @param AnalogEvent Event to read data from. Gamepad axis / trigger / analog-like input.
+	 * @param Mappings Stored mappings to search in.
+	 * @param OutMappings Returns found mappings sorted by InputPriority (highest first).
+	 * @return Returns true if at least one mapping was found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Input",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mappings (Analog Event)")
+	static bool FindUIActionMappingsFromAnalogEvent(const FAnalogInputEvent& AnalogEvent, 
+		const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
+	
+	/**
+	 * Tries to resolve UI action mappings from a Slate pointer event (mouse / touch / pen).
+	 *
+	 * For mouse button events, the "effecting button" is used.
+	 * For mouse wheel events, this function resolves input as EKeys::MouseWheelAxis when WheelDelta != 0.
+	 *
+	 * @param MouseEvent Event to read data from. Mouse/touch pointer event most of the time.
+	 * @param Mappings Stored mappings to search in.
+	 * @param OutMappings Returns found mappings sorted by InputPriority (highest first).
+	 * @return Returns true if at least one mapping was found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Input",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mappings (Mouse Event)")
+	static bool FindUIActionMappingsFromMouseEvent(const FPointerEvent& MouseEvent, 
+		const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
+	
 	static bool FindUIActionMappingByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
 		const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping);
+	static bool FindUIActionMappingsByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
+		const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
 	
 #pragma endregion
 	

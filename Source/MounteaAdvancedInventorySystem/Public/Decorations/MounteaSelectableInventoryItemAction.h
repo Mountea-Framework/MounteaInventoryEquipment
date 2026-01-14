@@ -70,6 +70,22 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
 	FText ActionDescription;
+	
+	/** 
+	 * Gameplay tag identifying the preferred UI Input to trigger this action. 
+	 * Limited to "Input" category only!
+	 * 
+	 * If more than 1 is specified, the list assumes first one is most preferred and last one least.
+	 * Fighting for inputs should NOT happen!
+	 * If more than 1 Item Actions end up with same preferred keys, then `ActionPriority` is what decides the order
+	 * of selection.
+	 * If you run out of UI Inputs, then the Item Action will NOT be displayed, unless you implement your own logic.
+	 */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
+		meta=(Categories="Input,Mountea_Inventory.Input"),
+		meta=(TitleProperty="ActionTag"),
+		meta=(NoResetToDefault))
+	FGameplayTagContainer PreferredSelectionKeys;
 
 	/**
 	 * Icon representing this action in the user interface.

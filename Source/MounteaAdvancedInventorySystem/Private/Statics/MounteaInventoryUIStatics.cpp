@@ -387,41 +387,96 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointe
 	return FindUIActionMappingByKey(PressedKey, MouseEvent.GetModifierKeys(), Mappings, OutMapping);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
-	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromKeyEvent(const FKeyEvent& KeyEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
 {
-	if (!PressedKey.IsValid())
-	{
-		return false;
-	}
-
-	for (const FMounteaWidgetInputActionMapping& inputMapping : Mappings)
-	{
-		// 1) Simple keys.
-		if (inputMapping.Keys.Contains(PressedKey))
-		{
-			OutMapping = inputMapping;
-			return true;
-		}
-
-		// 2) Chords (Key + optional modifier).
-		/*
-		for (const FMounteaWidgetInputKeyChord& Chord : inputMapping.Chords)
-		{
-			if (Chord.Key == PressedKey && ModifiersMatchChord(Modifiers, Chord))
-			{
-				OutMapping = inputMapping;
-				return true;
-			}
-		}
-		*/
-	}
-
-	return false;
+	return FindUIActionMappingsByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), Mappings, OutMappings);
 }
 
-FInventoryItem UMounteaInventoryUIStatics::FindItem(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromAnalogEvent(const FAnalogInputEvent& AnalogEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+{
+	return FindUIActionMappingsByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), Mappings, OutMappings);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromMouseEvent(const FPointerEvent& MouseEvent,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+{
+	const float WheelDelta = MouseEvent.GetWheelDelta();
+	const FKey PressedKey = !FMath::IsNearlyZero(WheelDelta)
+		? EKeys::MouseWheelAxis
+		: MouseEvent.GetEffectingButton();
+
+	return FindUIActionMappingsByKey(PressedKey, MouseEvent.GetModifierKeys(), Mappings, OutMappings);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey,
+	const FModifierKeysState& Modifiers, const TArray<FMounteaWidgetInputActionMapping>& Mappings,
+	FMounteaWidgetInputActionMapping& OutMapping)
+{
+	if (!PressedKey.IsValid())
+		return false;
+
+	const auto IsKeyMatch = [&PressedKey](const FMounteaWidgetInputActionMapping& Mapping)
+	{
+		return Mapping.Keys.Contains(PressedKey);
+	};
+
+	const FMounteaWidgetInputActionMapping* bestMapping = nullptr;
+	int32 bestPriority = TNumericLimits<int32>::Lowest();
+
+	for (const FMounteaWidgetInputActionMapping& mapping : Mappings)
+	{
+		if (!IsKeyMatch(mapping))
+		continue;
+
+		const int32 mappingPriority = mapping.InputPriority;
+		const bool isBetter = (bestMapping == nullptr) || (mappingPriority > bestPriority);
+
+		if (isBetter)
+		{
+			bestMapping = &mapping;
+			bestPriority = mappingPriority;
+		}
+	}
+
+	if (bestMapping == nullptr)
+		return false;
+
+	OutMapping = *bestMapping;
+	return true;
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(const FKey& PressedKey, 
+	const FModifierKeysState& Modifiers, const TArray<FMounteaWidgetInputActionMapping>& Mappings, 
+	TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+{
+	OutMappings.Reset();
+
+	if (!PressedKey.IsValid())
+		return false;
+
+	const auto isKeyMatch = [&PressedKey](const FMounteaWidgetInputActionMapping& mapping)
+	{
+		return mapping.Keys.Contains(PressedKey);
+	};
+
+	Algo::TransformIf(
+		Mappings,
+		OutMappings,
+		isKeyMatch,
+		[](const FMounteaWidgetInputActionMapping& mapping) { return mapping; }
+	);
+
+	OutMappings.Sort([](const FMounteaWidgetInputActionMapping& a, const FMounteaWidgetInputActionMapping& b)
+	{
+		return a.InputPriority > b.InputPriority;
+	});
+	
+	return true;
+}
+
+FInventoryItem UMounteaInventoryUIStatics::FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryItemSearchParams& SearchParams)
 {
 	if (!IsValid(Target.GetObject()))
@@ -681,7 +736,7 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 }
 
 void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UWidget* Target,
-		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem)
+	const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeItemAction(
@@ -729,8 +784,8 @@ TSoftClassPtr<UMounteaSelectableInventoryItemAction> UMounteaInventoryUIStatics:
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target,
-																			   const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
+void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target, 
+	const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -905,8 +960,8 @@ void UMounteaInventoryUIStatics::ItemSlot_SetParentSlotsWrapper(UWidget* Target,
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetParentSlotsWrapper(Target, ParentSlotsWrapper);
 }
 
-void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UWidget* Target,
-																	  const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
+void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UWidget* Target, 
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }

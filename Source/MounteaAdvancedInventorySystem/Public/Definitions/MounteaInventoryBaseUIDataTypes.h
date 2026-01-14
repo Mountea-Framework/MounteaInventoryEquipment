@@ -455,11 +455,22 @@ struct FMounteaWidgetInputActionMapping
 	 * Limited to "Input" category only!
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
-		meta=(Categories="Input,Mountea_Inventory.Input"))
+		meta=(Categories="Input,Mountea_Inventory.Input"),
+		meta=(NoResetToDefault))
 	FGameplayTag ActionTag;
 
+	/**
+	 * Higher the value, higher is the priority of specified Input.
+	 * If you have input with more Keys, the Key with higher priority wins.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input")
+	int32 InputPriority = INDEX_NONE;
+
 	/** Keys that can trigger this action (Esc, Enter, Gamepad_FaceButton_Right, etc.). */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input",
+		meta=(ShowOnlyInnerProperties),
+		meta=(TitleProperty="KeyName"),
+		meta=(NoResetToDefault))
 	TArray<FKey> Keys;
 
 	// TODO: Holding 2 buttons at the same time for example
@@ -468,8 +479,11 @@ struct FMounteaWidgetInputActionMapping
 	//TArray<FMounteaWidgetInputKeyChord> Chords;
 
 	/** If true, the UI layer should consume the input when this mapping triggers. */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input", AdvancedDisplay)
 	bool bConsume = true;
+	
+	// TODO:
+	// - allow remapping
 };
 
 
