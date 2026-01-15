@@ -471,7 +471,7 @@ struct FMounteaWidgetInputActionMapping
 		meta=(ShowOnlyInnerProperties),
 		meta=(TitleProperty="KeyName"),
 		meta=(NoResetToDefault))
-	TArray<FKey> Keys;
+	TMap<FKey,UTexture2D*> Keys;
 
 	// TODO: Holding 2 buttons at the same time for example
 	/** Key chords (key + optional modifiers) that can trigger this action. */

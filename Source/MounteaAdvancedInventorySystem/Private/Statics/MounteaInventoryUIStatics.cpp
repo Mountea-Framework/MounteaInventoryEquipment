@@ -24,6 +24,7 @@
 #include "GameFramework/PlayerState.h"
 
 #include "CommonActivatableWidget.h"
+#include "Algo/MaxElement.h"
 #include "Components/PanelWidget.h"
 
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
@@ -362,6 +363,36 @@ FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGri
 	return SourceData.ToString();
 }
 
+bool UMounteaInventoryUIStatics::FindUIActionMappingForItemAction(const FGameplayTagContainer& PreferredInputActions,
+	FMounteaWidgetInputActionMapping& OutMapping)
+{
+	OutMapping = FMounteaWidgetInputActionMapping();
+
+	const auto uiConfig = GetInventoryUISettingsConfig();
+	if (!IsValid(uiConfig))
+		return false;
+
+	const auto definedMappings = uiConfig->UIActionMappings;
+	if (definedMappings.Num() == 0)
+		return false;
+
+	if (PreferredInputActions.Num() == 0)
+		return false;
+
+	const auto foundMapping = Algo::FindByPredicate(definedMappings,
+		[&PreferredInputActions](const FMounteaWidgetInputActionMapping& mapping)
+		{
+			return PreferredInputActions.HasTagExact(mapping.ActionTag);
+		});
+
+	if (foundMapping == nullptr)
+		return false;
+
+	OutMapping = *foundMapping;
+	return true;
+}
+
+
 bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
@@ -416,39 +447,39 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey
 {
 	if (!PressedKey.IsValid())
 		return false;
-
-	const auto IsKeyMatch = [&PressedKey](const FMounteaWidgetInputActionMapping& Mapping)
-	{
-		return Mapping.Keys.Contains(PressedKey);
-	};
-
-	const FMounteaWidgetInputActionMapping* bestMapping = nullptr;
-	int32 bestPriority = TNumericLimits<int32>::Lowest();
-
-	for (const FMounteaWidgetInputActionMapping& mapping : Mappings)
-	{
-		if (!IsKeyMatch(mapping))
-		continue;
-
-		const int32 mappingPriority = mapping.InputPriority;
-		const bool isBetter = (bestMapping == nullptr) || (mappingPriority > bestPriority);
-
-		if (isBetter)
-		{
-			bestMapping = &mapping;
-			bestPriority = mappingPriority;
-		}
-	}
-
-	if (bestMapping == nullptr)
+	
+	if (Mappings.Num() <= 0)
 		return false;
 
-	OutMapping = *bestMapping;
+	const auto matchingMapping = [&PressedKey](const FMounteaWidgetInputActionMapping& M)
+	{
+		return M.Keys.Contains(PressedKey);
+	};
+
+	TArray<const FMounteaWidgetInputActionMapping*> candidateMappings;
+	candidateMappings.Reserve(Mappings.Num());
+
+	Algo::TransformIf(
+		Mappings,
+		candidateMappings,
+		matchingMapping,
+		[](const FMounteaWidgetInputActionMapping& M) { return &M; }
+	);
+
+	const FMounteaWidgetInputActionMapping* const* bestMapping =
+		Algo::MaxElementBy(candidateMappings, [](const auto* M) { return M->InputPriority; });
+
+	if (!bestMapping)
+		return false;
+
+	OutMapping = **bestMapping;
 	return true;
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(const FKey& PressedKey, 
-	const FModifierKeysState& Modifiers, const TArray<FMounteaWidgetInputActionMapping>& Mappings, 
+bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(
+	const FKey& PressedKey,
+	const FModifierKeysState& Modifiers,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings,
 	TArray<FMounteaWidgetInputActionMapping>& OutMappings)
 {
 	OutMappings.Reset();
@@ -456,23 +487,40 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(const FKey& PressedKe
 	if (!PressedKey.IsValid())
 		return false;
 
-	const auto isKeyMatch = [&PressedKey](const FMounteaWidgetInputActionMapping& mapping)
+	if (Mappings.Num() <= 0)
+		return false;
+
+	const auto matchingMapping = [&PressedKey](const FMounteaWidgetInputActionMapping& M)
 	{
-		return mapping.Keys.Contains(PressedKey);
+		return M.Keys.Contains(PressedKey);
 	};
+
+	TArray<const FMounteaWidgetInputActionMapping*> candidateMappings;
+	candidateMappings.Reserve(Mappings.Num());
 
 	Algo::TransformIf(
 		Mappings,
-		OutMappings,
-		isKeyMatch,
-		[](const FMounteaWidgetInputActionMapping& mapping) { return mapping; }
+		candidateMappings,
+		matchingMapping,
+		[](const FMounteaWidgetInputActionMapping& M) { return &M; }
 	);
 
-	OutMappings.Sort([](const FMounteaWidgetInputActionMapping& a, const FMounteaWidgetInputActionMapping& b)
+	if (candidateMappings.IsEmpty())
+		return false;
+
+	Algo::Sort(candidateMappings, [](const auto* A, const auto* B)
 	{
-		return a.InputPriority > b.InputPriority;
+		return A->InputPriority > B->InputPriority;
 	});
-	
+
+	OutMappings.Reserve(candidateMappings.Num());
+
+	Algo::Transform(
+		candidateMappings,
+		OutMappings,
+		[](const FMounteaWidgetInputActionMapping* M) { return *M; }
+	);
+
 	return true;
 }
 

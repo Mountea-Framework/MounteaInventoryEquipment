@@ -358,6 +358,19 @@ public:
 #pragma region UIInput
 	
 	/**
+	 * Tries to find UI action mapping Input Action based on the preferred tags.
+	 *
+	 * @param PreferredInputActions List of preferred Input Action Tags..
+	 * @param OutMapping Returns found Mapping if any is found.
+	 * @return Returns true if a mapping was found. OutMapping contains the best match.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Input", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mapping (Item Action)")
+	static bool FindUIActionMappingForItemAction(const FGameplayTagContainer& PreferredInputActions,
+		FMounteaWidgetInputActionMapping& OutMapping);
+	
+	/**
 	 * Tries to resolve a UI action mapping from a Slate key event.
 	 *
 	 * @param KeyEvent Event to read data from. Keyboard event most of the time.
