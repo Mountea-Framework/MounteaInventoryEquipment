@@ -139,7 +139,8 @@ FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWid
 	return FVector2D(0.0f, translationY);
 }
 
-FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(const TSharedPtr<SWidget>& ListWidget, const FGeometry& ListGeometry, const int32 SelectedIndex)
+FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(const TSharedPtr<SWidget>& ListWidget, 
+	const FGeometry& ListGeometry, const int32 SelectedIndex)
 {
 	TSharedPtr<SPanel> panel = StaticCastSharedPtr<SPanel>(ListWidget);
 	
@@ -191,8 +192,7 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics:
 	return Target.GetObject() ? Target->Execute_GetParentInventory(Target.GetObject()) : nullptr;
 }
 
-void UMounteaInventoryUIStatics::SetParentInventory(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+void UMounteaInventoryUIStatics::SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
 	if (Target.GetObject())
@@ -281,8 +281,8 @@ FString UMounteaInventoryUIStatics::GetSelectedCategoryId(
 	return Target.GetObject() ? Target->Execute_GetSelectedCategoryId(Target.GetObject()) : TEXT("none");
 }
 
-void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-											  const FGuid& ItemGuid)
+void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+	const FGuid& ItemGuid)
 {
 	if (Target.GetObject())
 		IMounteaAdvancedInventoryUIManagerInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
@@ -294,8 +294,8 @@ FGuid UMounteaInventoryUIStatics::GetSelectedItemGuid(
 	return Target.GetObject() ? Target->Execute_GetActiveItemGuid(Target.GetObject()) : FGuid();
 }
 
-void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UWidget* Target,
-															   const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
+void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UWidget* Target, 
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -341,8 +341,8 @@ UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig
 	return config->BaseTheme.LoadSynchronous();
 }
 
-void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData,
-												 const FMounteaInventoryGridSlot& TargetData)
+void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData, 
+	const FMounteaInventoryGridSlot& TargetData)
 {
 	SourceData = TargetData;
 }
@@ -616,8 +616,7 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::InitializeWrapperWidget(
-	UObject* Target,
+void UMounteaInventoryUIStatics::InitializeWrapperWidget(UObject* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent)
 {
 	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
@@ -745,21 +744,21 @@ void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UWidget* Target
 		LOG_ERROR(TEXT("[InitializeItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
 }
 
-bool UMounteaInventoryUIStatics::ItemAction_IsActionEnabled(UUserWidget* Target)
+bool UMounteaInventoryUIStatics::ItemAction_IsActionEnabled(UWidget* Target)
 {
 	return IsValid(Target) &&
 		Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>() && 
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_IsActionEnabled(Target);
 }
 
-bool UMounteaInventoryUIStatics::ItemAction_IsActionValid(UUserWidget* Target)
+bool UMounteaInventoryUIStatics::ItemAction_IsActionValid(UWidget* Target)
 {
 	return IsValid(Target) && 
 		Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>() && 
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_IsActionValid(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UUserWidget* Target)
+void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_ExecuteItemAction(Target);
@@ -767,7 +766,7 @@ void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UUserWidget* Targe
 		LOG_ERROR(TEXT("[ExecuteItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
 }
 
-TSoftClassPtr<UMounteaSelectableInventoryItemAction> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUserWidget* Target)
+TSoftClassPtr<UMounteaSelectableInventoryItemAction> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UWidget* Target)
 {
 	if (!IsValid(Target))
 	{
@@ -1160,7 +1159,9 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	return FindEmptyGridSlotRecursive(InventoryInterface, inventoryItem, gridSlots, bIsStackable, bAlwaysStack);
 }
 
-int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems)
+int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, 
+	const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, 
+	const bool bAlwaysStackItems)
 {
 	return INDEX_NONE;
 	/*
@@ -1234,11 +1235,8 @@ int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IM
 	*/
 }
 
-bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(
-	UUserWidget* GridWidget, 
-	const FGuid& ItemId, 
-	int32 SlotIndex,
-	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent)
+bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(UUserWidget* GridWidget, const FGuid& ItemId, 
+	int32 SlotIndex, TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent)
 {
 	return false;
 	/*
@@ -1510,13 +1508,15 @@ void UMounteaInventoryUIStatics::ItemPreview_ResetPreview(UMounteaAdvancedInvent
 		Target->ResetCameraToDefaults();
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const FVector2f& MouseDelta)
 {
 	if (IsValid(Target))
 		Target->ProcessRotationInput(MouseDelta);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const FVector2f& MouseDelta)
 {
 	if (IsValid(Target))
 		Target->ProcessHeightInput(MouseDelta);
@@ -1543,7 +1543,8 @@ void UMounteaInventoryUIStatics::ItemPreview_SetCameraHeightAbsolute(UMounteaAdv
 		Target->SetCameraHeightAbsolute(HeightNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float ZoomNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraZoomAbsolute(ZoomNormalized);
