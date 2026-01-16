@@ -495,7 +495,7 @@ struct FMounteaWidgetInputActionMapping
 	 * → Then "Use" can blacklist ModalWindow state
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
-		meta=(Categories="Mountea_Inventory.Widget.State"),
+		meta=(Categories="Mountea_Inventory.WidgetState.Modal,State"),
 		meta=(NoResetToDefault))
 	FGameplayTagContainer BlacklistedWidgetStates;
 
