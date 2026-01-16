@@ -23,6 +23,7 @@
 //  - FItemWidgetData: all data a UI widget needs to render an item/slot.
 // ============================================================================
 
+enum class ECommonInputType : uint8;
 enum class EMounteaWidgetInputMethod : uint8;
 class UUserWidget;
 class UTextureCube;
@@ -434,21 +435,33 @@ public:
 	FKey ModifierKey;
 };
 
+/**
+ * FMounteaWidgetInputKeyTextureMapping defines the icon representation for a specific input method.
+ *
+ * Used by FMounteaWidgetInputActionMapping to provide per-device icon overrides (e.g. keyboard glyph
+ * vs. gamepad glyph) for the same logical UI action/key binding.
+ */
 USTRUCT(BlueprintType)
 struct FMounteaWidgetInputKeyTextureMapping
 {
 	GENERATED_BODY()
 
 public:
+
+	/**
+	 * Input method this mapping applies to.
+	 * Determines when this icon should be used based on the currently active input type.
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	ECommonInputType InputType;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input",
-		meta=(Categories="Input,Mountea_Inventory.InputType"))
-	FGameplayTag InputQueryTag;
-	
+	/**
+	 * Icon texture used for the specified input method.
+	 * Stored as a soft reference to support deferred loading and reduce memory overhead.
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
 	TSoftObjectPtr<UTexture2D> InputIcon;
 };
-
 
 /**
  * FMounteaWidgetInputActionMapping defines a UI action (identified by a gameplay tag)
@@ -481,6 +494,19 @@ struct FMounteaWidgetInputActionMapping
 	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input")
 	int32 InputPriority = INDEX_NONE;
 
+	/**
+	 * Widget states in which this action must not trigger.
+	 * Used to suppress actions based on current widget state (e.g. disabled, modal, editing text).
+	 * Example:
+	 * → Input Actions "Confirm" and "Use" both use same Gamepad Key
+	 * → If Inventory has Modal window which requires confirmation, the Widget states get updated with the modal Window's state
+	 * → Then "Use" can blacklist ModalWindow state
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(Categories="Mountea_Inventory.Widget.State"),
+		meta=(NoResetToDefault))
+	FGameplayTagContainer BlacklistedWidgetStates;
+
 	/** Keys that can trigger this action (Esc, Enter, Gamepad_FaceButton_Right, etc.). */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input",
 		meta=(ShowOnlyInnerProperties),
@@ -500,7 +526,6 @@ struct FMounteaWidgetInputActionMapping
 	// TODO:
 	// - allow remapping
 };
-
 
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {
