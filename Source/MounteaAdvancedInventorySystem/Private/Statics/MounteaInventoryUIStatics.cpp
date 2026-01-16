@@ -831,7 +831,7 @@ TSoftClassPtr<UMounteaSelectableInventoryItemAction> UMounteaInventoryUIStatics:
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target, 
+void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UWidget* Target, 
 	const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
@@ -843,8 +843,8 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(U
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, ItemActionsList);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UUserWidget* Target,
-	UUserWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UWidget* Target,
+	UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -855,8 +855,8 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(U
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_AddItemActionToContainer(Target, ItemActionWidget);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContainer(UUserWidget* Target,
-	UUserWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContainer(UWidget* Target,
+	UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -873,7 +873,7 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContai
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_RemoveItemActionFromContainer(Target, ItemActionWidget);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_ClearItemActionsContainer(UUserWidget* Target)
+void UMounteaInventoryUIStatics::ItemActionsContainer_ClearItemActionsContainer(UWidget* Target)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -884,8 +884,8 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_ClearItemActionsContainer(
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ClearItemActionsContainer(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UUserWidget* Target,
-	UUserWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UWidget* Target,
+	UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -902,7 +902,7 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UUserWidg
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_SelectItemAction(Target, ItemActionWidget);
 }
 
-TArray<UUserWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemActionsInContainer(UUserWidget* Target)
+TArray<UWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemActionsInContainer(UWidget* Target)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -913,7 +913,7 @@ TArray<UUserWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemAct
 	return IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_GetItemActionsInContainer(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemActionByIndex(UUserWidget* Target,
+void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemActionByIndex(UWidget* Target,
 	const int32 ItemActionIndex)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
