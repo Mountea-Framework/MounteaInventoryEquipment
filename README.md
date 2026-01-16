@@ -80,5 +80,13 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 
 ---
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Mountea-Framework/MounteaInventoryEquipment&type=Date)](https://star-history.com/#Mountea-Framework/MounteaInventoryEquipment&Date)
+## Star History
+
+> <a href="https://www.star-history.com/#Mountea-Framework/MounteaInventoryEquipment&type=date&legend=top-left">
+>  <picture>
+>    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Mountea-Framework/MounteaInventoryEquipment&type=date&theme=dark&legend=top-left" />
+>    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Mountea-Framework/MounteaInventoryEquipment&type=date&legend=top-left" />
+>    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Mountea-Framework/MounteaInventoryEquipment&type=date&legend=top-left" />
+>  </picture>
+> </a>
 
