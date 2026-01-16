@@ -12,6 +12,7 @@
 
 #include "Components/MounteaInventoryUIComponent.h"
 
+#include "Algo/AnyOf.h"
 #include "Blueprint/UserWidget.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
@@ -469,6 +470,37 @@ void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryIt
 	const int32 NewQuantity)
 {
 	Execute_ProcessItemModified(this, Item);
+}
+
+bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag,
+	const FGuid& ItemId)
+{
+	FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
+	if (!foundData || foundData->StoredIds.IsEmpty())
+		return false;
+
+	const int32 removedCount = foundData->StoredIds.RemoveAll([&ItemId](const FGuid& storedId)
+	{
+		return storedId == ItemId;
+	});
+
+	if (removedCount > 0 && foundData->StoredIds.Num() == 0)
+		CustomItemsMap.Remove(ItemTag);
+
+	return removedCount > 0;
+}
+
+bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag,
+                                                                          const FGuid& ItemId)
+{
+	const FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
+	if (!foundData)
+		return false;
+	
+	return Algo::AnyOf(foundData->StoredIds, [&ItemId](const FGuid& storedId)
+	{
+		return storedId == ItemId;
+	});
 }
 
 void UMounteaInventoryUIComponent::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)

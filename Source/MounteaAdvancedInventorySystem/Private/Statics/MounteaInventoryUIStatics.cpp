@@ -581,13 +581,20 @@ void UMounteaInventoryUIStatics::ClearCustomItems(const TScriptInterface<IMounte
 }
 
 bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-	const FGameplayTag& ItemTag)
+	const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
 	if (Target.GetObject())
-		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag);
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag, ItemId);
 	return false;
 }
 
+bool UMounteaInventoryUIStatics::IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+	const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	if (Target.GetObject())
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_IsItemStoredInCustomMap(Target.GetObject(), ItemTag, ItemId);
+	return false;
+}
 
 
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)

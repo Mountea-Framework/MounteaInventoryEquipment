@@ -280,16 +280,34 @@ public:
 	/**
 	 * Removes a single custom item from the target UI component's custom items map.
 	 *
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @param ItemTag    Gameplay tag representing the custom item key to remove.
+	 * @param Target    UI component implementing MounteaAdvancedInventoryUIManagerInterface.
+	 * @param ItemTag   Gameplay tag representing the custom item key to remove.
+	 * @param ItemId	Guide of the item to be removed.
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Inventory UI - Remove Custom Item")
 	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-		const FGameplayTag& ItemTag);
+		const FGameplayTag& ItemTag, const FGuid& ItemId);
+	
+	/**
+	 * Validates whether the provided Item guid is stored in a map for specified tag.
+	 * Example:
+	 * → Is Item in Favorites
+	 * 
+	 * @param Target UI manager implementing MounteaAdvancedInventoryUIManagerInterface.
+	 * @param ItemTag Tag which defines the key, like "Favorite"
+	 * @param ItemId Item guid to search for
+	 * @return True if item is stored in such container, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Inventory UI - Is Item Stored In Custom Map")
+	static bool IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		const FGameplayTag& ItemTag, const FGuid& ItemId);
 	
 #pragma endregion
 	

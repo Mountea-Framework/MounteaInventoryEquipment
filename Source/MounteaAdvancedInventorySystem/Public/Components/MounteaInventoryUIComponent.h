@@ -79,7 +79,8 @@ public:
 	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override { CustomItemsMap.Append(OtherItems); };
 	virtual void ClearCustomItemsMap_Implementation() override { CustomItemsMap.Reset(); };
-	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag) override { return CustomItemsMap.Remove(ItemTag) > 0; };
+	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
+	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	
 	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const override {return SavedGridSlots;};
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;

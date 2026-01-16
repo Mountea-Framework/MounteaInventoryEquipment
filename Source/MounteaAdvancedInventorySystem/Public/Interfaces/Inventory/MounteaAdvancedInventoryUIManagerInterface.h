@@ -273,13 +273,27 @@ public:
 	/**
 	 * Removes a single entry from the custom items map.
 	 *
-	 * @param ItemTag   Gameplay tag representing the custom item key to remove.
+	 * @param ItemTag Key to remove the item from.
+	 * @param ItemId Guid representing the custom item key to remove.
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
-	bool RemoveCustomItemFromMap(const FGameplayTag& ItemTag);
-	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag) = 0;
+	bool RemoveCustomItemFromMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
+	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
+
+	/**
+	 * Validates whether the provided Item guid is stored in a map for specified tag.
+	 * Example:
+	 * → Is Item in Favorites
+	 * 
+	 * @param ItemTag Tag which defines the key, like "Favorite"
+	 * @param ItemId Item guid to search for
+	 * @return True if item is stored in such container, false otherwise
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	bool IsItemStoredInCustomMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
+	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 
 		
 	// --- Slots
