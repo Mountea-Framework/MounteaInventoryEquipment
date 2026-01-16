@@ -15,14 +15,6 @@
 #include "MounteaInventoryItem.h"
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
-// ============================================================================
-//  Inventory Slot & Item Widget Data
-//  Responsibility:
-//  - FInventorySlot: purely inventory/model-side container information.
-//  - FMounteaInventoryGridSlot: adds grid position on top of FInventorySlot.
-//  - FItemWidgetData: all data a UI widget needs to render an item/slot.
-// ============================================================================
-
 enum class ECommonInputType : uint8;
 enum class EMounteaWidgetInputMethod : uint8;
 class UUserWidget;
@@ -510,7 +502,7 @@ struct FMounteaWidgetInputActionMapping
 	/** Keys that can trigger this action (Esc, Enter, Gamepad_FaceButton_Right, etc.). */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input",
 		meta=(ShowOnlyInnerProperties),
-		meta=(TitleProperty="KeyName"),
+		meta=(TitleProperty="InputType"),
 		meta=(NoResetToDefault))
 	TMap<FKey, FMounteaWidgetInputKeyTextureMapping> Keys;
 

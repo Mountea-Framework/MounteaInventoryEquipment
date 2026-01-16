@@ -12,7 +12,6 @@
 
 #include "Components/MounteaInventoryUIComponent.h"
 
-#include "CommonActivatableWidget.h"
 #include "Blueprint/UserWidget.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
@@ -29,7 +28,6 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
-#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"

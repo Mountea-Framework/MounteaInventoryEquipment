@@ -17,6 +17,7 @@
 #include "MounteaInventoryUIStatics.generated.h"
 
 enum class EMounteaWidgetInputPhase : uint8;
+enum class ECommonInputType : uint8;
 
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
@@ -295,11 +296,23 @@ public:
 	// --- Helpers	
 #pragma region Helpers
 	
+	/**
+	 * Validates whether the specified hardware input type is currently active for the owning local player.
+	 *
+	 * This helper evaluates the active input method as reported by CommonUI (UCommonInputSubsystem) and compares it
+	 * against the provided input type. Useful for switching UI glyphs, button hints, or input-specific behavior
+	 * (keyboard/mouse vs gamepad vs touch) directly in Blueprint.
+	 *
+	 * @param ContextObject User widget used to resolve the owning local player and its CommonUI input subsystem.
+	 * @param InputType Input type to validate against the currently active input method.
+	 *
+	 * @return True if the owning local player exists and its current input type matches InputType, otherwise false.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
 		meta=(CustomTag="MounteaK2Validate"),
 		meta=(DefaultToSelf="ContextObject"),
-		DisplayName="Validate HW Input Tag")
-	static bool IsInputTagActive(const UUserWidget* ContextObject, const FGameplayTag& Tag);
+		DisplayName="Validate HW Input Type")
+	static bool InInputTypeActive(const UUserWidget* ContextObject, const ECommonInputType& InputType);
 	
 	/**
 	 * Centers a specific item in a list widget by applying render translation.
