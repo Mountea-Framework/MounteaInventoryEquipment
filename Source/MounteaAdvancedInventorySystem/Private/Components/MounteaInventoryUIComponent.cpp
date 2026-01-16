@@ -529,3 +529,9 @@ void UMounteaInventoryUIComponent::UpdateSlot_Implementation(const FMounteaInven
 		SavedGridSlots.Remove(SlotData);
 	SavedGridSlots.Add(SlotData);
 }
+
+void UMounteaInventoryUIComponent::ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload)
+{
+	if (WrapperWidget && WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, Command, OptionalPayload);
+}

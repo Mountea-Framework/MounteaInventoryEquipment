@@ -596,6 +596,13 @@ bool UMounteaInventoryUIStatics::IsItemStoredInCustomMap(const TScriptInterface<
 	return false;
 }
 
+void UMounteaInventoryUIStatics::ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+	const FString& Command, UObject* OptionalPayload)
+{
+	if (Target.GetObject())
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_ExecuteWidgetCommand(Target.GetObject(), Command, OptionalPayload);
+}
+
 
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
 {

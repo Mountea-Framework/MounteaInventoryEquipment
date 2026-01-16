@@ -53,7 +53,7 @@ public:
 	 * Retrieves the parent inventory associated with this UI.
 	 * @return The parent inventory interface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
 	TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory() const;
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const = 0;
 
@@ -61,7 +61,7 @@ public:
 	 * Sets the parent inventory for this UI.
 	 * @param NewParentInventory - The inventory interface to associate.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
 	void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
 	
@@ -69,7 +69,7 @@ public:
 	 * Creates the inventory UI.
 	 * @return True if UI was successfully created, otherwise false.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
 	bool CreateWrapperWidget();
 	virtual bool CreateWrapperWidget_Implementation() = 0;
 
@@ -77,14 +77,14 @@ public:
 	 * Returns the inventory UI.
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
 	UUserWidget* GetWrapperWidget() const;
 	virtual UUserWidget* GetWrapperWidget_Implementation() const = 0;
 
 	/**
 	 * Removes the inventory UI.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
 	void RemoveWrapperWidget();
 	virtual void RemoveWrapperWidget_Implementation() = 0;
 	
@@ -92,7 +92,7 @@ public:
 	 * Creates the inventory UI.
 	 * @return True if UI was successfully created, otherwise false.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	bool CreateInventoryWidget();
 	virtual bool CreateInventoryWidget_Implementation() = 0;
 
@@ -100,7 +100,7 @@ public:
 	 * Returns the inventory UI.
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	UUserWidget* GetInventoryWidget() const;
 	virtual UUserWidget* GetInventoryWidget_Implementation() const = 0;
 	
@@ -108,14 +108,14 @@ public:
 	 * Sets the inventory UI from outside.
 	 * @return True if UI was successfully set, otherwise false.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	bool SetInventoryWidget(UUserWidget* NewInventoryWidget);
 	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) = 0;
 
 	/**
 	 * Removes the inventory UI.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Inventory")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	void RemoveInventoryWidget();
 	virtual void RemoveInventoryWidget_Implementation() = 0;
 	
@@ -125,7 +125,7 @@ public:
 	 * Retrieves the notification container widget.
 	 * @return A pointer to the notification container widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Notifications")
 	UUserWidget* GetNotificationContainer() const;
 	virtual UUserWidget* GetNotificationContainer_Implementation() const = 0;
 
@@ -133,7 +133,7 @@ public:
 	 * Sets the notification container widget.
 	 * @param NewNotificationContainer - The new notification container widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Notifications")
 	void SetNotificationContainer(UUserWidget* NewNotificationContainer);
 	virtual void SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer) = 0;
 
@@ -141,14 +141,14 @@ public:
 	 * Creates a new inventory notification.
 	 * @param NotificationData - The data defining the notification.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Notifications")
 	void CreateInventoryNotification(const FInventoryNotificationData& NotificationData);
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) = 0;
 
 	/**
 	 * Removes all active inventory notifications.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Main|Notifications")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Notifications")
 	void RemoveInventoryNotifications();
 	virtual void RemoveInventoryNotifications_Implementation() = 0;
 
@@ -364,6 +364,21 @@ public:
 	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
 	void UpdateSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
+	
+	// --- General
+	
+	/**
+	 * This function allows UI Manager to listen to external systems which might want to process Widget Commands.
+	 * Example might to a request to refresh item count when Item Action consumes it.
+	 * 
+	 * Chain of hierarchy is respected, so commands are given to root and then based on the selection passed down.
+	 * 
+	 * @param Command Command to Process
+	 * @param OptionalPayload Optional Payload to pass with the command
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
+	void ExecuteWidgetCommand(const FString& Command, UObject* OptionalPayload);
+	virtual void ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload) = 0;
 
 	// --- Events
 	

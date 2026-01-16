@@ -227,7 +227,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Items",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI - Find Item")
+		DisplayName="Inventory UI ManagerFind Item")
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
@@ -238,7 +238,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI - Get Custom Items")
+		DisplayName="Inventory UI ManagerGet Custom Items")
 	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
@@ -250,7 +250,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Add Custom Item")
+		DisplayName="Inventory UI ManagerAdd Custom Item")
 	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FGameplayTag& ItemTag,
 		const FGuid& ItemId);
 	
@@ -263,7 +263,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Append Custom Items")
+		DisplayName="Inventory UI ManagerAppend Custom Items")
 	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 
@@ -274,7 +274,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Clear Custom Items")
+		DisplayName="Inventory UI ManagerClear Custom Items")
 	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
@@ -289,7 +289,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Inventory UI - Remove Custom Item")
+		DisplayName="Inventory UI ManagerRemove Custom Item")
 	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
 	
@@ -305,9 +305,25 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Validate"),
-		DisplayName="Inventory UI - Is Item Stored In Custom Map")
+		DisplayName="Inventory UI ManagerIs Item Stored In Custom Map")
 	static bool IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
+	
+	/**
+	 * This function allows UI Manager to listen to external systems which might want to process Widget Commands.
+	 * Example might to a request to refresh item count when Item Action consumes it.
+	 * 
+	 * Chain of hierarchy is respected, so commands are given to root and then based on the selection passed down.
+	 * 
+	 * @param Target UI Manager to execute the logic on
+	 * @param Command Command to Process
+	 * @param OptionalPayload Optional Payload to pass with the command
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI ManagerExecute Widget Command")
+	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		const FString& Command, UObject* OptionalPayload);
 	
 #pragma endregion
 	
@@ -1002,7 +1018,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI - Get Active Item Widget")
+		DisplayName="Inventory UI ManagerGet Active Item Widget")
 	static UWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
@@ -1013,7 +1029,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Set Active Item Widget")
+		DisplayName="Inventory UI ManagerSet Active Item Widget")
 	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UWidget* NewActiveItemWidget);
 
 #pragma endregion
