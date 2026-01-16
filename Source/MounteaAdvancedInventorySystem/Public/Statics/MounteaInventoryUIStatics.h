@@ -98,6 +98,11 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventoryUISubsystem* GetInventoryUISubsystem(APlayerController* FromPlayerController);
 	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory UI Subsystem")
+	static UMounteaAdvancedInventoryUISubsystem* GetInventoryUISubsystem_Generic(UObject* Context);
+	
 #pragma endregion
 	
 	// --- UI Manager	
@@ -232,7 +237,7 @@ public:
 	 * @return Custom Items Mpa if any specified.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Inventory UI - Get Custom Items")
 	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	

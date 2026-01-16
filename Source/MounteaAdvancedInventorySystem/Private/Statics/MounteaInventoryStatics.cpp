@@ -23,6 +23,27 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
+#pragma region ItemActions
+
+bool UMounteaInventoryStatics::InitializeItemAction(UMounteaInventoryItemAction* Target,
+	const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+	UObject* ContextPayload)
+{
+	return IsValid(Target) ? Target->InitializeItemAction(TargetItem, OwningInventory, ContextPayload) : false;
+}
+
+bool UMounteaInventoryStatics::ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem)
+{
+	return IsValid(Target) ? Target->ExecuteInventoryAction(TargetItem) : false;
+}
+
+FGameplayTagContainer UMounteaInventoryStatics::GetItemActionTags(UMounteaInventoryItemAction* Target)
+{
+	return IsValid(Target) ? Target->GetItemActionTags() : FGameplayTagContainer();
+}
+
+#pragma endregion 
+
 FInventoryCategoryData UMounteaInventoryStatics::GetInventoryCategoryData(const FString& CategoryName, const FString ParentCategory, bool& bResult)
 {
 	bResult = false;

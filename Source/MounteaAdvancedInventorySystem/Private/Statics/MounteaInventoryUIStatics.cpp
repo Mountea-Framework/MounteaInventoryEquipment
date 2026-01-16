@@ -613,6 +613,26 @@ UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUI
 	return localSubsystem;
 }
 
+UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUISubsystem_Generic(UObject* Context)
+{
+	if (!IsValid(Context))
+		return nullptr;
+
+	APlayerController* playerController = nullptr;
+
+	if (AActor* actor = Cast<AActor>(Context))
+		playerController = FindPlayerController(actor, 3);
+	else if (const UActorComponent* actorComp = Cast<UActorComponent>(Context))
+	{
+		if (AActor* ownerActor = actorComp->GetOwner())
+			playerController = FindPlayerController(ownerActor, 3);
+	}
+	else if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
+		playerController = FindPlayerController(userWidget->GetOwningPlayer(), 2);
+
+	return IsValid(playerController) ? GetInventoryUISubsystem(playerController) : nullptr;
+}
+
 int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetChildrenCount(
 	const UMounteaInventoryScrollBox* ScrollBox)
 {

@@ -12,6 +12,7 @@ class UMounteaAdvancedInventorySettings;
 class UMounteaAdvancedInventorySettingsConfig;
 class UMounteaSelectableInventoryItemAction;
 class UMounteaCallbackInventoryItemAction;
+class UMounteaInventoryItemAction;
 
 enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
@@ -23,6 +24,108 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryStatics : public UBlue
 	GENERATED_BODY()
 
 public:
+	
+#pragma region ItemActions
+	
+	/**
+	 * Initializes the action with the target item and owning inventory.
+	 * This must be called before executing the action to establish the operating context.
+	 * 
+	 * @param Target The Item Action.
+	 * @param TargetItem The inventory item this action will operate on.
+	 * @param OwningInventory The inventory interface that contains the target item.
+	 * @param ContextPayload Optional context object for additional data (e.g., player controller, UI context).
+	 * 
+	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
+	static bool InitializeItemAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem, 
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory, UObject* ContextPayload = nullptr);
+	
+	/**
+	 * Executes the inventory action on the specified target item.
+	 * 
+	 * This is the main entry point for all inventory actions, regardless of implementation type:
+	 * → Selectable actions: Execute logic and does UI related stuff
+	 * → Callback actions: Execute logic directly and returns result
+	 * 
+	 * @param Target The Item Action.
+	 * @param TargetItem The inventory item to perform the action on.
+	 * 
+	 * @return True if the action was executed successfully, false if it failed.
+	 * 
+	 * @note Always call InitializeItemAction() before executing actions to ensure proper context.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
+	static bool ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem);
+	
+	/**
+	 * Gets the inventory interface that owns the target item.
+	 * 
+	 * @param Target The Item Action.
+	 * @return Script interface to the inventory containing the target item.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Getter"))
+	static FGameplayTagContainer GetItemActionTags(UMounteaInventoryItemAction* Target);
+
+	/**
+	 * Retrieves the item action flags for the specified target.
+	 * This function returns the current set of flags that indicate which item actions are available for the target.
+	 *
+	 * @param Target The Item Action for which to retrieve the item action flags.
+	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Getter"))
+	static EInventoryItemActionCallback GetItemActionFlags(const UMounteaSelectableInventoryItemAction* Target);
+	
+	/**
+	 * Checks if a specific flag is set in the given flag container.
+	 *
+	 * @param Target Item Action to check for flags.
+	 * @param FlagToCheck The specific flag to test for.
+	 * @return True if the flag is set, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Validate"))
+	static bool ItemAction_HasActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck);
+
+	/**
+	 * Adds a specific flag to the flag container.
+	 *
+	 * @param Target Item Action to add new flags to.
+	 * @param FlagToAdd The flag to add.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
+	static void ItemAction_AddActionFlag(UMounteaSelectableInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd);
+
+	/**
+	 * Removes a specific flag from the flag container.
+	 *
+	 * @param Target Item Action to remove flags from.
+	 * @param FlagToRemove The flag to clear.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
+	static void ItemAction_RemoveActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove);
+
+	/**
+	 * Clears all flags.
+	 *
+	 * @param Target Item Action to clear all flags from.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"))
+	static void ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target);
+
+#pragma endregion
+	
+	
+	//------------------------------------------------------------------------------------------
 
 #pragma region Category
 	
@@ -464,60 +567,5 @@ public:
 	
 	static bool ItemTemplate_CalculateItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate);
 	
-#pragma endregion
-
-#pragma region ItemActions
-
-	/**
-	 * Retrieves the item action flags for the specified target.
-	 * This function returns the current set of flags that indicate which item actions are available for the target.
-	 *
-	 * @param Target The Item Action for which to retrieve the item action flags.
-	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Getter"))
-	static EInventoryItemActionCallback GetItemActionFlags(const UMounteaSelectableInventoryItemAction* Target);
-	
-	/**
-	 * Checks if a specific flag is set in the given flag container.
-	 *
-	 * @param Target Item Action to check for flags.
-	 * @param FlagToCheck The specific flag to test for.
-	 * @return True if the flag is set, false otherwise.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Validate"))
-	static bool ItemAction_HasActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck);
-
-	/**
-	 * Adds a specific flag to the flag container.
-	 *
-	 * @param Target Item Action to add new flags to.
-	 * @param FlagToAdd The flag to add.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
-	static void ItemAction_AddActionFlag(UMounteaSelectableInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd);
-
-	/**
-	 * Removes a specific flag from the flag container.
-	 *
-	 * @param Target Item Action to remove flags from.
-	 * @param FlagToRemove The flag to clear.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
-	static void ItemAction_RemoveActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove);
-
-	/**
-	 * Clears all flags.
-	 *
-	 * @param Target Item Action to clear all flags from.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
-	static void ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target);
-
 #pragma endregion
 };
