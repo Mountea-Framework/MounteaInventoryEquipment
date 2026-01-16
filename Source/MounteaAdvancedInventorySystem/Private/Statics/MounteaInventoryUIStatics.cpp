@@ -17,6 +17,7 @@
 #include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "CommonInputSubsystem.h"
 
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -91,6 +92,48 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 	}
 
 	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
+}
+
+bool UMounteaInventoryUIStatics::IsInputTagActive(const UUserWidget* ContextObject, const FGameplayTag& Tag)
+{
+	if (!Tag.IsValid())
+		return false;
+
+	if (!IsValid(ContextObject))
+		return false;
+
+	const ULocalPlayer* localPlayer = ContextObject->GetOwningLocalPlayer();
+	if (!localPlayer)
+		return false;
+
+	const UCommonInputSubsystem* inputSubsystem = UCommonInputSubsystem::Get(localPlayer);
+	if (!inputSubsystem)
+		return false;
+
+	const ECommonInputType inputType = inputSubsystem->GetCurrentInputType();
+
+	switch (inputType) 
+	{
+		case ECommonInputType::MouseAndKeyboard:
+			break;
+		case ECommonInputType::Gamepad:
+			break;
+		case ECommonInputType::Touch:
+			break;
+		case ECommonInputType::Count:
+			break;
+	}
+	// Map "hardware input" -> gameplay tags (use your tag names)
+	if (Tag.ToString().Equals(TEXT("Input.Gamepad")))
+		return inputType == ECommonInputType::Gamepad;
+
+	if (Tag.ToString().Equals(TEXT("Input.MouseAndKeyboard")))
+		return inputType == ECommonInputType::MouseAndKeyboard;
+
+	if (Tag.ToString().Equals(TEXT("Input.Touch")))
+		return inputType == ECommonInputType::Touch;
+
+	return false;
 }
 
 void UMounteaInventoryUIStatics::CenterListItemAtIndex(UPanelWidget* ListWidget, int32 SelectedIndex)
@@ -571,6 +614,8 @@ bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounte
 		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag);
 	return false;
 }
+
+
 
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
 {

@@ -434,6 +434,21 @@ public:
 	FKey ModifierKey;
 };
 
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputKeyTextureMapping
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input",
+		meta=(Categories="Input,Mountea_Inventory.InputType"))
+	FGameplayTag InputQueryTag;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	TSoftObjectPtr<UTexture2D> InputIcon;
+};
+
 
 /**
  * FMounteaWidgetInputActionMapping defines a UI action (identified by a gameplay tag)
@@ -471,7 +486,7 @@ struct FMounteaWidgetInputActionMapping
 		meta=(ShowOnlyInnerProperties),
 		meta=(TitleProperty="KeyName"),
 		meta=(NoResetToDefault))
-	TMap<FKey,TSoftObjectPtr<UTexture2D>> Keys;
+	TMap<FKey, FMounteaWidgetInputKeyTextureMapping> Keys;
 
 	// TODO: Holding 2 buttons at the same time for example
 	/** Key chords (key + optional modifiers) that can trigger this action. */

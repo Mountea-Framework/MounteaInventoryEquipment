@@ -14,7 +14,6 @@
 #include "CoreMinimal.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
 enum class EMounteaWidgetInputPhase : uint8;
@@ -295,6 +294,12 @@ public:
 	
 	// --- Helpers	
 #pragma region Helpers
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(DefaultToSelf="ContextObject"),
+		DisplayName="Validate HW Input Tag")
+	static bool IsInputTagActive(const UUserWidget* ContextObject, const FGameplayTag& Tag);
 	
 	/**
 	 * Centers a specific item in a list widget by applying render translation.

@@ -29,6 +29,7 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
+	
 
 	/**
 	 * Registers an Inventory UI Manager instance.
