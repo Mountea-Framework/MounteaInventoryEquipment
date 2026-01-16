@@ -99,9 +99,11 @@ namespace InventoryUICommands
 	namespace Categories
 	{
 		inline const FString Selected(TEXT("CategorySelected"));
+		inline const FString Refresh(TEXT("RefreshCategory"));
 
 		inline const TSet<FString> All = {
-			Selected
+			Selected,
+			Refresh
 		};
 	}
 
