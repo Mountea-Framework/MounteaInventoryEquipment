@@ -21,7 +21,9 @@ public class MounteaAdvancedInventorySystemDeveloper : ModuleRules
 				"Projects",
 				"Engine",
 				"Slate",
-				"SlateCore", 
+				"SlateCore",
+				"GameplayTags",
+				
 				"MounteaAdvancedInventorySystem", 
 			}
 		);
@@ -34,6 +36,7 @@ public class MounteaAdvancedInventorySystemDeveloper : ModuleRules
 					"EditorStyle",
 					"BlueprintGraph",
 					"ApplicationCore",
+					"UnrealEd"
 				}
 			);
 		}

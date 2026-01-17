@@ -12,14 +12,37 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
+#include "Decorations/MounteaCallbackInventoryItemAction.h"
+#include "Decorations/MounteaInventoryItemAction.h"
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
 #include "Definitions/MounteaAdvancedInventoryNotification.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaEquipmentBaseDataTypes.h"
-#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
+
+#pragma region ItemActions
+
+bool UMounteaInventoryStatics::InitializeItemAction(UMounteaInventoryItemAction* Target,
+	const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+	UObject* ContextPayload)
+{
+	return IsValid(Target) ? Target->InitializeItemAction(TargetItem, OwningInventory, ContextPayload) : false;
+}
+
+bool UMounteaInventoryStatics::ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem)
+{
+	return IsValid(Target) ? Target->ExecuteInventoryAction(TargetItem) : false;
+}
+
+FGameplayTagContainer UMounteaInventoryStatics::GetItemActionTags(UMounteaInventoryItemAction* Target)
+{
+	return IsValid(Target) ? Target->GetItemActionTags() : FGameplayTagContainer();
+}
+
+#pragma endregion 
 
 FInventoryCategoryData UMounteaInventoryStatics::GetInventoryCategoryData(const FString& CategoryName, const FString ParentCategory, bool& bResult)
 {
@@ -251,46 +274,44 @@ bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
 	return Item.IsItemValid();
 }
 
-TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
-{
-	if (!Item.IsItemValid()) return {};
-	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!settings) return {};
-	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!inventorySettingsConfig) return {};
+TArray<UMounteaCallbackInventoryItemAction*> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+{	
+	const auto itemTemplate = Item.GetTemplate();
+	if (!itemTemplate) return {};
     
-	const auto itemCategory = Item.GetTemplate()->ItemCategory;
-	const auto itemSubCategory = Item.GetTemplate()->ItemSubCategory;
-    
-	const auto categoryDefinition = inventorySettingsConfig->AllowedCategories.FindRef(itemCategory);
-	if (categoryDefinition.CategoryData.AllowedActions.Num() <= 0)
-	{
-		LOG_WARNING(TEXT("No actions defined for category '%s'!"), *itemCategory);
-		return {};
-	}
-    
-	TArray<FInventoryItemActionDefinition> uniqueActions = categoryDefinition.CategoryData.AllowedActions;
-	if (!itemSubCategory.IsEmpty())
-		uniqueActions.Append(categoryDefinition.SubCategories.FindRef(itemSubCategory).AllowedActions);
+	TArray<UMounteaCallbackInventoryItemAction*> validActions;
+	const TArray<UMounteaSelectableInventoryItemAction*> uniqueActions = GetDisplayableItemActions(Item);
 
-	TArray<FInventoryItemActionDefinition> validActions = uniqueActions;
-	validActions.RemoveAll([](const FInventoryItemActionDefinition& actionData)
-	{
-		return actionData.IsValidAction();
-	});
+	Algo::TransformIf(
+		uniqueActions,
+		validActions,
+		[](const UMounteaSelectableInventoryItemAction* A)
+		{
+			return A && A->GetCallbackItemAction() != nullptr;
+		},
+		[](const UMounteaSelectableInventoryItemAction* A)
+		{
+			return A->GetCallbackItemAction();
+		}
+	);
 
 	return validActions;
 }
 
-TArray<FInventoryItemActionDefinition> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
-{
-	TArray<FInventoryItemActionDefinition> returnValue = GetItemActions(Item);
-	returnValue.RemoveAll([](const FInventoryItemActionDefinition& actionData)
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
+{	
+	const auto itemTemplate = Item.GetTemplate();
+	if (!itemTemplate) return {};
+	
+	const TArray<UMounteaSelectableInventoryItemAction*> uniqueActions = itemTemplate->ItemActions;
+	TArray<UMounteaSelectableInventoryItemAction*> validActions = uniqueActions;
+	
+	validActions.RemoveAll([Item](const UMounteaSelectableInventoryItemAction* actionData)
 	{
-		return actionData.bIsUIAction != true;
+		return actionData && actionData->IsAllowed(Item) != true && actionData->IsActionVisible(Item) != true;
 	});
 
-	return returnValue;
+	return validActions;
 }
 
 TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
@@ -457,84 +478,55 @@ bool UMounteaInventoryStatics::ItemTemplate_CalculateItemTemplateJson(UMounteaIn
     return false;
 }
 
-EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UObject* Target)
+EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UMounteaSelectableInventoryItemAction* Target)
 {
 	if (!IsValid(Target))
 	{
 		LOG_ERROR(TEXT("[GetItemActionFlags] Target is invalid!"))
 		return EInventoryItemActionCallback::EIIAC_None;
 	}
-	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
-	{
-		LOG_ERROR(TEXT("[GetItemActionFlags] Target does not implement IMounteaInventoryItemActionInterface!"))
-		return EInventoryItemActionCallback::EIIAC_None;
-	}
-	return IMounteaAdvancedInventoryItemActionInterface::Execute_GetInventoryItemActionCallback(Target);
+	return Target->GetInventoryItemActionCallback();
 }
 
-bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToCheck)
+bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck)
 {
 	if (!IsValid(Target))
 	{
 		LOG_ERROR(TEXT("[HasActionFlag] Target is invalid!"))
 		return false;
-	}
-	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
-	{
-		LOG_ERROR(TEXT("[HasActionFlag] Target does not implement IMounteaInventoryItemActionInterface!"))
-		return false;
-	}
-	
-	return (static_cast<uint8>(IMounteaAdvancedInventoryItemActionInterface::Execute_GetInventoryItemActionCallback(Target))
+	}	
+	return (static_cast<uint8>(Target->GetInventoryItemActionCallback())
 		& static_cast<uint8>(FlagToCheck)) != 0;
 }
 
-void UMounteaInventoryStatics::ItemAction_AddActionFlag(UObject* Target, EInventoryItemActionCallback FlagToAdd)
+void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaSelectableInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd)
 {
 	if (!IsValid(Target))
 	{
 		LOG_ERROR(TEXT("[AddActionFlag] Target is invalid!"))
 		return;
 	}
-	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
-	{
-		LOG_ERROR(TEXT("[AddActionFlag] Target does not implement IMounteaInventoryItemActionInterface!"))
-		return;
-	}
-
-	IMounteaAdvancedInventoryItemActionInterface::Execute_AddActionFlag(Target, FlagToAdd);	
+	Target->AddActionFlag(FlagToAdd);	
 }
 
-void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UObject* Target, const EInventoryItemActionCallback FlagToRemove)
+void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove)
 {
 	if (!IsValid(Target))
 	{
 		LOG_ERROR(TEXT("[RemoveActionFlag] Target is invalid!"))
 		return;
 	}
-	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
-	{
-		LOG_ERROR(TEXT("[RemoveActionFlag] Target does not implement IMounteaInventoryItemActionInterface!"))
-		return;
-	}
-
-	IMounteaAdvancedInventoryItemActionInterface::Execute_RemoveActionFlag(Target, FlagToRemove);
+	Target->RemoveActionFlag(FlagToRemove);
 }
 
-void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UObject* Target)
+void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target)
 {
 	if (!IsValid(Target))
 	{
 		LOG_ERROR(TEXT("[ClearAllActionFlags] Target is invalid!"))
 		return;
 	}
-	if (!Target->Implements<UMounteaAdvancedInventoryItemActionInterface>())
-	{
-		LOG_ERROR(TEXT("[ClearAllActionFlags] Target does not implement IMounteaInventoryItemActionInterface!"))
-		return;
-	}
-
-	IMounteaAdvancedInventoryItemActionInterface::Execute_ClearAllActionFlags(Target);
+	Target->ClearAllActionFlags();
 }
 
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(

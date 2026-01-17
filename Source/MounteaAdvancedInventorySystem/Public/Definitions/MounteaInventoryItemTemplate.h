@@ -22,7 +22,7 @@
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemTemplate"
 
 class UTexture;
-class UMounteaInventoryItemAction;
+class UMounteaSelectableInventoryItemAction;
 enum class EInventoryItemFlags : uint8;
 
 /**
@@ -188,6 +188,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
 		meta=(NoResetToDefault))
 	FGameplayTagContainer AttachmentSlots;
+	
+	/**
+	 * Definition of allowed Actions for specific Category.
+	 * Each Item of this category can perform selected Action.
+	 * 
+	 * When Item is created, all Actions based on Item Category are pre-defined.
+	 * When Category/Subcategory is changed, all Item Actions are removed!
+	 * 
+	 * Future enhancement:
+	 * - Do not delete shared Item Actions
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Actions", Instanced)
+	TArray<TObjectPtr<UMounteaSelectableInventoryItemAction>> ItemActions;
 
 	/** A reference to a special gameplay abilities or effects triggered by this item. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
@@ -223,6 +236,21 @@ protected:
 	static TArray<FString> GetAllowedRarities();
 
 #if WITH_EDITOR
+	
+public:
+	
+	/**
+	 * Request default Item Actions from Category.
+	 * This will delete all current actions and will create new ones based on selected Category.
+	 * 
+	 * This function is called anytime you change Category for the Item Template, press the button only
+	 * if you messed up and need to re-load Item Actions!
+	 */
+	UFUNCTION(CallInEditor, Category="Edit Actions")
+	virtual void ReloadItemActions();
+	
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemTemplateChanged, UMounteaInventoryItemTemplate*);
+	FOnItemTemplateChanged TemplateChangedDelegate;
 	
 protected:
 

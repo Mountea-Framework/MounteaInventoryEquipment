@@ -14,10 +14,10 @@
 #include "CoreMinimal.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
 enum class EMounteaWidgetInputPhase : uint8;
+enum class ECommonInputType : uint8;
 
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
@@ -25,11 +25,11 @@ struct FMounteaItemActionData;
 
 class UMounteaAdvancedInventoryUISubsystem;
 
+class UMounteaSelectableInventoryItemAction;
 class UMounteaInventoryScrollBox;
 class UVerticalBoxSlot;
 class UWidget;
 class UTextBlock;
-class UMounteaInventoryItemAction;
 class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
 class UMounteaAdvancedInventoryUIConfig;
@@ -97,6 +97,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventoryUISubsystem* GetInventoryUISubsystem(APlayerController* FromPlayerController);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory UI Subsystem")
+	static UMounteaAdvancedInventoryUISubsystem* GetInventoryUISubsystem_Generic(UObject* Context);
 	
 #pragma endregion
 	
@@ -222,7 +227,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Items",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI - Find Item")
+		DisplayName="Inventory UI ManagerFind Item")
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
@@ -232,8 +237,8 @@ public:
 	 * @return Custom Items Mpa if any specified.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Get Custom Items")
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Inventory UI ManagerGet Custom Items")
 	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
@@ -245,7 +250,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Add Custom Item")
+		DisplayName="Inventory UI ManagerAdd Custom Item")
 	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FGameplayTag& ItemTag,
 		const FGuid& ItemId);
 	
@@ -258,7 +263,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Append Custom Items")
+		DisplayName="Inventory UI ManagerAppend Custom Items")
 	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 
@@ -269,27 +274,96 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Clear Custom Items")
+		DisplayName="Inventory UI ManagerClear Custom Items")
 	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
 	 * Removes a single custom item from the target UI component's custom items map.
 	 *
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @param ItemTag    Gameplay tag representing the custom item key to remove.
+	 * @param Target    UI component implementing MounteaAdvancedInventoryUIManagerInterface.
+	 * @param ItemTag   Gameplay tag representing the custom item key to remove.
+	 * @param ItemId	Guide of the item to be removed.
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI - Remove Custom Item")
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Inventory UI ManagerRemove Custom Item")
 	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-		const FGameplayTag& ItemTag);
+		const FGameplayTag& ItemTag, const FGuid& ItemId);
+	
+	/**
+	 * Validates whether the provided Item guid is stored in a map for specified tag.
+	 * Example:
+	 * - Is Item in Favorites
+	 * 
+	 * @param Target UI manager implementing MounteaAdvancedInventoryUIManagerInterface.
+	 * @param ItemTag Tag which defines the key, like "Favorite"
+	 * @param ItemId Item guid to search for
+	 * @return True if item is stored in such container, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Inventory UI ManagerIs Item Stored In Custom Map")
+	static bool IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		const FGameplayTag& ItemTag, const FGuid& ItemId);
+	
+	/**
+	 * This function allows UI Manager to listen to external systems which might want to process Widget Commands.
+	 * Example might to a request to refresh item count when Item Action consumes it.
+	 * 
+	 * Chain of hierarchy is respected, so commands are given to root and then based on the selection passed down.
+	 * 
+	 * @param Target UI Manager to execute the logic on
+	 * @param Command Command to Process
+	 * @param OptionalPayload Optional Payload to pass with the command
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI Manager Execute Widget Command")
+	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		const FString& Command, UObject* OptionalPayload);
 	
 #pragma endregion
 	
 	// --- Helpers	
 #pragma region Helpers
+
+	/**
+	 * Checks whether the UI item represented by InventoryItemData is detached (not present) in the provided list of ValidItems.
+	 *
+	 * A detached UI item is considered "orphaned" from the valid items collection:
+	 * - If ValidItems is empty, the item is treated as detached.
+	 * - If InventoryItemData.ContainingItem is invalid, the item is treated as detached.
+	 * - Otherwise, the function checks whether InventoryItemData.ContainingItem.Guid exists in ValidItems.
+	 *
+	 * @param ValidItems Collection of items that are considered valid/attached for UI purposes.
+	 * @param InventoryItemData UI inventory item data containing the item reference (ContainingItem) to validate.
+	 * @return True if the item is detached (not found in ValidItems or invalid input), false if the item exists in ValidItems.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Item UI Detached From Valid Items")
+	static bool IsItemWidgetDetachedFromValidItems(const TArray<FInventoryItem>& ValidItems, const FInventoryItemData& InventoryItemData);
+	
+	/**
+	 * Validates whether the specified hardware input type is currently active for the owning local player.
+	 *
+	 * This helper evaluates the active input method as reported by CommonUI (UCommonInputSubsystem) and compares it
+	 * against the provided input type. Useful for switching UI glyphs, button hints, or input-specific behavior
+	 * (keyboard/mouse vs gamepad vs touch) directly in Blueprint.
+	 *
+	 * @param ContextObject User widget used to resolve the owning local player and its CommonUI input subsystem.
+	 * @param InputType Input type to validate against the currently active input method.
+	 *
+	 * @return True if the owning local player exists and its current input type matches InputType, otherwise false.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(DefaultToSelf="ContextObject"),
+		DisplayName="Validate HW Input Type")
+	static bool InInputTypeActive(const UUserWidget* ContextObject, const ECommonInputType& InputType);
 	
 	/**
 	 * Centers a specific item in a list widget by applying render translation.
@@ -358,31 +432,50 @@ public:
 #pragma region UIInput
 	
 	/**
+	 * Tries to find UI action mapping Input Action based on the preferred tags.
+	 *
+	 * @param PreferredInputActions List of preferred Input Action Tags.
+	 * @param WidgetStates Widget States from wrapper (or any in-focus widget) which behave as filters for KeyMappings.
+	 * @param OutMapping Returns found Mapping if any is found.
+	 * 
+	 * @return Returns true if a mapping was found. OutMapping contains the best match.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Input", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mapping (Item Action)")
+	static bool FindUIActionMappingForItemAction(const FGameplayTagContainer& PreferredInputActions,
+		const FGameplayTagContainer& WidgetStates, FMounteaWidgetInputActionMapping& OutMapping);
+	
+	/**
 	 * Tries to resolve a UI action mapping from a Slate key event.
 	 *
 	 * @param KeyEvent Event to read data from. Keyboard event most of the time.
+	 * @param WidgetStates Widget States from wrapper (or any in-focus widget) which behave as filters for KeyMappings.
 	 * @param Mappings Stored mappings to search in.
 	 * @param OutMapping Returns found Mapping if any is found.
+	 * 
 	 * @return Returns true if a mapping was found. OutMapping contains the first match.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Input", 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find UI Input Mapping (Key Event)")
-	static bool FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent, 
+	static bool FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent, const FGameplayTagContainer& WidgetStates,
 		const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping);
 	
 	/**
 	 * Tries to resolve a UI action mapping from a Slate analog input event.
 	 *
 	 * @param AnalogEvent Event to read data from. Gamepad axis / trigger / analog-like input.
+	 * @param WidgetStates Widget States from wrapper (or any in-focus widget) which behave as filters for KeyMappings.
 	 * @param Mappings Stored mappings to search in.
 	 * @param OutMapping Returns found Mapping if any is found.
+	 * 
 	 * @return Returns true if a mapping was found. OutMapping contains the first match.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Input", 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find UI Input Mapping (Analog Event)")
-	static bool FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent,
+	static bool FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent, const FGameplayTagContainer& WidgetStates,
 		const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping);
 	
 	/**
@@ -392,18 +485,73 @@ public:
 	 * For mouse wheel events, this function resolves input as EKeys::MouseWheelAxis when WheelDelta != 0.
 	 *
 	 * @param MouseEvent Event to read data from. Mouse/touch pointer event most of the time.
+	 * @param WidgetStates Widget States from wrapper (or any in-focus widget) which behave as filters for KeyMappings.
 	 * @param Mappings Stored mappings to search in.
 	 * @param OutMapping Returns found Mapping if any is found.
+	 * 
 	 * @return Returns true if a mapping was found. OutMapping contains the first match.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Input", 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find UI Input Mapping (Mouse Event)")
-	static bool FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent,
+	static bool FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent, const FGameplayTagContainer& WidgetStates,
 		const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping);
 	
+	/**
+	 * Tries to resolve UI action mappings from a Slate key event.
+	 *
+	 * @param KeyEvent Event to read data from. Keyboard event most of the time.
+	 * @param WidgetStates Widget States from wrapper (or any in-focus widget) which behave as filters for KeyMappings.
+	 * @param Mappings Stored mappings to search in.
+	 * @param OutMappings Returns found mappings sorted by InputPriority (highest first).
+	 * 
+	 * @return Returns true if at least one mapping was found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Input",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mappings (Key Event)")
+	static bool FindUIActionMappingsFromKeyEvent(const FKeyEvent& KeyEvent, const FGameplayTagContainer& WidgetStates,
+		const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
+	
+	/**
+	 * Tries to resolve UI action mappings from a Slate analog input event.
+	 *
+	 * @param AnalogEvent Event to read data from. Gamepad axis / trigger / analog-like input.
+	 * @param WidgetStates Widget States from wrapper (or any in-focus widget) which behave as filters for KeyMappings.
+	 * @param Mappings Stored mappings to search in.
+	 * @param OutMappings Returns found mappings sorted by InputPriority (highest first).
+	 * 
+	 * @return Returns true if at least one mapping was found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Input",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mappings (Analog Event)")
+	static bool FindUIActionMappingsFromAnalogEvent(const FAnalogInputEvent& AnalogEvent, const FGameplayTagContainer& WidgetStates,
+		const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
+	
+	/**
+	 * Tries to resolve UI action mappings from a Slate pointer event (mouse / touch / pen).
+	 *
+	 * For mouse button events, the "effecting button" is used.
+	 * For mouse wheel events, this function resolves input as EKeys::MouseWheelAxis when WheelDelta != 0.
+	 *
+	 * @param MouseEvent Event to read data from. Mouse/touch pointer event most of the time.
+	 * @param WidgetStates Widget States from wrapper (or any in-focus widget) which behave as filters for KeyMappings.
+	 * @param Mappings Stored mappings to search in.
+	 * @param OutMappings Returns found mappings sorted by InputPriority (highest first).
+	 * 
+	 * @return Returns true if at least one mapping was found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Input",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find UI Input Mappings (Mouse Event)")
+	static bool FindUIActionMappingsFromMouseEvent(const FPointerEvent& MouseEvent, const FGameplayTagContainer& WidgetStates,
+		const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
+	
 	static bool FindUIActionMappingByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
-		const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping);
+		const FGameplayTagContainer& WidgetStates, const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping);
+	static bool FindUIActionMappingsByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
+		const FGameplayTagContainer& WidgetStates, const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings);
 	
 #pragma endregion
 	
@@ -470,10 +618,44 @@ public:
 		DisplayName="Reset Children")
 	static void MounteaInventoryScrollBox_ResetChildren(UMounteaInventoryScrollBox* ScrollBox);
 
+	/**
+	 * Retrieves all child Widgets in the Scrollbox.
+	 * @param ScrollBox Target Mountea Scrollbox.
+	 * @return Array of UWidget objects, might be empty.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Scrollbox",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get All Children")
+	static TArray<UWidget*> MounteaInventoryScrollBox_GetAllChildren(UMounteaInventoryScrollBox* ScrollBox);
+	
+	/**
+	 * Removes specified child from the ScrollBox.
+	 *
+	 * @param Content Widget to be removed from Scrollbox.
+	 * @param ScrollBox ScrollBox instance to clear.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Remove Child")
+	static void MounteaInventoryScrollBox_RemoveChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content);
+	
+	/**
+	 * Removes specified child from the ScrollBox at given index.
+	 *
+	 * @param Index Index of the Widget to be removed from Scrollbox.
+	 * @param ScrollBox ScrollBox instance to clear.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Remove Child At")
+	static void MounteaInventoryScrollBox_RemoveChildAt(UMounteaInventoryScrollBox* ScrollBox, const int32 Index);
+
 #pragma endregion
 	
 	// --- Wrapper	
 #pragma region Wrapper
+	
+	static bool IsValidWrapperWidget(const UObject* Target);
 	
 	/**
 	 * Sets the source inventory for a given Wrapper widget.
@@ -490,7 +672,126 @@ public:
 		DisplayName="Set Wrapper Widget Parent Manager")
 	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, 
 		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory);
-	
+
+	/**
+	 * Returns all currently active Widget State tags tracked by the target Wrapper.
+	 *
+	 * Wrapper widget states are used to keep track of which UI widgets are currently active/visible/in use
+	 * within the Wrapper (for example Modal Window, Tooltip, Context Menu, Inventory Panel, etc.).
+	 * Each widget that is created/added to the Wrapper should contribute its predefined Gameplay Tag
+	 * so the Wrapper and UI Manager can quickly query what is active and react accordingly.
+	 *
+	 * @param Target The target Wrapper widget interface from which the active state container will be retrieved.
+	 * @return Container of Gameplay Tags representing active UI states/widgets currently tracked by the Wrapper.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Wrapper Widget States")
+	static FGameplayTagContainer GetWrapperWidgetStates(UObject* Target);
+
+	/**
+	 * Overwrites Wrapper widget state tracking with a new tag container on the target Wrapper.
+	 *
+	 * This replaces the current tracked Widget State tags with the provided container.
+	 * Intended for bulk synchronization/reset scenarios (rebuild, restore, switching UI modes).
+	 *
+	 * Notes:
+	 * - This only updates state tracking. It should not be assumed to create/destroy widgets by itself.
+	 * - Implementations should ensure the stored state remains consistent with actual active widgets.
+	 *
+	 * @param Target The target Wrapper widget interface whose states will be overwritten.
+	 * @param NewStates Container of Gameplay Tags that will become the Wrapper's active widget states.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Wrapper Widget States")
+	static void SetWrapperWidgetStates(UObject* Target,
+		const FGameplayTagContainer& NewStates);
+
+	/**
+	 * Adds a new Widget State tag to the target Wrapper's active state container.
+	 *
+	 * Expected flow:
+	 * - A child widget (e.g., ModalWindow) is created/added to the Wrapper.
+	 * - That widget provides its state tag definition.
+	 * - Wrapper registers the tag so the system can track that the widget is now active.
+	 *
+	 * @param Target The target Wrapper widget interface that will receive the state tag.
+	 * @param Tag The Gameplay Tag describing the widget state to add.
+	 * @return True if the tag was added (was not present before). False if invalid or already present.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Add Wrapper Widget State Tag")
+	static bool AddWidgetStateTag(UObject* Target,
+		const FGameplayTag& Tag);
+
+	/**
+	 * Removes an existing Widget State tag from the target Wrapper's active state container.
+	 *
+	 * This should be called when a UI element is removed/hidden/destroyed so the Wrapper no longer reports
+	 * it as active, preventing stale state and enabling correct UI Manager decisions.
+	 *
+	 * @param Target The target Wrapper widget interface from which the state tag will be removed.
+	 * @param Tag The Gameplay Tag describing the widget state to remove.
+	 * @return True if the tag was removed. False if invalid or not found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Remove Wrapper Widget State Tag")
+	static bool RemoveWidgetStateTag(UObject* Target,
+		const FGameplayTag& Tag);
+
+	/**
+	 * Checks whether the target Wrapper currently contains a given Widget State tag.
+	 *
+	 * Used for querying whether a particular UI element/state is currently active within the Wrapper.
+	 * Example: prevent opening another modal if "UI.Modal.Active" is already present, or change input rules.
+	 *
+	 * @param Target The target Wrapper widget interface to query.
+	 * @param Tag The Gameplay Tag describing the widget state to check.
+	 * @param bExactMatch If true, requires an exact tag match. If false, allows hierarchical matching
+	 *                    (e.g., checking "UI.Modal" would match "UI.Modal.Active").
+	 * @return True if the Wrapper currently reports the tag as active; otherwise false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Has Wrapper Widget State Tag")
+	static bool HasWidgetStateTag(UObject* Target,
+		const FGameplayTag& Tag, bool bExactMatch = true);
+
+	/**
+	 * Clears all Widget State tags tracked by the target Wrapper.
+	 *
+	 * Typically used during full teardown/reset scenarios such as RemoveWrapperWidget, rebuilding the UI,
+	 * or when the UI Manager needs to force the Wrapper into a clean baseline state.
+	 *
+	 * Note:
+	 * - This does not automatically destroy UI widgets by itself. It only clears the tracked state tags.
+	 *
+	 * @param Target The target Wrapper widget interface whose states will be cleared.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Clear Wrapper Widget State Tags")
+	static void ClearWidgetStateTags(UObject* Target);
+
+	/**
+	 * Appends multiple Widget State tags to the target Wrapper's active state container.
+	 *
+	 * Useful when adding a composite widget (or UI mode) that activates multiple tracked states at once,
+	 * or when synchronizing the Wrapper to a known set of states provided by another system.
+	 *
+	 * @param Target The target Wrapper widget interface that will receive the state tags.
+	 * @param TagsToAppend Container of Gameplay Tags to add to the Wrapper's active state container.
+	 * @return True if at least one new tag was added. False if empty or all tags were already present.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Append Wrapper Widget State Tags")
+	static bool AppendWidgetStateTags(UObject* Target,
+		const FGameplayTagContainer& TagsToAppend);
+
 #pragma endregion
 	
 	// --- Notification
@@ -532,43 +833,7 @@ public:
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 #pragma endregion
-	
-	// --- Generic Widget
-#pragma region GenericWidget
-	
-	/**
-	 * Consumes player input forwarded from gameplay classes.
-	 *
-	 * This method allows Player Controllers or Pawns to route Enhanced Input
-	 * actions into UI widgets without exposing input mapping logic to the UI layer.
-	 *
-	 * Input meaning is conveyed via Gameplay Tags, while values are provided
-	 * through a generic payload structure.
-	 *
-	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
-	 * @param InputTag A gameplay tag identifying the semantic meaning of the input (e.g. UI.ItemPreview.Zoom, UI.Inventory.Navigate).
-	 * @param Payload A lightweight container holding the relevant input value.
-	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"))
-	static void ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime);
-
-	/**
-	 * Refreshes the provided UserWidget if it implements the MounteaInventoryGenericWidgetInterface.
-	 *
-	 * This utility function checks if the passed UUserWidget instance is valid and whether
-	 * it implements the UMounteaInventoryGenericWidgetInterface. If both conditions are
-	 * satisfied, it triggers the execution of the RefreshWidget function on the Target widget.
-	 *
-	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"))
-	static void RefreshWidget(UWidget* Target);
-	
-#pragma endregion
-	
+		
 	// --- Items Preview
 #pragma region ItemsPreview
 
@@ -735,6 +1000,78 @@ public:
 	
 #pragma endregion
 	
+	// --- Item Action
+#pragma region ItemActions
+
+	/**
+	 * Initializes the item action widget with the Initiator UI and item action data.
+	 * 
+	 * @param Target Widget object which implements MounteaAdvancedInventoryItemActionWidgetInterface
+	 * @param ItemAction The item action associated with this widget.
+	 * @param SelectedItem Inventory Item which this action affects.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Item Action - Initialize")
+	static void ItemAction_InitializeItemAction(UWidget* Target,
+		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
+
+	/**
+	 * Checks if the item action associated with the specified target widget is enabled.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the IsActionEnabled method if available.
+	 *
+	 * @param Target The target widget from which to check the item action status. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return True if the item action is enabled; otherwise, false.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Item Action - Is Action Enabled")
+	static bool ItemAction_IsActionEnabled(UWidget* Target);
+
+	/**
+	 * Checks if the item action associated with the specified target widget is valid.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the IsActionValid method if available.
+	 *
+	 * @param Target The target widget from which to check the item action validity. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return True if the item action is valid; otherwise, false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Item Action - Is Action Valid")
+	static bool ItemAction_IsActionValid(UWidget* Target);
+
+	/**
+	 * Executes the item action associated with the specified target widget.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and calls the ExecuteItemAction method if available.
+	 *
+	 * @param Target The target widget from which to execute the item action. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Item Action - Execute Item Action")
+	static void ItemAction_ExecuteItemAction(UWidget* Target);
+
+	/**
+	 * Retrieves the item action class associated with the specified target widget.
+	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
+	 * and retrieves the item action class if available.
+	 *
+	 * @param Target The target widget from which to retrieve the item action class. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
+	 * 
+	 * @return A TSoftClassPtr to the UMounteaInventorySimpleItemAction class if available; otherwise, returns nullptr.
+	 */
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Item Action - Get Item Action")
+	static TSoftClassPtr<UMounteaSelectableInventoryItemAction> ItemAction_GetItemAction(UWidget* Target);
+
+#pragma endregion
+	
 	// --- OLD
 	
 	// --- Theme
@@ -829,7 +1166,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI - Get Active Item Widget")
+		DisplayName="Inventory UI ManagerGet Active Item Widget")
 	static UWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
@@ -840,7 +1177,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI - Set Active Item Widget")
+		DisplayName="Inventory UI ManagerSet Active Item Widget")
 	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UWidget* NewActiveItemWidget);
 
 #pragma endregion
@@ -993,7 +1330,8 @@ public:
 	 * Returns an empty FGuid otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Item - Get Item ID")
 	static FGuid ItemWidget_GetInventoryItemId(UWidget* Target);
 
 	/**
@@ -1088,109 +1426,9 @@ public:
 	static void Item_HighlightItem(UWidget* Target, const bool bIsSelected = false);
 	
 #pragma endregion
-
-	// --- Item Action
-#pragma region ItemActions
-
-	/**
-	 * Initializes the item action widget with the parent UI and item action data.
-	 *
-	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
-	 * @param ParentUI The parent UI interface that owns this item action widget.
-	 * @param ItemActionClass The item action class associated with this widget.
-	 * @param ParentWidget Inventory Item widget which owns this item action widget.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Item Action - Initialize")
-	static void ItemAction_InitializeItemAction(UUserWidget* Target,
-		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-		const TSoftClassPtr<UObject>& ItemActionClass,
-		UWidget* ParentWidget);
-
-	/**
-	 * Checks if the item action associated with the specified target widget is enabled.
-	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
-	 * and calls the IsActionEnabled method if available.
-	 *
-	 * @param Target The target widget from which to check the item action status. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
-	 * 
-	 * @return True if the item action is enabled; otherwise, false.
-	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Is Action Enabled")
-	static bool ItemAction_IsActionEnabled(UUserWidget* Target);
-
-	/**
-	 * Checks if the item action associated with the specified target widget is valid.
-	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
-	 * and calls the IsActionValid method if available.
-	 *
-	 * @param Target The target widget from which to check the item action validity. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
-	 * 
-	 * @return True if the item action is valid; otherwise, false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Is Action Valid")
-	static bool ItemAction_IsActionValid(UUserWidget* Target);
-
-	/**
-	 * Executes the item action associated with the specified target widget.
-	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
-	 * and calls the ExecuteItemAction method if available.
-	 *
-	 * @param Target The target widget from which to execute the item action. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Execute Item Action")
-	static void ItemAction_ExecuteItemAction(UUserWidget* Target);
-
-	/**
-	 * Retrieves the item action class associated with the specified target widget.
-	 * This function checks if the target widget implements the MounteaAdvancedInventoryItemActionWidgetInterface
-	 * and retrieves the item action class if available.
-	 *
-	 * @param Target The target widget from which to retrieve the item action class. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
-	 * 
-	 * @return A TSoftClassPtr to the UMounteaInventoryItemAction class if available; otherwise, returns nullptr.
-	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Get Item Action")
-	static TSoftClassPtr<UObject> ItemAction_GetItemAction(UUserWidget* Target);
-
-	/**
-	 * Retrieves the action data associated with a specific target widget.
-	 * This function checks if the target widget is valid and implements the MounteaAdvancedInventoryItemActionWidgetInterface,
-	 * then retrieves the action data from it.
-	 *
-	 * @param Target The target widget from which to retrieve the action data. Must be a valid widget implementing the interface.
-	 * 
-	 * @return The FMounteaItemActionData containing the action's display information, or an empty struct if the target is invalid.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Helpers",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Get Item Action Data")
-	static FMounteaItemActionData ItemAction_GetActionData(UWidget* Target);
-
-#pragma endregion
-
+	
 	// --- Item Actions Container
 #pragma region ItemActionsContainer
-
-	/**
-	 * Sets the parent item widget for the item actions container.
-	 *
-	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
-	 * @param ParentItemWidget The parent item widget to be set for the item actions container.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set Parent Item Widget")
-	static void ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget);
 
 	/**
 	 * Constructs the item actions container from a list of item action classes.
@@ -1203,7 +1441,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Construct From Actions List")
-	static void ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target, const TArray<TSoftClassPtr<UObject>>& ItemActionsList);
+	static void ItemActionsContainer_ConstructFromActionsList(UWidget* Target, const TArray<TSoftClassPtr<UObject>>& ItemActionsList);
 
 	/**
 	 * Initializes the item actions container widget with the parent UI.
@@ -1214,7 +1452,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Add Item Action To Container")
-	static void ItemActionsContainer_AddItemActionToContainer(UUserWidget* Target, UUserWidget* ItemActionWidget);
+	static void ItemActionsContainer_AddItemActionToContainer(UWidget* Target, UWidget* ItemActionWidget);
 
 	/**
 	 * Removes the specified item action widget from the item actions container.
@@ -1225,7 +1463,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Remove Item Action From Container")
-	static void ItemActionsContainer_RemoveItemActionFromContainer(UUserWidget* Target, UUserWidget* ItemActionWidget);
+	static void ItemActionsContainer_RemoveItemActionFromContainer(UWidget* Target, UWidget* ItemActionWidget);
 
 	/**
 	 * Clears all item action widgets from the item actions container.
@@ -1235,7 +1473,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Clear Item Actions Container")
-	static void ItemActionsContainer_ClearItemActionsContainer(UUserWidget* Target);
+	static void ItemActionsContainer_ClearItemActionsContainer(UWidget* Target);
 
 	/**
 	 * Selects a specific item action widget within the item actions container.
@@ -1246,18 +1484,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Select Item Action")
-	static void ItemActionsContainer_SelectItemAction(UUserWidget* Target, UUserWidget* ItemActionWidget);
+	static void ItemActionsContainer_SelectItemAction(UWidget* Target, UWidget* ItemActionWidget);
 
 	/**
 	 * Retrieves all item action widgets currently present in the item actions container.
 	 *
 	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
-	 * @return An array of UUserWidget pointers representing the item actions in the container.
+	 * @return An array of UWidget pointers representing the item actions in the container.
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Item Actions In Container")
-	static TArray<UUserWidget*> ItemActionsContainer_GetItemActionsInContainer(UUserWidget* Target);
+	static TArray<UWidget*> ItemActionsContainer_GetItemActionsInContainer(UWidget* Target);
 
 	/**
 	 * Selects an item action widget by its index within the item actions container.
@@ -1268,7 +1506,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Get Item Actions In Container By Index")
-	static void ItemActionsContainer_SelectItemActionByIndex(UUserWidget* Target, int32 ItemActionIndex);
+	static void ItemActionsContainer_SelectItemActionByIndex(UWidget* Target, int32 ItemActionIndex);
 	
 #pragma endregion
 	

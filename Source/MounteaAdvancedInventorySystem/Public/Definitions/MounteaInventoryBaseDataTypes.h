@@ -16,9 +16,14 @@
 #include "MounteaInventoryBaseEnums.h"
 #include "MounteaInventoryBaseDataTypes.generated.h"
 
-class UMounteaInventoryItemAction;
+class UMounteaSelectableInventoryItemAction;
 class UTexture;
+class UTexture2D;
+class UGameplayEffect;
 
+enum class EInventoryItemActionCallback : uint8;
+
+#pragma region InventoryRarity
 #define LOCTEXT_NAMESPACE "InventoryRarity"
 
 /**
@@ -66,52 +71,9 @@ struct FInventoryRarity
 };
 
 #undef LOCTEXT_NAMESPACE
+#pragma endregion
 
-/**
- * FInventoryItemActionDefinition contains the definition of Inventory item Action.
- * Item Actions are usually 2 types:
- * → UI Actions
- * → Technical Actions
- *
- * @see [Item Categories](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
- * @see FInventoryCategory
- * @see UMounteaInventoryItemAction
- */
-USTRUCT(BlueprintType)
-struct FInventoryItemActionDefinition
-{
-	GENERATED_BODY()
-	
-public:
-	
-	/** 
-	 * Defines whether the Action should be shown to UI or whether is purely technical one.
-	 * Example of UI Actions:
-	 * → Split Item (UI with quantity)
-	 * → Drop Item (UI with quantity)
-	 * 
-	 * Example of non-UI Actions:
-	 * → Drop Item (perform removal of Item from Inventory)
-	 * → Equip Item (calls to Equipment System to process Equipment)
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action")
-	uint8 bIsUIAction : 1;
-	
-	/**
-	 * Defines a class of allowed Action.
-	 * Each Item of this category can perform selected Action.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Action",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TSoftClassPtr<UObject> ItemActionClass;
-	
-public:
-	bool IsValidAction() const;
-	
-	TSoftClassPtr<UObject> GetItemActionClass() const
-	{ return ItemActionClass; };
-};
-
+#pragma region InventoryCategory
 #define LOCTEXT_NAMESPACE "InventoryCategory"
 
 /**
@@ -145,10 +107,10 @@ struct FInventoryCategoryData
 	/**
 	 * Tags that define this Category.
 	 * By default filtered for:
-	 * → Mountea_Inventory.Categories
-	 * → Mountea_Inventory.Category
-	 * → Categories
-	 * → Category
+	 * - Mountea_Inventory.Categories
+	 * - Mountea_Inventory.Category
+	 * - Categories
+	 * - Category
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category"))
@@ -173,7 +135,7 @@ struct FInventoryCategoryData
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TArray<FInventoryItemActionDefinition> AllowedActions;
+	TArray<TSoftClassPtr<UMounteaSelectableInventoryItemAction>> AllowedActions;	
 };
 
 /**
@@ -210,7 +172,9 @@ struct FInventoryCategory
 };
 
 #undef LOCTEXT_NAMESPACE
+#pragma endregion
 
+#pragma region InventoryType
 #define LOCTEXT_NAMESPACE "InventoryType"
 
 /**
@@ -309,6 +273,9 @@ public:
 };
 
 #undef LOCTEXT_NAMESPACE
+#pragma endregion
+
+#pragma region InventorySortCriteria
 
 /**
  * Defines a single sorting rule used to order items in an inventory.
@@ -355,6 +322,8 @@ public:
 	FString SortingKey;
 	
 };
+
+#pragma endregion
 
 // Equality operator for FInventoryRarity
 FORCEINLINE bool operator==(const FInventoryRarity& LHS, const FInventoryRarity& RHS)

@@ -11,27 +11,28 @@
 
 
 #include "Statics/MounteaInventoryUIStatics.h"
+#include "Statics/MounteaInventorySystemStatics.h"
+#include "Statics/MounteaInventoryStatics.h"
 
-#include "InputMappingContext.h"
 #include "Algo/Copy.h"
+#include "Algo/MaxElement.h"
+
 #include "Blueprint/SlateBlueprintLibrary.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/TextBlock.h"
+
+#include "CommonInputSubsystem.h"
 
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
 #include "GameFramework/PlayerState.h"
 
-#include "CommonActivatableWidget.h"
 #include "Components/PanelWidget.h"
 
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
-#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
 #include "Interfaces/Widgets/BaseWidget/MounteaAdvancedBaseInventoryWidgetInterface.h"
-#include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
 #include "Interfaces/Widgets/ItemActions/MounteaAdvancedInventoryItemActionsContainerWidgetInterface.h"
@@ -46,10 +47,9 @@
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
-#include "Slate/MounteaInventoryScrollBox.h"
-#include "Statics/MounteaInventoryStatics.h"
 
-#include "Statics/MounteaInventorySystemStatics.h"
+#include "Slate/MounteaInventoryScrollBox.h"
+
 #include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
 #include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
@@ -93,7 +93,37 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::CenterListItemAtIndex(UPanelWidget* ListWidget, int32 SelectedIndex)
+bool UMounteaInventoryUIStatics::IsItemWidgetDetachedFromValidItems(const TArray<FInventoryItem>& ValidItems,
+	const FInventoryItemData& InventoryItemData)
+{
+	if (ValidItems.IsEmpty())
+		return true;
+	if (!InventoryItemData.ContainingItem.IsItemValid())
+		return true;
+	
+	return !ValidItems.ContainsByPredicate([&InventoryItemData](const FInventoryItem& Item)
+	{
+		return Item.Guid == InventoryItemData.ContainingItem.Guid;
+	});
+}
+
+bool UMounteaInventoryUIStatics::InInputTypeActive(const UUserWidget* ContextObject, const ECommonInputType& InputType)
+{
+	if (!IsValid(ContextObject))
+		return false;
+
+	const ULocalPlayer* localPlayer = ContextObject->GetOwningLocalPlayer();
+	if (!localPlayer)
+		return false;
+
+	const UCommonInputSubsystem* inputSubsystem = UCommonInputSubsystem::Get(localPlayer);
+	if (!inputSubsystem)
+		return false;
+
+	return InputType == inputSubsystem->GetCurrentInputType();
+}
+
+void UMounteaInventoryUIStatics::CenterListItemAtIndex(UPanelWidget* ListWidget, const int32 SelectedIndex)
 {
 	if (!ListWidget || SelectedIndex < 0)
 		return;
@@ -140,7 +170,8 @@ FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(UPanelWid
 	return FVector2D(0.0f, translationY);
 }
 
-FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(const TSharedPtr<SWidget>& ListWidget, const FGeometry& ListGeometry, const int32 SelectedIndex)
+FVector2D UMounteaInventoryUIStatics::CalculateCenteredListTranslation(const TSharedPtr<SWidget>& ListWidget, 
+	const FGeometry& ListGeometry, const int32 SelectedIndex)
 {
 	TSharedPtr<SPanel> panel = StaticCastSharedPtr<SPanel>(ListWidget);
 	
@@ -192,8 +223,7 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics:
 	return Target.GetObject() ? Target->Execute_GetParentInventory(Target.GetObject()) : nullptr;
 }
 
-void UMounteaInventoryUIStatics::SetParentInventory(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+void UMounteaInventoryUIStatics::SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
 	if (Target.GetObject())
@@ -282,8 +312,8 @@ FString UMounteaInventoryUIStatics::GetSelectedCategoryId(
 	return Target.GetObject() ? Target->Execute_GetSelectedCategoryId(Target.GetObject()) : TEXT("none");
 }
 
-void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-											  const FGuid& ItemGuid)
+void UMounteaInventoryUIStatics::ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+	const FGuid& ItemGuid)
 {
 	if (Target.GetObject())
 		IMounteaAdvancedInventoryUIManagerInterface::Execute_ItemSelected(Target.GetObject(), ItemGuid);
@@ -295,8 +325,8 @@ FGuid UMounteaInventoryUIStatics::GetSelectedItemGuid(
 	return Target.GetObject() ? Target->Execute_GetActiveItemGuid(Target.GetObject()) : FGuid();
 }
 
-void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UWidget* Target,
-															   const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
+void UMounteaInventoryUIStatics::SetInventoryOwningInventoryUI(UWidget* Target, 
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -342,8 +372,8 @@ UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig
 	return config->BaseTheme.LoadSynchronous();
 }
 
-void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData,
-												 const FMounteaInventoryGridSlot& TargetData)
+void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData, 
+	const FMounteaInventoryGridSlot& TargetData)
 {
 	SourceData = TargetData;
 }
@@ -363,19 +393,58 @@ FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGri
 	return SourceData.ToString();
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent,
-	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+#pragma region UI_Input
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingForItemAction(const FGameplayTagContainer& PreferredInputActions,
+	const FGameplayTagContainer& WidgetStates, FMounteaWidgetInputActionMapping& OutMapping)
 {
-	return FindUIActionMappingByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), Mappings, OutMapping);
+	OutMapping = FMounteaWidgetInputActionMapping();
+
+	const auto uiConfig = GetInventoryUISettingsConfig();
+	if (!IsValid(uiConfig))
+		return false;
+
+	const auto& definedMappings = uiConfig->UIActionMappings;
+	if (definedMappings.Num() == 0)
+		return false;
+
+	if (PreferredInputActions.Num() == 0)
+		return false;
+
+	const bool bUseStateFiltering = (WidgetStates.Num() > 0);
+
+	const auto foundMapping = Algo::FindByPredicate(definedMappings,
+		[&PreferredInputActions, &WidgetStates, bUseStateFiltering](const FMounteaWidgetInputActionMapping& Mapping)
+		{
+			if (!PreferredInputActions.HasTagExact(Mapping.ActionTag))
+				return false;
+
+			if (!bUseStateFiltering)
+				return true;
+
+			return !Mapping.BlacklistedWidgetStates.HasAnyExact(WidgetStates);
+		});
+
+	if (foundMapping == nullptr)
+		return false;
+
+	OutMapping = *foundMapping;
+	return true;
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
-	return FindUIActionMappingByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), Mappings, OutMapping);
+	return FindUIActionMappingByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), WidgetStates, Mappings, OutMapping);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent, const FGameplayTagContainer& WidgetStates,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+{
+	return FindUIActionMappingByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), WidgetStates, Mappings, OutMapping);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
 	// Wheel events (NativeOnMouseWheel) don't have an "effecting button".
@@ -385,44 +454,120 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointe
 		? EKeys::MouseWheelAxis
 		: MouseEvent.GetEffectingButton();
 
-	return FindUIActionMappingByKey(PressedKey, MouseEvent.GetModifierKeys(), Mappings, OutMapping);
+	return FindUIActionMappingByKey(PressedKey, MouseEvent.GetModifierKeys(), WidgetStates, Mappings, OutMapping);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromKeyEvent(const FKeyEvent& KeyEvent, const FGameplayTagContainer& WidgetStates,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+{
+	return FindUIActionMappingsByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), WidgetStates, Mappings, OutMappings);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromAnalogEvent(const FAnalogInputEvent& AnalogEvent, const FGameplayTagContainer& WidgetStates,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+{
+	return FindUIActionMappingsByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), WidgetStates, Mappings, OutMappings);
+}
+
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromMouseEvent(const FPointerEvent& MouseEvent, const FGameplayTagContainer& WidgetStates,
+	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+{
+	const float WheelDelta = MouseEvent.GetWheelDelta();
+	const FKey PressedKey = !FMath::IsNearlyZero(WheelDelta)
+		? EKeys::MouseWheelAxis
+		: MouseEvent.GetEffectingButton();
+
+	return FindUIActionMappingsByKey(PressedKey, MouseEvent.GetModifierKeys(), WidgetStates, Mappings, OutMappings);
 }
 
 bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
-	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
+	const FGameplayTagContainer& WidgetStates, const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
 	if (!PressedKey.IsValid())
-	{
 		return false;
-	}
+	
+	if (Mappings.Num() <= 0)
+		return false;
 
-	for (const FMounteaWidgetInputActionMapping& inputMapping : Mappings)
+	const bool bUseStateFiltering = (WidgetStates.Num() > 0);
+
+	const auto matchingMapping = [&PressedKey, &WidgetStates, bUseStateFiltering](const FMounteaWidgetInputActionMapping& M)
 	{
-		// 1) Simple keys.
-		if (inputMapping.Keys.Contains(PressedKey))
-		{
-			OutMapping = inputMapping;
-			return true;
-		}
+		const bool bKeyFound = M.Keys.Contains(PressedKey);
+		return bUseStateFiltering ? bKeyFound && !M.BlacklistedWidgetStates.HasAnyExact(WidgetStates) : bKeyFound;
+	};
 
-		// 2) Chords (Key + optional modifier).
-		/*
-		for (const FMounteaWidgetInputKeyChord& Chord : inputMapping.Chords)
-		{
-			if (Chord.Key == PressedKey && ModifiersMatchChord(Modifiers, Chord))
-			{
-				OutMapping = inputMapping;
-				return true;
-			}
-		}
-		*/
-	}
+	TArray<const FMounteaWidgetInputActionMapping*> candidateMappings;
+	candidateMappings.Reserve(Mappings.Num());
 
-	return false;
+	Algo::TransformIf(
+		Mappings,
+		candidateMappings,
+		matchingMapping,
+		[](const FMounteaWidgetInputActionMapping& M) { return &M; }
+	);
+
+	const FMounteaWidgetInputActionMapping* const* bestMapping =
+		Algo::MaxElementBy(candidateMappings, [](const auto* M) { return M->InputPriority; });
+
+	if (!bestMapping)
+		return false;
+
+	OutMapping = **bestMapping;
+	return true;
 }
 
-FInventoryItem UMounteaInventoryUIStatics::FindItem(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
+	const FGameplayTagContainer& WidgetStates, const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+{
+	OutMappings.Reset();
+
+	if (!PressedKey.IsValid())
+		return false;
+
+	if (Mappings.Num() <= 0)
+		return false;
+	
+	const bool bUseStateFiltering = (WidgetStates.Num() > 0);
+
+	const auto matchingMapping = [&PressedKey, &WidgetStates, bUseStateFiltering](const FMounteaWidgetInputActionMapping& M)
+	{
+		const bool bKeyFound = M.Keys.Contains(PressedKey);
+		return bUseStateFiltering ? bKeyFound && !M.BlacklistedWidgetStates.HasAnyExact(WidgetStates) : bKeyFound;
+	};
+
+	TArray<const FMounteaWidgetInputActionMapping*> candidateMappings;
+	candidateMappings.Reserve(Mappings.Num());
+
+	Algo::TransformIf(
+		Mappings,
+		candidateMappings,
+		matchingMapping,
+		[](const FMounteaWidgetInputActionMapping& M) { return &M; }
+	);
+
+	if (candidateMappings.IsEmpty())
+		return false;
+
+	Algo::Sort(candidateMappings, [](const auto* A, const auto* B)
+	{
+		return A->InputPriority > B->InputPriority;
+	});
+
+	OutMappings.Reserve(candidateMappings.Num());
+
+	Algo::Transform(
+		candidateMappings,
+		OutMappings,
+		[](const FMounteaWidgetInputActionMapping* M) { return *M; }
+	);
+
+	return true;
+}
+
+#pragma endregion 
+
+FInventoryItem UMounteaInventoryUIStatics::FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryItemSearchParams& SearchParams)
 {
 	if (!IsValid(Target.GetObject()))
@@ -463,11 +608,26 @@ void UMounteaInventoryUIStatics::ClearCustomItems(const TScriptInterface<IMounte
 }
 
 bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-	const FGameplayTag& ItemTag)
+	const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
 	if (Target.GetObject())
-		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag);
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag, ItemId);
 	return false;
+}
+
+bool UMounteaInventoryUIStatics::IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+	const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	if (Target.GetObject())
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_IsItemStoredInCustomMap(Target.GetObject(), ItemTag, ItemId);
+	return false;
+}
+
+void UMounteaInventoryUIStatics::ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+	const FString& Command, UObject* OptionalPayload)
+{
+	if (Target.GetObject())
+		return IMounteaAdvancedInventoryUIManagerInterface::Execute_ExecuteWidgetCommand(Target.GetObject(), Command, OptionalPayload);
 }
 
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
@@ -511,6 +671,26 @@ UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUI
 	return localSubsystem;
 }
 
+UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUISubsystem_Generic(UObject* Context)
+{
+	if (!IsValid(Context))
+		return nullptr;
+
+	APlayerController* playerController = nullptr;
+
+	if (AActor* actor = Cast<AActor>(Context))
+		playerController = FindPlayerController(actor, 3);
+	else if (const UActorComponent* actorComp = Cast<UActorComponent>(Context))
+	{
+		if (AActor* ownerActor = actorComp->GetOwner())
+			playerController = FindPlayerController(ownerActor, 3);
+	}
+	else if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
+		playerController = FindPlayerController(userWidget->GetOwningPlayer(), 2);
+
+	return IsValid(playerController) ? GetInventoryUISubsystem(playerController) : nullptr;
+}
+
 int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetChildrenCount(
 	const UMounteaInventoryScrollBox* ScrollBox)
 {
@@ -543,17 +723,21 @@ void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_ResetChildren(UMounte
 	ScrollBox->ResetChildren();
 }
 
-void UMounteaInventoryUIStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag,
-	const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
+TArray<UWidget*> UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetAllChildren(UMounteaInventoryScrollBox* ScrollBox)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ConsumeUIInput(Target, InputTag, Payload, DeltaTime);
+	return ScrollBox ? ScrollBox->GetChildWidgets() : TArray<UWidget*>();
 }
 
-void UMounteaInventoryUIStatics::RefreshWidget(UWidget* Target)
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_RemoveChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(Target);
+	if (ScrollBox)
+		return ScrollBox->RemoveChild(Content);
+}
+
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_RemoveChildAt(UMounteaInventoryScrollBox* ScrollBox, const int32 Index)
+{
+	if (ScrollBox)
+		return ScrollBox->RemoveChildAt(Index);
 }
 
 void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
@@ -562,8 +746,7 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::InitializeWrapperWidget(
-	UObject* Target,
+void UMounteaInventoryUIStatics::InitializeWrapperWidget(UObject* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent)
 {
 	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
@@ -577,6 +760,57 @@ void UMounteaInventoryUIStatics::SetSourceInventory(
 	if (Target.GetObject())
 		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
 }
+
+#pragma region Wrapper
+
+bool UMounteaInventoryUIStatics::IsValidWrapperWidget(const UObject* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>();
+}
+
+FGameplayTagContainer UMounteaInventoryUIStatics::GetWrapperWidgetStates(UObject* Target)
+{
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_GetWrapperWidgetStates(Target) : FGameplayTagContainer();
+}
+
+void UMounteaInventoryUIStatics::SetWrapperWidgetStates(UObject* Target, const FGameplayTagContainer& NewStates)
+{
+	if (IsValidWrapperWidget(Target))
+		return IMounteaInventorySystemWrapperWidgetInterface::Execute_SetWrapperWidgetStates(Target, NewStates);
+}
+
+bool UMounteaInventoryUIStatics::AddWidgetStateTag(UObject* Target, const FGameplayTag& Tag)
+{
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_AddWidgetStateTag(Target, Tag) : false;
+}
+
+bool UMounteaInventoryUIStatics::RemoveWidgetStateTag(UObject* Target, const FGameplayTag& Tag)
+{
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_RemoveWidgetStateTag(Target, Tag) : false;
+}
+
+bool UMounteaInventoryUIStatics::HasWidgetStateTag(UObject* Target, const FGameplayTag& Tag, const bool bExactMatch)
+{
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_HasWidgetStateTag(Target, Tag, bExactMatch) : false;
+}
+
+void UMounteaInventoryUIStatics::ClearWidgetStateTags(UObject* Target)
+{
+	if (IsValidWrapperWidget(Target))
+		return IMounteaInventorySystemWrapperWidgetInterface::Execute_ClearWidgetStateTags(Target);
+}
+
+bool UMounteaInventoryUIStatics::AppendWidgetStateTags(UObject* Target, const FGameplayTagContainer& TagsToAppend)
+{
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_AppendWidgetStateTags(Target, TagsToAppend) : false;
+}
+
+#pragma endregion 
 
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UWidget* Target, const FString& CategoryId)
 {
@@ -681,32 +915,31 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_HighlightItem(Target, bIsSelected);
 }
 
-void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UUserWidget* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-	const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget)
+void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UWidget* Target,
+	const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeItemAction(
-				Target, ParentUI, ItemActionClass, ParentWidget);
+				Target, ItemAction, SelectedItem);
 	else
 		LOG_ERROR(TEXT("[InitializeItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
 }
 
-bool UMounteaInventoryUIStatics::ItemAction_IsActionEnabled(UUserWidget* Target)
+bool UMounteaInventoryUIStatics::ItemAction_IsActionEnabled(UWidget* Target)
 {
 	return IsValid(Target) &&
 		Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>() && 
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_IsActionEnabled(Target);
 }
 
-bool UMounteaInventoryUIStatics::ItemAction_IsActionValid(UUserWidget* Target)
+bool UMounteaInventoryUIStatics::ItemAction_IsActionValid(UWidget* Target)
 {
 	return IsValid(Target) && 
 		Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>() && 
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_IsActionValid(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UUserWidget* Target)
+void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UWidget* Target)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_ExecuteItemAction(Target);
@@ -714,7 +947,7 @@ void UMounteaInventoryUIStatics::ItemAction_ExecuteItemAction(UUserWidget* Targe
 		LOG_ERROR(TEXT("[ExecuteItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
 }
 
-TSoftClassPtr<UObject> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUserWidget* Target)
+TSoftClassPtr<UMounteaSelectableInventoryItemAction> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UWidget* Target)
 {
 	if (!IsValid(Target))
 	{
@@ -731,36 +964,8 @@ TSoftClassPtr<UObject> UMounteaInventoryUIStatics::ItemAction_GetItemAction(UUse
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
 }
 
-FMounteaItemActionData UMounteaInventoryUIStatics::ItemAction_GetActionData(UWidget* Target)
-{
-	if (!IsValid(Target))
-	{
-		LOG_ERROR(TEXT("[GetActionData] Invalid Target!"));
-		return FMounteaItemActionData();
-	}
-
-	if (!Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
-	{
-		LOG_ERROR(TEXT("[GetActionData] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
-		return FMounteaItemActionData();
-	}
-
-	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemActionData(Target);
-}
-
-void UMounteaInventoryUIStatics::ItemActionsContainer_SetParentItemWidget(UWidget* Target, UWidget* ParentItemWidget)
-{
-	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
-	{
-		LOG_ERROR(TEXT("[SetParentItemWidget] Target does not implement IMounteaAdvancedInventoryItemActionsContainerWidgetInterface or is invalid!"));
-		return;
-	}
-
-	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_SetParentItemWidget(Target, ParentItemWidget);
-}
-
-void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UUserWidget* Target,
-																			   const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
+void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UWidget* Target, 
+	const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -771,8 +976,8 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(U
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, ItemActionsList);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UUserWidget* Target,
-	UUserWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UWidget* Target,
+	UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -783,8 +988,8 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(U
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_AddItemActionToContainer(Target, ItemActionWidget);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContainer(UUserWidget* Target,
-	UUserWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContainer(UWidget* Target,
+	UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -801,7 +1006,7 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContai
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_RemoveItemActionFromContainer(Target, ItemActionWidget);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_ClearItemActionsContainer(UUserWidget* Target)
+void UMounteaInventoryUIStatics::ItemActionsContainer_ClearItemActionsContainer(UWidget* Target)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -812,8 +1017,8 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_ClearItemActionsContainer(
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ClearItemActionsContainer(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UUserWidget* Target,
-	UUserWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UWidget* Target,
+	UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -830,7 +1035,7 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UUserWidg
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_SelectItemAction(Target, ItemActionWidget);
 }
 
-TArray<UUserWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemActionsInContainer(UUserWidget* Target)
+TArray<UWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemActionsInContainer(UWidget* Target)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -841,7 +1046,7 @@ TArray<UUserWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemAct
 	return IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_GetItemActionsInContainer(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemActionByIndex(UUserWidget* Target,
+void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemActionByIndex(UWidget* Target,
 	const int32 ItemActionIndex)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
@@ -935,8 +1140,8 @@ void UMounteaInventoryUIStatics::ItemSlot_SetParentSlotsWrapper(UWidget* Target,
 		IMounteaAdvancedInventoryItemSlotWidgetInterface::Execute_SetParentSlotsWrapper(Target, ParentSlotsWrapper);
 }
 
-void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UWidget* Target,
-																	  const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
+void UMounteaInventoryUIStatics::SetItemSlotsWrapperOwningInventoryUI(UWidget* Target, 
+	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
@@ -1135,7 +1340,9 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	return FindEmptyGridSlotRecursive(InventoryInterface, inventoryItem, gridSlots, bIsStackable, bAlwaysStack);
 }
 
-int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems)
+int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, 
+	const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, 
+	const bool bAlwaysStackItems)
 {
 	return INDEX_NONE;
 	/*
@@ -1209,11 +1416,8 @@ int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IM
 	*/
 }
 
-bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(
-	UUserWidget* GridWidget, 
-	const FGuid& ItemId, 
-	int32 SlotIndex,
-	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent)
+bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(UUserWidget* GridWidget, const FGuid& ItemId, 
+	int32 SlotIndex, TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent)
 {
 	return false;
 	/*
@@ -1485,13 +1689,15 @@ void UMounteaInventoryUIStatics::ItemPreview_ResetPreview(UMounteaAdvancedInvent
 		Target->ResetCameraToDefaults();
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const FVector2f& MouseDelta)
 {
 	if (IsValid(Target))
 		Target->ProcessRotationInput(MouseDelta);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta)
+void UMounteaInventoryUIStatics::ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const FVector2f& MouseDelta)
 {
 	if (IsValid(Target))
 		Target->ProcessHeightInput(MouseDelta);
@@ -1518,7 +1724,8 @@ void UMounteaInventoryUIStatics::ItemPreview_SetCameraHeightAbsolute(UMounteaAdv
 		Target->SetCameraHeightAbsolute(HeightNormalized);
 }
 
-void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized)
+void UMounteaInventoryUIStatics::ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
+	const float ZoomNormalized)
 {
 	if (IsValid(Target))
 		Target->SetCameraZoomAbsolute(ZoomNormalized);

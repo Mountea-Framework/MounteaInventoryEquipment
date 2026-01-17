@@ -18,9 +18,11 @@
 #include "AssetActions/FMounteaAdvancedInventoryUIConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventorySelectableInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryUIComponent_AssetAction.h"
@@ -174,6 +176,22 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigIcon);
 				}
+				
+				FSlateImageBrush* InventorySelectableInventoryItemActionThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InventorySelectableInventoryItemActionIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (InventorySelectableInventoryItemActionThumb && InventorySelectableInventoryItemActionIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaSelectableInventoryItemAction", InventorySelectableInventoryItemActionThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaSelectableInventoryItemAction", InventorySelectableInventoryItemActionIcon);
+				}
+				
+				FSlateImageBrush* InventoryCallbackInventoryItemActionThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionCallbackIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InventoryCallbackInventoryItemActionIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionCallbackIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (InventoryCallbackInventoryItemActionThumb && InventoryCallbackInventoryItemActionIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
@@ -192,6 +210,8 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventorySelectableInventoryItemAction_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction>());	
 
 		for (const auto& Itr : AssetActions)
 		{

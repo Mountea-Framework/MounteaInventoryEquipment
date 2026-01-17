@@ -16,8 +16,9 @@
 #include "MounteaInventoryGenericWidgetInterface.generated.h"
 
 struct FMounteaWidgetInputPayload;
-enum class EMounteaWidgetInputPhase : uint8;
 struct FGameplayTag;
+
+enum class EMounteaWidgetInputPhase : uint8;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventoryGenericWidgetInterface : public UInterface
@@ -84,13 +85,52 @@ public:
 	 * through a generic payload structure.
 	 *
 	 * @param InputTag A gameplay tag identifying the semantic meaning of the input (e.g. UI.ItemPreview.Zoom, UI.Inventory.Navigate).
-	 * @param Phase The current lifecycle phase of the input action.
 	 * @param Payload A lightweight container holding the relevant input value.
 	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
-	void ConsumeUIInput(const FGameplayTag& InputTag, 
-						const FMounteaWidgetInputPayload& Payload, float DeltaTime);
-	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag,
-						const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
+	void ConsumeUIInput(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime);
+	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
+
+	/**
+	 * Sets the Widget Tag definition for this UI element.
+	 *
+	 * Each UI element that can be hosted/managed by the Wrapper should define a unique Gameplay Tag
+	 * representing its identity/state (for example UI.ModalWindow, UI.Tooltip, UI.ContextMenu, etc.).
+	 * This tag is used by the Wrapper to track which widgets are currently active and in use, allowing
+	 * the UI Manager/Wrapper to:
+	 * - prevent duplicate widget instances,
+	 * - resolve UI stacking rules (e.g., only one modal at a time),
+	 * - adjust input routing (e.g., block interaction while modal is present),
+	 * - query current UI composition for debugging/logic.
+	 *
+	 * Expected usage:
+	 * - Widget tag is assigned during initialization / construction of the widget.
+	 * - Wrapper reads this tag when the widget is added/removed and updates its internal state tracking.
+	 *
+	 * @param WidgetTag Gameplay Tag defining the widget identity/state used for Wrapper/UI tracking.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	void SetWidgetTag(const FGameplayTag& WidgetTag);
+	virtual void SetWidgetTag_Implementation(const FGameplayTag& WidgetTag) = 0;
+	
+	/**
+	 * Returns the Widget Tag definition for this UI element.
+	 *
+	 * Each UI element that can be hosted/managed by the Wrapper should expose a Gameplay Tag representing
+	 * its identity/state (for example UI.ModalWindow, UI.Tooltip, UI.ContextMenu, etc.).
+	 * The Wrapper and UI Manager use this tag to track which widgets are currently active and in use, enabling:
+	 * - fast queries of active UI states,
+	 * - prevention of duplicate widgets,
+	 * - correct UI stacking/layering logic,
+	 * - input routing rules based on active UI layers.
+	 *
+	 * The returned tag is expected to remain stable for the lifetime of the widget instance and should be
+	 * assigned via SetWidgetTag during initialization / widget creation.
+	 *
+	 * @return Gameplay Tag defining this widget identity/state used for Wrapper/UI tracking.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	FGameplayTag GetWidgetTag() const;
+	virtual FGameplayTag GetWidgetTag_Implementation() const = 0;
 };

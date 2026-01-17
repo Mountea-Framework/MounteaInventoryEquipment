@@ -18,7 +18,7 @@
 struct FMounteaItemActionData;
 
 class UWidget;
-class UMounteaInventoryItemAction;
+class UMounteaSelectableInventoryItemAction;
 class IMounteaAdvancedInventoryUIManagerInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemActionSelected, const UUserWidget*, SelectedItemActionWidget);
@@ -44,17 +44,16 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionWidg
 public:
 
 	/**
-	 * Initializes the item action widget with the parent UI and item action data.
+	 * Initializes the item action widget with the Initiator UI and item action data.
 	 * 
-	 * @param ParentUI The parent UI interface that owns this item action widget.
-	 * @param ItemActionClass The item action class associated with this widget.
-	 * @param ParentWidget Inventory Item widget which owns this item action widget.
+	 * @param ItemAction The item action associated with this widget.
+	 * @param SelectedItem Inventory Item which this action affects.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
-	void InitializeItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-		const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget);
-	virtual void InitializeItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentUI,
-		const TSoftClassPtr<UObject>& ItemActionClass, UWidget* ParentWidget) = 0;
+	void InitializeItemAction(
+		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
+	virtual void InitializeItemAction_Implementation(
+		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.
@@ -90,17 +89,6 @@ public:
 	 * @return The soft class reference to the item action.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
-	TSoftClassPtr<UObject> GetItemAction() const;
-	virtual TSoftClassPtr<UObject> GetItemAction_Implementation() const = 0;
-
-	/**
-	 * Gets the data associated with this item's action, including its display name, icon, and other properties.
-	 * 
-	 * @return The action data containing information about the item action.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
-	FMounteaItemActionData GetItemActionData() const;
-	virtual FMounteaItemActionData GetItemActionData_Implementation() const = 0;
-
-	virtual FOnItemActionSelected& GetOnItemActionSelectedEventHandle() = 0;
+	TSoftClassPtr<UMounteaSelectableInventoryItemAction> GetItemAction() const;
+	virtual TSoftClassPtr<UMounteaSelectableInventoryItemAction> GetItemAction_Implementation() const = 0;
 };

@@ -38,7 +38,6 @@
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Guid.h"
-#include "Decorations/MounteaInventoryItemAction.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
@@ -136,7 +135,6 @@ void SMounteaInventoryTemplateEditor::NotifyPostChange(const FPropertyChangedEve
 		TemplateTreeView->RequestTreeRefresh();
 }
 
-
 TArray<UObject*> SMounteaInventoryTemplateEditor::LoadAllTemplatesForMatrix()
 {
 	TArray<UObject*> allTemplates;
@@ -195,6 +193,8 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 	TArray<UObject*> allTemplates = LoadAllTemplatesForMatrix();
 	
 	AvailableTemplates.Empty();
+	UnbindItemChanged();
+	
 	Algo::TransformIf(
 		allTemplates,
 		AvailableTemplates,
@@ -208,6 +208,7 @@ void SMounteaInventoryTemplateEditor::RefreshTemplateList()
 			return TWeakObjectPtr<UMounteaInventoryItemTemplate>(Cast<UMounteaInventoryItemTemplate>(obj));
 		}
 	);
+	BindItemChanged();
 	
 	RebuildTreeStructure();
 	ApplySearchFilter();
@@ -966,6 +967,61 @@ void SMounteaInventoryTemplateEditor::UnbindAssetRegistry()
 	AssetRenamedHandle.Reset();
 	AssetAddedHandle.Reset();
 	AssetUpdatedHandle.Reset();
+}
+
+void SMounteaInventoryTemplateEditor::BindItemChanged()
+{
+	for (auto itemTemplate : AvailableTemplates)
+	{
+		if (itemTemplate.IsValid())
+			itemTemplate->TemplateChangedDelegate.AddRaw(this, &SMounteaInventoryTemplateEditor::OnItemChanged);
+	}
+}
+
+void SMounteaInventoryTemplateEditor::UnbindItemChanged()
+{
+	for (auto itemTemplate : AvailableTemplates)
+	{
+		if (itemTemplate.IsValid())
+			itemTemplate->TemplateChangedDelegate.RemoveAll(this);
+	}
+}
+
+void SMounteaInventoryTemplateEditor::OnItemChanged(UMounteaInventoryItemTemplate* Template)
+{
+	if (!Template)
+		return;
+
+	UPackage* itemPackage = Template->GetOutermost();
+	if (itemPackage && itemPackage->IsDirty() && !PendingChanges.Contains(Template))
+	{
+		PendingChanges.Add(Template);
+        
+		if (ProcessChangesTimer.IsValid())
+			GEditor->GetTimerManager()->ClearTimer(ProcessChangesTimer);
+        
+		GEditor->GetTimerManager()->SetTimer(
+			ProcessChangesTimer,
+			FTimerDelegate::CreateSP(this, &SMounteaInventoryTemplateEditor::ProcessPendingChanges),
+			ChangeDebounceDelay,
+			false
+		);
+	}
+}
+
+void SMounteaInventoryTemplateEditor::ProcessPendingChanges()
+{
+	if (PendingChanges.Num() == 0)
+		return;
+
+	for (UMounteaInventoryItemTemplate* itemTemplate : PendingChanges)
+	{
+		if (itemTemplate)
+			TrackDirtyAsset(itemTemplate);
+	}
+    
+	PendingChanges.Empty();
+	RefreshTemplateList();
 }
 
 void SMounteaInventoryTemplateEditor::ApplySearchFilter()

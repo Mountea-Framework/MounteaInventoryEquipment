@@ -35,6 +35,7 @@ public:
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const override;
 
 	// UK2Node_CallFunction
+	virtual bool IsNodePure() const override;
 	virtual FText GetToolTipHeading() const override;
 	virtual FText GetTooltipText() const override;
 	virtual FLinearColor GetNodeTitleColor() const override;

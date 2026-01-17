@@ -29,11 +29,23 @@ int32 UMounteaInventoryScrollBox::GetChildrenCount() const
 	return VerticalBox ? VerticalBox->GetChildrenCount() : INDEX_NONE;
 }
 
-void UMounteaInventoryScrollBox::AddChild(UWidget* Content)
+void UMounteaInventoryScrollBox::AddChild(UWidget* Content) const
 {
 	if (!Content || !VerticalBox)
 		return;
 	VerticalBox->AddChild(Content);
+}
+
+void UMounteaInventoryScrollBox::RemoveChild(UWidget* Content) const
+{
+	if (Content && VerticalBox)
+		VerticalBox->RemoveChild(Content);
+}
+
+void UMounteaInventoryScrollBox::RemoveChildAt(const int32 Index) const
+{
+	if (VerticalBox && Index != INDEX_NONE && VerticalBox->GetChildAt(Index) != nullptr)
+		VerticalBox->RemoveChildAt(Index);
 }
 
 void UMounteaInventoryScrollBox::ResetChildren()
@@ -186,6 +198,11 @@ void UMounteaInventoryScrollBox::SetActiveIndex(const int32 NewIndex)
 	const int32 maxIndex = VerticalBox->GetChildrenCount() - 1;
 	ActiveIndex = FMath::Clamp(NewIndex, 0, maxIndex);
 	CalculateDesiredTransform();
+}
+
+TArray<UWidget*> UMounteaInventoryScrollBox::GetChildWidgets() const
+{
+	return VerticalBox ? VerticalBox->GetAllChildren() : TArray<UWidget*>();
 }
 
 void UMounteaInventoryScrollBox::BroadcastIndexChange(const int32 Delta) const

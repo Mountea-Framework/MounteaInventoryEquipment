@@ -27,8 +27,7 @@
  * @see FGameplayTag
  */
 UCLASS()
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API
-	UMounteaAdvancedInventoryButtonWidget : public UButton, public IMounteaInventoryGenericWidgetInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryButtonWidget : public UButton, public IMounteaInventoryGenericWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -38,6 +37,12 @@ public:
 	virtual void ApplyTheme_Implementation() override;
 	virtual void RefreshWidget_Implementation() override {};
 	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime) override {};
+	virtual FGameplayTag GetWidgetTag_Implementation() const override { return Tag; };
+	virtual void SetWidgetTag_Implementation(const FGameplayTag& WidgetTag) override
+	{
+		if (WidgetTag != Tag)
+			Tag = WidgetTag;
+	};
 
 private:
 	
@@ -51,6 +56,12 @@ private:
 #endif
 
 public:
+	
+	/** Defines type of the Widget. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data",
+		AdvancedDisplay, 
+		DisplayName="Widget Tag")
+	FGameplayTag Tag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button", meta=(NoResetToDefault))
 	FGameplayTag ButtonActionTag;

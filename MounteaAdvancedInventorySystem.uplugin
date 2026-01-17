@@ -61,10 +61,6 @@
 			"Enabled": true
 		},
 		{
-			"Name": "EditorScriptingUtilities",
-			"Enabled": true
-		},
-		{
 			"Name": "WebBrowserWidget",
 			"Enabled": false,
 			"Optional": true

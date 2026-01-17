@@ -12,124 +12,121 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
-#include "Abilities/GameplayAbility.h"
+#include "UObject/Object.h"
+
+#include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
-#include "Interfaces/ItemActions/MounteaAdvancedInventoryItemActionInterface.h"
+
 #include "MounteaInventoryItemAction.generated.h"
 
-class UTexture2D;
-class UGameplayEffect;
-
 /**
- * UMounteaInventoryItemAction implements inventory actions as Gameplay Abilities for complex interactions.
- * Leverages the Gameplay Ability System for cooldowns, resource costs, targeting validation, and gameplay effect application,
- * providing full GAS integration with network replication, prediction, and ability lifecycle management
- * for gameplay-affecting inventory operations like consuming items, applying buffs, or triggering abilities.
+ * UMounteaInventoryItemAction provides lightweight inventory actions for local UI operations.
+ * Simple actions execute directly without Gameplay Ability System overhead, making them ideal
+ * for non-gameplay inventory operations like splitting stacks, moving items, or UI-only modifications
+ * with immediate execution and minimal performance impact for inventory management tasks.
  *
- * @see [GAS Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/GASActions)
- * @see IMounteaAdvancedInventoryItemActionInterface
- * @see UMounteaInventorySimpleItemAction
+ * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
+ * @see UMounteaInventoryItemAction
  */
-UCLASS(ClassGroup=(Mountea), Abstract, BlueprintType, Blueprintable,
+UCLASS(ClassGroup=(Mountea), Abstract, NotBlueprintable, BlueprintType, DefaultToInstanced, EditInlineNew,
 	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
-	HideCategories=("Cooking","Collision"),
-	meta=(DisplayName="Mountea GAS Inventory Action"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UGameplayAbility, public IMounteaAdvancedInventoryItemActionInterface
+	HideCategories=("Cooking","Collision","Private"),
+	meta=(DisplayName="Mountea Inventory Action"))
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UObject
 {
 	GENERATED_BODY()
 
 public:
+	
+	/**
+	 * Initializes the action with the target item and owning inventory.
+	 * This must be called before executing the action to establish the operating context.
+	 * 
+	 * @param TargetItem The inventory item this action will operate on.
+	 * @param OwningInventory The inventory interface that contains the target item.
+	 * @param ContextPayload Optional context object for additional data (e.g., player controller, UI context).
+	 * 
+	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool InitializeItemAction(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+		UObject* ContextPayload = nullptr);
+	virtual bool InitializeItemAction_Implementation(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+		UObject* ContextPayload = nullptr);
 
-	UMounteaInventoryItemAction();
+	/**
+	 * Gets the inventory interface that owns the target item.
+	 * 
+	 * @return Script interface to the inventory containing the target item.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const;
+	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory_Implementation() const;
 
-#pragma region Inventory Specific
+	/**
+	 * Validates that the target item can be modified by this action.
+	 * 
+	 * @return True if the item is in a valid state for modification.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool CanModifyTargetItem() const;
+	virtual bool CanModifyTargetItem_Implementation() const { return true; };
+
+	/**
+	 * Determines whether this action is currently allowed to be executed on the target item.
+	 * 
+	 * @param TargetItem The inventory item to check execution permissions for.
+	 * 
+	 * @return True if the action can be executed, false if it's currently blocked.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool IsAllowed(const FInventoryItem& TargetItem) const;
+	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const;
+
+	/**
+	 * Gets a user-friendly reason explaining why the action is not allowed.
+	 * 
+	 * @param TargetItem The inventory item that the action cannot be performed on.
+	 * 
+	 * @return Localized text explaining why the action is disabled or unavailable.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	FText GetDisallowedReason(const FInventoryItem& TargetItem) const;
+	virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const;
+
+	/**
+	 * Executes the inventory action on the specified target item.
+	 * 
+	 * This is the main entry point for all inventory actions, regardless of implementation type:
+	 * - Selectable actions: Execute logic and does UI related stuff
+	 * - Callback actions: Execute logic directly and returns result
+	 * 
+	 * @param TargetItem The inventory item to perform the action on.
+	 * 
+	 * @return True if the action was executed successfully, false if it failed.
+	 * 
+	 * @note Always call InitializeItemAction() before executing actions to ensure proper context.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	bool ExecuteInventoryAction(const FInventoryItem& TargetItem);
+	virtual bool ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem);
+
+	/**
+	 * Gets the gameplay tag that uniquely identifies this inventory action.
+	 * 
+	 * @return The gameplay tag used for filtering and identifying this action type.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	FGameplayTagContainer GetItemActionTags() const;
+	virtual FGameplayTagContainer GetItemActionTags_Implementation() const { return ItemActionTags; };
 
 protected:
-
-	/** Data of the Inventory Action. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Inventory Action",
-		meta=(ShowOnlyInnerProperties))
-	FMounteaItemActionData ItemActionData;
-
-#pragma endregion
-
-#pragma region IMounteaAdvancedInventoryItemActionInterface
-
-	virtual bool InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory,
-		UObject* ContextPayload = nullptr) override;
-	virtual FInventoryItem GetTargetItem_Implementation() const override
-	{ return CurrentTargetItem; };
-	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory_Implementation() const override;
-	virtual FMounteaItemActionData GetActionData_Implementation() const override
-	{ return ItemActionData; };
-	virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const override;
-	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const override;
-	virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const override;
-	virtual bool ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem) override;
-	virtual FGameplayTag GetInventoryItemTag_Implementation() const override
-	{ return ItemActionData.ItemActionTag; };
-	virtual bool ProcessAction_Implementation(UObject* ActionInitiator, const FInventoryItem& TargetItem) override;
-	virtual bool CanModifyTargetItem_Implementation() const override
-	{ return true; };
-	virtual void AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd) override;
-	virtual void RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove) override;
-	virtual void ClearAllActionFlags_Implementation() override;
-	virtual EInventoryItemActionCallback GetInventoryItemActionCallback_Implementation() const override;
-
-#pragma endregion
-
-#pragma region UGameplayAbility
-
-protected:
-
-	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const override;
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-
-#pragma endregion
-
-#pragma region Blueprint Events
-
-	/**
-	 * Blueprint event called when the inventory action begins execution.
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category="Inventory Action", DisplayName="On Execute Action")
-	void ReceiveExecuteAction(const FInventoryItem& TargetItem);
-
-	/**
-	 * Blueprint event called when the inventory action completes successfully.
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category="Inventory Action", DisplayName="On Action Completed")
-	void ReceiveActionCompleted(const FInventoryItem& TargetItem);
-
-	/**
-	 * Blueprint event called when the inventory action fails or is cancelled.
-	 */
-	UFUNCTION(BlueprintImplementableEvent, Category="Inventory Action", DisplayName="On Action Failed")
-	void ReceiveActionFailed(const FInventoryItem& TargetItem, const FText& Reason);
-
-#pragma endregion
-
-#pragma region Helper Functions
 	
 	/**
-	 * Applies the configured gameplay effects to the ability owner.
+	 * The tag used to identify this action in the gameplay ability system.
+	 * This tag is used for filtering and identifying actions in the UI and logic.
 	 */
-	void ApplyActionEffects();
-
-#pragma endregion
-
-#pragma region Private Data
-
-private:
-	
-	/**
-	 * The inventory item currently being processed by this action.
-	 */
-	UPROPERTY(Transient)
-	FInventoryItem CurrentTargetItem;
-	
-#pragma endregion
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
+		meta=(Categories="Mountea_Inventory.ItemAction,Mountea_Inventory.ItemActions,ItemAction,Action"))
+	FGameplayTagContainer ItemActionTags;
 };

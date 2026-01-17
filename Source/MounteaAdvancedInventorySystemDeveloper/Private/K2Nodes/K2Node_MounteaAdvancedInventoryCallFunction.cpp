@@ -75,6 +75,20 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 	}
 }
 
+bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const
+{
+	if (const UFunction* localFunction = GetTargetFunction())
+	{
+		if (localFunction->HasMetaData(TEXT("CustomTag")))
+		{
+			const FString customTagValue = localFunction->GetMetaData(TEXT("CustomTag"));
+			if (customTagValue == TEXT("MounteaK2Setter")) return false;
+			if (customTagValue == TEXT("MounteaK2Getter")) return true;
+		}
+	}
+	return Super::IsNodePure();
+}
+
 FText UK2Node_MounteaAdvancedInventoryCallFunction::GetToolTipHeading() const
 {
 	return LOCTEXT("MounteaAdvancedInventoryCallFunctionFunctions", "Mountea Advanced Inventory Function");

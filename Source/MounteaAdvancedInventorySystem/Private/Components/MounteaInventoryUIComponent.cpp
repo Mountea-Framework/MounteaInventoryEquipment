@@ -12,7 +12,7 @@
 
 #include "Components/MounteaInventoryUIComponent.h"
 
-#include "CommonActivatableWidget.h"
+#include "Algo/AnyOf.h"
 #include "Blueprint/UserWidget.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
@@ -29,7 +29,6 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
-#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 
 #include "Statics/MounteaInventorySystemStatics.h"
@@ -57,7 +56,9 @@ void UMounteaInventoryUIComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetOwner() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	if (GetOwner() && 
+		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
+		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
 		auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
 		if (!IsValid(inventoryComponent))
@@ -178,6 +179,9 @@ bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 	}
 
 	WrapperWidget = newWidget;
+	ensure(WrapperWidget != nullptr);
+	
+	WrapperWidget->SetIsFocusable(true);
 	
 	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> wrapperWidget = WrapperWidget;
 	ensure(wrapperWidget.GetObject() != nullptr);
@@ -473,6 +477,37 @@ void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryIt
 	Execute_ProcessItemModified(this, Item);
 }
 
+bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag,
+	const FGuid& ItemId)
+{
+	FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
+	if (!foundData || foundData->StoredIds.IsEmpty())
+		return false;
+
+	const int32 removedCount = foundData->StoredIds.RemoveAll([&ItemId](const FGuid& storedId)
+	{
+		return storedId == ItemId;
+	});
+
+	if (removedCount > 0 && foundData->StoredIds.Num() == 0)
+		CustomItemsMap.Remove(ItemTag);
+
+	return removedCount > 0;
+}
+
+bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag,
+                                                                          const FGuid& ItemId)
+{
+	const FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
+	if (!foundData)
+		return false;
+	
+	return Algo::AnyOf(foundData->StoredIds, [&ItemId](const FGuid& storedId)
+	{
+		return storedId == ItemId;
+	});
+}
+
 void UMounteaInventoryUIComponent::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
 {
 	SavedGridSlots.Add(SlotData);
@@ -498,4 +533,10 @@ void UMounteaInventoryUIComponent::UpdateSlot_Implementation(const FMounteaInven
 	if (SavedGridSlots.Contains(SlotData))
 		SavedGridSlots.Remove(SlotData);
 	SavedGridSlots.Add(SlotData);
+}
+
+void UMounteaInventoryUIComponent::ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload)
+{
+	if (WrapperWidget && WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, Command, OptionalPayload);
 }

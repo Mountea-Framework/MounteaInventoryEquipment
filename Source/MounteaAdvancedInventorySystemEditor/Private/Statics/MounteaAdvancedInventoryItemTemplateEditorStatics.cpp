@@ -106,6 +106,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
 
             if (ParseSingleTemplateJson(itemJson, newTemplate, OutErrorMessage))
             {
+                newTemplate->ReloadItemActions();
                 newTemplate->CalculateJson();
                 
                 const FString packagePath = FPaths::Combine(folderToUse, assetName);

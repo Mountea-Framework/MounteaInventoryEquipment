@@ -15,14 +15,7 @@
 #include "MounteaInventoryItem.h"
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
-// ============================================================================
-//  Inventory Slot & Item Widget Data
-//  Responsibility:
-//  - FInventorySlot: purely inventory/model-side container information.
-//  - FMounteaInventoryGridSlot: adds grid position on top of FInventorySlot.
-//  - FItemWidgetData: all data a UI widget needs to render an item/slot.
-// ============================================================================
-
+enum class ECommonInputType : uint8;
 enum class EMounteaWidgetInputMethod : uint8;
 class UUserWidget;
 class UTextureCube;
@@ -434,6 +427,33 @@ public:
 	FKey ModifierKey;
 };
 
+/**
+ * FMounteaWidgetInputKeyTextureMapping defines the icon representation for a specific input method.
+ *
+ * Used by FMounteaWidgetInputActionMapping to provide per-device icon overrides (e.g. keyboard glyph
+ * vs. gamepad glyph) for the same logical UI action/key binding.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaWidgetInputKeyTextureMapping
+{
+	GENERATED_BODY()
+
+public:
+
+	/**
+	 * Input method this mapping applies to.
+	 * Determines when this icon should be used based on the currently active input type.
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	ECommonInputType InputType;
+	
+	/**
+	 * Icon texture used for the specified input method.
+	 * Stored as a soft reference to support deferred loading and reduce memory overhead.
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	TSoftObjectPtr<UTexture2D> InputIcon;
+};
 
 /**
  * FMounteaWidgetInputActionMapping defines a UI action (identified by a gameplay tag)
@@ -455,12 +475,36 @@ struct FMounteaWidgetInputActionMapping
 	 * Limited to "Input" category only!
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
-		meta=(Categories="Input,Mountea_Inventory.Input"))
+		meta=(Categories="Input,Mountea_Inventory.Input"),
+		meta=(NoResetToDefault))
 	FGameplayTag ActionTag;
 
+	/**
+	 * Higher the value, higher is the priority of specified Input.
+	 * If you have input with more Keys, the Key with higher priority wins.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input")
+	int32 InputPriority = INDEX_NONE;
+
+	/**
+	 * Widget states in which this action must not trigger.
+	 * Used to suppress actions based on current widget state (e.g. disabled, modal, editing text).
+	 * Example:
+	 * - Input Actions "Confirm" and "Use" both use same Gamepad Key
+	 * → If Inventory has Modal window which requires confirmation, the Widget states get updated with the modal Window's state
+	 * → Then "Use" can blacklist ModalWindow state
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(Categories="Mountea_Inventory.WidgetState.Modal,State"),
+		meta=(NoResetToDefault))
+	FGameplayTagContainer BlacklistedWidgetStates;
+
 	/** Keys that can trigger this action (Esc, Enter, Gamepad_FaceButton_Right, etc.). */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
-	TArray<FKey> Keys;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input",
+		meta=(ShowOnlyInnerProperties),
+		meta=(TitleProperty="InputType"),
+		meta=(NoResetToDefault))
+	TMap<FKey, FMounteaWidgetInputKeyTextureMapping> Keys;
 
 	// TODO: Holding 2 buttons at the same time for example
 	/** Key chords (key + optional modifiers) that can trigger this action. */
@@ -468,10 +512,12 @@ struct FMounteaWidgetInputActionMapping
 	//TArray<FMounteaWidgetInputKeyChord> Chords;
 
 	/** If true, the UI layer should consume the input when this mapping triggers. */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input", AdvancedDisplay)
 	bool bConsume = true;
+	
+	// TODO:
+	// - allow remapping
 };
-
 
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {

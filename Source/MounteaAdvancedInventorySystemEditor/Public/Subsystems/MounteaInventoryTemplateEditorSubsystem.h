@@ -39,5 +39,6 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMounteaInventoryItemTemplate> TempTemplate;
 	
-	FOnTemplatesChanged TemplatesChangedDelegate;
+	FOnTemplatesChanged TemplatesChangedDelegate;	
+	
 };

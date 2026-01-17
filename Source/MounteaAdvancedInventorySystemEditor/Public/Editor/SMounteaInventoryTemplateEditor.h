@@ -164,6 +164,10 @@ private:
 	TWeakPtr<FActiveTimerHandle> PendingRefreshTimer;
 	bool bPendingRefresh = false;
 	
+	TSet<UMounteaInventoryItemTemplate*> PendingChanges;
+	FTimerHandle ProcessChangesTimer;
+	float ChangeDebounceDelay = 0.5f;
+	
 	void ApplySearchFilter();
 	
 	void OnSearchTextChanged(const FText& InSearchText);
@@ -178,6 +182,11 @@ private:
 	EActiveTimerReturnType HandleDeferredRefresh(double, float);
 	void BindAssetRegistry();
 	void UnbindAssetRegistry();
+	
+	void BindItemChanged();
+	void UnbindItemChanged();
+	void OnItemChanged(UMounteaInventoryItemTemplate* Template);
+	void ProcessPendingChanges();
 };
 
 #undef LOCTEXT_NAMESPACE
