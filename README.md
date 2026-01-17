@@ -50,8 +50,8 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 ### Item Templates Editor
 > Allows in-editor bulk changes with options to export to `mnteaitem` or `mnteaitems` files for edits outside of Unreal Engine.
 > <p align="center" width="100%">
->     <img width="40%" src="https://github.com/user-attachments/assets/557a0676-b974-4926-ab2b-5f85ca9788f2">
->     <img width="40%" src="https://github.com/user-attachments/assets/fa76e02d-3fed-4367-a5c5-786a1f4ba4da">
+>     <img width="45%" src="https://github.com/user-attachments/assets/557a0676-b974-4926-ab2b-5f85ca9788f2">
+>     <img width="45%" src="https://github.com/user-attachments/assets/fa76e02d-3fed-4367-a5c5-786a1f4ba4da">
 > </p>
 
 ### Data-Driven Approach
@@ -61,16 +61,16 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 > * * Inventory UI Configuration to define User Interface settings
 > * Etc.
 > <p align="center" width="100%">
->     <img width="33%" src="https://github.com/user-attachments/assets/bd88891d-d1d9-4bce-b74f-2a52b05d2809">
->     <img width="33%" src="https://github.com/user-attachments/assets/05ddd769-9784-4974-ad1e-75ea7522b7f3">
->     <img width="33%" src="https://github.com/user-attachments/assets/59889a6c-1e04-4916-ac44-846bf7e22ef4">
+>     <img width="30%" src="https://github.com/user-attachments/assets/bd88891d-d1d9-4bce-b74f-2a52b05d2809">
+>     <img width="30%" src="https://github.com/user-attachments/assets/05ddd769-9784-4974-ad1e-75ea7522b7f3">
+>     <img width="30%" src="https://github.com/user-attachments/assets/59889a6c-1e04-4916-ac44-846bf7e22ef4">
 > </p> 
 
 ### Custom K2Nodes
 > Custom K2Nodes are designed to provide maximum efficiency for your development speed.
 > Using GameplayTags for Input for UI mapping is one example of how the development can be simplified. Rather than searching all tags in the system, only the `Input` ones are allowed.
 > <p align="center" width="100%">
->     <img width="80%" src="https://github.com/user-attachments/assets/9b1a13b0-9ad4-4802-876a-c7a42f367ed6">
+>     <img width="90%" src="https://github.com/user-attachments/assets/9b1a13b0-9ad4-4802-876a-c7a42f367ed6">
 > </p>
 
 ### Custom UI Driven Input
@@ -78,8 +78,8 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 > The system is built atop Enhanced Input; however, it is mainly focused on UI, with custom states filtering, priorities and hardware mapping.
 >
 > <p align="center" width="100%">
->     <img width="50%" src="https://github.com/user-attachments/assets/3d543fa0-da4e-463b-a4ca-53037e152fac">
->     <img width="50%" src="https://github.com/user-attachments/assets/727405e8-d62a-4982-9ada-bdb3830c7e1f">
+>     <img width="45%" src="https://github.com/user-attachments/assets/3d543fa0-da4e-463b-a4ca-53037e152fac">
+>     <img width="45%" src="https://github.com/user-attachments/assets/727405e8-d62a-4982-9ada-bdb3830c7e1f">
 > </p>
 
 ### Inventory/Equipment Actions
