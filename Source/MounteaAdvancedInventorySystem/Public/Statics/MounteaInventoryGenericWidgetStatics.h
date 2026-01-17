@@ -69,8 +69,11 @@ public:
 	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"))
-	static void ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime);
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Consume UI Input")
+	static void ConsumeUIInput(UWidget* Target, 
+		UPARAM(meta=(Categories="Input,Mountea_Inventory.Input")) const FGameplayTag InputTag, 
+		const FMounteaWidgetInputPayload& Payload, float DeltaTime);
 
 	/**
 	 * Refreshes the provided UserWidget if it implements the MounteaInventoryGenericWidgetInterface.

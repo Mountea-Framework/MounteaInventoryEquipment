@@ -761,52 +761,56 @@ void UMounteaInventoryUIStatics::SetSourceInventory(
 		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
 }
 
-FGameplayTagContainer UMounteaInventoryUIStatics::GetWrapperWidgetStates(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target)
+#pragma region Wrapper
+
+bool UMounteaInventoryUIStatics::IsValidWrapperWidget(const UObject* Target)
 {
-	return IsValid(Target.GetObject()) ? 
-		IMounteaInventorySystemWrapperWidgetInterface::Execute_GetWrapperWidgetStates(Target.GetObject()) : FGameplayTagContainer();
+	return IsValid(Target) && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>();
 }
 
-void UMounteaInventoryUIStatics::SetWrapperWidgetStates(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
-	const FGameplayTagContainer& NewStates)
+FGameplayTagContainer UMounteaInventoryUIStatics::GetWrapperWidgetStates(UObject* Target)
 {
-	if (IsValid(Target.GetObject()))
-		return IMounteaInventorySystemWrapperWidgetInterface::Execute_SetWrapperWidgetStates(Target.GetObject(), NewStates);
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_GetWrapperWidgetStates(Target) : FGameplayTagContainer();
 }
 
-bool UMounteaInventoryUIStatics::AddWidgetStateTag(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, 
-	const FGameplayTag& Tag)
+void UMounteaInventoryUIStatics::SetWrapperWidgetStates(UObject* Target, const FGameplayTagContainer& NewStates)
 {
-	return IsValid(Target.GetObject()) ? 
-		IMounteaInventorySystemWrapperWidgetInterface::Execute_AddWidgetStateTag(Target.GetObject(), Tag) : false;
+	if (IsValidWrapperWidget(Target))
+		return IMounteaInventorySystemWrapperWidgetInterface::Execute_SetWrapperWidgetStates(Target, NewStates);
 }
 
-bool UMounteaInventoryUIStatics::RemoveWidgetStateTag(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, 
-	const FGameplayTag& Tag)
+bool UMounteaInventoryUIStatics::AddWidgetStateTag(UObject* Target, const FGameplayTag& Tag)
 {
-	return IsValid(Target.GetObject()) ? 
-		IMounteaInventorySystemWrapperWidgetInterface::Execute_RemoveWidgetStateTag(Target.GetObject(), Tag) : false;
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_AddWidgetStateTag(Target, Tag) : false;
 }
 
-bool UMounteaInventoryUIStatics::HasWidgetStateTag(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target, 
-	const FGameplayTag& Tag, const bool bExactMatch)
+bool UMounteaInventoryUIStatics::RemoveWidgetStateTag(UObject* Target, const FGameplayTag& Tag)
 {
-	return IsValid(Target.GetObject()) ? 
-		IMounteaInventorySystemWrapperWidgetInterface::Execute_HasWidgetStateTag(Target.GetObject(), Tag, bExactMatch) : false;
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_RemoveWidgetStateTag(Target, Tag) : false;
 }
 
-void UMounteaInventoryUIStatics::ClearWidgetStateTags(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target)
+bool UMounteaInventoryUIStatics::HasWidgetStateTag(UObject* Target, const FGameplayTag& Tag, const bool bExactMatch)
 {
-	if (IsValid(Target.GetObject()))
-		return IMounteaInventorySystemWrapperWidgetInterface::Execute_ClearWidgetStateTags(Target.GetObject());
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_HasWidgetStateTag(Target, Tag, bExactMatch) : false;
 }
 
-bool UMounteaInventoryUIStatics::AppendWidgetStateTags(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
-	const FGameplayTagContainer& TagsToAppend)
+void UMounteaInventoryUIStatics::ClearWidgetStateTags(UObject* Target)
 {
-	return IsValid(Target.GetObject()) ? 
-		IMounteaInventorySystemWrapperWidgetInterface::Execute_AppendWidgetStateTags(Target.GetObject(), TagsToAppend) : false;
+	if (IsValidWrapperWidget(Target))
+		return IMounteaInventorySystemWrapperWidgetInterface::Execute_ClearWidgetStateTags(Target);
 }
+
+bool UMounteaInventoryUIStatics::AppendWidgetStateTags(UObject* Target, const FGameplayTagContainer& TagsToAppend)
+{
+	return IsValidWrapperWidget(Target) ? 
+		IMounteaInventorySystemWrapperWidgetInterface::Execute_AppendWidgetStateTags(Target, TagsToAppend) : false;
+}
+
+#pragma endregion 
 
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UWidget* Target, const FString& CategoryId)
 {

@@ -12,6 +12,7 @@
 
 #include "Statics/MounteaInventoryGenericWidgetStatics.h"
 
+#include "GameplayTagContainer.h"
 #include "Components/Widget.h"
 
 void UMounteaInventoryGenericWidgetStatics::ProcessInventoryWidgetCommand(UObject* GenericWidget, const FString& Command, 
@@ -24,7 +25,7 @@ void UMounteaInventoryGenericWidgetStatics::ProcessInventoryWidgetCommand(UObjec
 		return IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(GenericWidget, Command, OptionalPayload);
 }
 
-void UMounteaInventoryGenericWidgetStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag, 
+void UMounteaInventoryGenericWidgetStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag InputTag, 
 	const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
