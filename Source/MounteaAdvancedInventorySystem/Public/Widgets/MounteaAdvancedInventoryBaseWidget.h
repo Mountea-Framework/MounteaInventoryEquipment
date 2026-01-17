@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/BaseWidget/MounteaAdvancedBaseInventoryWidgetInterface.h"
@@ -28,8 +29,8 @@
  */
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryBaseWidget : public UUserWidget,
-public IMounteaInventoryGenericWidgetInterface,
-public IMounteaAdvancedBaseInventoryWidgetInterface
+	public IMounteaInventoryGenericWidgetInterface,
+	public IMounteaAdvancedBaseInventoryWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -50,6 +51,13 @@ public:
 
 	virtual TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> GetOwningInventoryUI_Implementation() const override
 	{ return ParentUIComponent; };
+	
+	virtual FGameplayTag GetWidgetTag_Implementation() const override { return Tag; };
+	virtual void SetWidgetTag_Implementation(const FGameplayTag& WidgetTag) override
+	{
+		if (WidgetTag != Tag)
+			Tag = WidgetTag;
+	};
 
 protected:
 	
@@ -59,4 +67,10 @@ protected:
 		DisplayName="UI Manager",
 		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> ParentUIComponent = nullptr;
+	
+	/** Defines type of the Widget. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data",
+		AdvancedDisplay, 
+		DisplayName="Widget Tag")
+	FGameplayTag Tag;
 };

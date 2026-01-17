@@ -47,8 +47,8 @@ public:
 	 * Executes the inventory action on the specified target item.
 	 * 
 	 * This is the main entry point for all inventory actions, regardless of implementation type:
-	 * → Selectable actions: Execute logic and does UI related stuff
-	 * → Callback actions: Execute logic directly and returns result
+	 * - Selectable actions: Execute logic and does UI related stuff
+	 * - Callback actions: Execute logic directly and returns result
 	 * 
 	 * @param Target The Item Action.
 	 * @param TargetItem The inventory item to perform the action on.

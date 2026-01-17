@@ -34,9 +34,9 @@ class UMounteaCallbackInventoryItemAction;
  * "UMounteaCallbackInventoryItemAction".
  *
  * Example workflow:
- * → Selectable Action requests "Consume" and spawns a modal window to pick quantity
- * → Once confirmed, Selectable Action forwards the request to its "CallbackAction"
- * → Callback Action performs the actual Inventory System operation and any other runtime logic
+ * - Selectable Action requests "Consume" and spawns a modal window to pick quantity
+ * - Once confirmed, Selectable Action forwards the request to its "CallbackAction"
+ * - Callback Action performs the actual Inventory System operation and any other runtime logic
  *
  * @see [Simple Actions](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemActions)
  * @see UMounteaCallbackInventoryItemAction

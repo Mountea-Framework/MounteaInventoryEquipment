@@ -107,10 +107,10 @@ struct FInventoryCategoryData
 	/**
 	 * Tags that define this Category.
 	 * By default filtered for:
-	 * → Mountea_Inventory.Categories
-	 * → Mountea_Inventory.Category
-	 * → Categories
-	 * → Category
+	 * - Mountea_Inventory.Categories
+	 * - Mountea_Inventory.Category
+	 * - Categories
+	 * - Category
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category"))

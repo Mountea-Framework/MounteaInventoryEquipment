@@ -285,7 +285,7 @@ public:
 	/**
 	 * Validates whether the provided Item guid is stored in a map for specified tag.
 	 * Example:
-	 * → Is Item in Favorites
+	 * - Is Item in Favorites
 	 * 
 	 * @param ItemTag Tag which defines the key, like "Favorite"
 	 * @param ItemId Item guid to search for

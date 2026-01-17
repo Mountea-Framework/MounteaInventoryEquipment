@@ -490,7 +490,7 @@ struct FMounteaWidgetInputActionMapping
 	 * Widget states in which this action must not trigger.
 	 * Used to suppress actions based on current widget state (e.g. disabled, modal, editing text).
 	 * Example:
-	 * → Input Actions "Confirm" and "Use" both use same Gamepad Key
+	 * - Input Actions "Confirm" and "Use" both use same Gamepad Key
 	 * → If Inventory has Modal window which requires confirmation, the Widget states get updated with the modal Window's state
 	 * → Then "Use" can blacklist ModalWindow state
 	 */

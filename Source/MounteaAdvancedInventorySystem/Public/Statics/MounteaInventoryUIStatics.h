@@ -296,7 +296,7 @@ public:
 	/**
 	 * Validates whether the provided Item guid is stored in a map for specified tag.
 	 * Example:
-	 * → Is Item in Favorites
+	 * - Is Item in Favorites
 	 * 
 	 * @param Target UI manager implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param ItemTag Tag which defines the key, like "Favorite"
@@ -334,9 +334,9 @@ public:
 	 * Checks whether the UI item represented by InventoryItemData is detached (not present) in the provided list of ValidItems.
 	 *
 	 * A detached UI item is considered "orphaned" from the valid items collection:
-	 * → If ValidItems is empty, the item is treated as detached.
-	 * → If InventoryItemData.ContainingItem is invalid, the item is treated as detached.
-	 * → Otherwise, the function checks whether InventoryItemData.ContainingItem.Guid exists in ValidItems.
+	 * - If ValidItems is empty, the item is treated as detached.
+	 * - If InventoryItemData.ContainingItem is invalid, the item is treated as detached.
+	 * - Otherwise, the function checks whether InventoryItemData.ContainingItem.Guid exists in ValidItems.
 	 *
 	 * @param ValidItems Collection of items that are considered valid/attached for UI purposes.
 	 * @param InventoryItemData UI inventory item data containing the item reference (ContainingItem) to validate.
@@ -656,7 +656,126 @@ public:
 		DisplayName="Set Wrapper Widget Parent Manager")
 	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, 
 		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory);
-	
+
+	/**
+	 * Returns all currently active Widget State tags tracked by the target Wrapper.
+	 *
+	 * Wrapper widget states are used to keep track of which UI widgets are currently active/visible/in use
+	 * within the Wrapper (for example Modal Window, Tooltip, Context Menu, Inventory Panel, etc.).
+	 * Each widget that is created/added to the Wrapper should contribute its predefined Gameplay Tag
+	 * so the Wrapper and UI Manager can quickly query what is active and react accordingly.
+	 *
+	 * @param Target The target Wrapper widget interface from which the active state container will be retrieved.
+	 * @return Container of Gameplay Tags representing active UI states/widgets currently tracked by the Wrapper.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Wrapper Widget States")
+	static FGameplayTagContainer GetWrapperWidgetStates(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target);
+
+	/**
+	 * Overwrites Wrapper widget state tracking with a new tag container on the target Wrapper.
+	 *
+	 * This replaces the current tracked Widget State tags with the provided container.
+	 * Intended for bulk synchronization/reset scenarios (rebuild, restore, switching UI modes).
+	 *
+	 * Notes:
+	 * - This only updates state tracking. It should not be assumed to create/destroy widgets by itself.
+	 * - Implementations should ensure the stored state remains consistent with actual active widgets.
+	 *
+	 * @param Target The target Wrapper widget interface whose states will be overwritten.
+	 * @param NewStates Container of Gameplay Tags that will become the Wrapper's active widget states.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Wrapper Widget States")
+	static void SetWrapperWidgetStates(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
+		const FGameplayTagContainer& NewStates);
+
+	/**
+	 * Adds a new Widget State tag to the target Wrapper's active state container.
+	 *
+	 * Expected flow:
+	 * - A child widget (e.g., ModalWindow) is created/added to the Wrapper.
+	 * - That widget provides its state tag definition.
+	 * - Wrapper registers the tag so the system can track that the widget is now active.
+	 *
+	 * @param Target The target Wrapper widget interface that will receive the state tag.
+	 * @param Tag The Gameplay Tag describing the widget state to add.
+	 * @return True if the tag was added (was not present before). False if invalid or already present.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Add Wrapper Widget State Tag")
+	static bool AddWidgetStateTag(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
+		const FGameplayTag& Tag);
+
+	/**
+	 * Removes an existing Widget State tag from the target Wrapper's active state container.
+	 *
+	 * This should be called when a UI element is removed/hidden/destroyed so the Wrapper no longer reports
+	 * it as active, preventing stale state and enabling correct UI Manager decisions.
+	 *
+	 * @param Target The target Wrapper widget interface from which the state tag will be removed.
+	 * @param Tag The Gameplay Tag describing the widget state to remove.
+	 * @return True if the tag was removed. False if invalid or not found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Remove Wrapper Widget State Tag")
+	static bool RemoveWidgetStateTag(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
+		const FGameplayTag& Tag);
+
+	/**
+	 * Checks whether the target Wrapper currently contains a given Widget State tag.
+	 *
+	 * Used for querying whether a particular UI element/state is currently active within the Wrapper.
+	 * Example: prevent opening another modal if "UI.Modal.Active" is already present, or change input rules.
+	 *
+	 * @param Target The target Wrapper widget interface to query.
+	 * @param Tag The Gameplay Tag describing the widget state to check.
+	 * @param bExactMatch If true, requires an exact tag match. If false, allows hierarchical matching
+	 *                    (e.g., checking "UI.Modal" would match "UI.Modal.Active").
+	 * @return True if the Wrapper currently reports the tag as active; otherwise false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Has Wrapper Widget State Tag")
+	static bool HasWidgetStateTag(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
+		const FGameplayTag& Tag, bool bExactMatch = true);
+
+	/**
+	 * Clears all Widget State tags tracked by the target Wrapper.
+	 *
+	 * Typically used during full teardown/reset scenarios such as RemoveWrapperWidget, rebuilding the UI,
+	 * or when the UI Manager needs to force the Wrapper into a clean baseline state.
+	 *
+	 * Note:
+	 * - This does not automatically destroy UI widgets by itself. It only clears the tracked state tags.
+	 *
+	 * @param Target The target Wrapper widget interface whose states will be cleared.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Clear Wrapper Widget State Tags")
+	static void ClearWidgetStateTags(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target);
+
+	/**
+	 * Appends multiple Widget State tags to the target Wrapper's active state container.
+	 *
+	 * Useful when adding a composite widget (or UI mode) that activates multiple tracked states at once,
+	 * or when synchronizing the Wrapper to a known set of states provided by another system.
+	 *
+	 * @param Target The target Wrapper widget interface that will receive the state tags.
+	 * @param TagsToAppend Container of Gameplay Tags to add to the Wrapper's active state container.
+	 * @return True if at least one new tag was added. False if empty or all tags were already present.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Function"),
+		DisplayName="Append Wrapper Widget State Tags")
+	static bool AppendWidgetStateTags(const TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface>& Target,
+		const FGameplayTagContainer& TagsToAppend);
+
 #pragma endregion
 	
 	// --- Notification
@@ -698,43 +817,7 @@ public:
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 #pragma endregion
-	
-	// --- Generic Widget
-#pragma region GenericWidget
-	
-	/**
-	 * Consumes player input forwarded from gameplay classes.
-	 *
-	 * This method allows Player Controllers or Pawns to route Enhanced Input
-	 * actions into UI widgets without exposing input mapping logic to the UI layer.
-	 *
-	 * Input meaning is conveyed via Gameplay Tags, while values are provided
-	 * through a generic payload structure.
-	 *
-	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
-	 * @param InputTag A gameplay tag identifying the semantic meaning of the input (e.g. UI.ItemPreview.Zoom, UI.Inventory.Navigate).
-	 * @param Payload A lightweight container holding the relevant input value.
-	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"))
-	static void ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime);
-
-	/**
-	 * Refreshes the provided UserWidget if it implements the MounteaInventoryGenericWidgetInterface.
-	 *
-	 * This utility function checks if the passed UUserWidget instance is valid and whether
-	 * it implements the UMounteaInventoryGenericWidgetInterface. If both conditions are
-	 * satisfied, it triggers the execution of the RefreshWidget function on the Target widget.
-	 *
-	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"))
-	static void RefreshWidget(UWidget* Target);
-	
-#pragma endregion
-	
+		
 	// --- Items Preview
 #pragma region ItemsPreview
 

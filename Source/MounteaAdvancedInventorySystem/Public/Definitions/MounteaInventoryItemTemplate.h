@@ -197,7 +197,7 @@ public:
 	 * When Category/Subcategory is changed, all Item Actions are removed!
 	 * 
 	 * Future enhancement:
-	 * → Do not delete shared Item Actions
+	 * - Do not delete shared Item Actions
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Actions", Instanced)
 	TArray<TObjectPtr<UMounteaSelectableInventoryItemAction>> ItemActions;
