@@ -73,6 +73,15 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 >     <img width="80%" src="https://github.com/user-attachments/assets/9b1a13b0-9ad4-4802-876a-c7a42f367ed6">
 > </p>
 
+### Custom UI Driven Input
+> The Inventory & Equipment come with a custom UI driven Input System based on a custom mapping sheet, which supports dynamic runtime remapping and lazy icon loading.
+> The system is built atop Enhanced Input; however, it is mainly focused on UI, with custom states filtering, priorities and hardware mapping.
+>
+> <p align="center" width="100%">
+>     <img width="50%" src="https://github.com/user-attachments/assets/3d543fa0-da4e-463b-a4ca-53037e152fac">
+>     <img width="50%" src="https://github.com/user-attachments/assets/727405e8-d62a-4982-9ada-bdb3830c7e1f">
+> </p>
+
 ### Inventory/Equipment Actions
 > In-line editable configuration with the ability to extend logic in Blueprints.</p>
 > Each Action represents a logic that can be performed for each Item from the selected Category. For example, Apples can be consumed, Keys can be used, etc.</p>
