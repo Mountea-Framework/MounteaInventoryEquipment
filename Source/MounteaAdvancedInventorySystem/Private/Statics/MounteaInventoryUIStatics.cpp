@@ -93,6 +93,20 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
 }
 
+bool UMounteaInventoryUIStatics::IsItemWidgetDetachedFromValidItems(const TArray<FInventoryItem>& ValidItems,
+	const FInventoryItemData& InventoryItemData)
+{
+	if (ValidItems.IsEmpty())
+		return true;
+	if (!InventoryItemData.ContainingItem.IsItemValid())
+		return true;
+	
+	return !ValidItems.ContainsByPredicate([&InventoryItemData](const FInventoryItem& Item)
+	{
+		return Item.Guid == InventoryItemData.ContainingItem.Guid;
+	});
+}
+
 bool UMounteaInventoryUIStatics::InInputTypeActive(const UUserWidget* ContextObject, const ECommonInputType& InputType)
 {
 	if (!IsValid(ContextObject))
@@ -603,7 +617,6 @@ void UMounteaInventoryUIStatics::ExecuteWidgetCommandFromManager(const TScriptIn
 		return IMounteaAdvancedInventoryUIManagerInterface::Execute_ExecuteWidgetCommand(Target.GetObject(), Command, OptionalPayload);
 }
 
-
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
 {
 	if (!IsValid(ParentWidget))
@@ -697,7 +710,24 @@ void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_ResetChildren(UMounte
 	ScrollBox->ResetChildren();
 }
 
-void UMounteaInventoryUIStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag,
+TArray<UWidget*> UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetAllChildren(UMounteaInventoryScrollBox* ScrollBox)
+{
+	return ScrollBox ? ScrollBox->GetChildWidgets() : TArray<UWidget*>();
+}
+
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_RemoveChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content)
+{
+	if (ScrollBox)
+		return ScrollBox->RemoveChild(Content);
+}
+
+void UMounteaInventoryUIStatics::MounteaInventoryScrollBox_RemoveChildAt(UMounteaInventoryScrollBox* ScrollBox, const int32 Index)
+{
+	if (ScrollBox)
+		return ScrollBox->RemoveChildAt(Index);
+}
+
+void UMounteaInventoryUIStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag& InputTag, 
 	const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())

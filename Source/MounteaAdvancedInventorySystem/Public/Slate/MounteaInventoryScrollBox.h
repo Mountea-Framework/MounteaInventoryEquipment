@@ -65,10 +65,13 @@ public:
 	
 public:	
 	void SetActiveIndex(int32 NewIndex);
+	TArray<UWidget*> GetChildWidgets() const;
 	int32 GetActiveIndex() const { return ActiveIndex; }
 	int32 GetChildrenCount() const;
 	
-	void AddChild(UWidget* Content);
+	void AddChild(UWidget* Content) const;
+	void RemoveChild(UWidget* Content) const;
+	void RemoveChildAt(int32 Index) const;
 	void ResetChildren();
 
 protected:

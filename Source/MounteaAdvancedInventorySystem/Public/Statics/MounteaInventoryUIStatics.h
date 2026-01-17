@@ -321,7 +321,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI ManagerExecute Widget Command")
+		DisplayName="Inventory UI Manager Execute Widget Command")
 	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FString& Command, UObject* OptionalPayload);
 	
@@ -329,6 +329,23 @@ public:
 	
 	// --- Helpers	
 #pragma region Helpers
+
+	/**
+	 * Checks whether the UI item represented by InventoryItemData is detached (not present) in the provided list of ValidItems.
+	 *
+	 * A detached UI item is considered "orphaned" from the valid items collection:
+	 * → If ValidItems is empty, the item is treated as detached.
+	 * → If InventoryItemData.ContainingItem is invalid, the item is treated as detached.
+	 * → Otherwise, the function checks whether InventoryItemData.ContainingItem.Guid exists in ValidItems.
+	 *
+	 * @param ValidItems Collection of items that are considered valid/attached for UI purposes.
+	 * @param InventoryItemData UI inventory item data containing the item reference (ContainingItem) to validate.
+	 * @return True if the item is detached (not found in ValidItems or invalid input), false if the item exists in ValidItems.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Item UI Detached From Valid Items")
+	static bool IsItemWidgetDetachedFromValidItems(const TArray<FInventoryItem>& ValidItems, const FInventoryItemData& InventoryItemData);
 	
 	/**
 	 * Validates whether the specified hardware input type is currently active for the owning local player.
@@ -586,6 +603,38 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Reset Children")
 	static void MounteaInventoryScrollBox_ResetChildren(UMounteaInventoryScrollBox* ScrollBox);
+
+	/**
+	 * Retrieves all child Widgets in the Scrollbox.
+	 * @param ScrollBox Target Mountea Scrollbox.
+	 * @return Array of UWidget objects, might be empty.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Scrollbox",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get All Children")
+	static TArray<UWidget*> MounteaInventoryScrollBox_GetAllChildren(UMounteaInventoryScrollBox* ScrollBox);
+	
+	/**
+	 * Removes specified child from the ScrollBox.
+	 *
+	 * @param Content Widget to be removed from Scrollbox.
+	 * @param ScrollBox ScrollBox instance to clear.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Remove Child")
+	static void MounteaInventoryScrollBox_RemoveChild(UMounteaInventoryScrollBox* ScrollBox, UWidget* Content);
+	
+	/**
+	 * Removes specified child from the ScrollBox at given index.
+	 *
+	 * @param Index Index of the Widget to be removed from Scrollbox.
+	 * @param ScrollBox ScrollBox instance to clear.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Scrollbox",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Remove Child At")
+	static void MounteaInventoryScrollBox_RemoveChildAt(UMounteaInventoryScrollBox* ScrollBox, const int32 Index);
 
 #pragma endregion
 	
@@ -1182,7 +1231,8 @@ public:
 	 * Returns an empty FGuid otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Item - Get Item ID")
 	static FGuid ItemWidget_GetInventoryItemId(UWidget* Target);
 
 	/**
