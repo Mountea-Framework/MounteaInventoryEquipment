@@ -56,7 +56,9 @@ void UMounteaInventoryUIComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetOwner() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	if (GetOwner() && 
+		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
+		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
 		auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
 		if (!IsValid(inventoryComponent))
