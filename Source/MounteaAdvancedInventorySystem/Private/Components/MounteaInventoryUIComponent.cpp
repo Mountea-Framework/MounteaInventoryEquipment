@@ -179,6 +179,9 @@ bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
 	}
 
 	WrapperWidget = newWidget;
+	ensure(WrapperWidget != nullptr);
+	
+	WrapperWidget->SetIsFocusable(true);
 	
 	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> wrapperWidget = WrapperWidget;
 	ensure(wrapperWidget.GetObject() != nullptr);

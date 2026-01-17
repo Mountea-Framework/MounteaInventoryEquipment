@@ -55,13 +55,9 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 	UTextureRenderTarget2D* templateRT = interactiveConfig->DefaultRenderTarget.LoadSynchronous();
 	if (!templateRT) return false;
 
-	PreviewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
-	PreviewRenderTarget->RenderTargetFormat = templateRT->RenderTargetFormat;
-	PreviewRenderTarget->ClearColor = FLinearColor::Transparent;
-	PreviewRenderTarget->bAutoGenerateMips = templateRT->bAutoGenerateMips;
-	PreviewRenderTarget->InitAutoFormat(templateRT->SizeX, templateRT->SizeY);
+	PreviewRenderTarget = DuplicateObject<UTextureRenderTarget2D>(templateRT, this, TEXT("PreviewRT"));
 	PreviewRenderTarget->UpdateResourceImmediate(true);
-
+	
 	const auto previewMaterial = interactiveConfig->DefaultRenderTargetMaterial.LoadSynchronous();
 	if (!previewMaterial) return false;
 	
