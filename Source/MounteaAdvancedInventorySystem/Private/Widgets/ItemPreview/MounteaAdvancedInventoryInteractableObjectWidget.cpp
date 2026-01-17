@@ -28,9 +28,13 @@ void UMounteaAdvancedInventoryInteractableObjectWidget::CleanUpPreviewScene()
 		PreviewScene->GetWorld()->DestroyActor( RendererActor );
 	if(EnvironmentActor)
 		PreviewScene->GetWorld()->DestroyActor( EnvironmentActor );
+	if (PreviewRenderTarget)
+		PreviewRenderTarget->MarkAsGarbage();
 	
 	EnvironmentActor = nullptr;
 	RendererActor = nullptr;
+	PreviewRenderTarget	= nullptr;
+	
 	PreviewScene.Reset();
 }
 
@@ -48,8 +52,15 @@ bool UMounteaAdvancedInventoryInteractableObjectWidget::InitializeInteractableWi
 	auto interactiveConfig = Cast<UMounteaAdvancedInventoryInteractiveWidgetConfig>(templateConfig);
 	if (!interactiveConfig) return false;
 	
-	PreviewRenderTarget = interactiveConfig->DefaultRenderTarget.LoadSynchronous();
-	if (!PreviewRenderTarget) return false;
+	UTextureRenderTarget2D* templateRT = interactiveConfig->DefaultRenderTarget.LoadSynchronous();
+	if (!templateRT) return false;
+
+	PreviewRenderTarget = NewObject<UTextureRenderTarget2D>(this);
+	PreviewRenderTarget->RenderTargetFormat = templateRT->RenderTargetFormat;
+	PreviewRenderTarget->ClearColor = FLinearColor::Transparent;
+	PreviewRenderTarget->bAutoGenerateMips = templateRT->bAutoGenerateMips;
+	PreviewRenderTarget->InitAutoFormat(templateRT->SizeX, templateRT->SizeY);
+	PreviewRenderTarget->UpdateResourceImmediate(true);
 
 	const auto previewMaterial = interactiveConfig->DefaultRenderTargetMaterial.LoadSynchronous();
 	if (!previewMaterial) return false;
