@@ -393,8 +393,10 @@ FString UMounteaInventoryUIStatics::GridSlot_ToString(const FMounteaInventoryGri
 	return SourceData.ToString();
 }
 
+#pragma region UI_Input
+
 bool UMounteaInventoryUIStatics::FindUIActionMappingForItemAction(const FGameplayTagContainer& PreferredInputActions,
-	FMounteaWidgetInputActionMapping& OutMapping)
+	const FGameplayTagContainer& WidgetStates, FMounteaWidgetInputActionMapping& OutMapping)
 {
 	OutMapping = FMounteaWidgetInputActionMapping();
 
@@ -402,17 +404,25 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingForItemAction(const FGamepla
 	if (!IsValid(uiConfig))
 		return false;
 
-	const auto definedMappings = uiConfig->UIActionMappings;
+	const auto& definedMappings = uiConfig->UIActionMappings;
 	if (definedMappings.Num() == 0)
 		return false;
 
 	if (PreferredInputActions.Num() == 0)
 		return false;
 
+	const bool bUseStateFiltering = (WidgetStates.Num() > 0);
+
 	const auto foundMapping = Algo::FindByPredicate(definedMappings,
-		[&PreferredInputActions](const FMounteaWidgetInputActionMapping& mapping)
+		[&PreferredInputActions, &WidgetStates, bUseStateFiltering](const FMounteaWidgetInputActionMapping& Mapping)
 		{
-			return PreferredInputActions.HasTagExact(mapping.ActionTag);
+			if (!PreferredInputActions.HasTagExact(Mapping.ActionTag))
+				return false;
+
+			if (!bUseStateFiltering)
+				return true;
+
+			return !Mapping.BlacklistedWidgetStates.HasAnyExact(WidgetStates);
 		});
 
 	if (foundMapping == nullptr)
@@ -422,20 +432,19 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingForItemAction(const FGamepla
 	return true;
 }
 
-
-bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromKeyEvent(const FKeyEvent& KeyEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
-	return FindUIActionMappingByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), Mappings, OutMapping);
+	return FindUIActionMappingByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), WidgetStates, Mappings, OutMapping);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromAnalogEvent(const FAnalogInputEvent& AnalogEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
-	return FindUIActionMappingByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), Mappings, OutMapping);
+	return FindUIActionMappingByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), WidgetStates, Mappings, OutMapping);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointerEvent& MouseEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
 	// Wheel events (NativeOnMouseWheel) don't have an "effecting button".
@@ -445,22 +454,22 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingFromMouseEvent(const FPointe
 		? EKeys::MouseWheelAxis
 		: MouseEvent.GetEffectingButton();
 
-	return FindUIActionMappingByKey(PressedKey, MouseEvent.GetModifierKeys(), Mappings, OutMapping);
+	return FindUIActionMappingByKey(PressedKey, MouseEvent.GetModifierKeys(), WidgetStates, Mappings, OutMapping);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingsFromKeyEvent(const FKeyEvent& KeyEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromKeyEvent(const FKeyEvent& KeyEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
 {
-	return FindUIActionMappingsByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), Mappings, OutMappings);
+	return FindUIActionMappingsByKey(KeyEvent.GetKey(), KeyEvent.GetModifierKeys(), WidgetStates, Mappings, OutMappings);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingsFromAnalogEvent(const FAnalogInputEvent& AnalogEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromAnalogEvent(const FAnalogInputEvent& AnalogEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
 {
-	return FindUIActionMappingsByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), Mappings, OutMappings);
+	return FindUIActionMappingsByKey(AnalogEvent.GetKey(), AnalogEvent.GetModifierKeys(), WidgetStates, Mappings, OutMappings);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingsFromMouseEvent(const FPointerEvent& MouseEvent,
+bool UMounteaInventoryUIStatics::FindUIActionMappingsFromMouseEvent(const FPointerEvent& MouseEvent, const FGameplayTagContainer& WidgetStates,
 	const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
 {
 	const float WheelDelta = MouseEvent.GetWheelDelta();
@@ -468,12 +477,11 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingsFromMouseEvent(const FPoint
 		? EKeys::MouseWheelAxis
 		: MouseEvent.GetEffectingButton();
 
-	return FindUIActionMappingsByKey(PressedKey, MouseEvent.GetModifierKeys(), Mappings, OutMappings);
+	return FindUIActionMappingsByKey(PressedKey, MouseEvent.GetModifierKeys(), WidgetStates, Mappings, OutMappings);
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey,
-	const FModifierKeysState& Modifiers, const TArray<FMounteaWidgetInputActionMapping>& Mappings,
-	FMounteaWidgetInputActionMapping& OutMapping)
+bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
+	const FGameplayTagContainer& WidgetStates, const TArray<FMounteaWidgetInputActionMapping>& Mappings, FMounteaWidgetInputActionMapping& OutMapping)
 {
 	if (!PressedKey.IsValid())
 		return false;
@@ -481,9 +489,12 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey
 	if (Mappings.Num() <= 0)
 		return false;
 
-	const auto matchingMapping = [&PressedKey](const FMounteaWidgetInputActionMapping& M)
+	const bool bUseStateFiltering = (WidgetStates.Num() > 0);
+
+	const auto matchingMapping = [&PressedKey, &WidgetStates, bUseStateFiltering](const FMounteaWidgetInputActionMapping& M)
 	{
-		return M.Keys.Contains(PressedKey);
+		const bool bKeyFound = M.Keys.Contains(PressedKey);
+		return bUseStateFiltering ? bKeyFound && !M.BlacklistedWidgetStates.HasAnyExact(WidgetStates) : bKeyFound;
 	};
 
 	TArray<const FMounteaWidgetInputActionMapping*> candidateMappings;
@@ -506,11 +517,8 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingByKey(const FKey& PressedKey
 	return true;
 }
 
-bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(
-	const FKey& PressedKey,
-	const FModifierKeysState& Modifiers,
-	const TArray<FMounteaWidgetInputActionMapping>& Mappings,
-	TArray<FMounteaWidgetInputActionMapping>& OutMappings)
+bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(const FKey& PressedKey, const FModifierKeysState& Modifiers,
+	const FGameplayTagContainer& WidgetStates, const TArray<FMounteaWidgetInputActionMapping>& Mappings, TArray<FMounteaWidgetInputActionMapping>& OutMappings)
 {
 	OutMappings.Reset();
 
@@ -519,10 +527,13 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(
 
 	if (Mappings.Num() <= 0)
 		return false;
+	
+	const bool bUseStateFiltering = (WidgetStates.Num() > 0);
 
-	const auto matchingMapping = [&PressedKey](const FMounteaWidgetInputActionMapping& M)
+	const auto matchingMapping = [&PressedKey, &WidgetStates, bUseStateFiltering](const FMounteaWidgetInputActionMapping& M)
 	{
-		return M.Keys.Contains(PressedKey);
+		const bool bKeyFound = M.Keys.Contains(PressedKey);
+		return bUseStateFiltering ? bKeyFound && !M.BlacklistedWidgetStates.HasAnyExact(WidgetStates) : bKeyFound;
 	};
 
 	TArray<const FMounteaWidgetInputActionMapping*> candidateMappings;
@@ -553,6 +564,8 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingsByKey(
 
 	return true;
 }
+
+#pragma endregion 
 
 FInventoryItem UMounteaInventoryUIStatics::FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryItemSearchParams& SearchParams)
