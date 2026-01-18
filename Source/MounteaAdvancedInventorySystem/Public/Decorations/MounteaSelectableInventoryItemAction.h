@@ -168,6 +168,8 @@ public:
 	bool ClearAllActionFlags();
 	virtual bool ClearAllActionFlags_Implementation();
 	
+	int32 GetActionPriority() const { return ActionPriority; };
+	
 	UMounteaCallbackInventoryItemAction* GetCallbackItemAction() const
 	{ return CallbackAction; };
 	

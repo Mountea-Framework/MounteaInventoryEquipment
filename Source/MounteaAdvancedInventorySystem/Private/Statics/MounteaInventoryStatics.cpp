@@ -310,6 +310,13 @@ TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisp
 	{
 		return actionData && actionData->IsAllowed(Item) != true && actionData->IsActionVisible(Item) != true;
 	});
+	
+	validActions.Sort([](const UMounteaSelectableInventoryItemAction& A, const UMounteaSelectableInventoryItemAction& B)
+	{
+		if (!IsValid(&A)) return false;
+		if (!IsValid(&B)) return true;
+		return A.GetActionPriority() < B.GetActionPriority();
+	});
 
 	return validActions;
 }
