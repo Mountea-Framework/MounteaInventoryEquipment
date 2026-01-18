@@ -532,6 +532,18 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(Keywords="selectable,display"))
 	static TArray<UMounteaSelectableInventoryItemAction*> GetDisplayableItemActions(const FInventoryItem& Item);
+	
+	/**
+	 * Retrieves the Custom Data Tags Container, which serves a purpose of being a write/read container for
+	 * transient data, like `QuestItem` for items, which are not by default Quest Items.
+	 *
+	 * @param Item - The inventory item for which to retrieve the associated actions
+	 * @return The custom data tags associated with this item
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Item - Get Item Custom Data")
+	static FGameplayTagContainer GetItemCustomData(const FInventoryItem& Item);
 
 	// --- Items
 	

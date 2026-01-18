@@ -50,9 +50,9 @@ public:
 	 * @param OptionalPayload Object-based optional payloads which can hold additional data around.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(CustomTag="MounteaK2Setter,MounteaK2Command"),
 		DisplayName="Process Widget Command")
-	static void ProcessInventoryWidgetCommand( UObject* GenericWidget, const FString& Command, UObject* OptionalPayload); 
+	static void ProcessInventoryWidgetCommand(UObject* GenericWidget, const FString& Command, UObject* OptionalPayload);
 	
 	/**
 	 * Consumes player input forwarded from gameplay classes.

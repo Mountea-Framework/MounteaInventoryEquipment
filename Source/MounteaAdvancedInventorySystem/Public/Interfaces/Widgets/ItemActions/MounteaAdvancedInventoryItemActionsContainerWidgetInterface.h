@@ -16,6 +16,7 @@
 #include "MounteaAdvancedInventoryItemActionsContainerWidgetInterface.generated.h"
 
 class UWidget;
+class UMounteaSelectableInventoryItemAction;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemActionsContainerWidgetInterface : public UInterface
@@ -45,17 +46,20 @@ public:
 	 * Each class must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
-	void ConstructFromActionsList(const TArray<TSoftClassPtr<UObject>>& ItemActionsList);
-	virtual void ConstructFromActionsList_Implementation(const TArray<TSoftClassPtr<UObject>>& ItemActionsList) = 0;
+	void ConstructFromActionsList(const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList);
+	virtual void ConstructFromActionsList_Implementation(const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList) = 0;
 	
 	/**
 	 * Adds an item action widget to the container.
 	 * 
-	 * @param ItemActionWidget The widget to be added to the container. Must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 * @param ItemAction The Action that we need to generate widget for.
+	 * @param ItemId Item Guid which this Action is related to.
+	 * 
+	 * @return Returns create Widget if action is successful
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container")
-	void AddItemActionToContainer(UWidget* ItemActionWidget);
-	virtual void AddItemActionToContainer_Implementation(UWidget* ItemActionWidget) = 0;
+	UWidget* AddItemActionToContainer(UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& ItemId);
+	virtual UWidget* AddItemActionToContainer_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& ItemId) = 0;
 
 	/**
 	 * Removes an item action widget from the container.

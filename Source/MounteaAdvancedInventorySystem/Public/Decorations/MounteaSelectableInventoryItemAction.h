@@ -90,6 +90,7 @@ protected:
 
 	/**
 	 * Priority value used for sorting actions in UI elements.
+	 * Higher the value, higher is the priority and earlier is the action displayed.
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
 	int32 ActionPriority = INDEX_NONE;
@@ -167,6 +168,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	bool ClearAllActionFlags();
 	virtual bool ClearAllActionFlags_Implementation();
+	
+	int32 GetActionPriority() const { return ActionPriority; };
 	
 	UMounteaCallbackInventoryItemAction* GetCallbackItemAction() const
 	{ return CallbackAction; };

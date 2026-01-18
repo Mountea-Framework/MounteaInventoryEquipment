@@ -10,7 +10,7 @@ public class MounteaAdvancedInventorySystemDeveloper : ModuleRules
 			new string[]
 			{
 				"Core", 
-				"BlueprintGraph"
+				"InputCore"
 			}
 		);
 
@@ -24,7 +24,7 @@ public class MounteaAdvancedInventorySystemDeveloper : ModuleRules
 				"SlateCore",
 				"GameplayTags",
 				
-				"MounteaAdvancedInventorySystem", 
+				"MounteaAdvancedInventorySystem"
 			}
 		);
 
@@ -36,7 +36,13 @@ public class MounteaAdvancedInventorySystemDeveloper : ModuleRules
 					"EditorStyle",
 					"BlueprintGraph",
 					"ApplicationCore",
-					"UnrealEd"
+					"UnrealEd",
+					"GraphEditor",
+					"KismetCompiler",
+					"PropertyEditor",
+					"ToolMenus",
+					"AssetTools",
+					"ContentBrowser"
 				}
 			);
 		}
