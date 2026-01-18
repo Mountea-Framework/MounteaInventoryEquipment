@@ -916,7 +916,7 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 }
 
 void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UWidget* Target,
-	const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem)
+                                                                 const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
 		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeItemAction(
@@ -964,32 +964,29 @@ TSoftClassPtr<UMounteaSelectableInventoryItemAction> UMounteaInventoryUIStatics:
 	return IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_GetItemAction(Target);
 }
 
+#pragma region ItemActionsContainer
+
+bool UMounteaInventoryUIStatics::IsValidActionsContainerWidget(const UObject* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>();
+}
+
 void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UWidget* Target, 
-	const TArray<TSoftClassPtr<UObject>>& ItemActionsList)
+	const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList)
 {
-	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
-	{
-		LOG_ERROR(TEXT("[ConstructFromActionsList] Target does not implement IMounteaAdvancedInventoryItemActionsContainerWidgetInterface or is invalid!"));
-		return;
-	}
-
-	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, ItemActionsList);
+	if (IsValidActionsContainerWidget(Target))
+		IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, ItemActionsList);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UWidget* Target,
-	UWidget* ItemActionWidget)
+UWidget* UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UWidget* Target, UMounteaSelectableInventoryItemAction* ItemAction, 
+	const FGuid& ItemId)
 {
-	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
-	{
-		LOG_ERROR(TEXT("[AddItemActionToContainer] Target does not implement IMounteaAdvancedInventoryItemActionsContainerWidgetInterface or is invalid!"));
-		return;
-	}
-
-	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_AddItemActionToContainer(Target, ItemActionWidget);
+	return IsValidActionsContainerWidget(Target) ? 
+		IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_AddItemActionToContainer(Target, ItemAction, ItemId) :
+		nullptr;
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContainer(UWidget* Target,
-	UWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_RemoveItemActionFromContainer(UWidget* Target, UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -1017,8 +1014,7 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_ClearItemActionsContainer(
 	IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ClearItemActionsContainer(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UWidget* Target,
-	UWidget* ItemActionWidget)
+void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemAction(UWidget* Target, UWidget* ItemActionWidget)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -1046,8 +1042,7 @@ TArray<UWidget*> UMounteaInventoryUIStatics::ItemActionsContainer_GetItemActions
 	return IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_GetItemActionsInContainer(Target);
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemActionByIndex(UWidget* Target,
-	const int32 ItemActionIndex)
+void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemActionByIndex(UWidget* Target, const int32 ItemActionIndex)
 {
 	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>())
 	{
@@ -1064,6 +1059,8 @@ void UMounteaInventoryUIStatics::ItemActionsContainer_SelectItemActionByIndex(UW
 
 	ItemActionsContainer_SelectItemAction(Target, itemActions[ItemActionIndex]);
 }
+
+#pragma endregion
 
 void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, const FInventorySlot& SourceSlot)
 {

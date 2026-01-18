@@ -9,11 +9,9 @@
 //
 // For more information, visit: https://mountea.tools
 
-
 #include "K2Nodes/K2Node_MounteaAdvancedInventoryCallFunction.h"
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"
-#include "Kismet2/BlueprintEditorUtils.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryCallFunction"
@@ -24,7 +22,6 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 
 	UClass* nodeClass = GetClass();
 	
-	// Lambda for node customization
 	auto customizeNodeLambda = [](UEdGraphNode* newNode, bool bIsTemplateNode, UFunction* relevantFunction, UClass* relevantClass)
 	{
 		UK2Node_MounteaAdvancedInventoryCallFunction* inputNode = CastChecked<UK2Node_MounteaAdvancedInventoryCallFunction>(newNode);
@@ -34,8 +31,6 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 	if (actionRegistrar.IsOpenForRegistration(nodeClass))
 	{
 		const TSet<UClass*>& relevantClasses = MounteaAdvancedInventoryHelpers::GetRelevantClasses();
-
-		// Create a set to track added functions
 		TSet<UFunction*> registeredFunctions;
 
 		for (UClass* relevantClass : relevantClasses)
@@ -50,7 +45,6 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 				
 				if (!function->HasAnyFunctionFlags(FUNC_Private))
 				{
-					// Check if the function is already registered
 					if (!registeredFunctions.Contains(function))
 					{
 						classFunctions.Add(function);
@@ -75,6 +69,22 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 	}
 }
 
+bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseCommandSelector(UEdGraphPin* Pin) const
+{
+	if (!Pin || Pin->PinName != TEXT("Command")) return false;
+    
+	const UFunction* targetFunction = GetTargetFunction();
+	if (!targetFunction) return false;
+    
+	if (targetFunction->HasMetaData(TEXT("CustomTag")))
+	{
+		const FString customTagValue = targetFunction->GetMetaData(TEXT("CustomTag"));
+		return customTagValue.Contains(TEXT("MounteaK2Command"));
+	}
+    
+	return false;
+}
+
 bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const
 {
 	if (const UFunction* localFunction = GetTargetFunction())
@@ -82,8 +92,8 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const
 		if (localFunction->HasMetaData(TEXT("CustomTag")))
 		{
 			const FString customTagValue = localFunction->GetMetaData(TEXT("CustomTag"));
-			if (customTagValue == TEXT("MounteaK2Setter")) return false;
-			if (customTagValue == TEXT("MounteaK2Getter")) return true;
+			if (customTagValue.Contains(TEXT("MounteaK2Setter"))) return false;
+			if (customTagValue.Contains(TEXT("MounteaK2Getter"))) return true;
 		}
 	}
 	return Super::IsNodePure();
@@ -101,9 +111,9 @@ EFunctionCallType UK2Node_MounteaAdvancedInventoryCallFunction::GetFunctionType(
 		if (localFunction->HasMetaData(TEXT("CustomTag")))
 		{
 			const FString customTagValue = localFunction->GetMetaData(TEXT("CustomTag"));
-			if (customTagValue == TEXT("MounteaK2Function")) return EFunctionCallType::Function;
-			if (customTagValue == TEXT("MounteaK2Message")) return EFunctionCallType::Message;
-			if (customTagValue == TEXT("MounteaK2Delegate")) return EFunctionCallType::Delegate;
+			if (customTagValue.Contains(TEXT("MounteaK2Function"))) return EFunctionCallType::Function;
+			if (customTagValue.Contains(TEXT("MounteaK2Message"))) return EFunctionCallType::Message;
+			if (customTagValue.Contains(TEXT("MounteaK2Delegate"))) return EFunctionCallType::Delegate;
 		}
 	}
 	return EFunctionCallType::Unknown;
@@ -116,9 +126,9 @@ EFunctionRole UK2Node_MounteaAdvancedInventoryCallFunction::GetFunctionRole() co
 		if (localFunction->HasMetaData(TEXT("CustomTag")))
 		{
 			const FString customTagValue = localFunction->GetMetaData(TEXT("CustomTag"));
-			if (customTagValue == TEXT("MounteaK2Getter")) return EFunctionRole::Get;
-			if (customTagValue == TEXT("MounteaK2Setter")) return EFunctionRole::Set;
-			if (customTagValue == TEXT("MounteaK2Validate")) return EFunctionRole::Validate;
+			if (customTagValue.Contains(TEXT("MounteaK2Getter"))) return EFunctionRole::Get;
+			if (customTagValue.Contains(TEXT("MounteaK2Setter"))) return EFunctionRole::Set;
+			if (customTagValue.Contains(TEXT("MounteaK2Validate"))) return EFunctionRole::Validate;
 		}
 	}
 	return EFunctionRole::Unknown;
