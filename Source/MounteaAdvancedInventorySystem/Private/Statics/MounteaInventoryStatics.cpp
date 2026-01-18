@@ -315,10 +315,16 @@ TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisp
 	{
 		if (!IsValid(&A)) return false;
 		if (!IsValid(&B)) return true;
-		return A.GetActionPriority() < B.GetActionPriority();
+		return A.GetActionPriority() > B.GetActionPriority();
 	});
 
 	return validActions;
+}
+
+FGameplayTagContainer UMounteaInventoryStatics::GetItemCustomData(const FInventoryItem& Item)
+{
+	if (!Item.IsItemValid()) return {};
+	return Item.GetCustomData();
 }
 
 TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
