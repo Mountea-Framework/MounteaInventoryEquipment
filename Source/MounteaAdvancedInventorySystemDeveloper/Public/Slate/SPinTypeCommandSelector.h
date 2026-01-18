@@ -31,7 +31,9 @@ private:
 	void OnCommandSelected(TSharedPtr<FString> Selection, ESelectInfo::Type SelectInfo);
 	FText GetSelectedCommandText() const;
 	TSharedRef<SWidget> GenerateCommandWidget(TSharedPtr<FString> Item);
-    
+	virtual EVisibility GetDefaultValueVisibility() const override;
+    static void GetWidgetCommandsFromSettings(TArray<FName>& OutCommands);
+	
 	TArray<TSharedPtr<FString>> CommandOptions;
 };
 
