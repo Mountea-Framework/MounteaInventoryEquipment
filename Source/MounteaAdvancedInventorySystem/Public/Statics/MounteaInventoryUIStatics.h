@@ -320,7 +320,7 @@ public:
 	 * @param OptionalPayload Optional Payload to pass with the command
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(CustomTag="MounteaK2Setter,MounteaK2Command"),
 		DisplayName="Inventory UI Manager Execute Widget Command")
 	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FString& Command, UObject* OptionalPayload);
