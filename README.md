@@ -73,8 +73,9 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 > 
 > For processing UI Command we also have a custom Node, which allows custom inputs, as well as selection from pre-defined commands!
 > <p align="center" width="100%">
->     <img width="45%" src="https://github.com/user-attachments/assets/9b1a13b0-9ad4-4802-876a-c7a42f367ed6">
->    <img width="45%" src="https://github.com/user-attachments/assets/0a2f66c1-92a6-4c7c-8e70-9a50d414f621">
+>    <img width="33%" src="https://github.com/user-attachments/assets/739c356a-bd21-4c77-b2d3-cfc5efaaee76">
+>     <img width="33%" src="https://github.com/user-attachments/assets/9b1a13b0-9ad4-4802-876a-c7a42f367ed6">
+>    <img width="33%" src="https://github.com/user-attachments/assets/0a2f66c1-92a6-4c7c-8e70-9a50d414f621">
 > </p>
 
 ### Custom UI Driven Input
