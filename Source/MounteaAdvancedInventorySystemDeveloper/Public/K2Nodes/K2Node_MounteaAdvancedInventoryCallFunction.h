@@ -31,6 +31,8 @@ public:
 
 	void Initialize(const UFunction* relevantFunction, UClass* relevantClass);
 	
+	bool ShouldUseCommandSelector(UEdGraphPin* Pin) const;
+	
 	// UK2Node
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const override;
 
