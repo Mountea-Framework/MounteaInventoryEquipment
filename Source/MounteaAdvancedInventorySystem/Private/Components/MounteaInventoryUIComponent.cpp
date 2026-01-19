@@ -547,7 +547,7 @@ bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSele
     return true;
 }
 
-bool UMounteaInventoryUIComponent::EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*> ItemActions, UObject* Payload)
+bool UMounteaInventoryUIComponent::EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload)
 {
 	if (ItemActions.Num() == 0)
 		return false;

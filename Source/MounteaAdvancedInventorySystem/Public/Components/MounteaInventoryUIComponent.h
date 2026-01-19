@@ -87,7 +87,7 @@ public:
 	virtual TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue_Implementation() const override;
 	
 	virtual bool EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) override;
-	virtual bool EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*> ItemActions, UObject* Payload) override;
+	virtual bool EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload) override;
 	virtual void EmptyItemActionsQueue_Implementation() override;
 	virtual void PauseItemActionsQueue_Implementation() override;
 	virtual bool ResumeItemActionsQueue_Implementation() override;

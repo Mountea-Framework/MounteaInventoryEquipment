@@ -351,31 +351,9 @@ public:
 	 * @return True if all actions were successfully enqueued, false otherwise (some actions may be rejected).
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool EnqueueItemActions(TArray<UMounteaSelectableInventoryItemAction*> ItemActions, UObject* Payload);
-	virtual bool EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*> ItemActions, UObject* Payload) = 0;
-
-	/**
-	 * Returns the currently executing Item Action, if any.
-	 *
-	 * If the queue is idle, this function returns nullptr. The same if its empty.
-	 *
-	 * @return Item Action currently being processed, or nullptr if no action is running.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	UMounteaSelectableInventoryItemAction* GetCurrentAction() const;
-	virtual UMounteaSelectableInventoryItemAction* GetCurrentAction_Implementation() const = 0;
-
-	/**
-	 * Checks whether the queue is currently busy processing an action.
-	 *
-	 * Busy state typically means that an action is currently running or the queue is paused mid-processing.
-	 *
-	 * @return True if the queue is busy, false if it is idle and ready to start processing.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool IsItemActionsQueueBusy() const;
-	virtual bool IsItemActionsQueueBusy_Implementation() const;
-
+	bool EnqueueItemActions(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload);
+	virtual bool EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload) = 0;
+	
 	/**
 	 * Empties the queued Item Actions waiting for execution.
 	 *
@@ -384,7 +362,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	void EmptyItemActionsQueue();
-	virtual void EmptyItemActionsQueue_Implementation();
+	virtual void EmptyItemActionsQueue_Implementation()= 0;;
 
 	/**
 	 * Pauses processing of the Item Action queue.
@@ -394,7 +372,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	void PauseItemActionsQueue();
-	virtual void PauseItemActionsQueue_Implementation();
+	virtual void PauseItemActionsQueue_Implementation() = 0;
 
 	/**
 	 * Resumes processing of the Item Action queue after it has been paused.
@@ -405,7 +383,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	bool ResumeItemActionsQueue();
-	virtual bool ResumeItemActionsQueue_Implementation();
+	virtual bool ResumeItemActionsQueue_Implementation() = 0;
 	
 	/**
 	 * Starts processing of the Item Action queue.
@@ -415,23 +393,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	void StartItemActionsQueue();
 	virtual void StartItemActionsQueue_Implementation() = 0;
-	
-	/**
-	 * Processes the current queue item.
-	 *
-	 * This function is responsible for advancing the internal action queue:
-	 * - If an action is already active, it will not start another one.
-	 * - If the queue is paused, no action will be started.
-	 * - If no action is active, it will pull the next pending queue entry and execute it.
-	 *
-	 * The provided Payload stored with the queued entry is forwarded to the action execution.
-	 * This function does not wait for completion — it only starts processing.
-	 *
-	 * @return True if a new action has been started, false otherwise (paused, already active, or no pending actions).
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool ProcessCurrentItemActionsQueueItem();
-	virtual bool ProcessCurrentItemActionsQueueItem_Implementation() = 0;
 
 	// --- Events
 	
