@@ -530,33 +530,26 @@ struct FActionQueueEntry
 
 struct FActionsQueue
 {
-	enum class EState : uint8 { Idle, Running, Paused };
-
-	EState State = EState::Idle;
-	TOptional<FActionQueueEntry> Active;
-
 	TArray<FActionQueueEntry> Pending;
-	int32 Head = 0;
-
-	bool HasPending() const { return Head < Pending.Num(); }
-
+    
+	bool HasPending() const { return Pending.Num() > 0; }
+    
 	void Enqueue(FActionQueueEntry&& Entry)
 	{
 		Pending.Add(MoveTemp(Entry));
 	}
-
+    
 	bool Dequeue(FActionQueueEntry& Out)
 	{
 		if (!HasPending()) return false;
-		Out = MoveTemp(Pending[Head++]);
-
+		Out = MoveTemp(Pending[0]);
+		Pending.RemoveAt(0);
 		return true;
 	}
-
-	void ClearPending()
+    
+	void Clear()
 	{
 		Pending.Reset();
-		Head = 0;
 	}
 };
 

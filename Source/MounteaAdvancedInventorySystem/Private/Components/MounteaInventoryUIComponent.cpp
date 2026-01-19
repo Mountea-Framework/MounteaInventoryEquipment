@@ -61,7 +61,7 @@ void UMounteaInventoryUIComponent::BeginPlay()
 		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
 		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
-		Execute_PauseQueue(this); // Do NOT receive any queue items
+		Execute_EmptyItemActionsQueue(this); // Do NOT receive any queue items
 		
 		{
 			auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
@@ -88,8 +88,6 @@ void UMounteaInventoryUIComponent::BeginPlay()
 			else
 				inventoryUISubsystem->RegisterInventoryUIManager(this);
 		}
-		
-		Execute_ResumeQueue(this); // Feel free to proceed
 	}
 }
 
@@ -471,21 +469,17 @@ void UMounteaInventoryUIComponent::AddCustomItemToMap_Implementation(const FGame
 	}	
 }
 
-
-void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability,
-                                                                const float NewDurability)
+void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability, const float NewDurability)
 {
 	Execute_ProcessItemModified(this, Item);
 }
 
-void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity,
-	const int32 NewQuantity)
+void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
 {
 	Execute_ProcessItemModified(this, Item);
 }
 
-bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag,
-	const FGuid& ItemId)
+bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
 	FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
 	if (!foundData || foundData->StoredIds.IsEmpty())
@@ -502,8 +496,7 @@ bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const 
 	return removedCount > 0;
 }
 
-bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag,
-                                                                          const FGuid& ItemId)
+bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
 	const FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
 	if (!foundData)
@@ -521,119 +514,107 @@ void UMounteaInventoryUIComponent::ExecuteWidgetCommand_Implementation(const FSt
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, Command, OptionalPayload);
 }
 
-TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetActionsQueue_Implementation() const
+void UMounteaInventoryUIComponent::TickItemActionsQueue()
 {
-	TArray<UMounteaSelectableInventoryItemAction*> returnValue;
-	returnValue.Reserve(ActionsQueue.Pending.Num() - ActionsQueue.Head);
-
-	for (int32 i = ActionsQueue.Head; i < ActionsQueue.Pending.Num(); ++i)
-	{
-		if (ActionsQueue.Pending[i].Action)
-			returnValue.Add(ActionsQueue.Pending[i].Action.Get());
-	}
-
-	return returnValue;
+    if (!ActionsQueue.HasPending())
+    {
+        Execute_PauseItemActionsQueue(this);
+        return;
+    }
+    
+    FActionQueueEntry entry;
+    if (!ActionsQueue.Dequeue(entry) || !IsValid(entry.Action))
+        return;
+    
+    entry.Action->ExecuteQueuedAction(entry.Payload.Get());
+    
+    if (!ActionsQueue.HasPending())
+    	Execute_PauseItemActionsQueue(this);
 }
 
-bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction,
-	UObject* Payload)
+bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
 {
-	if (!IsValid(ItemAction))
-		return false;
-
-	FActionQueueEntry Entry;
-	Entry.Action = ItemAction;
-	Entry.Payload = Payload;
-
-	ActionsQueue.Enqueue(MoveTemp(Entry));
-
-	if (ActionsQueue.State != FActionsQueue::EState::Paused)
-		Execute_ProcessCurrentQueueItem(this);
-
-	return true;
+    if (!IsValid(ItemAction))
+        return false;
+    
+    FActionQueueEntry entry;
+    entry.Action = ItemAction;
+    entry.Payload = Payload;
+    
+    ActionsQueue.Enqueue(MoveTemp(entry));
+    Execute_StartItemActionsQueue(this);
+    
+    return true;
 }
 
-bool UMounteaInventoryUIComponent::EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*> ItemActions,
-	UObject* Payload)
+bool UMounteaInventoryUIComponent::EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*> ItemActions, UObject* Payload)
 {
 	if (ItemActions.Num() == 0)
 		return false;
-
-	bool bAllEnqueued = true;
-
+    
+	bool bAllValid = true;
 	for (UMounteaSelectableInventoryItemAction* itemAction : ItemActions)
 	{
 		if (!IsValid(itemAction))
 		{
-			bAllEnqueued = false;
+			bAllValid = false;
 			continue;
 		}
-
-		FActionQueueEntry Entry;
-		Entry.Action = itemAction;
-		Entry.Payload = Payload;
-
-		ActionsQueue.Enqueue(MoveTemp(Entry));
+        
+		FActionQueueEntry entry;
+		entry.Action = itemAction;
+		entry.Payload = Payload;
+		ActionsQueue.Enqueue(MoveTemp(entry));
 	}
-
-	if (ActionsQueue.State != FActionsQueue::EState::Paused)
-		Execute_ProcessCurrentQueueItem(this);
-
-	return bAllEnqueued;
+    
+	if (ActionsQueue.HasPending())
+		Execute_StartItemActionsQueue(this);
+    
+	return bAllValid;
 }
 
-UMounteaSelectableInventoryItemAction* UMounteaInventoryUIComponent::GetCurrentAction_Implementation() const
+void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 {
-	return ActionsQueue.Active.IsSet() ? ActionsQueue.Active->Action.Get() : nullptr;
+	Execute_PauseItemActionsQueue(this);
+    ActionsQueue.Clear();
 }
 
-bool UMounteaInventoryUIComponent::IsQueueBusy_Implementation() const
+void UMounteaInventoryUIComponent::PauseItemActionsQueue_Implementation()
 {
-	return ActionsQueue.State != FActionsQueue::EState::Idle;
+	if (!GetWorld())
+		return;
+    
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_ActionsQueue);
 }
 
-void UMounteaInventoryUIComponent::EmptyQueue_Implementation()
+bool UMounteaInventoryUIComponent::ResumeItemActionsQueue_Implementation()
 {
-	ActionsQueue.ClearPending();
-
-	if (!ActionsQueue.Active.IsSet())
-		ActionsQueue.State = FActionsQueue::EState::Idle;
+	Execute_StartItemActionsQueue(this);
+	return true;
 }
 
-void UMounteaInventoryUIComponent::PauseQueue_Implementation()
+void UMounteaInventoryUIComponent::StartItemActionsQueue_Implementation()
 {
-	ActionsQueue.State = FActionsQueue::EState::Paused;
-}
-
-bool UMounteaInventoryUIComponent::ResumeQueue_Implementation()
-{
-	if (ActionsQueue.State != FActionsQueue::EState::Paused)
-		return false;
-
-	ActionsQueue.State = FActionsQueue::EState::Running;
-	if (!Execute_ProcessCurrentQueueItem(this))
+	if (!GetWorld())
+		return;
+    
+	FTimerManager& timerManager = GetWorld()->GetTimerManager();
+	if (!timerManager.IsTimerActive(TimerHandle_ActionsQueue))
 	{
-		ActionsQueue.State = FActionsQueue::EState::Idle;
-		return false;
+		timerManager.SetTimer(TimerHandle_ActionsQueue, this, &UMounteaInventoryUIComponent::TickItemActionsQueue, 1.0f, true);
 	}
-
-	if (!ActionsQueue.Active.IsSet() && !ActionsQueue.HasPending())
-		ActionsQueue.State = FActionsQueue::EState::Idle;
-
-	return true;
 }
 
-bool UMounteaInventoryUIComponent::ProcessCurrentQueueItem_Implementation()
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetItemActionsQueue_Implementation() const
 {
-	if (!ActionsQueue.Active.IsSet())
-		return false;
-
-	const FActionQueueEntry& activeQueueEntry = ActionsQueue.Active.GetValue();
-	
-	if (!IsValid(activeQueueEntry.Action))
-		return false;
-	
-	activeQueueEntry.Action->ExecuteQueuedAction(activeQueueEntry.Payload.Get());
-
-	return true;
+    TArray<UMounteaSelectableInventoryItemAction*> result;
+    result.Reserve(ActionsQueue.Pending.Num());
+    
+    for (const FActionQueueEntry& entry : ActionsQueue.Pending)
+    {
+        if (entry.Action)
+            result.Add(entry.Action.Get());
+    }
+    
+    return result;
 }

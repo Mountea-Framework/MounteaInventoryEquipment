@@ -317,13 +317,13 @@ public:
 	/**
 	 * Returns a snapshot of the currently queued Item Actions waiting to be processed.
 	 *
-	 * Queue order reflects processing order (FIFO), where the first element is the next action to execute.
+	 * ItemActionsQueue order reflects processing order (FIFO), where the first element is the next action to execute.
 	 *
 	 * @return Array of queued Item Actions.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	TArray<UMounteaSelectableInventoryItemAction*> GetActionsQueue() const;
-	virtual TArray<UMounteaSelectableInventoryItemAction*> GetActionsQueue_Implementation() const = 0;
+	TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue() const;
+	virtual TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue_Implementation() const = 0;
 
 	/**
 	 * Enqueues a single Item Action to be executed by the UI Manager.
@@ -373,8 +373,8 @@ public:
 	 * @return True if the queue is busy, false if it is idle and ready to start processing.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool IsQueueBusy() const;
-	virtual bool IsQueueBusy_Implementation() const;
+	bool IsItemActionsQueueBusy() const;
+	virtual bool IsItemActionsQueueBusy_Implementation() const;
 
 	/**
 	 * Empties the queued Item Actions waiting for execution.
@@ -383,18 +383,18 @@ public:
 	 * Recommended behavior is to leave the current action intact and clear only pending actions.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	void EmptyQueue();
-	virtual void EmptyQueue_Implementation();
+	void EmptyItemActionsQueue();
+	virtual void EmptyItemActionsQueue_Implementation();
 
 	/**
 	 * Pauses processing of the Item Action queue.
 	 *
 	 * When paused, no new actions are started, but the currently running action may continue depending on
-	 * implementation and action design. The queue remains paused until ResumeQueue is called.
+	 * implementation and action design. The queue remains paused until ResumeItemActionsQueue is called.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	void PauseQueue();
-	virtual void PauseQueue_Implementation();
+	void PauseItemActionsQueue();
+	virtual void PauseItemActionsQueue_Implementation();
 
 	/**
 	 * Resumes processing of the Item Action queue after it has been paused.
@@ -404,8 +404,17 @@ public:
 	 * @return True if queue was resumed successfully, false otherwise (queue not paused, no valid state, etc.).
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool ResumeQueue();
-	virtual bool ResumeQueue_Implementation();
+	bool ResumeItemActionsQueue();
+	virtual bool ResumeItemActionsQueue_Implementation();
+	
+	/**
+	 * Starts processing of the Item Action queue.
+	 *
+	 * If no action is currently in the queue the queue won't start processing anything and will idle itself.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
+	void StartItemActionsQueue();
+	virtual void StartItemActionsQueue_Implementation() = 0;
 	
 	/**
 	 * Processes the current queue item.
@@ -421,8 +430,8 @@ public:
 	 * @return True if a new action has been started, false otherwise (paused, already active, or no pending actions).
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool ProcessCurrentQueueItem();
-	virtual bool ProcessCurrentQueueItem_Implementation() = 0;
+	bool ProcessCurrentItemActionsQueueItem();
+	virtual bool ProcessCurrentItemActionsQueueItem_Implementation() = 0;
 
 	// --- Events
 	
