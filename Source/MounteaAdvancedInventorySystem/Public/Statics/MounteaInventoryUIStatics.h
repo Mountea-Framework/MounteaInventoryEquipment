@@ -288,7 +288,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),		
 		DisplayName="Inventory UI Manager - Remove Custom Item")
 	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
@@ -354,6 +354,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(Keywords="add"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Inventory UI Manager - Enqueue Item Action")
 	static bool EnqueueItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
 		UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
@@ -369,7 +370,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(Keywords="clear"),
-		DisplayName="Inventory UI Manager - Enqueue Item Action")
+		DisplayName="Inventory UI Manager - Empty Item Actions Queue")
 	static void EmptyItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
