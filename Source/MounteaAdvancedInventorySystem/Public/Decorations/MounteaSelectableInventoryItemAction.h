@@ -19,6 +19,8 @@ class UMounteaCallbackInventoryItemAction;
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemActionData"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSelectableActionCompleted, UObject*, OptionalPayload);
+
 /**
  * UMounteaSelectableInventoryItemAction provides lightweight inventory actions intended purely for
  * local "UI-level" operations.
@@ -57,6 +59,15 @@ public:
 		ActionPriority(0),
 		InventoryItemActionCallback(0)
 	{};
+	
+public:
+	
+	/**
+	 * Event called once Action is completed.
+	 * The Event has optional Payload of Object type.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintReadOnly, Category="Events")
+	FOnSelectableActionCompleted OnSelectableActionCompleted;
 	
 protected:
 	
@@ -118,6 +129,14 @@ protected:
 	FGameplayTagContainer ItemActionBlockingTags;
 	
 public:
+	
+	/**
+	 * 
+	 * @param OptionalPayload 
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void ExecuteQueuedAction(UObject* OptionalPayload);
+	virtual void ExecuteQueuedAction_Implementation(UObject* OptionalPayload);
 	
 	/**
 	 * Determines whether this action should be visible in the UI for the given item.

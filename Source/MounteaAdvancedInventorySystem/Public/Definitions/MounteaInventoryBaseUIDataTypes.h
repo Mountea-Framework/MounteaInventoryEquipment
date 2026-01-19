@@ -19,6 +19,7 @@ enum class ECommonInputType : uint8;
 enum class EMounteaWidgetInputMethod : uint8;
 class UUserWidget;
 class UTextureCube;
+class UMounteaSelectableInventoryItemAction;
 
 /**
  * FInventoryItemData represents the pure logical data of a single inventory entry.
@@ -518,6 +519,48 @@ struct FMounteaWidgetInputActionMapping
 	// TODO:
 	// - allow remapping
 };
+
+#pragma region ItemActionsQueue
+
+struct FActionQueueEntry
+{
+	TObjectPtr<UMounteaSelectableInventoryItemAction> Action = nullptr;
+	TObjectPtr<UObject> Payload = nullptr;
+};
+
+struct FActionsQueue
+{
+	enum class EState : uint8 { Idle, Running, Paused };
+
+	EState State = EState::Idle;
+	TOptional<FActionQueueEntry> Active;
+
+	TArray<FActionQueueEntry> Pending;
+	int32 Head = 0;
+
+	bool HasPending() const { return Head < Pending.Num(); }
+
+	void Enqueue(FActionQueueEntry&& Entry)
+	{
+		Pending.Add(MoveTemp(Entry));
+	}
+
+	bool Dequeue(FActionQueueEntry& Out)
+	{
+		if (!HasPending()) return false;
+		Out = MoveTemp(Pending[Head++]);
+
+		return true;
+	}
+
+	void ClearPending()
+	{
+		Pending.Reset();
+		Head = 0;
+	}
+};
+
+#pragma endregion 
 
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {

@@ -82,14 +82,17 @@ public:
 	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	
-	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const override {return SavedGridSlots;};
-	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
-	virtual void RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
-	virtual void AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) override;
-	virtual void RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) override;
-	virtual void UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) override;
-	
 	virtual void ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload) override;
+	
+	virtual TArray<UMounteaSelectableInventoryItemAction*> GetActionsQueue_Implementation() const override;
+	virtual bool EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) override;
+	virtual bool EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*> ItemActions, UObject* Payload) override;
+	virtual UMounteaSelectableInventoryItemAction* GetCurrentAction_Implementation() const override;
+	virtual bool IsQueueBusy_Implementation() const override;
+	virtual void EmptyQueue_Implementation() override;
+	virtual void PauseQueue_Implementation() override;
+	virtual bool ResumeQueue_Implementation() override;
+	virtual bool ProcessCurrentQueueItem_Implementation() override;
 
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
 	{ return OnCategorySelected; };
@@ -108,9 +111,9 @@ protected:
 	/**
 	 * Delegate that is broadcast when an inventory category is selected.
 	 *
-	* This BlueprintAssignable delegate allows other components to handle the logic
+	 * This BlueprintAssignable delegate allows other components to handle the logic
 	 * for Category selection in the inventory.
-	 * It broadcasts FSTRING CategoryId.
+	 * It broadcasts CategoryId.
 	 */
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryCategorySelected OnCategorySelected;
@@ -120,7 +123,7 @@ protected:
 	 *
 	 * This BlueprintAssignable delegate allows other components to handle the logic
 	 * for Item selection in the inventory.
-	 * It broadcasts FGUID ItemId.
+	 * It broadcasts ItemId.
 	 */
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryItemSelected OnItemSelected;
@@ -142,16 +145,8 @@ protected:
 	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
-
-	/**
-	 * Represents the set of saved inventory grid slots.
-	 *
-	 * This variable stores a collection of FMounteaInventoryGridSlot data structures,
-	 * which define the slots in the inventory grid system. It is used for managing
-	 * and persisting slot configurations across game sessions.
-	 */
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
-	TSet<FMounteaInventoryGridSlot> SavedGridSlots;
+	
+	FActionsQueue ActionsQueue;
 	
 private:
 	

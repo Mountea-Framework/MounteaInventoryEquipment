@@ -721,7 +721,7 @@ public:
 	 * @return True if the tag was added (was not present before). False if invalid or already present.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Add Wrapper Widget State Tag")
 	static bool AddWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag);
@@ -737,7 +737,7 @@ public:
 	 * @return True if the tag was removed. False if invalid or not found.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Remove Wrapper Widget State Tag")
 	static bool RemoveWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag);
@@ -755,7 +755,7 @@ public:
 	 * @return True if the Wrapper currently reports the tag as active; otherwise false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Has Wrapper Widget State Tag")
 	static bool HasWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag, bool bExactMatch = true);
@@ -772,7 +772,7 @@ public:
 	 * @param Target The target Wrapper widget interface whose states will be cleared.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Clear Wrapper Widget State Tags")
 	static void ClearWidgetStateTags(UObject* Target);
 
@@ -787,7 +787,7 @@ public:
 	 * @return True if at least one new tag was added. False if empty or all tags were already present.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Append Wrapper Widget State Tags")
 	static bool AppendWidgetStateTags(UObject* Target,
 		const FGameplayTagContainer& TagsToAppend);

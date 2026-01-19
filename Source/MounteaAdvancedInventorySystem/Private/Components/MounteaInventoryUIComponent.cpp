@@ -14,6 +14,7 @@
 
 #include "Algo/AnyOf.h"
 #include "Blueprint/UserWidget.h"
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
 
@@ -60,29 +61,35 @@ void UMounteaInventoryUIComponent::BeginPlay()
 		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
 		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
-		auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
-		if (!IsValid(inventoryComponent))
-			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! UI will NOT work!"))
-		else
+		Execute_PauseQueue(this); // Do NOT receive any queue items
+		
 		{
-			Execute_SetParentInventory(this, inventoryComponent);
-			ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
+			auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
+			if (!IsValid(inventoryComponent))
+				LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! UI will NOT work!"))
+			else
+			{
+				Execute_SetParentInventory(this, inventoryComponent);
+				ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
 
-			ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
+				ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
 			
-			ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
-			ParentInventory->GetOnItemRemovedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemRemoved);
+				ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
+				ParentInventory->GetOnItemRemovedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemRemoved);
 
-			ParentInventory->GetOnItemDurabilityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemDurabilityChanged);
-			ParentInventory->GetOnItemQuantityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemQuantityChanged);
+				ParentInventory->GetOnItemDurabilityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemDurabilityChanged);
+				ParentInventory->GetOnItemQuantityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemQuantityChanged);
+			}
+		
+			const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
+				UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
+			if (!inventoryUISubsystem)
+				LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will NOT work!"))
+			else
+				inventoryUISubsystem->RegisterInventoryUIManager(this);
 		}
 		
-		const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
-			UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
-		if (!inventoryUISubsystem)
-			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will NOT work!"))
-		else
-			inventoryUISubsystem->RegisterInventoryUIManager(this);
+		Execute_ResumeQueue(this); // Feel free to proceed
 	}
 }
 
@@ -508,35 +515,125 @@ bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const 
 	});
 }
 
-void UMounteaInventoryUIComponent::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
-{
-	SavedGridSlots.Add(SlotData);
-}
-
-void UMounteaInventoryUIComponent::RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
-{
-	SavedGridSlots.Remove(SlotData);
-}
-
-void UMounteaInventoryUIComponent::AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
-{
-	SavedGridSlots.Append(SlotData);
-}
-
-void UMounteaInventoryUIComponent::RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
-{
-	SavedGridSlots = SavedGridSlots.Difference(SlotData);
-}
-
-void UMounteaInventoryUIComponent::UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
-{
-	if (SavedGridSlots.Contains(SlotData))
-		SavedGridSlots.Remove(SlotData);
-	SavedGridSlots.Add(SlotData);
-}
-
 void UMounteaInventoryUIComponent::ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload)
 {
 	if (WrapperWidget && WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, Command, OptionalPayload);
+}
+
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetActionsQueue_Implementation() const
+{
+	TArray<UMounteaSelectableInventoryItemAction*> returnValue;
+	returnValue.Reserve(ActionsQueue.Pending.Num() - ActionsQueue.Head);
+
+	for (int32 i = ActionsQueue.Head; i < ActionsQueue.Pending.Num(); ++i)
+	{
+		if (ActionsQueue.Pending[i].Action)
+			returnValue.Add(ActionsQueue.Pending[i].Action.Get());
+	}
+
+	return returnValue;
+}
+
+bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction,
+	UObject* Payload)
+{
+	if (!IsValid(ItemAction))
+		return false;
+
+	FActionQueueEntry Entry;
+	Entry.Action = ItemAction;
+	Entry.Payload = Payload;
+
+	ActionsQueue.Enqueue(MoveTemp(Entry));
+
+	if (ActionsQueue.State != FActionsQueue::EState::Paused)
+		Execute_ProcessCurrentQueueItem(this);
+
+	return true;
+}
+
+bool UMounteaInventoryUIComponent::EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*> ItemActions,
+	UObject* Payload)
+{
+	if (ItemActions.Num() == 0)
+		return false;
+
+	bool bAllEnqueued = true;
+
+	for (UMounteaSelectableInventoryItemAction* itemAction : ItemActions)
+	{
+		if (!IsValid(itemAction))
+		{
+			bAllEnqueued = false;
+			continue;
+		}
+
+		FActionQueueEntry Entry;
+		Entry.Action = itemAction;
+		Entry.Payload = Payload;
+
+		ActionsQueue.Enqueue(MoveTemp(Entry));
+	}
+
+	if (ActionsQueue.State != FActionsQueue::EState::Paused)
+		Execute_ProcessCurrentQueueItem(this);
+
+	return bAllEnqueued;
+}
+
+UMounteaSelectableInventoryItemAction* UMounteaInventoryUIComponent::GetCurrentAction_Implementation() const
+{
+	return ActionsQueue.Active.IsSet() ? ActionsQueue.Active->Action.Get() : nullptr;
+}
+
+bool UMounteaInventoryUIComponent::IsQueueBusy_Implementation() const
+{
+	return ActionsQueue.State != FActionsQueue::EState::Idle;
+}
+
+void UMounteaInventoryUIComponent::EmptyQueue_Implementation()
+{
+	ActionsQueue.ClearPending();
+
+	if (!ActionsQueue.Active.IsSet())
+		ActionsQueue.State = FActionsQueue::EState::Idle;
+}
+
+void UMounteaInventoryUIComponent::PauseQueue_Implementation()
+{
+	ActionsQueue.State = FActionsQueue::EState::Paused;
+}
+
+bool UMounteaInventoryUIComponent::ResumeQueue_Implementation()
+{
+	if (ActionsQueue.State != FActionsQueue::EState::Paused)
+		return false;
+
+	ActionsQueue.State = FActionsQueue::EState::Running;
+	if (!Execute_ProcessCurrentQueueItem(this))
+	{
+		ActionsQueue.State = FActionsQueue::EState::Idle;
+		return false;
+	}
+
+	if (!ActionsQueue.Active.IsSet() && !ActionsQueue.HasPending())
+		ActionsQueue.State = FActionsQueue::EState::Idle;
+
+	return true;
+}
+
+bool UMounteaInventoryUIComponent::ProcessCurrentQueueItem_Implementation()
+{
+	if (!ActionsQueue.Active.IsSet())
+		return false;
+
+	const FActionQueueEntry& activeQueueEntry = ActionsQueue.Active.GetValue();
+	
+	if (!IsValid(activeQueueEntry.Action))
+		return false;
+	
+	activeQueueEntry.Action->ExecuteQueuedAction(activeQueueEntry.Payload.Get());
+
+	return true;
 }

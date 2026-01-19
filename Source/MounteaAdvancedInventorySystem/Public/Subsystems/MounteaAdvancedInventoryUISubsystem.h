@@ -40,7 +40,8 @@ public:
 	 * @param NewInventoryUIManager Object instance to register as the Inventory UI Manager.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Subsystem",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Register Inventory UI Manager")
 	void RegisterInventoryUIManager(UObject* NewInventoryUIManager);
 
 	/**
@@ -52,7 +53,8 @@ public:
 	 * @param DirtyInventoryUIManager Inventory UI Manager instance to unregister.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Subsystem",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Unregister Inventory UI Manager")
 	void UnregisterInventoryUIManager(const UObject* DirtyInventoryUIManager);
 
 	/**
@@ -61,8 +63,19 @@ public:
 	 * @return The active Inventory UI Manager instance, or nullptr if none is registered.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Subsystem",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory UI Manager")
 	UObject* GetInventoryUIManager() const;
+	
+	/**
+	 * Returns the currently registered Inventory UI Manager.
+	 *
+	 * @return The active Inventory UI Manager instance, or nullptr if none is registered.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Subsystem",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory UI Manager")
+	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> GetInventoryUIManager_Interface() const;
 
 
 private:
