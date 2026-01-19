@@ -526,6 +526,7 @@ bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSele
 	FActionQueueEntry entry;
 	entry.Action = ItemAction;
 	entry.Payload = Payload;
+	entry.CreationTime = FDateTime::Now();
     
 	ActionsQueue.Enqueue(MoveTemp(entry));
     
@@ -549,6 +550,21 @@ void UMounteaInventoryUIComponent::CancelQueuedAction_Implementation(UMounteaSel
 	ItemAction->CancelInventoryAction();
 	ActionsQueue.Remove(ItemAction);
 }
+
+/* TODO: do some cleanup, like every 30 seconds? Make it into UI Config?
+void UMounteaInventoryUIComponent::CleanupExpiredActions_Implementation(float MaxAgeSeconds)
+{
+	FTimespan maxAge = FTimespan::FromSeconds(MaxAgeSeconds);
+	FDateTime now = FDateTime::Now();
+    
+	for (int32 i = ActionsQueue.Pending.Num() - 1; i >= 0; --i)
+	{
+		const FActionQueueEntry& entry = ActionsQueue.Pending[i];
+		if ((now - entry.CreationTime) > maxAge && entry.Action)
+			Execute_CancelQueuedAction(this, entry.Action.Get());
+	}
+}
+*/
 
 void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 {

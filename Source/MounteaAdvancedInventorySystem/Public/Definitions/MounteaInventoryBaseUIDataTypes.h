@@ -526,6 +526,7 @@ struct FActionQueueEntry
 {
 	TObjectPtr<UMounteaSelectableInventoryItemAction> Action = nullptr;
 	TObjectPtr<UObject> Payload = nullptr;
+	FDateTime CreationTime;
 };
 
 struct FActionsQueue
