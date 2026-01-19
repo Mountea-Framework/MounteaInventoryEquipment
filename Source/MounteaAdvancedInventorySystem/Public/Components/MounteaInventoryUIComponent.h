@@ -85,13 +85,10 @@ public:
 	virtual void ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload) override;
 	
 	virtual TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue_Implementation() const override;
-	
 	virtual bool EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) override;
-	virtual bool EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload) override;
 	virtual void EmptyItemActionsQueue_Implementation() override;
-	virtual void PauseItemActionsQueue_Implementation() override;
-	virtual bool ResumeItemActionsQueue_Implementation() override;
-	virtual void StartItemActionsQueue_Implementation() override;
+	virtual void CompleteQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) override;
+	virtual void CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction) override;
 
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
 	{ return OnCategorySelected; };
@@ -104,8 +101,6 @@ protected:
 	void ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability, const float NewDurability);
 	UFUNCTION()
 	void ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
-	UFUNCTION()
-	void TickItemActionsQueue();
 
 protected:
 	
@@ -146,8 +141,7 @@ protected:
 	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
 	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
-	
-	FTimerHandle TimerHandle_ActionsQueue;
+
 	FActionsQueue ActionsQueue;
 	
 private:

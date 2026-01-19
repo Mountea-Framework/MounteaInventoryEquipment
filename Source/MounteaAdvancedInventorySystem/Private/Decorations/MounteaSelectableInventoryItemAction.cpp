@@ -31,7 +31,7 @@ bool UMounteaSelectableInventoryItemAction::IsAllowed_Implementation(const FInve
 
 void UMounteaSelectableInventoryItemAction::ExecuteQueuedAction_Implementation(UObject* OptionalPayload)
 {
-	
+	OnSelectableActionQueueExecuted.Broadcast(this, OptionalPayload);
 }
 
 bool UMounteaSelectableInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const

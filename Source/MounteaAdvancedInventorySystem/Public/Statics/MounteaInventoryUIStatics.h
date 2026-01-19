@@ -359,77 +359,51 @@ public:
 		UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
 	
 	/**
-	 * Enqueues multiple Item Actions to be executed by the UI Manager in the provided order.
+	 * Removes all queued Selectable Item Actions from the UI Manager queue.
 	 *
-	 * All actions receive the same Payload instance. The queue order reflects the order within the input array.
-	 *
-	 * @param Target UI Manager to execute the logic on
-	 * @param ItemActions Item Actions to enqueue.
-	 * @param Payload Optional context object passed to each queued action.
-	 *
-	 * @return True if all actions were successfully enqueued, false otherwise (some actions may be rejected).
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(Keywords="add"),
-		DisplayName="Inventory UI Manager - Enqueue Item Actions")
-	static bool EnqueueItemActions_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
-		TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload);
-	
-	/**
-	 * Empties the queued Item Actions waiting for execution.
-	 *
-	 * This does not necessarily cancel the currently executing action unless the implementation explicitly does so.
-	 * Recommended behavior is to leave the current action intact and clear only pending actions.
+	 * This function clears the queue registry only. It does not attempt to complete or cancel individual actions,
+	 * nor does it notify them. Any UI or async work owned by the actions remains their responsibility.
 	 * 
 	 * @param Target UI Manager to execute the logic on
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(Keywords="clear"),
-		DisplayName="Inventory UI Manager - Empty Item Actions Queue")
+		DisplayName="Inventory UI Manager - Enqueue Item Action")
 	static void EmptyItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
-	
 	/**
-	 * Pauses processing of the Item Action queue.
+	 * Marks the specified queued Selectable Item Action as completed and removes it from the queue.
 	 *
-	 * When paused, no new actions are started, but the currently running action may continue depending on
-	 * implementation and action design. The queue remains paused until ResumeItemActionsQueue is called.
-	 * 
+	 * This function is typically called by the action itself after its UI-gated flow has been approved and the action
+	 * has executed its final logic (e.g. consume amount selected in a modal). The UI Manager uses this call to stop
+	 * tracking the action in its pending registry.
+	 *
 	 * @param Target UI Manager to execute the logic on
+	 * @param ItemAction Selectable Item Action to remove from the queue.
+	 * @param Payload Optional payload received for completion of the Action. Usually contains "returned" values (eg. how much quantity was requested to consume).
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI Manager - Pause Item Actions Queue")
-	static void PauseItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
-	
+		DisplayName="Inventory UI Manager - Complete Item Action")
+	static void CompleteQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
 	
 	/**
-	 * Resumes processing of the Item Action queue after it has been paused.
+	 * Cancels the specified queued Selectable Item Action and removes it from the queue.
 	 *
-	 * If no action is currently running, resuming should typically trigger processing of the next queued action.
+	 * This function is typically called by the action itself when the UI-gated flow is declined/cancelled
+	 * (e.g. modal closed, user pressed cancel). The UI Manager uses this call to stop tracking the action
+	 * in its pending registry.
 	 *
 	 * @param Target UI Manager to execute the logic on
-	 *
-	 * @return True if queue was resumed successfully, false otherwise (queue not paused, no valid state, etc.).
+	 * @param ItemAction Selectable Item Action to remove from the queue.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI Manager - Resume Item Actions Queue")
-	static bool ResumeItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
-	
-	/**
-	 * Starts processing of the Item Action queue.
-	 *
-	 * If no action is currently in the queue the queue won't start processing anything and will idle itself.
-	 * 
-	 * @param Target UI Manager to execute the logic on
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI Manager - Start Item Actions Queue")
-	static void StartItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+		DisplayName="Inventory UI Manager - Cancel Item Action")
+	static void CancelQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UMounteaSelectableInventoryItemAction* ItemAction);
 	
 #pragma endregion
 	

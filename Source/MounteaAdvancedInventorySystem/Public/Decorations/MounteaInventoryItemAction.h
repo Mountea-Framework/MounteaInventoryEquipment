@@ -112,6 +112,13 @@ public:
 	virtual bool ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem);
 
 	/**
+	 * Cancels the Inventory Action. This should be called mostly from delayed Actions!
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void CancelInventoryAction();
+	virtual void CancelInventoryAction_Implementation() {};
+
+	/**
 	 * Gets the gameplay tag that uniquely identifies this inventory action.
 	 * 
 	 * @return The gameplay tag used for filtering and identifying this action type.

@@ -539,12 +539,19 @@ struct FActionsQueue
 		Pending.Add(MoveTemp(Entry));
 	}
     
-	bool Dequeue(FActionQueueEntry& Out)
+	bool Remove(UMounteaSelectableInventoryItemAction* Action)
 	{
-		if (!HasPending()) return false;
-		Out = MoveTemp(Pending[0]);
-		Pending.RemoveAt(0);
-		return true;
+		const int32 index = Pending.IndexOfByPredicate([Action](const FActionQueueEntry& Entry)
+		{
+			return Entry.Action == Action;
+		});
+        
+		if (index != INDEX_NONE)
+		{
+			Pending.RemoveAt(index);
+			return true;
+		}
+		return false;
 	}
     
 	void Clear()

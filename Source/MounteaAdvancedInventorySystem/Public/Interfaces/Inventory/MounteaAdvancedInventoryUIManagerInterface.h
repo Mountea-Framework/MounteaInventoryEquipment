@@ -312,87 +312,74 @@ public:
 	void ExecuteWidgetCommand(const FString& Command, UObject* OptionalPayload);
 	virtual void ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload) = 0;
 	
-	// --- Selectable Actions
-	
+	// --- Item Actions
+
 	/**
-	 * Returns a snapshot of the currently queued Item Actions waiting to be processed.
+	 * Returns a snapshot of Selectable Item Actions currently waiting in the UI Manager queue.
 	 *
-	 * ItemActionsQueue order reflects processing order (FIFO), where the first element is the next action to execute.
+	 * The returned array represents the current pending actions stored by the UI Manager. The queue does not
+	 * execute actions automatically; actions are expected to drive their own completion/cancellation flow and
+	 * notify the UI Manager when they should be removed.
 	 *
-	 * @return Array of queued Item Actions.
+	 * @return Array of queued Selectable Item Actions.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue() const;
 	virtual TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue_Implementation() const = 0;
 
 	/**
-	 * Enqueues a single Item Action to be executed by the UI Manager.
+	 * Registers (enqueues) a Selectable Item Action together with an optional payload object.
 	 *
-	 * The provided Payload is passed forward to the action execution and can represent any context data
-	 * required for processing (such as the targeted item, owning inventory, UI widget, etc.).
+	 * This queue acts as a lightweight registry of pending UI-gated actions. Enqueuing does not start execution,
+	 * tick, or advance any processing. The action itself is responsible for initiating UI interaction, waiting for
+	 * approval/decline, and then calling CompleteQueuedAction or CancelQueuedAction to remove itself from the queue.
 	 *
-	 * @param ItemAction Item Action to enqueue.
-	 * @param Payload Optional context object passed to the queued action.
+	 * @param ItemAction Selectable Item Action to register.
+	 * @param Payload Optional data container/context associated with this queued action instance.
 	 *
-	 * @return True if the action was successfully enqueued, false otherwise (invalid action, queue disabled, etc.).
+	 * @return True if the action was successfully enqueued, false otherwise (invalid action).
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	bool EnqueueItemAction(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
 	virtual bool EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) = 0;
 
 	/**
-	 * Enqueues multiple Item Actions to be executed by the UI Manager in the provided order.
+	 * Removes all queued Selectable Item Actions from the UI Manager queue.
 	 *
-	 * All actions receive the same Payload instance. The queue order reflects the order within the input array.
-	 *
-	 * @param ItemActions Item Actions to enqueue.
-	 * @param Payload Optional context object passed to each queued action.
-	 *
-	 * @return True if all actions were successfully enqueued, false otherwise (some actions may be rejected).
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool EnqueueItemActions(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload);
-	virtual bool EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload) = 0;
-	
-	/**
-	 * Empties the queued Item Actions waiting for execution.
-	 *
-	 * This does not necessarily cancel the currently executing action unless the implementation explicitly does so.
-	 * Recommended behavior is to leave the current action intact and clear only pending actions.
+	 * This function clears the queue registry only. It does not attempt to complete or cancel individual actions,
+	 * nor does it notify them. Any UI or async work owned by the actions remains their responsibility.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	void EmptyItemActionsQueue();
-	virtual void EmptyItemActionsQueue_Implementation()= 0;;
+	virtual void EmptyItemActionsQueue_Implementation() = 0;
 
 	/**
-	 * Pauses processing of the Item Action queue.
+	 * Marks the specified queued Selectable Item Action as completed and removes it from the queue.
 	 *
-	 * When paused, no new actions are started, but the currently running action may continue depending on
-	 * implementation and action design. The queue remains paused until ResumeItemActionsQueue is called.
+	 * This function is typically called by the action itself after its UI-gated flow has been approved and the action
+	 * has executed its final logic (e.g. consume amount selected in a modal). The UI Manager uses this call to stop
+	 * tracking the action in its pending registry.
+	 *
+	 * @param ItemAction Selectable Item Action to remove from the queue.
+	 * @param Payload Optional payload received for completion of the Action. Usually contains "returned" values (eg. how much quantity was requested to consume).
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	void PauseItemActionsQueue();
-	virtual void PauseItemActionsQueue_Implementation() = 0;
+	void CompleteQueuedAction(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
+	virtual void CompleteQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) = 0;
 
 	/**
-	 * Resumes processing of the Item Action queue after it has been paused.
+	 * Cancels the specified queued Selectable Item Action and removes it from the queue.
 	 *
-	 * If no action is currently running, resuming should typically trigger processing of the next queued action.
+	 * This function is typically called by the action itself when the UI-gated flow is declined/cancelled
+	 * (e.g. modal closed, user pressed cancel). The UI Manager uses this call to stop tracking the action
+	 * in its pending registry.
 	 *
-	 * @return True if queue was resumed successfully, false otherwise (queue not paused, no valid state, etc.).
+	 * @param ItemAction Selectable Item Action to remove from the queue.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	bool ResumeItemActionsQueue();
-	virtual bool ResumeItemActionsQueue_Implementation() = 0;
-	
-	/**
-	 * Starts processing of the Item Action queue.
-	 *
-	 * If no action is currently in the queue the queue won't start processing anything and will idle itself.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
-	void StartItemActionsQueue();
-	virtual void StartItemActionsQueue_Implementation() = 0;
+	void CancelQueuedAction(UMounteaSelectableInventoryItemAction* ItemAction);
+	virtual void CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction) = 0;
+
 
 	// --- Events
 	

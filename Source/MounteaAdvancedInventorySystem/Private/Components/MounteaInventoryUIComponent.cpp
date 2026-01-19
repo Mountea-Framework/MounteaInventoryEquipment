@@ -93,6 +93,8 @@ void UMounteaInventoryUIComponent::BeginPlay()
 
 void UMounteaInventoryUIComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	Execute_EmptyItemActionsQueue(this); // we don't care if this runs on server I guess?
+	
 	switch (EndPlayReason)
 	{		
 		case EEndPlayReason::EndPlayInEditor:
@@ -102,7 +104,9 @@ void UMounteaInventoryUIComponent::EndPlay(const EEndPlayReason::Type EndPlayRea
 		case EEndPlayReason::LevelTransition:
 		case EEndPlayReason::Quit:
 			{
-				if (GetOwner() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+				if (GetOwner() && 
+					(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
+					UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 				{
 					const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
 						UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
@@ -514,107 +518,53 @@ void UMounteaInventoryUIComponent::ExecuteWidgetCommand_Implementation(const FSt
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, Command, OptionalPayload);
 }
 
-void UMounteaInventoryUIComponent::TickItemActionsQueue()
-{
-    if (!ActionsQueue.HasPending())
-    {
-        Execute_PauseItemActionsQueue(this);
-        return;
-    }
-    
-    FActionQueueEntry entry;
-    if (!ActionsQueue.Dequeue(entry) || !IsValid(entry.Action))
-        return;
-    
-    entry.Action->ExecuteQueuedAction(entry.Payload.Get());
-    
-    if (!ActionsQueue.HasPending())
-    	Execute_PauseItemActionsQueue(this);
-}
-
 bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
 {
-    if (!IsValid(ItemAction))
-        return false;
-    
-    FActionQueueEntry entry;
-    entry.Action = ItemAction;
-    entry.Payload = Payload;
-    
-    ActionsQueue.Enqueue(MoveTemp(entry));
-    Execute_StartItemActionsQueue(this);
-    
-    return true;
-}
-
-bool UMounteaInventoryUIComponent::EnqueueItemActions_Implementation(TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload)
-{
-	if (ItemActions.Num() == 0)
+	if (!IsValid(ItemAction))
 		return false;
     
-	bool bAllValid = true;
-	for (UMounteaSelectableInventoryItemAction* itemAction : ItemActions)
-	{
-		if (!IsValid(itemAction))
-		{
-			bAllValid = false;
-			continue;
-		}
-        
-		FActionQueueEntry entry;
-		entry.Action = itemAction;
-		entry.Payload = Payload;
-		ActionsQueue.Enqueue(MoveTemp(entry));
-	}
+	FActionQueueEntry entry;
+	entry.Action = ItemAction;
+	entry.Payload = Payload;
     
-	if (ActionsQueue.HasPending())
-		Execute_StartItemActionsQueue(this);
+	ActionsQueue.Enqueue(MoveTemp(entry));
     
-	return bAllValid;
+	return true;
+}
+
+void UMounteaInventoryUIComponent::CompleteQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
+{
+	if (!IsValid(ItemAction))
+		return;
+    
+	ItemAction->ExecuteQueuedAction(Payload);
+	ActionsQueue.Remove(ItemAction);
+}
+
+void UMounteaInventoryUIComponent::CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction)
+{
+	if (!IsValid(ItemAction))
+		return;
+	
+	ItemAction->CancelInventoryAction();
+	ActionsQueue.Remove(ItemAction);
 }
 
 void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 {
-	Execute_PauseItemActionsQueue(this);
-    ActionsQueue.Clear();
-}
-
-void UMounteaInventoryUIComponent::PauseItemActionsQueue_Implementation()
-{
-	if (!GetWorld())
-		return;
-    
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_ActionsQueue);
-}
-
-bool UMounteaInventoryUIComponent::ResumeItemActionsQueue_Implementation()
-{
-	Execute_StartItemActionsQueue(this);
-	return true;
-}
-
-void UMounteaInventoryUIComponent::StartItemActionsQueue_Implementation()
-{
-	if (!GetWorld())
-		return;
-    
-	FTimerManager& timerManager = GetWorld()->GetTimerManager();
-	if (!timerManager.IsTimerActive(TimerHandle_ActionsQueue))
-	{
-		timerManager.SetTimer(TimerHandle_ActionsQueue, this, &UMounteaInventoryUIComponent::TickItemActionsQueue, 1.0f, true);
-	}
+	ActionsQueue.Clear();
 }
 
 TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetItemActionsQueue_Implementation() const
 {
-    TArray<UMounteaSelectableInventoryItemAction*> result;
-    result.Reserve(ActionsQueue.Pending.Num());
+	TArray<UMounteaSelectableInventoryItemAction*> result;
+	result.Reserve(ActionsQueue.Pending.Num());
     
-    for (const FActionQueueEntry& entry : ActionsQueue.Pending)
-    {
-        if (entry.Action)
-            result.Add(entry.Action.Get());
-    }
+	for (const FActionQueueEntry& entry : ActionsQueue.Pending)
+	{
+		if (entry.Action)
+			result.Add(entry.Action.Get());
+	}
     
-    return result;
+	return result;
 }
