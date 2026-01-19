@@ -630,6 +630,46 @@ void UMounteaInventoryUIStatics::ExecuteWidgetCommandFromManager(const TScriptIn
 		return IMounteaAdvancedInventoryUIManagerInterface::Execute_ExecuteWidgetCommand(Target.GetObject(), Command, OptionalPayload);
 }
 
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIStatics::GetItemActionsQueue(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return Target.GetObject() ? IMounteaAdvancedInventoryUIManagerInterface::Execute_GetItemActionsQueue(Target.GetObject()) : TArray<UMounteaSelectableInventoryItemAction*>();
+}
+
+bool UMounteaInventoryUIStatics::EnqueueItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
+{
+	return Target.GetObject() ? IMounteaAdvancedInventoryUIManagerInterface::Execute_EnqueueItemAction(Target.GetObject(), ItemAction, Payload) : false;
+}
+
+bool UMounteaInventoryUIStatics::EnqueueItemActions_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	TArray<UMounteaSelectableInventoryItemAction*>& ItemActions, UObject* Payload)
+{
+	return Target.GetObject() ? IMounteaAdvancedInventoryUIManagerInterface::Execute_EnqueueItemActions(Target.GetObject(), ItemActions, Payload) : false;
+}
+
+void UMounteaInventoryUIStatics::EmptyItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_EmptyItemActionsQueue(Target.GetObject());
+}
+
+void UMounteaInventoryUIStatics::PauseItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_PauseItemActionsQueue(Target.GetObject());
+}
+
+bool UMounteaInventoryUIStatics::ResumeItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return Target.GetObject() ? IMounteaAdvancedInventoryUIManagerInterface::Execute_ResumeItemActionsQueue(Target.GetObject()) : false;
+}
+
+void UMounteaInventoryUIStatics::StartItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_StartItemActionsQueue(Target.GetObject());
+}
+
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
 {
 	if (!IsValid(ParentWidget))
