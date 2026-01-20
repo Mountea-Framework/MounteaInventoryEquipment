@@ -104,11 +104,9 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 >     <img width="45%" src="https://github.com/user-attachments/assets/727405e8-d62a-4982-9ada-bdb3830c7e1f">
 > </p>
 
-### Inventory/Equipment Actions
+### UI Actions
 
-> In-line editable configuration with the ability to extend logic in Blueprints.</p>
-> Each Action represents a logic that can be performed for each Item from the selected Category. For example, Apples can be consumed, Keys can be used, etc.</p>
-> Each Action can be shown from the in-game context menu, and the visibility can be adjusted using the `DisplayAction` function, which can be overridden per Action type.
+> UI Actions are a custom solution built to provide as approachable as possible toolset to create Item-based actions, such as, yet not limited to, Consume, Drop, Favourite, Equip and more.
 
 ---
 
