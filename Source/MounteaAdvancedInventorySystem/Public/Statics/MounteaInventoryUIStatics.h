@@ -1252,7 +1252,9 @@ public:
 	 *
 	 * @param Target The user widget to which the theme will be applied. Must be a valid object.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Theme", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
 	static void ApplyTheme(UWidget* Target);
 
 	/**
