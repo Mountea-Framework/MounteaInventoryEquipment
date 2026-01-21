@@ -141,13 +141,21 @@ public:
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> ItemActionWidgetClass;
 	
+	// ---- Modal
+	
+	/** Widget class used to display Modal Window. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🪟 Modals",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"),
+		meta=(NoResetToDefault))
+	TSoftClassPtr<UUserWidget> InventoryModalWidgetClass;
+	
 	// ---- Fonts
 	
 	/** Default font settings used across the inventory user interface (labels, counters, titles). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🔤 Font",
 		meta=(NoResetToDefault))
 	FSlateFontInfo DefaultFont;
-	
+		
 	// ---- Settings
 	
 	/** Defines list of available Widget Commands. Those are available using custom ProcessWidgetCommand Node.*/
