@@ -349,12 +349,6 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryId(Target) : TEXT("none");
 }
 
-void UMounteaInventoryUIStatics::ApplyTheme(UWidget* Target)
-{
-	if (!IsValid(Target)) return;
-	IMounteaInventoryGenericWidgetInterface::Execute_ApplyTheme(Target);
-}
-
 UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig()
 {
 	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();

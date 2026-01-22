@@ -803,6 +803,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Add Wrapper Widget State Tag")
 	static bool AddWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag);
@@ -819,6 +820,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Remove Wrapper Widget State Tag")
 	static bool RemoveWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag);
@@ -869,6 +871,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Append Wrapper Widget State Tags")
 	static bool AppendWidgetStateTags(UObject* Target,
 		const FGameplayTagContainer& TagsToAppend);
@@ -1086,6 +1089,21 @@ public:
 	
 	// --- Item Action
 #pragma region ItemActions
+	
+	/**
+	 * Checks if the specified flags are set in the value.
+	 * @param Value - The value to check
+	 * @param FlagMask - The flag(s) to check for
+	 * @return - True if all flags in the mask are set in the value
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|UI|Item Action", 
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Item Action - Does Have Flag")
+	static bool ItemAction_HasFlag(const uint8 Value, 
+		UPARAM(meta = (Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback")) const int32 FlagMask)
+	{
+		return (Value & FlagMask) == FlagMask;
+	}
 
 	/**
 	 * Initializes the item action widget with the Initiator UI and item action data.
@@ -1247,18 +1265,7 @@ public:
 	// --- OLD
 	
 	// --- Theme
-#pragma region Theme
-
-	/**
-	 * Applies the specified theme to the given user widget.
-	 * This function ensures that the provided widget is valid and executes the ApplyTheme logic via the Mountea Inventory Generic Widget Interface.
-	 *
-	 * @param Target The user widget to which the theme will be applied. Must be a valid object.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Theme", 
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(DefaultToSelf="Target"))
-	static void ApplyTheme(UWidget* Target);
+#pragma region Theme	
 
 	/**
 	 * Retrieves the theme configuration for the Mountea Advanced Inventory system.

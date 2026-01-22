@@ -29,6 +29,8 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryGenericWidgetStatics :
 
 public:
 	
+	static bool IsValidGenericWidget(const UObject* Target);
+	
 	/**
 	 * Delegates command with optional payload to provided Generic Widget.
 	 * This allows sending logic commands across multiple levels and through multiple systems.
@@ -52,6 +54,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
 		meta=(CustomTag="MounteaK2Setter,MounteaK2Command"),
 		meta=(DefaultToSelf="GenericWidget"),
+		meta=(Keywords="execute"),
 		DisplayName="Process Widget Command")
 	static void ProcessInventoryWidgetCommand(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UObject* GenericWidget, 
 		const FString& Command, UObject* OptionalPayload);
@@ -89,6 +92,68 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
 		meta=(CustomTag="MounteaK2Setter"),
-		meta=(DefaultToSelf="Target"))
+		meta=(DefaultToSelf="Target"),
+		DisplayName="Refresh Widget")
 	static void RefreshWidget(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);
+	
+	/**
+	 * Applies the specified theme to the given user widget.
+	 * This function ensures that the provided widget is valid and executes the ApplyTheme logic via the Mountea Inventory Generic Widget Interface.
+	 *
+	 * @param Target The user widget to which the theme will be applied. Must be a valid object.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		DisplayName="Apply Widget Theme")
+	static void ApplyTheme(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);
+	
+	/**
+	 * Sets the Widget Tag definition for this UI element.
+	 *
+	 * Each UI element that can be hosted/managed by the Wrapper should define a unique Gameplay Tag
+	 * representing its identity/state (for example UI.ModalWindow, UI.Tooltip, UI.ContextMenu, etc.).
+	 * This tag is used by the Wrapper to track which widgets are currently active and in use, allowing
+	 * the UI Manager/Wrapper to:
+	 * - prevent duplicate widget instances,
+	 * - resolve UI stacking rules (e.g., only one modal at a time),
+	 * - adjust input routing (e.g., block interaction while modal is present),
+	 * - query current UI composition for debugging/logic.
+	 *
+	 * Expected usage:
+	 * - Widget tag is assigned during initialization / construction of the widget.
+	 * - Wrapper reads this tag when the widget is added/removed and updates its internal state tracking.
+	 *
+	 * @param Target The user widget to set Tag on.
+	 * @param WidgetTag Gameplay Tag defining the widget identity/state used for Wrapper/UI tracking.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		DisplayName="Set Widget Config")
+	static void SetWidgetTag(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& WidgetTag);
+	
+	/**
+	 * Returns the Widget Tag definition for this UI element.
+	 *
+	 * Each UI element that can be hosted/managed by the Wrapper should expose a Gameplay Tag representing
+	 * its identity/state (for example UI.ModalWindow, UI.Tooltip, UI.ContextMenu, etc.).
+	 * The Wrapper and UI Manager use this tag to track which widgets are currently active and in use, enabling:
+	 * - fast queries of active UI states,
+	 * - prevention of duplicate widgets,
+	 * - correct UI stacking/layering logic,
+	 * - input routing rules based on active UI layers.
+	 *
+	 * The returned tag is expected to remain stable for the lifetime of the widget instance and should be
+	 * assigned via SetWidgetTag during initialization / widget creation.
+	 *
+	 * @param Target The user widget to get Tag from.
+	 * @return Gameplay Tag defining this widget identity/state used for Wrapper/UI tracking.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(DefaultToSelf="Target"),
+		DisplayName="Get Widget Config")
+	static FGameplayTag GetWidgetTag(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);
 };
