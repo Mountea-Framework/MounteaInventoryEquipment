@@ -51,8 +51,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
 		meta=(CustomTag="MounteaK2Setter,MounteaK2Command"),
+		meta=(DefaultToSelf="GenericWidget"),
 		DisplayName="Process Widget Command")
-	static void ProcessInventoryWidgetCommand(UObject* GenericWidget, const FString& Command, UObject* OptionalPayload);
+	static void ProcessInventoryWidgetCommand(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UObject* GenericWidget, 
+		const FString& Command, UObject* OptionalPayload);
 	
 	/**
 	 * Consumes player input forwarded from gameplay classes.
@@ -70,8 +72,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Consume UI Input")
-	static void ConsumeUIInput(UWidget* Target, 
+	static void ConsumeUIInput(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target, 
 		UPARAM(meta=(Categories="Input,Mountea_Inventory.Input")) const FGameplayTag InputTag, 
 		const FMounteaWidgetInputPayload& Payload, float DeltaTime);
 
@@ -85,6 +88,7 @@ public:
 	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"))
-	static void RefreshWidget(UWidget* Target);
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
+	static void RefreshWidget(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);
 };

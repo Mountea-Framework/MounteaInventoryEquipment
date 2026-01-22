@@ -893,7 +893,8 @@ public:
 	 * @param NewNotificationContainer The user widget to use as the notification container
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
 	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewNotificationContainer);
 
 	/**
@@ -902,7 +903,8 @@ public:
 	 * @param NotificationData The data structure containing all notification parameters (text, duration, etc.)
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
 	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryNotificationData& NotificationData);
 
 	/**
@@ -910,7 +912,8 @@ public:
 	 * @param Target The UI interface to remove notifications from
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 #pragma endregion
