@@ -655,6 +655,13 @@ void UMounteaInventoryUIStatics::CancelQueuedAction_Implementation(const TScript
 		IMounteaAdvancedInventoryUIManagerInterface::Execute_CancelQueuedAction(Target.GetObject(), ItemAction);
 }
 
+void UMounteaInventoryUIStatics::RemoveQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UMounteaSelectableInventoryItemAction* ItemAction)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_CancelQueuedAction(Target.GetObject(), ItemAction);
+}
+
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
 {
 	if (!IsValid(ParentWidget))
