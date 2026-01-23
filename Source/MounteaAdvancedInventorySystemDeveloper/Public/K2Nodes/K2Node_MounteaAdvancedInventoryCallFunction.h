@@ -35,6 +35,7 @@ public:
 	
 	// UK2Node
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const override;
+	virtual FText GetKeywords() const override;
 
 	// UK2Node_CallFunction
 	virtual bool IsNodePure() const override;

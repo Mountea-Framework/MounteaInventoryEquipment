@@ -69,6 +69,45 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 	}
 }
 
+FText UK2Node_MounteaAdvancedInventoryCallFunction::GetKeywords() const
+{
+	FString keywordsString = Super::GetKeywords().ToString();
+
+	auto AppendKeyword = [&keywordsString](const FString& keyword)
+	{
+		const FString trimmedKeyword = keyword.TrimStartAndEnd();
+		if (trimmedKeyword.IsEmpty()) return;
+
+		if (!keywordsString.IsEmpty())
+			keywordsString += TEXT(" ");
+
+		keywordsString += trimmedKeyword;
+	};
+
+	if (const UFunction* targetFunction = GetTargetFunction())
+	{
+		if (targetFunction->HasMetaData(FBlueprintMetadata::MD_FunctionKeywords))
+			AppendKeyword(targetFunction->GetMetaData(FBlueprintMetadata::MD_FunctionKeywords));
+		else if (targetFunction->HasMetaData(TEXT("Keywords")))
+			AppendKeyword(targetFunction->GetMetaData(TEXT("Keywords")));
+
+		if (targetFunction->HasMetaData(FBlueprintMetadata::MD_DisplayName))
+			AppendKeyword(targetFunction->GetMetaData(FBlueprintMetadata::MD_DisplayName));
+
+		AppendKeyword(targetFunction->GetName());
+
+		if (targetFunction->HasMetaData(TEXT("CustomTag")))
+		{
+			FString customTagValue = targetFunction->GetMetaData(TEXT("CustomTag"));
+			customTagValue.ReplaceInline(TEXT(","), TEXT(" "));
+			AppendKeyword(customTagValue);
+		}
+	}
+
+	return FText::FromString(keywordsString);
+}
+
+
 bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseCommandSelector(UEdGraphPin* Pin) const
 {
 	if (!Pin || Pin->PinName != TEXT("Command")) return false;
