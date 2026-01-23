@@ -175,3 +175,33 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 
 	return returnValue;
 }
+
+bool UMounteaInventorySystemStatics::SetIntPropertyValue(UObject* Target, const FName PropertyName, const int32 Value)
+{
+	return SetPropertyValueInternal<int32, FIntProperty>(Target, PropertyName, Value);
+}
+
+bool UMounteaInventorySystemStatics::SetFloatPropertyValue(UObject* Target, const FName PropertyName, const float Value)
+{
+	return SetPropertyValueInternal<float, FFloatProperty>(Target, PropertyName, Value);
+}
+
+bool UMounteaInventorySystemStatics::SetStringPropertyValue(UObject* Target, const FName PropertyName, const FString& Value)
+{
+	return SetPropertyValueInternal<FString, FStrProperty>(Target, PropertyName, Value);
+}
+
+bool UMounteaInventorySystemStatics::SetBoolPropertyValue(UObject* Target, const FName PropertyName, const bool Value)
+{
+	return SetPropertyValueInternal<bool, FBoolProperty>(Target, PropertyName, Value);
+}
+
+bool UMounteaInventorySystemStatics::SetNamePropertyValue(UObject* Target, const FName PropertyName, const FName Value)
+{
+	return SetPropertyValueInternal<FName, FNameProperty>(Target, PropertyName, Value);
+}
+
+bool UMounteaInventorySystemStatics::SetBytePropertyValue(UObject* Target, const FName PropertyName, const uint8 Value)
+{
+	return SetPropertyValueInternal<uint8, FByteProperty>(Target, PropertyName, Value);
+}

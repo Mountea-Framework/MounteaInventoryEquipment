@@ -27,10 +27,9 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventorySystemStatics : public
 
 public:
 
-	/*************************************************************/
-	/************************ INTERNAL ***********************/
-	/*************************************************************/
 	static bool CanExecuteCosmeticEvents(const UWorld* WorldContext);
+	
+public:
 
 	/**
 	 * Retrieves the given object if it is of the specified class type.
@@ -47,12 +46,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
 		meta = (ClassFilter = "Object"),
 		meta=(DeterminesOutputType = "ClassFilter"),
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Object By Class")
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 	
-	/*************************************************************/
-	/********************** BLUEPRINTABLE ************************/
-	/*************************************************************/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettingsConfig* GetMounteaAdvancedInventoryConfig();
@@ -127,10 +124,70 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
 	
+	UFUNCTION(Category = "Mountea|Inventory & Equipment|Payloads", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Int Property Value")
+	static bool SetIntPropertyValue(UObject* Target, FName PropertyName, int32 Value);
+
+	UFUNCTION(Category = "Mountea|Inventory & Equipment|Payloads", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Float Property Value")
+	static bool SetFloatPropertyValue(UObject* Target, FName PropertyName, float Value);
+
+	UFUNCTION(Category = "Mountea|Inventory & Equipment|Payloads", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set String Property Value")
+	static bool SetStringPropertyValue(UObject* Target, FName PropertyName, const FString& Value);
+
+	UFUNCTION(Category = "Mountea|Inventory & Equipment|Payloads", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Bool Property Value")
+	static bool SetBoolPropertyValue(UObject* Target, FName PropertyName, bool Value);
+
+	UFUNCTION(Category = "Mountea|Inventory & Equipment|Payloads", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Name Property Value")
+	static bool SetNamePropertyValue(UObject* Target, FName PropertyName, FName Value);
+
+	UFUNCTION(Category = "Mountea|Inventory & Equipment|Payloads", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Byte Property Value")
+	static bool SetBytePropertyValue(UObject* Target, FName PropertyName, uint8 Value);
+
+public:
+	
 	template<typename TEnum>
-	static constexpr bool HasFlag(uint8 value, TEnum flag)
+	static constexpr bool HasFlag(const uint8 value, TEnum Flag)
 	{
 		static_assert(std::is_enum<TEnum>::value, "TEnum must be an enum type.");
-		return (value & static_cast<uint8>(flag)) != 0;
+		return (value & static_cast<uint8>(Flag)) != 0;
+	}
+	
+	template<typename T, typename PropertyType>
+	static bool SetPropertyValueInternal(UObject* Target, const FName PropertyName, const T Value)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		PropertyType* typedProperty = CastField<PropertyType>(targetProperty);
+		if (!typedProperty)
+			return false;
+
+		void* propertyAddress = typedProperty->template ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		typedProperty->SetPropertyValue(propertyAddress, Value);
+		return true;
 	}
 };
+
+
