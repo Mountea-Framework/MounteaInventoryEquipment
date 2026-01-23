@@ -107,7 +107,6 @@ FText UK2Node_MounteaAdvancedInventoryCallFunction::GetKeywords() const
 	return FText::FromString(keywordsString);
 }
 
-
 bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseCommandSelector(UEdGraphPin* Pin) const
 {
 	if (!Pin || Pin->PinName != TEXT("Command")) return false;
