@@ -38,7 +38,28 @@ void UK2Node_SetPropertyByName::AllocateDefaultPins()
 
 FText UK2Node_SetPropertyByName::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return LOCTEXT("SetPropertyByName_Title", "Set Property by Name");
+	FText functionName = LOCTEXT("SetPropertyByName_Title", "Set Property by Name");
+	
+	if(TitleType == ENodeTitleType::FullTitle)
+	{
+		FText contextString = LOCTEXT("SetPropertyByName_Subtitle", "Source is Advanced Mountea Inventory & Equipment System");
+		
+		FFormatNamedArguments namedArgs;
+		namedArgs.Add(TEXT("FunctionName"), functionName);
+		namedArgs.Add(TEXT("ContextString"), contextString);
+
+		if (contextString.IsEmpty())
+			return FText::Format(LOCTEXT("SetPropertyByName_Title", "{FunctionName}"), namedArgs);
+		else
+			return FText::Format(LOCTEXT("SetPropertyByName_Title_WithContext", "{FunctionName}\n{ContextString}"), namedArgs);
+	}
+	return functionName;
+}
+
+FText UK2Node_SetPropertyByName::GetVisualWarningTooltipText() const
+{
+	return LOCTEXT("SetPropertyByName_Warning", 
+		"Please, keep in mind that this will set the value directly! No setter is called! Use with extreme caution!");
 }
 
 FText UK2Node_SetPropertyByName::GetTooltipText() const
@@ -133,18 +154,27 @@ UFunction* UK2Node_SetPropertyByName::GetTargetFunction(const UEdGraphPin* Value
 {
 	const UClass* staticsClass = UMounteaInventorySystemStatics::StaticClass();
 	
-	if (ValuePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Int || 
-		ValuePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Int64)
+	if (!ValuePin)
+		return nullptr;
+	
+	const bool bValidInputs = ValuePin->LinkedTo.Num() > 0;
+	if (!bValidInputs)
+		return nullptr;
+	
+	const FEdGraphPinType& effectiveType = GetEffectiveType(ValuePin);
+
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int || 
+		effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int64)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetIntPropertyValue));
-	else if (ValuePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Real)
+	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Real)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetFloatPropertyValue));
-	else if (ValuePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean)
+	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Boolean)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetBoolPropertyValue));
-	else if (ValuePin->PinType.PinCategory == UEdGraphSchema_K2::PC_String)
+	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_String)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetStringPropertyValue));
-	else if (ValuePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Name)
+	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Name)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetNamePropertyValue));
-	else if (ValuePin->PinType.PinCategory == UEdGraphSchema_K2::PC_Byte)
+	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Byte)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetBytePropertyValue));
 
 	return nullptr;

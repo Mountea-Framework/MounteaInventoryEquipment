@@ -17,6 +17,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEMDEVELOPER_API UK2Node_SetPropertyByName : pu
 public:
 	virtual void AllocateDefaultPins() override;
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
+	virtual FText GetVisualWarningTooltipText() const override;
 	virtual FText GetTooltipText() const override;
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
@@ -37,4 +38,13 @@ protected:
 	static const FName TargetPinName;
 	static const FName PropertyNamePinName;
 	static const FName ValuePinName;
+	
+	static const FEdGraphPinType& GetEffectiveType(const UEdGraphPin* Pin)
+	{
+		if (Pin && Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Wildcard && Pin->LinkedTo.Num() > 0 && Pin->LinkedTo[0])
+		{
+			return Pin->LinkedTo[0]->PinType;
+		}
+		return Pin->PinType;
+	}
 };
