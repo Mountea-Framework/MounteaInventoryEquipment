@@ -124,36 +124,49 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
 	
-	UFUNCTION(BlueprintInternalUseOnly, BlueprintCallable, Category = "Mountea|Inventory & Equipment|Payloads", 
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set Int Property Value")
+#pragma region K2NodeHelpers
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetIntPropertyValue(UObject* Target, FName PropertyName, int32 Value);
 
-	UFUNCTION(BlueprintInternalUseOnly, BlueprintCallable,Category = "Mountea|Inventory & Equipment|Payloads", 
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set Float Property Value")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly,Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetFloatPropertyValue(UObject* Target, FName PropertyName, float Value);
 
-	UFUNCTION(BlueprintInternalUseOnly, BlueprintCallable, Category = "Mountea|Inventory & Equipment|Payloads", 
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set String Property Value")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetStringPropertyValue(UObject* Target, FName PropertyName, const FString& Value);
 
-	UFUNCTION(BlueprintInternalUseOnly, BlueprintCallable, Category = "Mountea|Inventory & Equipment|Payloads", 
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set Bool Property Value")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetBoolPropertyValue(UObject* Target, FName PropertyName, bool Value);
 
-	UFUNCTION(BlueprintInternalUseOnly, BlueprintCallable, Category = "Mountea|Inventory & Equipment|Payloads", 
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set Name Property Value")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetNamePropertyValue(UObject* Target, FName PropertyName, FName Value);
 
-	UFUNCTION(BlueprintInternalUseOnly, BlueprintCallable, Category = "Mountea|Inventory & Equipment|Payloads", 
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Set Byte Property Value")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetBytePropertyValue(UObject* Target, FName PropertyName, uint8 Value);
 
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetIntPropertyValue(UObject* Target, FName PropertyName, int32& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetInt64PropertyValue(UObject* Target, FName PropertyName, int64& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetFloatPropertyValue(UObject* Target, FName PropertyName, float& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetStringPropertyValue(UObject* Target, FName PropertyName, FString& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetBoolPropertyValue(UObject* Target, FName PropertyName, bool& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetNamePropertyValue(UObject* Target, FName PropertyName, FName& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetBytePropertyValue(UObject* Target, FName PropertyName, uint8& Value);
+
+#pragma endregion
+	
 public:
 	
 	template<typename TEnum>
@@ -186,6 +199,32 @@ public:
 			return false;
 
 		typedProperty->SetPropertyValue(propertyAddress, Value);
+		return true;
+	}
+	
+	template<typename T, typename PropertyType>
+	static bool GetPropertyValueInternal(UObject* Target, const FName PropertyName, T& OutValue)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		PropertyType* typedProperty = CastField<PropertyType>(targetProperty);
+		if (!typedProperty)
+			return false;
+
+		const void* propertyAddress = typedProperty->template ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		OutValue = typedProperty->GetPropertyValue(propertyAddress);
 		return true;
 	}
 };
