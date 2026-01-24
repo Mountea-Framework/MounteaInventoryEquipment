@@ -224,6 +224,12 @@ void UK2Node_SetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	BreakAllNodeLinks();
 }
 
+void UK2Node_SetPropertyByName::PostReconstructNode()
+{
+	Super::PostReconstructNode();
+	RefreshPinTypes();
+}
+
 #if WITH_EDITOR
 
 FText UK2Node_SetPropertyByName::GetToolTipHeading() const

@@ -25,6 +25,8 @@ public:
 	virtual bool IsConnectionDisallowed(const UEdGraphPin* MyPin, const UEdGraphPin* OtherPin, FString& OutReason) const override;
 	virtual void NotifyPinConnectionListChanged(UEdGraphPin* Pin) override;
 	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
+	virtual void PostReconstructNode() override;
+	virtual bool ShowVisualWarning() const override { return true; };
 
 #if WITH_EDITOR
 	virtual FText GetToolTipHeading() const override;
