@@ -1,4 +1,13 @@
-﻿// REPLACE COPYRIGHT
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
 
 #pragma once
 
@@ -16,11 +25,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEMDEVELOPER_API UK2Node_SetPropertyByName : pu
 
 public:
 	virtual void AllocateDefaultPins() override;
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	
-	virtual FText GetTooltipText() const override;
-	virtual FLinearColor GetNodeTitleColor() const override;
-	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
 	virtual bool IsConnectionDisallowed(const UEdGraphPin* MyPin, const UEdGraphPin* OtherPin, FString& OutReason) const override;
 	virtual void NotifyPinConnectionListChanged(UEdGraphPin* Pin) override;
@@ -28,6 +33,11 @@ public:
 	virtual void PostReconstructNode() override;
 	
 #if WITH_EDITOR
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;	
+	virtual FText GetTooltipText() const override;
+	virtual FLinearColor GetNodeTitleColor() const override;
+	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
+	
 	virtual FText GetVisualWarningTooltipText() const override;
 	virtual FText GetToolTipHeading() const override;
 	virtual FName GetCornerIcon() const override;
