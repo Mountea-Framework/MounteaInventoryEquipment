@@ -15,6 +15,7 @@
 const FName UK2Node_SetPropertyByName::TargetPinName(TEXT("Target"));
 const FName UK2Node_SetPropertyByName::PropertyNamePinName(TEXT("PropertyName"));
 const FName UK2Node_SetPropertyByName::ValuePinName(TEXT("Value"));
+const FName UK2Node_SetPropertyByName::ReturnValuePinName(TEXT("ReturnValue"));
 
 UK2Node_SetPropertyByName::UK2Node_SetPropertyByName(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -27,6 +28,8 @@ void UK2Node_SetPropertyByName::AllocateDefaultPins()
 
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
+	
+	UEdGraphPin* returnResultPin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Boolean, ReturnValuePinName);
 
 	UEdGraphPin* targetPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UObject::StaticClass(), TargetPinName);
 	
@@ -56,12 +59,6 @@ FText UK2Node_SetPropertyByName::GetNodeTitle(ENodeTitleType::Type TitleType) co
 	return functionName;
 }
 
-FText UK2Node_SetPropertyByName::GetVisualWarningTooltipText() const
-{
-	return LOCTEXT("SetPropertyByName_Warning", 
-		"Please, keep in mind that this will set the value directly! No setter is called! Use with extreme caution!");
-}
-
 FText UK2Node_SetPropertyByName::GetTooltipText() const
 {
 	return LOCTEXT("SetPropertyByName_Tooltip", 
@@ -69,7 +66,7 @@ FText UK2Node_SetPropertyByName::GetTooltipText() const
 		"Similar to 'Set Scalar Parameter Value' but works with any UObject property.\n"
 		"Supports: Int, Float, Bool, String, Name, and Byte types.\n\n"
 		"Returns false if property doesn't exist or type doesn't match.\n\n"
-		"Please, keep in mind that this will set the value directly! No setter is called! Use with extreme caution!");
+		"⚠ Please, keep in mind that this will set the value directly! No setter is called! Use with extreme caution!");
 }
 
 FLinearColor UK2Node_SetPropertyByName::GetNodeTitleColor() const
@@ -189,6 +186,7 @@ void UK2Node_SetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	UEdGraphPin* targetPin = FindPinChecked(TargetPinName);
 	UEdGraphPin* propertyNamePin = FindPinChecked(PropertyNamePinName);
 	UEdGraphPin* valuePin = FindPinChecked(ValuePinName);
+	UEdGraphPin* returnValuePin = FindPinChecked(ReturnValuePinName);
 
 	if (valuePin->LinkedTo.Num() == 0)
 	{
@@ -208,9 +206,11 @@ void UK2Node_SetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	UK2Node_CallFunction* callFunctionNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
 	callFunctionNode->SetFromFunction(targetFunction);
 	callFunctionNode->AllocateDefaultPins();
+	UEdGraphPin* functionReturnPin = callFunctionNode->GetReturnValuePin();
 
 	CompilerContext.MovePinLinksToIntermediate(*execPin, *callFunctionNode->GetExecPin());
 	CompilerContext.MovePinLinksToIntermediate(*thenPin, *callFunctionNode->GetThenPin());
+	CompilerContext.MovePinLinksToIntermediate(*returnValuePin, *functionReturnPin);
 
 	UEdGraphPin* callTargetPin = callFunctionNode->FindPinChecked(TEXT("Target"));
 	CompilerContext.MovePinLinksToIntermediate(*targetPin, *callTargetPin);
@@ -231,6 +231,12 @@ void UK2Node_SetPropertyByName::PostReconstructNode()
 }
 
 #if WITH_EDITOR
+
+FText UK2Node_SetPropertyByName::GetVisualWarningTooltipText() const
+{
+	return LOCTEXT("SetPropertyByName_Warning", 
+		"⚠ Please, keep in mind that this will set the value directly!\nNo setter is called!\n\nUse with extreme caution!");
+}
 
 FText UK2Node_SetPropertyByName::GetToolTipHeading() const
 {
