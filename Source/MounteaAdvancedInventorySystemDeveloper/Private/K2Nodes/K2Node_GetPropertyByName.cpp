@@ -179,15 +179,14 @@ void UK2Node_GetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	UEdGraphPin* propertyNamePin = FindPinChecked(PropertyNamePinName);
 	UEdGraphPin* valuePin = FindPinChecked(ValuePinName);
 	UEdGraphPin* returnValuePin = FindPinChecked(ReturnValuePinName);
-
-	/*
-	if (valuePin->LinkedTo.Num() == 0)
+	
+	const FEdGraphPinType& effectiveType = GetEffectiveType(valuePin);	
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Wildcard)
 	{
 		CompilerContext.MessageLog.Error(*LOCTEXT("NoValueConsumer", "@@ must have Value pin connected").ToString(), this);
 		BreakAllNodeLinks();
 		return;
 	}
-	*/
 
 	UFunction* targetFunction = GetTargetFunction(valuePin);
 	if (!targetFunction)
@@ -214,7 +213,6 @@ void UK2Node_GetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	CompilerContext.MovePinLinksToIntermediate(*propertyNamePin, *callPropertyNamePin);
 
 	UEdGraphPin* callValuePin = callFunctionNode->FindPinChecked(TEXT("Value"));
-	const FEdGraphPinType& effectiveType = GetEffectiveType(valuePin);
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Struct)
 		callValuePin->PinType = effectiveType;
 	CompilerContext.MovePinLinksToIntermediate(*valuePin, *callValuePin);
@@ -296,6 +294,11 @@ FText UK2Node_GetPropertyByName::GetToolTipHeading() const
 FName UK2Node_GetPropertyByName::GetCornerIcon() const
 {
 	return TEXT("MAISStyleSet.MounteaLogo");
+}
+
+FText UK2Node_GetPropertyByName::GetMenuCategory() const
+{
+	return LOCTEXT("GetPropertyByName_Category", "Mountea|Inventory & Equipment|Helpers");
 }
 
 #endif

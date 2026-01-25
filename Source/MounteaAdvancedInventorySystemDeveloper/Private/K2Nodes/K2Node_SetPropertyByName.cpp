@@ -291,6 +291,11 @@ FName UK2Node_SetPropertyByName::GetCornerIcon() const
 	return TEXT("MAISStyleSet.MounteaLogo");
 }
 
+FText UK2Node_SetPropertyByName::GetMenuCategory() const
+{
+	return LOCTEXT("SetPropertyByName_Category", "Mountea|Inventory & Equipment|Helpers");
+}
+
 #endif
 
 #undef LOCTEXT_NAMESPACE
