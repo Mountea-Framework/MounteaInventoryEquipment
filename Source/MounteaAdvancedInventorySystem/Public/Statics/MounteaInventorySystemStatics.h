@@ -219,6 +219,8 @@ public:
 
 #pragma endregion
 	
+#pragma region Templates
+	
 public:
 	
 	template<typename TEnum>
@@ -508,4 +510,6 @@ public:
 		OutValue = objectProperty->GetObjectPropertyValue(propertyAddress);
 		return true;
 	}
+	
+#pragma endregion 
 };

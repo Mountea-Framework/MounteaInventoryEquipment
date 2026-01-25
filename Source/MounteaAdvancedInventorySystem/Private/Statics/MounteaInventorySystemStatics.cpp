@@ -23,8 +23,7 @@ bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* Worl
 	return !UKismetSystemLibrary::IsDedicatedServer(WorldContext);
 }
 
-UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter,
-	bool& bResult)
+UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult)
 {
 	bResult = false;
 
@@ -98,7 +97,6 @@ FString UMounteaInventorySystemStatics::EscapeRegexSpecialChars(const FString& I
 
 	return escapedString;
 }
-
 
 FString UMounteaInventorySystemStatics::ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText)
 {
@@ -175,6 +173,8 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 
 	return returnValue;
 }
+
+#pragma region K2NodeHelpers
 
 bool UMounteaInventorySystemStatics::SetIntPropertyValue(UObject* Target, const FName PropertyName, const int32 Value)
 {
@@ -368,3 +368,5 @@ DEFINE_FUNCTION(UMounteaInventorySystemStatics::execGetGenericStructPropertyValu
 
 	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
 }
+
+#pragma endregion
