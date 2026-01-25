@@ -26,8 +26,7 @@ bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FInv
 	return true;
 }
 
-TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::
-GetOwningInventory_Implementation() const
+TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::GetOwningInventory_Implementation() const
 {
 	return nullptr;
 }
@@ -59,7 +58,11 @@ bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const FI
 		return false;
 	}
 	
-	LOG_WARNING(TEXT("[ExecuteInventoryAction] Called on action class for %s!"), *GetName())
 	return true;
+}
+
+void UMounteaInventoryItemAction::CancelInventoryAction_Implementation()
+{
+	CleanupInventoryAction();
 }
 

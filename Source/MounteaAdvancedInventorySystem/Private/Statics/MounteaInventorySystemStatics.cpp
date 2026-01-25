@@ -175,3 +175,138 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 
 	return returnValue;
 }
+
+bool UMounteaInventorySystemStatics::SetIntPropertyValue(UObject* Target, const FName PropertyName, const int32 Value)
+{
+	return Target ? SetPropertyValueInternal<int32, FIntProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetFloatPropertyValue(UObject* Target, const FName PropertyName, const float Value)
+{
+	return Target ? SetPropertyValueInternal<float, FFloatProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetStringPropertyValue(UObject* Target, const FName PropertyName, const FString& Value)
+{
+	return Target ? SetPropertyValueInternal<FString, FStrProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetBoolPropertyValue(UObject* Target, const FName PropertyName, const bool Value)
+{
+	return Target ? SetPropertyValueInternal<bool, FBoolProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetNamePropertyValue(UObject* Target, const FName PropertyName, const FName& Value)
+{
+	return Target ? SetPropertyValueInternal<FName, FNameProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetBytePropertyValue(UObject* Target, const FName PropertyName, const uint8 Value)
+{
+	return Target ? SetPropertyValueInternal<uint8, FByteProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetGuidPropertyValue(UObject* Target, const FName PropertyName, const FGuid& Value)
+{
+	return Target ? SetStructPropertyValueInternal<FGuid>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetVectorPropertyValue(UObject* Target, const FName PropertyName, const FVector& Value)
+{
+	return Target ? SetStructPropertyValueInternal<FVector>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetVector2DPropertyValue(UObject* Target, const FName PropertyName, const FVector2D& Value)
+{
+	return Target ? SetStructPropertyValueInternal<FVector2D>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject* Value)
+{
+	return Target && Value ? SetObjectPropertyValueInternal(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetSoftObjectPropertyValue(UObject* Target, const FName PropertyName, const TSoftObjectPtr<UObject>& Value)
+{
+	return Target ? SetSoftObjectPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetClassPropertyValue(UObject* Target, const FName PropertyName, const TSubclassOf<UObject> Value)
+{
+	return Target ? SetClassPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetSoftClassPropertyValue(UObject* Target, const FName PropertyName, const TSoftClassPtr<UObject>& Value)
+{
+	return Target ? SetSoftClassPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetIntPropertyValue(UObject* Target, const FName PropertyName, int32& Value)
+{
+	return Target ? GetPropertyValueInternal<int32, FIntProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetInt64PropertyValue(UObject* Target, const FName PropertyName, int64& Value)
+{
+	return Target ? GetPropertyValueInternal<int64, FInt64Property>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetFloatPropertyValue(UObject* Target, const FName PropertyName, float& Value)
+{
+	return Target ? GetPropertyValueInternal<float, FFloatProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetStringPropertyValue(UObject* Target, const FName PropertyName, FString& Value)
+{
+	return Target ? GetPropertyValueInternal<FString, FStrProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetBoolPropertyValue(UObject* Target, const FName PropertyName, bool& Value)
+{
+	return Target ? GetPropertyValueInternal<bool, FBoolProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetNamePropertyValue(UObject* Target, const FName PropertyName, FName& Value)
+{
+	return Target ? GetPropertyValueInternal<FName, FNameProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetBytePropertyValue(UObject* Target, const FName PropertyName, uint8& Value)
+{
+	return Target ? GetPropertyValueInternal<uint8, FByteProperty>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetGuidPropertyValue(UObject* Target, const FName PropertyName, FGuid& Value)
+{
+	return Target ? GetStructPropertyValueInternal<FGuid>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetVectorPropertyValue(UObject* Target, const FName PropertyName, FVector& Value)
+{
+	return Target ? GetStructPropertyValueInternal<FVector>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetVector2DPropertyValue(UObject* Target, const FName PropertyName, FVector2D& Value)
+{
+	return Target ? GetStructPropertyValueInternal<FVector2D>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject*& Value)
+{
+	return Target && Value ? GetObjectPropertyValueInternal(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetSoftObjectPropertyValue(UObject* Target, const FName PropertyName, TSoftObjectPtr<UObject>& Value)
+{
+	return Target ? GetSoftObjectPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetClassPropertyValue(UObject* Target, const FName PropertyName, TSubclassOf<UObject>& Value)
+{
+	return Target ? GetClassPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::GetSoftClassPropertyValue(UObject* Target, const FName PropertyName, TSoftClassPtr<UObject>& Value)
+{
+	return Target ? GetSoftClassPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
+}

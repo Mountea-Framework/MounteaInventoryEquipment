@@ -15,21 +15,43 @@
 #include "GameplayTagContainer.h"
 #include "Components/Widget.h"
 
+bool UMounteaInventoryGenericWidgetStatics::IsValidGenericWidget(const UObject* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>();
+}
+
 void UMounteaInventoryGenericWidgetStatics::ProcessInventoryWidgetCommand(UObject* GenericWidget, const FString& Command, UObject* OptionalPayload)
 {
-	if (IsValid(GenericWidget) && GenericWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+	if (IsValidGenericWidget(GenericWidget))
 		return IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(GenericWidget, Command, OptionalPayload);
 }
 
 void UMounteaInventoryGenericWidgetStatics::ConsumeUIInput(UWidget* Target, const FGameplayTag InputTag, 
 	const FMounteaWidgetInputPayload& Payload, const float DeltaTime)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
+	if (IsValidGenericWidget(Target))
 		IMounteaInventoryGenericWidgetInterface::Execute_ConsumeUIInput(Target, InputTag, Payload, DeltaTime);
 }
 
 void UMounteaInventoryGenericWidgetStatics::RefreshWidget(UWidget* Target)
 {
-	if (IsValid(Target) && Target->Implements<UMounteaInventoryGenericWidgetInterface>())
+	if (IsValidGenericWidget(Target))
 		IMounteaInventoryGenericWidgetInterface::Execute_RefreshWidget(Target);
+}
+
+void UMounteaInventoryGenericWidgetStatics::ApplyTheme(UWidget* Target)
+{
+	if (IsValidGenericWidget(Target))
+		IMounteaInventoryGenericWidgetInterface::Execute_ApplyTheme(Target);
+}
+
+void UMounteaInventoryGenericWidgetStatics::SetWidgetTag(UWidget* Target, const FGameplayTag& WidgetTag)
+{
+	if (IsValidGenericWidget(Target))
+		IMounteaInventoryGenericWidgetInterface::Execute_SetWidgetTag(Target, WidgetTag);
+}
+
+FGameplayTag UMounteaInventoryGenericWidgetStatics::GetWidgetTag(UWidget* Target)
+{
+	return IsValidGenericWidget(Target) ? IMounteaInventoryGenericWidgetInterface::Execute_GetWidgetTag(Target) : FGameplayTag();
 }

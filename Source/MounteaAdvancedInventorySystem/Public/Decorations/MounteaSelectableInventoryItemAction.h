@@ -19,6 +19,8 @@ class UMounteaCallbackInventoryItemAction;
 
 #define LOCTEXT_NAMESPACE "MounteaInventoryItemActionData"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSelectableActionQueueExecuted, UMounteaSelectableInventoryItemAction*, SelectableAction, UObject*, OptionalPayload);
+
 /**
  * UMounteaSelectableInventoryItemAction provides lightweight inventory actions intended purely for
  * local "UI-level" operations.
@@ -57,6 +59,15 @@ public:
 		ActionPriority(0),
 		InventoryItemActionCallback(0)
 	{};
+	
+public:
+	
+	/**
+	 * Event called once Action is completed.
+	 * The Event has optional Payload of Object type.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintReadOnly, Category="Events")
+	FOnSelectableActionQueueExecuted OnSelectableActionQueueExecuted;
 	
 protected:
 	
@@ -118,6 +129,29 @@ protected:
 	FGameplayTagContainer ItemActionBlockingTags;
 	
 public:
+	
+	/**
+	 * Executes this Selectable Item Action after it has been approved/validated by an external UI flow.
+	 *
+	 * This function is not a general entry point for inventory actions. Instead, it represents the
+	 * continuation step of a Selectable Item Action that was previously initiated via ExecuteInventoryAction(),
+	 * enqueued through the UI Manager (QueueItemAction), and then gated by an interactive UI element
+	 * (for example a modal confirmation window).
+	 *
+	 * Typical flow:
+	 * - ExecuteInventoryAction() prepares UI context and enqueues this action together with a payload container.
+	 * - UI (modal/selection widget) is presented to the user and can modify the payload.
+	 * - If the UI flow is cancelled, the action is cancelled/invalidated and ExecuteQueuedAction is never called.
+	 * - If the UI flow is approved, the UI notifies the action that it is ready, and ExecuteQueuedAction() is invoked.
+	 *
+	 * ExecuteQueuedAction() should use the payload as the finalized data container (e.g. quantity to consume)
+	 * and complete the action’s logic (apply changes, send commands, update UI, etc.).
+	 *
+	 * @param OptionalPayload Optional context/data container associated with this queued action instance.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void ExecuteQueuedAction(UObject* OptionalPayload);
+	virtual void ExecuteQueuedAction_Implementation(UObject* OptionalPayload);
 	
 	/**
 	 * Determines whether this action should be visible in the UI for the given item.

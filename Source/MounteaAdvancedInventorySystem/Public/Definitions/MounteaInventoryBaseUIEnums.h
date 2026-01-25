@@ -27,11 +27,7 @@ enum class EInventoryItemActionCallback : uint8
 {
 	EIIAC_None                 = 0	UMETA(DisplayName = "None", Tooltip = "No additional input or confirmation required."),
 	EIIAC_QuantityNeeded       = 1 << 0	UMETA(DisplayName = "Quantity Needed", Tooltip = "Player must specify the quantity to use or move."),
-	EIIAC_ConfirmationNeeded   = 1 << 1	UMETA(DisplayName = "Confirmation Needed", Tooltip = "Requires user confirmation before proceeding."),
-	EIIAC_TargetSelection      = 1 << 2	UMETA(DisplayName = "Target Selection", Tooltip = "Player must choose a target for the item action."),
-	EIIAC_ContextMenuRequired  = 1 << 3	UMETA(DisplayName = "Context Menu Required", Tooltip = "Displays a context menu to select the exact action."),
-	EIIAC_CraftingSelection    = 1 << 4	UMETA(DisplayName = "Crafting Selection", Tooltip = "User must select a recipe or crafting variant."),
-	EIIAC_ItemSlotSelection    = 1 << 5	UMETA(DisplayName = "Item Slot Selection", Tooltip = "User must pick a slot to place or equip the item.")
+	EIIAC_ConfirmationNeeded   = 1 << 1	UMETA(DisplayName = "Confirmation Needed", Tooltip = "Requires user confirmation before proceeding.")
 };
 ENUM_CLASS_FLAGS(EInventoryItemActionCallback)
 

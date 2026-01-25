@@ -39,7 +39,9 @@ public:
 	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Initialize Inventory Action")
 	static bool InitializeItemAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem, 
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory, UObject* ContextPayload = nullptr);
 	
@@ -58,7 +60,10 @@ public:
 	 * @note Always call InitializeItemAction() before executing actions to ensure proper context.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="start"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Execute Inventory Action")
 	static bool ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem);
 	
 	/**
@@ -68,7 +73,8 @@ public:
 	 * @return Script interface to the inventory containing the target item.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory Action Tags")
 	static FGameplayTagContainer GetItemActionTags(UMounteaInventoryItemAction* Target);
 
 	/**
@@ -79,7 +85,8 @@ public:
 	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory Action Flags")
 	static EInventoryItemActionCallback GetItemActionFlags(const UMounteaSelectableInventoryItemAction* Target);
 	
 	/**
@@ -90,7 +97,8 @@ public:
 	 * @return True if the flag is set, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Validate"))
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Has Inventory Action Flag")
 	static bool ItemAction_HasActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck);
 
 	/**
@@ -100,7 +108,8 @@ public:
 	 * @param FlagToAdd The flag to add.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Add Inventory Action Flag")
 	static void ItemAction_AddActionFlag(UMounteaSelectableInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd);
 
 	/**
@@ -110,7 +119,8 @@ public:
 	 * @param FlagToRemove The flag to clear.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Remove Inventory Action Flag")
 	static void ItemAction_RemoveActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove);
 
 	/**
@@ -119,11 +129,22 @@ public:
 	 * @param Target Item Action to clear all flags from.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Clear Inventory Action Flags")
 	static void ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target);
 
-#pragma endregion
+	/**
+	 * Gets called once Action has finished/cancelled to restore resources.
+	 * 
+	 * @param Target Item Action to clear/reset.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="reset"),
+		DisplayName="Cleanup Inventory Action")
+	static void CleanupInventoryAction(UMounteaInventoryItemAction* Target);
 	
+#pragma endregion
 	
 	//------------------------------------------------------------------------------------------
 
@@ -350,24 +371,24 @@ public:
 	 * @param Amount Amount to increase
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item|Quantity",
 		meta=(CustomTag="MounteaK2Setter"), 
 		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool IncreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
-		int32 Amount = 1);
+		UPARAM(meta=(UIMin=1,ClampMin=1)) int32 Amount = 1);
 
 	/**
 	 * Decreases item quantity
 	 * @param Target The inventory interface to execute on
 	 * @param ItemGuid Target item GUID
-	 * @param Amount Amount to decrease
+	 * @param Amount Amount to decrease, must be positive number!
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item|Quantity",
 		meta=(CustomTag="MounteaK2Setter"), 
 		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool DecreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
-		int32 Amount = 1);
+		UPARAM(meta=(UIMin=1,ClampMin=1)) int32 Amount = 1);
 
 	/**
 	 * Modifies item durability
@@ -376,11 +397,12 @@ public:
 	 * @param DeltaDurability Change in durability
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Durability", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item|Durability",
+		BlueprintAuthorityOnly,
 		meta=(CustomTag="MounteaK2Setter"), 
 		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool ModifyItemDurability(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
-		float DeltaDurability);
+		UPARAM(meta=(UIMin=0.f,ClampMin=0.f)) float DeltaDurability);
 	
 #pragma endregion
 	

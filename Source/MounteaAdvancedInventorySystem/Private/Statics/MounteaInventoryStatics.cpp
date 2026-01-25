@@ -542,6 +542,12 @@ void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UMounteaSelectable
 	Target->ClearAllActionFlags();
 }
 
+void UMounteaInventoryStatics::CleanupInventoryAction(UMounteaInventoryItemAction* Target)
+{
+	if (IsValid(Target))
+		Target->CleanupInventoryAction();
+}
+
 FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const FString& Type,
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& SourceInventory,

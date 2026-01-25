@@ -18,8 +18,10 @@
 
 struct FInventoryItem;
 struct FInventoryNotificationData;
+
 class IMounteaAdvancedInventoryInterface;
-class UCommonActivatableWidget;
+
+class UMounteaSelectableInventoryItemAction;
 class UWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
@@ -53,7 +55,7 @@ public:
 	 * Retrieves the parent inventory associated with this UI.
 	 * @return The parent inventory interface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory() const;
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const = 0;
 
@@ -61,7 +63,7 @@ public:
 	 * Sets the parent inventory for this UI.
 	 * @param NewParentInventory - The inventory interface to associate.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
 	
@@ -69,7 +71,7 @@ public:
 	 * Creates the inventory UI.
 	 * @return True if UI was successfully created, otherwise false.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	bool CreateWrapperWidget();
 	virtual bool CreateWrapperWidget_Implementation() = 0;
 
@@ -77,14 +79,14 @@ public:
 	 * Returns the inventory UI.
 	 * @return UI if UI exists, otherwise nullptr.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	UUserWidget* GetWrapperWidget() const;
 	virtual UUserWidget* GetWrapperWidget_Implementation() const = 0;
 
 	/**
 	 * Removes the inventory UI.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	void RemoveWrapperWidget();
 	virtual void RemoveWrapperWidget_Implementation() = 0;
 	
@@ -158,7 +160,7 @@ public:
 	 * Handles the selection of a category in the inventory UI.
 	 * @param SelectedCategoryId The ID of the selected category.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Category")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Category")
 	void CategorySelected(const FString& SelectedCategoryId);
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
 
@@ -166,7 +168,7 @@ public:
 	 * Retrieves the currently selected category ID.
 	 * @return The ID of the currently selected category.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Category")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Category")
 	FString GetSelectedCategoryId() const;
 	virtual FString GetSelectedCategoryId_Implementation() const = 0;
 	
@@ -179,7 +181,7 @@ public:
 	 *
 	 * @return A pointer to the UWidget representing the active item widget, or nullptr if no widget is active.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	UWidget* GetActiveItemWidget() const;
 	virtual UWidget* GetActiveItemWidget_Implementation() const = 0;
 
@@ -188,7 +190,7 @@ public:
 	 *
 	 * @param NewActiveItemWidget The new widget to be set as the active item widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	void SetActiveItemWidget(UWidget* NewActiveItemWidget);
 	virtual void SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget) = 0;
 
@@ -196,7 +198,7 @@ public:
 	 * Processes an item that has been added to the inventory.
 	 * @param AddedItem The item that has been added to the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
 	void ProcessItemAdded(const FInventoryItem& AddedItem);
 	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) = 0;
 
@@ -204,7 +206,7 @@ public:
 	 * Processes an item that has been removed from the inventory.
 	 * @param RemovedItem The item that has been removed from the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
 	void ProcessItemRemoved(const FInventoryItem& RemovedItem);
 	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) = 0;
 
@@ -212,7 +214,7 @@ public:
 	 * Processes an item that has been modified in the inventory.
 	 * @param ModifiedItem The item that has been modified in the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
 	void ProcessItemModified(const FInventoryItem& ModifiedItem);
 	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) = 0;
 	
@@ -220,7 +222,7 @@ public:
 	 * Handles the selection of an item in the inventory UI.
 	 * @param SelectedItem The GUID of the selected item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
 	void ItemSelected(const FGuid& SelectedItem);
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
 
@@ -228,7 +230,7 @@ public:
 	 * Retrieves the currently active item GUID.
 	 * @return The GUID of the currently active item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
 	FGuid GetActiveItemGuid() const;
 	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
 	
@@ -239,17 +241,17 @@ public:
 	 * 
 	 * @return Custom Items Mpa if any specified.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
 	TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap() const;
 	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const = 0;
 	
 	/**
- * Adds (or replaces) a single entry in the custom items map.
- *
- * @param ItemTag   Gameplay tag representing the custom item key.
- * @param ItemId    Guid value associated with the item.
- */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	 * Adds (or replaces) a single entry in the custom items map.
+	 *
+	 * @param ItemTag   Gameplay tag representing the custom item key.
+	 * @param ItemId    Guid value associated with the item.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
 	void AddCustomItemToMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 
@@ -259,14 +261,14 @@ public:
 	 *
 	 * @param OtherItems   Map of custom items to merge in.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
 	void AppendCustomItemsMap(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) = 0;
 
 	/**
 	 * Clears all entries from the custom items map.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
 	void ClearCustomItemsMap();
 	virtual void ClearCustomItemsMap_Implementation() = 0;
 
@@ -278,7 +280,7 @@ public:
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
 	bool RemoveCustomItemFromMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 
@@ -291,79 +293,9 @@ public:
 	 * @param ItemId Item guid to search for
 	 * @return True if item is stored in such container, false otherwise
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
 	bool IsItemStoredInCustomMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
-
-		
-	// --- Slots
-
-	/**
-	 * Retrieves the saved inventory grid slots.
-	 *
-	 * This function provides a set of saved inventory grid slots, represented as FMounteaInventoryGridSlot objects.
-	 * It is used to maintain and manage the inventory layout, allowing you to save and restore UI states.
-	 *
-	 * @return A set of saved FMounteaInventoryGridSlot instances representing the current saved state of the inventory grid.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
-	TSet<FMounteaInventoryGridSlot> GetSavedSlots() const;
-	virtual TSet<FMounteaInventoryGridSlot> GetSavedSlots_Implementation() const = 0;
-
-	/**
-	 * Adds a single grid slot to the inventory.
-	 *
-	 * This function adds a single FMounteaInventoryGridSlot to the grid, allowing an item to be placed into a new slot.
-	 * 
-	 * @param SlotData The data of the slot being added to the grid.
-	 */
-	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
-	void AddSlot(const FMounteaInventoryGridSlot& SlotData);
-	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
-
-	/**
-	 * Removes a single grid slot from the inventory.
-	 *
-	 * This function removes a specific FMounteaInventoryGridSlot from the grid, effectively clearing that slot.
-	 *
-	 * @param SlotData The data of the slot being removed from the grid.
-	 */
-	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
-	void RemoveSlot(const FMounteaInventoryGridSlot& SlotData);
-	virtual void RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
-
-	/**
-	 * Adds multiple grid slots to the inventory.
-	 *
-	 * This function adds a collection of FMounteaInventoryGridSlots to the grid, expanding the inventory layout.
-	 *
-	 * @param SlotData A set of FMounteaInventoryGridSlot instances to be added to the grid.
-	 */
-	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
-	void AddSlots(const TSet<FMounteaInventoryGridSlot>& SlotData);
-	virtual void AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) = 0;
-
-	/**
-	 * Removes multiple grid slots from the inventory.
-	 *
-	 * This function removes a collection of FMounteaInventoryGridSlots from the grid, clearing those slots.
-	 *
-	 * @param SlotData A set of FMounteaInventoryGridSlot instances to be removed from the grid.
-	 */
-	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
-	void RemoveSlots(const TSet<FMounteaInventoryGridSlot>& SlotData);
-	virtual void RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData) = 0;
-
-	/**
-	 * Updates an existing grid slot in the inventory.
-	 *
-	 * This function updates the data of an existing FMounteaInventoryGridSlot, modifying the information of the slot.
-	 * 
-	 * @param SlotData The updated data of the grid slot to be modified.
-	 */
-	UFUNCTION(BlueprintNativeEvent,  Category="Mountea|Inventory & Equipment|Inventory|UI|Slots")
-	void UpdateSlot(const FMounteaInventoryGridSlot& SlotData);
-	virtual void UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 	
 	// --- General
 	
@@ -379,6 +311,75 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	void ExecuteWidgetCommand(const FString& Command, UObject* OptionalPayload);
 	virtual void ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload) = 0;
+	
+	// --- Item Actions
+
+	/**
+	 * Returns a snapshot of Selectable Item Actions currently waiting in the UI Manager queue.
+	 *
+	 * The returned array represents the current pending actions stored by the UI Manager. The queue does not
+	 * execute actions automatically; actions are expected to drive their own completion/cancellation flow and
+	 * notify the UI Manager when they should be removed.
+	 *
+	 * @return Array of queued Selectable Item Actions.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
+	TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue() const;
+	virtual TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue_Implementation() const = 0;
+
+	/**
+	 * Registers (enqueues) a Selectable Item Action together with an optional payload object.
+	 *
+	 * This queue acts as a lightweight registry of pending UI-gated actions. Enqueuing does not start execution,
+	 * tick, or advance any processing. The action itself is responsible for initiating UI interaction, waiting for
+	 * approval/decline, and then calling CompleteQueuedAction or CancelQueuedAction to remove itself from the queue.
+	 *
+	 * @param ItemAction Selectable Item Action to register.
+	 * @param Payload Optional data container/context associated with this queued action instance.
+	 *
+	 * @return True if the action was successfully enqueued, false otherwise (invalid action).
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
+	bool EnqueueItemAction(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
+	virtual bool EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) = 0;
+
+	/**
+	 * Removes all queued Selectable Item Actions from the UI Manager queue.
+	 *
+	 * This function clears the queue registry only. It does not attempt to complete or cancel individual actions,
+	 * nor does it notify them. Any UI or async work owned by the actions remains their responsibility.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
+	void EmptyItemActionsQueue();
+	virtual void EmptyItemActionsQueue_Implementation() = 0;
+
+	/**
+	 * Marks the specified queued Selectable Item Action as completed and removes it from the queue.
+	 *
+	 * This function is typically called by the action itself after its UI-gated flow has been approved and the action
+	 * has executed its final logic (e.g. consume amount selected in a modal). The UI Manager uses this call to stop
+	 * tracking the action in its pending registry.
+	 *
+	 * @param ItemAction Selectable Item Action to remove from the queue.
+	 * @param Payload Optional payload received for completion of the Action. Usually contains "returned" values (eg. how much quantity was requested to consume).
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
+	void CompleteQueuedAction(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
+	virtual void CompleteQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) = 0;
+
+	/**
+	 * Cancels the specified queued Selectable Item Action and removes it from the queue.
+	 *
+	 * This function is typically called by the action itself when the UI-gated flow is declined/cancelled
+	 * (e.g. modal closed, user pressed cancel). The UI Manager uses this call to stop tracking the action
+	 * in its pending registry.
+	 *
+	 * @param ItemAction Selectable Item Action to remove from the queue.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
+	void CancelQueuedAction(UMounteaSelectableInventoryItemAction* ItemAction);
+	virtual void CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction) = 0;
+
 
 	// --- Events
 	

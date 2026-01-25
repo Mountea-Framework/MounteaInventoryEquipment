@@ -19,6 +19,7 @@ enum class ECommonInputType : uint8;
 enum class EMounteaWidgetInputMethod : uint8;
 class UUserWidget;
 class UTextureCube;
+class UMounteaSelectableInventoryItemAction;
 
 /**
  * FInventoryItemData represents the pure logical data of a single inventory entry.
@@ -100,6 +101,13 @@ public:
 			*Item,
 			*QtyString
 		);
+	}
+	
+	bool IsDirty(const FInventoryItemData& PreviousState) const
+	{
+		if (*this != PreviousState)
+			return true;
+		return Quantity != PreviousState.Quantity;
 	}
 
 	bool operator==(const FInventoryItemData& Other) const
@@ -518,6 +526,49 @@ struct FMounteaWidgetInputActionMapping
 	// TODO:
 	// - allow remapping
 };
+
+#pragma region ItemActionsQueue
+
+struct FActionQueueEntry
+{
+	TObjectPtr<UMounteaSelectableInventoryItemAction> Action = nullptr;
+	TObjectPtr<UObject> Payload = nullptr;
+	FDateTime CreationTime;
+};
+
+struct FActionsQueue
+{
+	TArray<FActionQueueEntry> Pending;
+    
+	bool HasPending() const { return Pending.Num() > 0; }
+    
+	void Enqueue(FActionQueueEntry&& Entry)
+	{
+		Pending.Add(MoveTemp(Entry));
+	}
+    
+	bool Remove(UMounteaSelectableInventoryItemAction* Action)
+	{
+		const int32 index = Pending.IndexOfByPredicate([Action](const FActionQueueEntry& Entry)
+		{
+			return Entry.Action == Action;
+		});
+        
+		if (index != INDEX_NONE)
+		{
+			Pending.RemoveAt(index);
+			return true;
+		}
+		return false;
+	}
+    
+	void Clear()
+	{
+		Pending.Reset();
+	}
+};
+
+#pragma endregion 
 
 FORCEINLINE uint32 GetTypeHash(const FInventoryItemData& Data)
 {

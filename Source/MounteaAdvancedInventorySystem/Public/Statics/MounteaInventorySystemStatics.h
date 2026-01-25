@@ -27,10 +27,9 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventorySystemStatics : public
 
 public:
 
-	/*************************************************************/
-	/************************ INTERNAL ***********************/
-	/*************************************************************/
 	static bool CanExecuteCosmeticEvents(const UWorld* WorldContext);
+	
+public:
 
 	/**
 	 * Retrieves the given object if it is of the specified class type.
@@ -47,12 +46,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
 		meta = (ClassFilter = "Object"),
 		meta=(DeterminesOutputType = "ClassFilter"),
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Object By Class")
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 	
-	/*************************************************************/
-	/********************** BLUEPRINTABLE ************************/
-	/*************************************************************/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettingsConfig* GetMounteaAdvancedInventoryConfig();
@@ -127,10 +124,439 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
 	
+#pragma region K2NodeHelpers
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetIntPropertyValue(UObject* Target, FName PropertyName, int32 Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly,Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetFloatPropertyValue(UObject* Target, FName PropertyName, float Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetStringPropertyValue(UObject* Target, FName PropertyName, const FString& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetBoolPropertyValue(UObject* Target, FName PropertyName, bool Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetNamePropertyValue(UObject* Target, FName PropertyName, const FName& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetBytePropertyValue(UObject* Target, FName PropertyName, uint8 Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetGuidPropertyValue(UObject* Target, FName PropertyName, const FGuid& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetVectorPropertyValue(UObject* Target, FName PropertyName, const FVector& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetVector2DPropertyValue(UObject* Target, FName PropertyName, const FVector2D& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject* Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetSoftObjectPropertyValue(UObject* Target, FName PropertyName, const TSoftObjectPtr<UObject>& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetClassPropertyValue(UObject* Target, FName PropertyName, const TSubclassOf<UObject> Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool SetSoftClassPropertyValue(UObject* Target, FName PropertyName, const TSoftClassPtr<UObject>& Value);
+
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetIntPropertyValue(UObject* Target, FName PropertyName, int32& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetInt64PropertyValue(UObject* Target, FName PropertyName, int64& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetFloatPropertyValue(UObject* Target, FName PropertyName, float& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetStringPropertyValue(UObject* Target, FName PropertyName, FString& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetBoolPropertyValue(UObject* Target, FName PropertyName, bool& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetNamePropertyValue(UObject* Target, FName PropertyName, FName& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetBytePropertyValue(UObject* Target, FName PropertyName, uint8& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetGuidPropertyValue(UObject* Target, FName PropertyName, FGuid& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetVectorPropertyValue(UObject* Target, FName PropertyName, FVector& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetVector2DPropertyValue(UObject* Target, FName PropertyName, FVector2D& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject*& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetSoftObjectPropertyValue(UObject* Target, FName PropertyName, TSoftObjectPtr<UObject>& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetClassPropertyValue(UObject* Target, FName PropertyName, TSubclassOf<UObject>& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	static bool GetSoftClassPropertyValue(UObject* Target, FName PropertyName, TSoftClassPtr<UObject>& Value);
+
+#pragma endregion
+	
+public:
+	
 	template<typename TEnum>
-	static constexpr bool HasFlag(uint8 value, TEnum flag)
+	static constexpr bool HasFlag(const uint8 value, TEnum Flag)
 	{
 		static_assert(std::is_enum<TEnum>::value, "TEnum must be an enum type.");
-		return (value & static_cast<uint8>(flag)) != 0;
+		return (value & static_cast<uint8>(Flag)) != 0;
+	}
+	
+	template<typename T, typename PropertyType>
+	static bool SetPropertyValueInternal(UObject* Target, const FName PropertyName, const T Value)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		PropertyType* typedProperty = CastField<PropertyType>(targetProperty);
+		if (!typedProperty)
+			return false;
+
+		void* propertyAddress = typedProperty->template ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		typedProperty->SetPropertyValue(propertyAddress, Value);
+		return true;
+	}
+	
+	template<typename T, typename PropertyType>
+	static bool GetPropertyValueInternal(UObject* Target, const FName PropertyName, T& OutValue)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		PropertyType* typedProperty = CastField<PropertyType>(targetProperty);
+		if (!typedProperty)
+			return false;
+
+		const void* propertyAddress = typedProperty->template ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		OutValue = typedProperty->GetPropertyValue(propertyAddress);
+		return true;
+	}
+	
+	template<typename T>
+	static bool SetStructPropertyValueInternal(UObject* Target, const FName PropertyName, const T& Value)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FStructProperty* structProperty = CastField<FStructProperty>(targetProperty);
+		if (!structProperty)
+			return false;
+
+		// CRITICAL: Validate struct type matches
+		if (structProperty->Struct != TBaseStructure<T>::Get())
+			return false;
+
+		void* propertyAddress = structProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		*static_cast<T*>(propertyAddress) = Value;
+		return true;
+	}
+
+	template<typename T>
+	static bool GetStructPropertyValueInternal(UObject* Target, const FName PropertyName, T& OutValue)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FStructProperty* structProperty = CastField<FStructProperty>(targetProperty);
+		if (!structProperty)
+			return false;
+
+		// CRITICAL: Validate struct type matches
+		if (structProperty->Struct != TBaseStructure<T>::Get())
+			return false;
+
+		const void* propertyAddress = structProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		OutValue = *static_cast<const T*>(propertyAddress);
+		return true;
+	}
+	
+	template<typename T>
+	static bool SetSoftObjectPropertyValueInternal(UObject* Target, const FName PropertyName, const TSoftObjectPtr<T>& Value)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FSoftObjectProperty* softObjectProperty = CastField<FSoftObjectProperty>(targetProperty);
+		if (!softObjectProperty)
+			return false;
+
+		// Validate class compatibility
+		if (Value.IsValid())
+		{
+			UObject* loadedObject = Value.LoadSynchronous();
+			if (loadedObject && !loadedObject->IsA(softObjectProperty->PropertyClass))
+				return false;
+		}
+
+		void* propertyAddress = softObjectProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		*static_cast<TSoftObjectPtr<T>*>(propertyAddress) = Value;
+		return true;
+	}
+
+	template<typename T>
+	static bool GetSoftObjectPropertyValueInternal(UObject* Target, const FName PropertyName, TSoftObjectPtr<T>& OutValue)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FSoftObjectProperty* softObjectProperty = CastField<FSoftObjectProperty>(targetProperty);
+		if (!softObjectProperty)
+			return false;
+
+		const void* propertyAddress = softObjectProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		OutValue = *static_cast<const TSoftObjectPtr<T>*>(propertyAddress);
+		return true;
+	}
+	
+	template<typename T>
+	static bool SetClassPropertyValueInternal(UObject* Target, const FName PropertyName, const TSubclassOf<T>& Value)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FClassProperty* classProperty = CastField<FClassProperty>(targetProperty);
+		if (!classProperty)
+			return false;
+
+		// Validate metaclass compatibility
+		if (Value && !Value->IsChildOf(classProperty->MetaClass))
+			return false;
+
+		void* propertyAddress = classProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		*static_cast<TSubclassOf<T>*>(propertyAddress) = Value;
+		return true;
+	}
+
+	template<typename T>
+	static bool GetClassPropertyValueInternal(UObject* Target, const FName PropertyName, TSubclassOf<T>& OutValue)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FClassProperty* classProperty = CastField<FClassProperty>(targetProperty);
+		if (!classProperty)
+			return false;
+
+		const void* propertyAddress = classProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		OutValue = *static_cast<const TSubclassOf<T>*>(propertyAddress);
+		return true;
+	}
+	
+	template<typename T>
+	static bool SetSoftClassPropertyValueInternal(UObject* Target, const FName PropertyName, const TSoftClassPtr<T>& Value)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FSoftClassProperty* softClassProperty = CastField<FSoftClassProperty>(targetProperty);
+		if (!softClassProperty)
+			return false;
+
+		// Validate metaclass compatibility
+		if (Value.IsValid())
+		{
+			UClass* loadedClass = Value.LoadSynchronous();
+			if (loadedClass && !loadedClass->IsChildOf(softClassProperty->MetaClass))
+				return false;
+		}
+
+		void* propertyAddress = softClassProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		*static_cast<TSoftClassPtr<T>*>(propertyAddress) = Value;
+		return true;
+	}
+
+	template<typename T>
+	static bool GetSoftClassPropertyValueInternal(UObject* Target, const FName PropertyName, TSoftClassPtr<T>& OutValue)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FSoftClassProperty* softClassProperty = CastField<FSoftClassProperty>(targetProperty);
+		if (!softClassProperty)
+			return false;
+
+		const void* propertyAddress = softClassProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		OutValue = *static_cast<const TSoftClassPtr<T>*>(propertyAddress);
+		return true;
+	}
+	
+	static bool SetObjectPropertyValueInternal(UObject* Target, const FName PropertyName, UObject* Value)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FObjectProperty* objectProperty = CastField<FObjectProperty>(targetProperty);
+		if (!objectProperty)
+			return false;
+
+		// CRITICAL: Validate object class compatibility
+		if (Value && !Value->IsA(objectProperty->PropertyClass))
+			return false;
+
+		void* propertyAddress = objectProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		objectProperty->SetObjectPropertyValue(propertyAddress, Value);
+		return true;
+	}
+	static bool GetObjectPropertyValueInternal(UObject* Target, const FName PropertyName, UObject*& OutValue)
+	{
+		if (!IsValid(Target))
+			return false;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return false;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		if (!targetProperty)
+			return false;
+
+		FObjectProperty* objectProperty = CastField<FObjectProperty>(targetProperty);
+		if (!objectProperty)
+			return false;
+
+		const void* propertyAddress = objectProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return false;
+
+		OutValue = objectProperty->GetObjectPropertyValue(propertyAddress);
+		return true;
 	}
 };

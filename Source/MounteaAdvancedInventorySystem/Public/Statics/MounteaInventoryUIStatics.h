@@ -227,7 +227,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Items",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI ManagerFind Item")
+		DisplayName="Inventory UI Manager - Find Item")
 	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
@@ -236,9 +236,9 @@ public:
 	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @return Custom Items Mpa if any specified.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI ManagerGet Custom Items")
+		DisplayName="Inventory UI Manager - Get Custom Items")
 	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
@@ -248,9 +248,9 @@ public:
 	 * @param ItemTag    Gameplay tag representing the custom item key.
 	 * @param ItemId     Guid value associated with the item.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI ManagerAdd Custom Item")
+		DisplayName="Inventory UI Manager - Add Custom Item")
 	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FGameplayTag& ItemTag,
 		const FGuid& ItemId);
 	
@@ -261,9 +261,9 @@ public:
 	 * @param Target       UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param OtherItems   Map of custom items to append.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI ManagerAppend Custom Items")
+		DisplayName="Inventory UI Manager - Append Custom Items")
 	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 
@@ -272,9 +272,9 @@ public:
 	 *
 	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI ManagerClear Custom Items")
+		DisplayName="Inventory UI Manager - Clear Custom Items")
 	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
@@ -286,10 +286,10 @@ public:
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Setter"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Inventory UI ManagerRemove Custom Item")
+		meta=(ExpandBoolAsExecs="ReturnValue"),		
+		DisplayName="Inventory UI Manager - Remove Custom Item")
 	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
 	
@@ -303,9 +303,9 @@ public:
 	 * @param ItemId Item guid to search for
 	 * @return True if item is stored in such container, false otherwise
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Validate"),
-		DisplayName="Inventory UI ManagerIs Item Stored In Custom Map")
+		DisplayName="Inventory UI Manager - Is Item Stored In Custom Map")
 	static bool IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
 	
@@ -319,11 +319,106 @@ public:
 	 * @param Command Command to Process
 	 * @param OptionalPayload Optional Payload to pass with the command
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Commands",
 		meta=(CustomTag="MounteaK2Setter,MounteaK2Command"),
-		DisplayName="Inventory UI Manager Execute Widget Command")
+		DisplayName="Inventory UI Manager - Execute Widget Command")
 	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		const FString& Command, UObject* OptionalPayload);
+	
+	/**
+	 * Returns a snapshot of the currently queued Item Actions waiting to be processed.
+	 *
+	 * ItemActionsQueue order reflects processing order (FIFO), where the first element is the next action to execute.
+	 *
+	 * @param Target UI Manager to execute the logic on
+	 * 
+	 * @return Array of queued Item Actions.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Inventory UI Manager - Get Item Actions Queue")
+	static TArray<UMounteaSelectableInventoryItemAction*> GetItemActionsQueue(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	
+	/**
+	 * Enqueues a single Item Action to be executed by the UI Manager.
+	 *
+	 * The provided Payload is passed forward to the action execution and can represent any context data
+	 * required for processing (such as the targeted item, owning inventory, UI widget, etc.).
+	 *
+	 * @param Target UI Manager to execute the logic on
+	 * @param ItemAction Item Action to enqueue.
+	 * @param Payload Optional context object passed to the queued action.
+	 *
+	 * @return True if the action was successfully enqueued, false otherwise (invalid action, queue disabled, etc.).
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="add"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Inventory UI Manager - Enqueue Item Action")
+	static bool EnqueueItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+		UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
+	
+	/**
+	 * Removes all queued Selectable Item Actions from the UI Manager queue.
+	 *
+	 * This function clears the queue registry only. It does not attempt to complete or cancel individual actions,
+	 * nor does it notify them. Any UI or async work owned by the actions remains their responsibility.
+	 * 
+	 * @param Target UI Manager to execute the logic on
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="clear"),
+		DisplayName="Inventory UI Manager - Empty Item Actions Queue")
+	static void EmptyItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	
+	/**
+	 * Marks the specified queued Selectable Item Action as completed and removes it from the queue.
+	 *
+	 * This function is typically called by the action itself after its UI-gated flow has been approved and the action
+	 * has executed its final logic (e.g. consume amount selected in a modal). The UI Manager uses this call to stop
+	 * tracking the action in its pending registry.
+	 *
+	 * @param Target UI Manager to execute the logic on
+	 * @param ItemAction Selectable Item Action to remove from the queue.
+	 * @param Payload Optional payload received for completion of the Action. Usually contains "returned" values (eg. how much quantity was requested to consume).
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI Manager - Complete Item Action")
+	static void CompleteQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
+	
+	/**
+	 * Cancels the specified queued Selectable Item Action and removes it from the queue.
+	 *
+	 * This function is typically called by the action itself when the UI-gated flow is declined/cancelled
+	 * (e.g. modal closed, user pressed cancel). The UI Manager uses this call to stop tracking the action
+	 * in its pending registry.
+	 *
+	 * @param Target UI Manager to execute the logic on
+	 * @param ItemAction Selectable Item Action to remove from the queue.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI Manager - Cancel Item Action")
+	static void CancelQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UMounteaSelectableInventoryItemAction* ItemAction);
+	
+	/**
+	 * Removes the specified queued Selectable Item Action from the queue.
+	 *
+	 * This function is typically called by the action itself once the action is completed.
+	 *
+	 * @param Target UI Manager to execute the logic on
+	 * @param ItemAction Selectable Item Action to remove from the queue.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Inventory UI Manager - Remove Item Action")
+	static void RemoveQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UMounteaSelectableInventoryItemAction* ItemAction);
 	
 #pragma endregion
 	
@@ -721,7 +816,8 @@ public:
 	 * @return True if the tag was added (was not present before). False if invalid or already present.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Add Wrapper Widget State Tag")
 	static bool AddWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag);
@@ -737,7 +833,8 @@ public:
 	 * @return True if the tag was removed. False if invalid or not found.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Remove Wrapper Widget State Tag")
 	static bool RemoveWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag);
@@ -755,7 +852,7 @@ public:
 	 * @return True if the Wrapper currently reports the tag as active; otherwise false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Has Wrapper Widget State Tag")
 	static bool HasWidgetStateTag(UObject* Target,
 		const FGameplayTag& Tag, bool bExactMatch = true);
@@ -772,7 +869,7 @@ public:
 	 * @param Target The target Wrapper widget interface whose states will be cleared.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Clear Wrapper Widget State Tags")
 	static void ClearWidgetStateTags(UObject* Target);
 
@@ -787,7 +884,8 @@ public:
 	 * @return True if at least one new tag was added. False if empty or all tags were already present.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Function"),
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Append Wrapper Widget State Tags")
 	static bool AppendWidgetStateTags(UObject* Target,
 		const FGameplayTagContainer& TagsToAppend);
@@ -812,7 +910,8 @@ public:
 	 * @param NewNotificationContainer The user widget to use as the notification container
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
 	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewNotificationContainer);
 
 	/**
@@ -821,7 +920,8 @@ public:
 	 * @param NotificationData The data structure containing all notification parameters (text, duration, etc.)
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
 	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryNotificationData& NotificationData);
 
 	/**
@@ -829,7 +929,8 @@ public:
 	 * @param Target The UI interface to remove notifications from
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
-		meta=(CustomTag="MounteaK2Setter"))
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"))
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 #pragma endregion
@@ -1002,6 +1103,21 @@ public:
 	
 	// --- Item Action
 #pragma region ItemActions
+	
+	/**
+	 * Checks if the specified flags are set in the value.
+	 * @param Value - The value to check
+	 * @param FlagMask - The flag(s) to check for
+	 * @return - True if all flags in the mask are set in the value
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|UI|Item Action", 
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Item Action - Does Have Flag")
+	static bool ItemAction_HasFlag(const uint8 Value, 
+		UPARAM(meta = (Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback")) const int32 FlagMask)
+	{
+		return (Value & FlagMask) == FlagMask;
+	}
 
 	/**
 	 * Initializes the item action widget with the Initiator UI and item action data.
@@ -1163,16 +1279,7 @@ public:
 	// --- OLD
 	
 	// --- Theme
-#pragma region Theme
-
-	/**
-	 * Applies the specified theme to the given user widget.
-	 * This function ensures that the provided widget is valid and executes the ApplyTheme logic via the Mountea Inventory Generic Widget Interface.
-	 *
-	 * @param Target The user widget to which the theme will be applied. Must be a valid object.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Setter"))
-	static void ApplyTheme(UWidget* Target);
+#pragma region Theme	
 
 	/**
 	 * Retrieves the theme configuration for the Mountea Advanced Inventory system.
@@ -1254,7 +1361,7 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Inventory UI ManagerGet Active Item Widget")
+		DisplayName="Inventory UI Manager - Get Active Item Widget")
 	static UWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
@@ -1265,7 +1372,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
 		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Inventory UI ManagerSet Active Item Widget")
+		DisplayName="Inventory UI Manager - Set Active Item Widget")
 	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UWidget* NewActiveItemWidget);
 
 #pragma endregion
@@ -1392,6 +1499,19 @@ public:
 		DisplayName="Make New Inventory Inventory Item Widget Data",
 		meta=(NativeMakeFunc))
 	static FInventoryItemData MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity);
+
+	/**
+	 * Validates whether Item Widget Data has changed (Widget is Dirty for re-render).
+	 * 
+	 * @param NewState New expected state of Data
+	 * @param OldState Previous state of Data
+	 * @return true if anything changed, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(Keywords="dirty,check,validate,equal,=="),
+		DisplayName="Compare Item Widget Data")
+	static bool CompareItemWidgetData(const FInventoryItemData& NewState, const FInventoryItemData& OldState);
 	
 	/**
 	 * Selects this inventory item in the UI.

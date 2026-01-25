@@ -14,6 +14,7 @@
 
 #include "Algo/AnyOf.h"
 #include "Blueprint/UserWidget.h"
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
 
@@ -60,34 +61,40 @@ void UMounteaInventoryUIComponent::BeginPlay()
 		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
 		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
-		auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
-		if (!IsValid(inventoryComponent))
-			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! UI will NOT work!"))
-		else
-		{
-			Execute_SetParentInventory(this, inventoryComponent);
-			ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
-
-			ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
-			
-			ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
-			ParentInventory->GetOnItemRemovedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemRemoved);
-
-			ParentInventory->GetOnItemDurabilityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemDurabilityChanged);
-			ParentInventory->GetOnItemQuantityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemQuantityChanged);
-		}
+		Execute_EmptyItemActionsQueue(this); // Do NOT receive any queue items
 		
-		const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
-			UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
-		if (!inventoryUISubsystem)
-			LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will NOT work!"))
-		else
-			inventoryUISubsystem->RegisterInventoryUIManager(this);
+		{
+			auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
+			if (!IsValid(inventoryComponent))
+				LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! UI will NOT work!"))
+			else
+			{
+				Execute_SetParentInventory(this, inventoryComponent);
+				ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
+
+				ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
+			
+				ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
+				ParentInventory->GetOnItemRemovedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemRemoved);
+
+				ParentInventory->GetOnItemDurabilityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemDurabilityChanged);
+				ParentInventory->GetOnItemQuantityChangedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemQuantityChanged);
+			}
+		
+			const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
+				UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
+			if (!inventoryUISubsystem)
+				LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory UI Subsystem'. UI will NOT work!"))
+			else
+				inventoryUISubsystem->RegisterInventoryUIManager(this);
+		}
 	}
 }
 
 void UMounteaInventoryUIComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	Execute_EmptyItemActionsQueue(this); // we don't care if this runs on server I guess?
+	
 	switch (EndPlayReason)
 	{		
 		case EEndPlayReason::EndPlayInEditor:
@@ -97,7 +104,9 @@ void UMounteaInventoryUIComponent::EndPlay(const EEndPlayReason::Type EndPlayRea
 		case EEndPlayReason::LevelTransition:
 		case EEndPlayReason::Quit:
 			{
-				if (GetOwner() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+				if (GetOwner() && 
+					(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
+					UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 				{
 					const auto inventoryUISubsystem = UMounteaInventoryUIStatics::GetInventoryUISubsystem(
 						UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3));
@@ -464,21 +473,17 @@ void UMounteaInventoryUIComponent::AddCustomItemToMap_Implementation(const FGame
 	}	
 }
 
-
-void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability,
-                                                                const float NewDurability)
+void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability, const float NewDurability)
 {
 	Execute_ProcessItemModified(this, Item);
 }
 
-void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity,
-	const int32 NewQuantity)
+void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
 {
 	Execute_ProcessItemModified(this, Item);
 }
 
-bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag,
-	const FGuid& ItemId)
+bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
 	FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
 	if (!foundData || foundData->StoredIds.IsEmpty())
@@ -495,8 +500,7 @@ bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const 
 	return removedCount > 0;
 }
 
-bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag,
-                                                                          const FGuid& ItemId)
+bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
 	const FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
 	if (!foundData)
@@ -508,35 +512,75 @@ bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const 
 	});
 }
 
-void UMounteaInventoryUIComponent::AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
-{
-	SavedGridSlots.Add(SlotData);
-}
-
-void UMounteaInventoryUIComponent::RemoveSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
-{
-	SavedGridSlots.Remove(SlotData);
-}
-
-void UMounteaInventoryUIComponent::AddSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
-{
-	SavedGridSlots.Append(SlotData);
-}
-
-void UMounteaInventoryUIComponent::RemoveSlots_Implementation(const TSet<FMounteaInventoryGridSlot>& SlotData)
-{
-	SavedGridSlots = SavedGridSlots.Difference(SlotData);
-}
-
-void UMounteaInventoryUIComponent::UpdateSlot_Implementation(const FMounteaInventoryGridSlot& SlotData)
-{
-	if (SavedGridSlots.Contains(SlotData))
-		SavedGridSlots.Remove(SlotData);
-	SavedGridSlots.Add(SlotData);
-}
-
 void UMounteaInventoryUIComponent::ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload)
 {
 	if (WrapperWidget && WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, Command, OptionalPayload);
+}
+
+bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
+{
+	if (!IsValid(ItemAction))
+		return false;
+    
+	FActionQueueEntry entry;
+	entry.Action = ItemAction;
+	entry.Payload = Payload;
+	entry.CreationTime = FDateTime::Now();
+    
+	ActionsQueue.Enqueue(MoveTemp(entry));
+    
+	return true;
+}
+
+void UMounteaInventoryUIComponent::CompleteQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
+{
+	if (!IsValid(ItemAction))
+		return;
+    
+	ItemAction->ExecuteQueuedAction(Payload);
+	ActionsQueue.Remove(ItemAction);
+}
+
+void UMounteaInventoryUIComponent::CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction)
+{
+	if (!IsValid(ItemAction))
+		return;
+	
+	ItemAction->CancelInventoryAction();
+	ActionsQueue.Remove(ItemAction);
+}
+
+/* TODO: do some cleanup, like every 30 seconds? Make it into UI Config?
+void UMounteaInventoryUIComponent::CleanupExpiredActions_Implementation(float MaxAgeSeconds)
+{
+	FTimespan maxAge = FTimespan::FromSeconds(MaxAgeSeconds);
+	FDateTime now = FDateTime::Now();
+    
+	for (int32 i = ActionsQueue.Pending.Num() - 1; i >= 0; --i)
+	{
+		const FActionQueueEntry& entry = ActionsQueue.Pending[i];
+		if ((now - entry.CreationTime) > maxAge && entry.Action)
+			Execute_CancelQueuedAction(this, entry.Action.Get());
+	}
+}
+*/
+
+void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
+{
+	ActionsQueue.Clear();
+}
+
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetItemActionsQueue_Implementation() const
+{
+	TArray<UMounteaSelectableInventoryItemAction*> result;
+	result.Reserve(ActionsQueue.Pending.Num());
+    
+	for (const FActionQueueEntry& entry : ActionsQueue.Pending)
+	{
+		if (entry.Action)
+			result.Add(entry.Action.Get());
+	}
+    
+	return result;
 }
