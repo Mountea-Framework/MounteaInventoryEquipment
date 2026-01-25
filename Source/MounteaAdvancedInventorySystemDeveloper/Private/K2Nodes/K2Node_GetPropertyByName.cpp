@@ -136,11 +136,10 @@ UFunction* UK2Node_GetPropertyByName::GetTargetFunction(const UEdGraphPin* Value
 	if (!ValuePin)
 		return nullptr;
 
-	const bool bValidLinks = ValuePin->LinkedTo.Num() > 0;
-	if (!bValidLinks)
-		return nullptr;
-
 	const FEdGraphPinType& effectiveType = GetEffectiveType(ValuePin);
+	
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Wildcard)
+		return nullptr;
 
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetIntPropertyValue));
@@ -181,12 +180,14 @@ void UK2Node_GetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	UEdGraphPin* valuePin = FindPinChecked(ValuePinName);
 	UEdGraphPin* returnValuePin = FindPinChecked(ReturnValuePinName);
 
+	/*
 	if (valuePin->LinkedTo.Num() == 0)
 	{
 		CompilerContext.MessageLog.Error(*LOCTEXT("NoValueConsumer", "@@ must have Value pin connected").ToString(), this);
 		BreakAllNodeLinks();
 		return;
 	}
+	*/
 
 	UFunction* targetFunction = GetTargetFunction(valuePin);
 	if (!targetFunction)
