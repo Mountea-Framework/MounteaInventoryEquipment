@@ -49,7 +49,17 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Object By Class")
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
-	
+
+	/**
+	 * Retrieves actually used Inventory Config.
+	 * If no Inventory Config is setup, null is returned instead.
+	 * 
+	 * Inventory Config is to be selected in:
+	 * * Project Settings
+	 * * * Mountea Inventor & Equipment
+	 * 
+	 * @return Inventory Config, or null
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettingsConfig* GetMounteaAdvancedInventoryConfig();
@@ -63,7 +73,8 @@ public:
 	 * @return The modified text with the replacements applied.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Replace Regex (Text)")
 	static FText ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText);
 	static FString EscapeRegexSpecialChars(const FString& Input);
 
@@ -76,7 +87,8 @@ public:
 	 * @return The modified string with the replacements applied.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Replace Regex (String)")
 	static FString ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText);
 
 	/**
@@ -86,7 +98,8 @@ public:
 	 * @return 
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Gameplay Tag")
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
 
 	/**
@@ -97,7 +110,9 @@ public:
 	 * @return An invalid FGuid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Guid",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(CompactNodeTitle="Invalid Guid"),
+		DisplayName="Invalid Guid")
 	static FGuid GetInvalidGuid() { return FGuid(); };
 
 	/**
@@ -110,7 +125,8 @@ public:
 	 * @return The actor that owns the specified component, or nullptr if the component is invalid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Owner",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Owning Actor")
 	static AActor* GetOwningActor(const UObject* Target);
 
 	/**
@@ -121,7 +137,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Assets", 
 		meta = (DeterminesOutputType = "FilterClass"),
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Assets")
 	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
 	
 #pragma region K2NodeHelpers
@@ -145,15 +162,6 @@ public:
 	static bool SetBytePropertyValue(UObject* Target, FName PropertyName, uint8 Value);
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
-	static bool SetGuidPropertyValue(UObject* Target, FName PropertyName, const FGuid& Value);
-	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
-	static bool SetVectorPropertyValue(UObject* Target, FName PropertyName, const FVector& Value);
-	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
-	static bool SetVector2DPropertyValue(UObject* Target, FName PropertyName, const FVector2D& Value);
-	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject* Value);
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
@@ -164,6 +172,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool SetSoftClassPropertyValue(UObject* Target, FName PropertyName, const TSoftClassPtr<UObject>& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"))
+	static bool SetGenericStructPropertyValue(UObject* Target, FName PropertyName, const int32& Value);
 
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
@@ -188,15 +199,6 @@ public:
 	static bool GetBytePropertyValue(UObject* Target, FName PropertyName, uint8& Value);
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
-	static bool GetGuidPropertyValue(UObject* Target, FName PropertyName, FGuid& Value);
-	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
-	static bool GetVectorPropertyValue(UObject* Target, FName PropertyName, FVector& Value);
-
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
-	static bool GetVector2DPropertyValue(UObject* Target, FName PropertyName, FVector2D& Value);
-	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool GetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject*& Value);
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
@@ -207,16 +209,23 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
 	static bool GetSoftClassPropertyValue(UObject* Target, FName PropertyName, TSoftClassPtr<UObject>& Value);
+	
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"))
+	static bool GetGenericStructPropertyValue(UObject* Target, FName PropertyName, int32& Value);
+
+	
+	DECLARE_FUNCTION(execSetGenericStructPropertyValue);
+	DECLARE_FUNCTION(execGetGenericStructPropertyValue);
 
 #pragma endregion
 	
 public:
 	
 	template<typename TEnum>
-	static constexpr bool HasFlag(const uint8 value, TEnum Flag)
+	static constexpr bool HasFlag(const uint8 Value, TEnum Flag)
 	{
 		static_assert(std::is_enum<TEnum>::value, "TEnum must be an enum type.");
-		return (value & static_cast<uint8>(Flag)) != 0;
+		return (Value & static_cast<uint8>(Flag)) != 0;
 	}
 	
 	template<typename T, typename PropertyType>
@@ -268,66 +277,6 @@ public:
 			return false;
 
 		OutValue = typedProperty->GetPropertyValue(propertyAddress);
-		return true;
-	}
-	
-	template<typename T>
-	static bool SetStructPropertyValueInternal(UObject* Target, const FName PropertyName, const T& Value)
-	{
-		if (!IsValid(Target))
-			return false;
-
-		UClass* targetClass = Target->GetClass();
-		if (!targetClass)
-			return false;
-
-		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
-		if (!targetProperty)
-			return false;
-
-		FStructProperty* structProperty = CastField<FStructProperty>(targetProperty);
-		if (!structProperty)
-			return false;
-
-		// CRITICAL: Validate struct type matches
-		if (structProperty->Struct != TBaseStructure<T>::Get())
-			return false;
-
-		void* propertyAddress = structProperty->ContainerPtrToValuePtr<void>(Target);
-		if (!propertyAddress)
-			return false;
-
-		*static_cast<T*>(propertyAddress) = Value;
-		return true;
-	}
-
-	template<typename T>
-	static bool GetStructPropertyValueInternal(UObject* Target, const FName PropertyName, T& OutValue)
-	{
-		if (!IsValid(Target))
-			return false;
-
-		UClass* targetClass = Target->GetClass();
-		if (!targetClass)
-			return false;
-
-		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
-		if (!targetProperty)
-			return false;
-
-		FStructProperty* structProperty = CastField<FStructProperty>(targetProperty);
-		if (!structProperty)
-			return false;
-
-		// CRITICAL: Validate struct type matches
-		if (structProperty->Struct != TBaseStructure<T>::Get())
-			return false;
-
-		const void* propertyAddress = structProperty->ContainerPtrToValuePtr<void>(Target);
-		if (!propertyAddress)
-			return false;
-
-		OutValue = *static_cast<const T*>(propertyAddress);
 		return true;
 	}
 	
