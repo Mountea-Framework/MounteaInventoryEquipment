@@ -74,12 +74,21 @@ bool UK2Node_SetPropertyByName::IsConnectionDisallowed(const UEdGraphPin* MyPin,
 
 		bool bSupported = false;
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Int);
-		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Int64);
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Real);
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean);
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_String);
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Name);
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Byte);
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Object);
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject);
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass);
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Class);
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && 
+					   OtherPin->PinType.PinSubCategoryObject == TBaseStructure<FVector>::Get());
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && 
+					   OtherPin->PinType.PinSubCategoryObject == TBaseStructure<FVector2D>::Get());
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && 
+					   OtherPin->PinType.PinSubCategoryObject == TBaseStructure<FGuid>::Get());
 
 		if (!bSupported)
 		{
@@ -131,16 +140,33 @@ UFunction* UK2Node_SetPropertyByName::GetTargetFunction(const UEdGraphPin* Value
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int || 
 		effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int64)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetIntPropertyValue));
-	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Real)
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Real)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetFloatPropertyValue));
-	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Boolean)
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Boolean)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetBoolPropertyValue));
-	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_String)
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_String)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetStringPropertyValue));
-	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Name)
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Name)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetNamePropertyValue));
-	else if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Byte)
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Byte)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetBytePropertyValue));
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_SoftObject)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetSoftObjectPropertyValue));
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_SoftClass)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetSoftClassPropertyValue));
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Class)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetClassPropertyValue));
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+	{
+		if (effectiveType.PinSubCategoryObject == TBaseStructure<FVector>::Get())
+			return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetVectorPropertyValue));
+    
+		if (effectiveType.PinSubCategoryObject == TBaseStructure<FVector2D>::Get())
+			return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetVector2DPropertyValue));
+    
+		if (effectiveType.PinSubCategoryObject == TBaseStructure<FGuid>::Get())
+			return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetGuidPropertyValue));
+	}
 
 	return nullptr;
 }
