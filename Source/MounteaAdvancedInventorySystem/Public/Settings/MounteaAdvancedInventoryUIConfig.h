@@ -38,7 +38,7 @@ public:
 	// --- UI Inputs
 	
 	/** Discrete UI actions (Close, Confirm, ContextMenu, NextTab, PreviousTab, etc.). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|🎮 Inputs",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🎮 Inputs",
 		meta=(ShowOnlyInnerProperties),
 		meta=(TitleProperty="ActionTag"),
 		meta=(NoResetToDefault),
@@ -50,7 +50,7 @@ public:
 	/** Widget class used as the main user interface wrapper (root HUD panel, container for other widgets, 
 	 * like Inventory, Equipment, Crafting menu etc.). This Wrapper should be used for other UI systems to
 	 * avoid Z-oder fighting.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🧩 Wrapper",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wrapper",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
@@ -58,7 +58,7 @@ public:
 	// --- Inventory
 	
 	/** Widget class used to display the inventory itself (slots, items, navigation inside the inventory). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🎒 Inventory",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
@@ -66,35 +66,35 @@ public:
 	// ---- Notifications
 	
 	/** Widget class that acts as a container for all inventory notifications (list / stack of notification widgets). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🔔 Notifications",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
 	
 	/** Widget class used for a single inventory notification entry (one message / card in the notification container). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🔔 Notifications",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
 	
 	/** Material used for rendering individual notification cards (background, styling, effects). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🔔 Notifications|💳 Notification Card")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
 	TSoftObjectPtr<UMaterialInterface> NotificationCardMaterial = nullptr;
 	
 	/** Default size (in Slate units) of the notification card widget when rendered on screen. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🔔 Notifications|💳 Notification Card")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
 	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
 	
 	// ---- Categories
 	
 	/** Widget class used as a container for all inventory categories (tabs, filters, or category list). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🗂 Categories",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Categories",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoriesWrapperWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> CategoriesContainerWidgetClass;
 	
 	/** Widget class representing a single inventory category entry (one category button / tab). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🗂 Categories",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Categories",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> CategoryWidgetClass;
@@ -102,13 +102,13 @@ public:
 	// ---- Items
 	
 	/** Widget class used as a container for inventory item widgets (grid, list, or panel of item slots). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|📦 Items",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> ItemsContainerWidgetClass;
 	
 	/** Widget class representing a single inventory item (slot visual, icon, quantity, tooltip, etc.). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|📦 Items",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> ItemWidgetClass;
@@ -116,13 +116,13 @@ public:
 	// ---- Item
 	
 	/** Widget class used to detailed Item Information. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🏺 Item",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemPanelWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> ItemPanelWidgetClass;
 	
 	/** Widget class used to display Tooltip information of currently selected/hovered item. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🏺 Item",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryTooltipWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> ItemTooltipWidgetClass;
@@ -130,28 +130,36 @@ public:
 	// ---- Item Actions
 	
 	/** Widget class used display list of available Item Actions. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🎛 Item Action",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionsContainerWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> ItemActionsContainerWidgetClass;
 	
 	/** Widget class used to display individual Item Actions. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🎛 Item Action",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionWidgetInterface"),
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UUserWidget> ItemActionWidgetClass;
 	
+	// ---- Modal
+	
+	/** Widget class used to display Modal Window. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Modals",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"),
+		meta=(NoResetToDefault))
+	TSoftClassPtr<UUserWidget> InventoryModalWidgetClass;
+	
 	// ---- Fonts
 	
 	/** Default font settings used across the inventory user interface (labels, counters, titles). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|🔤 Font",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "🔤 Font",
 		meta=(NoResetToDefault))
 	FSlateFontInfo DefaultFont;
-	
+		
 	// ---- Settings
 	
 	/** Defines list of available Widget Commands. Those are available using custom ProcessWidgetCommand Node.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="✨ UserInterface|🎚 Config", 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="⚙ Config & Settings", 
 		meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;
 	
@@ -163,12 +171,12 @@ public:
 	 *
 	 * ⚠ Can result in performance impact on lower-end machines, especially with huge amounts of items!
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|⚙ Settings", 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings", 
 		DisplayName="⚠ Always Stack Stackable Items")
 	uint8 bAlwaysStackStackableItems : 1;
 
 	/** Determines if the inventory system allows drag-and-drop operations for items. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|⚙ Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings")
 	uint8 bAllowDragAndDrop : 1;
 	
 public:

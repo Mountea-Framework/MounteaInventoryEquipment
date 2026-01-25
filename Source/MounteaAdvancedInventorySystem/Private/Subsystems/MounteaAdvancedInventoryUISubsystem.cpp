@@ -63,3 +63,8 @@ UObject* UMounteaAdvancedInventoryUISubsystem::GetInventoryUIManager() const
 {
 	return InventoryUIManager.GetObject();
 }
+
+TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> UMounteaAdvancedInventoryUISubsystem::GetInventoryUIManager_Interface() const
+{
+	return InventoryUIManager;
+}

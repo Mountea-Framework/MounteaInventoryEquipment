@@ -349,12 +349,6 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryId(Target) : TEXT("none");
 }
 
-void UMounteaInventoryUIStatics::ApplyTheme(UWidget* Target)
-{
-	if (!IsValid(Target)) return;
-	IMounteaInventoryGenericWidgetInterface::Execute_ApplyTheme(Target);
-}
-
 UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig()
 {
 	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
@@ -630,6 +624,44 @@ void UMounteaInventoryUIStatics::ExecuteWidgetCommandFromManager(const TScriptIn
 		return IMounteaAdvancedInventoryUIManagerInterface::Execute_ExecuteWidgetCommand(Target.GetObject(), Command, OptionalPayload);
 }
 
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIStatics::GetItemActionsQueue(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	return Target.GetObject() ? IMounteaAdvancedInventoryUIManagerInterface::Execute_GetItemActionsQueue(Target.GetObject()) : TArray<UMounteaSelectableInventoryItemAction*>();
+}
+
+bool UMounteaInventoryUIStatics::EnqueueItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
+{
+	return Target.GetObject() ? IMounteaAdvancedInventoryUIManagerInterface::Execute_EnqueueItemAction(Target.GetObject(), ItemAction, Payload) : false;
+}
+
+void UMounteaInventoryUIStatics::EmptyItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_EmptyItemActionsQueue(Target.GetObject());
+}
+
+void UMounteaInventoryUIStatics::CompleteQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_CompleteQueuedAction(Target.GetObject(), ItemAction, Payload);
+}
+
+void UMounteaInventoryUIStatics::CancelQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UMounteaSelectableInventoryItemAction* ItemAction)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_CancelQueuedAction(Target.GetObject(), ItemAction);
+}
+
+void UMounteaInventoryUIStatics::RemoveQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UMounteaSelectableInventoryItemAction* ItemAction)
+{
+	if (Target.GetObject())
+		IMounteaAdvancedInventoryUIManagerInterface::Execute_CancelQueuedAction(Target.GetObject(), ItemAction);
+}
+
 FVector2D UMounteaInventoryUIStatics::GetActionsListSpawnLocation(UWidget* ParentWidget)
 {
 	if (!IsValid(ParentWidget))
@@ -842,8 +874,12 @@ FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const
 	return FInventoryItemData(Quantity, Item);
 }
 
-UWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+bool UMounteaInventoryUIStatics::CompareItemWidgetData(const FInventoryItemData& NewState, const FInventoryItemData& OldState)
+{
+	return !NewState.IsDirty(OldState);
+}
+
+UWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return (
 		IsValid(Target.GetObject()) )

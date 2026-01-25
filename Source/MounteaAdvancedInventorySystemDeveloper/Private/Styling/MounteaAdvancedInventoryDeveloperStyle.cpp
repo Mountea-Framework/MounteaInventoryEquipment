@@ -48,6 +48,9 @@ void FMounteaAdvancedInventoryDeveloperStyle::Create()
 	
 	StyleSet->Set("MAISStyleSet.K2Node_SwitchIcon.Small", new IMAGE_BRUSH(TEXT("K2Node_SwitchIcon"), Icon16x16));
 	StyleSet->Set("MAISStyleSet.K2Node_SwitchIcon", new IMAGE_BRUSH(TEXT("K2Node_SwitchIcon"), Icon40x40));
+	
+	StyleSet->Set("MAISStyleSet.K2Node_SetPropertyByName.Small", new IMAGE_BRUSH(TEXT("K2Node_Hammer"), Icon16x16));
+	StyleSet->Set("MAISStyleSet.K2Node_SetPropertyByName", new IMAGE_BRUSH(TEXT("K2Node_Hammer"), Icon40x40));
 }
 
 void FMounteaAdvancedInventoryDeveloperStyle::Initialize()
