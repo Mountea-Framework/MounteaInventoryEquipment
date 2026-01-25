@@ -367,7 +367,10 @@ bool UMounteaInventoryComponent::IncreaseItemQuantity_Implementation(const FGuid
 	if (!IsActive()) return false;
 	
 	if (!IsAuthority())
-		return false;
+	{
+		ChangeItemQuantity_Server(ItemGuid, Amount);
+		return true;
+	}
 	
 	const int32 index = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
 	if (index != INDEX_NONE && InventoryItems.Items.IsValidIndex(index))
@@ -393,7 +396,10 @@ bool UMounteaInventoryComponent::DecreaseItemQuantity_Implementation(const FGuid
 	if (!IsActive()) return false;
 	
 	if (!IsAuthority())
-		return false;
+	{
+		ChangeItemQuantity_Server(ItemGuid, -Amount);
+		return true;
+	}
 	
 	const int32 index = Execute_FindItemIndex(this, FInventoryItemSearchParams(ItemGuid));
 	if (index != INDEX_NONE && InventoryItems.Items.IsValidIndex(index))
