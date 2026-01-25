@@ -116,7 +116,7 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	void CancelInventoryAction();
-	virtual void CancelInventoryAction_Implementation() {};
+	virtual void CancelInventoryAction_Implementation();
 
 	/**
 	 * Gets the gameplay tag that uniquely identifies this inventory action.
@@ -126,6 +126,13 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	FGameplayTagContainer GetItemActionTags() const;
 	virtual FGameplayTagContainer GetItemActionTags_Implementation() const { return ItemActionTags; };
+
+	/**
+	 * Gets called once Action has finished/cancelled to restore resources.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
+	void CleanupInventoryAction();
+	virtual void CleanupInventoryAction_Implementation() {};
 
 protected:
 	

@@ -40,6 +40,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Initialize Inventory Action")
 	static bool InitializeItemAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem, 
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory, UObject* ContextPayload = nullptr);
@@ -132,8 +133,18 @@ public:
 		DisplayName="Clear Inventory Action Flags")
 	static void ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target);
 
-#pragma endregion
+	/**
+	 * Gets called once Action has finished/cancelled to restore resources.
+	 * 
+	 * @param Target Item Action to clear/reset.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="reset"),
+		DisplayName="Cleanup Inventory Action")
+	static void CleanupInventoryAction(UMounteaInventoryItemAction* Target);
 	
+#pragma endregion
 	
 	//------------------------------------------------------------------------------------------
 
