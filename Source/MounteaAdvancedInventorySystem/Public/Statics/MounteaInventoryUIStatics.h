@@ -1499,6 +1499,19 @@ public:
 		DisplayName="Make New Inventory Inventory Item Widget Data",
 		meta=(NativeMakeFunc))
 	static FInventoryItemData MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity);
+
+	/**
+	 * Validates whether Item Widget Data has changed (Widget is Dirty for re-render).
+	 * 
+	 * @param NewState New expected state of Data
+	 * @param OldState Previous state of Data
+	 * @return true if anything changed, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(Keywords="dirty,check,validate,equal,=="),
+		DisplayName="Compare Item Widget Data")
+	static bool CompareItemWidgetData(const FInventoryItemData& NewState, const FInventoryItemData& OldState);
 	
 	/**
 	 * Selects this inventory item in the UI.

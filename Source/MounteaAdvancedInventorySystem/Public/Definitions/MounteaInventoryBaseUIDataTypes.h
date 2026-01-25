@@ -102,6 +102,13 @@ public:
 			*QtyString
 		);
 	}
+	
+	bool IsDirty(const FInventoryItemData& PreviousState) const
+	{
+		if (*this != PreviousState)
+			return true;
+		return Quantity != PreviousState.Quantity;
+	}
 
 	bool operator==(const FInventoryItemData& Other) const
 	{ return ContainingItem == Other.ContainingItem; }

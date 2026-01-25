@@ -371,24 +371,24 @@ public:
 	 * @param Amount Amount to increase
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item|Quantity",
 		meta=(CustomTag="MounteaK2Setter"), 
 		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool IncreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
-		int32 Amount = 1);
+		UPARAM(meta=(UIMin=1,ClampMin=1)) int32 Amount = 1);
 
 	/**
 	 * Decreases item quantity
 	 * @param Target The inventory interface to execute on
 	 * @param ItemGuid Target item GUID
-	 * @param Amount Amount to decrease
+	 * @param Amount Amount to decrease, must be positive number!
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Stack", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item|Quantity",
 		meta=(CustomTag="MounteaK2Setter"), 
 		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool DecreaseItemQuantity(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
-		int32 Amount = 1);
+		UPARAM(meta=(UIMin=1,ClampMin=1)) int32 Amount = 1);
 
 	/**
 	 * Modifies item durability
@@ -397,11 +397,12 @@ public:
 	 * @param DeltaDurability Change in durability
 	 * @return True if successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Durability", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item|Durability",
+		BlueprintAuthorityOnly,
 		meta=(CustomTag="MounteaK2Setter"), 
 		meta=(ExpandBoolAsExecs="ReturnValue"))
 	static bool ModifyItemDurability(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FGuid& ItemGuid, 
-		float DeltaDurability);
+		UPARAM(meta=(UIMin=0.f,ClampMin=0.f)) float DeltaDurability);
 	
 #pragma endregion
 	

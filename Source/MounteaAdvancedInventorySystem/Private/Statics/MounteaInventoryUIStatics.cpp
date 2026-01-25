@@ -874,8 +874,12 @@ FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const
 	return FInventoryItemData(Quantity, Item);
 }
 
-UWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+bool UMounteaInventoryUIStatics::CompareItemWidgetData(const FInventoryItemData& NewState, const FInventoryItemData& OldState)
+{
+	return !NewState.IsDirty(OldState);
+}
+
+UWidget* UMounteaInventoryUIStatics::GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return (
 		IsValid(Target.GetObject()) )
