@@ -22,6 +22,7 @@
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryPayloadConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySelectableInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
@@ -192,6 +193,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionIcon);
 				}
+				
+				FSlateImageBrush* MounteaAdvancedInventoryPayloadsConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PayloadConfigIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedInventoryPayloadsConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PayloadConfigIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedInventoryPayloadsConfigThumb && MounteaAdvancedInventoryPayloadsConfigIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
@@ -212,6 +221,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventorySelectableInventoryItemAction_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction>());	
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryPayloadConfigs_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{
