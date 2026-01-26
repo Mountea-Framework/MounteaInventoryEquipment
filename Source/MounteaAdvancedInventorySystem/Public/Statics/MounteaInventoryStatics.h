@@ -10,6 +10,7 @@
 
 class UMounteaAdvancedInventorySettings;
 class UMounteaAdvancedInventorySettingsConfig;
+class UMounteaAdvancedInventoryPayloadsConfig;
 class UMounteaSelectableInventoryItemAction;
 class UMounteaCallbackInventoryItemAction;
 class UMounteaInventoryItemAction;
@@ -189,9 +190,27 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettingsConfig* GetInventorySettingsConfig();
 
+	/**
+	 * Retrieves configuration asset from the Mountea Inventory Confiration
+	 *
+	 * @param Key Identifier to search the config by.
+	 * @return - A pointer to the Configuration Asset or null
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", 
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Template Config")
 	static UPrimaryDataAsset* GetTemplateConfig(const FString& Key);
+	
+	/**
+	 * Retrieves Payloads configuration asset from the Mountea Inventory Confiration
+	 *
+	 * @return - A pointer to the Payloads Configuration Asset or null
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Payloads Config")
+	static UMounteaAdvancedInventoryPayloadsConfig* GetPayloadsConfig();
+	
 #pragma endregion
 	
 #pragma region Inventory

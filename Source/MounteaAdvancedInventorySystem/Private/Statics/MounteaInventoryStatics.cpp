@@ -21,6 +21,7 @@
 #include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/TemplatesConfig/MounteaAdvancedInventoryPayloadsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
 #pragma region ItemActions
@@ -94,6 +95,11 @@ UPrimaryDataAsset* UMounteaInventoryStatics::GetTemplateConfig(const FString& Ke
 	if (!config) return nullptr;
 	const auto templateConfig = config->TemplatesConfig.Find(Key);
 	return templateConfig ? templateConfig->LoadSynchronous() : nullptr;
+}
+
+UMounteaAdvancedInventoryPayloadsConfig* UMounteaInventoryStatics::GetPayloadsConfig()
+{
+	return Cast<UMounteaAdvancedInventoryPayloadsConfig>(GetTemplateConfig(TEXT("Payloads")));
 }
 
 FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
