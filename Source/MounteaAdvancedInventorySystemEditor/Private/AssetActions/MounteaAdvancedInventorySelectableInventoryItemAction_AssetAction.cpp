@@ -12,6 +12,7 @@
 
 #include "MounteaAdvancedInventorySelectableInventoryItemAction_AssetAction.h"
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
+#include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryItemSelectableAction"
 
@@ -47,7 +48,7 @@ const TArray<FText>& FMounteaAdvancedInventorySelectableInventoryItemAction_Asse
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("4. Item Actions")
+		MounteaAdvancedInventoryBaseTypes::AssetActionsMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 };

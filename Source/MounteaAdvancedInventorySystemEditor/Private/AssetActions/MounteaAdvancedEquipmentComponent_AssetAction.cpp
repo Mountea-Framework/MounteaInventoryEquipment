@@ -13,6 +13,7 @@
 #include "MounteaAdvancedEquipmentComponent_AssetAction.h"
 
 #include "Components/MounteaEquipmentComponent.h"
+#include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedEquipmentComponent_AssetAction"
 
@@ -48,7 +49,7 @@ const TArray<FText>& FMounteaAdvancedEquipmentComponent_AssetAction::GetSubMenus
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("3. Base Classes (Equipment)")
+		MounteaAdvancedInventoryBaseTypes::EquipmentBaseClassesMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 };
