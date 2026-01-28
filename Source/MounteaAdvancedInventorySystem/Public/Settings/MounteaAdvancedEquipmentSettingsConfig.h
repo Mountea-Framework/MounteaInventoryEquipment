@@ -36,7 +36,9 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedEquipmentSettingsConfig
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
-		meta=(ForceInlineRow, NoResetToDefault, ShowOnlyInnerProperties))
+		meta=(ForceInlineRow),
+		meta=(NoResetToDefault), 
+		meta=(ShowOnlyInnerProperties))
 	TMap<FName, FMounteaEquipmentSlotHeaderData> AllowedEquipmentSlots;
 
 };
