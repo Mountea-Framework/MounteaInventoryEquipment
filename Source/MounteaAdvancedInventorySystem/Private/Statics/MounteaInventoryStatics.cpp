@@ -110,12 +110,19 @@ FPayloadConfig UMounteaInventoryStatics::FindPayloadConfig(const FGameplayTag Cr
 		bSuccess = false;
 		return {};
 	}
-	
+
 	FPayloadConfig searchKey;
 	searchKey.PayloadCreator = Creator;
 	searchKey.PayloadReceiver = Receiver;
-	bSuccess = payloadConfig->PayloadConfigs.Contains(searchKey);
-	return bSuccess ? (*payloadConfig->PayloadConfigs.Find(searchKey)) : FPayloadConfig{};
+
+	if (const FPayloadConfig* foundConfig = payloadConfig->PayloadConfigs.Find(searchKey))
+	{
+		bSuccess = true;
+		return *foundConfig;
+	}
+
+	bSuccess = false;
+	return {};
 }
 
 FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
