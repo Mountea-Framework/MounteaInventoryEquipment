@@ -102,6 +102,22 @@ UMounteaAdvancedInventoryPayloadsConfig* UMounteaInventoryStatics::GetPayloadsCo
 	return Cast<UMounteaAdvancedInventoryPayloadsConfig>(GetTemplateConfig(TEXT("Payloads")));
 }
 
+FPayloadConfig UMounteaInventoryStatics::FindPayloadConfig(const FGameplayTag Creator, const FGameplayTag Receiver, bool& bSuccess)
+{
+	const auto payloadConfig = GetPayloadsConfig();
+	if (!IsValid(payloadConfig))
+	{
+		bSuccess = false;
+		return {};
+	}
+	
+	FPayloadConfig searchKey;
+	searchKey.PayloadCreator = Creator;
+	searchKey.PayloadReceiver = Receiver;
+	bSuccess = payloadConfig->PayloadConfigs.Contains(searchKey);
+	return bSuccess ? (*payloadConfig->PayloadConfigs.Find(searchKey)) : FPayloadConfig{};
+}
+
 FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
 {
 	return FInventoryItem(ItemGuid);

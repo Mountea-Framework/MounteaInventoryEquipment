@@ -25,6 +25,8 @@ class UMounteaSelectableInventoryItemAction;
 class UMounteaCallbackInventoryItemAction;
 class UMounteaInventoryItemAction;
 
+struct FPayloadConfig;
+
 enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
 enum class EInventoryItemActionCallback : uint8;
@@ -220,6 +222,21 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Payloads Config")
 	static UMounteaAdvancedInventoryPayloadsConfig* GetPayloadsConfig();
+	
+	/**
+	 * Retrieves Payload Config from Config File if it exists.
+	 *
+	 * @param Creator GameplayTag of the creator Object
+	 * @param Receiver GameplayTag of the receiver
+	 * @param bSuccess Whether operation was success or not
+	 * 
+	 * @return - A data associated to key of Created and Receiver, or null
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Payload Config")
+	static FPayloadConfig FindPayloadConfig(UPARAM(meta=(Categories="Mountea_Inventory")) const FGameplayTag Creator, 
+		UPARAM(meta=(Categories="Mountea_Inventory")) const FGameplayTag Receiver, bool& bSuccess);
 	
 #pragma endregion
 	
