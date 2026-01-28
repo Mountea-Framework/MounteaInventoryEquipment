@@ -66,35 +66,41 @@ public:
 	 * equipment-related input within the Mountea Advanced Inventory system.
 	 * This can be configured to define custom input actions for inventory equipment handling.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true))
 	TSoftObjectPtr<UInputMappingContext> AdvancedInventoryEquipmentInputMapping;
 
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Inventory.
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true))
 	TSoftObjectPtr<UMounteaAdvancedInventorySettingsConfig> AdvancedInventorySettingsConfig;
 
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Equipment.
 	 * This reference is used to define and load equipment-specific configurations.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true))
 	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> AdvancedEquipmentSettingsConfig;
 	
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Inventory UI.
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true),
+		DisplayName="Advanced Inventory UI Settings Config")
 	TSoftObjectPtr<UMounteaAdvancedInventoryUIConfig> AdvancedInventoryUISettingsConfig;
 
 	/**
 	 * Defines logging level that is allowed to be shown.
 	 * Affects on-screen messages.
 	 */
-	UPROPERTY(config, EditDefaultsOnly, Category = "Logging", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EMounteaAdvancedInventoryLoggingVerbosity", ForceShowPluginContent = true))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Logging", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EMounteaAdvancedInventoryLoggingVerbosity"))
 	uint8 LogVerbosity;
 
 public:
