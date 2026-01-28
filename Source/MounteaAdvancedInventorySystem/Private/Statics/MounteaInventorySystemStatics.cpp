@@ -38,7 +38,7 @@ UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const
 UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig()
 {
 	auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
-	return settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
+	return settings ? settings->AdvancedInventorySettingsConfig.LoadSynchronous() : nullptr;
 }
 
 FText UMounteaInventorySystemStatics::ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText)

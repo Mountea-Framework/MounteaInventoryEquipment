@@ -76,15 +76,15 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedSubCategories() const
 	if (!IsValid(inventorySettings))
 		return TArray<FString>();
 	
-	auto inventorySettingsConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(inventorySettingsConfig))
+	auto advancedInventorySettingsConfig = inventorySettings->AdvancedInventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(advancedInventorySettingsConfig))
 		return TArray<FString>();
 
-	if (inventorySettingsConfig->AllowedCategories.Num() <= 0)
+	if (advancedInventorySettingsConfig->AllowedCategories.Num() <= 0)
 		return TArray<FString>();
 
 	TArray<FString> returnValues;
-	if (const auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory))
+	if (const auto categoryConfiguration = advancedInventorySettingsConfig->AllowedCategories.Find(ItemCategory))
 		categoryConfiguration->SubCategories.GetKeys(returnValues);
 	
 	return returnValues;
@@ -111,9 +111,9 @@ void UMounteaInventoryItemTemplate::ReloadItemActions()
 	if (!inventorySettings)
 		return;
 
-	if (const auto inventorySettingsConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous())
+	if (const auto advancedInventorySettingsConfig = inventorySettings->AdvancedInventorySettingsConfig.LoadSynchronous())
 	{
-		auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory);
+		auto categoryConfiguration = advancedInventorySettingsConfig->AllowedCategories.Find(ItemCategory);
 		if (categoryConfiguration->CategoryData.AllowedActions.Num() > 0)
 		{
 			const auto categoryActionClasses = categoryConfiguration->CategoryData.AllowedActions;
@@ -144,13 +144,13 @@ void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChang
 	auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
 	if (!inventorySettings)
 		return;
-	auto inventorySettingsConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	auto advancedInventorySettingsConfig = inventorySettings->AdvancedInventorySettingsConfig.LoadSynchronous();
 	
 	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemTemplate, ItemCategory))
 	{
-		if (inventorySettingsConfig)
+		if (advancedInventorySettingsConfig)
 		{
-			auto categoryConfiguration = inventorySettingsConfig->AllowedCategories.Find(ItemCategory);
+			auto categoryConfiguration = advancedInventorySettingsConfig->AllowedCategories.Find(ItemCategory);
 			ItemFlags = categoryConfiguration->CategoryData.CategoryFlags;
 			
 			ReloadItemActions();

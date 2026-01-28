@@ -14,7 +14,7 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
-UMounteaAdvancedInventorySettings::UMounteaAdvancedInventorySettings() : InventorySettingsConfig(nullptr),
+UMounteaAdvancedInventorySettings::UMounteaAdvancedInventorySettings() : AdvancedInventorySettingsConfig(nullptr),
 																		 LogVerbosity(14)
 {
 	CategoryName = TEXT("Mountea Framework");
@@ -28,8 +28,8 @@ EMounteaAdvancedInventoryLoggingVerbosity UMounteaAdvancedInventorySettings::Get
 
 TMap<FString, FInventoryRarity> UMounteaAdvancedInventorySettings::GetAllowedRarities() const
 {
-	auto inventorySettingsConfig = InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(inventorySettingsConfig))
+	auto advancedInventorySettingsConfig = AdvancedInventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(advancedInventorySettingsConfig))
 	{
 		TMap<FString, FInventoryRarity> returnValues;
 		FInventoryRarity CommonRarity;
@@ -43,7 +43,7 @@ TMap<FString, FInventoryRarity> UMounteaAdvancedInventorySettings::GetAllowedRar
 		return returnValues;
 	}
 
-	auto returnValues = inventorySettingsConfig->AllowedRarities;
+	auto returnValues = advancedInventorySettingsConfig->AllowedRarities;
 
 	returnValues.ValueStableSort(
 		[](const FInventoryRarity& A, const FInventoryRarity& B)
@@ -56,8 +56,8 @@ TMap<FString, FInventoryRarity> UMounteaAdvancedInventorySettings::GetAllowedRar
 
 TMap<FString, FInventoryCategory> UMounteaAdvancedInventorySettings::GetAllowedCategories() const
 {
-	auto inventorySettingsConfig = InventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(inventorySettingsConfig))
+	auto advancedInventorySettingsConfig = AdvancedInventorySettingsConfig.LoadSynchronous();
+	if (!IsValid(advancedInventorySettingsConfig))
 	{
 		TMap<FString, FInventoryCategory> returnValues;
 		FInventoryCategory miscellaneousCategory;
@@ -69,7 +69,7 @@ TMap<FString, FInventoryCategory> UMounteaAdvancedInventorySettings::GetAllowedC
 		return returnValues;
 	}
 
-	auto returnValues = inventorySettingsConfig->AllowedCategories;
+	auto returnValues = advancedInventorySettingsConfig->AllowedCategories;
 
 	returnValues.ValueStableSort(
 		[](const FInventoryCategory& A, const FInventoryCategory& B)

@@ -27,7 +27,7 @@ TArray<FString> FMounteaTemplateFilters::GetAvailableCategories()
 	if (!inventorySettings)
 		return returnValue;
 	
-	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->AdvancedInventorySettingsConfig.LoadSynchronous();
 	if (!inventoryConfig)
 		return returnValue;
 	
@@ -43,7 +43,7 @@ TArray<FString> FMounteaTemplateFilters::GetAvailableRarities()
 	if (!inventorySettings)
 		return returnValue;
 	
-	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->InventorySettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventorySettingsConfig* inventoryConfig = inventorySettings->AdvancedInventorySettingsConfig.LoadSynchronous();
 	if (!inventoryConfig)
 		return returnValue;
 	

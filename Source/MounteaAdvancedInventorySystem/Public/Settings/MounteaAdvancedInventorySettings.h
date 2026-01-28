@@ -74,21 +74,21 @@ public:
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
-	TSoftObjectPtr<UMounteaAdvancedInventorySettingsConfig> InventorySettingsConfig;
+	TSoftObjectPtr<UMounteaAdvancedInventorySettingsConfig> AdvancedInventorySettingsConfig;
 
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Equipment.
 	 * This reference is used to define and load equipment-specific configurations.
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
-	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> EquipmentSettingsConfig;
+	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> AdvancedEquipmentSettingsConfig;
 	
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Inventory UI.
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
-	TSoftObjectPtr<UMounteaAdvancedInventoryUIConfig> InventoryUISettingsConfig;
+	TSoftObjectPtr<UMounteaAdvancedInventoryUIConfig> AdvancedInventoryUISettingsConfig;
 
 	/**
 	 * Defines logging level that is allowed to be shown.

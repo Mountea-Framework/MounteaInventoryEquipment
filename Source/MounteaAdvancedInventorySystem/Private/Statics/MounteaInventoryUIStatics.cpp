@@ -214,7 +214,7 @@ UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISet
 {
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return nullptr;
-	return settings->InventoryUISettingsConfig.LoadSynchronous();
+	return settings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(
@@ -357,7 +357,7 @@ UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig
 		LOG_ERROR(TEXT("[GetThemeConfig] Settings not found!"))
 		return nullptr;
 	}
-	const auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	const auto config = settings->AdvancedInventorySettingsConfig.LoadSynchronous();
 	if (!IsValid(config))
 	{
 		LOG_ERROR(TEXT("[GetThemeConfig] Config not found!"))
@@ -1342,7 +1342,7 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
 	if (!IsValid(settings)) return INDEX_NONE;
 
-	auto config = settings->InventorySettingsConfig.LoadSynchronous();
+	auto config = settings->AdvancedInventorySettingsConfig.LoadSynchronous();
 	if (!IsValid(config)) return INDEX_NONE;
 	
 	UObject* inventoryObject = nullptr;
@@ -1465,7 +1465,7 @@ bool UMounteaInventoryUIStatics::Helper_ItemsGrid_UpdateItemInSlot(UUserWidget* 
 	if (!item.IsItemValid()) return false;
 
 	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	const auto config = settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
+	const auto config = settings ? settings->AdvancedInventorySettingsConfig.LoadSynchronous() : nullptr;
 		
 	const bool bIsStackable = UMounteaInventoryStatics::HasInventoryFlags(
 		item.Template->ItemFlags, static_cast<int32>(EInventoryItemFlags::EIIF_Stackable)

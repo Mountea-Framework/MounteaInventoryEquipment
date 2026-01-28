@@ -113,7 +113,7 @@ TArray<FName> UMounteaAdvancedAttachmentSlotBase::GetAvailableSlotNames() const
 	if (!advanedSettings)
 		return {};
 
-	const auto equipmentConfig = advanedSettings->EquipmentSettingsConfig.LoadSynchronous();
+	const auto equipmentConfig = advanedSettings->AdvancedEquipmentSettingsConfig.LoadSynchronous();
 	if (!IsValid(equipmentConfig))
 		return {};
 
@@ -137,7 +137,7 @@ void UMounteaAdvancedAttachmentSlotBase::PostEditChangeProperty(struct FProperty
 	UMounteaAdvancedEquipmentSettingsConfig* equipmentConfig = nullptr;
 
 	if (const auto advanedSettings = GetDefault<UMounteaAdvancedInventorySettings>())
-		equipmentConfig = advanedSettings->EquipmentSettingsConfig.LoadSynchronous();
+		equipmentConfig = advanedSettings->AdvancedEquipmentSettingsConfig.LoadSynchronous();
 	
 	
 	const FName propertName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
