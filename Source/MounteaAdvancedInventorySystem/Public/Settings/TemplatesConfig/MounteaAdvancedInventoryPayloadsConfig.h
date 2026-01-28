@@ -53,7 +53,8 @@ public:
 	 * Value : Soft class reference to the payload UObject-derived class.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Payload Definitions",
-		meta=(ShowOnlyInnerProperties))
+		meta=(ShowOnlyInnerProperties),
+		meta=(ForceShowPluginContent = true))
 	TMap<EPayloadDirection, TSoftClassPtr<UObject>> PayloadClassMap;
 };
 

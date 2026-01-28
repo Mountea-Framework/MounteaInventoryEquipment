@@ -66,35 +66,40 @@ public:
 	 * equipment-related input within the Mountea Advanced Inventory system.
 	 * This can be configured to define custom input actions for inventory equipment handling.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true))
 	TSoftObjectPtr<UInputMappingContext> AdvancedInventoryEquipmentInputMapping;
 
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Inventory.
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true))
 	TSoftObjectPtr<UMounteaAdvancedInventorySettingsConfig> InventorySettingsConfig;
 
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Equipment.
 	 * This reference is used to define and load equipment-specific configurations.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true))
 	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> EquipmentSettingsConfig;
 	
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Inventory UI.
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
-	UPROPERTY(Config, EditAnywhere, Category="Config", meta = (ForceShowPluginContent = true))
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta = (ForceShowPluginContent = true))
 	TSoftObjectPtr<UMounteaAdvancedInventoryUIConfig> InventoryUISettingsConfig;
 
 	/**
 	 * Defines logging level that is allowed to be shown.
 	 * Affects on-screen messages.
 	 */
-	UPROPERTY(config, EditDefaultsOnly, Category = "Logging", meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EMounteaAdvancedInventoryLoggingVerbosity", ForceShowPluginContent = true))
+	UPROPERTY(config, EditDefaultsOnly, Category = "Logging", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EMounteaAdvancedInventoryLoggingVerbosity"))
 	uint8 LogVerbosity;
 
 public:
@@ -105,7 +110,8 @@ public:
 	 *
 	 * @return The allowed logging verbosity as an enum value of EMounteaAdvancedInventoryLoggingVerbosity.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  
+		meta=(CustomTag="MounteaK2Getter"))
 	EMounteaAdvancedInventoryLoggingVerbosity GetAllowedLoggVerbosity() const;
 
 	/**
@@ -114,7 +120,8 @@ public:
 	 *
 	 * @return An array of strings representing the allowed item rarities.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  
+		meta=(CustomTag="MounteaK2Getter"))
 	TMap<FString, FInventoryRarity> GetAllowedRarities() const;
 
 	/**
@@ -123,7 +130,8 @@ public:
 	 *
 	 * @return An list of strings representing the allowed inventory categories.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  
+		meta=(CustomTag="MounteaK2Getter"))
 	TMap<FString, FInventoryCategory> GetAllowedCategories() const;
 
 	/**
@@ -132,6 +140,7 @@ public:
 	 *
 	 * @return A soft object pointer to the input mapping context for inventory equipment management.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  
+		meta=(CustomTag="MounteaK2Getter"))
 	TSoftObjectPtr<UInputMappingContext> GetAdvancedInventoryEquipmentInputMapping() const;
 };
