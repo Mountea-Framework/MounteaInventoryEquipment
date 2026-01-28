@@ -53,7 +53,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wrapper",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
 	
 	// --- Inventory
@@ -62,7 +63,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
 	
 	// ---- Notifications
@@ -71,14 +73,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
 	
 	/** Widget class used for a single inventory notification entry (one message / card in the notification container). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
 	
 	/** Material used for rendering individual notification cards (background, styling, effects). */
@@ -95,14 +99,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Categories",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoriesWrapperWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> CategoriesContainerWidgetClass;
 	
 	/** Widget class representing a single inventory category entry (one category button / tab). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Categories",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> CategoryWidgetClass;
 	
 	// ---- Items
@@ -111,14 +117,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemsContainerWidgetClass;
 	
 	/** Widget class representing a single inventory item (slot visual, icon, quantity, tooltip, etc.). */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemWidgetClass;
 	
 	// ---- Item
@@ -127,14 +135,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemPanelWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemPanelWidgetClass;
 	
 	/** Widget class used to display Tooltip information of currently selected/hovered item. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryTooltipWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemTooltipWidgetClass;
 	
 	// ---- Item Actions
@@ -143,14 +153,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionsContainerWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemActionsContainerWidgetClass;
 	
 	/** Widget class used to display individual Item Actions. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemActionWidgetClass;
 	
 	// ---- Modal
@@ -159,7 +171,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Modals",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"),
 		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> InventoryModalWidgetClass;
 	
 	// ---- Fonts

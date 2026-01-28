@@ -67,7 +67,8 @@ public:
 	 * This can be configured to define custom input actions for inventory equipment handling.
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config", 
-		meta = (ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftObjectPtr<UInputMappingContext> AdvancedInventoryEquipmentInputMapping;
 
 	/**
@@ -75,7 +76,8 @@ public:
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config", 
-		meta = (ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftObjectPtr<UMounteaAdvancedInventorySettingsConfig> AdvancedInventorySettingsConfig;
 
 	/**
@@ -83,7 +85,8 @@ public:
 	 * This reference is used to define and load equipment-specific configurations.
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config", 
-		meta = (ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> AdvancedEquipmentSettingsConfig;
 	
 	/**
@@ -91,7 +94,8 @@ public:
 	 * This reference is used to define and load inventory-specific configurations.
 	 */
 	UPROPERTY(Config, EditAnywhere, Category="Config", 
-		meta = (ForceShowPluginContent = true),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent),
 		DisplayName="Advanced Inventory UI Settings Config")
 	TSoftObjectPtr<UMounteaAdvancedInventoryUIConfig> AdvancedInventoryUISettingsConfig;
 

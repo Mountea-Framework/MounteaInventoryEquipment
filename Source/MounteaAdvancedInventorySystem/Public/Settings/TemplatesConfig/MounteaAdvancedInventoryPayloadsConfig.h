@@ -52,7 +52,8 @@ public:
 	 * to be loaded on demand at runtime.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Payload Definitions",
-		meta=(ForceShowPluginContent = true))
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UObject> PayloadClass;
 	
 public:
