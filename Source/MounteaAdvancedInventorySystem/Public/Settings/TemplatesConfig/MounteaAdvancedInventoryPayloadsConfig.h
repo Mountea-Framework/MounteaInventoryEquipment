@@ -17,27 +17,14 @@
 #include "MounteaAdvancedInventoryPayloadsConfig.generated.h"
 
 /**
- * Enumerates supported payload directions used by the payload configuration system.
- */
-UENUM(Blueprintable, BlueprintType)
-enum class EPayloadDirection : uint8
-{
-	EPD_Outgoing	UMETA(DisplayName = "Outgoing", ToolTip="Defines payload which is sent and never expected to be returned."),
-	EPD_Incoming	UMETA(DisplayName = "Incoming", ToolTip="Defines payload which is expected to be received from other source."),
-	EPD_Generic		UMETA(DisplayName = "Generic",  ToolTip="Defines generic payload which can be used for anything."),
-	
-	Hidde			UMETA(Hidden)
-};
-
-/**
- * Defines payload class mapping for a single gameplay tag configuration.
- *
- * Each entry associates an EPayloadDirection with a payload class reference.
- * Soft class pointers are used to avoid hard-loading assets until needed.
- *
- * Intended usage:
- * - Configure direction -> payload class mappings in editor.
- * - Resolve/load the class on demand when processing payloads.
+ * Defines a payload class binding identified by a pair of Gameplay Tags.
+ * 
+ * FPayloadConfig represents a single payload mapping entry where the combination of
+ * PayloadCreator and PayloadReceiver uniquely identifies the configuration.
+ * 
+ * The associated `PayloadClass` specifies which UObject-derived payload type should be used
+ * for the given Creator/Receiver tag pair. A soft class pointer is used to avoid hard-loading
+ * assets until they are explicitly needed.
  */
 USTRUCT(Blueprintable, BlueprintType)
 struct FPayloadConfig
@@ -46,30 +33,64 @@ struct FPayloadConfig
 	
 public:
 	
+	/** Gameplay tag identifying the source (creator) domain of the payload. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Payload Definitions",
+		meta=(NoResetToDefault),
+		meta=(Categories="Mountea_Inventory"))
+	FGameplayTag PayloadCreator;
+	
+	/** Gameplay tag identifying the target (receiver) domain of the payload. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Payload Definitions",
+		meta=(NoResetToDefault),
+		meta=(Categories="Mountea_Inventory"))
+	FGameplayTag PayloadReceiver;
+	
 	/**
-	 * Mapping between payload direction and payload class type.
+	 * Soft reference to the UObject-derived payload class associated with this Creator/Receiver pair.
 	 *
-	 * Key   : Direction semantics for the payload.
-	 * Value : Soft class reference to the payload UObject-derived class.
+	 * Soft class pointers are used to prevent hard dependencies and allow the payload class
+	 * to be loaded on demand at runtime.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Payload Definitions",
-		meta=(ShowOnlyInnerProperties),
 		meta=(ForceShowPluginContent = true))
-	TMap<EPayloadDirection, TSoftClassPtr<UObject>> PayloadClassMap;
+	TSoftClassPtr<UObject> PayloadClass;
+	
+public:
+	
+	FORCEINLINE bool IsValid() const
+	{
+		return PayloadCreator.IsValid() && PayloadReceiver.IsValid() && !PayloadClass.IsNull();
+	}
+	
+	friend FORCEINLINE bool operator==(const FPayloadConfig& A, const FPayloadConfig& B)
+	{
+		return A.PayloadCreator == B.PayloadCreator
+			&& A.PayloadReceiver == B.PayloadReceiver;
+	}
+	
+	friend FORCEINLINE uint32 GetTypeHash(const FPayloadConfig& Value)
+	{
+		return HashCombine(GetTypeHash(Value.PayloadCreator), GetTypeHash(Value.PayloadReceiver));
+	}
 };
 
 /**
  * UMounteaAdvancedInventoryPayloadsConfig manages payload definitions for the Inventory & Equipment system.
- * Payload configs define direction-based payload class mappings (Outgoing/Incoming/Generic) keyed by gameplay tags
- * for data-driven payload resolution and usage across inventory/equipment features.
  *
- * Each entry in `PayloadConfigs` represents a payload “domain” identified by a `FGameplayTag`.
- * The corresponding `FPayloadConfig` then maps `EPayloadDirection` to a soft class reference, allowing
- * payload classes to be loaded on demand without forcing hard dependencies at startup.
+ * This data asset allows you to define which payload class should be used for a specific combination
+ * of Creator and Receiver Gameplay Tags. Each entry represents a single payload configuration,
+ * making it easy to set up data-driven payload behavior directly in the editor.
+ *
+ * Payload classes are referenced using soft pointers, so they are only loaded when needed,
+ * helping to avoid unnecessary hard dependencies and keeping startup lightweight.
+ *
+ * Typical usage:
+ * - Define Creator/Receiver tag pairs in the editor.
+ * - Assign a payload class to each pair.
+ * - At runtime, query the configuration to resolve the appropriate payload class.
  *
  * @see [Inventory & Equipment Payloads Configuration](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  * @see FPayloadConfig
- * @see EPayloadDirection
  */
 UCLASS(ClassGroup = (Mountea), meta = (DisplayName = "Inventory & Equipment Payloads Config"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryPayloadsConfig : public UPrimaryDataAsset
@@ -79,14 +100,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryPayloadsConfig
 public:
 	
 	/**
-	 * Payload configuration sets keyed by gameplay tag.
+	 * Collection of payload configurations.
 	 *
-	 * Key   : Gameplay tag identifying the payload domain/type.
-	 * Value : Direction-to-class mapping configuration.
+	 * Each entry defines a Creator/Receiver Gameplay Tag pair and the payload class associated with it.
+	 * The combination of both tags uniquely identifies a configuration.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Payload Definitions",
-		meta=(ShowOnlyInnerProperties))
-	TMap<FGameplayTag, FPayloadConfig> PayloadConfigs;
+		meta=(ShowOnlyInnerProperties),
+		meta=(NoResetToDefault),
+		meta=(TitleProperty="{PayloadCreator} | {PayloadReceiver}"))
+	TSet<FPayloadConfig> PayloadConfigs;
 };
-
-// TODO: Create statics getters for tags and inputs, so its easier to query
