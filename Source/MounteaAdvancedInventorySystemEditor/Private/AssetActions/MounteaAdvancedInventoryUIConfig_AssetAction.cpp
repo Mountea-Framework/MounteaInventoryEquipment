@@ -10,7 +10,7 @@
 // For more information, visit: https://mountea.tools
 
 
-#include "FMounteaAdvancedInventoryUIConfig_AssetAction.h"
+#include "MounteaAdvancedInventoryUIConfig_AssetAction.h"
 
 #include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
