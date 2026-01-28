@@ -105,7 +105,7 @@ public:
 	 *
 	 * @return The allowed logging verbosity as an enum value of EMounteaAdvancedInventoryLoggingVerbosity.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
 	EMounteaAdvancedInventoryLoggingVerbosity GetAllowedLoggVerbosity() const;
 
 	/**
@@ -114,7 +114,7 @@ public:
 	 *
 	 * @return An array of strings representing the allowed item rarities.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
 	TMap<FString, FInventoryRarity> GetAllowedRarities() const;
 
 	/**
@@ -123,7 +123,7 @@ public:
 	 *
 	 * @return An list of strings representing the allowed inventory categories.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
 	TMap<FString, FInventoryCategory> GetAllowedCategories() const;
 
 	/**
@@ -132,6 +132,6 @@ public:
 	 *
 	 * @return A soft object pointer to the input mapping context for inventory equipment management.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter", ForceShowPluginContent = true))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory||Settings",  meta=(CustomTag="MounteaK2Getter"))
 	TSoftObjectPtr<UInputMappingContext> GetAdvancedInventoryEquipmentInputMapping() const;
 };
