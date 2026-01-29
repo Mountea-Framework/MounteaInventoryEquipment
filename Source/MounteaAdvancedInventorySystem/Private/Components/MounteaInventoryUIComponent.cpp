@@ -311,10 +311,10 @@ bool UMounteaInventoryUIComponent::SetInventoryWidget_Implementation(UUserWidget
 void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget)
 {
 	if (ActiveItemWidget != NewActiveItemWidget)
-	{
 		ActiveItemWidget = NewActiveItemWidget;
-		NewActiveItemWidget->SetFocus();
-	}
+	
+	if (IsValid(ActiveItemWidget))
+		ActiveItemWidget->SetFocus();
 }
 
 UUserWidget* UMounteaInventoryUIComponent::GetNotificationContainer_Implementation() const
