@@ -1291,7 +1291,8 @@ public:
 	 *         is valid and successfully resolved. Returns nullptr if the configuration
 	 *         is invalid or unavailable.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Theme", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Theme", 
+		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventoryThemeConfig* GetThemeConfig();
 
 #pragma endregion

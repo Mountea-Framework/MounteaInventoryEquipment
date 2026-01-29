@@ -85,16 +85,11 @@ bool UK2Node_GetPropertyByName::IsConnectionDisallowed(const UEdGraphPin* MyPin,
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject);
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass);
 		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Class);
-		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && 
-					   OtherPin->PinType.PinSubCategoryObject == TBaseStructure<FVector>::Get());
-		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && 
-					   OtherPin->PinType.PinSubCategoryObject == TBaseStructure<FVector2D>::Get());
-		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct && 
-					   OtherPin->PinType.PinSubCategoryObject == TBaseStructure<FGuid>::Get());
+		bSupported |= (OtherPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct);
 
 		if (!bSupported)
 		{
-			OutReason = LOCTEXT("UnsupportedType", "Only Int, Int64, Float, Bool, String, Name, and Byte types are supported").ToString();
+			OutReason = LOCTEXT("UnsupportedType", "Unsupported type - cannot connect").ToString();
 			return true;
 		}
 	}
@@ -115,7 +110,11 @@ void UK2Node_GetPropertyByName::RefreshPinTypes() const
 	UEdGraphPin* valuePin = FindPinChecked(ValuePinName);
 
 	if (valuePin->LinkedTo.Num() > 0 && valuePin->LinkedTo[0])
+	{
 		valuePin->PinType = valuePin->LinkedTo[0]->PinType;
+		valuePin->PinType.PinSubCategory = valuePin->LinkedTo[0]->PinType.PinSubCategory;
+		valuePin->PinType.PinSubCategoryObject = valuePin->LinkedTo[0]->PinType.PinSubCategoryObject;
+	}
 	else
 	{
 		valuePin->PinType.PinCategory = UEdGraphSchema_K2::PC_Wildcard;
@@ -137,11 +136,10 @@ UFunction* UK2Node_GetPropertyByName::GetTargetFunction(const UEdGraphPin* Value
 	if (!ValuePin)
 		return nullptr;
 
-	const bool bValidLinks = ValuePin->LinkedTo.Num() > 0;
-	if (!bValidLinks)
-		return nullptr;
-
 	const FEdGraphPinType& effectiveType = GetEffectiveType(ValuePin);
+	
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Wildcard)
+		return nullptr;
 
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetIntPropertyValue));
@@ -157,6 +155,8 @@ UFunction* UK2Node_GetPropertyByName::GetTargetFunction(const UEdGraphPin* Value
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetNamePropertyValue));
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Byte)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetBytePropertyValue));
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Object)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetObjectPropertyValue));
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_SoftObject)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetSoftObjectPropertyValue));
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_SoftClass)
@@ -164,16 +164,7 @@ UFunction* UK2Node_GetPropertyByName::GetTargetFunction(const UEdGraphPin* Value
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Class)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetClassPropertyValue));
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Struct)
-	{
-		if (effectiveType.PinSubCategoryObject == TBaseStructure<FVector>::Get())
-			return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetVectorPropertyValue));
-    
-		if (effectiveType.PinSubCategoryObject == TBaseStructure<FVector2D>::Get())
-			return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetVector2DPropertyValue));
-    
-		if (effectiveType.PinSubCategoryObject == TBaseStructure<FGuid>::Get())
-			return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, SetGuidPropertyValue));
-	}
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaInventorySystemStatics, GetGenericStructPropertyValue));
 
 	return nullptr;
 }
@@ -188,8 +179,9 @@ void UK2Node_GetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	UEdGraphPin* propertyNamePin = FindPinChecked(PropertyNamePinName);
 	UEdGraphPin* valuePin = FindPinChecked(ValuePinName);
 	UEdGraphPin* returnValuePin = FindPinChecked(ReturnValuePinName);
-
-	if (valuePin->LinkedTo.Num() == 0)
+	
+	const FEdGraphPinType& effectiveType = GetEffectiveType(valuePin);	
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Wildcard)
 	{
 		CompilerContext.MessageLog.Error(*LOCTEXT("NoValueConsumer", "@@ must have Value pin connected").ToString(), this);
 		BreakAllNodeLinks();
@@ -221,6 +213,8 @@ void UK2Node_GetPropertyByName::ExpandNode(FKismetCompilerContext& CompilerConte
 	CompilerContext.MovePinLinksToIntermediate(*propertyNamePin, *callPropertyNamePin);
 
 	UEdGraphPin* callValuePin = callFunctionNode->FindPinChecked(TEXT("Value"));
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+		callValuePin->PinType = effectiveType;
 	CompilerContext.MovePinLinksToIntermediate(*valuePin, *callValuePin);
 
 	BreakAllNodeLinks();
@@ -276,12 +270,11 @@ FText UK2Node_GetPropertyByName::GetTooltipText() const
 		"- Bool\n"
 		"- String & Name\n"
 		"- Byte\n"
-		"- Guid\n"
-		"- Vector & Vector2D\n"
 		"- Object (with property class validation)\n"
 		"- Soft Object (with property class validation)\n"
 		"- Class (with property class validation)\n"
 		"- Soft Class (with property class validation)\n"
+		"- ANY UStruct (FVector, FGuid, custom structs, etc.)\n"
 		"\n"
 		"Returns false if property doesn't exist or type doesn't match.\n\n"
 		"⚠ Please, keep in mind that this will get the value directly! No getter is called! Use with extreme caution!");
@@ -301,6 +294,11 @@ FText UK2Node_GetPropertyByName::GetToolTipHeading() const
 FName UK2Node_GetPropertyByName::GetCornerIcon() const
 {
 	return TEXT("MAISStyleSet.MounteaLogo");
+}
+
+FText UK2Node_GetPropertyByName::GetMenuCategory() const
+{
+	return LOCTEXT("GetPropertyByName_Category", "Mountea|Inventory & Equipment|Helpers");
 }
 
 #endif

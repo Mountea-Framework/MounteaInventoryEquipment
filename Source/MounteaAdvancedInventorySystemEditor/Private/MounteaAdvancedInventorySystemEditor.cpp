@@ -15,30 +15,38 @@
 #include "ContentBrowserModule.h"
 #include "FileHelpers.h"
 #include "IContentBrowserSingleton.h"
-#include "AssetActions/FMounteaAdvancedInventoryUIConfig_AssetAction.h"
+
 #include "AssetActions/MounteaAdvancedEquipmentComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetEnvConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryPayloadConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySelectableInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryUIComponent_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryUIConfig_AssetAction.h"
+
 #include "Commands/FMAISCommands.h"
-#include "Components/MounteaAttachmentContainerComponent.h"
+
 #include "Definitions/MounteaInventoryItemTemplate.h"
-#include "DetailsCustomizations/MounteaAttachmentContainerDetailsCustomization.h"
-#include "Editor/SMounteaInventoryTemplateEditor.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
+
+#include "Editor/SMounteaInventoryTemplateEditor.h"
+
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
+
 #include "Framework/Docking/TabManager.h"
 #include "Framework/Notifications/NotificationManager.h"
+
 #include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
+
 #include "Widgets/Notifications/SNotificationList.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
@@ -161,8 +169,8 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedAttachmentSlot", AttachableSlotIcon);
 				}
 				
-				FSlateImageBrush* InventoryUIConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUISettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* InventoryUIConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUISettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
+				FSlateImageBrush* InventoryUIConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventoryUISettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* InventoryUIConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventoryUISettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
 				if (InventoryUIConfigThumb && InventoryUIConfigIcon)
 				{
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryUIConfig", InventoryUIConfigThumb);
@@ -192,6 +200,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionIcon);
 				}
+				
+				FSlateImageBrush* MounteaAdvancedInventoryPayloadsConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PayloadConfigIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedInventoryPayloadsConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PayloadConfigIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedInventoryPayloadsConfigThumb && MounteaAdvancedInventoryPayloadsConfigIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
@@ -212,6 +228,8 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventorySelectableInventoryItemAction_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction>());	
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryPayloadConfigs_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetEnvironmentConfig_AssetAction>());
 
 		for (const auto& Itr : AssetActions)
 		{

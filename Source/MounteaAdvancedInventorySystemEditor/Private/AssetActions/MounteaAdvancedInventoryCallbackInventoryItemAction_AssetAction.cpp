@@ -12,6 +12,7 @@
 
 #include "MounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction.h"
 #include "Decorations/MounteaCallbackInventoryItemAction.h"
+#include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryItemCallbackAction"
 
@@ -47,7 +48,7 @@ const TArray<FText>& FMounteaAdvancedInventoryCallbackInventoryItemAction_AssetA
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("4. Item Actions")
+		MounteaAdvancedInventoryBaseTypes::AssetActionsMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 };

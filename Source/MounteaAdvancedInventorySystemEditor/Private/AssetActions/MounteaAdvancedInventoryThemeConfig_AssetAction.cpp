@@ -11,6 +11,7 @@
 
 #include "MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 
+#include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryThemeConfigAssetAction"
@@ -48,7 +49,7 @@ const TArray<FText>& FMounteaAdvancedInventoryThemeConfig_AssetAction::GetSubMen
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("666. Configuration")
+		MounteaAdvancedInventoryBaseTypes::ConfigurationMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 }

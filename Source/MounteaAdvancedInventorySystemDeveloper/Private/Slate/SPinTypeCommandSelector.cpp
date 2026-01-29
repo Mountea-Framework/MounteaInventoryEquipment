@@ -44,7 +44,7 @@ void SPinTypeCommandSelector::GetWidgetCommandsFromSettings(TArray<FName>& OutCo
     const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
     if (!settings) return;
 	
-    const UMounteaAdvancedInventoryUIConfig* uiConfig = settings->InventoryUISettingsConfig.LoadSynchronous();
+    const UMounteaAdvancedInventoryUIConfig* uiConfig = settings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
     if (!uiConfig)
         return;
 

@@ -23,8 +23,7 @@ bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* Worl
 	return !UKismetSystemLibrary::IsDedicatedServer(WorldContext);
 }
 
-UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter,
-	bool& bResult)
+UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult)
 {
 	bResult = false;
 
@@ -39,7 +38,7 @@ UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const
 UMounteaAdvancedInventorySettingsConfig* UMounteaInventorySystemStatics::GetMounteaAdvancedInventoryConfig()
 {
 	auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
-	return settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
+	return settings ? settings->AdvancedInventorySettingsConfig.LoadSynchronous() : nullptr;
 }
 
 FText UMounteaInventorySystemStatics::ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText)
@@ -98,7 +97,6 @@ FString UMounteaInventorySystemStatics::EscapeRegexSpecialChars(const FString& I
 
 	return escapedString;
 }
-
 
 FString UMounteaInventorySystemStatics::ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText)
 {
@@ -176,6 +174,8 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 	return returnValue;
 }
 
+#pragma region K2NodeHelpers
+
 bool UMounteaInventorySystemStatics::SetIntPropertyValue(UObject* Target, const FName PropertyName, const int32 Value)
 {
 	return Target ? SetPropertyValueInternal<int32, FIntProperty>(Target, PropertyName, Value) : false;
@@ -206,21 +206,6 @@ bool UMounteaInventorySystemStatics::SetBytePropertyValue(UObject* Target, const
 	return Target ? SetPropertyValueInternal<uint8, FByteProperty>(Target, PropertyName, Value) : false;
 }
 
-bool UMounteaInventorySystemStatics::SetGuidPropertyValue(UObject* Target, const FName PropertyName, const FGuid& Value)
-{
-	return Target ? SetStructPropertyValueInternal<FGuid>(Target, PropertyName, Value) : false;
-}
-
-bool UMounteaInventorySystemStatics::SetVectorPropertyValue(UObject* Target, const FName PropertyName, const FVector& Value)
-{
-	return Target ? SetStructPropertyValueInternal<FVector>(Target, PropertyName, Value) : false;
-}
-
-bool UMounteaInventorySystemStatics::SetVector2DPropertyValue(UObject* Target, const FName PropertyName, const FVector2D& Value)
-{
-	return Target ? SetStructPropertyValueInternal<FVector2D>(Target, PropertyName, Value) : false;
-}
-
 bool UMounteaInventorySystemStatics::SetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject* Value)
 {
 	return Target && Value ? SetObjectPropertyValueInternal(Target, PropertyName, Value) : false;
@@ -239,6 +224,12 @@ bool UMounteaInventorySystemStatics::SetClassPropertyValue(UObject* Target, cons
 bool UMounteaInventorySystemStatics::SetSoftClassPropertyValue(UObject* Target, const FName PropertyName, const TSoftClassPtr<UObject>& Value)
 {
 	return Target ? SetSoftClassPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
+}
+
+bool UMounteaInventorySystemStatics::SetGenericStructPropertyValue(UObject* Target, FName PropertyName, const int32& Value)
+{
+	check(0);
+	return false;
 }
 
 bool UMounteaInventorySystemStatics::GetIntPropertyValue(UObject* Target, const FName PropertyName, int32& Value)
@@ -276,21 +267,6 @@ bool UMounteaInventorySystemStatics::GetBytePropertyValue(UObject* Target, const
 	return Target ? GetPropertyValueInternal<uint8, FByteProperty>(Target, PropertyName, Value) : false;
 }
 
-bool UMounteaInventorySystemStatics::GetGuidPropertyValue(UObject* Target, const FName PropertyName, FGuid& Value)
-{
-	return Target ? GetStructPropertyValueInternal<FGuid>(Target, PropertyName, Value) : false;
-}
-
-bool UMounteaInventorySystemStatics::GetVectorPropertyValue(UObject* Target, const FName PropertyName, FVector& Value)
-{
-	return Target ? GetStructPropertyValueInternal<FVector>(Target, PropertyName, Value) : false;
-}
-
-bool UMounteaInventorySystemStatics::GetVector2DPropertyValue(UObject* Target, const FName PropertyName, FVector2D& Value)
-{
-	return Target ? GetStructPropertyValueInternal<FVector2D>(Target, PropertyName, Value) : false;
-}
-
 bool UMounteaInventorySystemStatics::GetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject*& Value)
 {
 	return Target && Value ? GetObjectPropertyValueInternal(Target, PropertyName, Value) : false;
@@ -310,3 +286,87 @@ bool UMounteaInventorySystemStatics::GetSoftClassPropertyValue(UObject* Target, 
 {
 	return Target ? GetSoftClassPropertyValueInternal<UObject>(Target, PropertyName, Value) : false;
 }
+
+bool UMounteaInventorySystemStatics::GetGenericStructPropertyValue(UObject* Target, FName PropertyName, int32& Value)
+{
+	check(0);
+	return false;
+}
+
+DEFINE_FUNCTION(UMounteaInventorySystemStatics::execSetGenericStructPropertyValue)
+{
+	P_GET_OBJECT(UObject, Target);
+	P_GET_PROPERTY(FNameProperty, PropertyName);
+
+	Stack.StepCompiledIn<FStructProperty>(nullptr);
+	void* valuePtr = Stack.MostRecentPropertyAddress;
+	FStructProperty* valueProperty = CastField<FStructProperty>(Stack.MostRecentProperty);
+
+	P_FINISH;
+
+	bool bSuccess = false;
+
+	[&]()
+	{
+		if (!IsValid(Target) || !valuePtr || !valueProperty || !valueProperty->Struct)
+			return;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		FStructProperty* structProperty = CastField<FStructProperty>(targetProperty);
+		if (!structProperty || structProperty->Struct != valueProperty->Struct)
+			return;
+
+		void* propertyAddress = structProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return;
+
+		structProperty->Struct->CopyScriptStruct(propertyAddress, valuePtr);
+		bSuccess = true;
+	}();
+
+	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
+}
+
+DEFINE_FUNCTION(UMounteaInventorySystemStatics::execGetGenericStructPropertyValue)
+{
+	P_GET_OBJECT(UObject, Target);
+	P_GET_PROPERTY(FNameProperty, PropertyName);
+
+	Stack.StepCompiledIn<FStructProperty>(nullptr);
+	void* valuePtr = Stack.MostRecentPropertyAddress;
+	FStructProperty* valueProperty = CastField<FStructProperty>(Stack.MostRecentProperty);
+
+	P_FINISH;
+
+	bool bSuccess = false;
+
+	[&]()
+	{
+		if (!IsValid(Target) || !valuePtr || !valueProperty || !valueProperty->Struct)
+			return;
+
+		UClass* targetClass = Target->GetClass();
+		if (!targetClass)
+			return;
+
+		FProperty* targetProperty = targetClass->FindPropertyByName(PropertyName);
+		FStructProperty* structProperty = CastField<FStructProperty>(targetProperty);
+		if (!structProperty || structProperty->Struct != valueProperty->Struct)
+			return;
+
+		const void* propertyAddress = structProperty->ContainerPtrToValuePtr<void>(Target);
+		if (!propertyAddress)
+			return;
+
+		structProperty->Struct->CopyScriptStruct(valuePtr, propertyAddress);
+		bSuccess = true;
+	}();
+
+	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
+}
+
+#pragma endregion

@@ -12,6 +12,7 @@
 
 #include "MounteaAdvancedInventoryItemTemplate_AssetAction.h"
 
+#include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction "
@@ -49,7 +50,7 @@ const TArray<FText>& FMounteaAdvancedInventoryItemTemplate_AssetAction::GetSubMe
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("1. Templates")
+		MounteaAdvancedInventoryBaseTypes::TemplatesMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 }

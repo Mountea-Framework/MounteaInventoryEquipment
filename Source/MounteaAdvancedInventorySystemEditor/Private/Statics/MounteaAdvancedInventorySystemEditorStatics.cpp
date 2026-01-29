@@ -32,7 +32,7 @@ void UMounteaAdvancedInventorySystemEditorStatics::OpenAsset(const FString& Asse
 void UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig()
 {
 	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->InventorySettingsConfig.LoadSynchronous() : nullptr;
+	auto config = settings ? settings->AdvancedInventorySettingsConfig.LoadSynchronous() : nullptr;
 	if (!IsValid(config))
 	{
 		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
@@ -45,7 +45,7 @@ void UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig()
 void UMounteaAdvancedInventorySystemEditorStatics::OpenEquipmentConfig()
 {
 	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->EquipmentSettingsConfig.LoadSynchronous() : nullptr;
+	auto config = settings ? settings->AdvancedEquipmentSettingsConfig.LoadSynchronous() : nullptr;
 	if (!IsValid(config))
 	{
 		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Equipment Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
@@ -58,7 +58,7 @@ void UMounteaAdvancedInventorySystemEditorStatics::OpenEquipmentConfig()
 void UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryUIConfig()
 {
 	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->InventoryUISettingsConfig.LoadSynchronous() : nullptr;
+	auto config = settings ? settings->AdvancedInventoryUISettingsConfig.LoadSynchronous() : nullptr;
 	if (!IsValid(config))
 	{
 		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));

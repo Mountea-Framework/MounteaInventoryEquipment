@@ -339,7 +339,7 @@ void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(co
 	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
 	ensure(notificationContainerInterface.GetObject() != nullptr);
 	
-	const UMounteaAdvancedInventoryUIConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventoryUISettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventoryUIConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 	if (!Config)
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))

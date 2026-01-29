@@ -12,6 +12,7 @@
 
 #include "MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 
+#include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 
 
@@ -50,7 +51,7 @@ const TArray<FText>& FMounteaAdvancedEquipmentSettingsConfig_AssetAction::GetSub
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("666. Configuration")
+		MounteaAdvancedInventoryBaseTypes::ConfigurationMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 }
