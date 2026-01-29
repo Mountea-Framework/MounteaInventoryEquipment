@@ -116,6 +116,16 @@ namespace InventoryUICommands
 			Show
 		};
 	}
+	
+	// ItemPreview
+	namespace ItemPreview
+	{
+		inline const FString ClearPreview(TEXT("ClearItemPreview"));
+
+		inline const TSet<FString> All = {
+			ClearPreview
+		};
+	}
 
 	// General
 	namespace General
@@ -150,6 +160,7 @@ namespace InventoryUICommands
 		Result.Append(Categories::All);
 		Result.Append(Notifications::All);
 		Result.Append(General::All);
+		Result.Append(ItemPreview::All);
 
 		return Result;
 	}();
