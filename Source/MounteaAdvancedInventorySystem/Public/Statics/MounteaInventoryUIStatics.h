@@ -852,10 +852,12 @@ public:
 	 * @return True if the Wrapper currently reports the tag as active; otherwise false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Validate"),
+		meta=(CustomTag="MounteaK2Validate"),		
+		meta=(AutoCreateRefTerm="Tag"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Has Wrapper Widget State Tag")
 	static bool HasWidgetStateTag(UObject* Target,
-		const FGameplayTag& Tag, bool bExactMatch = true);
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, bool bExactMatch = true);
 
 	/**
 	 * Clears all Widget State tags tracked by the target Wrapper.
