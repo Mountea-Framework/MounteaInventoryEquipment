@@ -45,13 +45,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCallbackInventoryItemAction : p
 protected:
 	
 	/**
-	 * Class which defines what payload this action expects to receive in the Initialize function.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
-		DisplayName="Action Payload")
-	TSoftClassPtr<UObject> ActionPayloadClass;
-	
-	/**
 	 * Gameplay effects to apply when this action is successfully executed.
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",

@@ -9,33 +9,35 @@
 //
 // For more information, visit: https://mountea.tools
 
-#include "MounteaAdvancedInventorySettingsConfig_AssetAction.h"
+#include "MounteaAdvancedInventoryPayloadConfigs_AssetAction.h"
 
+#include "MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
-#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/TemplatesConfig/MounteaAdvancedInventoryPayloadsConfig.h"
 
-#define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySettingsConfigAssetAction"
 
-FMounteaAdvancedInventorySettingsConfig_AssetAction::FMounteaAdvancedInventorySettingsConfig_AssetAction()
+#define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryPayloadConfigs_AssetAction"
+
+FMounteaAdvancedInventoryPayloadConfigs_AssetAction::FMounteaAdvancedInventoryPayloadConfigs_AssetAction()
 {
 }
 
-FText FMounteaAdvancedInventorySettingsConfig_AssetAction::GetName() const
+FText FMounteaAdvancedInventoryPayloadConfigs_AssetAction::GetName() const
 {
-	return LOCTEXT("MounteaAdvancedInventorySettingsConfigAssetAction", "Mountea Advanced Inventory Config");
+	return LOCTEXT("MounteaAdvancedInventoryPayloadConfigs_AssetAction", "Mountea Advanced Inventory Payloads Config");
 }
 
-FColor FMounteaAdvancedInventorySettingsConfig_AssetAction::GetTypeColor() const
+FColor FMounteaAdvancedInventoryPayloadConfigs_AssetAction::GetTypeColor() const
 {
 	return FColor::Orange;
 }
 
-UClass* FMounteaAdvancedInventorySettingsConfig_AssetAction::GetSupportedClass() const
+UClass* FMounteaAdvancedInventoryPayloadConfigs_AssetAction::GetSupportedClass() const
 {
-	return UMounteaAdvancedInventorySettingsConfig::StaticClass();
+	return UMounteaAdvancedInventoryPayloadsConfig::StaticClass();
 }
 
-uint32 FMounteaAdvancedInventorySettingsConfig_AssetAction::GetCategories()
+uint32 FMounteaAdvancedInventoryPayloadConfigs_AssetAction::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
 	{
@@ -45,7 +47,7 @@ uint32 FMounteaAdvancedInventorySettingsConfig_AssetAction::GetCategories()
 	return EAssetTypeCategories::Misc;
 }
 
-const TArray<FText>& FMounteaAdvancedInventorySettingsConfig_AssetAction::GetSubMenus() const
+const TArray<FText>& FMounteaAdvancedInventoryPayloadConfigs_AssetAction::GetSubMenus() const
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{

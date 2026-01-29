@@ -162,7 +162,7 @@ void UK2Node_SwitchWidgetInputTag::GetAvailableUIActionTags(TArray<FGameplayTag>
 	const auto inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!inventorySettings) return;
 	
-	const UMounteaAdvancedInventoryUIConfig* uiConfig = inventorySettings->InventoryUISettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventoryUIConfig* uiConfig = inventorySettings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 	if (!uiConfig) return;
 
 	for (const FMounteaWidgetInputActionMapping& inputMapping : uiConfig->UIActionMappings)

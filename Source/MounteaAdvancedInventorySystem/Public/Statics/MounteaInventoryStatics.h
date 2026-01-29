@@ -1,4 +1,14 @@
-﻿// MounteaInventoryStatics.h
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -10,9 +20,12 @@
 
 class UMounteaAdvancedInventorySettings;
 class UMounteaAdvancedInventorySettingsConfig;
+class UMounteaAdvancedInventoryPayloadsConfig;
 class UMounteaSelectableInventoryItemAction;
 class UMounteaCallbackInventoryItemAction;
 class UMounteaInventoryItemAction;
+
+struct FPayloadConfig;
 
 enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
@@ -189,9 +202,42 @@ public:
 		meta=(CustomTag="MounteaK2Getter"))
 	static UMounteaAdvancedInventorySettingsConfig* GetInventorySettingsConfig();
 
+	/**
+	 * Retrieves configuration asset from the Mountea Inventory Confiration
+	 *
+	 * @param Key Identifier to search the config by.
+	 * @return - A pointer to the Configuration Asset or null
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", 
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Template Config")
 	static UPrimaryDataAsset* GetTemplateConfig(const FString& Key);
+	
+	/**
+	 * Retrieves Payloads configuration asset from the Mountea Inventory Confiration
+	 *
+	 * @return - A pointer to the Payloads Configuration Asset or null
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Payloads Config")
+	static UMounteaAdvancedInventoryPayloadsConfig* GetPayloadsConfig();
+	
+	/**
+	 * Retrieves Payload Config from Config File if it exists.
+	 *
+	 * @param Creator GameplayTag of the creator Object
+	 * @param Receiver GameplayTag of the receiver
+	 * @param bSuccess Whether operation was success or not
+	 * 
+	 * @return - A data associated to key of Created and Receiver, or null
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Payload Config")
+	static FPayloadConfig FindPayloadConfig(UPARAM(meta=(Categories="Mountea_Inventory")) const FGameplayTag Creator, 
+		UPARAM(meta=(Categories="Mountea_Inventory")) const FGameplayTag Receiver, bool& bSuccess);
+	
 #pragma endregion
 	
 #pragma region Inventory

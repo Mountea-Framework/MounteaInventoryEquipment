@@ -63,7 +63,6 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				"DesktopPlatform", 
 				
 				"EditorSubsystem", 
-				"EditorScriptingUtilities",
 				
 				"Json",
 				"WebBrowser"

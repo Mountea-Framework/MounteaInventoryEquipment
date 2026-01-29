@@ -21,6 +21,7 @@
 #include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/TemplatesConfig/MounteaAdvancedInventoryPayloadsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
 #pragma region ItemActions
@@ -85,7 +86,7 @@ UMounteaAdvancedInventorySettingsConfig* UMounteaInventoryStatics::GetInventoryS
 {
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return nullptr;
-	return settings->InventorySettingsConfig.LoadSynchronous();
+	return settings->AdvancedInventorySettingsConfig.LoadSynchronous();
 }
 
 UPrimaryDataAsset* UMounteaInventoryStatics::GetTemplateConfig(const FString& Key)
@@ -94,6 +95,34 @@ UPrimaryDataAsset* UMounteaInventoryStatics::GetTemplateConfig(const FString& Ke
 	if (!config) return nullptr;
 	const auto templateConfig = config->TemplatesConfig.Find(Key);
 	return templateConfig ? templateConfig->LoadSynchronous() : nullptr;
+}
+
+UMounteaAdvancedInventoryPayloadsConfig* UMounteaInventoryStatics::GetPayloadsConfig()
+{
+	return Cast<UMounteaAdvancedInventoryPayloadsConfig>(GetTemplateConfig(TEXT("Payloads")));
+}
+
+FPayloadConfig UMounteaInventoryStatics::FindPayloadConfig(const FGameplayTag Creator, const FGameplayTag Receiver, bool& bSuccess)
+{
+	const auto payloadConfig = GetPayloadsConfig();
+	if (!IsValid(payloadConfig))
+	{
+		bSuccess = false;
+		return {};
+	}
+
+	FPayloadConfig searchKey;
+	searchKey.PayloadCreator = Creator;
+	searchKey.PayloadReceiver = Receiver;
+
+	if (const FPayloadConfig* foundConfig = payloadConfig->PayloadConfigs.Find(searchKey))
+	{
+		bSuccess = true;
+		return *foundConfig;
+	}
+
+	bSuccess = false;
+	return {};
 }
 
 FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
@@ -220,10 +249,10 @@ FInventoryCategory UMounteaInventoryStatics::GetInventoryCategory(const FInvento
 	if (!Item.Template) return FInventoryCategory();
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return FInventoryCategory();
-	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!inventorySettingsConfig) return FInventoryCategory();
+	const auto advancedInventorySettingsConfig = settings->AdvancedInventorySettingsConfig.LoadSynchronous();
+	if (!advancedInventorySettingsConfig) return FInventoryCategory();
 	const auto categoryKey = Item.Template->ItemCategory;
-	return inventorySettingsConfig->AllowedCategories.Contains(categoryKey) ? inventorySettingsConfig->AllowedCategories.FindChecked(categoryKey) : FInventoryCategory();
+	return advancedInventorySettingsConfig->AllowedCategories.Contains(categoryKey) ? advancedInventorySettingsConfig->AllowedCategories.FindChecked(categoryKey) : FInventoryCategory();
 }
 
 FString UMounteaInventoryStatics::GetInventoryCategoryKey(const FInventoryItem& Item)
@@ -237,10 +266,10 @@ FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryIt
 	if (!Item.Template) return FInventoryRarity();
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return FInventoryRarity();
-	const auto inventorySettingsConfig = settings->InventorySettingsConfig.LoadSynchronous();
-	if (!inventorySettingsConfig) return FInventoryRarity();
+	const auto advancedInventorySettingsConfig = settings->AdvancedInventorySettingsConfig.LoadSynchronous();
+	if (!advancedInventorySettingsConfig) return FInventoryRarity();
 	const auto rarityKey = Item.Template->ItemRarity;
-	return inventorySettingsConfig->AllowedRarities.Contains(rarityKey) ? inventorySettingsConfig->AllowedRarities.FindChecked(rarityKey) : FInventoryRarity();
+	return advancedInventorySettingsConfig->AllowedRarities.Contains(rarityKey) ? advancedInventorySettingsConfig->AllowedRarities.FindChecked(rarityKey) : FInventoryRarity();
 }
 
 FString UMounteaInventoryStatics::GetInventoryRarityKey(const FInventoryItem& Item)
@@ -555,7 +584,7 @@ FInventoryNotificationData UMounteaInventoryStatics::CreateNotificationData(
 	const int32 QuantityDelta
 )
 {
-	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->InventorySettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventorySettingsConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventorySettingsConfig.LoadSynchronous();
 	if (!Config) return FInventoryNotificationData();
 
 	const FInventoryNotificationConfig* NotifConfig = Config->NotificationConfigs.Find(Type);

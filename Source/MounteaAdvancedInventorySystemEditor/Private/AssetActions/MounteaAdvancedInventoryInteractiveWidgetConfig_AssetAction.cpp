@@ -11,6 +11,7 @@
 
 #include "MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 
+#include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryInteractiveWidgetConfig.h"
 
 
@@ -49,7 +50,7 @@ const TArray<FText>& FMounteaAdvancedInventoryInteractiveWidgetConfig_AssetActio
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		FText::FromString("666. Configuration")
+		MounteaAdvancedInventoryBaseTypes::ConfigurationMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 }

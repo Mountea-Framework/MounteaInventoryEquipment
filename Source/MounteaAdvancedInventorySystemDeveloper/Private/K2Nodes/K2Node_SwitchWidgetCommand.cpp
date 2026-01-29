@@ -121,7 +121,7 @@ void UK2Node_SwitchWidgetCommand::GetWidgetCommandsFromSettings(TArray<FName>& O
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return;
 	
-	const UMounteaAdvancedInventoryUIConfig* uiConfig = settings->InventoryUISettingsConfig.LoadSynchronous();
+	const UMounteaAdvancedInventoryUIConfig* uiConfig = settings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 	if (!uiConfig)
 	return;
 

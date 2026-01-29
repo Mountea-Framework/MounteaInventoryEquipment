@@ -33,7 +33,6 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 
 #include "ContentBrowserModule.h"
-#include "EditorAssetLibrary.h"
 #include "IContentBrowserSingleton.h"
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
@@ -48,6 +47,7 @@
 #include "AssetToolsModule.h"
 #include "DesktopPlatformModule.h"
 #include "MounteaItemTemplatesEditorHelp.h"
+#include "ObjectTools.h"
 #include "Algo/ForEach.h"
 #include "Editor/STemplateTreeItemRow.h"
 #include "Search/MounteaInventoryTemplateSearchFilter.h"
@@ -1075,32 +1075,41 @@ FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMou
 {
 	if (!Template.IsValid())
 		return FReply::Unhandled();
-	
+
 	UMounteaInventoryItemTemplate* itemTemplate = Template.Get();
-	
+
 	if (itemTemplate->HasAnyFlags(RF_Transient))
 	{
 		ShowTemplateEditorNotification(TEXT("Cannot delete unsaved template."), false);
 		return FReply::Handled();
 	}
-	
-	FText title = LOCTEXT("DeleteTemplateTitle", "Delete Template");
-	FText message = FText::Format(LOCTEXT("DeleteTemplateMessage", "Are you sure you want to delete '{0}'?"), 
-		itemTemplate->DisplayName.IsEmpty() ? FText::FromString(itemTemplate->GetName()) : itemTemplate->DisplayName);
-	
-	if (FMessageDialog::Open(EAppMsgType::YesNo, message, title) == EAppReturnType::Yes)
+
+	const FText title = LOCTEXT("DeleteTemplateTitle", "Delete Template");
+	const FText message = FText::Format(
+		LOCTEXT("DeleteTemplateMessage", "Are you sure you want to delete '{0}'?"),
+		itemTemplate->DisplayName.IsEmpty()
+			? FText::FromString(itemTemplate->GetName())
+			: itemTemplate->DisplayName
+	);
+
+	if (FMessageDialog::Open(EAppMsgType::YesNo, message, title) != EAppReturnType::Yes)
+		return FReply::Handled();
+
+	UntrackDirtyAsset(itemTemplate);
+
+	TArray<UObject*> objectsToDelete;
+	objectsToDelete.Add(itemTemplate);
+
+	const int32 numDeleted = ObjectTools::DeleteObjects(objectsToDelete, false);
+
+	if (numDeleted > 0)
 	{
-		UntrackDirtyAsset(itemTemplate);
-		
-		if (UEditorAssetLibrary::DeleteAsset(itemTemplate->GetPathName()))
-		{
-			RefreshTemplateList();
-			ShowTemplateEditorNotification(TEXT("Template deleted successfully."), true);
-		}
-		else
-			ShowTemplateEditorNotification(TEXT("Failed to delete template."), false);
+		RefreshTemplateList();
+		ShowTemplateEditorNotification(TEXT("Template deleted successfully."), true);
 	}
-	
+	else
+		ShowTemplateEditorNotification(TEXT("Failed to delete template."), false);
+
 	return FReply::Handled();
 }
 
