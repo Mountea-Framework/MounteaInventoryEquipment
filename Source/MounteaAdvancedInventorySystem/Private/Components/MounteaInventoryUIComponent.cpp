@@ -551,6 +551,36 @@ void UMounteaInventoryUIComponent::CancelQueuedAction_Implementation(UMounteaSel
 	ActionsQueue.Remove(ItemAction);
 }
 
+void UMounteaInventoryUIComponent::SetWidgetStates_Implementation(const FGameplayTagContainer& NewStates)
+{
+	if (WidgetStatesContainer != NewStates)
+		WidgetStatesContainer = NewStates;
+}
+
+bool UMounteaInventoryUIComponent::AddWidgetStateTag_Implementation(const FGameplayTag& Tag)
+{
+	if (!WidgetStatesContainer.HasTag(Tag))
+		return false;
+	WidgetStatesContainer.AddTag(Tag);
+	return true;
+}
+
+bool UMounteaInventoryUIComponent::RemoveWidgetStateTag_Implementation(const FGameplayTag& Tag)
+{
+	return WidgetStatesContainer.RemoveTag(Tag);
+}
+
+bool UMounteaInventoryUIComponent::HasWidgetStateTag_Implementation(const FGameplayTag& Tag, bool bExactMatch) const
+{
+	return bExactMatch ? WidgetStatesContainer.HasTagExact(Tag) : WidgetStatesContainer.HasTag(Tag);
+}
+
+bool UMounteaInventoryUIComponent::AppendWidgetStateTags_Implementation(const FGameplayTagContainer& TagsToAppend)
+{
+	WidgetStatesContainer.AppendTags(TagsToAppend);
+	return true;
+}
+
 /* TODO: do some cleanup, like every 30 seconds? Make it into UI Config?
 void UMounteaInventoryUIComponent::CleanupExpiredActions_Implementation(float MaxAgeSeconds)
 {

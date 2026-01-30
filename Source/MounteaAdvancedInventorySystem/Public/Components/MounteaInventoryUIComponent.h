@@ -91,7 +91,16 @@ public:
 	virtual void EmptyItemActionsQueue_Implementation() override;
 	virtual void CompleteQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) override;
 	virtual void CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction) override;
-
+	
+	virtual FGameplayTagContainer GetWidgetStates_Implementation() const override { return WidgetStatesContainer; };
+	virtual void SetWidgetStates_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates) override;
+	virtual bool AddWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag) override;
+	virtual bool RemoveWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag) override;
+	virtual bool HasWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, 
+		bool bExactMatch) const override;
+	virtual void ClearWidgetStateTags_Implementation() override { WidgetStatesContainer.Reset(); };
+	virtual bool AppendWidgetStateTags_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend) override;
+	
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
 	{ return OnCategorySelected; };
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
@@ -129,15 +138,15 @@ protected:
 protected:
 	
 	// Currently active category in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
 	FString ActiveCategoryId;
 
 	// Currently active item in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Mountea|Inventory")
 	FGuid ActiveItemGuid;
 
 	// Currently active item Widget.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
 	TObjectPtr<UWidget> ActiveItemWidget;
 	
 	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
@@ -168,5 +177,9 @@ private:
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
 	
 	UPROPERTY(Transient)
+	FGameplayTagContainer WidgetStatesContainer;
+	
+	UPROPERTY(Transient,
+		meta=(Categories="Mountea_Inventory.WidgetState,State"))
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 };

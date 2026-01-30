@@ -356,7 +356,7 @@ public:
 		meta=(Keywords="add"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Inventory UI Manager - Enqueue Item Action")
-	static bool EnqueueItemAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
+	static bool EnqueueItemAction(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
 		UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
 	
 	/**
@@ -371,7 +371,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(Keywords="clear"),
 		DisplayName="Inventory UI Manager - Empty Item Actions Queue")
-	static void EmptyItemActionsQueue_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static void EmptyItemActionsQueue(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
 	 * Marks the specified queued Selectable Item Action as completed and removes it from the queue.
@@ -387,7 +387,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI Manager - Complete Item Action")
-	static void CompleteQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static void CompleteQueuedAction(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload);
 	
 	/**
@@ -403,7 +403,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI Manager - Cancel Item Action")
-	static void CancelQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static void CancelQueuedAction(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		UMounteaSelectableInventoryItemAction* ItemAction);
 	
 	/**
@@ -417,8 +417,159 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Item Actions",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI Manager - Remove Item Action")
-	static void RemoveQueuedAction_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static void RemoveQueuedAction(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		UMounteaSelectableInventoryItemAction* ItemAction);
+	
+	/**
+	 * Sets the source inventory for a given Wrapper widget.
+	 * This function should be used sparsely as it resets the Parent Inventory
+	 * for all children elements of this Wrapper!
+	 *
+	 * @param Target The target widget interface that will have its source inventory set.
+	 * @param ParentInventory The parent UI Manager to associate with the target widget.
+	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Wrapper", 
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(Keywords="container,viewport"),
+		DisplayName="Set Wrapper Widget Parent Manager")
+	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, 
+		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory);
+
+	/**
+	 * Returns all currently active Widget State tags tracked by the target UI Manager.
+	 *
+	 * UI Manager states are used to keep track of which UI widgets are currently active/visible/in use
+	 * within the Wrapper (for example Modal Window, Tooltip, Context Menu, Inventory Panel, etc.).
+	 * Each widget that is created/added to the Wrapper should contribute its predefined Gameplay Tag
+	 * so the Wrapper and UI Manager can quickly query what is active and react accordingly.
+	 *
+	 * @param Target The target UI Manager interface from which the active state container will be retrieved.
+	 * @return Container of Gameplay Tags representing active UI states/widgets currently tracked by the UI Manager.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(DefaultToSelf="Target"),
+		DisplayName="Get Widget States")
+	static FGameplayTagContainer GetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+
+	/**
+	 * Overwrites UI Manager state tracking with a new tag container.
+	 *
+	 * This function replaces the current tracked Widget State tags with the provided container.
+	 * It exists primarily as a write-back mechanism for systems that manipulate state tags in bulk
+	 * (including helper functions such as AddWidgetStateTag, RemoveWidgetStateTag, ClearWidgetStateTags
+	 * or AppendWidgetStateTags).
+	 *
+	 * @note
+	 * - This function only updates state tracking. It should not be assumed to create/destroy widgets by itself.
+	 * - Implementations should ensure the stored state remains consistent with actual active widgets.
+	 *
+	 * @param Target The target Wrapper widget interface whose states will be overwritten.
+	 * @param NewStates Container of Gameplay Tags that will become the UI Manager's active widget states.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		DisplayName="Set Widget States")
+	static void SetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates);
+
+	/**
+	 * Adds a new Widget State tag to the target UI Manager's active state container.
+	 *
+	 * Expected flow:
+	 * - A child widget (e.g., ModalWindow) is created/added to the UI Manager.
+	 * - That widget provides its state tag definition.
+	 * - UI Manager registers the tag so the system can track that the widget is now active.
+	 *
+	 * @param Target The target UI Manager that will receive the state tag.
+	 * @param Tag The Gameplay Tag describing the widget state to add.
+	 * @return True if the tag was added (was not present before). False if invalid or already present.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		meta=(AutoCreateRefTerm="Tag"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Add Widget State Tag")
+	static bool AddWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
+
+	/**
+	 * Removes an existing Widget State tag from the target UI Manager's active state container.
+	 *
+	 * This should be called when a UI element is removed/hidden/destroyed so the Wrapper no longer reports
+	 * it as active, preventing stale state and enabling correct UI Manager decisions.
+	 *
+	 * @param Target The target UI Manager interface from which the state tag will be removed.
+	 * @param Tag The Gameplay Tag describing the widget state to remove.
+	 * @return True if the tag was removed. False if invalid or not found.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		meta=(AutoCreateRefTerm="Tag"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Remove Widget State Tag")
+	static bool RemoveWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
+
+	/**
+	 * Checks whether the target UI Manager currently contains a given Widget State tag.
+	 *
+	 * Used for querying whether a particular UI element/state is currently active within the Wrapper.
+	 * Example: prevent opening another modal if "UI.Modal.Active" is already present, or change input rules.
+	 *
+	 * @param Target The target UI Manager interface to query.
+	 * @param Tag The Gameplay Tag describing the widget state to check.
+	 * @param bExactMatch If true, requires an exact tag match. If false, allows hierarchical matching
+	 *                    (e.g., checking "UI.Modal" would match "UI.Modal.Active").
+	 * @return True if the UI Manager currently reports the tag as active; otherwise false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Validate"),		
+		meta=(DefaultToSelf="Target"),
+		meta=(AutoCreateRefTerm="Tag"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Has Widget State Tag")
+	static bool HasWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, bool bExactMatch = true);
+
+	/**
+	 * Clears all Widget State tags tracked by the target UI Manager.
+	 *
+	 * Typically used during full teardown/reset scenarios such as RemoveWrapperWidget, rebuilding the UI,
+	 * or when the UI Manager needs to force the Wrapper into a clean baseline state.
+	 *
+	 * Note:
+	 * - This does not automatically destroy UI widgets by itself. It only clears the tracked state tags.
+	 *
+	 * @param Target The target UI Manager interface whose states will be cleared.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		DisplayName="Clear Widget State Tags")
+	static void ClearWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+
+	/**
+	 * Appends multiple Widget State tags to the target UI Manager's active state container.
+	 *
+	 * Useful when adding a composite widget (or UI mode) that activates multiple tracked states at once,
+	 * or when synchronizing the UI Manager to a known set of states provided by another system.
+	 *
+	 * @param Target The target UI Manager interface that will receive the state tags.
+	 * @param TagsToAppend Container of Gameplay Tags to add to the UI Manager's active state container.
+	 * @return True if at least one new tag was added. False if empty or all tags were already present.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Append Widget State Tags")
+	static bool AppendWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend);
 	
 #pragma endregion
 	
@@ -751,155 +902,6 @@ public:
 #pragma region Wrapper
 	
 	static bool IsValidWrapperWidget(const UObject* Target);
-	
-	/**
-	 * Sets the source inventory for a given Wrapper widget.
-	 * This function should be used sparsely as it resets the Parent Inventory
-	 * for all children elements of this Wrapper!
-	 *
-	 * @param Target The target widget interface that will have its source inventory set.
-	 * @param ParentInventory The parent UI Manager to associate with the target widget.
-	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Wrapper", 
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(Keywords="container,viewport"),
-		DisplayName="Set Wrapper Widget Parent Manager")
-	static void SetSourceInventory(const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target, 
-		const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory);
-
-	/**
-	 * Returns all currently active Widget State tags tracked by the target Wrapper.
-	 *
-	 * Wrapper widget states are used to keep track of which UI widgets are currently active/visible/in use
-	 * within the Wrapper (for example Modal Window, Tooltip, Context Menu, Inventory Panel, etc.).
-	 * Each widget that is created/added to the Wrapper should contribute its predefined Gameplay Tag
-	 * so the Wrapper and UI Manager can quickly query what is active and react accordingly.
-	 *
-	 * @param Target The target Wrapper widget interface from which the active state container will be retrieved.
-	 * @return Container of Gameplay Tags representing active UI states/widgets currently tracked by the Wrapper.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Getter"),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Get Wrapper Widget States")
-	static FGameplayTagContainer GetWrapperWidgetStates(UObject* Target);
-
-	/**
-	 * Overwrites Wrapper widget state tracking with a new tag container on the target Wrapper.
-	 *
-	 * This replaces the current tracked Widget State tags with the provided container.
-	 * Intended for bulk synchronization/reset scenarios (rebuild, restore, switching UI modes).
-	 *
-	 * Notes:
-	 * - This only updates state tracking. It should not be assumed to create/destroy widgets by itself.
-	 * - Implementations should ensure the stored state remains consistent with actual active widgets.
-	 *
-	 * @param Target The target Wrapper widget interface whose states will be overwritten.
-	 * @param NewStates Container of Gameplay Tags that will become the Wrapper's active widget states.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Set Wrapper Widget States")
-	static void SetWrapperWidgetStates(UObject* Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates);
-
-	/**
-	 * Adds a new Widget State tag to the target Wrapper's active state container.
-	 *
-	 * Expected flow:
-	 * - A child widget (e.g., ModalWindow) is created/added to the Wrapper.
-	 * - That widget provides its state tag definition.
-	 * - Wrapper registers the tag so the system can track that the widget is now active.
-	 *
-	 * @param Target The target Wrapper widget interface that will receive the state tag.
-	 * @param Tag The Gameplay Tag describing the widget state to add.
-	 * @return True if the tag was added (was not present before). False if invalid or already present.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(DefaultToSelf="Target"),
-		meta=(AutoCreateRefTerm="Tag"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Add Wrapper Widget State Tag")
-	static bool AddWidgetStateTag(UObject* Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
-
-	/**
-	 * Removes an existing Widget State tag from the target Wrapper's active state container.
-	 *
-	 * This should be called when a UI element is removed/hidden/destroyed so the Wrapper no longer reports
-	 * it as active, preventing stale state and enabling correct UI Manager decisions.
-	 *
-	 * @param Target The target Wrapper widget interface from which the state tag will be removed.
-	 * @param Tag The Gameplay Tag describing the widget state to remove.
-	 * @return True if the tag was removed. False if invalid or not found.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(DefaultToSelf="Target"),
-		meta=(AutoCreateRefTerm="Tag"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Remove Wrapper Widget State Tag")
-	static bool RemoveWidgetStateTag(UObject* Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
-
-	/**
-	 * Checks whether the target Wrapper currently contains a given Widget State tag.
-	 *
-	 * Used for querying whether a particular UI element/state is currently active within the Wrapper.
-	 * Example: prevent opening another modal if "UI.Modal.Active" is already present, or change input rules.
-	 *
-	 * @param Target The target Wrapper widget interface to query.
-	 * @param Tag The Gameplay Tag describing the widget state to check.
-	 * @param bExactMatch If true, requires an exact tag match. If false, allows hierarchical matching
-	 *                    (e.g., checking "UI.Modal" would match "UI.Modal.Active").
-	 * @return True if the Wrapper currently reports the tag as active; otherwise false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Validate"),		
-		meta=(DefaultToSelf="Target"),
-		meta=(AutoCreateRefTerm="Tag"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Has Wrapper Widget State Tag")
-	static bool HasWidgetStateTag(UObject* Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, bool bExactMatch = true);
-
-	/**
-	 * Clears all Widget State tags tracked by the target Wrapper.
-	 *
-	 * Typically used during full teardown/reset scenarios such as RemoveWrapperWidget, rebuilding the UI,
-	 * or when the UI Manager needs to force the Wrapper into a clean baseline state.
-	 *
-	 * Note:
-	 * - This does not automatically destroy UI widgets by itself. It only clears the tracked state tags.
-	 *
-	 * @param Target The target Wrapper widget interface whose states will be cleared.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Clear Wrapper Widget State Tags")
-	static void ClearWidgetStateTags(UObject* Target);
-
-	/**
-	 * Appends multiple Widget State tags to the target Wrapper's active state container.
-	 *
-	 * Useful when adding a composite widget (or UI mode) that activates multiple tracked states at once,
-	 * or when synchronizing the Wrapper to a known set of states provided by another system.
-	 *
-	 * @param Target The target Wrapper widget interface that will receive the state tags.
-	 * @param TagsToAppend Container of Gameplay Tags to add to the Wrapper's active state container.
-	 * @return True if at least one new tag was added. False if empty or all tags were already present.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Append Wrapper Widget State Tags")
-	static bool AppendWidgetStateTags(UObject* Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend);
 
 #pragma endregion
 	
