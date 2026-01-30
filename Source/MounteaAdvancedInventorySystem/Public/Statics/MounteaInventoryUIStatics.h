@@ -781,6 +781,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Getter"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Wrapper Widget States")
 	static FGameplayTagContainer GetWrapperWidgetStates(UObject* Target);
 
@@ -799,9 +800,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Wrapper Widget States")
 	static void SetWrapperWidgetStates(UObject* Target,
-		const FGameplayTagContainer& NewStates);
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates);
 
 	/**
 	 * Adds a new Widget State tag to the target Wrapper's active state container.
@@ -817,10 +819,12 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		meta=(AutoCreateRefTerm="Tag"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Add Wrapper Widget State Tag")
 	static bool AddWidgetStateTag(UObject* Target,
-		const FGameplayTag& Tag);
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
 
 	/**
 	 * Removes an existing Widget State tag from the target Wrapper's active state container.
@@ -834,10 +838,12 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
+		meta=(AutoCreateRefTerm="Tag"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Remove Wrapper Widget State Tag")
 	static bool RemoveWidgetStateTag(UObject* Target,
-		const FGameplayTag& Tag);
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
 
 	/**
 	 * Checks whether the target Wrapper currently contains a given Widget State tag.
@@ -853,6 +859,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Validate"),		
+		meta=(DefaultToSelf="Target"),
 		meta=(AutoCreateRefTerm="Tag"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Has Wrapper Widget State Tag")
@@ -872,6 +879,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Clear Wrapper Widget State Tags")
 	static void ClearWidgetStateTags(UObject* Target);
 
@@ -887,10 +895,11 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Append Wrapper Widget State Tags")
 	static bool AppendWidgetStateTags(UObject* Target,
-		const FGameplayTagContainer& TagsToAppend);
+		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend);
 
 #pragma endregion
 	
