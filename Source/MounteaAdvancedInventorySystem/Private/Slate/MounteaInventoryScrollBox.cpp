@@ -21,7 +21,8 @@ void UMounteaInventoryScrollBox::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	SetIsFocusable(true);
+	if (bCaptureInput)
+		SetIsFocusable(true);
 }
 
 int32 UMounteaInventoryScrollBox::GetChildrenCount() const
