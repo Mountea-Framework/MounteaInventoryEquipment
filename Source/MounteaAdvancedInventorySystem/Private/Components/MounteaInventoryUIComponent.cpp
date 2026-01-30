@@ -61,6 +61,7 @@ void UMounteaInventoryUIComponent::BeginPlay()
 		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
 		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
+		UIConfig = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 		Execute_EmptyItemActionsQueue(this); // Do NOT receive any queue items
 		
 		{
@@ -311,10 +312,10 @@ bool UMounteaInventoryUIComponent::SetInventoryWidget_Implementation(UUserWidget
 void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget)
 {
 	if (ActiveItemWidget != NewActiveItemWidget)
-	{
 		ActiveItemWidget = NewActiveItemWidget;
-		NewActiveItemWidget->SetFocus();
-	}
+	
+	if (UIConfig && UIConfig->bAllowAutoFocus && ActiveItemWidget)
+		ActiveItemWidget->SetFocus();	
 }
 
 UUserWidget* UMounteaInventoryUIComponent::GetNotificationContainer_Implementation() const
@@ -339,20 +340,19 @@ void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(co
 	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
 	ensure(notificationContainerInterface.GetObject() != nullptr);
 	
-	const UMounteaAdvancedInventoryUIConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventoryUISettingsConfig.LoadSynchronous();
-	if (!Config)
+	if (!UIConfig)
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))
 		return;
 	}
 
-	if (Config->NotificationWidgetClass.IsNull())
+	if (UIConfig->NotificationWidgetClass.IsNull())
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load `NotificationWidgetClass` from Config!"))
 		return;
 	}
 	
-	auto notificationClass = Config->NotificationWidgetClass.LoadSynchronous();
+	auto notificationClass = UIConfig->NotificationWidgetClass.LoadSynchronous();
 	auto notificationWidget = CreateWidget(InventoryNotificationContainerWidget, notificationClass);
 	if (!IsValid(notificationWidget))
 	{

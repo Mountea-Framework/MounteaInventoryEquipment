@@ -103,6 +103,17 @@ public:
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
 
 	/**
+	 * Returns whether the tag container is empty or not.
+	 * @param Source Container to check
+	 * @return True if empty or invalid, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|GameplayTags",
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Is Tag Container Empty")
+	static bool IsTagsContainerEmpty(const FGameplayTagContainer& Source);
+
+	/**
 	 * Retrieves an invalid FGuid.
 	 *
 	 * This function provides a static method to return an invalid/uninitialized FGuid.
