@@ -559,7 +559,7 @@ void UMounteaInventoryUIComponent::SetWidgetStates_Implementation(const FGamepla
 
 bool UMounteaInventoryUIComponent::AddWidgetStateTag_Implementation(const FGameplayTag& Tag)
 {
-	if (!WidgetStatesContainer.HasTag(Tag))
+	if (WidgetStatesContainer.HasTag(Tag))
 		return false;
 	WidgetStatesContainer.AddTag(Tag);
 	return true;
