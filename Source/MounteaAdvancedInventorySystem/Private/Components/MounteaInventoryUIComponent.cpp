@@ -581,21 +581,6 @@ bool UMounteaInventoryUIComponent::AppendWidgetStateTags_Implementation(const FG
 	return true;
 }
 
-/* TODO: do some cleanup, like every 30 seconds? Make it into UI Config?
-void UMounteaInventoryUIComponent::CleanupExpiredActions_Implementation(float MaxAgeSeconds)
-{
-	FTimespan maxAge = FTimespan::FromSeconds(MaxAgeSeconds);
-	FDateTime now = FDateTime::Now();
-    
-	for (int32 i = ActionsQueue.Pending.Num() - 1; i >= 0; --i)
-	{
-		const FActionQueueEntry& entry = ActionsQueue.Pending[i];
-		if ((now - entry.CreationTime) > maxAge && entry.Action)
-			Execute_CancelQueuedAction(this, entry.Action.Get());
-	}
-}
-*/
-
 void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 {
 	ActionsQueue.Clear();
@@ -603,14 +588,16 @@ void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 
 TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetItemActionsQueue_Implementation() const
 {
-	TArray<UMounteaSelectableInventoryItemAction*> result;
-	result.Reserve(ActionsQueue.Pending.Num());
-    
-	for (const FActionQueueEntry& entry : ActionsQueue.Pending)
-	{
-		if (entry.Action)
-			result.Add(entry.Action.Get());
-	}
-    
-	return result;
+	TArray<UMounteaSelectableInventoryItemAction*> Result;
+	Result.Reserve(ActionsQueue.Pending.Num());
+
+	Algo::TransformIf(
+		ActionsQueue.Pending,
+		Result,
+		[](const FActionQueueEntry& entry) { return IsValid(entry.Action); },
+		[](const FActionQueueEntry& entry) { return entry.Action.Get(); }
+	);
+
+	return Result;
 }
+

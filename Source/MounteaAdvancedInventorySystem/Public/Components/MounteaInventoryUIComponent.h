@@ -164,22 +164,28 @@ private:
 	 * It enables communication between the inventory UI component and the parent inventory for functions such as handling item modifications,
 	 * notifications, and other inventory-related operations.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess), meta=(ExposeOnSpawn))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess), 
+		meta=(ExposeOnSpawn))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> WrapperWidget;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryWidget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
 	
 	UPROPERTY(Transient)
 	FGameplayTagContainer WidgetStatesContainer;
 	
-	UPROPERTY(Transient,
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
 		meta=(Categories="Mountea_Inventory.WidgetState,State"))
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 };
