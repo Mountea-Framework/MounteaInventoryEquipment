@@ -108,6 +108,11 @@ FGameplayTag UMounteaInventorySystemStatics::GetGameplayTag(const FGameplayTagCo
 	return Source.IsValidIndex(TagIndex) ? Source.GetByIndex(TagIndex) : Source.First(); 
 }
 
+bool UMounteaInventorySystemStatics::IsTagsContainerEmpty(const FGameplayTagContainer& Source)
+{
+	return Source.IsEmpty();
+}
+
 AActor* UMounteaInventorySystemStatics::GetOwningActor(const UObject* Target)
 {
 	if (!IsValid(Target))
