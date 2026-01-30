@@ -130,7 +130,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"),
-		DisplayName="Set Widget Config")
+		DisplayName="Set Widget Tag")
 	static void SetWidgetTag(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& WidgetTag);
 	
@@ -154,6 +154,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(DefaultToSelf="Target"),
-		DisplayName="Get Widget Config")
+		DisplayName="Get Widget Tag")
 	static FGameplayTag GetWidgetTag(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);
 };
