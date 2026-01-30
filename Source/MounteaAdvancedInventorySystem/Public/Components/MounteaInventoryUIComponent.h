@@ -18,6 +18,8 @@
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
 
+class UMounteaAdvancedInventoryUIConfig;
+
 /**
  * UMounteaInventoryUIComponent manages user interface aspects of inventory systems.
  * UI components handle widget creation, visibility management, item selection, category filtering,
@@ -164,4 +166,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 };
