@@ -29,9 +29,9 @@ class UMounteaAdvancedInventoryUIConfig;
  * @see IMounteaAdvancedInventoryUIManagerInterface
  * @see UMounteaInventoryComponent
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, 
-    AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
-    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory UI Component"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
+    meta=(BlueprintSpawnableComponent),
+    meta=(DisplayName="Mountea Inventory UI Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface
 {
 	GENERATED_BODY()
@@ -44,8 +44,6 @@ protected:
 	
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	// --- Interface Functions ------------------------------
 	
 public:
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override;
@@ -169,6 +167,15 @@ private:
 		meta=(ExposeOnSpawn))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
+	/** 
+	 * Represents the Main Widget, which contains all sub-widgets.
+	 * The Wrapper should be the root of all UI elements.
+	 * In the Wrapper you should have:
+	 * - Inventory
+	 * - Equipment
+	 * - Crafting
+	 * - Minimap etc.
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
 		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> WrapperWidget;
@@ -180,12 +187,18 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
 		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
-	
-	UPROPERTY(Transient)
-	FGameplayTagContainer WidgetStatesContainer;
-	
+
+	/**
+	 * This container defines what states the Manager has.
+	 * Imagine this as a flag container, where each "major" widget adds its flag as long as it exists.
+	 * This container defines whether Wrapper is empty or not.
+	 */
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
 		meta=(AllowPrivateAccess),
 		meta=(Categories="Mountea_Inventory.WidgetState,State"))
+	FGameplayTagContainer WidgetStatesContainer;
+	
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 };
