@@ -513,6 +513,11 @@ bool UMounteaInventoryUIStatics::AppendWidgetStateTags(const TScriptInterface<IM
 		IMounteaAdvancedInventoryUIManagerInterface::Execute_AppendWidgetStateTags(Target.GetObject(), TagsToAppend) : false;
 }
 
+bool UMounteaInventoryUIStatics::HasAnyWidgetStates(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
+{	
+	return Target.GetObject() ? GetManagerWidgetStates(Target).IsEmpty() : false;
+}
+
 #pragma endregion
 
 UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig()

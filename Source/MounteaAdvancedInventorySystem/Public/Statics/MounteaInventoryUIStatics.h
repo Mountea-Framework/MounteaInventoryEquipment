@@ -571,6 +571,23 @@ public:
 	static bool AppendWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend);
 	
+	/**
+	 * Returns whether Widget State has any flag at all.
+	 *
+	 * Useful when validating UI related tasks, such as inputs etc., as empty Widget States suggest that
+	 * the Manager UI has no custom UI components, therefore is "idling".
+	 *
+	 * @param Target The target UI Manager interface that will receive the state tags.
+	 * 
+	 * @return True if at least one tag is in the Widget States. False if empty.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Has Any Widget States")
+	static bool HasAnyWidgetStates(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	
 #pragma endregion
 	
 	// --- Helpers	
