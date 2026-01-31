@@ -28,6 +28,7 @@
 #include "GameFramework/PlayerState.h"
 
 #include "Components/PanelWidget.h"
+#include "Definitions/MounteaInventoryBaseUIEnums.h"
 
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
@@ -215,6 +216,24 @@ UMounteaAdvancedInventoryUIConfig* UMounteaInventoryUIStatics::GetInventoryUISet
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return nullptr;
 	return settings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
+}
+
+float UMounteaInventoryUIStatics::GetSignedStepFromPayload(const FMounteaWidgetInputPayload& Payload)
+{
+	if (Payload.InputKey != EMounteaWidgetInputKey::Wheel && Payload.InputKey != EMounteaWidgetInputKey::Analog)
+		return 0.f;
+	
+	if (FMath::IsNearlyZero(Payload.FloatValue))
+		return 0.f;
+
+	const auto* uiConfig = GetInventoryUISettingsConfig();
+	const float deadZone = IsValid(uiConfig) ? uiConfig->InputDeadzone : 0.1f;
+
+	const float returnValue = Payload.FloatValue;
+	if (FMath::Abs(returnValue) <= deadZone)
+		return 0.f;
+
+	return FMath::Sign(returnValue); // -1.f or +1.f
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIStatics::GetParentInventory(

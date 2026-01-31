@@ -672,6 +672,17 @@ public:
 		DisplayName="Get Inventory UI Config")
 	static UMounteaAdvancedInventoryUIConfig* GetInventoryUISettingsConfig();
 
+	/**
+	 * Returns a signed “step direction” from the payload:
+	 * -1.0f for negative input, +1.0f for positive input, 0.0f for neutral / deadzone.
+	 * @param Payload Payload to read value from
+	 * @return signed “step direction” from the payload in patter: Abs + (NearlyEqual/Deadzone) + Sign
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Step Size from Payload")
+	static float GetSignedStepFromPayload(const FMounteaWidgetInputPayload& Payload);
+
 #pragma endregion
 	
 	// --- UI Input
