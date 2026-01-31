@@ -45,3 +45,15 @@ enum class EMounteaWidgetInputMethod : uint8
 	Axis2D				UMETA(DisplayName = "Axis2D (Vector2D)"),
 	Axis3D				UMETA(DisplayName = "Axis3D (Vector)"),
 };
+
+/**
+ * Describes the physical source/type of the widget input.
+ */
+UENUM(BlueprintType)
+enum class EMounteaWidgetInputKey : uint8
+{
+	Key 				UMETA(DisplayName = "Key"),
+	Analog 				UMETA(DisplayName = "Analog"),
+	Wheel 				UMETA(DisplayName = "Wheel"),
+	Touch 				UMETA(DisplayName = "Touch"),
+};
