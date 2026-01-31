@@ -114,7 +114,7 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 > A few, the most common sockets are pre-defined and shipped with the plugin.
 > 
 > <p align="center" width="100%">
->     <img width="90%" src="https://github.com/user-attachments/assets/666c8401-ed4e-4cf5-82f4-a02ae881188c">
+>     <img width="90%" src="https://github.com/user-attachments/assets/2045c6cf-42a1-4c26-afcc-ebd52f0e1b9c">
 > </p>
 ---
 
