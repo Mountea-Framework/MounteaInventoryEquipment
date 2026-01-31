@@ -29,9 +29,9 @@ class UMounteaAdvancedInventoryUIConfig;
  * @see IMounteaAdvancedInventoryUIManagerInterface
  * @see UMounteaInventoryComponent
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, 
-    AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
-    meta=(BlueprintSpawnableComponent, DisplayName="Mountea Inventory UI Component"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
+    meta=(BlueprintSpawnableComponent),
+    meta=(DisplayName="Mountea Inventory UI Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface
 {
 	GENERATED_BODY()
@@ -44,8 +44,6 @@ protected:
 	
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	// --- Interface Functions ------------------------------
 	
 public:
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override;
@@ -91,7 +89,16 @@ public:
 	virtual void EmptyItemActionsQueue_Implementation() override;
 	virtual void CompleteQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload) override;
 	virtual void CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction) override;
-
+	
+	virtual FGameplayTagContainer GetWidgetStates_Implementation() const override { return WidgetStatesContainer; };
+	virtual void SetWidgetStates_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates) override;
+	virtual bool AddWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag) override;
+	virtual bool RemoveWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag) override;
+	virtual bool HasWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, 
+		bool bExactMatch) const override;
+	virtual void ClearWidgetStateTags_Implementation() override { WidgetStatesContainer.Reset(); };
+	virtual bool AppendWidgetStateTags_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend) override;
+	
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() override
 	{ return OnCategorySelected; };
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
@@ -129,15 +136,15 @@ protected:
 protected:
 	
 	// Currently active category in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
 	FString ActiveCategoryId;
 
 	// Currently active item in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Mountea|Inventory")
 	FGuid ActiveItemGuid;
 
 	// Currently active item Widget.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
 	TObjectPtr<UWidget> ActiveItemWidget;
 	
 	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
@@ -155,18 +162,43 @@ private:
 	 * It enables communication between the inventory UI component and the parent inventory for functions such as handling item modifications,
 	 * notifications, and other inventory-related operations.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess), meta=(ExposeOnSpawn))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess), 
+		meta=(ExposeOnSpawn))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	/** 
+	 * Represents the Main Widget, which contains all sub-widgets.
+	 * The Wrapper should be the root of all UI elements.
+	 * In the Wrapper you should have:
+	 * - Inventory
+	 * - Equipment
+	 * - Crafting
+	 * - Minimap etc.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> WrapperWidget;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryWidget;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
+
+	/**
+	 * This container defines what states the Manager has.
+	 * Imagine this as a flag container, where each "major" widget adds its flag as long as it exists.
+	 * This container defines whether Wrapper is empty or not.
+	 */
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(Categories="Mountea_Inventory.WidgetState,State"))
+	FGameplayTagContainer WidgetStatesContainer;
 	
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess))
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 };

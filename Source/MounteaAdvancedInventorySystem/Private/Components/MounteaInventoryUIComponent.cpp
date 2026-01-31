@@ -551,20 +551,35 @@ void UMounteaInventoryUIComponent::CancelQueuedAction_Implementation(UMounteaSel
 	ActionsQueue.Remove(ItemAction);
 }
 
-/* TODO: do some cleanup, like every 30 seconds? Make it into UI Config?
-void UMounteaInventoryUIComponent::CleanupExpiredActions_Implementation(float MaxAgeSeconds)
+void UMounteaInventoryUIComponent::SetWidgetStates_Implementation(const FGameplayTagContainer& NewStates)
 {
-	FTimespan maxAge = FTimespan::FromSeconds(MaxAgeSeconds);
-	FDateTime now = FDateTime::Now();
-    
-	for (int32 i = ActionsQueue.Pending.Num() - 1; i >= 0; --i)
-	{
-		const FActionQueueEntry& entry = ActionsQueue.Pending[i];
-		if ((now - entry.CreationTime) > maxAge && entry.Action)
-			Execute_CancelQueuedAction(this, entry.Action.Get());
-	}
+	if (WidgetStatesContainer != NewStates)
+		WidgetStatesContainer = NewStates;
 }
-*/
+
+bool UMounteaInventoryUIComponent::AddWidgetStateTag_Implementation(const FGameplayTag& Tag)
+{
+	if (WidgetStatesContainer.HasTag(Tag))
+		return false;
+	WidgetStatesContainer.AddTag(Tag);
+	return true;
+}
+
+bool UMounteaInventoryUIComponent::RemoveWidgetStateTag_Implementation(const FGameplayTag& Tag)
+{
+	return WidgetStatesContainer.RemoveTag(Tag);
+}
+
+bool UMounteaInventoryUIComponent::HasWidgetStateTag_Implementation(const FGameplayTag& Tag, bool bExactMatch) const
+{
+	return bExactMatch ? WidgetStatesContainer.HasTagExact(Tag) : WidgetStatesContainer.HasTag(Tag);
+}
+
+bool UMounteaInventoryUIComponent::AppendWidgetStateTags_Implementation(const FGameplayTagContainer& TagsToAppend)
+{
+	WidgetStatesContainer.AppendTags(TagsToAppend);
+	return true;
+}
 
 void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 {
@@ -573,14 +588,16 @@ void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 
 TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetItemActionsQueue_Implementation() const
 {
-	TArray<UMounteaSelectableInventoryItemAction*> result;
-	result.Reserve(ActionsQueue.Pending.Num());
-    
-	for (const FActionQueueEntry& entry : ActionsQueue.Pending)
-	{
-		if (entry.Action)
-			result.Add(entry.Action.Get());
-	}
-    
-	return result;
+	TArray<UMounteaSelectableInventoryItemAction*> Result;
+	Result.Reserve(ActionsQueue.Pending.Num());
+
+	Algo::TransformIf(
+		ActionsQueue.Pending,
+		Result,
+		[](const FActionQueueEntry& entry) { return IsValid(entry.Action); },
+		[](const FActionQueueEntry& entry) { return entry.Action.Get(); }
+	);
+
+	return Result;
 }
+

@@ -45,6 +45,12 @@ public:
 		DisplayName="Action Mappings for UI")
 	TArray<FMounteaWidgetInputActionMapping> UIActionMappings;
 	
+	/** Unified deadzone used for Analog and Wheel inputs. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="🎮 Inputs|Config",
+		meta=(NoResetToDefault),
+		meta=(UIMin=0.f, ClampMin=0.f))
+	float InputDeadzone = 0.1f;
+	
 	// --- Wrapper
 	
 	/** Widget class used as the main user interface wrapper (root HUD panel, container for other widgets, 

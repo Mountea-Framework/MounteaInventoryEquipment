@@ -49,7 +49,8 @@ public:
 	 * @param Command The command string to process, typically indicating an action or directive.
 	 * @param OptionalPayload An optional UObject providing additional context or data. Can be nullptr.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface",
+		DisplayName="Process Widget Command")
 	void ProcessInventoryWidgetCommand(const FString& Command, UObject* OptionalPayload = nullptr);
 	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload = nullptr) = 0;
 
@@ -59,7 +60,8 @@ public:
 	 * This method is intended to be overridden in Blueprint or C++ to define the specific
 	 * logic for applying themes to inventory or equipment-related user interface elements.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface",
+		DisplayName="Apply Theme")
 	void ApplyTheme();
 	virtual void ApplyTheme_Implementation() = 0;
 
@@ -71,7 +73,8 @@ public:
 	 * It may be used for reloading data, updating state, or applying changes made
 	 * to the widget’s configuration or content.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface",
+		DisplayName="Refresh Widget")
 	void RefreshWidget();
 	virtual void RefreshWidget_Implementation() = 0;
 	
@@ -88,9 +91,12 @@ public:
 	 * @param Payload A lightweight container holding the relevant input value.
 	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
-	void ConsumeUIInput(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime);
-	virtual void ConsumeUIInput_Implementation(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface",
+		DisplayName="Consume UI Input")
+	void ConsumeUIInput(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& InputTag, 
+		const FMounteaWidgetInputPayload& Payload, float DeltaTime);
+	virtual void ConsumeUIInput_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& InputTag, 
+		const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
 
 	/**
 	 * Sets the Widget Tag definition for this UI element.
@@ -110,9 +116,10 @@ public:
 	 *
 	 * @param WidgetTag Gameplay Tag defining the widget identity/state used for Wrapper/UI tracking.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
-	void SetWidgetTag(const FGameplayTag& WidgetTag);
-	virtual void SetWidgetTag_Implementation(const FGameplayTag& WidgetTag) = 0;
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface",
+		DisplayName="Set Widget Tag")
+	void SetWidgetTag(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& WidgetTag);
+	virtual void SetWidgetTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& WidgetTag) = 0;
 	
 	/**
 	 * Returns the Widget Tag definition for this UI element.
@@ -130,7 +137,9 @@ public:
 	 *
 	 * @return Gameplay Tag defining this widget identity/state used for Wrapper/UI tracking.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface",
+		meta=(Categories="Mountea_Inventory.WidgetState,State"),
+		DisplayName="Get Widget Tag")
 	FGameplayTag GetWidgetTag() const;
 	virtual FGameplayTag GetWidgetTag_Implementation() const = 0;
 };
