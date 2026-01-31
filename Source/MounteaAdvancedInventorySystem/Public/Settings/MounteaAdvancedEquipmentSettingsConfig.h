@@ -38,7 +38,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
 		meta=(ForceInlineRow),
 		meta=(NoResetToDefault), 
-		meta=(ShowOnlyInnerProperties))
+		meta=(ShowOnlyInnerProperties),
+		meta=(TitleProperty="DisplayName"))
 	TMap<FName, FMounteaEquipmentSlotHeaderData> AllowedEquipmentSlots;
 
+protected:
+	
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+	
 };

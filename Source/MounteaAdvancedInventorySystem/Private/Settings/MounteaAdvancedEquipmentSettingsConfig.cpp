@@ -11,3 +11,23 @@
 
 
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
+
+#include "Algo/ForEach.h"
+
+#if WITH_EDITOR
+void UMounteaAdvancedEquipmentSettingsConfig::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if (PropertyChangedEvent.GetMemberPropertyName() !=
+		GET_MEMBER_NAME_CHECKED(UMounteaAdvancedEquipmentSettingsConfig, AllowedEquipmentSlots))
+	{
+		return;
+	}
+
+	Algo::ForEach(AllowedEquipmentSlots, [](TPair<FName, FMounteaEquipmentSlotHeaderData>& Pair)
+	{
+		Pair.Value.RegenerateSlotId();
+	});
+}
+#endif
