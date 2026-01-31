@@ -83,21 +83,26 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta=(Categories="Mountea_Inventory"))
+		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
+		meta=(NoResetToDefault))
 	FGameplayTagContainer TagContainer;
 	
 	// Eg.: `LeftHand` is blocked by `TwoHanded` weapons etc.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta=(Categories="Mountea_Inventory"))
+		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
+		meta=(NoResetToDefault))
 	FGameplayTagContainer BlackedByTags;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(NoResetToDefault))
 	FText DisplayName;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(NoResetToDefault))
 	uint8 bIsEnabled : 1;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,
+		meta=(NoResetToDefault))
 	FGuid SlotId;
 };
 
