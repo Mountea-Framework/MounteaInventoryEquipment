@@ -31,6 +31,7 @@ class UMounteaAdvancedAttachmentSlot;
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
     AutoExpandCategories=("Mountea","AttachableContainer","Mountea|AttachableContainer"),
+    AutoCollapseCategories=("Variable,Sockets,Tags,Component Tick,ComponentReplication,Activation,Events,Replication,AssetUserData,Navigation"),
     HideCategories=("Cooking","Collision"),
     meta=(BlueprintSpawnableComponent, DisplayName="Mountea Attachment Container Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachmentContainerComponent : public UActorComponent, public IMounteaAdvancedAttachmentContainerInterface

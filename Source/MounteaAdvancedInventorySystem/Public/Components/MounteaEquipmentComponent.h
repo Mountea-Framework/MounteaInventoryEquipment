@@ -30,6 +30,7 @@
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
     AutoExpandCategories=("Mountea","Equipment","Mountea|Equipment"),
+    AutoCollapseCategories=("Variable,Sockets,Tags,Component Tick,Component Replication,Activation,Events,Replication,Asset User Data,Navigation"),
     HideCategories=("Cooking","Collision"),
     meta=(BlueprintSpawnableComponent, DisplayName="Mountea Equipment Component"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaEquipmentComponent : public UMounteaAttachmentContainerComponent, public IMounteaAdvancedEquipmentInterface
