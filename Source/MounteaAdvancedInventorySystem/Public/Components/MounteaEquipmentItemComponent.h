@@ -49,7 +49,8 @@ public:
 	virtual bool DoesRequireActivationEvent_Implementation() const override
 	{ return bRequiresActivationEvent; };
 	virtual bool SetRequiresActivationEvent_Implementation(const bool bValue) override;
-	
+	virtual UAnimationAsset* GetActivationAnimation_Implementation() const override;
+	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) override;
 	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() override
 	{ return OnEquipmentItemStateChanged; };
 	
@@ -73,6 +74,12 @@ protected:
 		meta=(NoResetToDefault),
 		meta=(EditCondition="!bAutoActivates"))
 	uint8 bRequiresActivationEvent : 1;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(EditCondition="!bAutoActivates && !bRequiresActivationEvent"),
+		meta=(AllowedClasses="/Script/Engine.AnimSequence,/Script/Engine.AnimMontage"))
+	TSoftObjectPtr<UAnimationAsset> ActivationAnimation;
 	
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault))

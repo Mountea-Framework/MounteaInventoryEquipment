@@ -54,3 +54,20 @@ bool UMounteaEquipmentItemComponent::SetRequiresActivationEvent_Implementation(c
 	}
 	return false;
 }
+
+UAnimationAsset* UMounteaEquipmentItemComponent::GetActivationAnimation_Implementation() const
+{
+	if (ActivationAnimation.ToSoftObjectPath().IsValid())
+		return Cast<UAnimationAsset>(ActivationAnimation.LoadSynchronous());
+	return nullptr;
+}
+
+bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation)
+{
+	if (ActivationAnimation != NewActivateAnimation)
+	{
+		ActivationAnimation = NewActivateAnimation;
+		return true;
+	}
+	return false;
+}

@@ -55,5 +55,13 @@ public:
 	bool SetRequiresActivationEvent(const bool bValue);
 	virtual bool SetRequiresActivationEvent_Implementation(const bool bValue) = 0;
 	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	UAnimationAsset* GetActivationAnimation() const;
+	virtual UAnimationAsset* GetActivationAnimation_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool SetActivationAnimation(UAnimationAsset* NewActivateAnimation);
+	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) = 0;
+	
 	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() = 0;
 };
