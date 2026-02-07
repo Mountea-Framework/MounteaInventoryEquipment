@@ -36,7 +36,7 @@ public:
 	 *
 	 * @param SlotId Inventory Slot this Tooltip shows information for..
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Tooltip")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Tooltip")
 	void SetTooltipItem(const FInventorySlot& SlotId);
 	virtual void SetTooltipItem_Implementation(const FInventorySlot& SlotId) = 0;
 };
