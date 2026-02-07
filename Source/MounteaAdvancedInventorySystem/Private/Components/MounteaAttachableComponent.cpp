@@ -29,7 +29,7 @@ UMounteaAttachableComponent::UMounteaAttachableComponent() :
 	SetIsReplicatedByDefault(true);
 	SetActiveFlag(true);
 
-	ComponentTags.Append({ TEXT("Mountea"), TEXT("Attachable") });
+	ComponentTags.Append({ TEXT("Mountea"), TEXT("Attachable"), TEXT("EquipmentItem") });
 }
 
 void UMounteaAttachableComponent::SetId_Implementation(const FName& NewId)

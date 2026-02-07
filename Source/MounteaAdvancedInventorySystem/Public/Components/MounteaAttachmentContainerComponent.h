@@ -99,10 +99,6 @@ public:
 		meta=(NoResetToDefault))
 	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
-		meta=(NoResetToDefault))
-	EAttachmentSlotState State;
-	
 	// Does not support runtime addition/removal of slots.
 	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
 		Instanced,
