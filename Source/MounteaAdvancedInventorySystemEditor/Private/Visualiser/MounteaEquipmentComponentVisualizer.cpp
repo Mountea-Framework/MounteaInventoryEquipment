@@ -84,10 +84,17 @@ bool FMounteaEquipmentComponentVisualizer::IsComponentSelected(const UActorCompo
 	if (!Component || !GEditor)
 		return false;
 
-	if (USelection* selectedComponent = GEditor->GetSelectedComponents())
+	const auto editorWorld = GEditor->GetEditorWorldContext().World();
+	if (!editorWorld)
+		return false;
+	
+	if (editorWorld->WorldType != EWorldType::EditorPreview)
 	{
-		if (selectedComponent->IsSelected(Component))
-			return true;
+		if (USelection* selectedComponent = GEditor->GetSelectedComponents())
+		{
+			if (selectedComponent->IsSelected(Component))
+				return true;
+		}
 	}
 
 	const AActor* owningActor = Component->GetOwner();
@@ -97,7 +104,7 @@ bool FMounteaEquipmentComponentVisualizer::IsComponentSelected(const UActorCompo
 	return false;
 }
 
-void FMounteaEquipmentComponentVisualizer::GatherSlotData(const UMounteaAttachmentContainerComponent* EquipmentComponent, TArray<FSlotVisualData>& OutSlots, TArray<FWarningVisualData>& OutWarnings) const
+void FMounteaEquipmentComponentVisualizer::GatherSlotData(const UMounteaAttachmentContainerComponent* EquipmentComponent, TArray<FSlotVisualData>& OutSlots, TArray<FWarningVisualData>& OutWarnings)
 {
 	if (!EquipmentComponent)
 	return;
@@ -152,7 +159,7 @@ void FMounteaEquipmentComponentVisualizer::GatherSlotData(const UMounteaAttachme
 	}
 }
 
-USceneComponent* FMounteaEquipmentComponentVisualizer::ResolveAttachmentTarget(const UMounteaAttachmentContainerComponent* EquipmentComponent, const UMounteaAdvancedAttachmentSlot* Slot, TArray<FString>& OutWarnings) const
+USceneComponent* FMounteaEquipmentComponentVisualizer::ResolveAttachmentTarget(const UMounteaAttachmentContainerComponent* EquipmentComponent, const UMounteaAdvancedAttachmentSlot* Slot, TArray<FString>& OutWarnings)
 {
 	if (!EquipmentComponent || !Slot)
 		return nullptr;

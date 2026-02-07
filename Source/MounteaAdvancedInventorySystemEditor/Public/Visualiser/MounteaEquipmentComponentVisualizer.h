@@ -38,8 +38,8 @@ private:
 	};
 
 	static bool IsComponentSelected(const UActorComponent* Component);
-	void GatherSlotData(const UMounteaAttachmentContainerComponent* EquipmentComponent, TArray<FSlotVisualData>& OutSlots, TArray<FWarningVisualData>& OutWarnings) const;
-	USceneComponent* ResolveAttachmentTarget(const UMounteaAttachmentContainerComponent* EquipmentComponent, const UMounteaAdvancedAttachmentSlot* Slot, TArray<FString>& OutWarnings) const;
+	static void GatherSlotData(const UMounteaAttachmentContainerComponent* EquipmentComponent, TArray<FSlotVisualData>& OutSlots, TArray<FWarningVisualData>& OutWarnings);
+	static USceneComponent* ResolveAttachmentTarget(const UMounteaAttachmentContainerComponent* EquipmentComponent, const UMounteaAdvancedAttachmentSlot* Slot, TArray<FString>& OutWarnings);
 	static FString GetSlotLabel(const UMounteaAdvancedAttachmentSlot* Slot);
 	static FLinearColor GetSlotColor(int32 Index);
 };
