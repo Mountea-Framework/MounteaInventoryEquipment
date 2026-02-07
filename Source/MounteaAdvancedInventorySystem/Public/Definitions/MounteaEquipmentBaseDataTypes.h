@@ -27,9 +27,7 @@ struct FMounteaEquipmentSlotHeaderData
 public:
 	
 	FMounteaEquipmentSlotHeaderData() : 
-		bIsEnabled(1),
-		bFirePreEquipEvent(0),
-		bFirePostEquipEvent(0)
+		bIsEnabled(1)
 	{};
 	
 	void RegenerateSlotId()
@@ -111,16 +109,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault))
 	uint8 bIsEnabled : 1;
-	
-	/** If true, a pre-equip event is fired before an item is equipped into this slot. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta=(NoResetToDefault))
-	uint8 bFirePreEquipEvent : 1;
-	
-	/** If true, a post-equip event is fired after an item is successfully equipped into this slot. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta=(NoResetToDefault))
-	uint8 bFirePostEquipEvent : 1;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault))

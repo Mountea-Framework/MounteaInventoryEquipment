@@ -43,7 +43,8 @@ public:
 public:
 	/** Override the default attachment target component by name */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableTargetNames", NoResetToDefault))
+		meta=(GetOptions="GetAvailableTargetNames"),
+		meta=(NoResetToDefault))
 	FName AttachmentTargetOverride;
 
 	/** Resolved component reference for attachment target override */
@@ -52,7 +53,8 @@ public:
 
 	/** Socket name to attach to when using socket-based attachment */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableSocketNames", NoResetToDefault),
+		meta=(GetOptions="GetAvailableSocketNames"),
+		meta=(NoResetToDefault),
 		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket", EditConditionHides))
 	FName SocketName;
 
