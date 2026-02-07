@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventoryBaseUIEnums.h"
 #include "MounteaInventoryItem.h"
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
@@ -399,7 +400,7 @@ struct FMounteaWidgetInputPayload
 	
 	/** Defines type of input to consume. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")
-	EMounteaWidgetInputMethod InputMethod;
+	EMounteaWidgetInputMethod InputMethod = EMounteaWidgetInputMethod::Boolean;
 	
 	/** Defines type of input key to consume. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")

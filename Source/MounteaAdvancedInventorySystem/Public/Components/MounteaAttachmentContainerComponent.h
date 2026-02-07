@@ -91,20 +91,23 @@ protected:
 public:
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
-		meta=(GetOptions="GetAvailableTargetNames"))
+		meta=(GetOptions="GetAvailableTargetNames"),
+		meta=(NoResetToDefault))
 	FName DefaultAttachmentTarget;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment Container")
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Attachment Container",
+		meta=(NoResetToDefault))
 	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment Container")
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
+		meta=(NoResetToDefault))
 	EAttachmentSlotState State;
 	
 	// Does not support runtime addition/removal of slots.
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite,
-		Category="Attachment Container",
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Attachment Container",
 		Instanced,
 		meta=(TitleProperty="DisplayName"),
+		meta=(NoResetToDefault),
 		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView))
 	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 
@@ -112,21 +115,24 @@ public:
 	 * Event triggered when an attachment is added or removed from the container.
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
-		meta = (IsBindableEvent=true))
+		meta=(IsBindableEvent=true),
+		meta=(NoResetToDefault))
 	FOnAttachmentChanged OnAttachmentChanged;
 
 	/**
 	 * Event triggered when the state of a slot changes.
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
-		meta = (IsBindableEvent=true))
+		meta=(IsBindableEvent=true),
+		meta=(NoResetToDefault))
 	FOnSlotStateChanged OnSlotStateChanged;
 
 	/**
 	 * Event triggered when the container is cleared of all attachments.
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Attachment Container",
-		meta = (IsBindableEvent=true))
+		meta=(IsBindableEvent=true),
+		meta=(NoResetToDefault))
 	FOnContainerCleared OnContainerCleared;
 
 protected:

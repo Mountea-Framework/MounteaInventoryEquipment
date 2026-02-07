@@ -63,7 +63,7 @@ bool UMounteaAttachableComponent::IsValidAttachable_Implementation() const
 
 bool UMounteaAttachableComponent::CanAttach_Implementation() const
 {
-	return IsValidAttachable() && State != EAttachmentState::EAS_Attached;
+	return IsValidAttachable() && State == EAttachmentState::EAS_Detached;
 }
 
 bool UMounteaAttachableComponent::AttachToSlot_Implementation(
