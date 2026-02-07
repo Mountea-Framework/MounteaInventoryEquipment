@@ -45,5 +45,5 @@ protected:
 	 * Equipment Item Component responsible for attaching this Actor to Player/NPC.
 	 */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Equipment")
-	TObjectPtr<class UMounteaEquipmentItemComponent> AttachableComponent;
+	TObjectPtr<class UMounteaEquipmentItemComponent> EquipmentItemComponent;
 };

@@ -77,7 +77,7 @@ protected:
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault),
-		meta=(EditCondition="!bAutoActivates && !bRequiresActivationEvent"),
+		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
 		meta=(AllowedClasses="/Script/Engine.AnimSequence,/Script/Engine.AnimMontage"))
 	TSoftObjectPtr<UAnimationAsset> ActivationAnimation;
 	

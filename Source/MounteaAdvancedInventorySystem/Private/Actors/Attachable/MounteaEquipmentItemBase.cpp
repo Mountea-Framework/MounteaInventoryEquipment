@@ -20,7 +20,7 @@ AMounteaEquipmentItemBase::AMounteaEquipmentItemBase()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	
-	AttachableComponent = CreateDefaultSubobject<UMounteaEquipmentItemComponent>(TEXT("AttachableComponent"));
+	EquipmentItemComponent = CreateDefaultSubobject<UMounteaEquipmentItemComponent>(TEXT("Equipment Item"));
 }
 
 void AMounteaEquipmentItemBase::BeginPlay()
