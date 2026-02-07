@@ -17,6 +17,8 @@
 
 enum class EEquipmentItemState : uint8;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentItemStateChanged, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>&, EquipmentItem, const EEquipmentItemState, NewState);
+
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedEquipmentItemInterface : public UInterface
 {
@@ -36,4 +38,22 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
 	bool SetEquipmentItemState(const EEquipmentItemState NewEquipmentItemState);
 	virtual bool SetEquipmentItemState_Implementation(const EEquipmentItemState NewEquipmentItemState) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool DoesAutoActive() const;
+	virtual bool DoesAutoActive_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool SetAutoActive(const bool bValue);
+	virtual bool SetAutoActive_Implementation(const bool bValue) = 0;	
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool DoesRequireActivationEvent() const;
+	virtual bool DoesRequireActivationEvent_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool SetRequiresActivationEvent(const bool bValue);
+	virtual bool SetRequiresActivationEvent_Implementation(const bool bValue) = 0;
+	
+	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() = 0;
 };

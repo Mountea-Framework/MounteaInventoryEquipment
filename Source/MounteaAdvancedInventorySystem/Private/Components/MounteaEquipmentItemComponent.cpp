@@ -15,6 +15,8 @@
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 
 UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() : 
+	bAutoActivates(1),
+	bRequiresActivationEvent(0),
 	EquipmentItemState(EEquipmentItemState::EES_Idle)
 {
 }
@@ -25,8 +27,30 @@ bool UMounteaEquipmentItemComponent::SetEquipmentItemState_Implementation(const 
 	if (NewEquipmentItemState != EquipmentItemState)
 	{
 		EquipmentItemState = NewEquipmentItemState;
+		OnEquipmentItemStateChanged.Broadcast(this, NewEquipmentItemState);
 		return true;
 	}
 	
+	return false;
+}
+
+bool UMounteaEquipmentItemComponent::SetAutoActive_Implementation(const bool bValue)
+{
+	if (bValue != bAutoActivates)
+	{
+		bAutoActivates = bValue;
+		return true;
+	}
+	
+	return false;
+}
+
+bool UMounteaEquipmentItemComponent::SetRequiresActivationEvent_Implementation(const bool bValue)
+{
+	if (bValue != bRequiresActivationEvent)
+	{
+		bRequiresActivationEvent = bValue;
+		return true;
+	}
 	return false;
 }
