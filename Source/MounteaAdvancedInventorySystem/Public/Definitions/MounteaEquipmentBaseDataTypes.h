@@ -27,7 +27,9 @@ struct FMounteaEquipmentSlotHeaderData
 public:
 	
 	FMounteaEquipmentSlotHeaderData() : 
-		bIsEnabled(1)
+		bIsEnabled(1),
+		bFirePreEquipEvent(0),
+		bFirePostEquipEvent(0)
 	{};
 	
 	void RegenerateSlotId()
@@ -49,8 +51,6 @@ public:
 
 		// Build a stable string key
 		TStringBuilder<512> stringBuilder;
-		stringBuilder.Append(TEXT("enabled="));
-		stringBuilder.Append(bIsEnabled ? TEXT("1") : TEXT("0"));
 
 		stringBuilder.Append(TEXT("|tags="));
 		for (const FGameplayTag& T : slotTags)
@@ -82,24 +82,45 @@ public:
 
 public:
 
+	/**
+	 * Tags that define what this equipment slot represents and what items may occupy it.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
 		meta=(NoResetToDefault))
 	FGameplayTagContainer TagContainer;
-	
-	// Eg.: `LeftHand` is blocked by `TwoHanded` weapons etc.
+
+	/**
+	 * Tags that, when present on an equipped item or state, block this slot from being used.
+	 * Example: a TwoHanded tag blocking LeftHand or RightHand slots.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
 		meta=(NoResetToDefault))
 	FGameplayTagContainer BlackedByTags;
 
+	/**
+	 * Human-readable name of the slot, used purely for UI and presentation.
+	 * Does not affect SlotId or runtime logic.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault))
 	FText DisplayName;
-	
+
+	/** Determines whether the slot is active and usable. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault))
 	uint8 bIsEnabled : 1;
+	
+	/** If true, a pre-equip event is fired before an item is equipped into this slot. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(NoResetToDefault))
+	uint8 bFirePreEquipEvent : 1;
+	
+	/** If true, a post-equip event is fired after an item is successfully equipped into this slot. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(NoResetToDefault))
+	uint8 bFirePostEquipEvent : 1;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault))
