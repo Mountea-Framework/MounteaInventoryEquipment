@@ -16,10 +16,12 @@
 #include "Engine/Canvas.h"
 #include "Engine/Engine.h"
 #include "Engine/Selection.h"
+#include "Engine/World.h"
 #include "SceneView.h"
 #include "SceneManagement.h"
 #include "CanvasItem.h"
 
+#include "Camera/CameraComponent.h"
 #include "Components/MounteaAttachmentContainerComponent.h"
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
@@ -27,7 +29,7 @@
 
 void FMounteaEquipmentComponentVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI)
 {
-	if (!Component || !PDI || !GEngine || !IsComponentSelected(Component))
+	if (!Component || !PDI || !GEngine || !View || IsCameraPreviewView(View) || !ShouldDrawForComponent(Component))
 		return;
 
 	const UMounteaAttachmentContainerComponent* attachableContainerComponent = Cast<UMounteaAttachmentContainerComponent>(Component);
@@ -46,8 +48,10 @@ void FMounteaEquipmentComponentVisualizer::DrawVisualization(const UActorCompone
 
 void FMounteaEquipmentComponentVisualizer::DrawVisualizationHUD(const UActorComponent* Component, const FViewport* Viewport, const FSceneView* View, FCanvas* Canvas)
 {
-	if (!Component || !View || !Canvas || !GEngine || !IsComponentSelected(Component))
+	if (!Component || !View || !Canvas || !GEngine || IsCameraPreviewView(View) || !ShouldDrawForComponent(Component))
+	{
 		return;
+	}
 
 	const UMounteaAttachmentContainerComponent* attachableContainerComponent = Cast<UMounteaAttachmentContainerComponent>(Component);
 	if (!attachableContainerComponent)
@@ -79,6 +83,20 @@ void FMounteaEquipmentComponentVisualizer::DrawVisualizationHUD(const UActorComp
 	}
 }
 
+bool FMounteaEquipmentComponentVisualizer::ShouldDrawForComponent(const UActorComponent* Component)
+{
+	if (!Component)
+		return false;
+
+	if (const UWorld* World = Component->GetWorld())
+	{
+		if (World->WorldType == EWorldType::EditorPreview)
+			return true;
+	}
+
+	return IsComponentSelected(Component);
+}
+
 bool FMounteaEquipmentComponentVisualizer::IsComponentSelected(const UActorComponent* Component)
 {
 	if (!Component || !GEditor)
@@ -89,13 +107,9 @@ bool FMounteaEquipmentComponentVisualizer::IsComponentSelected(const UActorCompo
 		return false;
 	
 	if (editorWorld->WorldType != EWorldType::EditorPreview)
-	{
 		if (USelection* selectedComponent = GEditor->GetSelectedComponents())
-		{
 			if (selectedComponent->IsSelected(Component))
 				return true;
-		}
-	}
 
 	const AActor* owningActor = Component->GetOwner();
 	if (owningActor)
@@ -104,10 +118,22 @@ bool FMounteaEquipmentComponentVisualizer::IsComponentSelected(const UActorCompo
 	return false;
 }
 
+bool FMounteaEquipmentComponentVisualizer::IsCameraPreviewView(const FSceneView* View)
+{
+	if (!View)
+		return false;
+
+	const AActor* viewActor = View->ViewActor.Get();
+	if (!viewActor)
+		return false;
+
+	return viewActor->FindComponentByClass<UCameraComponent>() != nullptr;
+}
+
 void FMounteaEquipmentComponentVisualizer::GatherSlotData(const UMounteaAttachmentContainerComponent* EquipmentComponent, TArray<FSlotVisualData>& OutSlots, TArray<FWarningVisualData>& OutWarnings)
 {
 	if (!EquipmentComponent)
-	return;
+		return;
 
 	const AActor* componentOwner = EquipmentComponent->GetOwner();
 	if (!componentOwner)
@@ -121,7 +147,7 @@ void FMounteaEquipmentComponentVisualizer::GatherSlotData(const UMounteaAttachme
 	for (int32 Index = 0; Index < attachableSlots.Num(); ++Index)
 	{
 		const UMounteaAdvancedAttachmentSlot* attachableSlot = attachableSlots[Index];
-		if (!attachableSlot)		
+		if (!attachableSlot)
 			continue;
 
 		USceneComponent* targetComponent = ResolveAttachmentTarget(EquipmentComponent, attachableSlot, warning);
@@ -148,11 +174,11 @@ void FMounteaEquipmentComponentVisualizer::GatherSlotData(const UMounteaAttachme
 
 	if (warning.Num() > 0)
 	{
-		const FVector baseLocation = componentOwner->GetActorLocation() + FVector(0.0f, 0.0f, 40.0f);
+		const FVector baseLocation = componentOwner->GetActorLocation() + FVector(0.0f, 0.0f, 1.0f);
 		for (int32 index = 0; index < warning.Num(); ++index)
 		{
 			FWarningVisualData warningInfo;
-			warningInfo.Location = baseLocation + FVector(0.0f, 0.0f, 15.0f * (index + 1));
+			warningInfo.Location = baseLocation + FVector(0.0f, 0.0f, 1.0f * (index + 1));
 			warningInfo.Message = warning[index];
 			OutWarnings.Add(MoveTemp(warningInfo));
 		}
@@ -167,8 +193,10 @@ USceneComponent* FMounteaEquipmentComponentVisualizer::ResolveAttachmentTarget(c
 	if (Slot->AttachmentTargetComponentOverride)
 		return Slot->AttachmentTargetComponentOverride;
 
+	const auto containerTarget = EquipmentComponent->Execute_GetDefaultAttachmentTarget(EquipmentComponent);
+	
 	const AActor* owningActor = EquipmentComponent->GetOwner();
-	const FName targetOverride = Slot->AttachmentTargetOverride;
+	const FName targetOverride = Slot->AttachmentTargetOverride.IsNone() ? containerTarget : Slot->AttachmentTargetOverride;
 	if (owningActor && !targetOverride.IsNone())
 	{
 		const TArray<FName> availableNames = UMounteaAttachmentsStatics::GetAvailableComponentNames(owningActor);

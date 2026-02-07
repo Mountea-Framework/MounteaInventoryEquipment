@@ -37,7 +37,9 @@ private:
 		FString Message;
 	};
 
+	static bool ShouldDrawForComponent(const UActorComponent* Component);
 	static bool IsComponentSelected(const UActorComponent* Component);
+	static bool IsCameraPreviewView(const FSceneView* View);
 	static void GatherSlotData(const UMounteaAttachmentContainerComponent* EquipmentComponent, TArray<FSlotVisualData>& OutSlots, TArray<FWarningVisualData>& OutWarnings);
 	static USceneComponent* ResolveAttachmentTarget(const UMounteaAttachmentContainerComponent* EquipmentComponent, const UMounteaAdvancedAttachmentSlot* Slot, TArray<FString>& OutWarnings);
 	static FString GetSlotLabel(const UMounteaAdvancedAttachmentSlot* Slot);

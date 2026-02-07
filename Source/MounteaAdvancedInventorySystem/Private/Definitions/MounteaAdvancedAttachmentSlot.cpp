@@ -52,7 +52,9 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableSocketNames() const
 		ParentContainer->Execute_GetDefaultAttachmentTarget(ParentContainer.GetObject()) : 
 		AttachmentTargetOverride;
 		
-	return UMounteaAttachmentsStatics::GetAvailableSocketNames(parentActor, targetName);
+	TArray<FName> returnValue = { NAME_None };
+	returnValue.Append(UMounteaAttachmentsStatics::GetAvailableSocketNames(parentActor, targetName));
+	return returnValue;
 }
 
 TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
@@ -61,7 +63,10 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 		return TArray<FName>();
 
 	AActor* parentActor = ParentContainer->Execute_GetOwningActor(ParentContainer.GetObject());
-	return IsValid(parentActor) ? UMounteaAttachmentsStatics::GetAvailableComponentNames(parentActor) : TArray<FName>();
+	TArray<FName> returnValue = { NAME_None };
+	if (IsValid(parentActor))
+		returnValue.Append(UMounteaAttachmentsStatics::GetAvailableComponentNames(parentActor));
+	return returnValue;
 }
 
 bool UMounteaAdvancedAttachmentSlot::IsEmpty() const
