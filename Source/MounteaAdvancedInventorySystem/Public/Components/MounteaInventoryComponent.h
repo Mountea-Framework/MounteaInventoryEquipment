@@ -84,6 +84,8 @@ protected:
 	void RemoveItem_Server(const FGuid& ItemGuid);
 	UFUNCTION(Server, Reliable)
 	void ChangeItemQuantity_Server(const FGuid& ItemGuid, const int32 DeltaAmount);
+	UFUNCTION(Server, Reliable)
+	void ClearInventory_Server();
 
 	UFUNCTION(Client, Unreliable)
 	void ProcessInventoryNotification_Client(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta);

@@ -184,7 +184,7 @@ public:
 		meta=(UIMin=0.001,ClampMin=0.001), meta=(NoResetToDefault))
 	float Weight;
 
-	/** Defines the compatible slots or affector types for this item template. */
+	/** Defines the compatible slots this template can be attached to. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
 		meta=(NoResetToDefault))
 	FGameplayTagContainer AttachmentSlots;
