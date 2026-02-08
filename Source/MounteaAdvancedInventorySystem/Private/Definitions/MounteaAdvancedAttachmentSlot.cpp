@@ -52,7 +52,9 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableSocketNames() const
 		ParentContainer->Execute_GetDefaultAttachmentTarget(ParentContainer.GetObject()) : 
 		AttachmentTargetOverride;
 		
-	return UMounteaAttachmentsStatics::GetAvailableSocketNames(parentActor, targetName);
+	TArray<FName> returnValue = { NAME_None };
+	returnValue.Append(UMounteaAttachmentsStatics::GetAvailableSocketNames(parentActor, targetName));
+	return returnValue;
 }
 
 TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
@@ -61,29 +63,10 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 		return TArray<FName>();
 
 	AActor* parentActor = ParentContainer->Execute_GetOwningActor(ParentContainer.GetObject());
-	return IsValid(parentActor) ? UMounteaAttachmentsStatics::GetAvailableComponentNames(parentActor) : TArray<FName>();
-}
-
-bool UMounteaAdvancedAttachmentSlot::IsEmpty() const
-{
-	return State == EAttachmentSlotState::EASS_Empty && Attachment == nullptr;
-}
-
-bool UMounteaAdvancedAttachmentSlot::IsOccupied() const
-{
-	return State == EAttachmentSlotState::EASS_Occupied && Attachment != nullptr;
-}
-
-void UMounteaAdvancedAttachmentSlot::DisableSlot()
-{
-	if (!IsEmpty())
-		Detach();
-	State = EAttachmentSlotState::EASS_Locked;
-}
-
-bool UMounteaAdvancedAttachmentSlot::IsLocked() const
-{
-	return State == EAttachmentSlotState::EASS_Locked;
+	TArray<FName> returnValue = { NAME_None };
+	if (IsValid(parentActor))
+		returnValue.Append(UMounteaAttachmentsStatics::GetAvailableComponentNames(parentActor));
+	return returnValue;
 }
 
 USceneComponent* UMounteaAdvancedAttachmentSlot::GetAttachmentTargetComponent() const
@@ -102,21 +85,19 @@ bool UMounteaAdvancedAttachmentSlot::PerformAttachmentLogic(UObject* NewAttachme
 		return false;
 	}
 
-	if (!IsValidForAttachment(NewAttachment) || !ValidateAttachmentSlot(attachmentTarget))
+	if (!ValidateAttachmentSlot(attachmentTarget))
 		return false;
 
 	if (!PerformPhysicalAttachment(NewAttachment, attachmentTarget))
 		return false;
 
-	Attachment = NewAttachment;
-	LastAttachment = NewAttachment;
-	State = EAttachmentSlotState::EASS_Occupied;
+	ForceAttach(NewAttachment);
 	
 	HandleAttachableInterface(NewAttachment);
 	return true;
 }
 
-void UMounteaAdvancedAttachmentSlot::HandleAttachableInterface(UObject* NewAttachment)
+void UMounteaAdvancedAttachmentSlot::HandleAttachableInterface(UObject* NewAttachment) const
 {
 	TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> attachableInterface = FindAttachableInterface(NewAttachment);
 	if (attachableInterface.GetObject())
@@ -127,12 +108,12 @@ void UMounteaAdvancedAttachmentSlot::HandleAttachableInterface(UObject* NewAttac
 
 bool UMounteaAdvancedAttachmentSlot::Attach(UObject* NewAttachment)
 {
-	return (CanAttach() && IsValid(NewAttachment)) ? PerformAttachmentLogic(NewAttachment) : false;
+	return Super::Attach(NewAttachment) ? PerformAttachmentLogic(NewAttachment) : false;
 }
 
 bool UMounteaAdvancedAttachmentSlot::ForceAttach(UObject* NewAttachment)
 {
-	return (IsSlotValid() && IsValid(NewAttachment)) ? PerformAttachmentLogic(NewAttachment) : false;
+	return Super::ForceAttach(NewAttachment) ? PerformAttachmentLogic(NewAttachment) : false;
 }
 
 TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> UMounteaAdvancedAttachmentSlot::FindAttachableInterface(UObject* Object)
@@ -163,29 +144,6 @@ TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> UMounteaAdvanced
 		returnAttachable = *foundComponent;
 
 	return returnAttachable;
-}
-
-bool UMounteaAdvancedAttachmentSlot::IsValidForAttachment(const UObject* NewAttachment)
-{
-	if (!IsValid(NewAttachment))
-	{
-		LOG_ERROR(TEXT("Attachment is not valid!"));
-		return false;
-	}
-	
-	if (!NewAttachment->Implements<UMounteaAdvancedAttachmentAttachableInterface>())
-	{
-		LOG_WARNING(TEXT("Attachable %s does not implement the required interface! Attachment will be performed, however, it may not behave as expected."), *NewAttachment->GetName())
-		return true;
-	}
-
-	if (!IMounteaAdvancedAttachmentAttachableInterface::Execute_CanAttach(NewAttachment))
-	{
-		LOG_WARNING(TEXT("Attachable object is not compatible with selected Slot!."));
-		return false;
-	}
-	
-	return true;
 }
 
 bool UMounteaAdvancedAttachmentSlot::ValidateAttachmentSlot(const USceneComponent* Target) const
@@ -226,24 +184,20 @@ FName UMounteaAdvancedAttachmentSlot::GetAttachmentSocketName() const
 
 bool UMounteaAdvancedAttachmentSlot::Detach()
 {
-	if (!IsOccupied())
+	if (!CanDetach())
 		return false;
 
 	PerformDetachment();
-	Attachment = nullptr;
-	State = EAttachmentSlotState::EASS_Empty;
-	return true;
+	return Super::Detach();
 }
 
 bool UMounteaAdvancedAttachmentSlot::ForceDetach()
 {
 	PerformDetachment();
-	Attachment = nullptr;
-	State = EAttachmentSlotState::EASS_Empty;
-	return true;
+	return Super::ForceDetach();
 }
 
-void UMounteaAdvancedAttachmentSlot::PerformDetachment()
+void UMounteaAdvancedAttachmentSlot::PerformDetachment() const
 {
 	UObject* targetAttachment = Attachment ? Attachment : LastAttachment;
 	

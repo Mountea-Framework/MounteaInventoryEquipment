@@ -61,6 +61,7 @@ void UMounteaInventoryUIComponent::BeginPlay()
 		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) && 
 		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
+		UIConfig = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 		Execute_EmptyItemActionsQueue(this); // Do NOT receive any queue items
 		
 		{
@@ -311,10 +312,10 @@ bool UMounteaInventoryUIComponent::SetInventoryWidget_Implementation(UUserWidget
 void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget)
 {
 	if (ActiveItemWidget != NewActiveItemWidget)
-	{
 		ActiveItemWidget = NewActiveItemWidget;
-		NewActiveItemWidget->SetFocus();
-	}
+	
+	if (UIConfig && UIConfig->bAllowAutoFocus && ActiveItemWidget)
+		ActiveItemWidget->SetFocus();	
 }
 
 UUserWidget* UMounteaInventoryUIComponent::GetNotificationContainer_Implementation() const
@@ -339,20 +340,19 @@ void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(co
 	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
 	ensure(notificationContainerInterface.GetObject() != nullptr);
 	
-	const UMounteaAdvancedInventoryUIConfig* Config = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventoryUISettingsConfig.LoadSynchronous();
-	if (!Config)
+	if (!UIConfig)
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))
 		return;
 	}
 
-	if (Config->NotificationWidgetClass.IsNull())
+	if (UIConfig->NotificationWidgetClass.IsNull())
 	{
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load `NotificationWidgetClass` from Config!"))
 		return;
 	}
 	
-	auto notificationClass = Config->NotificationWidgetClass.LoadSynchronous();
+	auto notificationClass = UIConfig->NotificationWidgetClass.LoadSynchronous();
 	auto notificationWidget = CreateWidget(InventoryNotificationContainerWidget, notificationClass);
 	if (!IsValid(notificationWidget))
 	{
@@ -551,20 +551,35 @@ void UMounteaInventoryUIComponent::CancelQueuedAction_Implementation(UMounteaSel
 	ActionsQueue.Remove(ItemAction);
 }
 
-/* TODO: do some cleanup, like every 30 seconds? Make it into UI Config?
-void UMounteaInventoryUIComponent::CleanupExpiredActions_Implementation(float MaxAgeSeconds)
+void UMounteaInventoryUIComponent::SetWidgetStates_Implementation(const FGameplayTagContainer& NewStates)
 {
-	FTimespan maxAge = FTimespan::FromSeconds(MaxAgeSeconds);
-	FDateTime now = FDateTime::Now();
-    
-	for (int32 i = ActionsQueue.Pending.Num() - 1; i >= 0; --i)
-	{
-		const FActionQueueEntry& entry = ActionsQueue.Pending[i];
-		if ((now - entry.CreationTime) > maxAge && entry.Action)
-			Execute_CancelQueuedAction(this, entry.Action.Get());
-	}
+	if (WidgetStatesContainer != NewStates)
+		WidgetStatesContainer = NewStates;
 }
-*/
+
+bool UMounteaInventoryUIComponent::AddWidgetStateTag_Implementation(const FGameplayTag& Tag)
+{
+	if (WidgetStatesContainer.HasTag(Tag))
+		return false;
+	WidgetStatesContainer.AddTag(Tag);
+	return true;
+}
+
+bool UMounteaInventoryUIComponent::RemoveWidgetStateTag_Implementation(const FGameplayTag& Tag)
+{
+	return WidgetStatesContainer.RemoveTag(Tag);
+}
+
+bool UMounteaInventoryUIComponent::HasWidgetStateTag_Implementation(const FGameplayTag& Tag, bool bExactMatch) const
+{
+	return bExactMatch ? WidgetStatesContainer.HasTagExact(Tag) : WidgetStatesContainer.HasTag(Tag);
+}
+
+bool UMounteaInventoryUIComponent::AppendWidgetStateTags_Implementation(const FGameplayTagContainer& TagsToAppend)
+{
+	WidgetStatesContainer.AppendTags(TagsToAppend);
+	return true;
+}
 
 void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 {
@@ -573,14 +588,16 @@ void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()
 
 TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIComponent::GetItemActionsQueue_Implementation() const
 {
-	TArray<UMounteaSelectableInventoryItemAction*> result;
-	result.Reserve(ActionsQueue.Pending.Num());
-    
-	for (const FActionQueueEntry& entry : ActionsQueue.Pending)
-	{
-		if (entry.Action)
-			result.Add(entry.Action.Get());
-	}
-    
-	return result;
+	TArray<UMounteaSelectableInventoryItemAction*> Result;
+	Result.Reserve(ActionsQueue.Pending.Num());
+
+	Algo::TransformIf(
+		ActionsQueue.Pending,
+		Result,
+		[](const FActionQueueEntry& entry) { return IsValid(entry.Action); },
+		[](const FActionQueueEntry& entry) { return entry.Action.Get(); }
+	);
+
+	return Result;
 }
+

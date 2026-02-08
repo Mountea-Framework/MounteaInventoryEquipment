@@ -45,6 +45,12 @@ public:
 		DisplayName="Action Mappings for UI")
 	TArray<FMounteaWidgetInputActionMapping> UIActionMappings;
 	
+	/** Unified deadzone used for Analog and Wheel inputs. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="🎮 Inputs|Config",
+		meta=(NoResetToDefault),
+		meta=(UIMin=0.f, ClampMin=0.f))
+	float InputDeadzone = 0.1f;
+	
 	// --- Wrapper
 	
 	/** Widget class used as the main user interface wrapper (root HUD panel, container for other widgets, 
@@ -198,12 +204,19 @@ public:
 	 * ⚠ Can result in performance impact on lower-end machines, especially with huge amounts of items!
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings", 
-		DisplayName="⚠ Always Stack Stackable Items")
+		DisplayName="⚠ Always Stack Stackable Items",
+		meta=(NoResetToDefault))
 	uint8 bAlwaysStackStackableItems : 1;
 
 	/** Determines if the inventory system allows drag-and-drop operations for items. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings",
+		meta=(NoResetToDefault))
 	uint8 bAllowDragAndDrop : 1;
+	
+	/** Determines whether focus will be automatically passed to Active Widget or not. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings",
+		meta=(NoResetToDefault))
+	uint8 bAllowAutoFocus : 1;
 	
 public:
 	

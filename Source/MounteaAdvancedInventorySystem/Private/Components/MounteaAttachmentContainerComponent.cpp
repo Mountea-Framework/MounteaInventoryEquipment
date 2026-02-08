@@ -289,9 +289,6 @@ void UMounteaAttachmentContainerComponent::GetLifetimeReplicatedProps(
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// TODO: update if needed
-	//DOREPLIFETIME_CONDITION(UMounteaAttachmentContainerComponent, State, COND_SimulatedOnly);
-	DOREPLIFETIME(UMounteaAttachmentContainerComponent, State);
 	DOREPLIFETIME(UMounteaAttachmentContainerComponent, AttachmentSlots);
 }
 

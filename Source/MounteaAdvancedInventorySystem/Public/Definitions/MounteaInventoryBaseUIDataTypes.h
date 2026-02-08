@@ -12,11 +12,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MounteaInventoryBaseUIEnums.h"
 #include "MounteaInventoryItem.h"
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
 enum class ECommonInputType : uint8;
 enum class EMounteaWidgetInputMethod : uint8;
+enum class EMounteaWidgetInputKey : uint8;
 class UUserWidget;
 class UTextureCube;
 class UMounteaSelectableInventoryItemAction;
@@ -398,7 +400,11 @@ struct FMounteaWidgetInputPayload
 	
 	/** Defines type of input to consume. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")
-	EMounteaWidgetInputMethod InputMethod;
+	EMounteaWidgetInputMethod InputMethod = EMounteaWidgetInputMethod::Boolean;
+	
+	/** Defines type of input key to consume. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")
+	EMounteaWidgetInputKey InputKey;
 
 	/** Scalar input value (e.g. mouse wheel delta, trigger axis, zoom amount). */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")

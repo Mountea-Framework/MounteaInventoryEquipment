@@ -49,7 +49,7 @@ public:
 	 * @param ItemAction The item action associated with this widget.
 	 * @param SelectedItem Inventory Item which this action affects.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions")
 	void InitializeItemAction(
 		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
 	virtual void InitializeItemAction_Implementation(
@@ -60,7 +60,7 @@ public:
 	 * 
 	 * @return The item action data associated with this widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions")
 	bool IsActionEnabled() const;
 	virtual bool IsActionEnabled_Implementation() const = 0;
 
@@ -69,7 +69,7 @@ public:
 	 * 
 	 * @return True if the action is valid, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions")
 	bool IsActionValid() const;
 	virtual bool IsActionValid_Implementation() const = 0;
 
@@ -79,7 +79,7 @@ public:
 	 * This function is typically called when the user clicks or interacts with the item action button.
 	 * It should handle the logic for performing the action, such as using, equipping, or dropping the item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions")
 	void ExecuteItemAction();
 	virtual void ExecuteItemAction_Implementation() = 0;
 
@@ -88,7 +88,7 @@ public:
 	 * 
 	 * @return The soft class reference to the item action.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions")
 	TSoftClassPtr<UMounteaSelectableInventoryItemAction> GetItemAction() const;
 	virtual TSoftClassPtr<UMounteaSelectableInventoryItemAction> GetItemAction_Implementation() const = 0;
 };

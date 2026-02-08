@@ -34,17 +34,17 @@ public:
 	/**
 	 * Retrieves the given object if it is of the specified class type.
 	 *
-	 * This function checks whether the provided `Object` is of the class type specified by `ClassFilter`.
-	 * If the `Object` is of the specified class or a subclass thereof, it returns the `Object` of the specified class and sets `bResult` to `true`.
-	 * Otherwise, it returns `nullptr` and sets `bResult` to `false`.
+	 * This function checks whether the provided Object is of the class type specified by ClassFilter.
+	 * If the Object is of the specified class or a subclass thereof, it returns the Object of the specified class and sets bResult to true.
+	 * Otherwise, it returns nullptr and sets bResult to false.
 	 *
 	 * @param Object		The object to check and potentially retrieve.
 	 * @param ClassFilter	The class type to check against. Only objects of this class or subclasses will be returned.
-	 * @param bResult		(Out) `true` if the object is of the specified class type; `false` otherwise.
-	 * @return					The casted `Object` if it is of the specified class type; otherwise, `nullptr`.
+	 * @param bResult		(Out) true if the object is of the specified class type; false otherwise.
+	 * @return				The casted Object if it is of the specified class type; otherwise, nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
-		meta = (ClassFilter = "Object"),
+		meta=(ClassFilter="/Script/CoreUObject.Object"),
 		meta=(DeterminesOutputType = "ClassFilter"),
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Object By Class")
@@ -61,7 +61,8 @@ public:
 	 * @return Inventory Config, or null
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
-		meta=(CustomTag="MounteaK2Getter"))
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Inventory Config")
 	static UMounteaAdvancedInventorySettingsConfig* GetMounteaAdvancedInventoryConfig();
 
 	/**
@@ -101,6 +102,17 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Gameplay Tag")
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
+
+	/**
+	 * Returns whether the tag container is empty or not.
+	 * @param Source Container to check
+	 * @return True if empty or invalid, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|GameplayTags",
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Is Tag Container Empty")
+	static bool IsTagsContainerEmpty(const FGameplayTagContainer& Source);
 
 	/**
 	 * Retrieves an invalid FGuid.

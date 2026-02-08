@@ -160,7 +160,7 @@ public:
 	 * Handles the selection of a category in the inventory UI.
 	 * @param SelectedCategoryId The ID of the selected category.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Category")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Category")
 	void CategorySelected(const FString& SelectedCategoryId);
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
 
@@ -168,7 +168,7 @@ public:
 	 * Retrieves the currently selected category ID.
 	 * @return The ID of the currently selected category.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Category")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Category")
 	FString GetSelectedCategoryId() const;
 	virtual FString GetSelectedCategoryId_Implementation() const = 0;
 	
@@ -198,7 +198,7 @@ public:
 	 * Processes an item that has been added to the inventory.
 	 * @param AddedItem The item that has been added to the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
 	void ProcessItemAdded(const FInventoryItem& AddedItem);
 	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) = 0;
 
@@ -206,7 +206,7 @@ public:
 	 * Processes an item that has been removed from the inventory.
 	 * @param RemovedItem The item that has been removed from the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
 	void ProcessItemRemoved(const FInventoryItem& RemovedItem);
 	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) = 0;
 
@@ -214,7 +214,7 @@ public:
 	 * Processes an item that has been modified in the inventory.
 	 * @param ModifiedItem The item that has been modified in the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
 	void ProcessItemModified(const FInventoryItem& ModifiedItem);
 	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) = 0;
 	
@@ -222,7 +222,7 @@ public:
 	 * Handles the selection of an item in the inventory UI.
 	 * @param SelectedItem The GUID of the selected item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
 	void ItemSelected(const FGuid& SelectedItem);
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
 
@@ -230,7 +230,7 @@ public:
 	 * Retrieves the currently active item GUID.
 	 * @return The GUID of the currently active item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
 	FGuid GetActiveItemGuid() const;
 	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
 	
@@ -241,7 +241,7 @@ public:
 	 * 
 	 * @return Custom Items Mpa if any specified.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
 	TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap() const;
 	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const = 0;
 	
@@ -251,7 +251,7 @@ public:
 	 * @param ItemTag   Gameplay tag representing the custom item key.
 	 * @param ItemId    Guid value associated with the item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
 	void AddCustomItemToMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 
@@ -261,14 +261,14 @@ public:
 	 *
 	 * @param OtherItems   Map of custom items to merge in.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
 	void AppendCustomItemsMap(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) = 0;
 
 	/**
 	 * Clears all entries from the custom items map.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
 	void ClearCustomItemsMap();
 	virtual void ClearCustomItemsMap_Implementation() = 0;
 
@@ -280,7 +280,7 @@ public:
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
 	bool RemoveCustomItemFromMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 
@@ -293,7 +293,7 @@ public:
 	 * @param ItemId Item guid to search for
 	 * @return True if item is stored in such container, false otherwise
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
 	bool IsItemStoredInCustomMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 	
@@ -379,6 +379,119 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|ItemActions")
 	void CancelQueuedAction(UMounteaSelectableInventoryItemAction* ItemAction);
 	virtual void CancelQueuedAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction) = 0;
+	
+	// --- Widget States
+	
+	/**
+	 * Returns all currently active Widget State tags tracked by the target UI Manager.
+	 *
+	 * UI Manager states are used to keep track of which UI widgets are currently active/visible/in use
+	 * within the Wrapper (for example Modal Window, Tooltip, Context Menu, Inventory Panel, etc.).
+	 * Each widget that is created/added to the Wrapper should contribute its predefined Gameplay Tag
+	 * so the Wrapper and UI Manager can quickly query what is active and react accordingly.
+	 *
+	 * @return Container of Gameplay Tags representing active UI states/widgets currently tracked by the UI Manager.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|State",
+		meta=(Categories="Mountea_Inventory.WidgetState,State"),
+		DisplayName="Get Widget States")
+	FGameplayTagContainer GetWidgetStates() const;
+	virtual FGameplayTagContainer GetWidgetStates_Implementation() const = 0;
+
+	/**
+	 * Overwrites UI Manager state tracking with a new tag container.
+	 *
+	 * This function replaces the current tracked Widget State tags with the provided container.
+	 * It exists primarily as a write-back mechanism for systems that manipulate state tags in bulk
+	 * (including helper functions such as AddWidgetStateTag, RemoveWidgetStateTag, ClearWidgetStateTags
+	 * or AppendWidgetStateTags).
+	 *
+	 * @note
+	 * - This function only updates state tracking. It should not be assumed to create/destroy widgets by itself.
+	 * - Implementations should ensure the stored state remains consistent with actual active widgets.
+	 *
+	 * @param NewStates Container of Gameplay Tags that will become the UI Manager's active widget states.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|State",
+		DisplayName="Set Widget States")
+	void SetWidgetStates(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates);
+	virtual void SetWidgetStates_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates) = 0;
+
+	/**
+	 * Adds a new Widget State tag to the target UI Manager's active state container.
+	 *
+	 * Expected flow:
+	 * - A child widget (e.g., ModalWindow) is created/added to the UI Manager.
+	 * - That widget provides its state tag definition.
+	 * - UI Manager registers the tag so the system can track that the widget is now active.
+	 *
+	 * @param Tag The Gameplay Tag describing the widget state to add.
+	 * @return True if the tag was added (was not present before). False if invalid or already present.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|State",
+		DisplayName="Add Widget State Tag")
+	bool AddWidgetStateTag(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
+	virtual bool AddWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag) = 0;
+
+	/**
+	 * Removes an existing Widget State tag from the target UI Manager's active state container.
+	 *
+	 * This should be called when a UI element is removed/hidden/destroyed so the Wrapper no longer reports
+	 * it as active, preventing stale state and enabling correct UI Manager decisions.
+	 *
+	 * @param Tag The Gameplay Tag describing the widget state to remove.
+	 * @return True if the tag was removed. False if invalid or not found.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|State",
+		DisplayName="Remove Widget State Tag")
+	bool RemoveWidgetStateTag(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
+	virtual bool RemoveWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag) = 0;
+
+	/**
+	 * Checks whether the target UI Manager currently contains a given Widget State tag.
+	 *
+	 * Used for querying whether a particular UI element/state is currently active within the Wrapper.
+	 * Example: prevent opening another modal if "UI.Modal.Active" is already present, or change input rules.
+	 *
+	 * @param Tag The Gameplay Tag describing the widget state to check.
+	 * @param bExactMatch If true, requires an exact tag match. If false, allows hierarchical matching
+	 *                    (e.g., checking "UI.Modal" would match "UI.Modal.Active").
+	 * @return True if the UI Manager currently reports the tag as active; otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|State",
+		DisplayName="Has Widget State Tag")
+	bool HasWidgetStateTag(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, 
+		bool bExactMatch) const;
+	virtual bool HasWidgetStateTag_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, 
+		bool bExactMatch) const = 0;
+
+	/**
+	 * Clears all Widget State tags tracked by the target UI Manager.
+	 *
+	 * Typically used during full teardown/reset scenarios such as RemoveWrapperWidget, rebuilding the UI,
+	 * or when the UI Manager needs to force the Wrapper into a clean baseline state.
+	 *
+	 * Note:
+	 * - This does not automatically destroy UI widgets by itself. It only clears the tracked state tags.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|State",
+		DisplayName="Clear Widget State Tags")
+	void ClearWidgetStateTags();
+	virtual void ClearWidgetStateTags_Implementation() = 0;
+
+	/**
+	 * Appends multiple Widget State tags to the target UI Manager's active state container.
+	 *
+	 * Useful when adding a composite widget (or UI mode) that activates multiple tracked states at once,
+	 * or when synchronizing the UI Manager to a known set of states provided by another system.
+	 *
+	 * @param TagsToAppend Container of Gameplay Tags to add to the UI Manager's active state container.
+	 * @return True if at least one new tag was added. False if empty or all tags were already present.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|State",
+		DisplayName="Append Widget State Tags")
+	bool AppendWidgetStateTags(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend);
+	virtual bool AppendWidgetStateTags_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend) = 0;
 
 
 	// --- Events

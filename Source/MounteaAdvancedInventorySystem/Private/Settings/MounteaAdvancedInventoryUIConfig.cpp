@@ -18,6 +18,7 @@
 UMounteaAdvancedInventoryUIConfig::UMounteaAdvancedInventoryUIConfig() : Super()
 	, bAlwaysStackStackableItems(true)
 	, bAllowDragAndDrop(true)
+	, bAllowAutoFocus(true)
 {
 	SetupWidgetCommands();
 }
