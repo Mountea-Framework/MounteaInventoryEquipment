@@ -27,6 +27,42 @@
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 
+namespace
+{
+	constexpr float SpherePixelRadius = .1f;
+	constexpr int32 SphereSegments = 16;
+	constexpr float LeaderLineLengthPixels = 60.0f;
+	constexpr float LeaderTextPaddingPixels = 6.0f;
+
+	float GetWorldRadiusForScreenSize(const FSceneView* View, const FVector& WorldLocation, const float PixelRadius)
+	{
+		if (!View || PixelRadius <= 0.0f)
+			return PixelRadius;
+
+		FVector2D pixelCenter;
+		if (!View->WorldToPixel(WorldLocation, pixelCenter))
+			return PixelRadius;
+
+		const FVector2D pixelOffset = pixelCenter + FVector2D(PixelRadius, 0.0f);
+
+		FVector worldOriginCenter;
+		FVector worldDirectionCenter;
+		FSceneView::DeprojectScreenToWorld(pixelCenter, View->UnconstrainedViewRect, View->ViewMatrices.GetInvViewMatrix(), View->ViewMatrices.GetInvProjectionMatrix(), worldOriginCenter, worldDirectionCenter);
+
+		FVector worldOriginOffset;
+		FVector worldDirectionOffset;
+		FSceneView::DeprojectScreenToWorld(pixelOffset, View->UnconstrainedViewRect, View->ViewMatrices.GetInvViewMatrix(), View->ViewMatrices.GetInvProjectionMatrix(), worldOriginOffset, worldDirectionOffset);
+
+		const FVector planeNormal = View->GetViewDirection();
+		const FPlane depthPlane(WorldLocation, planeNormal);
+
+		const FVector centerOnPlane = FMath::LinePlaneIntersection(worldOriginCenter, worldOriginCenter + worldDirectionCenter * 100000.0f, depthPlane);
+		const FVector offsetOnPlane = FMath::LinePlaneIntersection(worldOriginOffset, worldOriginOffset + worldDirectionOffset * 100000.0f, depthPlane);
+
+		return FVector::Dist(centerOnPlane, offsetOnPlane);
+	}
+}
+
 void FMounteaEquipmentComponentVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI)
 {
 	if (!Component || !PDI || !GEngine || !View || IsCameraPreviewView(View) || !ShouldDrawForComponent(Component))
@@ -42,16 +78,15 @@ void FMounteaEquipmentComponentVisualizer::DrawVisualization(const UActorCompone
 
 	for (const FSlotVisualData& SlotInfo : slotsData)
 	{
-		PDI->DrawPoint(SlotInfo.Location, SlotInfo.Color, 8.0f, SDPG_Foreground);
+		const float worldRadius = GetWorldRadiusForScreenSize(View, SlotInfo.Location, SpherePixelRadius);
+		DrawWireSphere(PDI, SlotInfo.Location, SlotInfo.Color.ToFColor(true), worldRadius, SphereSegments, SDPG_Foreground);
 	}
 }
 
 void FMounteaEquipmentComponentVisualizer::DrawVisualizationHUD(const UActorComponent* Component, const FViewport* Viewport, const FSceneView* View, FCanvas* Canvas)
 {
 	if (!Component || !View || !Canvas || !GEngine || IsCameraPreviewView(View) || !ShouldDrawForComponent(Component))
-	{
 		return;
-	}
 
 	const UMounteaAttachmentContainerComponent* attachableContainerComponent = Cast<UMounteaAttachmentContainerComponent>(Component);
 	if (!attachableContainerComponent)
@@ -66,20 +101,41 @@ void FMounteaEquipmentComponentVisualizer::DrawVisualizationHUD(const UActorComp
 		FVector2D screenPosition;
 		if (FSceneView::ProjectWorldToScreen(WorldLocation, View->CameraConstrainedViewRect, View->ViewMatrices.GetViewProjectionMatrix(), screenPosition))
 		{
-			FCanvasTextItem textItem(screenPosition, FText::FromString(Label), GEngine->GetSmallFont(), Color);
+			const FIntRect& viewRect = View->CameraConstrainedViewRect;
+			const float directionX = (screenPosition.X < viewRect.Min.X + (viewRect.Width() * 0.5f)) ? 1.0f : -1.0f;
+
+			const FVector2D lineStart = screenPosition + FVector2D(directionX * SpherePixelRadius, 0.0f);
+			const FVector2D lineEnd = lineStart + FVector2D(directionX * LeaderLineLengthPixels, 0.0f);
+
+			FCanvasLineItem lineItem(lineStart, lineEnd);
+			lineItem.SetColor(Color);
+			lineItem.LineThickness = 1.0f;
+			Canvas->DrawItem(lineItem);
+
+			UFont* font = GEngine->GetSmallFont();
+			int32 textHeight = 0;
+			int32 textWidth = 0;
+			font->GetStringHeightAndWidth(Label, textHeight, textWidth);
+			const FVector2D textSize(static_cast<float>(textWidth), static_cast<float>(textHeight));
+
+			FVector2D textPosition = lineEnd + FVector2D(directionX * LeaderTextPaddingPixels, -textSize.Y * 0.5f);
+			if (directionX < 0.0f)
+				textPosition.X -= textSize.X;
+
+			FCanvasTextItem textItem(textPosition, FText::FromString(Label), font, Color);
 			textItem.EnableShadow(FLinearColor::Black);
 			Canvas->DrawItem(textItem);
 		}
 	};
 
-	for (const FSlotVisualData& SlotInfo : slotData)
+	for (const FSlotVisualData& slotInfo : slotData)
 	{
-		drawLabel(SlotInfo.Location + FVector(0.0f, 0.0f, 10.0f), SlotInfo.Label, SlotInfo.Color);
+		drawLabel(slotInfo.Location, slotInfo.Label, slotInfo.Color);
 	}
 
-	for (const FWarningVisualData& WarningInfo : warningData)
+	for (const FWarningVisualData& warningInfo : warningData)
 	{
-		drawLabel(WarningInfo.Location, WarningInfo.Message, FLinearColor::Red);
+		drawLabel(warningInfo.Location, warningInfo.Message, FLinearColor::Red);
 	}
 }
 
