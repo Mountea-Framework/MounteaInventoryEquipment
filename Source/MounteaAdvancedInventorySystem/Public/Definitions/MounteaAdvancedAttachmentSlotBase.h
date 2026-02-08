@@ -40,46 +40,58 @@ public:
 	UMounteaAdvancedAttachmentSlotBase();
 
 public:
+	
 	/** Unique identifier for this attachment slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableSlotNames", DisplayPriority=-1, NoResetToDefault))
+		meta=(GetOptions="GetAvailableSlotNames"),
+		meta=(DisplayPriority=-1),
+		meta=(NoResetToDefault))
 	FName SlotName;
 
 	/** Gameplay tags that define what can attach to this slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1, NoResetToDefault))
+		meta=(DisplayPriority=-1),
+		meta=(NoResetToDefault))
 	FGameplayTagContainer SlotTags;
 
 	/** Human-readable name for this slot displayed in UI */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1, NoResetToDefault))
+		meta=(DisplayPriority=-1),
+		meta=(NoResetToDefault))
 	FText DisplayName;
 
 	/** Current state of the attachment slot (Empty, Occupied, Locked) */
 	UPROPERTY(ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1, NoResetToDefault))
+		meta=(DisplayPriority=-1),
+		meta=(NoResetToDefault))
 	EAttachmentSlotState State;
 	
 	/** Type of attachment this slot supports (Socket, Component) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1, NoResetToDefault))
+		meta=(DisplayPriority=-1),
+		meta=(NoResetToDefault))
 	EAttachmentSlotType SlotType;
 
 	/** Reference to the container that owns this slot */
 	UPROPERTY(BlueprintReadOnly, Category="Debug", AdvancedDisplay,
-		meta=(DisplayThumbnail=false, NoResetToDefault))
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
 
 	/** Currently attached object (replicated to clients) */
 	UPROPERTY(Replicated, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
-		meta=(DisplayThumbnail=false, NoResetToDefault))
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault))
 	TObjectPtr<UObject> Attachment;
 
 	/** Local cache of last attachment for detachment operations */
-	UPROPERTY()
+	UPROPERTY(Transient, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault))
 	TObjectPtr<UObject> LastAttachment;
 
 protected:
+	
 	/** Event broadcasted when slot begins play */
 	UPROPERTY(BlueprintAssignable, DisplayName="Begin Play")
 	FSlotBeginPlaySignature SlotBeginPlay;
@@ -94,20 +106,54 @@ public:
 	virtual AActor* GetOwningActor() const;
 
 public:
-	// UObject interface
+	
 	virtual UWorld* GetWorld() const override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override { return true; }
 	virtual int32 GetFunctionCallspace(UFunction* Function, FFrame* Stack) override;
 	virtual bool CallRemoteFunction(UFunction* Function, void* Parms, struct FOutParmRec* OutParms, FFrame* Stack) override;
+	
+public:
+	
+	virtual bool Attach(UObject* NewAttachment);
+	virtual bool ForceAttach(UObject* NewAttachment);
+	virtual bool Detach();
+	virtual bool ForceDetach();
+	virtual void DisableSlot();
+	
+	FORCEINLINE virtual bool IsSlotValid() const
+	{
+		return ParentContainer.GetObject() != nullptr && !SlotName.IsNone() && !SlotTags.IsEmpty();
+	}
+	FORCEINLINE virtual bool CanAttach() const
+	{
+		return IsSlotValid() && IsEmpty() && !IsLocked();
+	}
+	FORCEINLINE virtual bool CanDetach() const
+	{
+		return IsSlotValid() && IsOccupied();
+	}
+	FORCEINLINE virtual bool CanAttachAttachable(const UObject* NewAttachment) const;
+	FORCEINLINE virtual bool HasTag(const FGameplayTag& Tag) const
+	{
+		return SlotTags.HasTag(Tag);
+	}
+	FORCEINLINE virtual bool MatchesTags(const FGameplayTagContainer& Tags, const bool bRequireAll) const
+	{
+		return bRequireAll ? SlotTags.HasAll(Tags) : SlotTags.HasAny(Tags);
+	}
+	
+	virtual bool IsEmpty() const;
+	virtual bool IsOccupied() const;
+	virtual bool IsLocked() const;
 
 protected:
-	// Replication
+	
 	UFUNCTION()
 	virtual void OnRep_State();
 
 protected:
-	// Editor helpers
+	
 	UFUNCTION()
 	virtual TArray<FName> GetAvailableSlotNames() const;
 
