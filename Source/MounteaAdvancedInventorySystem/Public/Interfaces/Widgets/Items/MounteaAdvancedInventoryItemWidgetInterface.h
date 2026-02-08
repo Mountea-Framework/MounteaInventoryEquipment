@@ -62,14 +62,14 @@ public:
 	 * @param Item     Inventory item to be represented by this widget.
 	 * @param Quantity Initial quantity of the item to display.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void InitializeItemWidget(const FInventoryItem& Item, const int32 Quantity);
 	virtual void InitializeItemWidget_Implementation(const FInventoryItem& Item, const int32 Quantity) = 0;
 	
 	/**
 	 * Selects this inventory item in the UI.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void SelectItem();
 	virtual void SelectItem_Implementation() = 0;
 	
@@ -80,7 +80,7 @@ public:
 	 *
 	 * @return A copy of the item’s data structure describing quantity and contained item state.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	FInventoryItemData GetInventoryData() const;
 	virtual FInventoryItemData GetInventoryData_Implementation() const = 0;
 
@@ -91,7 +91,7 @@ public:
 	 *
 	 * @param InventoryData Data describing the item and its quantity.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void SetInventoryData(const FInventoryItemData& InventoryData);
 	virtual void SetInventoryData_Implementation(const FInventoryItemData& InventoryData) = 0;
 
@@ -100,7 +100,7 @@ public:
 	 *
 	 * @return GUID identifying the item, or invalid GUID if no valid item exists.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	FGuid GetInventoryItemId() const;
 	virtual FGuid GetInventoryItemId_Implementation() const = 0;
 
@@ -113,7 +113,7 @@ public:
 	 *
 	 * @param Quantity The current quantity to visually reflect.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void RefreshItemWidget(const int32 Quantity);
 	virtual void RefreshItemWidget_Implementation(const int32 Quantity) = 0;
 
@@ -122,7 +122,7 @@ public:
 	 *
 	 * @return Widget representing the slot that contains this item instance.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	UUserWidget* GetParentSlot() const;
 	virtual UUserWidget* GetParentSlot_Implementation() const = 0;
 	
@@ -133,7 +133,7 @@ public:
 	 *
 	 * @param ParentSlot Widget representing the inventory slot owning this item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void SetParentSlot(UUserWidget* ParentSlot);
 	virtual void SetParentSlot_Implementation(UUserWidget* ParentSlot) = 0;
 
@@ -147,7 +147,7 @@ public:
 	 *
 	 * @param bIsSelected Whether the widget should be rendered as highlighted.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void HighlightItem(const bool bIsSelected = false);
 	virtual void HighlightItem_Implementation(const bool bIsSelected = false) = 0;
 };

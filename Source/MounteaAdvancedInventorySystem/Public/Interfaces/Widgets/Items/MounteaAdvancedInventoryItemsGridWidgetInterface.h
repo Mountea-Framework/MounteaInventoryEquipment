@@ -43,7 +43,7 @@ public:
 	 * @param ItemId The unique identifier of the item to add.
 	 * @return True if the item was successfully added; false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool AddItemToEmptySlot(const FGuid& ItemId);
 	virtual bool AddItemToEmptySlot_Implementation(const FGuid& ItemId) = 0;
 
@@ -54,7 +54,7 @@ public:
 	 * @param SlotIndex The index of the slot to place the item into.
 	 * @return True if the item was successfully added; false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool AddItemToSlot(const FGuid& ItemId, const int32 SlotIndex);
 	virtual bool AddItemToSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex) = 0;
 
@@ -64,7 +64,7 @@ public:
 	 * @param SlotIndex The index of the slot from which to remove the item.
 	 * @return True if the item was successfully removed; false if the slot is empty or invalid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool RemoveItemFromSlot(const int32 SlotIndex);
 	virtual bool RemoveItemFromSlot_Implementation(const int32 SlotIndex) = 0;
 
@@ -78,7 +78,7 @@ public:
 	 * @param Quantity The number of items to remove. Defaults to -1, which removes all instances of the item.
 	 * @return Returns true if the item(s) were successfully removed; otherwise, returns false.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool RemoveItemFromGrid(const FGuid& ItemId, const int32 Quantity = -1);
 	virtual bool RemoveItemFromGrid_Implementation(const FGuid& ItemId, const int32 Quantity = -1) = 0;
 	
@@ -89,7 +89,7 @@ public:
 	 * @return The unique identifier (FGuid) of the item in the slot. 
 	 *         If the slot is empty, returns an invalid FGuid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	FGuid GetItemInSlot(const int32 SlotIndex) const;
 	virtual FGuid GetItemInSlot_Implementation(const int32 SlotIndex) const = 0;
 
@@ -100,7 +100,7 @@ public:
 	 * @param SlotIndex2 The index of the second slot.
 	 * @return True if the swap was successful; false if either slot is invalid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool SwapItemsBetweenSlots(const int32 SlotIndex1, const int32 SlotIndex2);
 	virtual bool SwapItemsBetweenSlots_Implementation(const int32 SlotIndex1, const int32 SlotIndex2) = 0;
 
@@ -109,7 +109,7 @@ public:
 	 * 
 	 * This is useful for resetting or clearing the inventory grid entirely.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	void ClearAllSlots();
 	virtual void ClearAllSlots_Implementation() = 0;
 
@@ -118,7 +118,7 @@ public:
 	 * 
 	 * @return The total number of slots available in the inventory grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	int32 GetTotalSlots() const;
 	virtual int32 GetTotalSlots_Implementation() const = 0;
 
@@ -128,7 +128,7 @@ public:
 	 * @param SlotIndex The index of the slot to check.
 	 * @return True if the slot is empty; false if it contains an item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool IsSlotEmpty(const int32 SlotIndex) const;
 	virtual bool IsSlotEmpty_Implementation(const int32 SlotIndex) const = 0;
 
@@ -138,7 +138,7 @@ public:
 	 * @param ItemId The unique identifier (FGuid) of the item to locate.
 	 * @return The index of the slot that contains the item, or -1 if the item is not found.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	int32 GetSlotIndexByItem(const FGuid& ItemId) const;
 	virtual int32 GetSlotIndexByItem_Implementation(const FGuid& ItemId) const = 0;
 
@@ -148,7 +148,7 @@ public:
 	 * @param ItemId The unique identifier of the item to check for.
 	 * @return True if the item is found in the grid; false if it is not present.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool IsItemInGrid(const FGuid& ItemId) const;
 	virtual bool IsItemInGrid_Implementation(const FGuid& ItemId) const = 0;
 
@@ -161,7 +161,7 @@ public:
 	 * @param SlotIndex The index of the grid slot to retrieve data for.
 	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	FMounteaInventoryGridSlot GetGridSlotData(const int32 SlotIndex) const;
 	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation(const int32 SlotIndex) const = 0;
 
@@ -174,7 +174,7 @@ public:
 	 * @param SlotCoords The coordinates of the grid slot to retrieve data for.
 	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	int32 GetGridSlotIndexByCoords(const FIntPoint& SlotCoords) const;
 	virtual int32 GetGridSlotIndexByCoords_Implementation(const FIntPoint& SlotCoords) const = 0;
 	
@@ -186,7 +186,7 @@ public:
 	 *
 	 * @return A set of FMounteaInventoryGridSlot containing the data for all slots in the grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	TSet<FMounteaInventoryGridSlot> GetGridSlotsData() const;
 	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsData_Implementation() const = 0;
 
@@ -199,7 +199,7 @@ public:
 	 * @return A UUserWidget pointer representing the first empty slot in the grid.
 	 *         Returns nullptr if no empty slots are available.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	UUserWidget* FindEmptyWidgetSlot() const;
 	virtual UUserWidget* FindEmptyWidgetSlot_Implementation() const = 0;
 
@@ -210,7 +210,7 @@ public:
 	 *
 	 * @return The index of the first empty slot, or -1 if no empty slots are available.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	int32 FindEmptySlotIndex(const FGuid& ItemId) const;
 	virtual int32 FindEmptySlotIndex_Implementation(const FGuid& ItemId) const = 0;
 
@@ -222,7 +222,7 @@ public:
 	 * @param SlotIndex The index of the slot to retrieve the widget for.
 	 * @return The widget associated with the specified slot index, or nullptr if no widget exists for the given index.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	UUserWidget* GetItemSlotWidget(const int32 SlotIndex) const;
 	virtual UUserWidget* GetItemSlotWidget_Implementation(const int32 SlotIndex) const = 0;
 
@@ -234,7 +234,7 @@ public:
 	 *
 	 * @return The UUserWidget representing the item slot. Returns nullptr if no widget is associated.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	UUserWidget* GetItemWidgetInSlot(const int32 SlotIndex) const;
 	virtual UUserWidget* GetItemWidgetInSlot_Implementation(const int32 SlotIndex) const = 0;
 
@@ -246,7 +246,7 @@ public:
 	 *
 	 * @param SlotData The data representing the slot to be added to the inventory grid.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	void AddSlot(const FMounteaInventoryGridSlot& SlotData);
 	virtual void AddSlot_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 
@@ -260,7 +260,7 @@ public:
 	 * @param SlotIndex The index of the slot in which the item is updated (default is 0).
 	 * @return Returns true if the item was successfully updated, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	bool UpdateItemInSlot(const FGuid& ItemId, const int32 SlotIndex = 0);
 	virtual bool UpdateItemInSlot_Implementation(const FGuid& ItemId, const int32 SlotIndex = 0) = 0;
 
@@ -273,7 +273,7 @@ public:
 	 * @param ItemId The unique identifier (FGuid) of the item for which the stack size is requested.
 	 * @return The total number of items in the stack for the specified item. Returns 0 if the item is not found.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	int32 GetStacksSizeForItem(const FGuid& ItemId) ;
 	virtual int32 GetStacksSizeForItem_Implementation(const FGuid& ItemId)  = 0;
 
@@ -286,7 +286,7 @@ public:
 	 * @param ItemId The unique identifier of the inventory item to query grid slot data for.
 	 * @return A set of grid slot data associated with the specified item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid")
 	TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem(const FGuid& ItemId) ;
 	virtual TSet<FMounteaInventoryGridSlot> GetGridSlotsDataForItem_Implementation(const FGuid& ItemId)  = 0;
 	

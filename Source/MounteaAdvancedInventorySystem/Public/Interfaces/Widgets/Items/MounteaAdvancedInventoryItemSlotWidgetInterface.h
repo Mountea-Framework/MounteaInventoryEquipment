@@ -44,7 +44,7 @@ public:
 	 * 
 	 * @return String tooltip of the Slot.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	FString GetSlotTooltip() const;
 	virtual FString GetSlotTooltipText_Implementation() const = 0;
 
@@ -53,7 +53,7 @@ public:
 	 *
 	 * @param ParentSlotsWrapper The parent widget that contains the slots.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	void SetParentSlotsWrapper(UUserWidget* ParentSlotsWrapper);
 	virtual void SetParentSlotsWrapper_Implementation(UUserWidget* ParentSlotsWrapper) = 0;
 
@@ -62,7 +62,7 @@ public:
 	 * 
 	 * @param SlotData The slot data to be stored.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	void StoreBasicSlotData(const FInventorySlot& SlotData);
 	virtual void StoreBasicSlotData_Implementation(const FInventorySlot& SlotData) = 0;
 
@@ -73,7 +73,7 @@ public:
 	 * 
 	 * @param SlotData The grid slot data to be stored.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	void StoreGridSlotData(const FMounteaInventoryGridSlot& SlotData);
 	virtual void StoreGridSlotData_Implementation(const FMounteaInventoryGridSlot& SlotData) = 0;
 	
@@ -82,7 +82,7 @@ public:
 	 *
 	 * @return The inventory slot data.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	FInventorySlot GetSlotData() const;
 	virtual FInventorySlot GetSlotData_Implementation() const = 0;
 
@@ -93,7 +93,7 @@ public:
 	 *
 	 * @return The inventory grid slot data.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	FMounteaInventoryGridSlot GetGridSlotData() const;
 	virtual FMounteaInventoryGridSlot GetGridSlotData_Implementation() const = 0;
 
@@ -102,7 +102,7 @@ public:
 	 *
 	 * @param ItemId The unique identifier of the item to be added to the slot.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	void AddItemToSlot(const FGuid& ItemId);
 	virtual void AddItemToSlot_Implementation(const FGuid& ItemId) = 0;
 
@@ -111,7 +111,7 @@ public:
 	 *
 	 * @param ItemId The unique identifier of the item to be removed from the slot.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	void RemoveItemFromSlot(const FGuid& ItemId);
 	virtual void RemoveItemFromSlot_Implementation(const FGuid& ItemId) = 0;
 
@@ -120,7 +120,7 @@ public:
 	 *
 	 * @return True if the slot is empty, otherwise false.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	bool IsSlotEmpty() const;
 	virtual bool IsSlotEmpty_Implementation() const = 0;
 
@@ -129,14 +129,14 @@ public:
 	 *
 	 * @return The item widget in the slot, or nullptr if no widget is present.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	UUserWidget* GetItemWidgetInSlot() const;
 	virtual UUserWidget* GetItemWidgetInSlot_Implementation() const = 0;
 
 	/**
 	 * Handles the logic for selecting an item in the corresponding inventory slot.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots")
 	void SelectItemInSlot();
 	virtual void SelectItemInSlot_Implementation() = 0;
 };

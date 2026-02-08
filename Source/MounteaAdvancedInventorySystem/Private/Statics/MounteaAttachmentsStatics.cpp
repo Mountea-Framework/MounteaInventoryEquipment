@@ -12,22 +12,50 @@
 
 #include "Statics/MounteaAttachmentsStatics.h"
 
+#include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Engine/SCS_Node.h"
+#include "Engine/SimpleConstructionScript.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
+#include "Statics/MounteaEquipmentStatics.h"
+
+static void GatherSCSSceneComponentTemplates(const AActor* CDO, TArray<USceneComponent*>& Out)
+{
+	UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(CDO->GetClass());
+	if (!blueprintClass || !blueprintClass->SimpleConstructionScript)
+		return;
+
+	const TArray<USCS_Node*>& blueprintNodes = blueprintClass->SimpleConstructionScript->GetAllNodes();
+	for (USCS_Node* blueprintNode : blueprintNodes)
+	{
+		if (!blueprintNode) continue;
+
+		// Template object for this component as defined in the BP
+		UActorComponent* componentTemplate = blueprintNode->GetActualComponentTemplate(blueprintClass);
+		if (USceneComponent* sceneComponent = Cast<USceneComponent>(componentTemplate))
+			Out.Add(sceneComponent);
+	}
+}
 
 TArray<USceneComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(const AActor* Target)
 {
-	if (!IsValid(Target))
-		return {};
-
 	TArray<USceneComponent*> components;
+	if (!IsValid(Target))
+		return components;
+
 	Target->GetComponents<USceneComponent>(components);
+
+#if WITH_EDITOR
+	GatherSCSSceneComponentTemplates(Target, components);
+#endif
+	
 	return components;
 }
 
 TArray<FName> UMounteaAttachmentsStatics::GetAvailableComponentNames(const AActor* Target)
 {
 	TArray<USceneComponent*> components = GetAvailableComponents(Target);
+	const auto allowedComponentTarget = UMounteaEquipmentStatics::GetAllowedAttachmentTargets();
 
 	TArray<FName> names;
 	names.Reserve(components.Num());
@@ -35,8 +63,13 @@ TArray<FName> UMounteaAttachmentsStatics::GetAvailableComponentNames(const AActo
 	Algo::TransformIf(
 		components,
 		names,
-		[](const USceneComponent* Comp) { return IsValid(Comp); },
-		[](const USceneComponent* Comp) { return Comp->GetFName(); }
+		[&allowedComponentTarget](const USceneComponent* Comp) { return IsValid(Comp) && allowedComponentTarget.Contains(Comp->GetClass()); },
+		[](const USceneComponent* Comp)
+		{
+			FString componentName = Comp->GetFName().ToString();
+			componentName.RemoveFromEnd(TEXT("_GEN_VARIABLE"));
+			return FName(*componentName);
+		}
 	);
 
 	return names;
@@ -198,7 +231,7 @@ void UMounteaAttachmentsStatics::SetTags(const TScriptInterface<IMounteaAdvanced
 
 EAttachmentState UMounteaAttachmentsStatics::GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target)
 {
-	return (Target.GetObject() != nullptr) ? Target->Execute_GetState(Target.GetObject()) : EAttachmentState();
+	return (Target.GetObject() != nullptr) ? Target->Execute_GetState(Target.GetObject()) : EAttachmentState::Default;
 }
 
 void UMounteaAttachmentsStatics::SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentState NewState)

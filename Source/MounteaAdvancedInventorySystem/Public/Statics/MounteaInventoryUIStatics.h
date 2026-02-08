@@ -429,7 +429,7 @@ public:
 	 * @param ParentInventory The parent UI Manager to associate with the target widget.
 	 * @return Returns true if the source inventory was successfully set; otherwise, returns false.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Wrapper", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(Keywords="container,viewport"),
 		DisplayName="Set Wrapper Widget Parent Manager")
@@ -941,7 +941,7 @@ public:
 	 * @param Target The UI interface to get the notification container from
 	 * @return A pointer to the user widget that serves as the notification container
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Getter"))
 	static UUserWidget* GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
@@ -950,7 +950,7 @@ public:
 	 * @param Target The UI interface to set the notification container for
 	 * @param NewNotificationContainer The user widget to use as the notification container
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"))
 	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewNotificationContainer);
@@ -960,7 +960,7 @@ public:
 	 * @param Target The UI interface to create the notification in
 	 * @param NotificationData The data structure containing all notification parameters (text, duration, etc.)
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"))
 	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryNotificationData& NotificationData);
@@ -969,7 +969,7 @@ public:
 	 * Removes all currently active inventory notifications from the UI.
 	 * @param Target The UI interface to remove notifications from
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Notifications", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"))
 	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
@@ -985,7 +985,7 @@ public:
 	 * @param Target A pointer to the UMounteaAdvancedInventoryInteractableObjectWidget that needs initialization.
 	 * @return True if the Target widget is valid and initialized successfully, otherwise false.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="ItemPreview - Initialize Interactable Widget")
@@ -997,7 +997,7 @@ public:
 	 * @param Target The target widget to set the preview mesh on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
 	 * @param StaticMesh The static mesh to be used as the preview mesh for the target widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Set Preview Mesh")
 	static void ItemPreview_SetPreviewMesh(UMounteaAdvancedInventoryInteractableObjectWidget* Target, UStaticMesh* StaticMesh);
@@ -1008,7 +1008,7 @@ public:
 	 * @param Target The target widget to set the preview mesh on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
 	 * @param SkeletalMesh The skeletal mesh to be used as the preview mesh for the target widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Set Preview Skeletal Mesh")
 	static void ItemPreview_SetPreviewSkeletalMesh(UMounteaAdvancedInventoryInteractableObjectWidget* Target, USkeletalMesh* SkeletalMesh);
@@ -1018,7 +1018,7 @@ public:
 	 *
 	 * @param Target A pointer to the UMounteaAdvancedInventoryInteractableObjectWidget for which the preview will be cleared. Must be a valid widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Clear Preview")
 	static void ItemPreview_ClearPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
@@ -1029,7 +1029,7 @@ public:
 	 * @param Target The target widget representing an advanced inventory interactable object.
 	 * The camera for this widget will be reset to its default state if it is valid.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Reset Preview")
 	static void ItemPreview_ResetPreview(UMounteaAdvancedInventoryInteractableObjectWidget* Target);
@@ -1040,7 +1040,7 @@ public:
 	 * @param Target The target widget to update camera rotation on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
 	 * @param MouseDelta The mouse movement delta values for rotation calculation.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Update Camera Rotation (Mouse)")
 	static void ItemPreview_UpdateCameraRotation(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta);
@@ -1051,7 +1051,7 @@ public:
 	 * @param Target The target widget to update camera height on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
 	 * @param MouseDelta The mouse movement delta values for height calculation.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Update Camera Height (Mouse)")
 	static void ItemPreview_UpdateCameraHeight(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const FVector2f& MouseDelta);
@@ -1062,7 +1062,7 @@ public:
 	 * @param Target The target widget to update camera zoom on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
 	 * @param WheelDelta The mouse wheel delta value for zoom calculation.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Update Camera Zoom (Mouse Wheel)")
 	static void ItemPreview_UpdateCameraZoom(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float WheelDelta);
@@ -1074,7 +1074,7 @@ public:
 	 * @param YawNormalized The normalized yaw value (0.0 to 1.0) representing the full rotation range.
 	 * @param PitchNormalized The normalized pitch value (0.0 to 1.0) representing the full rotation range.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Set Camera Rotation Absolute (Slider)")
 	static void ItemPreview_SetCameraRotationAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
 		const float YawNormalized, const float PitchNormalized);
@@ -1085,7 +1085,7 @@ public:
 	 * @param Target The target widget to set camera height on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
 	 * @param HeightNormalized The normalized height value (0.0 to 1.0) representing the full height range.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Set Camera Height Absolute (Slider)")
 	static void ItemPreview_SetCameraHeightAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float HeightNormalized);
@@ -1096,7 +1096,7 @@ public:
 	 * @param Target The target widget to set camera zoom on. This must derive from UMounteaAdvancedInventoryInteractableObjectWidget.
 	 * @param ZoomNormalized The normalized zoom value (0.0 to 1.0) representing the full zoom range.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Set Camera Zoom Absolute (Slider)")
 	static void ItemPreview_SetCameraZoomAbsolute(UMounteaAdvancedInventoryInteractableObjectWidget* Target, const float ZoomNormalized);
@@ -1108,7 +1108,7 @@ public:
 	 * @param AnalogInput The analog input values (-1.0 to 1.0) from gamepad stick for rotation calculation.
 	 * @param DeltaTime The time elapsed since the last frame for frame-rate independent movement.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Update Camera Rotation Analog (Gamepad)")
 	static void ItemPreview_UpdateCameraRotationAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
@@ -1121,7 +1121,7 @@ public:
 	 * @param AnalogInput The analog input value (-1.0 to 1.0) from gamepad for height calculation.
 	 * @param DeltaTime The time elapsed since the last frame for frame-rate independent movement.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Update Camera Height Analog (Gamepad)")
 	static void ItemPreview_UpdateCameraHeightAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
@@ -1134,7 +1134,7 @@ public:
 	 * @param AnalogInput The analog input value (-1.0 to 1.0) from gamepad for zoom calculation.
 	 * @param DeltaTime The time elapsed since the last frame for frame-rate independent movement.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemPreview", 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemPreview", 
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="ItemPreview - Update Camera Zoom Analog (Gamepad)")
 	static void ItemPreview_UpdateCameraZoomAnalog(UMounteaAdvancedInventoryInteractableObjectWidget* Target, 
@@ -1151,7 +1151,7 @@ public:
 	 * @param FlagMask - The flag(s) to check for
 	 * @return - True if all flags in the mask are set in the value
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|UI|Item Action", 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Inventory|Item Action", 
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Item Action - Does Have Flag")
 	static bool ItemAction_HasFlag(const uint8 Value, 
@@ -1167,7 +1167,7 @@ public:
 	 * @param ItemAction The item action associated with this widget.
 	 * @param SelectedItem Inventory Item which this action affects.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Action",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Action - Initialize")
 	static void ItemAction_InitializeItemAction(UWidget* Target,
@@ -1182,7 +1182,7 @@ public:
 	 * 
 	 * @return True if the item action is enabled; otherwise, false.
 	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Action",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Item Action - Is Action Enabled")
 	static bool ItemAction_IsActionEnabled(UWidget* Target);
@@ -1196,7 +1196,7 @@ public:
 	 * 
 	 * @return True if the item action is valid; otherwise, false.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Action",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Item Action - Is Action Valid")
 	static bool ItemAction_IsActionValid(UWidget* Target);
@@ -1208,7 +1208,7 @@ public:
 	 *
 	 * @param Target The target widget from which to execute the item action. Must implement the MounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Action",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Action - Execute Item Action")
 	static void ItemAction_ExecuteItemAction(UWidget* Target);
@@ -1222,7 +1222,7 @@ public:
 	 * 
 	 * @return A TSoftClassPtr to the UMounteaInventorySimpleItemAction class if available; otherwise, returns nullptr.
 	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Action",
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Action",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Item Action - Get Item Action")
 	static TSoftClassPtr<UMounteaSelectableInventoryItemAction> ItemAction_GetItemAction(UWidget* Target);
@@ -1242,7 +1242,7 @@ public:
 	 * 
 	 * Each class must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Construct From Actions List")
 	static void ItemActionsContainer_ConstructFromActionsList(UWidget* Target, const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList);
@@ -1256,7 +1256,7 @@ public:
 	 * 
 	 * @return Returns create Widget if action is successful
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Add Item Action To Container")
 	static UWidget* ItemActionsContainer_AddItemActionToContainer(UWidget* Target, UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& ItemId);
@@ -1267,7 +1267,7 @@ public:
 	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
 	 * @param ItemActionWidget The item action widget to be removed from the container.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Remove Item Action From Container")
 	static void ItemActionsContainer_RemoveItemActionFromContainer(UWidget* Target, UWidget* ItemActionWidget);
@@ -1277,7 +1277,7 @@ public:
 	 *
 	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Clear Item Actions Container")
 	static void ItemActionsContainer_ClearItemActionsContainer(UWidget* Target);
@@ -1288,7 +1288,7 @@ public:
 	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
 	 * @param ItemActionWidget The item action widget to be selected.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Select Item Action")
 	static void ItemActionsContainer_SelectItemAction(UWidget* Target, UWidget* ItemActionWidget);
@@ -1299,7 +1299,7 @@ public:
 	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
 	 * @return An array of UWidget pointers representing the item actions in the container.
 	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Item Actions In Container")
 	static TArray<UWidget*> ItemActionsContainer_GetItemActionsInContainer(UWidget* Target);
@@ -1310,7 +1310,7 @@ public:
 	 * @param Target The target widget that implements the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
 	 * @param ItemActionIndex The index of the item action to be selected.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item Actions Container",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Get Item Actions In Container By Index")
 	static void ItemActionsContainer_SelectItemActionByIndex(UWidget* Target, int32 ItemActionIndex);
@@ -1362,7 +1362,7 @@ public:
 	 * @param Target The interface implementing the IMounteaAdvancedInventoryUIManagerInterface, representing the inventory UI where the category selection operation should occur.
 	 * @param SelectedCategoryId The identifier of the selected category that needs to be processed by the target.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void CategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FString& SelectedCategoryId);
 
 	/**
@@ -1371,7 +1371,7 @@ public:
 	 * @param Target The inventory UI interface target from which to retrieve the selected category ID.
 	 * @return The selected category ID as a string. Returns "none" if the target object is invalid or the operation fails.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory", meta=(CustomTag="MounteaK2Getter"))
 	static FString GetSelectedCategoryId(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
@@ -1381,7 +1381,7 @@ public:
 	 *               Represents the inventory UI on which the action will be executed.
 	 * @param ItemGuid A FGuid that uniquely identifies the item being selected within the inventory.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void ItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FGuid& ItemGuid);
 
 	/**
@@ -1390,7 +1390,7 @@ public:
 	 * @param Target A TScriptInterface reference to the inventory UI interface from which the selected item's GUID is retrieved.
 	 * @return FGuid of the selected item if the interface is valid; otherwise, returns an empty FGuid.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory", meta=(CustomTag="MounteaK2Getter"))
 	static FGuid GetSelectedItemGuid(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
@@ -1401,7 +1401,7 @@ public:
 	 * @param Target 
 	 * @return A pointer to the UUserWidget representing the active item widget, or nullptr if no widget is active.
 	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Inventory UI Manager - Get Active Item Widget")
 	static UWidget* GetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
@@ -1412,7 +1412,7 @@ public:
 	 * @param Target 
 	 * @param NewActiveItemWidget The new widget to be set as the active item widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Inventory UI Manager - Set Active Item Widget")
 	static void SetActiveItemWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UWidget* NewActiveItemWidget);
@@ -1426,7 +1426,7 @@ public:
 	 * @param Target The UI interface to get the parent inventory from
 	 * @return The parent inventory interface that manages the items and slots
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory", meta=(CustomTag="MounteaK2Getter"))
 	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 
 	/**
@@ -1434,7 +1434,7 @@ public:
 	 * @param Target The UI interface to set the parent inventory on
 	 * @param NewParentInventory The inventory interface to associate with this UI
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 
 	/**
@@ -1443,7 +1443,7 @@ public:
 	 * @param Target The widget to which the owning inventory UI will be assigned.
 	 * @param OwningInventoryUI The owning inventory UI interface implementation to be set on the target widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Inventory", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Inventory", meta=(CustomTag="MounteaK2Setter"))
 	static void SetInventoryOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 	
 #pragma endregion
@@ -1457,7 +1457,7 @@ public:
 	 * @param Target The widget to associate with the inventory UI.
 	 * @param OwningInventoryUI The inventory UI interface to associate with the widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(CustomTag="MounteaK2Setter"))
 	static void SetCategoriesWrapperOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
 	/**
@@ -1467,7 +1467,7 @@ public:
 	 * @param Target The widget target that will have its active category ID set. Must implement the UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface interface.
 	 * @param ActiveCategoryId The category ID to set as active.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(CustomTag="MounteaK2Setter"))
 	static void SetActiveCategoryId(UWidget* Target, const FString& ActiveCategoryId);
 
 	/**
@@ -1480,7 +1480,7 @@ public:
 	 * @param Target The widget from which the active category ID is to be retrieved. Must implement the `UMounteaAdvancedInventoryCategoriesWrapperWidgetInterface` interface to return specific data.
 	 * @return The active category ID as a string if the widget is valid and conforms to the interface, or "none" as a default fallback.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(CustomTag="MounteaK2Getter"))
 	static FString GetActiveCategoryId(UWidget* Target);
 	
 #pragma endregion
@@ -1499,7 +1499,7 @@ public:
 	 *               that implements the UMounteaAdvancedInventoryCategoryWidgetInterface.
 	 * @param CategoryId The identifier of the inventory category to be assigned to the widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(CustomTag="MounteaK2Setter"))
 	static void SetInventoryCategoryKey(UWidget* Target, const FString& CategoryId);
 
 	/**
@@ -1510,7 +1510,7 @@ public:
 	 * @return The inventory category key as an FString if the Target is valid and implements the required interface.
 	 *         Returns "none" if the Target is invalid or does not implement the interface.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Getter"))
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(CustomTag="MounteaK2Getter"))
 	static FString GetInventoryCategoryKey(UWidget* Target);
 
 	/**
@@ -1519,7 +1519,7 @@ public:
 	 * @param Target The widget to associate with the owning inventory UI.
 	 * @param OwningInventoryUI The interface of the inventory UI that owns the specified widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(CustomTag="MounteaK2Setter"))
 	static void SetCategoryOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
 	/**
@@ -1528,7 +1528,7 @@ public:
 	 * @param Target     The widget to update the active state for. It must be valid and implement the required interface.
 	 * @param bIsActive  A boolean indicating whether the widget should be set as active (true) or inactive (false).
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(CustomTag="MounteaK2Setter"))
 	static void SetActiveState(UWidget* Target, const bool bIsActive);
 	
 #pragma endregion	
@@ -1536,7 +1536,7 @@ public:
 	// --- Item Widget
 #pragma region Item
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Make New Inventory Inventory Item Widget Data",
 		meta=(NativeMakeFunc))
@@ -1549,7 +1549,7 @@ public:
 	 * @param OldState Previous state of Data
 	 * @return true if anything changed, false otherwise
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Validate"),
 		meta=(Keywords="dirty,check,validate,equal,=="),
 		DisplayName="Compare Item Widget Data")
@@ -1563,7 +1563,7 @@ public:
 	 * 
 	 * @param Target The widget from which the Inventory Item ID is to be retrieved.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item - Select Item")
 	static void ItemWidget_SelectItem(UWidget* Target);
@@ -1579,7 +1579,7 @@ public:
 	 * @return The Inventory Item ID as an FGuid if the widget is valid and implements the required interface.
 	 * Returns an empty FGuid otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Item - Get Item ID")
 	static FGuid ItemWidget_GetInventoryItemId(UWidget* Target);
@@ -1590,7 +1590,7 @@ public:
 	 * @param Target The UWidget that will have its owning inventory UI set.
 	 * @param OwningInventoryUI The interface that represents the owning inventory UI to be assigned to the widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"))
 	static void SetItemOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
@@ -1609,7 +1609,7 @@ public:
 	 * @param Item     Inventory item to be represented by this widget.
 	 * @param Quantity Initial quantity of the item to display.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item - Initialize Item Widget")
 	static void ItemWidget_InitializeItemWidget(UWidget* Target, const FInventoryItem& Item, const int32 Quantity);
@@ -1622,7 +1622,7 @@ public:
 	 * @param Target Inventory Item Widget.
 	 * @return A copy of the item’s data structure describing quantity and contained item state.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 			meta=(CustomTag="MounteaK2Getter"),
 			DisplayName="Item - Get Item Widget Data")
 	static FInventoryItemData ItemWidget_GetInventoryData(UWidget* Target);
@@ -1635,7 +1635,7 @@ public:
 	 * @param Target Inventory Item Widget.
 	 * @param InventoryItemData Data describing the item and its quantity.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 			meta=(CustomTag="MounteaK2Setter"),
 			DisplayName="Item - Set Item Widget Data")
 	static void ItemWidget_SetInventoryData(UWidget* Target, const FInventoryItemData& InventoryItemData);
@@ -1646,7 +1646,7 @@ public:
 	 * @param Target The widget to refresh. Must implement the IMounteaAdvancedInventoryItemWidgetInterface.
 	 * @param Quantity The quantity of the item to display on the widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item - Refresh Item Widget")
 	static void Item_RefreshWidget(UWidget* Target, const int32 Quantity);
@@ -1659,7 +1659,7 @@ public:
 	 * @param Target The widget to set the parent slot for. Must implement the MounteaAdvancedInventoryItemWidgetInterface.
 	 * @param ParentSlot The user widget that will be assigned as the parent slot for the target widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item - Set Parent Slot")
 	static void Item_SetParentSlot(UWidget* Target, UUserWidget* ParentSlot);
@@ -1670,7 +1670,7 @@ public:
 	 * @param Target The target widget that implements the UMounteaAdvancedInventoryItemWidgetInterface.
 	 * @param bIsSelected A boolean indicating whether to highlight (true) or un-highlight (false) the item.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Items",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item - Highlight Item")
 	static void Item_HighlightItem(UWidget* Target, const bool bIsSelected = false);
@@ -1691,7 +1691,7 @@ public:
 	 * @param Target The target widget that implements the UMounteaAdvancedInventoryItemTooltipWidgetInterface.
 	 * @param SourceSlot Slot that contains the item information to be displayed in the tooltip.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemTooltip",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemTooltip",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Tooltip - Set Tooltip Item")
 	static void ItemTooltip_SetTooltipItem(UWidget* Target, const FInventorySlot& SourceSlot);
@@ -1701,13 +1701,13 @@ public:
 	// --- Item Slot Widget
 #pragma region ItemSlot
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Make New Inventory Slot Data",
 		meta=(NativeMakeFunc))
 	static FInventorySlot MakeInventoryGridSlotData(const FInventorySlot& SlotData);
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Make New Inventory Grid Slot Data",
 		meta=(NativeMakeFunc))
@@ -1719,7 +1719,7 @@ public:
 	 * @param ItemId The unique identifier of the item to be displayed in the slot.
 	 * @return A new FInventorySlot instance containing the item ID and quantity.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Make New Inventory Slot Data",
 		meta=(NativeMakeFunc))
@@ -1731,7 +1731,7 @@ public:
 	 * @param Target The target widget item slot to associate with the owning inventory UI.
 	 * @param OwningInventoryUI The inventory UI interface to set as the owner of the target item slot.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Slot - Set Item Slot Owning Inventory UI")
 	static void ItemSlot_SetItemSlotOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
@@ -1742,7 +1742,7 @@ public:
 	 * @param Target The target widget to which the item will be added. Expected to implement UMounteaAdvancedInventoryItemSlotWidgetInterface.
 	 * @param ItemId The unique identifier of the item to add to the specified slot.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Slot - Add Item To Slot")
 	static void ItemSlot_AddItemToSlot(UWidget* Target, const FGuid& ItemId);
@@ -1756,7 +1756,7 @@ public:
 	 * @param Target The target widget from which the item should be removed. Must implement UMounteaAdvancedInventoryItemSlotWidgetInterface.
 	 * @param ItemId The unique identifier (FGuid) of the item to be removed.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Slot - Remove Item From Slot")
 	static void ItemSlot_RemoveItemFromSlot(UWidget* Target, const FGuid& ItemId);
@@ -1769,7 +1769,7 @@ public:
 	 * @param Target  
 	 * @param SlotData The grid slot data to be stored.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"))
 	static void ItemSlot_StoreGridSlotData(UWidget* Target, const FMounteaInventoryGridSlot& SlotData);
 
@@ -1786,7 +1786,7 @@ public:
 	 * @return FMounteaInventoryGridSlot The grid slot data associated with the given widget, or a default
 	 * grid slot if the widget is invalid or incompatible.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Item Slot - Get Item Slot Data")
 	static FMounteaInventoryGridSlot ItemSlot_GetGridSlotData(UWidget* Target);
@@ -1797,7 +1797,7 @@ public:
 	 * @param Target 
 	 * @return The item widget in the slot, or nullptr if no widget is present.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Item Slot - Get Item Widget In Slot")
 	static UUserWidget* ItemSlot_GetItemWidgetInSlot(UWidget* Target);
@@ -1807,7 +1807,7 @@ public:
 	 * 
 	 * @param Target 
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Slot - Select Item In Slot")
 	static void ItemSlot_SelectItemInSlot(UWidget* Target);
@@ -1818,7 +1818,7 @@ public:
 	 * @param Target 
 	 * @param ParentSlotsWrapper The parent widget that contains the slots.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item Slot - Set Parent Slots Wrapper")
 	static void ItemSlot_SetParentSlotsWrapper(UWidget* Target, UUserWidget* ParentSlotsWrapper);
@@ -1834,7 +1834,7 @@ public:
 	 * @param Target The target widget for which the owning inventory UI is being set.
 	 * @param OwningInventoryUI The interface of the advanced inventory UI to be set as the owner.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"))
 	static void SetItemSlotsWrapperOwningInventoryUI(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI);
 
@@ -1845,7 +1845,7 @@ public:
 	 *               It serves as the target to add the item.
 	 * @param ItemId The unique identifier (GUID) of the item to be added to the Target widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Slots Wrapper - Add Item")
 	static void SlotsWrapper_AddItem(UWidget* Target, const FGuid& ItemId);
@@ -1859,7 +1859,7 @@ public:
 	 * @param OptionalItemSlot An optional integer specifying the specific slot where the update should occur.
 	 *                         If not provided, the default behavior is applied by the interface.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Slots Wrapper - Update Item")
 	static void SlotsWrapper_UpdateItem(UWidget* Target, const FGuid& ItemId, const int32 OptionalItemSlot = -1);
@@ -1872,7 +1872,7 @@ public:
 	 * @param ItemId The unique identifier of the item to be removed from the Slots Wrapper.
 	 * @param Quantity How many units of the item should be removed from Inventory UI.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Slots Wrapper - Remove Item")
 	static void SlotsWrapper_RemoveItem(UWidget* Target, const FGuid& ItemId, const int32 Quantity = -1);
@@ -1883,7 +1883,7 @@ public:
 	 * @param Target The widget that implements the Slots Wrapper.
 	 * @return Returns a pointer to the selected UUserWidget instance.
 	 */
-	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Slots Wrapper - Get Selected Item Widget")
 	static UWidget* SlotsWrapper_GetSelectedItemWidget(UWidget* Target);
@@ -1894,7 +1894,7 @@ public:
 	 * @param Target The widget that implements the Slots Wrapper.
 	 * @param NewSelectedItemWidget The widget to set as the currently selected item widget.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemSlots",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemSlots",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Slots Wrapper - Set Selected Item Widget")
 	static void SlotsWrapper_SetSelectedItemWidget(UWidget* Target, UWidget* NewSelectedItemWidget);
@@ -1911,7 +1911,7 @@ public:
 	 * @param ItemId The unique identifier of the item to add
 	 * @return True if the item was successfully added; false otherwise
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Add Item To Empty Slot")
@@ -1925,7 +1925,7 @@ public:
 	 * @param SlotIndex The index of the slot to place the item into
 	 * @return True if the item was successfully added; false otherwise
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Add Item To Slot")
@@ -1938,7 +1938,7 @@ public:
 	 * @param SlotIndex The index of the slot from which to remove the item
 	 * @return True if the item was successfully removed; false if the slot is empty or invalid
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Remove Item From Slot")
@@ -1955,7 +1955,7 @@ public:
 	 * @param Quantity The number of items to remove. Defaults to -1, which removes all instances of the item.
 	 * @return Returns true if the item(s) were successfully removed; otherwise, returns false.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Remove Item")
@@ -1969,7 +1969,7 @@ public:
 	 * @return The unique identifier (FGuid) of the item in the slot. 
 	 *         If the slot is empty, returns an invalid FGuid
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Get Item In Slot")
 	static FGuid ItemsGrid_GetItemInSlot(UWidget* Target, const int32 SlotIndex);
@@ -1982,7 +1982,7 @@ public:
 	 * @param SlotIndex2 The index of the second slot
 	 * @return True if the swap was successful; false if either slot is invalid
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Swap Items Between Slots")
@@ -1994,7 +1994,7 @@ public:
 	 * @param Target The items grid widget interface to operate on
 	 * This is useful for resetting or clearing the inventory grid entirely
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Items Grid - Clear All Slots")
 	static void ItemsGrid_ClearAllSlots(UWidget* Target);
@@ -2005,7 +2005,7 @@ public:
 	 * @param Target The items grid widget interface to query
 	 * @return The total number of slots available in the inventory grid
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Get Total Slots")
 	static int32 ItemsGrid_GetTotalSlots(UWidget* Target);
@@ -2017,7 +2017,7 @@ public:
 	 * @param SlotIndex The index of the slot to check
 	 * @return True if the slot is empty; false if it contains an item
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Is Slot Empty")
@@ -2030,7 +2030,7 @@ public:
 	 * @param ItemId The unique identifier (FGuid) of the item to locate
 	 * @return The index of the slot that contains the item, or -1 if the item is not found
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Get Slot Index By Item")
 	static int32 ItemsGrid_GetSlotIndexByItem(UWidget* Target, const FGuid& ItemId);
@@ -2045,7 +2045,7 @@ public:
 	 * @param SlotCoords The coordinates of the grid slot to retrieve data for.
 	 * @return FMounteaInventoryGridSlot containing information about the specified slot.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Get Slot Index By Coords")
 	static int32 ItemsGrid_GetGridSlotIndexByCoords(UWidget* Target, const FIntPoint& SlotCoords);
@@ -2057,7 +2057,7 @@ public:
 	 * @param ItemId The unique identifier of the item to check for
 	 * @return True if the item is found in the grid; false if it is not present
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Is Item In Grid")
@@ -2070,7 +2070,7 @@ public:
 	 * @param SlotIndex The index of the grid slot to retrieve data for
 	 * @return FMounteaInventoryGridSlot containing information about the specified slot
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Get Grid Slot Data")
 	static FMounteaInventoryGridSlot ItemsGrid_GetGridSlotData(UWidget* Target, const int32 SlotIndex);
@@ -2081,7 +2081,7 @@ public:
 	 * @param Target The items grid widget interface to query
 	 * @return A set of FMounteaInventoryGridSlot containing the data for all slots in the grid
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Get Grid Slots Data")
 	static TSet<FMounteaInventoryGridSlot> ItemsGrid_GetGridSlotsData(UWidget* Target);
@@ -2098,7 +2098,7 @@ public:
 	 * @return A pointer to the UUserWidget representing the item widget in the specified slot,
 	 *         or nullptr if the target is invalid or does not implement the necessary interface.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Get Item Wifget From Grid Slot")
 	static UUserWidget* ItemsGrid_GetItemWidgetInSlot(UWidget* Target, const int32 SlotIndex);
@@ -2109,7 +2109,7 @@ public:
 	 * @param Target The target user widget implementing MounteaAdvancedInventoryItemsGridWidgetInterface.
 	 * @return A pointer to the found empty widget slot, or nullptr if no empty slot exists or the target is invalid.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Find Empty Widget Slot")
 	static UUserWidget* ItemsGrid_FindEmptyWidgetSlot(UWidget* Target);
@@ -2121,7 +2121,7 @@ public:
 	 * @param ItemId The unique identifier of the item to check for
 	 * @return The index of the first empty slot if found, otherwise INDEX_NONE.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find Empty Slot Index")
 	static int32 ItemsGrid_FindEmptySlotIndex(UWidget* Target, const FGuid& ItemId);
@@ -2135,7 +2135,7 @@ public:
 	 * @param Target The target user widget that implements the MounteaAdvancedInventoryItemsGridWidgetInterface.
 	 * @param SlotData The data representing the slot to be added to the inventory grid.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Items Grid - Add Grid Slot")
 	static void ItemsGrid_AddSlot(UWidget* Target, const FMounteaInventoryGridSlot& SlotData);
@@ -2152,7 +2152,7 @@ public:
 	 * @param ParentInventory The parent inventory object associated with the widget. Must implement the inventory interface.
 	 * @return The index of an available grid slot if found, or INDEX_NONE if no suitable slot is available.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Find Empty Slot Index (Helper)")
 	static int32 Helper_FindEmptyGridSlotIndex(const UWidget* Target, const FGuid& ItemId, UObject* ParentInventory);
@@ -2169,7 +2169,7 @@ public:
 	 * @param SlotIndex The index of the slot in which the item is updated (default is 0).
 	 * @return Returns true if the item was successfully updated, false otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|ItemsGrid",
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemsGrid",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Items Grid - Update Item")
@@ -2190,7 +2190,7 @@ public:
 	 * @param SourceData The inventory grid slot that will be updated.
 	 * @param TargetData The inventory grid slot providing the data to update the source slot.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|GridSlots", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|GridSlots", meta=(CustomTag="MounteaK2Setter"))
 	static void SetGridSlotData(UPARAM(ref) FMounteaInventoryGridSlot& SourceData, const FMounteaInventoryGridSlot& TargetData);
 
 	/**
@@ -2201,7 +2201,7 @@ public:
 	 * @param SourceData Reference to the inventory grid slot where the item will be stored.
 	 * @param ItemId The unique identifier of the item to be stored in the inventory grid slot.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item", meta=(CustomTag="MounteaK2Setter"))
 	static void StoreItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData, const FGuid& ItemId);
 
 	/**
@@ -2209,7 +2209,7 @@ public:
 	 *
 	 * @param SourceData Reference to the inventory grid slot that will be reset.
 	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|UI|Item", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item", meta=(CustomTag="MounteaK2Setter"))
 	static void ResetItem(UPARAM(ref) FMounteaInventoryGridSlot& SourceData);
 
 	/**

@@ -41,11 +41,11 @@ public:
 	 * 
 	 * @param ItemId 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Items")
 	void AddItem(const FGuid& ItemId);
 	virtual void AddItem_Implementation(const FGuid& ItemId) = 0;
 
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Items")
 	void UpdateItem(const FGuid& ItemId, const int32 OptionalItemSlot = INDEX_NONE);
 	virtual void UpdateItem_Implementation(const FGuid& ItemId, const int32 OptionalItemSlot = INDEX_NONE) = 0;
 
@@ -54,7 +54,7 @@ public:
 	 * @param ItemId Unique identifier of the item to be removed.
 	 * @param Quantity The number of items to remove. If set to -1, all items with the given ID will be removed.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Items")
 	void RemoveItem(const FGuid& ItemId, const int32 Quantity = -1);
 	virtual void RemoveItem_Implementation(const FGuid& ItemId, const int32 Quantity = -1) = 0;
 
@@ -63,7 +63,7 @@ public:
 	 *
 	 * @return Returns a pointer to the selected UUserWidget instance.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Items")
 	UWidget* GetSelectedItemWidget() const;
 	virtual UWidget* GetSelectedItemWidget_Implementation() const = 0;
 
@@ -72,7 +72,7 @@ public:
 	 *
 	 * @param NewSelectedItemWidget The widget to set as the currently selected item widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Items")
 	void SetSelectedItemWidget(UWidget* NewSelectedItemWidget);
 	virtual void SetSelectedItemWidget_Implementation(UWidget* NewSelectedItemWidget) = 0;
 

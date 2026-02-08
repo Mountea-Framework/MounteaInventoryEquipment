@@ -43,7 +43,7 @@ public:
 	 *
 	 * @param NewOwningInventoryUI A TScriptInterface reference to the inventory UI interface that owns this widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Base")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Base")
 	void SetOwningInventoryUI(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI);
 	virtual void SetOwningInventoryUI_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI) = 0;
 
@@ -53,7 +53,7 @@ public:
 	 *
 	 * @return The TScriptInterface reference to the owning inventory UI interface.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Base")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Base")
 	TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> GetOwningInventoryUI() const;
 	virtual TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface> GetOwningInventoryUI_Implementation() const = 0;
 };

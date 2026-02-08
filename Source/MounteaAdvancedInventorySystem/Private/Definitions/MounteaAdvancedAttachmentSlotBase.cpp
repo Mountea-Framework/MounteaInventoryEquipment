@@ -13,7 +13,9 @@
 #include "Definitions/MounteaAdvancedAttachmentSlotBase.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
@@ -88,6 +90,87 @@ bool UMounteaAdvancedAttachmentSlotBase::CallRemoteFunction(UFunction* Function,
 		return true;
 	}
 	return false;
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::Attach(UObject* NewAttachment)
+{
+	return (CanAttach() && IsValid(NewAttachment) && CanAttachAttachable(NewAttachment));
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::ForceAttach(UObject* NewAttachment)
+{
+	LastAttachment = Attachment;
+	Attachment = NewAttachment;	
+	State = EAttachmentSlotState::EASS_Occupied;
+	return true;
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::Detach()
+{
+	if (!IsOccupied())
+		return false;
+	
+	Attachment = nullptr;
+	State = EAttachmentSlotState::EASS_Empty;
+	return true;
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::ForceDetach()
+{
+	Attachment = nullptr;
+	State = EAttachmentSlotState::EASS_Empty;
+	return true;
+}
+
+void UMounteaAdvancedAttachmentSlotBase::DisableSlot()
+{
+	if (!IsEmpty())
+		Detach();
+	State = EAttachmentSlotState::EASS_Locked;
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::CanAttachAttachable(const UObject* NewAttachment) const
+{
+	if (!IsValid(NewAttachment))
+	{
+		LOG_ERROR(TEXT("Attachment is not valid!"));
+		return false;
+	}
+	
+	if (!NewAttachment->Implements<UMounteaAdvancedAttachmentAttachableInterface>())
+	{
+		LOG_WARNING(TEXT("Attachable %s does not implement the required interface! Attachment will be performed, however, it may not behave as expected."), *NewAttachment->GetName())
+		return true;
+	}
+
+	if (!IMounteaAdvancedAttachmentAttachableInterface::Execute_CanAttach(NewAttachment))
+	{
+		LOG_WARNING(TEXT("Attachable object is not compatible with selected Slot!."));
+		return false;
+	}
+	
+	if (!MatchesTags(IMounteaAdvancedAttachmentAttachableInterface::Execute_GetTags(NewAttachment), false))
+	{
+		LOG_WARNING(TEXT("Attachable object does not match selected Slot tags!"));
+		return false;
+	}
+	
+	return true;
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::IsEmpty() const
+{
+	return State == EAttachmentSlotState::EASS_Empty && Attachment == nullptr;
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::IsOccupied() const
+{
+	return State == EAttachmentSlotState::EASS_Occupied && Attachment != nullptr;
+}
+
+bool UMounteaAdvancedAttachmentSlotBase::IsLocked() const
+{
+	return State == EAttachmentSlotState::EASS_Locked;
 }
 
 void UMounteaAdvancedAttachmentSlotBase::OnRep_State()

@@ -41,7 +41,7 @@ public:
 	 * 
 	 * @param ActiveCategoryId 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
 	void SetActiveCategoryId(const FString& ActiveCategoryId);
 	virtual void SetActiveCategoryId_Implementation(const FString& ActiveCategoryId) = 0;
 
@@ -49,7 +49,7 @@ public:
 	 * 
 	 * @return 
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|UI|Categories")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
 	FString GetActiveCategoryId() const;
 	virtual FString GetActiveCategoryId_Implementation() const = 0;
 };

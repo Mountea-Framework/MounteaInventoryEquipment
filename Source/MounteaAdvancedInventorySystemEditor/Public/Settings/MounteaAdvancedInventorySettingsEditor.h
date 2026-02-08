@@ -29,8 +29,24 @@ public:
 	UMounteaAdvancedInventorySettingsEditor();
 	
 	// If True, Icons will display Text next to icons.
-	UPROPERTY(Config, EditAnywhere, Category="Config")
+	UPROPERTY(Config, EditAnywhere, Category="Item Templates Editor")
 	uint8 bDisplayEditorButtonText : 1;
+	
+	// Defines the size of preview sphere where the slot is
+	UPROPERTY(Config, EditAnywhere, Category = "Equipment Slots")
+	float SpherePixelRadius = 3.5f;
+	
+	// Defines the complexity of the preview slot sphere
+	UPROPERTY(Config, EditAnywhere, Category = "Equipment Slots")
+	int32 SphereSegments = 16;
+	
+	// Defines length of the Arm which leads from the preview slot sphere to the slot name
+	UPROPERTY(Config, EditAnywhere, Category = "Equipment Slots")
+	float LeaderLineLengthPixels = 60.0f;
+	
+	// Defines distance between the Arm and the text
+	UPROPERTY(Config, EditAnywhere, Category = "Equipment Slots")
+	float LeaderTextPaddingPixels = 6.0f;
 	
 	// Shared styling for all documentation pages.
 	UPROPERTY(Config, EditAnywhere, Category = "Editor Templates",
