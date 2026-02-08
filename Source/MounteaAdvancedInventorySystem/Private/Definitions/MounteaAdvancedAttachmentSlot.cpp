@@ -69,13 +69,6 @@ TArray<FName> UMounteaAdvancedAttachmentSlot::GetAvailableTargetNames() const
 	return returnValue;
 }
 
-void UMounteaAdvancedAttachmentSlot::DisableSlot()
-{
-	if (!IsEmpty())
-		Detach();
-	State = EAttachmentSlotState::EASS_Locked;
-}
-
 USceneComponent* UMounteaAdvancedAttachmentSlot::GetAttachmentTargetComponent() const
 {
 	return AttachmentTargetComponentOverride ? 

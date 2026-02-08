@@ -124,6 +124,9 @@ bool UMounteaAdvancedAttachmentSlotBase::ForceDetach()
 
 void UMounteaAdvancedAttachmentSlotBase::DisableSlot()
 {
+	if (!IsEmpty())
+		Detach();
+	State = EAttachmentSlotState::EASS_Locked;
 }
 
 bool UMounteaAdvancedAttachmentSlotBase::CanAttachAttachable(const UObject* NewAttachment) const

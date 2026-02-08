@@ -43,17 +43,17 @@ public:
 public:
 	
 	/** Override the default attachment target component by name */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableTargetNames"),
 		meta=(NoResetToDefault))
 	FName AttachmentTargetOverride;
 
 	/** Resolved component reference for attachment target override */
-	UPROPERTY(BlueprintReadOnly, Category="Settings")
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Settings")
 	TObjectPtr<USceneComponent> AttachmentTargetComponentOverride = nullptr;
 
 	/** Socket name to attach to when using socket-based attachment */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableSocketNames"),
 		meta=(NoResetToDefault),
 		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket", EditConditionHides))
@@ -76,7 +76,6 @@ public:
 	virtual bool ForceAttach(UObject* NewAttachment) override;
 	virtual bool Detach() override;
 	virtual bool ForceDetach() override;
-	virtual void DisableSlot() override;
 
 public:
 	

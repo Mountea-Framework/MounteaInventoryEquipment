@@ -42,53 +42,53 @@ public:
 public:
 	
 	/** Unique identifier for this attachment slot */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableSlotNames"),
 		meta=(DisplayPriority=-1),
 		meta=(NoResetToDefault))
 	FName SlotName;
 
 	/** Gameplay tags that define what can attach to this slot */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1),
 		meta=(NoResetToDefault))
 	FGameplayTagContainer SlotTags;
 
 	/** Human-readable name for this slot displayed in UI */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1),
 		meta=(NoResetToDefault))
 	FText DisplayName;
 
 	/** Current state of the attachment slot (Empty, Occupied, Locked) */
-	UPROPERTY(ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1),
 		meta=(NoResetToDefault))
 	EAttachmentSlotState State;
 	
 	/** Type of attachment this slot supports (Socket, Component) */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Settings",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(DisplayPriority=-1),
 		meta=(NoResetToDefault))
 	EAttachmentSlotType SlotType;
 
 	/** Reference to the container that owns this slot */
-	UPROPERTY(BlueprintReadOnly, Category="Debug", AdvancedDisplay,
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
-
-	/** Currently attached object (replicated to clients) */
-	UPROPERTY(Replicated, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
-		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault))
-	TObjectPtr<UObject> Attachment;
-
+	
 	/** Local cache of last attachment for detachment operations */
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault))
 	TObjectPtr<UObject> LastAttachment;
+	
+	/** Currently attached object (replicated to clients) */
+	UPROPERTY(SaveGame, Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Information",
+		meta=(DisplayThumbnail=false),
+		meta=(NoResetToDefault))
+	TObjectPtr<UObject> Attachment;
 
 protected:
 	
