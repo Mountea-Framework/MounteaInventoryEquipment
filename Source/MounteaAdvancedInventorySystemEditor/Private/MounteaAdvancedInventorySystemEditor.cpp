@@ -46,8 +46,12 @@
 #include "Framework/Notifications/NotificationManager.h"
 
 #include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
+#include "Visualiser/MounteaEquipmentComponentVisualizer.h"
 
 #include "Widgets/Notifications/SNotificationList.h"
+#include "Components/MounteaAttachmentContainerComponent.h"
+#include "Editor/UnrealEdEngine.h"
+#include "UnrealEdGlobals.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -288,6 +292,16 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	{
 		RegisterTabSpawners();
 	}
+
+	// Register Equipment Component Visualiser
+	{
+		if (GUnrealEd)
+		{
+			TSharedPtr<FComponentVisualizer> Visualizer = MakeShareable(new FMounteaEquipmentComponentVisualizer);
+			GUnrealEd->RegisterComponentVisualizer(UMounteaAttachmentContainerComponent::StaticClass()->GetFName(), Visualizer);
+			Visualizer->OnRegister();
+		}
+	}
 	
 	// Validate WebBrowserWidget
 	if (!FModuleManager::Get().IsModuleLoaded("WebBrowserWidget"))
@@ -381,6 +395,12 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 	// Tab Spawners Cleanup
 	{
 		UnregisterTabSpawners();
+	}
+
+	// Equipment Component Visualiser Cleanup
+	{
+		if (GUnrealEd)
+			GUnrealEd->UnregisterComponentVisualizer(UMounteaAttachmentContainerComponent::StaticClass()->GetFName());
 	}
 }
 
