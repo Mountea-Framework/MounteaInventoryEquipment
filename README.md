@@ -108,14 +108,19 @@ Mountea Inventory & Equipment is an Open-source Mountea Framework Unreal Engine 
 
 > UI Actions are a custom solution built to provide as approachable as possible toolset to create Item-based actions, such as, yet not limited to, Consume, Drop, Favourite, Equip and more.
 
-### Equipment Sockets
+### Equipment Slots
 
-> Equipment Sockets allow a user-defined way to specify what part of any Character can be equipped with what Inventory Item.
-> A few, the most common sockets are pre-defined and shipped with the plugin.
+> Equipment Slots allow a user-defined way to specify what part of any Character can be equipped with what Inventory Item.
+> A few, the most common slots are pre-defined and shipped with the plugin.
+> The plugin also provides a visual way to display all Equipment Slots for the selected Actor, both in-level and in-editor.
 > 
 > <p align="center" width="100%">
 >     <img width="90%" src="https://github.com/user-attachments/assets/2045c6cf-42a1-4c26-afcc-ebd52f0e1b9c">
 > </p>
+> <p align="center" width="100%">
+>     <img width="90%" src="https://github.com/user-attachments/assets/c9aa529b-17d3-467c-a2f1-8ede6a24c4ed">
+> </p>
+
 ---
 
 ## Star History
