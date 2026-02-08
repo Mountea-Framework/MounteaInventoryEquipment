@@ -14,6 +14,13 @@
 
 #include "Algo/ForEach.h"
 
+UMounteaAdvancedEquipmentSettingsConfig::UMounteaAdvancedEquipmentSettingsConfig()
+{
+	AllowedAttachmentTargets.Add(TSoftClassPtr<USceneComponent>(USceneComponent::StaticClass()));
+	AllowedAttachmentTargets.Add(TSoftClassPtr<USceneComponent>(UStaticMeshComponent::StaticClass()));
+	AllowedAttachmentTargets.Add(TSoftClassPtr<USceneComponent>(USkeletalMeshComponent::StaticClass()));
+}
+
 #if WITH_EDITOR
 void UMounteaAdvancedEquipmentSettingsConfig::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {

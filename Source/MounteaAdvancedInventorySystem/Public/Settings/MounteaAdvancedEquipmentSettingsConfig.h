@@ -35,12 +35,20 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedEquipmentSettingsConfig
 
 public:
 	
+	UMounteaAdvancedEquipmentSettingsConfig();
+	
+public:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
 		meta=(ForceInlineRow),
 		meta=(NoResetToDefault), 
 		meta=(ShowOnlyInnerProperties),
 		meta=(TitleProperty="DisplayName"))
 	TMap<FName, FMounteaEquipmentSlotHeaderData> AllowedEquipmentSlots;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
+		meta=(TitleProperty="Allowed Attachment Targets"))
+	TSet<TSoftClassPtr<USceneComponent>> AllowedAttachmentTargets;
 
 protected:
 	
