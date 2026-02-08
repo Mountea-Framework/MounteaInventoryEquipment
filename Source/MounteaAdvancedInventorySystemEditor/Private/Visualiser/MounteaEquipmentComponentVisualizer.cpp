@@ -25,15 +25,11 @@
 #include "Components/MounteaAttachmentContainerComponent.h"
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 
 namespace
 {
-	constexpr float SpherePixelRadius = .1f;
-	constexpr int32 SphereSegments = 16;
-	constexpr float LeaderLineLengthPixels = 60.0f;
-	constexpr float LeaderTextPaddingPixels = 6.0f;
-
 	float GetWorldRadiusForScreenSize(const FSceneView* View, const FVector& WorldLocation, const float PixelRadius)
 	{
 		if (!View || PixelRadius <= 0.0f)
@@ -75,11 +71,15 @@ void FMounteaEquipmentComponentVisualizer::DrawVisualization(const UActorCompone
 	TArray<FSlotVisualData> slotsData;
 	TArray<FWarningVisualData> warningData;
 	GatherSlotData(attachableContainerComponent, slotsData, warningData);
+	
+	const auto editorSettings = GetMutableDefault<UMounteaAdvancedInventorySettingsEditor>();
+	const float spherePixelRadius = editorSettings ? editorSettings->SpherePixelRadius : 3.5f;
+	const int32 sphereSegments = editorSettings ? editorSettings->SphereSegments : 12;
 
-	for (const FSlotVisualData& SlotInfo : slotsData)
+	for (const FSlotVisualData& slotInfo : slotsData)
 	{
-		const float worldRadius = GetWorldRadiusForScreenSize(View, SlotInfo.Location, SpherePixelRadius);
-		DrawWireSphere(PDI, SlotInfo.Location, SlotInfo.Color.ToFColor(true), worldRadius, SphereSegments, SDPG_Foreground);
+		const float worldRadius = GetWorldRadiusForScreenSize(View, slotInfo.Location, spherePixelRadius);
+		DrawWireSphere(PDI, slotInfo.Location, slotInfo.Color.ToFColor(true), worldRadius, sphereSegments, SDPG_Foreground);
 	}
 }
 
@@ -95,17 +95,24 @@ void FMounteaEquipmentComponentVisualizer::DrawVisualizationHUD(const UActorComp
 	TArray<FSlotVisualData> slotData;
 	TArray<FWarningVisualData> warningData;
 	GatherSlotData(attachableContainerComponent, slotData, warningData);
+	
+	const auto editorSettings = GetMutableDefault<UMounteaAdvancedInventorySettingsEditor>();	
 
-	auto drawLabel = [View, Canvas](const FVector& WorldLocation, const FString& Label, const FLinearColor& Color)
+	auto drawLabel = [View, Canvas, editorSettings](const FVector& WorldLocation, const FString& Label, const FLinearColor& Color)
 	{
 		FVector2D screenPosition;
+		
+		const float spherePixelRadius = editorSettings ? editorSettings->SpherePixelRadius : 3.5f;
+		const float leaderLineLengthPixels = editorSettings ? editorSettings->LeaderLineLengthPixels : 60.f;
+		const float leaderTextPaddingPixels = editorSettings ? editorSettings->LeaderTextPaddingPixels : 60.f;
+		
 		if (FSceneView::ProjectWorldToScreen(WorldLocation, View->CameraConstrainedViewRect, View->ViewMatrices.GetViewProjectionMatrix(), screenPosition))
 		{
 			const FIntRect& viewRect = View->CameraConstrainedViewRect;
 			const float directionX = (screenPosition.X < viewRect.Min.X + (viewRect.Width() * 0.5f)) ? 1.0f : -1.0f;
 
-			const FVector2D lineStart = screenPosition + FVector2D(directionX * SpherePixelRadius, 0.0f);
-			const FVector2D lineEnd = lineStart + FVector2D(directionX * LeaderLineLengthPixels, 0.0f);
+			const FVector2D lineStart = screenPosition + FVector2D(directionX * spherePixelRadius, 0.0f);
+			const FVector2D lineEnd = lineStart + FVector2D(directionX * leaderLineLengthPixels, 0.0f);
 
 			FCanvasLineItem lineItem(lineStart, lineEnd);
 			lineItem.SetColor(Color);
@@ -118,7 +125,7 @@ void FMounteaEquipmentComponentVisualizer::DrawVisualizationHUD(const UActorComp
 			font->GetStringHeightAndWidth(Label, textHeight, textWidth);
 			const FVector2D textSize(static_cast<float>(textWidth), static_cast<float>(textHeight));
 
-			FVector2D textPosition = lineEnd + FVector2D(directionX * LeaderTextPaddingPixels, -textSize.Y * 0.5f);
+			FVector2D textPosition = lineEnd + FVector2D(directionX * leaderTextPaddingPixels, -textSize.Y * 0.5f);
 			if (directionX < 0.0f)
 				textPosition.X -= textSize.X;
 
