@@ -12,6 +12,7 @@
 
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 
+#include "Algo/AnyOf.h"
 #include "Algo/ForEach.h"
 
 UMounteaAdvancedEquipmentSettingsConfig::UMounteaAdvancedEquipmentSettingsConfig()
@@ -45,9 +46,21 @@ void UMounteaAdvancedEquipmentSettingsConfig::PostEditChangeProperty(FPropertyCh
 		return;
 	}
 
-	Algo::ForEach(AllowedEquipmentSlots, [](TPair<FName, FMounteaEquipmentSlotHeaderData>& Pair)
+	Algo::ForEach(AllowedEquipmentSlots, [this](TPair<FName, FMounteaEquipmentSlotHeaderData>& equipmentSlot)
 	{
-		Pair.Value.RegenerateSlotId();
+		const FName fallbackSlot = equipmentSlot.Value.FallbackSlot;
+		const bool bIsSelfFallback = (fallbackSlot == equipmentSlot.Key);
+		const bool bFallbackExists = fallbackSlot.IsNone() ? true : Algo::AnyOf(
+			AllowedEquipmentSlots,
+			[fallbackSlot](const TPair<FName, FMounteaEquipmentSlotHeaderData>& otherSlot)
+			{
+				return otherSlot.Key == fallbackSlot;
+			});
+
+		if (bIsSelfFallback || !bFallbackExists)
+			equipmentSlot.Value.FallbackSlot = NAME_None;
+
+		equipmentSlot.Value.RegenerateSlotId();
 	});
 }
 #endif
