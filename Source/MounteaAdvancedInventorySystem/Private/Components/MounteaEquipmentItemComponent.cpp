@@ -13,6 +13,8 @@
 #include "Components/MounteaEquipmentItemComponent.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
+#include "Statics/MounteaEquipmentStatics.h"
 
 UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() : 
 	bAutoActivates(1),
@@ -21,7 +23,7 @@ UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() :
 {
 }
 
-// TODO: Handle server and client re
+// TODO: Handle server and client
 bool UMounteaEquipmentItemComponent::SetEquipmentItemState_Implementation(const EEquipmentItemState NewEquipmentItemState)
 {
 	if (NewEquipmentItemState != EquipmentItemState)
@@ -70,4 +72,20 @@ bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnim
 		return true;
 	}
 	return false;
+}
+
+TArray<FName> UMounteaEquipmentItemComponent::GetAvailableSlots()
+{
+	const auto* equipmentConfig = UMounteaEquipmentStatics::GetEquipmentSettingsConfig();
+	if (!equipmentConfig)
+		return { NAME_None };
+
+	TArray<FName> returnValue{ NAME_None };
+	TArray<FName> slotKeys;
+	equipmentConfig->AllowedEquipmentSlots.GetKeys(slotKeys);
+
+	returnValue.Reserve(slotKeys.Num() + 1);
+	returnValue.Append(MoveTemp(slotKeys));
+
+	return returnValue;
 }
