@@ -43,9 +43,17 @@ public:
 	
 public:
 	
-	virtual bool EquipItem_Implementation(UObject* EquipmentItem) const override;
-	virtual bool EquipItemToSlot_Implementation(const FName& SlotId, UObject* EquipmentItem) override;
-	virtual bool UnequipItem_Implementation(UObject* EquipmentItem, bool bUseFallbackSlot = false) override;
+	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) const override;
+	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FInventoryItem& ItemDefinition) override;
+	virtual bool UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) override;
 	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
-	virtual bool IsEquipmentItemEquipped_Implementation(UObject* EquipmentItem) const override;
+	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
+	
+public:
+	
+	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
+		meta=(FunctionReference, AllowFunctionLibraries, PrototypeFunction="/Script/MounteaAdvancedInventorySystem.MounteaEquipmentStatics.Prototype_EquipItem"),
+		meta=(DefaultBindingName="On Equip Item Requested"),
+		meta=(NoResetToDefault))
+	FMemberReference OverrideEquipItemFunction;
 };
