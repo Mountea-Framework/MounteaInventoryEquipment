@@ -40,4 +40,12 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaEquipmentComponent : public UMo
 public:
 
 	UMounteaEquipmentComponent();
+	
+public:
+	
+	virtual bool EquipItem_Implementation(UObject* EquipmentItem) const override;
+	virtual bool EquipItemToSlot_Implementation(const FName& SlotId, UObject* EquipmentItem) override;
+	virtual bool UnequipItem_Implementation(UObject* EquipmentItem, bool bUseFallbackSlot = false) override;
+	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
+	virtual bool IsEquipmentItemEquipped_Implementation(UObject* EquipmentItem) const override;
 };

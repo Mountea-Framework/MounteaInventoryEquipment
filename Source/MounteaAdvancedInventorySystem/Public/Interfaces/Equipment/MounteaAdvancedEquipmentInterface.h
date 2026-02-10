@@ -18,7 +18,12 @@
 struct FAttachmentContainer;
 struct FAttachmentSlot;
 struct FInventoryItem;
+
 class UMounteaInventoryItemTemplate;
+
+enum class EEquipmentItemState : uint8;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEquipmentItemActivated, UObject*, EquipmentItem);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedEquipmentInterface : public UInterface
@@ -41,10 +46,24 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedEquipmentInterface
 
 public:
 	
-	/*
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool EquipItem() const;
-	virtual bool EquipItem_Implementation() const = 0;
-	*/
+	bool EquipItem(UObject* EquipmentItem) const;
+	virtual bool EquipItem_Implementation(UObject* EquipmentItem) const = 0; 
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool EquipItemToSlot(const FName& SlotId, UObject* EquipmentItem);
+	virtual bool EquipItemToSlot_Implementation(const FName& SlotId, UObject* EquipmentItem) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool UnequipItem(UObject* EquipmentItem, bool bUseFallbackSlot = false);
+	virtual bool UnequipItem_Implementation(UObject* EquipmentItem, bool bUseFallbackSlot = false) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool UnequipItemFromSlot(const FName& SlotId, bool bUseFallbackSlot = false);
+	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool IsEquipmentItemEquipped(UObject* EquipmentItem) const;
+	virtual bool IsEquipmentItemEquipped_Implementation(UObject* EquipmentItem) const = 0;
 };
 

@@ -17,3 +17,28 @@ UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 {
 	ComponentTags.Append( { TEXT("Equipment") } );
 }
+
+bool UMounteaEquipmentComponent::EquipItem_Implementation(UObject* EquipmentItem) const
+{
+	return true;
+}
+
+bool UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& SlotId, UObject* EquipmentItem)
+{
+	return true;
+}
+
+bool UMounteaEquipmentComponent::UnequipItem_Implementation(UObject* EquipmentItem, bool bUseFallbackSlot)
+{
+	return true;
+}
+
+bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot)
+{
+	return true;
+}
+
+bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(UObject* EquipmentItem) const
+{
+	return true;
+}
