@@ -94,8 +94,7 @@ AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() co
 	return UMounteaInventorySystemStatics::GetOwningActor(this);
 }
 
-void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_Implementation(
-	USceneComponent* NewTarget)
+void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_Implementation(USceneComponent* NewTarget)
 {
 	if (NewTarget != DefaultAttachmentTargetComponent)
 		DefaultAttachmentTargetComponent = NewTarget;
