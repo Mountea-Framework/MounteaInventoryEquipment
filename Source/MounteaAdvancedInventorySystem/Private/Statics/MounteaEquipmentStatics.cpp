@@ -3,6 +3,7 @@
 
 #include "Statics/MounteaEquipmentStatics.h"
 
+#include "Definitions/MounteaInventoryItem.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
@@ -33,3 +34,7 @@ TSet<TSoftClassPtr<USceneComponent>> UMounteaEquipmentStatics::GetAllowedAttachm
 	return returnValue;
 }
 
+bool UMounteaEquipmentStatics::EquipItem(const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor)
+{
+	return true;
+}

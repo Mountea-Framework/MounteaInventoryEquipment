@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryItem.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaEquipmentStatics.generated.h"
 
 class UMounteaAdvancedEquipmentSettingsConfig;
+
+
 /**
  * 
  */
@@ -25,7 +28,7 @@ public:
 	 *
 	 * @return - A pointer to the Mountea Advanced Equipment Settings configuration object
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Equipment Settings Config")
 	static UMounteaAdvancedEquipmentSettingsConfig* GetEquipmentSettingsConfig();
@@ -41,10 +44,21 @@ public:
 	 *
 	 * @return - A set of soft class pointers representing allowed attachment target classes for equipment.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Equipment Settings Config")
 	static TSet<TSoftClassPtr<USceneComponent>> GetAllowedAttachmentTargets();
 	
 #pragma endregion
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Equip Item")
+	static bool EquipItem(const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
+
+#if WITH_EDITOR
+	UFUNCTION(BlueprintInternalUseOnly)
+	bool Prototype_EquipItem(const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) { return false; };
+#endif
+	
 };
