@@ -53,6 +53,10 @@ public:
 	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) override;
 	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() override
 	{ return OnEquipmentItemStateChanged; };
+	virtual FName GetEquipmentItemPreferredSlot_Implementation() const override
+	{ return PreferredSlot; };
+	virtual FGameplayTag GetEquipmentPreferredSloTag_Implementation() const override
+	{ return PreferredSlotTag; };
 	
 protected:
 	
@@ -84,6 +88,16 @@ protected:
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault))
 	EEquipmentItemState EquipmentItemState;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(GetOptions="GetAvailableSlots"))
+	FName PreferredSlot = NAME_None;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"))
+	FGameplayTag PreferredSlotTag;
 
 	/**
 	 * Even Triggered when Equipment Item changes.
@@ -92,4 +106,9 @@ protected:
 		meta=(IsBindableEvent=true),
 		meta=(NoResetToDefault))
 	FOnEquipmentItemStateChanged OnEquipmentItemStateChanged;
+	
+public:
+	
+	UFUNCTION()
+	static TArray<FName> GetAvailableSlots();
 };
