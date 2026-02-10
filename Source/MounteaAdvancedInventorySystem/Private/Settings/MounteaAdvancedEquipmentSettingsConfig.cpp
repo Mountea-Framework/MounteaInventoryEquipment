@@ -21,7 +21,20 @@ UMounteaAdvancedEquipmentSettingsConfig::UMounteaAdvancedEquipmentSettingsConfig
 	AllowedAttachmentTargets.Add(TSoftClassPtr<USceneComponent>(USkeletalMeshComponent::StaticClass()));
 }
 
+TArray<FName> UMounteaAdvancedEquipmentSettingsConfig::GetFallbackSlotOptions() const
+{
+	TArray<FName> returnValue;
+	returnValue.Reserve(AllowedEquipmentSlots.Num() + 1);
+	returnValue.Add(NAME_None);
+	for (const auto& allowedSlot : AllowedEquipmentSlots)
+	{
+		returnValue.Add(allowedSlot.Key);
+	}
+	return returnValue;
+}
+
 #if WITH_EDITOR
+
 void UMounteaAdvancedEquipmentSettingsConfig::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);

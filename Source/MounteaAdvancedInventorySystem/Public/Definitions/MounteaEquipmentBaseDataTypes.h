@@ -105,6 +105,19 @@ public:
 		meta=(NoResetToDefault))
 	FText DisplayName;
 
+	/**
+	 * Used for Equipment when unequip item is called.
+	 * If using fallback slot is allowed, the equipped item will be returned to fallback slot.
+	 * Example:
+	 * - Weapon is in hand
+	 * - unequip is called (from hand)
+	 * - weapon is returned to fallback slot (scabbard, back etc.)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(GetOptions="GetFallbackSlotOptions"),
+		meta=(NoResetToDefault))
+	FName FallbackSlot;
+
 	/** Determines whether the slot is active and usable. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault))
