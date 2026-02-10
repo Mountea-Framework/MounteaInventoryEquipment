@@ -32,6 +32,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedEquipmentItemInterface
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	FName GetEquipmentItemPreferredSlot() const;
+	virtual FName GetEquipmentItemPreferredSlot_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	FGameplayTag GetEquipmentPreferredSloTag() const;
+	virtual FGameplayTag GetEquipmentPreferredSloTag_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
 	EEquipmentItemState GetEquipmentItemState() const;
 	virtual EEquipmentItemState GetEquipmentItemState_Implementation() const = 0;
 	

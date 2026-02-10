@@ -47,23 +47,23 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedEquipmentInterface
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool EquipItem(UObject* EquipmentItem) const;
-	virtual bool EquipItem_Implementation(UObject* EquipmentItem) const = 0; 
+	AActor* EquipItem(const FInventoryItem& ItemDefinition) const;
+	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) const = 0; 
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool EquipItemToSlot(const FName& SlotId, UObject* EquipmentItem);
-	virtual bool EquipItemToSlot_Implementation(const FName& SlotId, UObject* EquipmentItem) = 0;
+	AActor* EquipItemToSlot(const FName& SlotId, const FInventoryItem& ItemDefinition);
+	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FInventoryItem& ItemDefinition) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool UnequipItem(UObject* EquipmentItem, bool bUseFallbackSlot = false);
-	virtual bool UnequipItem_Implementation(UObject* EquipmentItem, bool bUseFallbackSlot = false) = 0;
+	bool UnequipItem(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false);
+	virtual bool UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
 	bool UnequipItemFromSlot(const FName& SlotId, bool bUseFallbackSlot = false);
 	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool IsEquipmentItemEquipped(UObject* EquipmentItem) const;
-	virtual bool IsEquipmentItemEquipped_Implementation(UObject* EquipmentItem) const = 0;
+	bool IsEquipmentItemEquipped(const FInventoryItem& ItemDefinition) const;
+	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const = 0;
 };
 
