@@ -66,8 +66,8 @@ bool UMounteaAttachableComponent::CanAttach_Implementation() const
 	return IsValidAttachable() && State == EAttachmentState::EAS_Detached;
 }
 
-bool UMounteaAttachableComponent::AttachToSlot_Implementation(
-	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId)
+bool UMounteaAttachableComponent::AttachToSlot_Implementation(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, 
+	const FName& SlotId)
 {
 	if (!Execute_CanAttach(this) || !IsValid(Target.GetObject()))
 		return false;

@@ -90,9 +90,11 @@ bool UMounteaAdvancedAttachmentSlot::PerformAttachmentLogic(UObject* NewAttachme
 
 	if (!PerformPhysicalAttachment(NewAttachment, attachmentTarget))
 		return false;
-
-	ForceAttach(NewAttachment);
 	
+	LastAttachment = Attachment;
+	Attachment = NewAttachment;	
+	State = EAttachmentSlotState::EASS_Occupied;
+		
 	HandleAttachableInterface(NewAttachment);
 	return true;
 }
@@ -162,16 +164,10 @@ bool UMounteaAdvancedAttachmentSlot::PerformPhysicalAttachment(UObject* Object, 
 	const FName attachmentName = GetAttachmentSocketName();
 	
 	if (USceneComponent* sceneComp = Cast<USceneComponent>(Object))
-	{
-		sceneComp->AttachToComponent(Target, attachmentRules, attachmentName);
-		return true;
-	}
+		return sceneComp->AttachToComponent(Target, attachmentRules, attachmentName);
 	
 	if (AActor* actor = Cast<AActor>(Object))
-	{
-		actor->AttachToComponent(Target, attachmentRules, attachmentName);
-		return true;
-	}
+		return actor->AttachToComponent(Target, attachmentRules, attachmentName);
 	
 	LOG_WARNING(TEXT("Unsupported attachment object type: %s"), *Object->GetName());
 	return false;
