@@ -83,10 +83,10 @@ public:
 protected:
 
 	UFUNCTION(Server, Reliable)
-	void ServerTryAttach(const FName& SlotId, UObject* Attachment);
+	void Server_TryAttach(const FName& SlotId, UObject* Attachment);
 	bool TryAttachInternal(const FName& SlotId, UObject* Attachment);
 	UFUNCTION(Server, Reliable)
-	void ServerTryDetach(const FName& SlotId);
+	void Server_TryDetach(const FName& SlotId);
 	
 public:
 	
