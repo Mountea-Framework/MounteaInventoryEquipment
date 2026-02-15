@@ -144,42 +144,27 @@ bool UMounteaEquipmentStatics::IsTargetClassValid(const UClass* TargetClass)
 	return false;
 }
 
-bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, bool& bValue)
+bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot*& TargetSlot)
 {
 	if (!IsValid(Outer))
-	{
-		bValue = false;
-		return true;
-	}
+		return false;
 
 	if (!IsValid(Outer->GetWorld()))
 		return false;
 	
 	if (!Outer->Implements<UMounteaAdvancedAttachmentContainerInterface>() && !Outer->Implements<UMounteaAdvancedEquipmentInterface>())
-	{
-		bValue = false;
-		return true;
-	}
+		return false;
 
 	if (!ItemDefinition.IsItemValid())
-	{
-		bValue = false;
-		return true;
-	}
+		return false;
 
 	const auto spawnClass = ItemDefinition.GetTemplate()->SpawnActor.LoadSynchronous();
 	if (!IsTargetClassValid(spawnClass))
-	{
-		bValue = false;
-		return true;
-	}
+		return false;
 
 	const auto defaultActor = spawnClass->GetDefaultObject<AActor>();
 	if (!IsValid(defaultActor))
-	{
-		bValue = false;
-		return true;
-	}
+		return false;
 
 	if (!IsValid(TargetSlot))
 	{
@@ -193,10 +178,7 @@ bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer
 			FGameplayTag();
 	
 		if (preferredSlotName == NAME_None && !preferredSlotTag.IsValid())
-		{
-			bValue = false;
-			return true;
-		}
+			return false;
 
 		TargetSlot = IMounteaAdvancedAttachmentContainerInterface::Execute_IsValidSlot(Outer, preferredSlotName) ? 
 							IMounteaAdvancedAttachmentContainerInterface::Execute_GetSlot(Outer, preferredSlotName) :
@@ -205,12 +187,9 @@ bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer
 	}
 
 	if (!IsValid(TargetSlot) || !TargetSlot->CanAttach())
-	{
-		bValue = false;
-		return true;
-	}
+		return false;
 	
-	return false;
+	return true;
 }
 
 // At this point we know all should be ready, so let's limit the validations
@@ -252,20 +231,17 @@ bool UMounteaEquipmentStatics::EquipItem(UObject* Outer, const FInventoryItem& I
 	OutSpawnedActor = nullptr;
 
 	UMounteaAdvancedAttachmentSlot* preferredSlot = nullptr;
-	bool bValue;
-	if (ValidateEquipmentItemRequest(Outer, ItemDefinition, preferredSlot, bValue)) 
-		return bValue;
+	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, preferredSlot)) 
+		return false;
 
 	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, preferredSlot, OutSpawnedActor);
 }
 
 bool UMounteaEquipmentStatics::EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
 	AActor*& OutSpawnedActor)
-{
-	bool bValue;
-	
-	if (ValidateEquipmentItemRequest(Outer, ItemDefinition, TargetSlot, bValue)) 
-		return bValue;
+{	
+	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, TargetSlot)) 
+		return false;
 	
 	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, TargetSlot, OutSpawnedActor);
 }
