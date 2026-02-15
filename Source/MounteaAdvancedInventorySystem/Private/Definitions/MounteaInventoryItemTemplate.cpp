@@ -12,7 +12,14 @@
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
 
+#include "Components/ActorComponent.h"
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/SCS_Node.h"
+#include "Engine/SimpleConstructionScript.h"
+#include "GameFramework/Actor.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Statics/MounteaInventoryStatics.h"
@@ -105,6 +112,43 @@ TArray<FString> UMounteaInventoryItemTemplate::GetAllowedRarities()
 
 #if WITH_EDITOR
 
+namespace
+{
+	bool DoesClassProvideAttachableInterface(const UClass* TargetClass)
+	{
+		if (!IsValid(TargetClass))
+			return false;
+
+		if (TargetClass->ImplementsInterface(UMounteaAdvancedAttachmentAttachableInterface::StaticClass()))
+			return true;
+
+		const AActor* targetActor = Cast<AActor>(TargetClass->GetDefaultObject());
+		if (!IsValid(targetActor))
+			return false;
+
+		TArray<UActorComponent*> components = targetActor->GetComponentsByInterface(UMounteaAdvancedAttachmentAttachableInterface::StaticClass());
+		if (components.Num() > 0)
+			return true;
+
+		const UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(TargetClass);
+		if (!blueprintClass || !blueprintClass->SimpleConstructionScript)
+			return false;
+
+		for (const USCS_Node* node : blueprintClass->SimpleConstructionScript->GetAllNodes())
+		{
+			if (!node)
+				continue;
+
+			const UActorComponent* componentTemplate = node->GetActualComponentTemplate(
+				const_cast<UBlueprintGeneratedClass*>(blueprintClass));
+			if (IsValid(componentTemplate) && componentTemplate->GetClass()->ImplementsInterface(UMounteaAdvancedAttachmentAttachableInterface::StaticClass()))
+				return true;
+		}
+
+		return false;
+	}
+}
+
 void UMounteaInventoryItemTemplate::ReloadItemActions()
 {
 	const auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
@@ -157,6 +201,22 @@ void UMounteaInventoryItemTemplate::PostEditChangeProperty(struct FPropertyChang
 		}
 
 		ItemSubCategory = TEXT("");
+	}
+	
+	if (PropertyChangedEvent.Property->GetFName() == GET_MEMBER_NAME_CHECKED(UMounteaInventoryItemTemplate, SpawnActor))
+	{
+		if (!SpawnActor.IsNull())
+		{
+			UClass* spawnClass = SpawnActor.LoadSynchronous();
+			if (!IsValid(spawnClass))
+				SpawnActor = nullptr;
+			else if (!DoesClassProvideAttachableInterface(spawnClass))
+			{
+				LOG_WARNING(TEXT("SpawnActor '%s' does not implement IMounteaAdvancedAttachmentAttachableInterface and has no component that does. Clearing selection."),
+					*spawnClass->GetName());
+				SpawnActor = nullptr;
+			}
+		}
 	}
 	
 	CalculateJson();

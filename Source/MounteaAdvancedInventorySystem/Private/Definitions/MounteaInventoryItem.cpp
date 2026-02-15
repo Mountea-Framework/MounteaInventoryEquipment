@@ -72,7 +72,7 @@ FInventoryItem::FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const 
 
 bool FInventoryItem::IsItemValid() const
 {
-	return Guid.IsValid() && Template != nullptr;
+	return Guid.IsValid() && IsValid(Template);
 }
 
 bool FInventoryItem::IsItemInInventory() const
