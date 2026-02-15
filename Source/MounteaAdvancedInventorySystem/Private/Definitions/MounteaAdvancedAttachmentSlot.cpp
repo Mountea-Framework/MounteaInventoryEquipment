@@ -115,7 +115,10 @@ bool UMounteaAdvancedAttachmentSlot::Attach(UObject* NewAttachment)
 
 bool UMounteaAdvancedAttachmentSlot::ForceAttach(UObject* NewAttachment)
 {
-	return Super::ForceAttach(NewAttachment) ? PerformAttachmentLogic(NewAttachment) : false;
+	if (!IsValid(NewAttachment))
+		return false;
+
+	return PerformAttachmentLogic(NewAttachment);
 }
 
 TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> UMounteaAdvancedAttachmentSlot::FindAttachableInterface(UObject* Object)
@@ -212,10 +215,17 @@ void UMounteaAdvancedAttachmentSlot::OnRep_State()
 	{
 		case EAttachmentSlotState::EASS_Occupied:
 			if (Attachment)
-				ForceAttach(Attachment);
+			{
+				TryResolveAttachmentTarget();
+				if (USceneComponent* attachmentTarget = GetAttachmentTargetComponent())
+				{
+					if (ValidateAttachmentSlot(attachmentTarget))
+						PerformPhysicalAttachment(Attachment, attachmentTarget);
+				}
+			}
 			break;
 		case EAttachmentSlotState::EASS_Empty:
-			ForceDetach();
+			PerformDetachment();
 			break;
 	}
 	
