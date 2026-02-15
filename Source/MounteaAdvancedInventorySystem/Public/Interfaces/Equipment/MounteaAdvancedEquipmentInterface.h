@@ -47,8 +47,8 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedEquipmentInterface
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	AActor* EquipItem(const FInventoryItem& ItemDefinition) const;
-	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) const = 0; 
+	AActor* EquipItem(const FInventoryItem& ItemDefinition);
+	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) = 0; 
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
 	AActor* EquipItemToSlot(const FName& SlotId, const FInventoryItem& ItemDefinition);

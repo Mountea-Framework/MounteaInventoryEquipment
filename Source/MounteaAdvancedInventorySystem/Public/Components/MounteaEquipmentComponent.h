@@ -43,11 +43,17 @@ public:
 	
 public:
 	
-	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) const override;
+	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) override;
 	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FInventoryItem& ItemDefinition) override;
 	virtual bool UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) override;
 	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
 	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
+	
+protected:
+	
+	bool IsAuthority() const;
+	UFUNCTION(Server, Reliable)
+	void Server_EquipItem(const FInventoryItem& ItemDefinition);
 	
 public:
 	

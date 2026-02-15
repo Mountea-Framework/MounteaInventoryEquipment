@@ -12,16 +12,66 @@
 
 #include "Components/MounteaEquipmentComponent.h"
 
+#include "Components/ActorComponent.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Engine/BlueprintGeneratedClass.h"
+#include "GameFramework/Actor.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaEquipmentStatics.h"
-
 
 UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 {
 	ComponentTags.Append( { TEXT("Equipment") } );
 }
 
-AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FInventoryItem& ItemDefinition) const
+void UMounteaEquipmentComponent::Server_EquipItem_Implementation(const FInventoryItem& ItemDefinition)
 {
+	Execute_EquipItem(this, ItemDefinition);
+}
+
+AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FInventoryItem& ItemDefinition)
+{
+	if (!ItemDefinition.IsItemValid())
+	{
+		LOG_WARNING(TEXT("[Equip Item]: Item Data not valid. No equipment will happen."))
+		return nullptr;
+	}
+
+	const UMounteaInventoryItemTemplate* templateAsset = ItemDefinition.GetTemplate();
+	if (!IsValid(templateAsset))
+	{
+		LOG_WARNING(TEXT("[Equip Item]: Item Template not valid. No equipment will happen."))
+		return nullptr;
+	}
+	
+	const auto spawnActorClass = templateAsset->SpawnActor;
+	if (spawnActorClass.IsNull())
+	{
+		LOG_WARNING(TEXT("[Equip Item]: Spawn Actor not valid. No equipment will happen."))
+		return nullptr;
+	}
+
+	UClass* spawnClass = spawnActorClass.LoadSynchronous();
+	if (!IsValid(spawnClass))
+	{
+		LOG_WARNING(TEXT("[Equip Item]: Spawn Actor class failed to load. No equipment will happen."))
+		return nullptr;
+	}
+
+	if (!UMounteaAttachmentsStatics::IsTargetClassValid(spawnClass))
+	{
+		LOG_WARNING(TEXT("[Equip Item]: Spawn Actor '%s' does not implement IMounteaAdvancedAttachmentAttachableInterface and has no component that does."),
+			*spawnClass->GetName());
+		return nullptr;
+	}
+	
+	if (!IsAuthority())
+	{
+		Server_EquipItem(ItemDefinition);
+		return nullptr;
+	}
+	
 	AActor* spawnedActor = nullptr;
 
 	// Try override binding first
@@ -68,7 +118,7 @@ AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FInventoryIte
 	}
 
 	// Fallback
-	const bool bResult = UMounteaEquipmentStatics::EquipItem(ItemDefinition, spawnedActor);
+	const bool bResult = UMounteaEquipmentStatics::EquipItem(this, ItemDefinition, spawnedActor);
 	return bResult ? spawnedActor : nullptr;
 }
 
@@ -101,4 +151,19 @@ bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName&
 bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const
 {
 	return true;
+}
+
+bool UMounteaEquipmentComponent::IsAuthority() const
+{
+	const AActor* owningActor = GetOwner();
+	if (!owningActor || !owningActor->GetWorld())
+		return false;
+
+	if (const ENetMode netMode = owningActor->GetWorld()->GetNetMode(); netMode == NM_Standalone)
+		return true;
+	
+	if (owningActor->HasAuthority())
+		return true;
+		
+	return false;
 }
