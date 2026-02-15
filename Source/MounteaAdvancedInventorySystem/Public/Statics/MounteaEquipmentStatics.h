@@ -19,6 +19,7 @@
 
 class UMounteaAdvancedEquipmentSettingsConfig;
 class UMounteaAdvancedAttachmentSlot;
+class IMounteaAdvancedEquipmentInterface;
 
 /**
  * 
@@ -86,45 +87,35 @@ public:
 		DisplayName="Is Valid Equipment Item Class")
 	static bool IsTargetClassValid(const UClass* TargetClass);
 	
-	static bool ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* preferredSlot, 
+	static bool ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		bool& bValue);
+	
+	static bool CreateEquipmentItemAndAttach(UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
+		AActor*& OutSpawnedActor);
+	
+	static bool EquipItem(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
+	
+	static bool EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
+		AActor*& OutSpawnedActor);
 
 #pragma endregion
+	
+#pragma region Equipment
 
 	/**
-	 * Attempts to equip an item to the given Outer equipment based on the item's definition.
-	 * Validates the Outer object, the item definition, and determines the appropriate equipment slot.
-	 * If successful, spawns the specified actor and assigns it to the desired slot.
+	 * Equips the specified item on the provided target that implements the Mountea Advanced Equipment Interface.
+	 * This utility function enables equipping items by leveraging the interface's internal logic.
 	 *
-	 * @param Outer            The target object, which must implement either the
-	 *                         MounteaAdvancedAttachmentContainerInterface or MounteaAdvancedEquipmentInterface.
-	 * @param ItemDefinition   The definition of the item to be equipped. Includes data such as the item's template and spawn settings.
-	 * @param OutSpawnedActor  Output reference to the spawned actor, if the equip operation is successful.
-	 *
-	 * @return                 True if the item was successfully equipped, false otherwise.
+	 * @param Target  The target object that implements the Mountea Advanced Equipment Interface. Typically an Actor or Component.
+	 * @param ItemDefinition  The definition of the inventory item to be equipped.
+	 * @return  True if the item was successfully equipped, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Equip Item")
-	static bool EquipItem(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
-
-	/**
-	 * Equips an inventory item to a specified attachment slot within the Mountea Equipment System.
-	 * This function spawns an actor for the provided item definition and attaches it to the specified slot.
-	 *
-	 * @param Outer              The outer context for the spawned actor, typically an owning object or actor.
-	 * @param ItemDefinition     The definition of the inventory item to be equipped.
-	 * @param TargetSlot         The target attachment slot where the item should be equipped.
-	 * @param OutSpawnedActor    Reference to the spawned actor, representing the equipped item.
-	 *                           This is set to nullptr if no actor is spawned.
-	 *
-	 * @return Returns true if the item was successfully equipped; false otherwise.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
-		DisplayName="Equip Item To Slot")
-	static bool EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
-		AActor*& OutSpawnedActor);
+	static bool EquipItem_K2Node(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+	
+#pragma endregion 
 
 #if WITH_EDITOR
 	UFUNCTION(BlueprintInternalUseOnly)

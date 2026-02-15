@@ -123,11 +123,11 @@ public:
 	
 	FORCEINLINE virtual bool IsSlotValid() const
 	{
-		return ParentContainer.GetObject() != nullptr && !SlotName.IsNone() && !SlotTags.IsEmpty();
+		return ParentContainer.GetObject() != nullptr && (!SlotName.IsNone() || !SlotTags.IsEmpty());
 	}
 	FORCEINLINE virtual bool CanAttach() const
 	{
-		return IsSlotValid() && IsEmpty() && !IsLocked();
+		return IsSlotValid() && !IsLocked();
 	}
 	FORCEINLINE virtual bool CanDetach() const
 	{

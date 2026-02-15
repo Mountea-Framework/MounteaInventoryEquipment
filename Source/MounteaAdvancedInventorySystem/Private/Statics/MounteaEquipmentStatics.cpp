@@ -144,7 +144,7 @@ bool UMounteaEquipmentStatics::IsTargetClassValid(const UClass* TargetClass)
 	return false;
 }
 
-bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* preferredSlot, bool& bValue)
+bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, bool& bValue)
 {
 	if (!IsValid(Outer))
 	{
@@ -152,6 +152,9 @@ bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer
 		return true;
 	}
 
+	if (!IsValid(Outer->GetWorld()))
+		return false;
+	
 	if (!Outer->Implements<UMounteaAdvancedAttachmentContainerInterface>() && !Outer->Implements<UMounteaAdvancedEquipmentInterface>())
 	{
 		bValue = false;
@@ -178,16 +181,16 @@ bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer
 		return true;
 	}
 
-	if (!IsValid(preferredSlot))
+	if (!IsValid(TargetSlot))
 	{
 		const auto equipmentInterface = FindEquipmentItemInterface(defaultActor);
-		const FName preferredSlotName = equipmentInterface.GetObject() ?
-											IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentItemPreferredSlot(equipmentInterface.GetObject()) :
-											NAME_None;
+		const FName preferredSlotName = equipmentInterface.GetObject() ? 
+			IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentItemPreferredSlot(equipmentInterface.GetObject()) : 
+			NAME_None;
 	
 		const auto preferredSlotTag = equipmentInterface.GetObject() ?
-										  IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentPreferredSlotTag(equipmentInterface.GetObject()) :
-										  FGameplayTag();
+			IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentPreferredSlotTag(equipmentInterface.GetObject()) :
+			FGameplayTag();
 	
 		if (preferredSlotName == NAME_None && !preferredSlotTag.IsValid())
 		{
@@ -195,19 +198,53 @@ bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer
 			return true;
 		}
 
-		preferredSlot = IMounteaAdvancedAttachmentContainerInterface::Execute_IsValidSlot(Outer, preferredSlotName) ? 
+		TargetSlot = IMounteaAdvancedAttachmentContainerInterface::Execute_IsValidSlot(Outer, preferredSlotName) ? 
 							IMounteaAdvancedAttachmentContainerInterface::Execute_GetSlot(Outer, preferredSlotName) :
 							IMounteaAdvancedAttachmentContainerInterface::Execute_GetSlot(Outer, 
 								IMounteaAdvancedAttachmentContainerInterface::Execute_FindFirstFreeSlotWithTags(Outer, FGameplayTagContainer(preferredSlotTag)));
 	}
 
-	if (!IsValid(preferredSlot))
+	if (!IsValid(TargetSlot) || !TargetSlot->CanAttach())
 	{
 		bValue = false;
 		return true;
 	}
 	
 	return false;
+}
+
+// At this point we know all should be ready, so let's limit the validations
+bool UMounteaEquipmentStatics::CreateEquipmentItemAndAttach(UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
+	AActor*& OutSpawnedActor)
+{
+	OutSpawnedActor = nullptr;
+	if (!IsValid(ItemDefinition.GetTemplate()))
+		return false;
+	if (!IsValid(Outer) || !IsValid(Outer->GetWorld()))
+		return false;
+	if (!IsValid(TargetSlot))
+		return false;
+	
+	const auto classToSpawn = ItemDefinition.GetTemplate()->SpawnActor.LoadSynchronous();
+	
+	FActorSpawnParameters spawnParams;
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	OutSpawnedActor = Outer->GetWorld()->SpawnActor<AActor>(classToSpawn, FTransform(), spawnParams);
+	
+	if (!IMounteaAdvancedAttachmentContainerInterface::Execute_TryAttach(Outer, TargetSlot->SlotName, OutSpawnedActor))
+	{
+		OutSpawnedActor->Destroy();
+		OutSpawnedActor = nullptr;
+		return false;
+	}
+	
+	return IsValid(OutSpawnedActor);
+}
+
+bool UMounteaEquipmentStatics::EquipItem_K2Node(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
+	const FInventoryItem& ItemDefinition)
+{
+	return IMounteaAdvancedEquipmentInterface::Execute_EquipItem(Target.GetObject(), ItemDefinition) != nullptr;
 }
 
 bool UMounteaEquipmentStatics::EquipItem(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor)
@@ -219,7 +256,7 @@ bool UMounteaEquipmentStatics::EquipItem(UObject* Outer, const FInventoryItem& I
 	if (ValidateEquipmentItemRequest(Outer, ItemDefinition, preferredSlot, bValue)) 
 		return bValue;
 
-	return EquipItemToSlot(Outer, ItemDefinition, preferredSlot, OutSpawnedActor);
+	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, preferredSlot, OutSpawnedActor);
 }
 
 bool UMounteaEquipmentStatics::EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
@@ -230,5 +267,5 @@ bool UMounteaEquipmentStatics::EquipItemToSlot(UObject* Outer, const FInventoryI
 	if (ValidateEquipmentItemRequest(Outer, ItemDefinition, TargetSlot, bValue)) 
 		return bValue;
 	
-	return true;
+	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, TargetSlot, OutSpawnedActor);
 }
