@@ -13,6 +13,7 @@
 #include "Components/MounteaEquipmentComponent.h"
 
 #include "Components/ActorComponent.h"
+#include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "GameFramework/Actor.h"
@@ -28,6 +29,11 @@ UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 void UMounteaEquipmentComponent::Server_EquipItem_Implementation(const FInventoryItem& ItemDefinition)
 {
 	Execute_EquipItem(this, ItemDefinition);
+}
+
+void UMounteaEquipmentComponent::Server_UnequipItem_Implementation(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot)
+{
+	Execute_UnequipItem(this, ItemDefinition, bUseFallbackSlot);
 }
 
 AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FInventoryItem& ItemDefinition)
@@ -118,7 +124,7 @@ AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FInventoryIte
 	}
 
 	// Fallback
-	const bool bResult = UMounteaEquipmentStatics::EquipItem(this, ItemDefinition, spawnedActor);
+	const bool bResult = UMounteaEquipmentStatics::EquipItemGeneral(this, ItemDefinition, spawnedActor);
 	return bResult ? spawnedActor : nullptr;
 }
 
@@ -130,13 +136,20 @@ AActor* UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& 
 	if (!Execute_IsValidSlot(this, SlotId))
 		return nullptr;
 
-	AActor* spawnedActor = EquipItem_Implementation(ItemDefinition);
-	if (!spawnedActor)
+	if (!IsAuthority())
+	{
+		Server_EquipItem(ItemDefinition);
+		return nullptr;
+	}
+
+	UMounteaAdvancedAttachmentSlot* targetSlot = Execute_GetSlot(this, SlotId);
+	if (!IsValid(targetSlot))
 		return nullptr;
 
-	return spawnedActor;
+	AActor* spawnedActor = nullptr;
+	const bool bResult = UMounteaEquipmentStatics::EquipItemToSlot(this, ItemDefinition, targetSlot, spawnedActor);
+	return bResult ? spawnedActor : nullptr;
 }
-
 
 bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot)
 {
@@ -150,7 +163,7 @@ bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName&
 
 bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const
 {
-	return true;
+	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition);
 }
 
 bool UMounteaEquipmentComponent::IsAuthority() const
