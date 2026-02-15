@@ -84,6 +84,18 @@ public:
 		DisplayName="Get Available Socket Names")
 	static TArray<FName> GetAvailableSocketNames(const AActor* Target, const FName& ComponentName);
 
+	/**
+	 * Checks if the specified class is valid to be attachable.
+	 * 
+	 * @param TargetClass  Target class to validate for being Attachable
+	 * @return  True if the class is valid, false otherwise
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Is Valid Attachable Class")
+	static bool IsTargetClassValid(const UClass* TargetClass);
+	
 #pragma endregion 
 	
 #pragma region AttachmentContainer

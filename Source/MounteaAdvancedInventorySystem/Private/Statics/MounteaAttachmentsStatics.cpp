@@ -112,6 +112,42 @@ TArray<FName> UMounteaAttachmentsStatics::GetAvailableSocketNames(const AActor* 
 	return match ? (*match)->GetAllSocketNames() : TArray<FName>();
 }
 
+bool UMounteaAttachmentsStatics::IsTargetClassValid(const UClass* TargetClass)
+{
+	if (!IsValid(TargetClass))
+		return false;
+
+	if (TargetClass->ImplementsInterface(UMounteaAdvancedAttachmentAttachableInterface::StaticClass()))
+		return true;
+
+	const AActor* targetActor = Cast<AActor>(TargetClass->GetDefaultObject());
+	if (!IsValid(targetActor))
+		return false;
+
+	const TArray<UActorComponent*> components = targetActor->GetComponentsByInterface(
+		UMounteaAdvancedAttachmentAttachableInterface::StaticClass());
+	if (components.Num() > 0)
+		return true;
+
+	const UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(TargetClass);
+	if (!blueprintClass || !blueprintClass->SimpleConstructionScript)
+		return false;
+
+	for (const USCS_Node* node : blueprintClass->SimpleConstructionScript->GetAllNodes())
+	{
+		if (!node)
+			continue;
+
+		const UActorComponent* componentTemplate = node->GetActualComponentTemplate(
+			const_cast<UBlueprintGeneratedClass*>(blueprintClass));
+		if (IsValid(componentTemplate) && componentTemplate->GetClass()->ImplementsInterface(
+			UMounteaAdvancedAttachmentAttachableInterface::StaticClass()))
+			return true;
+	}
+
+	return false;
+}
+
 AActor* UMounteaAttachmentsStatics::GetOwningActor(
 	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target)
 {
