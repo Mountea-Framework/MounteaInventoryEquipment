@@ -19,6 +19,7 @@
 
 class UMounteaAdvancedEquipmentSettingsConfig;
 class UMounteaAdvancedAttachmentSlot;
+class UMounteaEquipmentComponent;
 class IMounteaAdvancedEquipmentInterface;
 
 /**
@@ -92,10 +93,12 @@ public:
 	static bool CreateEquipmentItemAndAttach(UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
 	
-	static bool EquipItem(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
+	static bool EquipItemGeneral(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
 	
 	static bool EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
+	
+	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition);
 
 #pragma endregion
 	
@@ -113,8 +116,13 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Equip Item")
-	static bool EquipItem_K2Node(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+	static bool EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
 	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Item Equipped")
+	static bool IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+
 #pragma endregion 
 
 #if WITH_EDITOR

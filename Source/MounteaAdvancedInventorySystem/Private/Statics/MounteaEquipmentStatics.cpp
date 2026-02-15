@@ -13,6 +13,7 @@
 #include "Statics/MounteaEquipmentStatics.h"
 
 #include "Components/ActorComponent.h"
+#include "Components/MounteaEquipmentComponent.h"
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -20,8 +21,10 @@
 #include "Engine/SCS_Node.h"
 #include "Engine/SimpleConstructionScript.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaAttachmentsStatics.h"
@@ -31,6 +34,21 @@ namespace EquipmentStatics
 	static UMounteaAdvancedInventorySettings* GetInventorySettings()
 	{
 		return GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	}
+
+	static bool EnsureSlotIsReadyForEquip(UObject* Outer, const UMounteaAdvancedAttachmentSlot* TargetSlot)
+	{
+		if (!IsValid(Outer) || !IsValid(TargetSlot))
+			return false;
+		if (!Outer->Implements<UMounteaAdvancedAttachmentContainerInterface>())
+			return false;
+
+		if (!IMounteaAdvancedAttachmentContainerInterface::Execute_IsSlotOccupied(Outer, TargetSlot->SlotName))
+			return true;
+		if (!Outer->Implements<UMounteaAdvancedEquipmentInterface>())
+			return false;
+
+		return IMounteaAdvancedEquipmentInterface::Execute_UnequipItemFromSlot(Outer, TargetSlot->SlotName, true);
 	}
 }
 
@@ -192,7 +210,6 @@ bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer
 	return true;
 }
 
-// At this point we know all should be ready, so let's limit the validations
 bool UMounteaEquipmentStatics::CreateEquipmentItemAndAttach(UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
 	AActor*& OutSpawnedActor)
 {
@@ -209,6 +226,19 @@ bool UMounteaEquipmentStatics::CreateEquipmentItemAndAttach(UObject* Outer, cons
 	FActorSpawnParameters spawnParams;
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	OutSpawnedActor = Outer->GetWorld()->SpawnActor<AActor>(classToSpawn, FTransform(), spawnParams);
+
+	if (IsValid(OutSpawnedActor) && ItemDefinition.GetGuid().IsValid())
+	{
+		const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> attachableInterface =
+			UMounteaAdvancedAttachmentSlot::FindAttachableInterface(OutSpawnedActor);
+		if (attachableInterface.GetObject())
+		{
+			IMounteaAdvancedAttachmentAttachableInterface::Execute_SetId(
+				attachableInterface.GetObject(),
+				FName(*ItemDefinition.GetGuid().ToString(EGuidFormats::DigitsWithHyphens))
+			);
+		}
+	}
 	
 	if (!IMounteaAdvancedAttachmentContainerInterface::Execute_TryAttach(Outer, TargetSlot->SlotName, OutSpawnedActor))
 	{
@@ -220,13 +250,7 @@ bool UMounteaEquipmentStatics::CreateEquipmentItemAndAttach(UObject* Outer, cons
 	return IsValid(OutSpawnedActor);
 }
 
-bool UMounteaEquipmentStatics::EquipItem_K2Node(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
-	const FInventoryItem& ItemDefinition)
-{
-	return IMounteaAdvancedEquipmentInterface::Execute_EquipItem(Target.GetObject(), ItemDefinition) != nullptr;
-}
-
-bool UMounteaEquipmentStatics::EquipItem(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor)
+bool UMounteaEquipmentStatics::EquipItemGeneral(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor)
 {
 	OutSpawnedActor = nullptr;
 
@@ -234,6 +258,12 @@ bool UMounteaEquipmentStatics::EquipItem(UObject* Outer, const FInventoryItem& I
 	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, preferredSlot)) 
 		return false;
 
+	if (IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquipped(Outer, ItemDefinition))
+		return false;
+	
+	if (!EquipmentStatics::EnsureSlotIsReadyForEquip(Outer, preferredSlot))
+		return false;
+	
 	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, preferredSlot, OutSpawnedActor);
 }
 
@@ -243,5 +273,65 @@ bool UMounteaEquipmentStatics::EquipItemToSlot(UObject* Outer, const FInventoryI
 	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, TargetSlot)) 
 		return false;
 	
+	if (IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquipped(Outer, ItemDefinition))
+		return false;
+	
+	if (!EquipmentStatics::EnsureSlotIsReadyForEquip(Outer, TargetSlot))
+		return false;
+	
 	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, TargetSlot, OutSpawnedActor);
+}
+
+bool UMounteaEquipmentStatics::ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition)
+{
+	if (!IsValid(EquipmentComponent))
+		return false;
+	if (!ItemDefinition.IsItemValid())
+		return false;
+
+	if (const auto inventoryManager = ItemDefinition.GetOwningInventory();
+		inventoryManager.GetObject() != nullptr)
+	{
+		if (!inventoryManager.GetObject()->Implements<UMounteaAdvancedInventoryInterface>())
+			return false;
+
+		const auto itemData = IMounteaAdvancedInventoryInterface::Execute_FindItem(inventoryManager.GetObject(), FInventoryItemSearchParams(ItemDefinition.GetGuid()));
+		if (!itemData.IsItemValid())
+			return false;
+	}
+
+	const TArray<UMounteaAdvancedAttachmentSlot*> attachmentSlots = IMounteaAdvancedAttachmentContainerInterface::Execute_GetAttachmentSlots(EquipmentComponent);
+	if (attachmentSlots.Num() == 0)
+		return false;
+
+	const UMounteaInventoryItemTemplate* itemTemplate = ItemDefinition.GetTemplate();
+	if (!IsValid(itemTemplate))
+		return false;
+	if (itemTemplate->AttachmentSlots.IsEmpty())
+		return false;
+
+	for (const UMounteaAdvancedAttachmentSlot* slot : attachmentSlots)
+	{
+		if (!IsValid(slot) || !slot->IsOccupied() || !IsValid(slot->Attachment))
+			continue;
+		if (!slot->MatchesTags(itemTemplate->AttachmentSlots, false))
+			continue;
+
+		// TODO: get attachable and from the interface (the object or its component) find the item it stores
+		// If the same guid, then return true
+	}
+
+	return false;
+}
+
+bool UMounteaEquipmentStatics::EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
+	const FInventoryItem& ItemDefinition)
+{
+	return IMounteaAdvancedEquipmentInterface::Execute_EquipItem(Target.GetObject(), ItemDefinition) != nullptr;
+}
+
+bool UMounteaEquipmentStatics::IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
+	const FInventoryItem& ItemDefinition)
+{
+	return IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquipped(Target.GetObject(), ItemDefinition);
 }
