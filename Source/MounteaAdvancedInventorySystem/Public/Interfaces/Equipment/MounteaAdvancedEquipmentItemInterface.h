@@ -36,8 +36,8 @@ public:
 	virtual FName GetEquipmentItemPreferredSlot_Implementation() const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
-	FGameplayTag GetEquipmentPreferredSloTag() const;
-	virtual FGameplayTag GetEquipmentPreferredSloTag_Implementation() const = 0;
+	FGameplayTag GetEquipmentPreferredSlotTag() const;
+	virtual FGameplayTag GetEquipmentPreferredSlotTag_Implementation() const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
 	EEquipmentItemState GetEquipmentItemState() const;

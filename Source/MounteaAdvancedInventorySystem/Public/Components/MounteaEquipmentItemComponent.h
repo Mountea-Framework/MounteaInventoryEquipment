@@ -55,7 +55,7 @@ public:
 	{ return OnEquipmentItemStateChanged; };
 	virtual FName GetEquipmentItemPreferredSlot_Implementation() const override
 	{ return PreferredSlot; };
-	virtual FGameplayTag GetEquipmentPreferredSloTag_Implementation() const override
+	virtual FGameplayTag GetEquipmentPreferredSlotTag_Implementation() const override
 	{ return PreferredSlotTag; };
 	
 protected:
