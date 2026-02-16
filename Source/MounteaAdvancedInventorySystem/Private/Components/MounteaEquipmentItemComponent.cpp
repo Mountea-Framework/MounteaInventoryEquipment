@@ -74,6 +74,12 @@ bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnim
 	return false;
 }
 
+void UMounteaEquipmentItemComponent::SetEquippedItemId_Implementation(const FGuid& NewEquippedItemId)
+{
+	if (NewEquippedItemId != EquippedItemId)
+		EquippedItemId = NewEquippedItemId;
+}
+
 TArray<FName> UMounteaEquipmentItemComponent::GetAvailableSlots()
 {
 	const auto* equipmentConfig = UMounteaEquipmentStatics::GetEquipmentSettingsConfig();

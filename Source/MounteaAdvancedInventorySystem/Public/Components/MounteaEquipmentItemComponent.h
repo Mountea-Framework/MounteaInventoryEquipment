@@ -57,8 +57,16 @@ public:
 	{ return PreferredSlot; };
 	virtual FGameplayTag GetEquipmentPreferredSlotTag_Implementation() const override
 	{ return PreferredSlotTag; };
+	virtual FGuid GetEquippedItemId_Implementation() const override
+	{ return EquippedItemId; };
+	virtual void SetEquippedItemId_Implementation(const FGuid& NewEquippedItemId) override;
 	
 protected:
+	
+	// Defined the Equipped Item Id from Inventory
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault))
+	FGuid EquippedItemId;
 	
 	// If Item does activate when equipped (eg: Rings), like those Items which require no animation to activate.
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
