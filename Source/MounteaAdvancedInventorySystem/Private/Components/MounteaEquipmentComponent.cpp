@@ -18,8 +18,36 @@
 #include "Engine/BlueprintGeneratedClass.h"
 #include "GameFramework/Actor.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaEquipmentStatics.h"
+
+namespace EquipmentComponentStatics
+{
+	static FName ResolveFallbackSlotId(const FName& CurrentSlotId)
+	{
+		const UMounteaAdvancedEquipmentSettingsConfig* settingsConfig = UMounteaEquipmentStatics::GetEquipmentSettingsConfig();
+		if (!settingsConfig)
+			return NAME_None;
+
+		const FMounteaEquipmentSlotHeaderData* slotData = settingsConfig->AllowedEquipmentSlots.Find(CurrentSlotId);
+		if (!slotData)
+			return NAME_None;
+
+		return slotData->FallbackSlot;
+	}
+
+	static AActor* ResolveAttachmentActor(UObject* AttachmentObject)
+	{
+		if (AActor* attachmentActor = Cast<AActor>(AttachmentObject))
+			return attachmentActor;
+
+		if (const UActorComponent* attachmentComponent = Cast<UActorComponent>(AttachmentObject))
+			return attachmentComponent->GetOwner();
+
+		return nullptr;
+	}
+}
 
 UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 {
@@ -153,17 +181,84 @@ AActor* UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& 
 
 bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot)
 {
-	return true;
+	if (!ItemDefinition.IsItemValid())
+		return false;
+
+	if (!IsAuthority())
+	{
+		Server_UnequipItem(ItemDefinition, bUseFallbackSlot);
+		return true;
+	}
+
+	const TArray<UMounteaAdvancedAttachmentSlot*> attachmentSlots = Execute_GetAttachmentSlots(this);
+	for (const UMounteaAdvancedAttachmentSlot* slot : attachmentSlots)
+	{
+		if (!IsValid(slot) || !slot->IsOccupied() || !IsValid(slot->Attachment))
+			continue;
+
+		const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipmentItemInterface = UMounteaEquipmentStatics::FindEquipmentItemInterface(slot->Attachment);
+		if (!equipmentItemInterface.GetObject())
+			continue;
+
+		if (IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(equipmentItemInterface.GetObject()) != ItemDefinition.GetGuid())
+		continue;
+
+		return Execute_UnequipItemFromSlot(this, slot->SlotName, bUseFallbackSlot);
+	}
+
+	return false;
 }
 
 bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot)
 {
+	if (SlotId.IsNone())
+		return false;
+	if (!Execute_IsValidSlot(this, SlotId))
+		return false;
+
+	UMounteaAdvancedAttachmentSlot* targetSlot = Execute_GetSlot(this, SlotId);
+	if (!IsValid(targetSlot) || !targetSlot->IsOccupied() || !IsValid(targetSlot->Attachment))
+		return false;
+
+	UObject* attachmentObject = targetSlot->Attachment;
+
+	if (bUseFallbackSlot)
+	{
+		const FName fallbackSlotId = EquipmentComponentStatics::ResolveFallbackSlotId(SlotId);
+		const bool bCanUseFallback = !fallbackSlotId.IsNone() &&
+			fallbackSlotId != SlotId &&
+			Execute_IsValidSlot(this, fallbackSlotId) &&
+			!Execute_IsSlotOccupied(this, fallbackSlotId);
+
+		if (bCanUseFallback)
+		{
+			const bool bDetached = Execute_TryDetach(this, SlotId);
+			if (!bDetached)
+				return false;
+
+			if (Execute_TryAttach(this, fallbackSlotId, attachmentObject))
+				return true;
+		}
+	}
+
+	if (!Execute_TryDetach(this, SlotId))
+		return false;
+
+	AActor* detachedAttachmentActor = EquipmentComponentStatics::ResolveAttachmentActor(attachmentObject);
+	if (IsValid(detachedAttachmentActor) && detachedAttachmentActor != GetOwner())
+		detachedAttachmentActor->Destroy();
+
 	return true;
 }
 
 bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const
 {
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition);
+}
+
+bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_ImplementationInSlot(const FInventoryItem& ItemDefinition, const FName& SlotName) const
+{
+	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition, SlotName);
 }
 
 bool UMounteaEquipmentComponent::IsAuthority() const

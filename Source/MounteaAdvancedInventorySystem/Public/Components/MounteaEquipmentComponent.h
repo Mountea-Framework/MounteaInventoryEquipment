@@ -48,6 +48,7 @@ public:
 	virtual bool UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) override;
 	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
 	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
+	virtual bool IsEquipmentItemEquipped_ImplementationInSlot(const FInventoryItem& ItemDefinition, const FName& SlotName) const override;
 	
 protected:
 	

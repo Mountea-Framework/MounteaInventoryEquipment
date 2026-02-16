@@ -65,5 +65,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
 	bool IsEquipmentItemEquipped(const FInventoryItem& ItemDefinition) const;
 	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool IsEquipmentItemEquippedInSlot(const FInventoryItem& ItemDefinition, const FName& SlotName) const;
+	virtual bool IsEquipmentItemEquipped_ImplementationInSlot(const FInventoryItem& ItemDefinition, const FName& SlotName) const = 0;
 };
 
