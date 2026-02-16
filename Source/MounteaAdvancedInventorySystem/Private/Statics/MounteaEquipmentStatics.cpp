@@ -229,13 +229,12 @@ bool UMounteaEquipmentStatics::CreateEquipmentItemAndAttach(UObject* Outer, cons
 
 	if (IsValid(OutSpawnedActor) && ItemDefinition.GetGuid().IsValid())
 	{
-		const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> attachableInterface =
-			UMounteaAdvancedAttachmentSlot::FindAttachableInterface(OutSpawnedActor);
-		if (attachableInterface.GetObject())
+		const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipmentItemInterface = FindEquipmentItemInterface(OutSpawnedActor);
+		if (equipmentItemInterface.GetObject())
 		{
-			IMounteaAdvancedAttachmentAttachableInterface::Execute_SetId(
-				attachableInterface.GetObject(),
-				FName(*ItemDefinition.GetGuid().ToString(EGuidFormats::DigitsWithHyphens))
+			IMounteaAdvancedEquipmentItemInterface::Execute_SetEquippedItemId(
+				equipmentItemInterface.GetObject(),
+				ItemDefinition.GetGuid()
 			);
 		}
 	}
@@ -282,50 +281,73 @@ bool UMounteaEquipmentStatics::EquipItemToSlot(UObject* Outer, const FInventoryI
 	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, TargetSlot, OutSpawnedActor);
 }
 
-bool UMounteaEquipmentStatics::ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition)
+bool UMounteaEquipmentStatics::ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition, FName SlotName)
 {
 	if (!IsValid(EquipmentComponent))
 		return false;
 	if (!ItemDefinition.IsItemValid())
 		return false;
 
-	if (const auto inventoryManager = ItemDefinition.GetOwningInventory();
-		inventoryManager.GetObject() != nullptr)
+	FGuid expectedItemGuid = ItemDefinition.GetGuid();
+	if (!expectedItemGuid.IsValid())
+		return false;
+
+	const auto inventoryManager = ItemDefinition.GetOwningInventory();
+	if (inventoryManager.GetObject() != nullptr)
 	{
 		if (!inventoryManager.GetObject()->Implements<UMounteaAdvancedInventoryInterface>())
 			return false;
 
-		const auto itemData = IMounteaAdvancedInventoryInterface::Execute_FindItem(inventoryManager.GetObject(), FInventoryItemSearchParams(ItemDefinition.GetGuid()));
+		const auto itemData = IMounteaAdvancedInventoryInterface::Execute_FindItem(
+			inventoryManager.GetObject(),
+			FInventoryItemSearchParams(ItemDefinition.GetGuid())
+		);
 		if (!itemData.IsItemValid())
 			return false;
+
+		expectedItemGuid = itemData.GetGuid();
 	}
 
-	const TArray<UMounteaAdvancedAttachmentSlot*> attachmentSlots = IMounteaAdvancedAttachmentContainerInterface::Execute_GetAttachmentSlots(EquipmentComponent);
-	if (attachmentSlots.Num() == 0)
-		return false;
-
-	const UMounteaInventoryItemTemplate* itemTemplate = ItemDefinition.GetTemplate();
-	if (!IsValid(itemTemplate))
-		return false;
-	if (itemTemplate->AttachmentSlots.IsEmpty())
-		return false;
-
-	for (const UMounteaAdvancedAttachmentSlot* slot : attachmentSlots)
+	if (SlotName != NAME_None)
 	{
-		if (!IsValid(slot) || !slot->IsOccupied() || !IsValid(slot->Attachment))
-			continue;
-		if (!slot->MatchesTags(itemTemplate->AttachmentSlots, false))
-			continue;
+		const auto foundSlot = IMounteaAdvancedAttachmentContainerInterface::Execute_GetSlot(EquipmentComponent, SlotName);
+		if (!IsValid(foundSlot) || !foundSlot->IsOccupied() || !IsValid(foundSlot->Attachment))
+			return false;
+		const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipmentItemInterface = FindEquipmentItemInterface(foundSlot->Attachment);
+		if (!equipmentItemInterface.GetObject())
+			return false;
+		return IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(equipmentItemInterface.GetObject()) == expectedItemGuid;
+	}
+	else
+	{
+		const TArray<UMounteaAdvancedAttachmentSlot*> attachmentSlots = IMounteaAdvancedAttachmentContainerInterface::Execute_GetAttachmentSlots(EquipmentComponent);
+		if (attachmentSlots.Num() == 0)
+			return false;
 
-		// TODO: get attachable and from the interface (the object or its component) find the item it stores
-		// If the same guid, then return true
+		const UMounteaInventoryItemTemplate* itemTemplate = ItemDefinition.GetTemplate();
+		if (!IsValid(itemTemplate))
+			return false;
+		if (itemTemplate->AttachmentSlots.IsEmpty())
+			return false;
+
+		for (const UMounteaAdvancedAttachmentSlot* slot : attachmentSlots)
+		{
+			if (!IsValid(slot) || !slot->IsOccupied() || !IsValid(slot->Attachment))
+				continue;
+
+			const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipmentItemInterface = FindEquipmentItemInterface(slot->Attachment);
+			if (!equipmentItemInterface.GetObject())
+				continue;
+		
+			if (IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(equipmentItemInterface.GetObject()) == expectedItemGuid)
+				return true;
+		}
 	}
 
 	return false;
 }
 
-bool UMounteaEquipmentStatics::EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
-	const FInventoryItem& ItemDefinition)
+bool UMounteaEquipmentStatics::EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition)
 {
 	return IMounteaAdvancedEquipmentInterface::Execute_EquipItem(Target.GetObject(), ItemDefinition) != nullptr;
 }
@@ -334,4 +356,10 @@ bool UMounteaEquipmentStatics::IsItemEquipped(const TScriptInterface<IMounteaAdv
 	const FInventoryItem& ItemDefinition)
 {
 	return IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquipped(Target.GetObject(), ItemDefinition);
+}
+
+bool UMounteaEquipmentStatics::IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, 
+	const FInventoryItem& ItemDefinition, const FName& SlotName)
+{
+	return IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquippedInSlot(Target.GetObject(), ItemDefinition, SlotName);
 }

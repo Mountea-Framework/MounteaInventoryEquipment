@@ -98,7 +98,7 @@ public:
 	static bool EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
 	
-	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition);
+	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition, FName SlotName = NAME_None);
 
 #pragma endregion
 	
@@ -122,6 +122,12 @@ public:
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Is Item Equipped")
 	static bool IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Validate"),
+		meta=(AutoCreateRefTerm="SlotName"),
+		DisplayName="Is Item Equipped In Slot")
+	static bool IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& SlotName);
 
 #pragma endregion 
 
