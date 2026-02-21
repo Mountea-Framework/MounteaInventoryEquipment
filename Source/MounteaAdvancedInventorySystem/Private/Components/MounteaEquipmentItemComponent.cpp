@@ -111,4 +111,5 @@ void UMounteaEquipmentItemComponent::GetLifetimeReplicatedProps(TArray<FLifetime
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
 	DOREPLIFETIME(UMounteaEquipmentItemComponent, EquipmentItemState);
+	DOREPLIFETIME(UMounteaEquipmentItemComponent, EquippedItemId);
 }

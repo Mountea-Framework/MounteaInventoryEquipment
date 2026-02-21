@@ -56,6 +56,8 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Server_EquipItem(const FInventoryItem& ItemDefinition);
 	UFUNCTION(Server, Reliable)
+	void Server_EquipItemToSlot(const FInventoryItem& ItemDefinition, const FName& SlotId);
+	UFUNCTION(Server, Reliable)
 	void Server_UnequipItem(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot);
 	
 public:

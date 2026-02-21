@@ -59,6 +59,12 @@ void UMounteaEquipmentComponent::Server_EquipItem_Implementation(const FInventor
 	Execute_EquipItem(this, ItemDefinition);
 }
 
+void UMounteaEquipmentComponent::Server_EquipItemToSlot_Implementation(const FInventoryItem& ItemDefinition,
+	const FName& SlotId)
+{
+	Execute_EquipItemToSlot(this, SlotId, ItemDefinition);
+}
+
 void UMounteaEquipmentComponent::Server_UnequipItem_Implementation(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot)
 {
 	Execute_UnequipItem(this, ItemDefinition, bUseFallbackSlot);
@@ -166,7 +172,7 @@ AActor* UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& 
 
 	if (!IsAuthority())
 	{
-		Server_EquipItem(ItemDefinition);
+		Server_EquipItemToSlot(ItemDefinition, SlotId);
 		return nullptr;
 	}
 

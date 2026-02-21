@@ -78,6 +78,7 @@ protected:
 	
 	// Defined the Equipped Item Id from Inventory
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		Replicated, 
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=4))
 	FGuid EquippedItemId;
