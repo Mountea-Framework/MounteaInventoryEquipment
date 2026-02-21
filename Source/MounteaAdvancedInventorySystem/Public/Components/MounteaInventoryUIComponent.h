@@ -113,28 +113,6 @@ protected:
 
 protected:
 	
-	/**
-	 * Delegate that is broadcast when an inventory category is selected.
-	 *
-	 * This BlueprintAssignable delegate allows other components to handle the logic
-	 * for Category selection in the inventory.
-	 * It broadcasts CategoryId.
-	 */
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FInventoryCategorySelected OnCategorySelected;
-
-	/**
-	 * Delegate triggered when an inventory item is selected.
-	 *
-	 * This BlueprintAssignable delegate allows other components to handle the logic
-	 * for Item selection in the inventory.
-	 * It broadcasts ItemId.
-	 */
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
-	FInventoryItemSelected OnItemSelected;
-
-protected:
-	
 	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
 		meta=(DisplayPriority=3))
@@ -211,4 +189,26 @@ private:
 		meta=(AllowPrivateAccess),
 		meta=(DisplayPriority=9))
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
+	
+protected:
+	
+	/**
+	 * Delegate that is broadcast when an inventory category is selected.
+	 *
+	 * This BlueprintAssignable delegate allows other components to handle the logic
+	 * for Category selection in the inventory.
+	 * It broadcasts CategoryId.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	FInventoryCategorySelected OnCategorySelected;
+
+	/**
+	 * Delegate triggered when an inventory item is selected.
+	 *
+	 * This BlueprintAssignable delegate allows other components to handle the logic
+	 * for Item selection in the inventory.
+	 * It broadcasts ItemId.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	FInventoryItemSelected OnItemSelected;
 };

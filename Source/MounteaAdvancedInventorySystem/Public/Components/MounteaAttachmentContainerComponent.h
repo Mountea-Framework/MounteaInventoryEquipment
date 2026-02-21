@@ -90,6 +90,26 @@ protected:
 	
 public:
 	
+	// Does not support runtime addition/removal of slots.
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
+		Instanced,
+		meta=(TitleProperty="DisplayName"),
+		meta=(NoResetToDefault),
+		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView),
+		meta=(DisplayPriority=2))
+	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
+		meta=(GetOptions="GetAvailableTargetNames"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=0))
+	FName DefaultAttachmentTarget;
+
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Mountea|Attachment Container",
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
+	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
+	
 	/**
 	 * Event triggered when an attachment is added or removed from the container.
 	 */
@@ -113,26 +133,6 @@ public:
 		meta=(IsBindableEvent=true),
 		meta=(NoResetToDefault))
 	FOnContainerCleared OnContainerCleared;
-	
-	// Does not support runtime addition/removal of slots.
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
-		Instanced,
-		meta=(TitleProperty="DisplayName"),
-		meta=(NoResetToDefault),
-		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView),
-		meta=(DisplayPriority=2))
-	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
-	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
-		meta=(GetOptions="GetAvailableTargetNames"),
-		meta=(NoResetToDefault),
-		meta=(DisplayPriority=0))
-	FName DefaultAttachmentTarget;
-
-	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Mountea|Attachment Container",
-		meta=(NoResetToDefault),
-		meta=(DisplayPriority=1))
-	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 
 protected:
 

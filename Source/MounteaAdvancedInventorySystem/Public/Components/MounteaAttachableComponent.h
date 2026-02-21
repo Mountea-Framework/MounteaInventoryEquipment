@@ -42,12 +42,6 @@ public:
 
 public:	
 	
-	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
-	FOnAttachableAttached OnAttachableAttached;
-
-	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
-	FOnAttachableDetached OnAttachableDetached;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
 		meta=(DisplayPriority=3))
 	FGameplayTagContainer Tags;
@@ -68,6 +62,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
 		meta=(DisplayPriority=4))
 	EAttachmentState State;
+	
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	FOnAttachableAttached OnAttachableAttached;
+
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	FOnAttachableDetached OnAttachableDetached;
 
 public:
 	

@@ -63,14 +63,6 @@ public:
 	
 protected:
 	
-	/**
-	 * Even Triggered when Equipment Item changes.
-	 */
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Equipment",
-		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault))
-	FOnEquipmentItemStateChanged OnEquipmentItemStateChanged;
-	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault),
 		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
@@ -121,6 +113,14 @@ protected:
 		meta=(EditCondition="!bAutoActivates"),
 		meta=(DisplayPriority=6))
 	uint8 bRequiresActivationEvent : 1;
+	
+	/**
+	 * Even Triggered when Equipment Item changes.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Equipment",
+		meta=(IsBindableEvent=true),
+		meta=(NoResetToDefault))
+	FOnEquipmentItemStateChanged OnEquipmentItemStateChanged;
 	
 public:
 	

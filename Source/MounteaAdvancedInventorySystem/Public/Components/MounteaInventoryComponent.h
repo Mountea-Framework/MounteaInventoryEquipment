@@ -111,6 +111,24 @@ protected:
 	virtual FOnNotificationProcessed& GetOnNotificationProcessedEventHandle() override
 	{ return OnNotificationProcessed; };
 
+private:
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly,
+		ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=0))
+	FInventoryItemArray InventoryItems;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=1))
+	EInventoryType InventoryType;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=2))
+	EInventoryFlags InventoryTypeFlag;
+	
 protected:
 	
 	/**
@@ -142,22 +160,4 @@ protected:
 	*/
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnNotificationProcessed OnNotificationProcessed;
-
-private:
-
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly,
-		ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess),
-		meta=(DisplayPriority=0))
-	FInventoryItemArray InventoryItems;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess),
-		meta=(DisplayPriority=1))
-	EInventoryType InventoryType;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess),
-		meta=(DisplayPriority=2))
-	EInventoryFlags InventoryTypeFlag;
 };
