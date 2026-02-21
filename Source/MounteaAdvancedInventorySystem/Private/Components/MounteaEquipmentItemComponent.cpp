@@ -13,6 +13,7 @@
 #include "Components/MounteaEquipmentItemComponent.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Net/UnrealNetwork.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Statics/MounteaEquipmentStatics.h"
 
@@ -21,6 +22,10 @@ UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() :
 	bAutoActivates(1),
 	bRequiresActivationEvent(0)
 {
+	bAutoActivate = true;
+	
+	SetIsReplicatedByDefault(true);
+	SetActiveFlag(true);
 }
 
 // TODO: Handle server and client
@@ -94,4 +99,16 @@ TArray<FName> UMounteaEquipmentItemComponent::GetAvailableSlots()
 	returnValue.Append(MoveTemp(slotKeys));
 
 	return returnValue;
+}
+
+void UMounteaEquipmentItemComponent::OnRep_EquipmentItemState()
+{
+	OnEquipmentItemStateChanged.Broadcast(this, EquipmentItemState);
+}
+
+void UMounteaEquipmentItemComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(UMounteaEquipmentItemComponent, EquipmentItemState);
 }

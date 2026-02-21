@@ -102,10 +102,12 @@ void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_I
 
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const
 {
-	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
-		return Slot->SlotName == SlotId;
+	const auto foundSlot = AttachmentSlots.FindByPredicate([SlotId](const TObjectPtr<UMounteaAdvancedAttachmentSlot>& Slot)
+	{
+		return Slot && Slot->SlotName == SlotId;
 	});
-	return foundSlot && foundSlot->IsSlotValid();
+
+	return foundSlot && *foundSlot && (*foundSlot)->IsSlotValid();
 }
 
 UMounteaAdvancedAttachmentSlot* UMounteaAttachmentContainerComponent::GetSlot_Implementation(const FName& SlotId) const

@@ -341,8 +341,14 @@ bool UMounteaEquipmentStatics::EquipItem(const TScriptInterface<IMounteaAdvanced
 	return IMounteaAdvancedEquipmentInterface::Execute_EquipItem(Target.GetObject(), ItemDefinition) != nullptr;
 }
 
+bool UMounteaEquipmentStatics::EquipItemToSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
+	const FInventoryItem& ItemDefinition, const FName& SlotName)
+{
+	return IMounteaAdvancedEquipmentInterface::Execute_EquipItemToSlot(Target.GetObject(), SlotName, ItemDefinition) != nullptr;
+}
+
 bool UMounteaEquipmentStatics::IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
-	const FInventoryItem& ItemDefinition)
+                                              const FInventoryItem& ItemDefinition)
 {
 	return IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquipped(Target.GetObject(), ItemDefinition);
 }
@@ -351,4 +357,9 @@ bool UMounteaEquipmentStatics::IsItemEquippedInSlot(const TScriptInterface<IMoun
 	const FInventoryItem& ItemDefinition, const FName& SlotName)
 {
 	return IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquippedInSlot(Target.GetObject(), ItemDefinition, SlotName);
+}
+
+bool UMounteaEquipmentStatics::UnequipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, bool bUseFallbackSlot)
+{
+	return IMounteaAdvancedEquipmentInterface::Execute_UnequipItem(Target.GetObject(), ItemDefinition, bUseFallbackSlot);
 }

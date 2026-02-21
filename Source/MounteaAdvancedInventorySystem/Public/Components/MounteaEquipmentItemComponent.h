@@ -89,6 +89,7 @@ protected:
 	FGameplayTag PreferredSlotTag;
 	
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		ReplicatedUsing="OnRep_EquipmentItemState",
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=1))
 	EEquipmentItemState EquipmentItemState;
@@ -126,4 +127,11 @@ public:
 	
 	UFUNCTION()
 	static TArray<FName> GetAvailableSlots();
+	
+protected:
+	
+	UFUNCTION()
+	void OnRep_EquipmentItemState();
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
