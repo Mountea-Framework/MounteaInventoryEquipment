@@ -32,6 +32,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedEquipmentItemInterface
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	FName GetEquipmentItemPreferredSlot() const;
+	virtual FName GetEquipmentItemPreferredSlot_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	FGameplayTag GetEquipmentPreferredSlotTag() const;
+	virtual FGameplayTag GetEquipmentPreferredSlotTag_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
 	EEquipmentItemState GetEquipmentItemState() const;
 	virtual EEquipmentItemState GetEquipmentItemState_Implementation() const = 0;
 	
@@ -62,6 +70,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
 	bool SetActivationAnimation(UAnimationAsset* NewActivateAnimation);
 	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	FGuid GetEquippedItemId() const;
+	virtual FGuid GetEquippedItemId_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	void SetEquippedItemId(const FGuid& NewEquippedItemId);
+	virtual void SetEquippedItemId_Implementation(const FGuid& NewEquippedItemId) = 0;
 	
 	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() = 0;
 };

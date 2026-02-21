@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -40,4 +40,32 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaEquipmentComponent : public UMo
 public:
 
 	UMounteaEquipmentComponent();
+	
+public:
+	
+	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) override;
+	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FInventoryItem& ItemDefinition) override;
+	virtual bool UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) override;
+	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
+	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
+	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const override;
+	
+protected:
+	
+	bool IsAuthority() const;
+	UFUNCTION(Server, Reliable)
+	void Server_EquipItem(const FInventoryItem& ItemDefinition);
+	UFUNCTION(Server, Reliable)
+	void Server_EquipItemToSlot(const FInventoryItem& ItemDefinition, const FName& SlotId);
+	UFUNCTION(Server, Reliable)
+	void Server_UnequipItem(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot);
+	
+public:
+	
+	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
+		meta=(FunctionReference, AllowFunctionLibraries, PrototypeFunction="/Script/MounteaAdvancedInventorySystem.MounteaEquipmentStatics.Prototype_EquipItem"),
+		meta=(DefaultBindingName="On Equip Item Requested"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=0))
+	FMemberReference OverrideEquipItemFunction;
 };

@@ -84,6 +84,8 @@ protected:
 	void RemoveItem_Server(const FGuid& ItemGuid);
 	UFUNCTION(Server, Reliable)
 	void ChangeItemQuantity_Server(const FGuid& ItemGuid, const int32 DeltaAmount);
+	UFUNCTION(Server, Reliable)
+	void ClearInventory_Server();
 
 	UFUNCTION(Client, Unreliable)
 	void ProcessInventoryNotification_Client(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta);
@@ -109,6 +111,24 @@ protected:
 	virtual FOnNotificationProcessed& GetOnNotificationProcessedEventHandle() override
 	{ return OnNotificationProcessed; };
 
+private:
+
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly,
+		ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=0))
+	FInventoryItemArray InventoryItems;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=1))
+	EInventoryType InventoryType;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=2))
+	EInventoryFlags InventoryTypeFlag;
+	
 protected:
 	
 	/**
@@ -140,19 +160,4 @@ protected:
 	*/
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnNotificationProcessed OnNotificationProcessed;
-
-private:
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess))
-	EInventoryType InventoryType;
-
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess))
-	EInventoryFlags InventoryTypeFlag;
-	
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly,
-		ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess))
-	FInventoryItemArray InventoryItems;
 };

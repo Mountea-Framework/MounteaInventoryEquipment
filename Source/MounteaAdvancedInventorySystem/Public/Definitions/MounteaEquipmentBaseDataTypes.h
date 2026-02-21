@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -85,7 +85,8 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=0))
 	FGameplayTagContainer TagContainer;
 
 	/**
@@ -94,7 +95,8 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
 	FGameplayTagContainer BlackedByTags;
 
 	/**
@@ -102,17 +104,35 @@ public:
 	 * Does not affect SlotId or runtime logic.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=2))
 	FText DisplayName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=3))
+	FGuid SlotId;
+
+	/**
+	 * Used for Equipment when unequip item is called.
+	 * If using fallback slot is allowed, the equipped item will be returned to fallback slot.
+	 * Example:
+	 * - Weapon is in hand
+	 * - unequip is called (from hand)
+	 * - weapon is returned to fallback slot (scabbard, back etc.)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(GetOptions="GetFallbackSlotOptions"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=4))
+	FName FallbackSlot;
 
 	/** Determines whether the slot is active and usable. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=5))
 	uint8 bIsEnabled : 1;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,
-		meta=(NoResetToDefault))
-	FGuid SlotId;
 };
 
 FORCEINLINE bool operator==(const FMounteaEquipmentSlotHeaderData& A, const FMounteaEquipmentSlotHeaderData& B)
