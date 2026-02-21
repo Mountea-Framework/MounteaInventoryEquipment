@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -113,6 +113,85 @@ protected:
 
 protected:
 	
+	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(DisplayPriority=3))
+	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
+	
+	FActionsQueue ActionsQueue;
+	
+	// Currently active category in UI.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory", 
+		meta=(DisplayPriority=0))
+	FString ActiveCategoryId;
+
+	// Currently active item in UI.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Mountea|Inventory", 
+		meta=(DisplayPriority=1))
+	FGuid ActiveItemGuid;
+
+	// Currently active item Widget.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory", 
+		meta=(DisplayPriority=2))
+	TObjectPtr<UWidget> ActiveItemWidget;
+
+private:
+	
+	/**
+	 * This container defines what states the Manager has.
+	 * Imagine this as a flag container, where each "major" widget adds its flag as long as it exists.
+	 * This container defines whether Wrapper is empty or not.
+	 */
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(Categories="Mountea_Inventory.WidgetState,State"),
+		meta=(DisplayPriority=8))
+	FGameplayTagContainer WidgetStatesContainer;
+	
+	/**
+	 * Represents the parent inventory interface.
+	 *
+	 * This variable serves as a reference to the parent inventory system, allowing interaction with the advanced inventory interface.
+	 * It enables communication between the inventory UI component and the parent inventory for functions such as handling item modifications,
+	 * notifications, and other inventory-related operations.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess), 
+		meta=(ExposeOnSpawn),
+		meta=(DisplayPriority=4))
+	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
+
+	/** 
+	 * Represents the Main Widget, which contains all sub-widgets.
+	 * The Wrapper should be the root of all UI elements.
+	 * In the Wrapper you should have:
+	 * - Inventory
+	 * - Equipment
+	 * - Crafting
+	 * - Minimap etc.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=5))
+	TObjectPtr<UUserWidget> WrapperWidget;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=6))
+	TObjectPtr<UUserWidget> InventoryWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=7))
+	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;	
+	
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=9))
+	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
+	
+protected:
+	
 	/**
 	 * Delegate that is broadcast when an inventory category is selected.
 	 *
@@ -132,73 +211,4 @@ protected:
 	 */
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryItemSelected OnItemSelected;
-
-protected:
-	
-	// Currently active category in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
-	FString ActiveCategoryId;
-
-	// Currently active item in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Mountea|Inventory")
-	FGuid ActiveItemGuid;
-
-	// Currently active item Widget.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
-	TObjectPtr<UWidget> ActiveItemWidget;
-	
-	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
-	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
-
-	FActionsQueue ActionsQueue;
-	
-private:
-	
-	/**
-	 * Represents the parent inventory interface.
-	 *
-	 * This variable serves as a reference to the parent inventory system, allowing interaction with the advanced inventory interface.
-	 * It enables communication between the inventory UI component and the parent inventory for functions such as handling item modifications,
-	 * notifications, and other inventory-related operations.
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess), 
-		meta=(ExposeOnSpawn))
-	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
-
-	/** 
-	 * Represents the Main Widget, which contains all sub-widgets.
-	 * The Wrapper should be the root of all UI elements.
-	 * In the Wrapper you should have:
-	 * - Inventory
-	 * - Equipment
-	 * - Crafting
-	 * - Minimap etc.
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess))
-	TObjectPtr<UUserWidget> WrapperWidget;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess))
-	TObjectPtr<UUserWidget> InventoryWidget;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess))
-	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
-
-	/**
-	 * This container defines what states the Manager has.
-	 * Imagine this as a flag container, where each "major" widget adds its flag as long as it exists.
-	 * This container defines whether Wrapper is empty or not.
-	 */
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess),
-		meta=(Categories="Mountea_Inventory.WidgetState,State"))
-	FGameplayTagContainer WidgetStatesContainer;
-	
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess))
-	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 };

@@ -90,9 +90,11 @@ bool UMounteaAdvancedAttachmentSlot::PerformAttachmentLogic(UObject* NewAttachme
 
 	if (!PerformPhysicalAttachment(NewAttachment, attachmentTarget))
 		return false;
-
-	ForceAttach(NewAttachment);
 	
+	LastAttachment = Attachment;
+	Attachment = NewAttachment;	
+	State = EAttachmentSlotState::EASS_Occupied;
+		
 	HandleAttachableInterface(NewAttachment);
 	return true;
 }
@@ -113,7 +115,10 @@ bool UMounteaAdvancedAttachmentSlot::Attach(UObject* NewAttachment)
 
 bool UMounteaAdvancedAttachmentSlot::ForceAttach(UObject* NewAttachment)
 {
-	return Super::ForceAttach(NewAttachment) ? PerformAttachmentLogic(NewAttachment) : false;
+	if (!IsValid(NewAttachment))
+		return false;
+
+	return PerformAttachmentLogic(NewAttachment);
 }
 
 TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface> UMounteaAdvancedAttachmentSlot::FindAttachableInterface(UObject* Object)
@@ -162,16 +167,10 @@ bool UMounteaAdvancedAttachmentSlot::PerformPhysicalAttachment(UObject* Object, 
 	const FName attachmentName = GetAttachmentSocketName();
 	
 	if (USceneComponent* sceneComp = Cast<USceneComponent>(Object))
-	{
-		sceneComp->AttachToComponent(Target, attachmentRules, attachmentName);
-		return true;
-	}
+		return sceneComp->AttachToComponent(Target, attachmentRules, attachmentName);
 	
 	if (AActor* actor = Cast<AActor>(Object))
-	{
-		actor->AttachToComponent(Target, attachmentRules, attachmentName);
-		return true;
-	}
+		return actor->AttachToComponent(Target, attachmentRules, attachmentName);
 	
 	LOG_WARNING(TEXT("Unsupported attachment object type: %s"), *Object->GetName());
 	return false;
@@ -216,10 +215,17 @@ void UMounteaAdvancedAttachmentSlot::OnRep_State()
 	{
 		case EAttachmentSlotState::EASS_Occupied:
 			if (Attachment)
-				ForceAttach(Attachment);
+			{
+				TryResolveAttachmentTarget();
+				if (USceneComponent* attachmentTarget = GetAttachmentTargetComponent())
+				{
+					if (ValidateAttachmentSlot(attachmentTarget))
+						PerformPhysicalAttachment(Attachment, attachmentTarget);
+				}
+			}
 			break;
 		case EAttachmentSlotState::EASS_Empty:
-			ForceDetach();
+			PerformDetachment();
 			break;
 	}
 	

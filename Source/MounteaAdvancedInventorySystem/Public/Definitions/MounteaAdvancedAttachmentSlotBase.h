@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -41,54 +41,57 @@ public:
 
 public:
 	
-	/** Unique identifier for this attachment slot */
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(GetOptions="GetAvailableSlotNames"),
-		meta=(DisplayPriority=-1),
-		meta=(NoResetToDefault))
-	FName SlotName;
-
 	/** Gameplay tags that define what can attach to this slot */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=0))
 	FGameplayTagContainer SlotTags;
 
 	/** Human-readable name for this slot displayed in UI */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
 	FText DisplayName;
-
-	/** Current state of the attachment slot (Empty, Occupied, Locked) */
-	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1),
-		meta=(NoResetToDefault))
-	EAttachmentSlotState State;
-	
-	/** Type of attachment this slot supports (Socket, Component) */
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
-		meta=(DisplayPriority=-1),
-		meta=(NoResetToDefault))
-	EAttachmentSlotType SlotType;
 
 	/** Reference to the container that owns this slot */
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
 		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=2))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
+	
+	/** Unique identifier for this attachment slot */
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(GetOptions="GetAvailableSlotNames"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=5))
+	FName SlotName;
 	
 	/** Local cache of last attachment for detachment operations */
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
 		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=3))
 	TObjectPtr<UObject> LastAttachment;
 	
 	/** Currently attached object (replicated to clients) */
 	UPROPERTY(SaveGame, Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Information",
 		meta=(DisplayThumbnail=false),
-		meta=(NoResetToDefault))
-	TObjectPtr<UObject> Attachment;
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=4))
+	TObjectPtr<UObject> Attachment;	
+
+	/** Current state of the attachment slot (Empty, Occupied, Locked) */
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=6))
+	EAttachmentSlotState State;
+	
+	/** Type of attachment this slot supports (Socket, Component) */
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=7))
+	EAttachmentSlotType SlotType;
 
 protected:
 	
@@ -123,11 +126,11 @@ public:
 	
 	FORCEINLINE virtual bool IsSlotValid() const
 	{
-		return ParentContainer.GetObject() != nullptr && !SlotName.IsNone() && !SlotTags.IsEmpty();
+		return ParentContainer.GetObject() != nullptr && (!SlotName.IsNone() || !SlotTags.IsEmpty());
 	}
 	FORCEINLINE virtual bool CanAttach() const
 	{
-		return IsSlotValid() && IsEmpty() && !IsLocked();
+		return IsSlotValid() && !IsLocked();
 	}
 	FORCEINLINE virtual bool CanDetach() const
 	{

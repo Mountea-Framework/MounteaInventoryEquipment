@@ -94,8 +94,7 @@ AActor* UMounteaAttachmentContainerComponent::GetOwningActor_Implementation() co
 	return UMounteaInventorySystemStatics::GetOwningActor(this);
 }
 
-void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_Implementation(
-	USceneComponent* NewTarget)
+void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_Implementation(USceneComponent* NewTarget)
 {
 	if (NewTarget != DefaultAttachmentTargetComponent)
 		DefaultAttachmentTargetComponent = NewTarget;
@@ -103,10 +102,12 @@ void UMounteaAttachmentContainerComponent::SetDefaultAttachmentTargetComponent_I
 
 bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FName& SlotId) const
 {
-	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
-		return Slot->SlotName == SlotId;
+	const auto foundSlot = AttachmentSlots.FindByPredicate([SlotId](const TObjectPtr<UMounteaAdvancedAttachmentSlot>& Slot)
+	{
+		return Slot && Slot->SlotName == SlotId;
 	});
-	return foundSlot && foundSlot->IsSlotValid();
+
+	return foundSlot && *foundSlot && (*foundSlot)->IsSlotValid();
 }
 
 UMounteaAdvancedAttachmentSlot* UMounteaAttachmentContainerComponent::GetSlot_Implementation(const FName& SlotId) const
@@ -142,7 +143,7 @@ bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName&
 
 	if (!GetOwner()->HasAuthority())
 	{
-		ServerTryAttach(SlotId, Attachment);
+		Server_TryAttach(SlotId, Attachment);
 		return true;
 	}
 
@@ -152,7 +153,7 @@ bool UMounteaAttachmentContainerComponent::TryAttach_Implementation(const FName&
 	return bSuccess;
 }
 
-void UMounteaAttachmentContainerComponent::ServerTryAttach_Implementation(const FName& SlotId, UObject* Attachment)
+void UMounteaAttachmentContainerComponent::Server_TryAttach_Implementation(const FName& SlotId, UObject* Attachment)
 {
 	Execute_TryAttach(this, SlotId, Attachment);
 }
@@ -178,14 +179,14 @@ bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName&
 
 	if (!GetOwner()->HasAuthority())
 	{
-		ServerTryDetach(SlotId);
+		Server_TryDetach(SlotId);
 		return true;
 	}
 
 	return foundSlot->Detach();
 }
 
-void UMounteaAttachmentContainerComponent::ServerTryDetach_Implementation(const FName& SlotId)
+void UMounteaAttachmentContainerComponent::Server_TryDetach_Implementation(const FName& SlotId)
 {
 	Execute_TryDetach(this, SlotId);
 }

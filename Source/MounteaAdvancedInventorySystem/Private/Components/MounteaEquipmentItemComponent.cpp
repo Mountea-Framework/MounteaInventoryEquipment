@@ -13,15 +13,22 @@
 #include "Components/MounteaEquipmentItemComponent.h"
 
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Net/UnrealNetwork.h"
+#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
+#include "Statics/MounteaEquipmentStatics.h"
 
 UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() : 
+	EquipmentItemState(EEquipmentItemState::EES_Idle),
 	bAutoActivates(1),
-	bRequiresActivationEvent(0),
-	EquipmentItemState(EEquipmentItemState::EES_Idle)
+	bRequiresActivationEvent(0)
 {
+	bAutoActivate = true;
+	
+	SetIsReplicatedByDefault(true);
+	SetActiveFlag(true);
 }
 
-// TODO: Handle server and client re
+// TODO: Handle server and client
 bool UMounteaEquipmentItemComponent::SetEquipmentItemState_Implementation(const EEquipmentItemState NewEquipmentItemState)
 {
 	if (NewEquipmentItemState != EquipmentItemState)
@@ -43,6 +50,11 @@ bool UMounteaEquipmentItemComponent::SetAutoActive_Implementation(const bool bVa
 	}
 	
 	return false;
+}
+
+bool UMounteaEquipmentItemComponent::DoesRequireActivationEvent_Implementation() const
+{
+	return bRequiresActivationEvent && ActivationAnimation.ToSoftObjectPath().IsValid();
 }
 
 bool UMounteaEquipmentItemComponent::SetRequiresActivationEvent_Implementation(const bool bValue)
@@ -70,4 +82,39 @@ bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnim
 		return true;
 	}
 	return false;
+}
+
+void UMounteaEquipmentItemComponent::SetEquippedItemId_Implementation(const FGuid& NewEquippedItemId)
+{
+	if (NewEquippedItemId != EquippedItemId)
+		EquippedItemId = NewEquippedItemId;
+}
+
+TArray<FName> UMounteaEquipmentItemComponent::GetAvailableSlots()
+{
+	const auto* equipmentConfig = UMounteaEquipmentStatics::GetEquipmentSettingsConfig();
+	if (!equipmentConfig)
+		return { NAME_None };
+
+	TArray<FName> returnValue{ NAME_None };
+	TArray<FName> slotKeys;
+	equipmentConfig->AllowedEquipmentSlots.GetKeys(slotKeys);
+
+	returnValue.Reserve(slotKeys.Num() + 1);
+	returnValue.Append(MoveTemp(slotKeys));
+
+	return returnValue;
+}
+
+void UMounteaEquipmentItemComponent::OnRep_EquipmentItemState()
+{
+	OnEquipmentItemStateChanged.Broadcast(this, EquipmentItemState);
+}
+
+void UMounteaEquipmentItemComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(UMounteaEquipmentItemComponent, EquipmentItemState);
+	DOREPLIFETIME(UMounteaEquipmentItemComponent, EquippedItemId);
 }

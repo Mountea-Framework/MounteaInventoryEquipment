@@ -448,15 +448,22 @@ bool UMounteaInventoryComponent::ModifyItemDurability_Implementation(const FGuid
 	return false;
 }
 
+void UMounteaInventoryComponent::ClearInventory_Server_Implementation()
+{
+	Execute_ClearInventory(this);
+}
+
 void UMounteaInventoryComponent::ClearInventory_Implementation()
 {
-	// TODO: Server call
 	if (!IsAuthority())
+	{
+		ClearInventory_Server();
 		return;
+	}
 	
 	for (const auto& Item : InventoryItems.Items)
 	{
-		  OnItemRemoved.Broadcast(Item);
+		OnItemRemoved.Broadcast(Item);
 	}
 	InventoryItems.Items.Empty();
 }
@@ -493,8 +500,7 @@ bool UMounteaInventoryComponent::IsAuthority() const
 	return false;
 }
 
-void UMounteaInventoryComponent::ChangeItemQuantity_Server_Implementation(const FGuid& ItemGuid,
-	const int32 DeltaAmount)
+void UMounteaInventoryComponent::ChangeItemQuantity_Server_Implementation(const FGuid& ItemGuid, const int32 DeltaAmount)
 {
 	if (DeltaAmount < 0)
 		Execute_DecreaseItemQuantity(this, ItemGuid, FMath::Abs(DeltaAmount));

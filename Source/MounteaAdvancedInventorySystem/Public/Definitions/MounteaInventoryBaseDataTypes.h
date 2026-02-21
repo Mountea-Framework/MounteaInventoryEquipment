@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -44,29 +44,29 @@ struct FInventoryRarity
 	/**
 	 * The name of the item rarity (e.g., Common, Rare, Epic).
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=0))
 	FText RarityDisplayName = LOCTEXT("InventoryRarity_DisplayName", "");
 
 	/**
 	 * The visual color associated with the rarity for UI purposes.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=1))
 	FLinearColor RarityColor;
 	
 	// Rarity priority used for Sorting.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=2))
 	int32 RarityPriority = 0;
 
 	/**
 	 * A multiplier applied to item trade or sale prices for this rarity.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=3))
 	float BasePriceMultiplier = 1.f;
 
 	/**
 	 * Tags that define additional metadata or rules for this rarity.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=4))
 	FGameplayTagContainer RarityTags;
 };
 
@@ -95,14 +95,8 @@ struct FInventoryCategoryData
 	/**
 	 * The name of the item category (e.g., Weapon, Armor, Consumable), localized.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", meta=(DisplayPriority=0))
 	FText CategoryDisplayName = LOCTEXT("InventoryCategory_DisplayName", "");
-
-	/**
-	 * Priority for sorting categories in UI or other contexts.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
-	int32 CategoryPriority = 0;
 
 	/**
 	 * Tags that define this Category.
@@ -113,29 +107,38 @@ struct FInventoryCategoryData
 	 * - Category
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
-		meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category"))
+		meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category"),
+		meta=(DisplayPriority=1))
 	FGameplayTagContainer CategoryTags;
 
 	/**
 	 * Icon used in the UI to represent this category.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", meta=(DisplayPriority=2))
 	TSoftObjectPtr<UTexture> DisplayIcon;
-	
-	/**
-	 * Optional bitmask for category-specific behaviors (e.g., Craftable, Equipable).
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", 
-		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags"))
-	uint8 CategoryFlags;
 
 	/**
 	 * Defines a list of allowed Actions.
 	 * Each Item of this category can perform those Actions. Some Actions are not allowed in User Interface!
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"))
-	TArray<TSoftClassPtr<UMounteaSelectableInventoryItemAction>> AllowedActions;	
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"),
+		meta=(DisplayPriority=3))
+	TArray<TSoftClassPtr<UMounteaSelectableInventoryItemAction>> AllowedActions;
+
+	/**
+	 * Priority for sorting categories in UI or other contexts.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", meta=(DisplayPriority=4))
+	int32 CategoryPriority = 0;
+	
+	/**
+	 * Optional bitmask for category-specific behaviors (e.g., Craftable, Equipable).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemFlags"),
+		meta=(DisplayPriority=5))
+	uint8 CategoryFlags;
 };
 
 /**
@@ -159,7 +162,8 @@ struct FInventoryCategory
 	 * for managing and representing inventory category.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, 
-		meta=(ShowOnlyInnerProperties))
+		meta=(ShowOnlyInnerProperties),
+		meta=(DisplayPriority=0))
 	FInventoryCategoryData CategoryData;
 		
 	/**
@@ -167,7 +171,8 @@ struct FInventoryCategory
 	 * Used for further categorization within a primary category, allowing more detailed item classification.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, 
-		meta=(ForceInlineRow, ShowOnlyInnerProperties))
+		meta=(ForceInlineRow, ShowOnlyInnerProperties),
+		meta=(DisplayPriority=1))
 	TMap<FString,FInventoryCategoryData> SubCategories;
 };
 
@@ -194,57 +199,66 @@ struct FInventoryTypeConfig
 	FInventoryTypeConfig();
 
 	/** The name of the inventory (e.g., Player, Merchant, Loot), localized */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="User Interface")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="User Interface", meta=(DisplayPriority=0))
 	FText InventoryDisplayName = LOCTEXT("InventoryType_DisplayName", "");
 
 	/** Widget class to use for this inventory type */
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="User Interface", 
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"))
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryWidgetInterface"),
+		meta=(DisplayPriority=1))
 	TSoftClassPtr<UUserWidget> WidgetClass;
-
-	/** Configuration flags for this inventory type */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", 
-		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryTypeFlags"))
-	uint8 ConfigFlags;
-
-	/** Access and behavior flags for this inventory */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", 
-		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryFlags"))
-	uint8 AccessFlags;
 
 	/** Range of allowed slots (X = Min, Y = Max) */
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
-		meta=(ClampMin=1))
+		meta=(ClampMin=1),
+		meta=(DisplayPriority=2))
 	FIntPoint SlotsRange = FIntPoint(10, 20);
 
 	/** Starting number of slots (must be within SlotsRange) */
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
-		meta=(ClampMin=1, UIMin=1))
+		meta=(ClampMin=1, UIMin=1),
+		meta=(DisplayPriority=3))
 	int32 StartingSlots = 10;
 	
 	/** Maximum weight this inventory can hold */
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
-		meta=(ClampMin=0.0, Units="kg"))
+		meta=(ClampMin=0.0, Units="kg"),
+		meta=(DisplayPriority=4))
 	float MaxWeight = 100.0f;
 
 	/** Thresholds for weight-based effects (in percentages) */
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
-		meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
+		meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"),
+		meta=(DisplayPriority=5))
 	FVector4 WeightThresholds = FVector4(0.3f, 0.5f, 0.7f, 0.9f);
 
 	/** Movement speed multipliers for each weight threshold */
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
-		meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"))
+		meta=(ClampMin=0.0, ClampMax=1.0, Units="Percent"),
+		meta=(DisplayPriority=6))
 	FVector4 WeightSpeedMultipliers = FVector4(1.0f, 0.8f, 0.6f, 0.4f);
 
 	/** Maximum total value this inventory can hold */
 	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Constrains", 
-		meta=(ClampMin=0.0))
+		meta=(ClampMin=0.0),
+		meta=(DisplayPriority=7))
 	float MaxValue = 1000.0f;
 
 	/** Tags defining special properties or restrictions for this inventory type */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Tags")
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Tags", meta=(DisplayPriority=8))
 	FGameplayTagContainer InventoryTags;
+
+	/** Configuration flags for this inventory type */
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryTypeFlags"),
+		meta=(DisplayPriority=9))
+	uint8 ConfigFlags;
+
+	/** Access and behavior flags for this inventory */
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Configuration", 
+		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryFlags"),
+		meta=(DisplayPriority=10))
+	uint8 AccessFlags;
 
 public:
 
@@ -307,7 +321,7 @@ struct FInventorySortCriteria
 public:
 	
 	// If more than 1 sorting criteria are provided, sorting will happen one after another based on priority.
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta=(DisplayPriority=0))
 	int32 SortPriority = 0;
 	
 	/* 
@@ -318,7 +332,7 @@ public:
 	 * * Weight
 	 * * Rarity
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayPriority=1))
 	FString SortingKey;
 	
 };

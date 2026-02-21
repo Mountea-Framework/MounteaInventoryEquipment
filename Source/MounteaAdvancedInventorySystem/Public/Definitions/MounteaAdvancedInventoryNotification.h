@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -90,10 +90,12 @@ struct FInventoryNotificationStyle
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Appearance")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Appearance", 
+		meta=(DisplayPriority=0))
 	FSlateBrush IconBrush;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio", 
+		meta=(DisplayPriority=1))
 	TSoftObjectPtr<USoundBase> NotificationSound;
 };
 
@@ -111,42 +113,56 @@ struct FInventoryNotificationConfig
 	GENERATED_BODY()
 
 	FInventoryNotificationConfig()
-		: bIsEnabled(true)
-		, NotificationCategory(EInventoryNotificationCategory::EINC_Info)
+		: NotificationCategory(EInventoryNotificationCategory::EINC_Info)
+		, bIsEnabled(true)
 		, bShowProgressBar(false)
 		, bCanBeClosed(true)
 		, bHasDuration(false)
 	{};
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-	uint8 bIsEnabled : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-	EInventoryNotificationCategory NotificationCategory;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(DisplayPriority=0))
 	FText MessageTitle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(DisplayPriority=1))
 	FText MessageTemplate;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta=(EditCondition="bHasDuration"))
-	uint8 bShowProgressBar : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-	uint8 bCanBeClosed : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
-	uint8 bHasDuration : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta=(UIMin=0.1,ClampMin=0.1), meta=(EditCondition="bHasDuration"))
-	float DefaultDuration = 3.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(DisplayPriority=2))
 	FLinearColor BackgroundColor = FLinearColor(0.1f, 0.1f, 0.1f, 0.9f);
 	
-	UPROPERTY(EditAnywhere, Category="Settings", meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"))
+	UPROPERTY(EditAnywhere, Category="Settings", 
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"),
+		meta=(DisplayPriority=3))
 	TSoftClassPtr<UUserWidget> NotificationWidgetClassOverride;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(UIMin=0.1,ClampMin=0.1), 
+		meta=(EditCondition="bHasDuration"),
+		meta=(DisplayPriority=4))
+	float DefaultDuration = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(DisplayPriority=5))
+	EInventoryNotificationCategory NotificationCategory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(DisplayPriority=6))
+	uint8 bIsEnabled : 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(EditCondition="bHasDuration"),
+		meta=(DisplayPriority=7))
+	uint8 bShowProgressBar : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(DisplayPriority=8))
+	uint8 bCanBeClosed : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", 
+		meta=(DisplayPriority=9))
+	uint8 bHasDuration : 1;
 };
 
 /**
@@ -177,50 +193,62 @@ struct FInventoryNotificationData
 		const FInventoryNotificationConfig& SourceConfig = FInventoryNotificationConfig(),
 		UObject* InPayload = nullptr
 		) : Type(InType)
-			, Category(InCategory)
 			, NotificationTitle(InTitle)
 			, NotificationText(InText)
-			, Duration(InDuration)
-			, ItemGuid(InItemGuid)
+			, NotificationTags()
 			, SourceInventory(InSourceInventory)
-			, DeltaAmount(InDeltaAmount)
 			, NotificationPayload(InPayload)
 			, NotificationConfig(SourceConfig)
+			, ItemGuid(InItemGuid)
+			, Duration(InDuration)
+			, DeltaAmount(InDeltaAmount)
+			, Category(InCategory)
 	{
 	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=0))
 	FString Type = TEXT("");
-	 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
-	EInventoryNotificationCategory Category = EInventoryNotificationCategory::EINC_Info;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=1))
 	FText NotificationTitle;
 	 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=2))
 	FText NotificationText;
-	 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
-	float Duration = 3.0f;
-	 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=3))
 	FGameplayTagContainer NotificationTags;
-	 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
-	FGuid ItemGuid;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=4))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> SourceInventory;
-	 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
-	int32 DeltaAmount = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=5))
 	TObjectPtr<UObject> NotificationPayload;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Notification")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=6))
 	FInventoryNotificationConfig NotificationConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=7))
+	FGuid ItemGuid;
+	 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=8))
+	float Duration = 3.0f;
+	 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=9))
+	int32 DeltaAmount = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Notification", 
+		meta=(DisplayPriority=10))
+	EInventoryNotificationCategory Category = EInventoryNotificationCategory::EINC_Info;
 
 public:
 	FString ToString() const;

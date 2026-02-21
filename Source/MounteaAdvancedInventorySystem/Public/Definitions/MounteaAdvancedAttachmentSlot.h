@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -45,19 +45,22 @@ public:
 	/** Override the default attachment target component by name */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableTargetNames"),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
 	FName AttachmentTargetOverride;
-
-	/** Resolved component reference for attachment target override */
-	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Settings")
-	TObjectPtr<USceneComponent> AttachmentTargetComponentOverride = nullptr;
 
 	/** Socket name to attach to when using socket-based attachment */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(GetOptions="GetAvailableSocketNames"),
 		meta=(NoResetToDefault),
-		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket", EditConditionHides))
+		meta=(EditCondition="SlotType==EAttachmentSlotType::EAST_Socket", EditConditionHides),
+		meta=(DisplayPriority=2))
 	FName SocketName;
+	
+	/** Resolved component reference for attachment target override */
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Settings", 
+		meta=(DisplayPriority=0))
+	TObjectPtr<USceneComponent> AttachmentTargetComponentOverride = nullptr;
 
 protected:
 	virtual void BeginPlay_Implementation() override;

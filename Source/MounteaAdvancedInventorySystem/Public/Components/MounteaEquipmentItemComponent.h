@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -46,21 +46,60 @@ public:
 	virtual bool DoesAutoActive_Implementation() const override
 	{ return bAutoActivates; };
 	virtual bool SetAutoActive_Implementation(const bool bValue) override;
-	virtual bool DoesRequireActivationEvent_Implementation() const override
-	{ return bRequiresActivationEvent; };
+	virtual bool DoesRequireActivationEvent_Implementation() const override;
 	virtual bool SetRequiresActivationEvent_Implementation(const bool bValue) override;
 	virtual UAnimationAsset* GetActivationAnimation_Implementation() const override;
 	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) override;
 	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() override
 	{ return OnEquipmentItemStateChanged; };
+	virtual FName GetEquipmentItemPreferredSlot_Implementation() const override
+	{ return PreferredSlot; };
+	virtual FGameplayTag GetEquipmentPreferredSlotTag_Implementation() const override
+	{ return PreferredSlotTag; };
+	virtual FGuid GetEquippedItemId_Implementation() const override
+	{ return EquippedItemId; };
+	virtual void SetEquippedItemId_Implementation(const FGuid& NewEquippedItemId) override;
 	
 protected:
 	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
+		meta=(AllowedClasses="/Script/Engine.AnimSequence,/Script/Engine.AnimMontage"),
+		meta=(DisplayPriority=0))
+	TSoftObjectPtr<UAnimationAsset> ActivationAnimation;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(GetOptions="GetAvailableSlots"),
+		meta=(DisplayPriority=2))
+	FName PreferredSlot = NAME_None;
+	
+	// Defined the Equipped Item Id from Inventory
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		Replicated, 
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=4))
+	FGuid EquippedItemId;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
+		meta=(DisplayPriority=3))
+	FGameplayTag PreferredSlotTag;
+	
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		ReplicatedUsing="OnRep_EquipmentItemState",
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
+	EEquipmentItemState EquipmentItemState;
+
 	// If Item does activate when equipped (eg: Rings), like those Items which require no animation to activate.
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=5))
 	uint8 bAutoActivates : 1;
-	
+
 	/**
 	 * Defines whether this Item requires an Event to be activated.
 	 * 
@@ -72,19 +111,10 @@ protected:
 	 */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault),
-		meta=(EditCondition="!bAutoActivates"))
+		meta=(EditCondition="!bAutoActivates"),
+		meta=(DisplayPriority=6))
 	uint8 bRequiresActivationEvent : 1;
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault),
-		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
-		meta=(AllowedClasses="/Script/Engine.AnimSequence,/Script/Engine.AnimMontage"))
-	TSoftObjectPtr<UAnimationAsset> ActivationAnimation;
-	
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault))
-	EEquipmentItemState EquipmentItemState;
-
 	/**
 	 * Even Triggered when Equipment Item changes.
 	 */
@@ -92,4 +122,16 @@ protected:
 		meta=(IsBindableEvent=true),
 		meta=(NoResetToDefault))
 	FOnEquipmentItemStateChanged OnEquipmentItemStateChanged;
+	
+public:
+	
+	UFUNCTION()
+	static TArray<FName> GetAvailableSlots();
+	
+protected:
+	
+	UFUNCTION()
+	void OnRep_EquipmentItemState();
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

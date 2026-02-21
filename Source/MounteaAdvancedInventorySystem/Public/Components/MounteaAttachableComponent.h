@@ -40,24 +40,29 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachableComponent : public UA
 public:
 	UMounteaAttachableComponent();
 
-public:
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea|Attachable", AdvancedDisplay,
-		meta=(DisplayThumbnail=false))
-	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> AttachedTo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
-	FName Id;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
-	FText DisplayName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
+public:	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=3))
 	FGameplayTagContainer Tags;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea|Attachable", AdvancedDisplay,
+		meta=(DisplayThumbnail=false),
+		meta=(DisplayPriority=0))
+	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> AttachedTo;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=2))
+	FText DisplayName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=1))
+	FName Id;	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=4))
 	EAttachmentState State;
-
+	
 	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
 	FOnAttachableAttached OnAttachableAttached;
 
