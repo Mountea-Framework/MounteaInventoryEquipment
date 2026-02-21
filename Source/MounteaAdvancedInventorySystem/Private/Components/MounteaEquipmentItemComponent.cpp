@@ -17,9 +17,9 @@
 #include "Statics/MounteaEquipmentStatics.h"
 
 UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() : 
+	EquipmentItemState(EEquipmentItemState::EES_Idle),
 	bAutoActivates(1),
-	bRequiresActivationEvent(0),
-	EquipmentItemState(EEquipmentItemState::EES_Idle)
+	bRequiresActivationEvent(0)
 {
 }
 

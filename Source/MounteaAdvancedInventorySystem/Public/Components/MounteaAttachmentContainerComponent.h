@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -92,11 +92,13 @@ public:
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
 		meta=(GetOptions="GetAvailableTargetNames"),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
 	FName DefaultAttachmentTarget;
 
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Mountea|Attachment Container",
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=2))
 	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
 	// Does not support runtime addition/removal of slots.
@@ -104,7 +106,8 @@ public:
 		Instanced,
 		meta=(TitleProperty="DisplayName"),
 		meta=(NoResetToDefault),
-		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView))
+		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView),
+		meta=(DisplayPriority=3))
 	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 
 	/**
@@ -112,7 +115,8 @@ public:
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=4))
 	FOnAttachmentChanged OnAttachmentChanged;
 
 	/**
@@ -120,7 +124,8 @@ public:
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=5))
 	FOnSlotStateChanged OnSlotStateChanged;
 
 	/**
@@ -128,7 +133,8 @@ public:
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=6))
 	FOnContainerCleared OnContainerCleared;
 
 protected:

@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -63,16 +63,51 @@ public:
 	
 protected:
 	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
+		meta=(AllowedClasses="/Script/Engine.AnimSequence,/Script/Engine.AnimMontage"),
+		meta=(DisplayPriority=5))
+	TSoftObjectPtr<UAnimationAsset> ActivationAnimation;
+	
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=4))
+	EEquipmentItemState EquipmentItemState;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(GetOptions="GetAvailableSlots"),
+		meta=(DisplayPriority=2))
+	FName PreferredSlot = NAME_None;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
+		meta=(DisplayPriority=3))
+	FGameplayTag PreferredSlotTag;
+
+	/**
+	 * Even Triggered when Equipment Item changes.
+	 */
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Equipment",
+		meta=(IsBindableEvent=true),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=8))
+	FOnEquipmentItemStateChanged OnEquipmentItemStateChanged;
+
 	// Defined the Equipped Item Id from Inventory
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
 	FGuid EquippedItemId;
-	
+
 	// If Item does activate when equipped (eg: Rings), like those Items which require no animation to activate.
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=6))
 	uint8 bAutoActivates : 1;
-	
+
 	/**
 	 * Defines whether this Item requires an Event to be activated.
 	 * 
@@ -84,36 +119,9 @@ protected:
 	 */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault),
-		meta=(EditCondition="!bAutoActivates"))
+		meta=(EditCondition="!bAutoActivates"),
+		meta=(DisplayPriority=7))
 	uint8 bRequiresActivationEvent : 1;
-	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault),
-		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
-		meta=(AllowedClasses="/Script/Engine.AnimSequence,/Script/Engine.AnimMontage"))
-	TSoftObjectPtr<UAnimationAsset> ActivationAnimation;
-	
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault))
-	EEquipmentItemState EquipmentItemState;
-	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault),
-		meta=(GetOptions="GetAvailableSlots"))
-	FName PreferredSlot = NAME_None;
-	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
-		meta=(NoResetToDefault),
-		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"))
-	FGameplayTag PreferredSlotTag;
-
-	/**
-	 * Even Triggered when Equipment Item changes.
-	 */
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Equipment",
-		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault))
-	FOnEquipmentItemStateChanged OnEquipmentItemStateChanged;
 	
 public:
 	

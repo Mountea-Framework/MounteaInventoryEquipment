@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -120,7 +120,8 @@ protected:
 	 * for Category selection in the inventory.
 	 * It broadcasts CategoryId.
 	 */
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory",
+		meta=(DisplayPriority=10))
 	FInventoryCategorySelected OnCategorySelected;
 
 	/**
@@ -130,25 +131,30 @@ protected:
 	 * for Item selection in the inventory.
 	 * It broadcasts ItemId.
 	 */
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory",
+		meta=(DisplayPriority=11))
 	FInventoryItemSelected OnItemSelected;
 
 protected:
 	
 	// Currently active category in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory",
+		meta=(DisplayPriority=7))
 	FString ActiveCategoryId;
 
 	// Currently active item in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Mountea|Inventory",
+		meta=(DisplayPriority=8))
 	FGuid ActiveItemGuid;
 
 	// Currently active item Widget.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory",
+		meta=(DisplayPriority=9))
 	TObjectPtr<UWidget> ActiveItemWidget;
 	
 	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory")
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
+		meta=(DisplayPriority=6))
 	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
 
 	FActionsQueue ActionsQueue;
@@ -164,7 +170,8 @@ private:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
 		meta=(AllowPrivateAccess), 
-		meta=(ExposeOnSpawn))
+		meta=(ExposeOnSpawn),
+		meta=(DisplayPriority=1))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 
 	/** 
@@ -177,15 +184,18 @@ private:
 	 * - Minimap etc.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess))
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=2))
 	TObjectPtr<UUserWidget> WrapperWidget;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess))
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=3))
 	TObjectPtr<UUserWidget> InventoryWidget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess))
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=4))
 	TObjectPtr<UUserWidget> InventoryNotificationContainerWidget;
 
 	/**
@@ -195,10 +205,12 @@ private:
 	 */
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
 		meta=(AllowPrivateAccess),
-		meta=(Categories="Mountea_Inventory.WidgetState,State"))
+		meta=(Categories="Mountea_Inventory.WidgetState,State"),
+		meta=(DisplayPriority=5))
 	FGameplayTagContainer WidgetStatesContainer;
 	
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess))
+		meta=(AllowPrivateAccess),
+		meta=(DisplayPriority=12))
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 };

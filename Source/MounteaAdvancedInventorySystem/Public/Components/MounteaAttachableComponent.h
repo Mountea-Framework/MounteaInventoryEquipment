@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -43,26 +43,33 @@ public:
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea|Attachable", AdvancedDisplay,
-		meta=(DisplayThumbnail=false))
+		meta=(DisplayThumbnail=false),
+		meta=(DisplayPriority=1))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> AttachedTo;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
+		meta=(DisplayPriority=2))
 	FName Id;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
+		meta=(DisplayPriority=3))
 	FText DisplayName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
+		meta=(DisplayPriority=4))
 	FGameplayTagContainer Tags;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable")
-	EAttachmentState State;
-
-	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable",
+		meta=(DisplayPriority=5))
 	FOnAttachableAttached OnAttachableAttached;
 
-	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable",
+		meta=(DisplayPriority=6))
 	FOnAttachableDetached OnAttachableDetached;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
+		meta=(DisplayPriority=7))
+	EAttachmentState State;
 
 public:
 	
