@@ -22,7 +22,6 @@
 #include "Engine/SCS_Node.h"
 #include "Engine/SimpleConstructionScript.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
@@ -50,6 +49,55 @@ namespace EquipmentStatics
 			return false;
 
 		return IMounteaAdvancedEquipmentInterface::Execute_UnequipItemFromSlot(Outer, TargetSlot->SlotName, true);
+	}
+
+	static UMounteaAdvancedAttachmentSlot* FindSlotWithEquippedItem(UObject* Outer, const FGuid& ItemGuid)
+	{
+		if (!IsValid(Outer) || !ItemGuid.IsValid())
+			return nullptr;
+		if (!Outer->Implements<UMounteaAdvancedAttachmentContainerInterface>())
+			return nullptr;
+
+		const TArray<UMounteaAdvancedAttachmentSlot*> slots = IMounteaAdvancedAttachmentContainerInterface::Execute_GetAttachmentSlots(Outer);
+		for (UMounteaAdvancedAttachmentSlot* slot : slots)
+		{
+			if (!IsValid(slot) || !slot->IsOccupied() || !IsValid(slot->Attachment))
+				continue;
+
+			const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipmentItemInterface = UMounteaEquipmentStatics::FindEquipmentItemInterface(slot->Attachment);
+			if (!equipmentItemInterface.GetObject())
+				continue;
+
+			if (IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(equipmentItemInterface.GetObject()) == ItemGuid)
+				return slot;
+		}
+
+		return nullptr;
+	}
+
+	static bool SwitchEquippedItemSlot(UObject* Outer, UMounteaAdvancedAttachmentSlot* CurrentSlot, UMounteaAdvancedAttachmentSlot* TargetSlot)
+	{
+		if (!IsValid(Outer) || !IsValid(CurrentSlot) || !IsValid(TargetSlot))
+			return false;
+
+		UObject* attachmentObject = CurrentSlot->Attachment;
+		if (!IsValid(attachmentObject))
+			return false;
+
+		if (!EnsureSlotIsReadyForEquip(Outer, TargetSlot))
+			return false;
+
+		if (!IMounteaAdvancedAttachmentContainerInterface::Execute_TryDetach(Outer, CurrentSlot->SlotName))
+			return false;
+
+		if (!IMounteaAdvancedAttachmentContainerInterface::Execute_TryAttach(Outer, TargetSlot->SlotName, attachmentObject))
+		{
+			// Re-attach to original slot if target attach fails
+			IMounteaAdvancedAttachmentContainerInterface::Execute_TryAttach(Outer, CurrentSlot->SlotName, attachmentObject);
+			return false;
+		}
+
+		return true;
 	}
 }
 
@@ -255,30 +303,42 @@ bool UMounteaEquipmentStatics::EquipItemGeneral(UObject* Outer, const FInventory
 	OutSpawnedActor = nullptr;
 
 	UMounteaAdvancedAttachmentSlot* preferredSlot = nullptr;
-	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, preferredSlot)) 
+	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, preferredSlot))
 		return false;
 
 	if (IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquipped(Outer, ItemDefinition))
-		return false;
-	
+	{
+		UMounteaAdvancedAttachmentSlot* currentSlot = EquipmentStatics::FindSlotWithEquippedItem(Outer, ItemDefinition.GetGuid());
+		if (!IsValid(currentSlot) || currentSlot == preferredSlot)
+			return false;
+
+		return EquipmentStatics::SwitchEquippedItemSlot(Outer, currentSlot, preferredSlot);
+	}
+
 	if (!EquipmentStatics::EnsureSlotIsReadyForEquip(Outer, preferredSlot))
 		return false;
-	
+
 	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, preferredSlot, OutSpawnedActor);
 }
 
-bool UMounteaEquipmentStatics::EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
+bool UMounteaEquipmentStatics::EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot,
 	AActor*& OutSpawnedActor)
-{	
-	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, TargetSlot)) 
+{
+	if (!ValidateEquipmentItemRequest(Outer, ItemDefinition, TargetSlot))
 		return false;
-	
+
 	if (IMounteaAdvancedEquipmentInterface::Execute_IsEquipmentItemEquipped(Outer, ItemDefinition))
-		return false;
-	
+	{
+		UMounteaAdvancedAttachmentSlot* currentSlot = EquipmentStatics::FindSlotWithEquippedItem(Outer, ItemDefinition.GetGuid());
+		if (!IsValid(currentSlot) || currentSlot == TargetSlot)
+			return false;
+
+		return EquipmentStatics::SwitchEquippedItemSlot(Outer, currentSlot, TargetSlot);
+	}
+
 	if (!EquipmentStatics::EnsureSlotIsReadyForEquip(Outer, TargetSlot))
 		return false;
-	
+
 	return CreateEquipmentItemAndAttach(Outer, ItemDefinition, TargetSlot, OutSpawnedActor);
 }
 
