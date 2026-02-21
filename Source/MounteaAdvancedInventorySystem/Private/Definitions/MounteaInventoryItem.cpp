@@ -48,7 +48,7 @@ bool FInventoryItemSnapshot::HasCustomDataChanged(const FInventoryItem& Current)
 	return CustomData != Current.GetCustomData();
 }
 
-FInventoryItem::FInventoryItem() : Guid(FGuid()),  Template(nullptr), Quantity(-1), Durability(-1.f), OwningInventory(nullptr)
+FInventoryItem::FInventoryItem() : Guid(FGuid()),  Template(nullptr), OwningInventory(nullptr), Quantity(-1), Durability(-1.f)
 {
 }
 

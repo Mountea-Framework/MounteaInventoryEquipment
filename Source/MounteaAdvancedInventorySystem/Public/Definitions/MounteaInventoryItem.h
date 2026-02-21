@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -276,40 +276,48 @@ public:
 public:
 	
 	/** A unique identifier for this specific instance of the inventory item */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", 
+		meta=(DisplayPriority=0))
 	FGuid Guid;
 
 	/** A reference to the static template defining the base properties of the item */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", 
+		meta=(DisplayPriority=1))
 	TObjectPtr<UMounteaInventoryItemTemplate> Template;
+	
+	/** Custom tags for item-specific metadata or state (e.g., `ItemState.Broken`) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", 
+		meta=(DisplayPriority=4))
+	FGameplayTagContainer CustomData;
+	
+	/** Inventory which currently owns this Item. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", 
+		meta=(DisplayPriority=6))
+	TScriptInterface<IMounteaAdvancedInventoryInterface> OwningInventory;
 
 	/**
 	 * The current quantity of this item (for stackable items)
 	 * Items which cannot stack are set to 1
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", 
+		meta=(DisplayPriority=2))
 	int32 Quantity = 1;
 
 	/** The current durability of the item, if applicable */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
-	float Durability = 1.f;
-
-	/** Custom tags for item-specific metadata or state (e.g., `ItemState.Broken`) */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FGameplayTagContainer CustomData;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", 
+		meta=(DisplayPriority=3))
+	float Durability = 1.f;	
 
 	// TODO: Replace TMap with hashed array of custom struct
 	/** Map of affector slots to their corresponding attached items. Items are stored as guids to avoid hard references */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", NotReplicated)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data", NotReplicated, 
+		meta=(DisplayPriority=5))
 	TMap<FGameplayTag,FGuid> AffectorSlots;
-
-	/** Inventory which currently owns this Item. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
-	TScriptInterface<IMounteaAdvancedInventoryInterface> OwningInventory;
 
 private:
 	/** Snapshot of the item state before replication changes */
-	UPROPERTY(NotReplicated, Transient)
+	UPROPERTY(NotReplicated, Transient, 
+		meta=(DisplayPriority=7))
 	mutable FInventoryItemSnapshot PreReplicationSnapshot;
     
 	/** Takes a snapshot of current state before replication */
@@ -346,7 +354,8 @@ struct FInventoryItemArray : public FFastArraySerializer
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", 
+		meta=(DisplayPriority=0))
 	TArray<FInventoryItem> Items;
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)

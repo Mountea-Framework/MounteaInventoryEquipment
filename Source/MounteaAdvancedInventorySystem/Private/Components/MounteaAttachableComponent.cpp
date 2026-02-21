@@ -15,8 +15,8 @@
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 
 UMounteaAttachableComponent::UMounteaAttachableComponent() : 
-	Id(NAME_None),
 	DisplayName(FText::GetEmpty()),
+	Id(NAME_None),
 	State(EAttachmentState::EAS_Detached)
 {
 	PrimaryComponentTick.bCanEverTick = true;

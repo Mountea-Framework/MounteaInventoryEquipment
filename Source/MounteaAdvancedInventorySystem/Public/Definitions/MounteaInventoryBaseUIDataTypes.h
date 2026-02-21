@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -48,35 +48,37 @@ struct FInventoryItemData
 public:
 
 	/**
-	 * Quantity of the item represented by this data.
-	 *
-	 * If the data represents an empty slot, this will typically be INDEX_NONE or 0,
-	 * depending on your stack logic. INDEX_NONE can be used to signify “no valid quantity”.
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Data")
-	int32 Quantity = INDEX_NONE;
-
-	/**
 	 * Inventory Item Data which is stored in this Widget.
 	 * 
 	 * This data is stored to simplify the search logic.
 	 * If this Item is invalid (IsItemValid() == false), the data is considered to
 	 * represent an empty slot.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Data", 
+		meta=(DisplayPriority=0))
 	FInventoryItem ContainingItem;
+
+	/**
+	 * Quantity of the item represented by this data.
+	 *
+	 * If the data represents an empty slot, this will typically be INDEX_NONE or 0,
+	 * depending on your stack logic. INDEX_NONE can be used to signify “no valid quantity”.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Data", 
+		meta=(DisplayPriority=1))
+	int32 Quantity = INDEX_NONE;
 
 public:
 
 	FInventoryItemData()
-		: Quantity(INDEX_NONE)
-		, ContainingItem(FInventoryItem())
+		: ContainingItem(FInventoryItem())
+		, Quantity(INDEX_NONE)
 	{
 	}
 
 	FInventoryItemData(const int32 InQuantity, const FInventoryItem& InContainingItem)
-		: Quantity(InQuantity)
-		, ContainingItem(InContainingItem)
+		: ContainingItem(InContainingItem)
+		, Quantity(InQuantity)
 	{
 	}
 
@@ -149,7 +151,8 @@ public:
 	virtual ~FInventorySlot() = default;
 	
 	// Unique Slot ID.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", 
+		meta=(DisplayPriority=0))
 	FGuid SlotGuid;
 
 	/**
@@ -159,7 +162,8 @@ public:
 	 * It may be null when the slot is not currently represented in the UI or
 	 * before initialization.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", 
+		meta=(DisplayPriority=1))
 	TObjectPtr<UUserWidget> ItemWidget;
 
 public:
@@ -234,7 +238,8 @@ public:
 	 * This property specifies the 2D position of the inventory slot, represented as an integer
 	 * point with X and Y coordinates. Typically used for inventory or grid-based UI layouts.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Primary Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Primary Data", 
+		meta=(DisplayPriority=0))
 	FIntPoint SlotPosition = FIntPoint::ZeroValue;
 
 public:
@@ -277,7 +282,8 @@ public:
 	/**
 	 * Collection of GUIDs used to store UI-specific identifiers.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI", 
+		meta=(DisplayPriority=0))
 	TArray<FGuid> StoredIds;
 };
 
@@ -286,19 +292,28 @@ struct FMounteaPreviewDirectionalLightSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bEnabled = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
-	float Intensity = 1.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(EditCondition="bEnabled"),
+		meta=(DisplayPriority=0))
 	FLinearColor LightColor = FLinearColor::White;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(EditCondition="bEnabled"),
+		meta=(DisplayPriority=1))
 	FRotator Rotation = FRotator(-40.0f, -67.5f, 0.0f);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(EditCondition="bEnabled"),
+		meta=(DisplayPriority=2))
+	float Intensity = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(DisplayPriority=3))
+	bool bEnabled = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(EditCondition="bEnabled"),
+		meta=(DisplayPriority=4))
 	bool bCastShadows = false;
 };
 
@@ -307,14 +322,19 @@ struct FMounteaPreviewSkyLightSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bEnabled = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(EditCondition="bEnabled"),
+		meta=(DisplayPriority=0))
+	TSoftObjectPtr<UTextureCube> Cubemap;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(EditCondition="bEnabled"),
+		meta=(DisplayPriority=1))
 	float Intensity = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
-	TSoftObjectPtr<UTextureCube> Cubemap;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(DisplayPriority=2))
+	bool bEnabled = true;
 };
 
 USTRUCT(BlueprintType)
@@ -322,11 +342,14 @@ struct FMounteaPreviewPostProcessSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bEnabled = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(EditCondition="bEnabled"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(EditCondition="bEnabled"),
+		meta=(DisplayPriority=0))
 	FPostProcessSettings PostProcessSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, 
+		meta=(DisplayPriority=1))
+	bool bEnabled = false;
 };
 
 /**
@@ -339,49 +362,61 @@ struct FMounteaPreviewCameraControlSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
-	bool bAllowRotation = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowRotation", UIMin="0.0", ClampMin="0.0", UIMax="180.0", ClampMax="180.0"),
+		meta=(DisplayPriority=0))
+	FVector3f RotationLimits = FVector3f(0.f, 180.f, 180.f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
-		meta=(EditCondition="bAllowRotation", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"))
+		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"),
+		meta=(DisplayPriority=1))
+	FVector2f ZoomLimits = FVector2f(1.f, 5.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance", 
+		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"),
+		meta=(DisplayPriority=2))
+	float IdleThreshold = 3.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(EditCondition="bAllowRotation", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"),
+		meta=(DisplayPriority=3))
 	float CameraRotationSensitivity = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
-		meta=(EditCondition="bAllowRotation", UIMin="0.0", ClampMin="0.0", UIMax="180.0", ClampMax="180.0"))
-	FVector3f RotationLimits = FVector3f(0.f, 180.f, 180.f);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
-	bool bAllowZoom = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
-		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="5.0", ClampMax="5.0"))
+		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="5.0", ClampMax="5.0"),
+		meta=(DisplayPriority=4))
 	float CameraZoomSensitivity = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
-		meta=(EditCondition="bAllowZoom", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"))
-	FVector2f ZoomLimits = FVector2f(1.f, 5.f);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls")
-	bool bAllowHeightAdjustment = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
-		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"))
+		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="10.0", ClampMax="10.0"),
+		meta=(DisplayPriority=5))
 	float CameraHeightSensitivity = 0.2f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
-		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"))
+		meta=(EditCondition="bAllowHeightAdjustment", UIMin="0.01", ClampMin="0.01", UIMax="100.0", ClampMax="100.0"),
+		meta=(DisplayPriority=6))
 	float HeightLimit = 100.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance", 
-		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"))
+		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"),
+		meta=(DisplayPriority=7))
 	float PreviewTickFrequency = 30.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance")
-	uint8 bAutoStartTick : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(DisplayPriority=8))
+	bool bAllowRotation = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(DisplayPriority=9))
+	bool bAllowZoom = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera Controls", 
+		meta=(DisplayPriority=10))
+	bool bAllowHeightAdjustment = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Performance", 
-		meta=(UIMin="0.0", ClampMin="0.0", UIMax="60.0", ClampMax="60.0"))
-	float IdleThreshold = 3.f;
+		meta=(DisplayPriority=11))
+	uint8 bAutoStartTick : 1;
 };
 
 /**
@@ -397,25 +432,30 @@ USTRUCT(BlueprintType)
 struct FMounteaWidgetInputPayload
 {
 	GENERATED_BODY()
-	
+
+	/** Two-dimensional input value (e.g. mouse delta, analog stick rotation). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=0))
+	FVector2D Vector2DValue = FVector2D::ZeroVector;
+
+	/** Scalar input value (e.g. mouse wheel delta, trigger axis, zoom amount). */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=1))
+	float FloatValue = 0.f;
+
 	/** Defines type of input to consume. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=2))
 	EMounteaWidgetInputMethod InputMethod = EMounteaWidgetInputMethod::Boolean;
 	
 	/** Defines type of input key to consume. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=3))
 	EMounteaWidgetInputKey InputKey;
 
-	/** Scalar input value (e.g. mouse wheel delta, trigger axis, zoom amount). */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
-	float FloatValue = 0.f;
-
-	/** Two-dimensional input value (e.g. mouse delta, analog stick rotation). */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
-	FVector2D Vector2DValue = FVector2D::ZeroVector;
-
 	/** Boolean input value (e.g. confirm, cancel, toggle). */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=4))
 	bool bBoolValue = false;
 };
 
@@ -433,11 +473,13 @@ struct FMounteaWidgetInputKeyChord
 
 public:
 	/** Primary key (e.g. I, Escape, Gamepad_FaceButton_Bottom). */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=0))
 	FKey Key;
 
 	/** Optional modifier key (e.g. LeftControl, RightShift). If invalid => no modifier required. */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=1))
 	FKey ModifierKey;
 };
 
@@ -453,20 +495,22 @@ struct FMounteaWidgetInputKeyTextureMapping
 	GENERATED_BODY()
 
 public:
-
-	/**
-	 * Input method this mapping applies to.
-	 * Determines when this icon should be used based on the currently active input type.
-	 */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
-	ECommonInputType InputType;
 	
 	/**
 	 * Icon texture used for the specified input method.
 	 * Stored as a soft reference to support deferred loading and reduce memory overhead.
 	 */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=1))
 	TSoftObjectPtr<UTexture2D> InputIcon;
+
+	/**
+	 * Input method this mapping applies to.
+	 * Determines when this icon should be used based on the currently active input type.
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=0))
+	ECommonInputType InputType;	
 };
 
 /**
@@ -483,6 +527,9 @@ USTRUCT(BlueprintType)
 struct FMounteaWidgetInputActionMapping
 {
 	GENERATED_BODY()
+	
+	FMounteaWidgetInputActionMapping() : bConsume(true)
+	{};
 
 	/** 
 	 * Gameplay tag identifying the UI action (e.g. UI.Inventory.Close, UI.Inventory.Confirm). 
@@ -490,15 +537,9 @@ struct FMounteaWidgetInputActionMapping
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
 		meta=(Categories="Input,Mountea_Inventory.Input"),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=0))
 	FGameplayTag ActionTag;
-
-	/**
-	 * Higher the value, higher is the priority of specified Input.
-	 * If you have input with more Keys, the Key with higher priority wins.
-	 */
-	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input")
-	int32 InputPriority = INDEX_NONE;
 
 	/**
 	 * Widget states in which this action must not trigger.
@@ -510,15 +551,25 @@ struct FMounteaWidgetInputActionMapping
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input", 
 		meta=(Categories="Mountea_Inventory.WidgetState.Modal,State"),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
 	FGameplayTagContainer BlacklistedWidgetStates;
 
 	/** Keys that can trigger this action (Esc, Enter, Gamepad_FaceButton_Right, etc.). */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Mountea|UI Input",
 		meta=(ShowOnlyInnerProperties),
 		meta=(TitleProperty="InputType"),
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=2))
 	TMap<FKey, FMounteaWidgetInputKeyTextureMapping> Keys;
+
+	/**
+	 * Higher the value, higher is the priority of specified Input.
+	 * If you have input with more Keys, the Key with higher priority wins.
+	 */
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input", 
+		meta=(DisplayPriority=3))
+	int32 InputPriority = INDEX_NONE;
 
 	// TODO: Holding 2 buttons at the same time for example
 	/** Key chords (key + optional modifiers) that can trigger this action. */
@@ -526,8 +577,9 @@ struct FMounteaWidgetInputActionMapping
 	//TArray<FMounteaWidgetInputKeyChord> Chords;
 
 	/** If true, the UI layer should consume the input when this mapping triggers. */
-	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input", AdvancedDisplay)
-	bool bConsume = true;
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|UI Input", AdvancedDisplay, 
+		meta=(DisplayPriority=4))
+	uint8 bConsume : 1;
 	
 	// TODO:
 	// - allow remapping
