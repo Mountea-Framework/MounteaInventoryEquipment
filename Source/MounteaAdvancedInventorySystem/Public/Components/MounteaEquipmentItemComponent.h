@@ -46,8 +46,7 @@ public:
 	virtual bool DoesAutoActive_Implementation() const override
 	{ return bAutoActivates; };
 	virtual bool SetAutoActive_Implementation(const bool bValue) override;
-	virtual bool DoesRequireActivationEvent_Implementation() const override
-	{ return bRequiresActivationEvent; };
+	virtual bool DoesRequireActivationEvent_Implementation() const override;
 	virtual bool SetRequiresActivationEvent_Implementation(const bool bValue) override;
 	virtual UAnimationAsset* GetActivationAnimation_Implementation() const override;
 	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) override;

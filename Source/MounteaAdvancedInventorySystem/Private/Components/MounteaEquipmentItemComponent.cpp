@@ -52,6 +52,11 @@ bool UMounteaEquipmentItemComponent::SetAutoActive_Implementation(const bool bVa
 	return false;
 }
 
+bool UMounteaEquipmentItemComponent::DoesRequireActivationEvent_Implementation() const
+{
+	return bRequiresActivationEvent && ActivationAnimation.ToSoftObjectPath().IsValid();
+}
+
 bool UMounteaEquipmentItemComponent::SetRequiresActivationEvent_Implementation(const bool bValue)
 {
 	if (bValue != bRequiresActivationEvent)
