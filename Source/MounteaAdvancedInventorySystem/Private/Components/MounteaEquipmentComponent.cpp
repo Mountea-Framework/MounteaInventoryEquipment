@@ -179,7 +179,7 @@ AActor* UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& 
 	return bResult ? spawnedActor : nullptr;
 }
 
-bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot)
+bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot)
 {
 	if (!ItemDefinition.IsItemValid())
 		return false;
@@ -209,7 +209,7 @@ bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem
 	return false;
 }
 
-bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot)
+bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName& SlotId, const bool bUseFallbackSlot)
 {
 	if (SlotId.IsNone())
 		return false;
@@ -256,7 +256,7 @@ bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FI
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition);
 }
 
-bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_ImplementationInSlot(const FInventoryItem& ItemDefinition, const FName& SlotName) const
+bool UMounteaEquipmentComponent::IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const
 {
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition, SlotName);
 }
