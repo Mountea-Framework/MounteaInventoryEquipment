@@ -64,6 +64,6 @@ public:
 		meta=(FunctionReference, AllowFunctionLibraries, PrototypeFunction="/Script/MounteaAdvancedInventorySystem.MounteaEquipmentStatics.Prototype_EquipItem"),
 		meta=(DefaultBindingName="On Equip Item Requested"),
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=1))
+		meta=(DisplayPriority=0))
 	FMemberReference OverrideEquipItemFunction;
 };

@@ -90,33 +90,12 @@ protected:
 	
 public:
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
-		meta=(GetOptions="GetAvailableTargetNames"),
-		meta=(NoResetToDefault),
-		meta=(DisplayPriority=1))
-	FName DefaultAttachmentTarget;
-
-	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Mountea|Attachment Container",
-		meta=(NoResetToDefault),
-		meta=(DisplayPriority=2))
-	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
-	
-	// Does not support runtime addition/removal of slots.
-	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
-		Instanced,
-		meta=(TitleProperty="DisplayName"),
-		meta=(NoResetToDefault),
-		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView),
-		meta=(DisplayPriority=3))
-	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
-
 	/**
 	 * Event triggered when an attachment is added or removed from the container.
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault),
-		meta=(DisplayPriority=4))
+		meta=(NoResetToDefault))
 	FOnAttachmentChanged OnAttachmentChanged;
 
 	/**
@@ -124,8 +103,7 @@ public:
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault),
-		meta=(DisplayPriority=5))
+		meta=(NoResetToDefault))
 	FOnSlotStateChanged OnSlotStateChanged;
 
 	/**
@@ -133,9 +111,28 @@ public:
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
-		meta=(NoResetToDefault),
-		meta=(DisplayPriority=6))
+		meta=(NoResetToDefault))
 	FOnContainerCleared OnContainerCleared;
+	
+	// Does not support runtime addition/removal of slots.
+	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
+		Instanced,
+		meta=(TitleProperty="DisplayName"),
+		meta=(NoResetToDefault),
+		meta=(ForceInlineRow, ShowInnerProperties, ShowTreeView),
+		meta=(DisplayPriority=2))
+	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
+		meta=(GetOptions="GetAvailableTargetNames"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=0))
+	FName DefaultAttachmentTarget;
+
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Mountea|Attachment Container",
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=1))
+	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 
 protected:
 

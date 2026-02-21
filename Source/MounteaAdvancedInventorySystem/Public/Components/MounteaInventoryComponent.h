@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -116,36 +116,31 @@ protected:
 	/**
 	* Called when item is added to inventory
 	*/
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events",
-		meta=(DisplayPriority=1))
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnItemAdded OnItemAdded;
 
 	/**
 	* Called when item is removed from inventory
 	*/
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events",
-		meta=(DisplayPriority=2))
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnItemRemoved OnItemRemoved;
 
 	/**
 	* Called when item quantity changes
 	*/
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events",
-		meta=(DisplayPriority=3))
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnItemQuantityChanged OnItemQuantityChanged;
 
 	/**
 	* Called when item durability changes
 	*/
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events",
-		meta=(DisplayPriority=4))
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnItemDurabilityChanged OnItemDurabilityChanged;
 
 	/**
 	* Called when inventory Notification is processed
 	*/
-	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events",
-		meta=(DisplayPriority=5))
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory & Equipment|Inventory|Events")
 	FOnNotificationProcessed OnNotificationProcessed;
 
 private:
@@ -153,16 +148,16 @@ private:
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly,
 		ReplicatedUsing=OnRep_InventoryItems, Category="Mountea|Inventory",
 		meta=(AllowPrivateAccess),
-		meta=(DisplayPriority=1))
+		meta=(DisplayPriority=0))
 	FInventoryItemArray InventoryItems;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
 		meta=(AllowPrivateAccess),
-		meta=(DisplayPriority=2))
+		meta=(DisplayPriority=1))
 	EInventoryType InventoryType;
 
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
 		meta=(AllowPrivateAccess),
-		meta=(DisplayPriority=3))
+		meta=(DisplayPriority=2))
 	EInventoryFlags InventoryTypeFlag;
 };

@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -40,35 +40,33 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachableComponent : public UA
 public:
 	UMounteaAttachableComponent();
 
-public:
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea|Attachable", AdvancedDisplay,
-		meta=(DisplayThumbnail=false),
-		meta=(DisplayPriority=1))
-	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> AttachedTo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
-		meta=(DisplayPriority=2))
-	FName Id;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
-		meta=(DisplayPriority=3))
-	FText DisplayName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
-		meta=(DisplayPriority=4))
-	FGameplayTagContainer Tags;
-
-	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable",
-		meta=(DisplayPriority=5))
+public:	
+	
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
 	FOnAttachableAttached OnAttachableAttached;
 
-	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable",
-		meta=(DisplayPriority=6))
+	UPROPERTY(BlueprintAssignable, BlueprintReadWrite, Category="Mountea|Attachable")
 	FOnAttachableDetached OnAttachableDetached;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=3))
+	FGameplayTagContainer Tags;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Mountea|Attachable", AdvancedDisplay,
+		meta=(DisplayThumbnail=false),
+		meta=(DisplayPriority=0))
+	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> AttachedTo;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=2))
+	FText DisplayName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=1))
+	FName Id;	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable",
-		meta=(DisplayPriority=7))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Mountea|Attachable", 
+		meta=(DisplayPriority=4))
 	EAttachmentState State;
 
 public:
