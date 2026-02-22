@@ -66,6 +66,9 @@ public:
 	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
 
 protected:
+
+	bool ExecuteEquipmentStateTransition(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
+		EEquipmentItemState NewState, bool bResolveAsActivation);
 	
 	bool IsAuthority() const;
 	UFUNCTION(Server, Reliable)
@@ -78,6 +81,8 @@ protected:
 	void Server_ActivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
 	UFUNCTION(Server, Reliable)
 	void Server_DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	UFUNCTION(Server, Reliable)
+	void Server_AnimAttachItem(const FGuid& ItemGuid, const FName& TargetSlotId, bool bIsActivating);
 
 	FPendingEquipmentActivation PendingActivation;
 
@@ -85,7 +90,13 @@ protected:
 	void OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 public:
-	
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Anim Attach Item")
+	bool AnimAttachItem();
+
 	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
 		meta=(FunctionReference, AllowFunctionLibraries, PrototypeFunction="/Script/MounteaAdvancedInventorySystem.MounteaEquipmentStatics.Prototype_EquipItem"),
 		meta=(DefaultBindingName="On Equip Item Requested"),
