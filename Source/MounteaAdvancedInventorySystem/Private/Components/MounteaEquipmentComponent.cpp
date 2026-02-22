@@ -250,89 +250,94 @@ bool UMounteaEquipmentComponent::IsEquipmentItemEquippedInSlot_Implementation(co
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition, SlotName);
 }
 
-bool UMounteaEquipmentComponent::ExecuteEquipmentStateTransition(const FGuid& ItemGuid, const FName& TargetSlotId,
+bool UMounteaEquipmentComponent::BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId,
 	const EEquipmentItemState ExpectedState, const EEquipmentItemState NewState, const bool bResolveAsActivation,
-	const bool bLocalOnly)
+	FEquipmentTransitionContext& OutContext)
 {
-	UMounteaAdvancedAttachmentSlot* currentSlot = nullptr;
+	OutContext = FEquipmentTransitionContext();
+	OutContext.ItemGuid = ItemGuid;
+	OutContext.ResolvedTargetSlotId = TargetSlotId;
+	OutContext.ExpectedState = ExpectedState;
+	OutContext.NewState = NewState;
+	OutContext.bResolveAsActivation = bResolveAsActivation;
+
+	UMounteaAdvancedAttachmentSlot* currentSlotRaw = nullptr;
 	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface;
-	if (!UMounteaEquipmentStatics::FindEquippedItemSlotAndInterface(this, ItemGuid, currentSlot, equipItemInterface))
+	if (!UMounteaEquipmentStatics::FindEquippedItemSlotAndInterface(this, ItemGuid, currentSlotRaw, equipItemInterface))
 		return false;
+
+	OutContext.CurrentSlot = currentSlotRaw;
+	OutContext.EquipItemInterface = equipItemInterface;
 
 	const EEquipmentItemState currentState = IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentItemState(equipItemInterface.GetObject());
 	if (currentState != ExpectedState)
 		return false;
 
-	FName resolvedTargetSlotId = TargetSlotId;
-	if (resolvedTargetSlotId.IsNone())
+	if (OutContext.ResolvedTargetSlotId.IsNone())
 	{
-		resolvedTargetSlotId = bResolveAsActivation
-			? UMounteaEquipmentStatics::ResolveActiveSlotId(currentSlot->SlotName)
-			: UMounteaEquipmentStatics::ResolveFallbackSlotId(currentSlot->SlotName);
+		OutContext.ResolvedTargetSlotId = bResolveAsActivation
+			? UMounteaEquipmentStatics::ResolveActiveSlotId(currentSlotRaw->SlotName)
+			: UMounteaEquipmentStatics::ResolveFallbackSlotId(currentSlotRaw->SlotName);
 	}
 
-	if (const bool bNeedsSlotSwitch = !resolvedTargetSlotId.IsNone() && resolvedTargetSlotId != currentSlot->SlotName)
+	OutContext.bNeedsSlotSwitch = !OutContext.ResolvedTargetSlotId.IsNone() &&
+		OutContext.ResolvedTargetSlotId != currentSlotRaw->SlotName;
+	if (OutContext.bNeedsSlotSwitch)
 	{
-		UMounteaAdvancedAttachmentSlot* targetSlot = Execute_GetSlot(this, resolvedTargetSlotId);
-		if (!IsValid(targetSlot))
+		OutContext.TargetSlot = Execute_GetSlot(this, OutContext.ResolvedTargetSlotId);
+		if (!IsValid(OutContext.TargetSlot))
+			return false;
+	}
+
+	return true;
+}
+
+bool UMounteaEquipmentComponent::ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, const bool bLocalOnly)
+{
+	if (!IsValid(Context.CurrentSlot) || !Context.EquipItemInterface.GetObject())
+		return false;
+
+	const EEquipmentItemState currentState = IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentItemState(Context.EquipItemInterface.GetObject());
+	if (currentState != Context.ExpectedState)
+		return false;
+
+	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface = Context.EquipItemInterface;
+	if (Context.bNeedsSlotSwitch)
+	{
+		if (!IsValid(Context.TargetSlot))
 			return false;
 
 		bool bSwitchSuccess = false;
 		if (bLocalOnly)
 		{
-			if (targetSlot->IsOccupied())
+			if (Context.TargetSlot->IsOccupied())
 				return false;
 
-			UObject* attachmentObject = currentSlot->Attachment;
-			if (!currentSlot->Detach())
+			UObject* attachmentObject = Context.CurrentSlot->Attachment;
+			if (!Context.CurrentSlot->Detach())
 				return false;
 
-			if (!targetSlot->Attach(attachmentObject))
+			if (!Context.TargetSlot->Attach(attachmentObject))
 			{
-				currentSlot->Attach(attachmentObject);
+				Context.CurrentSlot->Attach(attachmentObject);
 				return false;
 			}
 
 			bSwitchSuccess = true;
 		}
 		else
-			bSwitchSuccess = UMounteaEquipmentStatics::SwitchEquippedItemSlot(this, currentSlot, targetSlot);
+			bSwitchSuccess = UMounteaEquipmentStatics::SwitchEquippedItemSlot(this, Context.CurrentSlot, Context.TargetSlot);
 
 		if (!bSwitchSuccess)
 			return false;
 
-		equipItemInterface = UMounteaEquipmentStatics::FindEquipmentItemInterface(targetSlot->Attachment);
+		equipItemInterface = UMounteaEquipmentStatics::FindEquipmentItemInterface(Context.TargetSlot->Attachment);
 	}
 
 	if (!equipItemInterface.GetObject())
 		return false;
 
-	IMounteaAdvancedEquipmentItemInterface::Execute_SetEquipmentItemState(equipItemInterface.GetObject(), NewState);
-	return true;
-}
-
-bool UMounteaEquipmentComponent::ResolveEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId,
-	const EEquipmentItemState ExpectedState, const bool bResolveAsActivation, UMounteaAdvancedAttachmentSlot*& OutCurrentSlot,
-	TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& OutEquipItemInterface, FName& OutResolvedTargetSlotId)
-{
-	OutCurrentSlot = nullptr;
-	OutEquipItemInterface = TScriptInterface<IMounteaAdvancedEquipmentItemInterface>();
-	OutResolvedTargetSlotId = TargetSlotId;
-
-	if (!UMounteaEquipmentStatics::FindEquippedItemSlotAndInterface(this, ItemGuid, OutCurrentSlot, OutEquipItemInterface))
-		return false;
-
-	const EEquipmentItemState currentState = IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentItemState(OutEquipItemInterface.GetObject());
-	if (currentState != ExpectedState)
-		return false;
-
-	if (OutResolvedTargetSlotId.IsNone())
-	{
-		OutResolvedTargetSlotId = bResolveAsActivation
-			? UMounteaEquipmentStatics::ResolveActiveSlotId(OutCurrentSlot->SlotName)
-			: UMounteaEquipmentStatics::ResolveFallbackSlotId(OutCurrentSlot->SlotName);
-	}
-
+	IMounteaAdvancedEquipmentItemInterface::Execute_SetEquipmentItemState(equipItemInterface.GetObject(), Context.NewState);
 	return true;
 }
 
@@ -349,18 +354,18 @@ UAnimInstance* UMounteaEquipmentComponent::ResolveOwnerAnimInstance() const
 	return mesh->GetAnimInstance();
 }
 
-bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* CurrentSlot, 
-	const FName& ResolvedTargetSlotId, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& EquipItemInterface, const bool bIsActivating)
+bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+	const bool bIsActivating)
 {
-	if (!bIsActivating || !EquipItemInterface.GetObject())
+	if (!bIsActivating || !Context.EquipItemInterface.GetObject())
 		return false;
 
-	const bool bItemAutoActivates = IMounteaAdvancedEquipmentItemInterface::Execute_DoesAutoActive(EquipItemInterface.GetObject());
-	const bool bRequiresEvent = IMounteaAdvancedEquipmentItemInterface::Execute_DoesRequireActivationEvent(EquipItemInterface.GetObject());
+	const bool bItemAutoActivates = IMounteaAdvancedEquipmentItemInterface::Execute_DoesAutoActive(Context.EquipItemInterface.GetObject());
+	const bool bRequiresEvent = IMounteaAdvancedEquipmentItemInterface::Execute_DoesRequireActivationEvent(Context.EquipItemInterface.GetObject());
 	if (bItemAutoActivates || !bRequiresEvent)
 		return false;
 
-	UAnimMontage* montage = IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(EquipItemInterface.GetObject());
+	UAnimMontage* montage = IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(Context.EquipItemInterface.GetObject());
 	if (!IsValid(montage))
 		return false;
 
@@ -372,8 +377,8 @@ bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem&
 		return false;
 
 	PendingActivation.ItemGuid = ItemDefinition.GetGuid();
-	PendingActivation.SourceSlotId = IsValid(CurrentSlot) ? CurrentSlot->SlotName : NAME_None;
-	PendingActivation.TargetSlotId = ResolvedTargetSlotId;
+	PendingActivation.SourceSlotId = IsValid(Context.CurrentSlot) ? Context.CurrentSlot->SlotName : NAME_None;
+	PendingActivation.TargetSlotId = Context.ResolvedTargetSlotId;
 	PendingActivation.Montage = montage;
 	PendingActivation.bIsActivating = bIsActivating;
 
@@ -391,38 +396,29 @@ bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInv
 	if (PendingActivation.IsValid())
 		return false;
 
-	UMounteaAdvancedAttachmentSlot* currentSlot = nullptr;
-	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface;
-	FName resolvedTargetSlotId = TargetSlotId;
-	if (!ResolveEquipmentTransitionContext(
+	FEquipmentTransitionContext transitionContext;
+	if (!BuildEquipmentTransitionContext(
 		ItemDefinition.GetGuid(),
 		TargetSlotId,
 		EEquipmentItemState::EES_Equipped,
+		EEquipmentItemState::EES_Active,
 		true,
-		currentSlot,
-		equipItemInterface,
-		resolvedTargetSlotId))
+		transitionContext))
 	{
 		return false;
 	}
 
 	// Notify-driven flow: slot switch/state change happens in AnimAttachItem.
-	if (TryStartTransitionMontage(ItemDefinition, currentSlot, resolvedTargetSlotId, equipItemInterface, true))
+	if (TryStartTransitionMontage(ItemDefinition, transitionContext, true))
 		return true;
 
 	if (!IsAuthority())
 	{
-		Server_ActivateEquipmentItem(ItemDefinition, resolvedTargetSlotId);
+		Server_ActivateEquipmentItem(ItemDefinition, transitionContext.ResolvedTargetSlotId);
 		return true;
 	}
 
-	return ExecuteEquipmentStateTransition(
-		ItemDefinition.GetGuid(),
-		resolvedTargetSlotId,
-		EEquipmentItemState::EES_Equipped,
-		EEquipmentItemState::EES_Active,
-		true
-	);
+	return ExecuteEquipmentStateTransition(transitionContext);
 }
 
 bool UMounteaEquipmentComponent::DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
@@ -433,37 +429,28 @@ bool UMounteaEquipmentComponent::DeactivateEquipmentItem_Implementation(const FI
 	if (PendingActivation.IsValid())
 		return false;
 
-	UMounteaAdvancedAttachmentSlot* currentSlot = nullptr;
-	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface;
-	FName resolvedTargetSlotId = TargetSlotId;
-	if (!ResolveEquipmentTransitionContext(
+	FEquipmentTransitionContext transitionContext;
+	if (!BuildEquipmentTransitionContext(
 		ItemDefinition.GetGuid(),
 		TargetSlotId,
 		EEquipmentItemState::EES_Active,
+		EEquipmentItemState::EES_Equipped,
 		false,
-		currentSlot,
-		equipItemInterface,
-		resolvedTargetSlotId))
+		transitionContext))
 	{
 		return false;
 	}
 
-	if (TryStartTransitionMontage(ItemDefinition, currentSlot, resolvedTargetSlotId, equipItemInterface, false))
+	if (TryStartTransitionMontage(ItemDefinition, transitionContext, false))
 		return true;
 
 	if (!IsAuthority())
 	{
-		Server_DeactivateEquipmentItem(ItemDefinition, resolvedTargetSlotId);
+		Server_DeactivateEquipmentItem(ItemDefinition, transitionContext.ResolvedTargetSlotId);
 		return true;
 	}
 
-	return ExecuteEquipmentStateTransition(
-		ItemDefinition.GetGuid(),
-		resolvedTargetSlotId,
-		EEquipmentItemState::EES_Active,
-		EEquipmentItemState::EES_Equipped,
-		false
-	);
+	return ExecuteEquipmentStateTransition(transitionContext);
 }
 
 void UMounteaEquipmentComponent::Server_ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
@@ -478,13 +465,19 @@ void UMounteaEquipmentComponent::Server_DeactivateEquipmentItem_Implementation(c
 
 void UMounteaEquipmentComponent::Server_AnimAttachItem_Implementation(const FGuid& ItemGuid, const FName& TargetSlotId, const bool bIsActivating)
 {
-	ExecuteEquipmentStateTransition(
+	FEquipmentTransitionContext transitionContext;
+	if (!BuildEquipmentTransitionContext(
 		ItemGuid,
 		TargetSlotId,
 		bIsActivating ? EEquipmentItemState::EES_Equipped : EEquipmentItemState::EES_Active,
 		bIsActivating ? EEquipmentItemState::EES_Active : EEquipmentItemState::EES_Equipped,
-		bIsActivating
-	);
+		bIsActivating,
+		transitionContext))
+	{
+		return;
+	}
+
+	ExecuteEquipmentStateTransition(transitionContext);
 }
 
 bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
@@ -498,30 +491,41 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 	if (!IsAuthority())
 	{
 		// Client-side prediction prevents temporary world-space floating before server replication arrives.
-		ExecuteEquipmentStateTransition(
+		FEquipmentTransitionContext transitionContext;
+		if (BuildEquipmentTransitionContext(
 			pendingData.ItemGuid,
 			pendingData.TargetSlotId,
 			pendingData.bIsActivating ? EEquipmentItemState::EES_Equipped : EEquipmentItemState::EES_Active,
 			pendingData.bIsActivating ? EEquipmentItemState::EES_Active : EEquipmentItemState::EES_Equipped,
 			pendingData.bIsActivating,
-			true
-		);
+			transitionContext))
+		{
+			ExecuteEquipmentStateTransition(transitionContext, true);
+		}
 
 		Server_AnimAttachItem(pendingData.ItemGuid, pendingData.TargetSlotId, pendingData.bIsActivating);
 		return true;
 	}
 
-	return ExecuteEquipmentStateTransition(
+	FEquipmentTransitionContext transitionContext;
+	if (!BuildEquipmentTransitionContext(
 		pendingData.ItemGuid,
 		pendingData.TargetSlotId,
 		pendingData.bIsActivating ? EEquipmentItemState::EES_Equipped : EEquipmentItemState::EES_Active,
 		pendingData.bIsActivating ? EEquipmentItemState::EES_Active : EEquipmentItemState::EES_Equipped,
-		pendingData.bIsActivating
-	);
+		pendingData.bIsActivating,
+		transitionContext))
+	{
+		return false;
+	}
+
+	return ExecuteEquipmentStateTransition(transitionContext);
 }
 
 void UMounteaEquipmentComponent::OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
+	(void)Montage;
+	(void)bInterrupted;
 	PendingActivation.Reset();
 }
 

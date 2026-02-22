@@ -14,11 +14,14 @@
 #include "CoreMinimal.h"
 #include "MounteaAttachmentContainerComponent.h"
 #include "Components/ActorComponent.h"
+#include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
+#include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
 #include "MounteaEquipmentComponent.generated.h"
 
 class UAnimMontage;
 class UAnimInstance;
+class UMounteaAdvancedAttachmentSlot;
 class IMounteaAdvancedEquipmentItemInterface;
 
 struct FPendingEquipmentActivation
@@ -31,6 +34,19 @@ struct FPendingEquipmentActivation
 
 	bool IsValid() const { return ItemGuid.IsValid(); }
 	void Reset() { *this = FPendingEquipmentActivation(); }
+};
+
+struct FEquipmentTransitionContext
+{
+	FGuid ItemGuid;
+	FName ResolvedTargetSlotId = NAME_None;
+	UMounteaAdvancedAttachmentSlot* CurrentSlot = nullptr;
+	UMounteaAdvancedAttachmentSlot* TargetSlot = nullptr;
+	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> EquipItemInterface;
+	EEquipmentItemState ExpectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState NewState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	bool bNeedsSlotSwitch = false;
 };
 
 /**
@@ -70,15 +86,11 @@ public:
 
 protected:
 
-	bool ExecuteEquipmentStateTransition(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
-		EEquipmentItemState NewState, bool bResolveAsActivation, bool bLocalOnly = false);
-	bool ResolveEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
-		bool bResolveAsActivation, UMounteaAdvancedAttachmentSlot*& OutCurrentSlot,
-		TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& OutEquipItemInterface, FName& OutResolvedTargetSlotId);
+	bool BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
+		EEquipmentItemState NewState, bool bResolveAsActivation, FEquipmentTransitionContext& OutContext);
+	bool ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, bool bLocalOnly = false);
 	UAnimInstance* ResolveOwnerAnimInstance() const;
-	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* CurrentSlot,
-		const FName& ResolvedTargetSlotId, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& EquipItemInterface,
-		bool bIsActivating);
+	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context, bool bIsActivating);
 	
 	bool IsAuthority() const;
 	UFUNCTION(Server, Reliable)
