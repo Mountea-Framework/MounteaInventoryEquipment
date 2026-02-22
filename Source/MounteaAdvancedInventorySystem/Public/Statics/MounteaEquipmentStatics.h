@@ -189,7 +189,7 @@ public:
 	 * @return - True if the item was successfully equipped to the slot, otherwise false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Equip Item to Slot")
@@ -218,7 +218,7 @@ public:
 	 * @return  True if the item is equipped in the specified slot on the target, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Validate"),
+		meta=(CustomTag="MounteaK2Validate,MounteaK2EquipmentSlot"),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Is Item Equipped In Slot")
 	static bool IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& SlotName);
@@ -248,7 +248,7 @@ public:
 	 * @return  True if activation was initiated, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Activate Equipment Item")
@@ -264,7 +264,7 @@ public:
 	 * @return  True if deactivation was initiated, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Deactivate Equipment Item")
