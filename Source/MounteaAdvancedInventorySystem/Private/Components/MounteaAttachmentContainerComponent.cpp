@@ -112,15 +112,18 @@ bool UMounteaAttachmentContainerComponent::IsValidSlot_Implementation(const FNam
 
 UMounteaAdvancedAttachmentSlot* UMounteaAttachmentContainerComponent::GetSlot_Implementation(const FName& SlotId) const
 {
-	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
-		return Slot->SlotName == SlotId;
+	const auto foundSlot = AttachmentSlots.FindByPredicate([SlotId](const TObjectPtr<UMounteaAdvancedAttachmentSlot>& Slot)
+	{
+		return Slot && Slot->SlotName == SlotId;
 	});
-	return foundSlot ? foundSlot : nullptr;
+
+	return foundSlot ? foundSlot->Get() : nullptr;
 }
 
 bool UMounteaAttachmentContainerComponent::IsSlotOccupied_Implementation(const FName& SlotId) const
 {
-	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+	const auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) 
+	{
 		return Slot->SlotName == SlotId;
 	});
 	return foundSlot && foundSlot->IsOccupied();
@@ -128,7 +131,8 @@ bool UMounteaAttachmentContainerComponent::IsSlotOccupied_Implementation(const F
 
 bool UMounteaAttachmentContainerComponent::DisableSlot_Implementation(const FName& SlotId)
 {
-	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) 
+	{
 		return Slot->SlotName == SlotId;
 	});
 	if (!foundSlot)
@@ -162,7 +166,8 @@ bool UMounteaAttachmentContainerComponent::TryAttachInternal(const FName& SlotId
 {
 	if (!Attachment) return false;
 
-	auto foundSlot = AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+	auto foundSlot = AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot)
+	{
 		return Slot && Slot->SlotName == SlotId;
 	});
     
@@ -171,7 +176,8 @@ bool UMounteaAttachmentContainerComponent::TryAttachInternal(const FName& SlotId
 
 bool UMounteaAttachmentContainerComponent::TryDetach_Implementation(const FName& SlotId)
 {
-	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot)
+	{
 		return Slot->SlotName == SlotId;
 	});
 	if (!foundSlot)
@@ -196,7 +202,8 @@ bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FNam
 	if (!Attachment)
 		return false;
 
-	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot)
+	{
 		return Slot->SlotName == SlotId;
 	});
 	if (!foundSlot)
@@ -209,7 +216,8 @@ bool UMounteaAttachmentContainerComponent::ForceAttach_Implementation(const FNam
 
 bool UMounteaAttachmentContainerComponent::ForceDetach_Implementation(const FName& SlotId)
 {
-	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot) {
+	auto foundSlot = *AttachmentSlots.FindByPredicate([SlotId](const UMounteaAdvancedAttachmentSlot* Slot)
+	{
 		return Slot->SlotName == SlotId;
 	});
 	if (!foundSlot)

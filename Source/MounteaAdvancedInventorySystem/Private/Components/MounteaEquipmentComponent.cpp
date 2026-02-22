@@ -12,42 +12,18 @@
 
 #include "Components/MounteaEquipmentComponent.h"
 
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 #include "Components/ActorComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
+#include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "GameFramework/Actor.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
-#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaEquipmentStatics.h"
-
-namespace EquipmentComponentStatics
-{
-	static FName ResolveFallbackSlotId(const FName& CurrentSlotId)
-	{
-		const UMounteaAdvancedEquipmentSettingsConfig* settingsConfig = UMounteaEquipmentStatics::GetEquipmentSettingsConfig();
-		if (!settingsConfig)
-			return NAME_None;
-
-		const FMounteaEquipmentSlotHeaderData* slotData = settingsConfig->AllowedEquipmentSlots.Find(CurrentSlotId);
-		if (!slotData)
-			return NAME_None;
-
-		return slotData->FallbackSlot;
-	}
-
-	static AActor* ResolveAttachmentActor(UObject* AttachmentObject)
-	{
-		if (AActor* attachmentActor = Cast<AActor>(AttachmentObject))
-			return attachmentActor;
-
-		if (const UActorComponent* attachmentComponent = Cast<UActorComponent>(AttachmentObject))
-			return attachmentComponent->GetOwner();
-
-		return nullptr;
-	}
-}
 
 UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 {
@@ -59,8 +35,7 @@ void UMounteaEquipmentComponent::Server_EquipItem_Implementation(const FInventor
 	Execute_EquipItem(this, ItemDefinition);
 }
 
-void UMounteaEquipmentComponent::Server_EquipItemToSlot_Implementation(const FInventoryItem& ItemDefinition,
-	const FName& SlotId)
+void UMounteaEquipmentComponent::Server_EquipItemToSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotId)
 {
 	Execute_EquipItemToSlot(this, SlotId, ItemDefinition);
 }
@@ -230,7 +205,7 @@ bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName&
 
 	if (bUseFallbackSlot)
 	{
-		const FName fallbackSlotId = EquipmentComponentStatics::ResolveFallbackSlotId(SlotId);
+		const FName fallbackSlotId = UMounteaEquipmentStatics::ResolveFallbackSlotId(SlotId);
 		const bool bCanUseFallback = !fallbackSlotId.IsNone() &&
 			fallbackSlotId != SlotId &&
 			Execute_IsValidSlot(this, fallbackSlotId) &&
@@ -243,14 +218,21 @@ bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName&
 				return false;
 
 			if (Execute_TryAttach(this, fallbackSlotId, attachmentObject))
+			{
+				// Reset equipment state to Equipped when moving to fallback (e.g. Active → Equipped)
+				const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface = UMounteaEquipmentStatics::FindEquipmentItemInterface(attachmentObject);
+				if (equipItemInterface.GetObject())
+					IMounteaAdvancedEquipmentItemInterface::Execute_SetEquipmentItemState(equipItemInterface.GetObject(), EEquipmentItemState::EES_Equipped);
+
 				return true;
+			}
 		}
 	}
 
 	if (!Execute_TryDetach(this, SlotId))
 		return false;
 
-	AActor* detachedAttachmentActor = EquipmentComponentStatics::ResolveAttachmentActor(attachmentObject);
+	AActor* detachedAttachmentActor = UMounteaEquipmentStatics::ResolveAttachmentActor(attachmentObject);
 	if (IsValid(detachedAttachmentActor) && detachedAttachmentActor != GetOwner())
 		detachedAttachmentActor->Destroy();
 
@@ -265,6 +247,151 @@ bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FI
 bool UMounteaEquipmentComponent::IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const
 {
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition, SlotName);
+}
+
+bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+{
+	if (!ItemDefinition.IsItemValid())
+		return false;
+
+	if (PendingActivation.IsValid())
+		return false;
+
+	// Find the slot where this item currently lives
+	UMounteaAdvancedAttachmentSlot* currentSlot = nullptr;
+	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface;
+	if (!UMounteaEquipmentStatics::FindEquippedItemSlotAndInterface(this, ItemDefinition.GetGuid(), currentSlot, equipItemInterface))
+		return false;
+
+	const EEquipmentItemState currentState = IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentItemState(equipItemInterface.GetObject());
+	if (currentState != EEquipmentItemState::EES_Equipped)
+		return false;
+
+	// Resolve target slot: explicit param > reverse fallback lookup (find which slot uses current as its fallback)
+	FName resolvedTargetSlotId = TargetSlotId;
+	if (resolvedTargetSlotId.IsNone())
+		resolvedTargetSlotId = UMounteaEquipmentStatics::ResolveActiveSlotId(currentSlot->SlotName);
+
+	const bool bNeedsSlotSwitch = !resolvedTargetSlotId.IsNone() && resolvedTargetSlotId != currentSlot->SlotName;
+
+	// Play cosmetic montage if applicable (on any machine — client, server, or standalone)
+	const bool bItemAutoActivates = IMounteaAdvancedEquipmentItemInterface::Execute_DoesAutoActive(equipItemInterface.GetObject());
+	const bool bRequiresEvent = IMounteaAdvancedEquipmentItemInterface::Execute_DoesRequireActivationEvent(equipItemInterface.GetObject());
+
+	if (!bItemAutoActivates && bRequiresEvent)
+	{
+		UAnimMontage* montage = IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(equipItemInterface.GetObject());
+		if (IsValid(montage))
+		{
+			if (const AActor* owner = GetOwner())
+			{
+				if (USkeletalMeshComponent* mesh = owner->FindComponentByClass<USkeletalMeshComponent>())
+				{
+					if (UAnimInstance* animInstance = mesh->GetAnimInstance())
+					{
+						const float duration = animInstance->Montage_Play(montage);
+						if (duration > 0.f)
+						{
+							PendingActivation.ItemGuid = ItemDefinition.GetGuid();
+							PendingActivation.SourceSlotId = currentSlot->SlotName;
+							PendingActivation.TargetSlotId = resolvedTargetSlotId;
+							PendingActivation.Montage = montage;
+							PendingActivation.bIsActivating = true;
+
+							FOnMontageEnded endDelegate;
+							endDelegate.BindUObject(this, &UMounteaEquipmentComponent::OnActivationMontageEnded);
+							animInstance->Montage_SetEndDelegate(endDelegate, montage);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (!IsAuthority())
+	{
+		Server_ActivateEquipmentItem(ItemDefinition, resolvedTargetSlotId);
+		return true;
+	}
+
+	// Server/standalone: slot switch (if needed) + state change
+	if (bNeedsSlotSwitch)
+	{
+		UMounteaAdvancedAttachmentSlot* targetSlot = Execute_GetSlot(this, resolvedTargetSlotId);
+		if (!IsValid(targetSlot) || !UMounteaEquipmentStatics::SwitchEquippedItemSlot(this, currentSlot, targetSlot))
+			return false;
+
+		// Re-resolve interface after re-attachment
+		equipItemInterface = UMounteaEquipmentStatics::FindEquipmentItemInterface(targetSlot->Attachment);
+	}
+
+	if (equipItemInterface.GetObject())
+		IMounteaAdvancedEquipmentItemInterface::Execute_SetEquipmentItemState(equipItemInterface.GetObject(), EEquipmentItemState::EES_Active);
+
+	return true;
+}
+
+bool UMounteaEquipmentComponent::DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+{
+	if (!ItemDefinition.IsItemValid())
+		return false;
+
+	if (PendingActivation.IsValid())
+		return false;
+
+	// Find the slot where this item currently lives
+	UMounteaAdvancedAttachmentSlot* currentSlot = nullptr;
+	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface;
+	if (!UMounteaEquipmentStatics::FindEquippedItemSlotAndInterface(this, ItemDefinition.GetGuid(), currentSlot, equipItemInterface))
+		return false;
+
+	const EEquipmentItemState currentState = IMounteaAdvancedEquipmentItemInterface::Execute_GetEquipmentItemState(equipItemInterface.GetObject());
+	if (currentState != EEquipmentItemState::EES_Active)
+		return false;
+
+	// Resolve target slot: explicit param > fallback lookup from current slot
+	FName resolvedTargetSlotId = TargetSlotId;
+	if (resolvedTargetSlotId.IsNone())
+		resolvedTargetSlotId = UMounteaEquipmentStatics::ResolveFallbackSlotId(currentSlot->SlotName);
+
+	const bool bNeedsSlotSwitch = !resolvedTargetSlotId.IsNone() && resolvedTargetSlotId != currentSlot->SlotName;
+
+	if (!IsAuthority())
+	{
+		Server_DeactivateEquipmentItem(ItemDefinition, resolvedTargetSlotId);
+		return true;
+	}
+
+	// Server/standalone: slot switch (if needed) + state change
+	if (bNeedsSlotSwitch)
+	{
+		UMounteaAdvancedAttachmentSlot* targetSlot = Execute_GetSlot(this, resolvedTargetSlotId);
+		if (!IsValid(targetSlot) || !UMounteaEquipmentStatics::SwitchEquippedItemSlot(this, currentSlot, targetSlot))
+			return false;
+
+		// Re-resolve interface after re-attachment
+		equipItemInterface = UMounteaEquipmentStatics::FindEquipmentItemInterface(targetSlot->Attachment);
+	}
+
+	if (equipItemInterface.GetObject())
+		IMounteaAdvancedEquipmentItemInterface::Execute_SetEquipmentItemState(equipItemInterface.GetObject(), EEquipmentItemState::EES_Equipped);
+
+	return true;
+}
+
+void UMounteaEquipmentComponent::Server_ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+{
+	Execute_ActivateEquipmentItem(this, ItemDefinition, TargetSlotId);
+}
+
+void UMounteaEquipmentComponent::Server_DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+{
+	Execute_DeactivateEquipmentItem(this, ItemDefinition, TargetSlotId);
+}
+
+void UMounteaEquipmentComponent::OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	PendingActivation.Reset();
 }
 
 bool UMounteaEquipmentComponent::IsAuthority() const

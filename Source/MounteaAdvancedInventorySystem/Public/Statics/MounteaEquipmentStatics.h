@@ -100,6 +100,65 @@ public:
 	
 	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition, const FName SlotName = NAME_None);
 
+	/**
+	 * Resolves the fallback slot for the given slot from equipment settings.
+	 * E.g., "RightHand" → "Back" (where item goes when deactivated).
+	 *
+	 * @param CurrentSlotId  The slot to look up the fallback for.
+	 * @return  The fallback slot name, or NAME_None if not found.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Resolve Fallback Slot Id")
+	static FName ResolveFallbackSlotId(const FName& CurrentSlotId);
+
+	/**
+	 * Resolves the active slot for the given storage slot via reverse fallback lookup.
+	 * Finds which slot uses the given slot as its fallback.
+	 * E.g., "Back" → "RightHand" (if RightHand's fallback is Back).
+	 *
+	 * @param StorageSlotId  The storage slot to reverse-lookup.
+	 * @return  The active slot name, or NAME_None if not found.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Resolve Active Slot Id")
+	static FName ResolveActiveSlotId(const FName& StorageSlotId);
+
+	/**
+	 * Finds the attachment slot where a specific equipped item lives.
+	 *
+	 * @param Outer  The equipment container to search.
+	 * @param ItemGuid  The GUID of the item to find.
+	 * @return  The slot containing the item, or nullptr if not found.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find Slot With Equipped Item")
+	static UMounteaAdvancedAttachmentSlot* FindSlotWithEquippedItem(UObject* Outer, const FGuid& ItemGuid);
+
+	/**
+	 * Switches an equipped item from one slot to another, handling occupant cleanup.
+	 *
+	 * @param Outer  The equipment container owning the slots.
+	 * @param CurrentSlot  The slot the item is currently in.
+	 * @param TargetSlot  The slot to move the item to.
+	 * @return  True if the switch was successful.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Switch Equipped Item Slot")
+	static bool SwitchEquippedItemSlot(UObject* Outer, UMounteaAdvancedAttachmentSlot* CurrentSlot, UMounteaAdvancedAttachmentSlot* TargetSlot);
+
+	static bool FindEquippedItemSlotAndInterface(UObject* Outer, const FGuid& ItemGuid,
+		UMounteaAdvancedAttachmentSlot*& OutSlot,
+		TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& OutInterface);
+
+	static bool EnsureSlotIsReadyForEquip(UObject* Outer, const UMounteaAdvancedAttachmentSlot* TargetSlot);
+
+	static AActor* ResolveAttachmentActor(UObject* AttachmentObject);
+
 #pragma endregion
 	
 #pragma region Equipment
@@ -175,7 +234,39 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unequip Item")
 	static bool UnequipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = true);
-	
+
+	/**
+	 * Activates the specified equipped item, transitioning it from Equipped to Active state.
+	 * May play an activation animation if configured on the item.
+	 *
+	 * @param Target  The target implementing the equipment interface.
+	 * @param ItemDefinition  The item to activate.
+	 * @param TargetSlotId  Optional target slot to activate into. If None, resolved automatically.
+	 * @return  True if activation was initiated, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(AutoCreateRefTerm="TargetSlotId"),
+		DisplayName="Activate Equipment Item")
+	static bool ActivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+
+	/**
+	 * Deactivates the specified active item, transitioning it from Active to Equipped state.
+	 * Moves the item back to its fallback/storage slot.
+	 *
+	 * @param Target  The target implementing the equipment interface.
+	 * @param ItemDefinition  The item to deactivate.
+	 * @param TargetSlotId  Optional target slot to deactivate into. If None, resolved automatically via fallback.
+	 * @return  True if deactivation was initiated, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(AutoCreateRefTerm="TargetSlotId"),
+		DisplayName="Deactivate Equipment Item")
+	static bool DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+
 #pragma endregion 
 
 #if WITH_EDITOR

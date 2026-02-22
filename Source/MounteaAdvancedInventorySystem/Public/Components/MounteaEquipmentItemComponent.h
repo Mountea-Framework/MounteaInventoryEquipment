@@ -48,8 +48,10 @@ public:
 	virtual bool SetAutoActive_Implementation(const bool bValue) override;
 	virtual bool DoesRequireActivationEvent_Implementation() const override;
 	virtual bool SetRequiresActivationEvent_Implementation(const bool bValue) override;
-	virtual UAnimationAsset* GetActivationAnimation_Implementation() const override;
-	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) override;
+	virtual UAnimMontage* GetActivationAnimation_Implementation() const override;
+	virtual bool SetActivationAnimation_Implementation(UAnimMontage* NewActivateAnimation) override;
+	virtual bool ShouldReplicateActivationAnimation_Implementation() const override
+	{ return bReplicateActivationAnimation; };
 	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() override
 	{ return OnEquipmentItemStateChanged; };
 	virtual FName GetEquipmentItemPreferredSlot_Implementation() const override
@@ -65,9 +67,8 @@ protected:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault),
 		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
-		meta=(AllowedClasses="/Script/Engine.AnimSequence,/Script/Engine.AnimMontage"),
 		meta=(DisplayPriority=0))
-	TSoftObjectPtr<UAnimationAsset> ActivationAnimation;
+	TSoftObjectPtr<UAnimMontage> ActivationAnimation;
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault),
@@ -114,7 +115,19 @@ protected:
 		meta=(EditCondition="!bAutoActivates"),
 		meta=(DisplayPriority=6))
 	uint8 bRequiresActivationEvent : 1;
-	
+
+	/**
+	 * If true, activation animation will be multicast to other clients.
+	 * Reserved for future use (v2).
+	 *
+	 * Editable only if Auto Activates is FALSE and Requires Activation Event is TRUE.
+	 */
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
+		meta=(DisplayPriority=7))
+	uint8 bReplicateActivationAnimation : 1;
+
 	/**
 	 * Even Triggered when Equipment Item changes.
 	 */

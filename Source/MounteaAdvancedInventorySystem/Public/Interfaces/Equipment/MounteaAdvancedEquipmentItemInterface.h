@@ -15,6 +15,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedEquipmentItemInterface.generated.h"
 
+class UAnimMontage;
 enum class EEquipmentItemState : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentItemStateChanged, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>&, EquipmentItem, const EEquipmentItemState, NewState);
@@ -64,13 +65,17 @@ public:
 	virtual bool SetRequiresActivationEvent_Implementation(const bool bValue) = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
-	UAnimationAsset* GetActivationAnimation() const;
-	virtual UAnimationAsset* GetActivationAnimation_Implementation() const = 0;
-	
+	UAnimMontage* GetActivationAnimation() const;
+	virtual UAnimMontage* GetActivationAnimation_Implementation() const = 0;
+
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
-	bool SetActivationAnimation(UAnimationAsset* NewActivateAnimation);
-	virtual bool SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation) = 0;
-	
+	bool SetActivationAnimation(UAnimMontage* NewActivateAnimation);
+	virtual bool SetActivationAnimation_Implementation(UAnimMontage* NewActivateAnimation) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool ShouldReplicateActivationAnimation() const;
+	virtual bool ShouldReplicateActivationAnimation_Implementation() const = 0;
+
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
 	FGuid GetEquippedItemId() const;
 	virtual FGuid GetEquippedItemId_Implementation() const = 0;

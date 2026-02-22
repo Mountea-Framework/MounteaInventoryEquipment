@@ -17,10 +17,11 @@
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Statics/MounteaEquipmentStatics.h"
 
-UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() : 
+UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() :
 	EquipmentItemState(EEquipmentItemState::EES_Idle),
 	bAutoActivates(1),
-	bRequiresActivationEvent(0)
+	bRequiresActivationEvent(0),
+	bReplicateActivationAnimation(0)
 {
 	bAutoActivate = true;
 	
@@ -67,14 +68,14 @@ bool UMounteaEquipmentItemComponent::SetRequiresActivationEvent_Implementation(c
 	return false;
 }
 
-UAnimationAsset* UMounteaEquipmentItemComponent::GetActivationAnimation_Implementation() const
+UAnimMontage* UMounteaEquipmentItemComponent::GetActivationAnimation_Implementation() const
 {
 	if (ActivationAnimation.ToSoftObjectPath().IsValid())
-		return Cast<UAnimationAsset>(ActivationAnimation.LoadSynchronous());
+		return ActivationAnimation.LoadSynchronous();
 	return nullptr;
 }
 
-bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation)
+bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnimMontage* NewActivateAnimation)
 {
 	if (ActivationAnimation != NewActivateAnimation)
 	{

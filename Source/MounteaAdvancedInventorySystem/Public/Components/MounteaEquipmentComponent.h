@@ -17,6 +17,19 @@
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
 #include "MounteaEquipmentComponent.generated.h"
 
+class UAnimMontage;
+
+struct FPendingEquipmentActivation
+{
+	FGuid ItemGuid;
+	FName SourceSlotId;
+	FName TargetSlotId;
+	TWeakObjectPtr<UAnimMontage> Montage;
+	bool bIsActivating = true;
+
+	bool IsValid() const { return ItemGuid.IsValid(); }
+	void Reset() { *this = FPendingEquipmentActivation(); }
+};
 
 /**
  * UMounteaEquipmentComponent extends attachment containers with specialized equipment functionality.
@@ -49,7 +62,9 @@ public:
 	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
 	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
 	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const override;
-	
+	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+
 protected:
 	
 	bool IsAuthority() const;
@@ -59,7 +74,16 @@ protected:
 	void Server_EquipItemToSlot(const FInventoryItem& ItemDefinition, const FName& SlotId);
 	UFUNCTION(Server, Reliable)
 	void Server_UnequipItem(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot);
-	
+	UFUNCTION(Server, Reliable)
+	void Server_ActivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	UFUNCTION(Server, Reliable)
+	void Server_DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+
+	FPendingEquipmentActivation PendingActivation;
+
+	UFUNCTION()
+	void OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 public:
 	
 	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
