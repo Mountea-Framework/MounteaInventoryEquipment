@@ -18,6 +18,8 @@
 #include "MounteaEquipmentComponent.generated.h"
 
 class UAnimMontage;
+class UAnimInstance;
+class IMounteaAdvancedEquipmentItemInterface;
 
 struct FPendingEquipmentActivation
 {
@@ -64,11 +66,19 @@ public:
 	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const override;
 	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
 	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+	virtual bool AnimAttachItem_Implementation() override;
 
 protected:
 
 	bool ExecuteEquipmentStateTransition(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
-		EEquipmentItemState NewState, bool bResolveAsActivation);
+		EEquipmentItemState NewState, bool bResolveAsActivation, bool bLocalOnly = false);
+	bool ResolveEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
+		bool bResolveAsActivation, UMounteaAdvancedAttachmentSlot*& OutCurrentSlot,
+		TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& OutEquipItemInterface, FName& OutResolvedTargetSlotId);
+	UAnimInstance* ResolveOwnerAnimInstance() const;
+	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* CurrentSlot,
+		const FName& ResolvedTargetSlotId, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& EquipItemInterface,
+		bool bIsActivating);
 	
 	bool IsAuthority() const;
 	UFUNCTION(Server, Reliable)
@@ -90,12 +100,6 @@ protected:
 	void OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 public:
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Anim Attach Item")
-	bool AnimAttachItem();
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
 		meta=(FunctionReference, AllowFunctionLibraries, PrototypeFunction="/Script/MounteaAdvancedInventorySystem.MounteaEquipmentStatics.Prototype_EquipItem"),

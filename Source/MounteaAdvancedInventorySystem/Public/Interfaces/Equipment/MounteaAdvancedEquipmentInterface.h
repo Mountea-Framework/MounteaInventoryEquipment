@@ -77,5 +77,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
 	bool DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
 	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool AnimAttachItem();
+	virtual bool AnimAttachItem_Implementation() = 0;
 };
 

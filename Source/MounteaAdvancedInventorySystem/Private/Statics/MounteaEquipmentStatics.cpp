@@ -527,3 +527,10 @@ bool UMounteaEquipmentStatics::DeactivateEquipmentItem(const TScriptInterface<IM
 		return false;
 	return IMounteaAdvancedEquipmentInterface::Execute_DeactivateEquipmentItem(Target.GetObject(), ItemDefinition, TargetSlotId);
 }
+
+bool UMounteaEquipmentStatics::AnimAttachItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target)
+{
+	if (!Target.GetObject())
+		return false;
+	return IMounteaAdvancedEquipmentInterface::Execute_AnimAttachItem(Target.GetObject());
+}

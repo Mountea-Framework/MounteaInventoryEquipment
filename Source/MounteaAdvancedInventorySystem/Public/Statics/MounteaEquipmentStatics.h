@@ -267,6 +267,12 @@ public:
 		DisplayName="Deactivate Equipment Item")
 	static bool DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
 
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Anim Attach Item")
+	static bool AnimAttachItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target);
+
 #pragma endregion 
 
 #if WITH_EDITOR
