@@ -31,6 +31,7 @@ struct FPendingEquipmentActivation
 	FName TargetSlotId = NAME_None;
 	TWeakObjectPtr<UAnimMontage> Montage;
 	bool bIsActivating = true;
+	double RequestedAtTimeSeconds = -1.0;
 
 	bool IsValid() const { return ItemGuid.IsValid(); }
 	void Reset() { *this = FPendingEquipmentActivation(); }

@@ -342,6 +342,54 @@ bool UMounteaEquipmentComponent::ExecuteEquipmentStateTransition(const FEquipmen
 	return true;
 }
 
+bool UMounteaEquipmentComponent::ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, const bool bIsActivating) const
+{
+	if (!bIsActivating || !Context.EquipItemInterface.GetObject())
+		return false;
+
+	const bool bItemAutoActivates = IMounteaAdvancedEquipmentItemInterface::Execute_DoesAutoActive(Context.EquipItemInterface.GetObject());
+	const bool bRequiresEvent = IMounteaAdvancedEquipmentItemInterface::Execute_DoesRequireActivationEvent(Context.EquipItemInterface.GetObject());
+	return !bItemAutoActivates && bRequiresEvent;
+}
+
+void UMounteaEquipmentComponent::ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+	const bool bIsActivating, UAnimMontage* Montage)
+{
+	PendingActivation.ItemGuid = ItemDefinition.GetGuid();
+	PendingActivation.SourceSlotId = IsValid(Context.CurrentSlot) ? Context.CurrentSlot->SlotName : NAME_None;
+	PendingActivation.TargetSlotId = Context.ResolvedTargetSlotId;
+	PendingActivation.Montage = Montage;
+	PendingActivation.bIsActivating = bIsActivating;
+	PendingActivation.RequestedAtTimeSeconds = GetOwner() && GetOwner()->GetWorld()
+		? GetOwner()->GetWorld()->GetTimeSeconds()
+		: -1.0;
+}
+
+bool UMounteaEquipmentComponent::IsPendingActivationExpired() const
+{
+	if (!PendingActivation.IsValid())
+		return false;
+
+	if (PendingActivationTimeoutSeconds <= 0.f)
+		return false;
+
+	if (PendingActivation.RequestedAtTimeSeconds < 0.0)
+		return false;
+
+	const AActor* owningActor = GetOwner();
+	if (!owningActor || !owningActor->GetWorld())
+		return false;
+
+	const double elapsed = owningActor->GetWorld()->GetTimeSeconds() - PendingActivation.RequestedAtTimeSeconds;
+	return elapsed >= PendingActivationTimeoutSeconds;
+}
+
+void UMounteaEquipmentComponent::ResetPendingActivationIfExpired()
+{
+	if (IsPendingActivationExpired())
+		PendingActivation.Reset();
+}
+
 UAnimInstance* UMounteaEquipmentComponent::ResolveOwnerAnimInstance() const
 {
 	const AActor* owner = GetOwner();
@@ -360,11 +408,6 @@ bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem&
 	if (!bIsActivating || !Context.EquipItemInterface.GetObject())
 		return false;
 
-	const bool bItemAutoActivates = IMounteaAdvancedEquipmentItemInterface::Execute_DoesAutoActive(Context.EquipItemInterface.GetObject());
-	const bool bRequiresEvent = IMounteaAdvancedEquipmentItemInterface::Execute_DoesRequireActivationEvent(Context.EquipItemInterface.GetObject());
-	if (bItemAutoActivates || !bRequiresEvent)
-		return false;
-
 	UAnimMontage* montage = IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(Context.EquipItemInterface.GetObject());
 	if (!IsValid(montage))
 		return false;
@@ -376,11 +419,7 @@ bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem&
 	if (const float duration = animInstance->Montage_Play(montage); duration <= 0.f)
 		return false;
 
-	PendingActivation.ItemGuid = ItemDefinition.GetGuid();
-	PendingActivation.SourceSlotId = IsValid(Context.CurrentSlot) ? Context.CurrentSlot->SlotName : NAME_None;
-	PendingActivation.TargetSlotId = Context.ResolvedTargetSlotId;
-	PendingActivation.Montage = montage;
-	PendingActivation.bIsActivating = bIsActivating;
+	ArmPendingActivation(ItemDefinition, Context, bIsActivating, montage);
 
 	FOnMontageEnded endDelegate;
 	endDelegate.BindUObject(this, &UMounteaEquipmentComponent::OnActivationMontageEnded);
@@ -390,6 +429,8 @@ bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem&
 
 bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
 {
+	ResetPendingActivationIfExpired();
+
 	if (!ItemDefinition.IsItemValid())
 		return false;
 
@@ -408,9 +449,25 @@ bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInv
 		return false;
 	}
 
-	// Notify-driven flow: slot switch/state change happens in AnimAttachItem.
-	if (TryStartTransitionMontage(ItemDefinition, transitionContext, true))
-		return true;
+	if (ShouldUseDeferredTransition(transitionContext, true))
+	{
+		// Montage-driven flow: transition is committed by AnimAttachItem notify callback.
+		if (TryStartTransitionMontage(ItemDefinition, transitionContext, true))
+			return true;
+
+		UAnimMontage* activationMontage = nullptr;
+		if (transitionContext.EquipItemInterface.GetObject())
+			activationMontage = IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(transitionContext.EquipItemInterface.GetObject());
+
+		// Procedural flow: no montage configured, so external animation system is expected to call AnimAttachItem manually.
+		if (!IsValid(activationMontage))
+		{
+			ArmPendingActivation(ItemDefinition, transitionContext, true);
+			return true;
+		}
+
+		LOG_WARNING(TEXT("[Activate Equipment Item]: Failed to play activation montage. Falling back to immediate transition."))
+	}
 
 	if (!IsAuthority())
 	{
@@ -423,6 +480,8 @@ bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInv
 
 bool UMounteaEquipmentComponent::DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
 {
+	ResetPendingActivationIfExpired();
+
 	if (!ItemDefinition.IsItemValid())
 		return false;
 
@@ -482,6 +541,8 @@ void UMounteaEquipmentComponent::Server_AnimAttachItem_Implementation(const FGui
 
 bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 {
+	ResetPendingActivationIfExpired();
+
 	if (!PendingActivation.IsValid())
 		return false;
 
@@ -524,6 +585,12 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 
 bool UMounteaEquipmentComponent::TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const
 {
+	if (IsPendingActivationExpired())
+	{
+		OutPendingActivation = FPendingEquipmentActivation();
+		return false;
+	}
+
 	OutPendingActivation = PendingActivation;
 	return OutPendingActivation.IsValid();
 }

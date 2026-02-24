@@ -64,6 +64,10 @@ protected:
 	bool BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
 		EEquipmentItemState NewState, bool bResolveAsActivation, FEquipmentTransitionContext& OutContext);
 	bool ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, bool bLocalOnly = false);
+	bool ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, bool bIsActivating) const;
+	void ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context, bool bIsActivating, UAnimMontage* Montage = nullptr);
+	bool IsPendingActivationExpired() const;
+	void ResetPendingActivationIfExpired();
 	UAnimInstance* ResolveOwnerAnimInstance() const;
 	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context, bool bIsActivating);
 	
@@ -85,6 +89,12 @@ protected:
 
 	UFUNCTION()
 	void OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
+		meta=(ClampMin="0.0", UIMin="0.0", ForceUnits="s"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=20))
+	float PendingActivationTimeoutSeconds = 1.f;
 
 public:
 
