@@ -30,9 +30,15 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryAnimNotify_Equ
 	
 public:
 
-	virtual bool Received_Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
-		const FAnimNotifyEventReference& EventReference) const override;
-	
+	UMounteaAdvancedInventoryAnimNotify_EquipItem();
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
+	virtual void BranchingPointNotify(FBranchingPointNotifyPayload& BranchingPointPayload) override;
+
+protected:
+
+	void ExecuteEquipAttach(USkeletalMeshComponent* MeshComp) const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Configuration")
 	uint8 bIsEquipAction : 1;
 };

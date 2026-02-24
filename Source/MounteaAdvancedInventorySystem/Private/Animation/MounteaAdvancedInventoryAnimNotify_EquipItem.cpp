@@ -16,16 +16,27 @@
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
 #include "Statics/MounteaEquipmentStatics.h"
 
-bool UMounteaAdvancedInventoryAnimNotify_EquipItem::Received_Notify(
-	USkeletalMeshComponent* MeshComp,
-	UAnimSequenceBase* Animation,
-	const FAnimNotifyEventReference& EventReference) const
+UMounteaAdvancedInventoryAnimNotify_EquipItem::UMounteaAdvancedInventoryAnimNotify_EquipItem() :
+	bIsEquipAction(1)
 {
-	(void)Animation;
-	(void)EventReference;
+}
 
+void UMounteaAdvancedInventoryAnimNotify_EquipItem::Notify(USkeletalMeshComponent* MeshComp,
+	UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+{
+	ExecuteEquipAttach(MeshComp);
+	Super::Notify(MeshComp, Animation, EventReference);
+}
+
+void UMounteaAdvancedInventoryAnimNotify_EquipItem::BranchingPointNotify(FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+	Super::BranchingPointNotify(BranchingPointPayload);
+}
+
+void UMounteaAdvancedInventoryAnimNotify_EquipItem::ExecuteEquipAttach(USkeletalMeshComponent* MeshComp) const
+{
 	if (!IsValid(MeshComp))
-		return false;
+		return;
 
 	UObject* interfaceSource = MeshComp->GetOwner();
 	if (!IsValid(interfaceSource))
@@ -34,7 +45,18 @@ bool UMounteaAdvancedInventoryAnimNotify_EquipItem::Received_Notify(
 	const TScriptInterface<IMounteaAdvancedEquipmentInterface> equipmentInterface =
 		UMounteaEquipmentStatics::FindEquipmentInterface(interfaceSource);
 	if (!equipmentInterface.GetObject())
-		return false;
+		return;
 
-	return UMounteaEquipmentStatics::AnimAttachItem(equipmentInterface);
+	if (const IMounteaAdvancedEquipmentInterface* equipmentApi = equipmentInterface.GetInterface())
+	{
+		FPendingEquipmentActivation pendingActivation;
+		if (equipmentApi->TryGetPendingEquipmentActivation(pendingActivation))
+		{
+			const bool bPendingIsEquipAction = pendingActivation.bIsActivating;
+			if (bPendingIsEquipAction != (bIsEquipAction != 0))
+				return;
+		}
+	}
+
+	UMounteaEquipmentStatics::AnimAttachItem(equipmentInterface);
 }
