@@ -15,39 +15,13 @@
 #include "MounteaAttachmentContainerComponent.h"
 #include "Components/ActorComponent.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
-#include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
 #include "MounteaEquipmentComponent.generated.h"
 
 class UAnimMontage;
 class UAnimInstance;
 class UMounteaAdvancedAttachmentSlot;
-class IMounteaAdvancedEquipmentItemInterface;
-
-struct FPendingEquipmentActivation
-{
-	FGuid ItemGuid;
-	FName SourceSlotId;
-	FName TargetSlotId;
-	TWeakObjectPtr<UAnimMontage> Montage;
-	bool bIsActivating = true;
-
-	bool IsValid() const { return ItemGuid.IsValid(); }
-	void Reset() { *this = FPendingEquipmentActivation(); }
-};
-
-struct FEquipmentTransitionContext
-{
-	FGuid ItemGuid;
-	FName ResolvedTargetSlotId = NAME_None;
-	UMounteaAdvancedAttachmentSlot* CurrentSlot = nullptr;
-	UMounteaAdvancedAttachmentSlot* TargetSlot = nullptr;
-	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> EquipItemInterface;
-	EEquipmentItemState ExpectedState = EEquipmentItemState::EES_Idle;
-	EEquipmentItemState NewState = EEquipmentItemState::EES_Idle;
-	bool bResolveAsActivation = false;
-	bool bNeedsSlotSwitch = false;
-};
 
 /**
  * UMounteaEquipmentComponent extends attachment containers with specialized equipment functionality.
@@ -83,6 +57,7 @@ public:
 	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
 	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
 	virtual bool AnimAttachItem_Implementation() override;
+	virtual bool TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const override;
 
 protected:
 

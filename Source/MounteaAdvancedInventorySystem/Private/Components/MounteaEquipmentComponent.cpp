@@ -21,6 +21,7 @@
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaEquipmentStatics.h"
@@ -354,8 +355,7 @@ UAnimInstance* UMounteaEquipmentComponent::ResolveOwnerAnimInstance() const
 	return mesh->GetAnimInstance();
 }
 
-bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
-	const bool bIsActivating)
+bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context, const bool bIsActivating)
 {
 	if (!bIsActivating || !Context.EquipItemInterface.GetObject())
 		return false;
@@ -520,6 +520,12 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 	}
 
 	return ExecuteEquipmentStateTransition(transitionContext);
+}
+
+bool UMounteaEquipmentComponent::TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const
+{
+	OutPendingActivation = PendingActivation;
+	return OutPendingActivation.IsValid();
 }
 
 void UMounteaEquipmentComponent::OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted)
