@@ -102,6 +102,67 @@ TScriptInterface<IMounteaAdvancedEquipmentItemInterface> UMounteaEquipmentStatic
 	return result;
 }
 
+TScriptInterface<IMounteaAdvancedEquipmentInterface> UMounteaEquipmentStatics::FindEquipmentInterface(UObject* Target)
+{
+	TScriptInterface<IMounteaAdvancedEquipmentInterface> result;
+
+	if (!IsValid(Target))
+		return result;
+
+	if (Target->GetClass()->ImplementsInterface(UMounteaAdvancedEquipmentInterface::StaticClass()))
+	{
+		result.SetObject(Target);
+		result.SetInterface(Cast<IMounteaAdvancedEquipmentInterface>(Target));
+		return result;
+	}
+
+	AActor* actor = Cast<AActor>(Target);
+	if (!IsValid(actor))
+	{
+		const UActorComponent* component = Cast<UActorComponent>(Target);
+		if (!IsValid(component))
+			return result;
+
+		actor = component->GetOwner();
+	}
+
+	if (!IsValid(actor))
+		return result;
+
+	const TArray<UActorComponent*> components = actor->GetComponentsByInterface(
+		UMounteaAdvancedEquipmentInterface::StaticClass());
+	if (components.Num() > 0)
+	{
+		UActorComponent* component = components[0];
+		result.SetObject(component);
+		result.SetInterface(Cast<IMounteaAdvancedEquipmentInterface>(component));
+		return result;
+	}
+
+	const UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(actor->GetClass());
+	if (!blueprintClass || !blueprintClass->SimpleConstructionScript)
+		return result;
+
+	for (const USCS_Node* node : blueprintClass->SimpleConstructionScript->GetAllNodes())
+	{
+		if (!node)
+			continue;
+
+		const UActorComponent* componentTemplate = node->GetActualComponentTemplate(
+			const_cast<UBlueprintGeneratedClass*>(blueprintClass));
+		if (IsValid(componentTemplate) && componentTemplate->GetClass()->ImplementsInterface(
+			UMounteaAdvancedEquipmentInterface::StaticClass()))
+		{
+			UActorComponent* mutableTemplate = const_cast<UActorComponent*>(componentTemplate);
+			result.SetObject(mutableTemplate);
+			result.SetInterface(Cast<IMounteaAdvancedEquipmentInterface>(mutableTemplate));
+			return result;
+		}
+	}
+
+	return result;
+}
+
 FName UMounteaEquipmentStatics::ResolveFallbackSlotId(const FName& CurrentSlotId)
 {
 	const UMounteaAdvancedEquipmentSettingsConfig* settingsConfig = GetEquipmentSettingsConfig();

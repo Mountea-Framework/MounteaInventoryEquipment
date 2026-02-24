@@ -75,6 +75,17 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find Equipment Item Interface")
 	static TScriptInterface<IMounteaAdvancedEquipmentItemInterface> FindEquipmentItemInterface(UObject* Target);
+
+	/**
+	 * Finds the equipment container interface on the target object or its components.
+	 *
+	 * @param Target  Target object to inspect (typically an Actor or Component)
+	 * @return  First found equipment interface, or empty if none found
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find Equipment Interface")
+	static TScriptInterface<IMounteaAdvancedEquipmentInterface> FindEquipmentInterface(UObject* Target);
 	
 	/**
 	 * Checks if the specified class is valid to be equipment item.
