@@ -13,13 +13,7 @@
 #include "Animation/MounteaAdvancedInventoryAnimNotify_EquipItem.h"
 
 #include "Components/SkeletalMeshComponent.h"
-#include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
 #include "Statics/MounteaEquipmentStatics.h"
-
-UMounteaAdvancedInventoryAnimNotify_EquipItem::UMounteaAdvancedInventoryAnimNotify_EquipItem() :
-	bIsEquipAction(1)
-{
-}
 
 void UMounteaAdvancedInventoryAnimNotify_EquipItem::Notify(USkeletalMeshComponent* MeshComp,
 	UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
@@ -33,7 +27,7 @@ void UMounteaAdvancedInventoryAnimNotify_EquipItem::BranchingPointNotify(FBranch
 	Super::BranchingPointNotify(BranchingPointPayload);
 }
 
-void UMounteaAdvancedInventoryAnimNotify_EquipItem::ExecuteEquipAttach(USkeletalMeshComponent* MeshComp) const
+void UMounteaAdvancedInventoryAnimNotify_EquipItem::ExecuteEquipAttach(USkeletalMeshComponent* MeshComp)
 {
 	if (!IsValid(MeshComp))
 		return;
@@ -46,17 +40,6 @@ void UMounteaAdvancedInventoryAnimNotify_EquipItem::ExecuteEquipAttach(USkeletal
 		UMounteaEquipmentStatics::FindEquipmentInterface(interfaceSource);
 	if (!equipmentInterface.GetObject())
 		return;
-
-	if (const IMounteaAdvancedEquipmentInterface* equipmentApi = equipmentInterface.GetInterface())
-	{
-		FPendingEquipmentActivation pendingActivation;
-		if (equipmentApi->TryGetPendingEquipmentActivation(pendingActivation))
-		{
-			const bool bPendingIsEquipAction = pendingActivation.bIsActivating;
-			if (bPendingIsEquipAction != (bIsEquipAction != 0))
-				return;
-		}
-	}
 
 	UMounteaEquipmentStatics::AnimAttachItem(equipmentInterface);
 }

@@ -18,27 +18,21 @@
 /**
  * A specialized animation notify class designed for item equip actions in the Mountea Advanced Inventory System.
  *
- * This class is used to trigger specific functionality related to item equip animations. It allows configuration
- * to define whether the animation corresponds to an equip action.
+ * This class triggers deferred equipment attach transitions from animation events.
  *
  * @note This class is part of the Mountea Advanced Inventory System module.
  */
-UCLASS()
+UCLASS(ClassGroup=(Mountea), Blueprintable,
+	AutoExpandCategories=("Mountea","Equipment","Mountea|Equipment"),
+	meta=(DisplayName="Mountea Equipment Anim Notify - Equip Item"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryAnimNotify_EquipItem : public UAnimNotify
 {
 	GENERATED_BODY()
 	
 public:
-
-	UMounteaAdvancedInventoryAnimNotify_EquipItem();
-
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 	virtual void BranchingPointNotify(FBranchingPointNotifyPayload& BranchingPointPayload) override;
 
 protected:
-
-	void ExecuteEquipAttach(USkeletalMeshComponent* MeshComp) const;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Configuration")
-	uint8 bIsEquipAction : 1;
+	static void ExecuteEquipAttach(USkeletalMeshComponent* MeshComp);
 };
