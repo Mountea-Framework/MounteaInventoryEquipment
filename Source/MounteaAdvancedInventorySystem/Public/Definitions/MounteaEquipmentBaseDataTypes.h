@@ -14,7 +14,43 @@
 #include "CoreMinimal.h"
 #include "Hash/Blake3.h"
 #include "GameplayTagContainer.h"
+#include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
 #include "MounteaEquipmentBaseDataTypes.generated.h"
+
+class UAnimMontage;
+class UMounteaAdvancedAttachmentSlot;
+
+USTRUCT()
+struct FPendingEquipmentActivation
+{
+	GENERATED_BODY()
+
+	FGuid ItemGuid;
+	FName SourceSlotId = NAME_None;
+	FName TargetSlotId = NAME_None;
+	TWeakObjectPtr<UAnimMontage> Montage;
+	bool bIsActivating = true;
+
+	bool IsValid() const { return ItemGuid.IsValid(); }
+	void Reset() { *this = FPendingEquipmentActivation(); }
+};
+
+USTRUCT()
+struct FEquipmentTransitionContext
+{
+	GENERATED_BODY()
+
+	FGuid ItemGuid;
+	FName ResolvedTargetSlotId = NAME_None;
+	UMounteaAdvancedAttachmentSlot* CurrentSlot = nullptr;
+	UMounteaAdvancedAttachmentSlot* TargetSlot = nullptr;
+	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> EquipItemInterface;
+	EEquipmentItemState ExpectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState NewState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	bool bNeedsSlotSwitch = false;
+};
 
 /**
  * 

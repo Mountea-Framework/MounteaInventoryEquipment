@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedEquipmentInterface.generated.h"
 
@@ -81,5 +82,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
 	bool AnimAttachItem();
 	virtual bool AnimAttachItem_Implementation() = 0;
+
+	virtual bool TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const
+	{
+		OutPendingActivation = FPendingEquipmentActivation();
+		return false;
+	}
 };
 
