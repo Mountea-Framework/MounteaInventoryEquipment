@@ -52,6 +52,11 @@ public:
 	virtual bool SetActivationAnimation_Implementation(UAnimMontage* NewActivateAnimation) override;
 	virtual bool ShouldReplicateActivationAnimation_Implementation() const override
 	{ return bReplicateActivationAnimation; };
+	virtual bool DoesUseDeactivationAnimation_Implementation() const override
+	{ return bUseDeactivationAnimation; };
+	virtual bool SetUseDeactivationAnimation_Implementation(const bool bValue) override;
+	virtual UAnimMontage* GetDeactivationAnimation_Implementation() const override;
+	virtual bool SetDeactivationAnimation_Implementation(UAnimMontage* NewDeactivateAnimation) override;
 	virtual FOnEquipmentItemStateChanged& GetOnEquipmentItemStateChangedHandle() override
 	{ return OnEquipmentItemStateChanged; };
 	virtual FName GetEquipmentItemPreferredSlot_Implementation() const override
@@ -69,6 +74,12 @@ protected:
 		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
 		meta=(DisplayPriority=0))
 	TSoftObjectPtr<UAnimMontage> ActivationAnimation;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent && bUseDeactivationAnimation"),
+		meta=(DisplayPriority=1))
+	TSoftObjectPtr<UAnimMontage> DeactivationAnimation;
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
 		meta=(NoResetToDefault),
@@ -127,6 +138,12 @@ protected:
 		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
 		meta=(DisplayPriority=7))
 	uint8 bReplicateActivationAnimation : 1;
+
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Mountea|Equipment",
+		meta=(NoResetToDefault),
+		meta=(EditCondition="!bAutoActivates && bRequiresActivationEvent"),
+		meta=(DisplayPriority=8))
+	uint8 bUseDeactivationAnimation : 1;
 
 	/**
 	 * Even Triggered when Equipment Item changes.

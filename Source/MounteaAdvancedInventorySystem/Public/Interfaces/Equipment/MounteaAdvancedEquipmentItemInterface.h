@@ -77,6 +77,26 @@ public:
 	virtual bool ShouldReplicateActivationAnimation_Implementation() const = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool DoesUseDeactivationAnimation() const;
+	virtual bool DoesUseDeactivationAnimation_Implementation() const
+	{ return false; }
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool SetUseDeactivationAnimation(const bool bValue);
+	virtual bool SetUseDeactivationAnimation_Implementation(const bool bValue)
+	{ return false; }
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	UAnimMontage* GetDeactivationAnimation() const;
+	virtual UAnimMontage* GetDeactivationAnimation_Implementation() const
+	{ return nullptr; }
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
+	bool SetDeactivationAnimation(UAnimMontage* NewDeactivateAnimation);
+	virtual bool SetDeactivationAnimation_Implementation(UAnimMontage* NewDeactivateAnimation)
+	{ return false; }
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|EquipmentItem")
 	FGuid GetEquippedItemId() const;
 	virtual FGuid GetEquippedItemId_Implementation() const = 0;
 	

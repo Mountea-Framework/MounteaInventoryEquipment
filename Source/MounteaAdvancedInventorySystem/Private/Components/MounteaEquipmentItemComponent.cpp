@@ -21,7 +21,8 @@ UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() :
 	EquipmentItemState(EEquipmentItemState::EES_Idle),
 	bAutoActivates(1),
 	bRequiresActivationEvent(0),
-	bReplicateActivationAnimation(0)
+	bReplicateActivationAnimation(0),
+	bUseDeactivationAnimation(0)
 {
 	bAutoActivate = true;
 	
@@ -80,6 +81,37 @@ bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnim
 	if (ActivationAnimation != NewActivateAnimation)
 	{
 		ActivationAnimation = NewActivateAnimation;
+		return true;
+	}
+	return false;
+}
+
+bool UMounteaEquipmentItemComponent::SetUseDeactivationAnimation_Implementation(const bool bValue)
+{
+	if (bUseDeactivationAnimation != bValue)
+	{
+		bUseDeactivationAnimation = bValue;
+		return true;
+	}
+	return false;
+}
+
+UAnimMontage* UMounteaEquipmentItemComponent::GetDeactivationAnimation_Implementation() const
+{
+	if (!bUseDeactivationAnimation)
+		return GetActivationAnimation_Implementation();
+
+	if (DeactivationAnimation.ToSoftObjectPath().IsValid())
+		return DeactivationAnimation.LoadSynchronous();
+
+	return GetActivationAnimation_Implementation();
+}
+
+bool UMounteaEquipmentItemComponent::SetDeactivationAnimation_Implementation(UAnimMontage* NewDeactivateAnimation)
+{
+	if (DeactivationAnimation != NewDeactivateAnimation)
+	{
+		DeactivationAnimation = NewDeactivateAnimation;
 		return true;
 	}
 	return false;
