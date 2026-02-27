@@ -63,13 +63,22 @@ protected:
 
 	bool BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
 		EEquipmentItemState NewState, bool bResolveAsActivation, FEquipmentTransitionContext& OutContext);
+	bool ResolveTransitionDefinition(EEquipmentTransitionType TransitionType, EEquipmentItemState& OutExpectedState,
+		EEquipmentItemState& OutNewState, bool& OutResolveAsActivation) const;
 	bool ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, bool bLocalOnly = false);
-	bool ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, bool bIsActivating) const;
-	void ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context, bool bIsActivating, UAnimMontage* Montage = nullptr);
+	bool ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, EEquipmentTransitionType TransitionType) const;
+	void ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+		EEquipmentTransitionType TransitionType, UAnimMontage* Montage = nullptr, float MontageDuration = -1.f);
+	double ResolvePendingTransitionTimeout(UAnimMontage* Montage, float MontageDuration) const;
 	bool IsPendingActivationExpired() const;
 	void ResetPendingActivationIfExpired();
+	bool IsTransitionInProgress(EEquipmentTransitionType RequestedTransitionType = EEquipmentTransitionType::EET_None) const;
+	void SetCurrentTransitionType(EEquipmentTransitionType NewTransitionType);
+	void ResetCurrentTransitionType();
 	UAnimInstance* ResolveOwnerAnimInstance() const;
-	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context, bool bIsActivating);
+	UAnimMontage* ResolveTransitionMontage(const FEquipmentTransitionContext& Context, EEquipmentTransitionType TransitionType) const;
+	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+		EEquipmentTransitionType TransitionType);
 	
 	bool IsAuthority() const;
 	UFUNCTION(Server, Reliable)
@@ -83,18 +92,25 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Server_DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
 	UFUNCTION(Server, Reliable)
-	void Server_AnimAttachItem(const FGuid& ItemGuid, const FName& TargetSlotId, bool bIsActivating);
+	void Server_AnimAttachItem(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentTransitionType TransitionType);
 
 	FPendingEquipmentActivation PendingActivation;
+	EEquipmentTransitionType CurrentTransitionType = EEquipmentTransitionType::EET_None;
 
 	UFUNCTION()
-	void OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnTransitionMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
 		meta=(ClampMin="0.0", UIMin="0.0", ForceUnits="s"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=20))
 	float PendingActivationTimeoutSeconds = 1.f;
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
+		meta=(ClampMin="0.0", UIMin="0.0"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=21))
+	float PendingActivationTimeoutMarginPercent = 0.2f;
 
 public:
 

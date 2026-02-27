@@ -293,6 +293,26 @@ bool UMounteaEquipmentComponent::BuildEquipmentTransitionContext(const FGuid& It
 	return true;
 }
 
+bool UMounteaEquipmentComponent::ResolveTransitionDefinition(const EEquipmentTransitionType TransitionType,
+	EEquipmentItemState& OutExpectedState, EEquipmentItemState& OutNewState, bool& OutResolveAsActivation) const
+{
+	switch (TransitionType)
+	{
+	case EEquipmentTransitionType::EET_Activate:
+		OutExpectedState = EEquipmentItemState::EES_Equipped;
+		OutNewState = EEquipmentItemState::EES_Active;
+		OutResolveAsActivation = true;
+		return true;
+	case EEquipmentTransitionType::EET_Deactivate:
+		OutExpectedState = EEquipmentItemState::EES_Active;
+		OutNewState = EEquipmentItemState::EES_Equipped;
+		OutResolveAsActivation = false;
+		return true;
+	default:
+		return false;
+	}
+}
+
 bool UMounteaEquipmentComponent::ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, const bool bLocalOnly)
 {
 	if (!IsValid(Context.CurrentSlot) || !Context.EquipItemInterface.GetObject())
@@ -342,9 +362,13 @@ bool UMounteaEquipmentComponent::ExecuteEquipmentStateTransition(const FEquipmen
 	return true;
 }
 
-bool UMounteaEquipmentComponent::ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, const bool bIsActivating) const
+bool UMounteaEquipmentComponent::ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context,
+	const EEquipmentTransitionType TransitionType) const
 {
-	if (!bIsActivating || !Context.EquipItemInterface.GetObject())
+	if (TransitionType != EEquipmentTransitionType::EET_Activate && TransitionType != EEquipmentTransitionType::EET_Deactivate)
+		return false;
+
+	if (!Context.EquipItemInterface.GetObject())
 		return false;
 
 	const bool bItemAutoActivates = IMounteaAdvancedEquipmentItemInterface::Execute_DoesAutoActive(Context.EquipItemInterface.GetObject());
@@ -353,41 +377,79 @@ bool UMounteaEquipmentComponent::ShouldUseDeferredTransition(const FEquipmentTra
 }
 
 void UMounteaEquipmentComponent::ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
-	const bool bIsActivating, UAnimMontage* Montage)
+	const EEquipmentTransitionType TransitionType, UAnimMontage* Montage, const float MontageDuration)
 {
 	PendingActivation.ItemGuid = ItemDefinition.GetGuid();
 	PendingActivation.SourceSlotId = IsValid(Context.CurrentSlot) ? Context.CurrentSlot->SlotName : NAME_None;
 	PendingActivation.TargetSlotId = Context.ResolvedTargetSlotId;
 	PendingActivation.Montage = Montage;
-	PendingActivation.bIsActivating = bIsActivating;
+	PendingActivation.TransitionType = TransitionType;
+	PendingActivation.TimeoutSeconds = ResolvePendingTransitionTimeout(Montage, MontageDuration);
 	PendingActivation.RequestedAtTimeSeconds = GetOwner() && GetOwner()->GetWorld()
 		? GetOwner()->GetWorld()->GetTimeSeconds()
 		: -1.0;
+	SetCurrentTransitionType(TransitionType);
+}
+
+double UMounteaEquipmentComponent::ResolvePendingTransitionTimeout(UAnimMontage* Montage, const float MontageDuration) const
+{
+	double timeoutSeconds = PendingActivationTimeoutSeconds;
+	if (MontageDuration > 0.f)
+		timeoutSeconds = MontageDuration;
+	else if (IsValid(Montage))
+		timeoutSeconds = Montage->GetPlayLength();
+
+	if (timeoutSeconds <= 0.0)
+		return timeoutSeconds;
+
+	const double marginMultiplier = 1.0 + FMath::Max(0.0, static_cast<double>(PendingActivationTimeoutMarginPercent));
+	return timeoutSeconds * marginMultiplier;
 }
 
 bool UMounteaEquipmentComponent::IsPendingActivationExpired() const
 {
-	if (!PendingActivation.IsValid())
-		return false;
-
-	if (PendingActivationTimeoutSeconds <= 0.f)
-		return false;
-
-	if (PendingActivation.RequestedAtTimeSeconds < 0.0)
-		return false;
-
-	const AActor* owningActor = GetOwner();
-	if (!owningActor || !owningActor->GetWorld())
-		return false;
-
-	const double elapsed = owningActor->GetWorld()->GetTimeSeconds() - PendingActivation.RequestedAtTimeSeconds;
-	return elapsed >= PendingActivationTimeoutSeconds;
+	// TODO: Investigate how to protect properly animation based workflow.
+	// Timeout expiration is intentionally disabled for now.
+	// Pending transitions are consumed by the first AnimAttachItem call.
+	return false;
 }
 
 void UMounteaEquipmentComponent::ResetPendingActivationIfExpired()
 {
 	if (IsPendingActivationExpired())
+	{
 		PendingActivation.Reset();
+		ResetCurrentTransitionType();
+	}
+}
+
+bool UMounteaEquipmentComponent::IsTransitionInProgress(const EEquipmentTransitionType RequestedTransitionType) const
+{
+	if (PendingActivation.IsValid())
+	{
+		if (RequestedTransitionType == EEquipmentTransitionType::EET_None)
+			return true;
+
+		return PendingActivation.TransitionType == RequestedTransitionType;
+	}
+
+	if (CurrentTransitionType == EEquipmentTransitionType::EET_None)
+		return false;
+
+	if (RequestedTransitionType == EEquipmentTransitionType::EET_None)
+		return true;
+
+	return CurrentTransitionType == RequestedTransitionType;
+}
+
+void UMounteaEquipmentComponent::SetCurrentTransitionType(const EEquipmentTransitionType NewTransitionType)
+{
+	CurrentTransitionType = NewTransitionType;
+}
+
+void UMounteaEquipmentComponent::ResetCurrentTransitionType()
+{
+	CurrentTransitionType = EEquipmentTransitionType::EET_None;
 }
 
 UAnimInstance* UMounteaEquipmentComponent::ResolveOwnerAnimInstance() const
@@ -403,12 +465,36 @@ UAnimInstance* UMounteaEquipmentComponent::ResolveOwnerAnimInstance() const
 	return mesh->GetAnimInstance();
 }
 
-bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context, const bool bIsActivating)
+UAnimMontage* UMounteaEquipmentComponent::ResolveTransitionMontage(const FEquipmentTransitionContext& Context,
+	const EEquipmentTransitionType TransitionType) const
 {
-	if (!bIsActivating || !Context.EquipItemInterface.GetObject())
+	if (!Context.EquipItemInterface.GetObject())
+		return nullptr;
+
+	UObject* itemObject = Context.EquipItemInterface.GetObject();
+	switch (TransitionType)
+	{
+	case EEquipmentTransitionType::EET_Activate:
+		return IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(itemObject);
+	case EEquipmentTransitionType::EET_Deactivate:
+		if (IMounteaAdvancedEquipmentItemInterface::Execute_DoesUseDeactivationAnimation(itemObject))
+		{
+			if (UAnimMontage* deactivationMontage = IMounteaAdvancedEquipmentItemInterface::Execute_GetDeactivationAnimation(itemObject))
+				return deactivationMontage;
+		}
+		return IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(itemObject);
+	default:
+		return nullptr;
+	}
+}
+
+bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem& ItemDefinition,
+	const FEquipmentTransitionContext& Context, const EEquipmentTransitionType TransitionType)
+{
+	if (!ShouldUseDeferredTransition(Context, TransitionType))
 		return false;
 
-	UAnimMontage* montage = IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(Context.EquipItemInterface.GetObject());
+	UAnimMontage* montage = ResolveTransitionMontage(Context, TransitionType);
 	if (!IsValid(montage))
 		return false;
 
@@ -416,13 +502,14 @@ bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem&
 	if (!IsValid(animInstance))
 		return false;
 
-	if (const float duration = animInstance->Montage_Play(montage); duration <= 0.f)
+	const float duration = animInstance->Montage_Play(montage);
+	if (duration <= 0.f)
 		return false;
 
-	ArmPendingActivation(ItemDefinition, Context, bIsActivating, montage);
+	ArmPendingActivation(ItemDefinition, Context, TransitionType, montage, duration);
 
 	FOnMontageEnded endDelegate;
-	endDelegate.BindUObject(this, &UMounteaEquipmentComponent::OnActivationMontageEnded);
+	endDelegate.BindUObject(this, &UMounteaEquipmentComponent::OnTransitionMontageEnded);
 	animInstance->Montage_SetEndDelegate(endDelegate, montage);
 	return true;
 }
@@ -434,39 +521,43 @@ bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInv
 	if (!ItemDefinition.IsItemValid())
 		return false;
 
-	if (PendingActivation.IsValid())
+	if (IsTransitionInProgress())
+		return false;
+
+	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	if (!ResolveTransitionDefinition(EEquipmentTransitionType::EET_Activate, expectedState, newState, bResolveAsActivation))
 		return false;
 
 	FEquipmentTransitionContext transitionContext;
 	if (!BuildEquipmentTransitionContext(
 		ItemDefinition.GetGuid(),
 		TargetSlotId,
-		EEquipmentItemState::EES_Equipped,
-		EEquipmentItemState::EES_Active,
-		true,
+		expectedState,
+		newState,
+		bResolveAsActivation,
 		transitionContext))
 	{
 		return false;
 	}
 
-	if (ShouldUseDeferredTransition(transitionContext, true))
+	if (ShouldUseDeferredTransition(transitionContext, EEquipmentTransitionType::EET_Activate))
 	{
 		// Montage-driven flow: transition is committed by AnimAttachItem notify callback.
-		if (TryStartTransitionMontage(ItemDefinition, transitionContext, true))
+		if (TryStartTransitionMontage(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Activate))
 			return true;
 
-		UAnimMontage* activationMontage = nullptr;
-		if (transitionContext.EquipItemInterface.GetObject())
-			activationMontage = IMounteaAdvancedEquipmentItemInterface::Execute_GetActivationAnimation(transitionContext.EquipItemInterface.GetObject());
+		UAnimMontage* transitionMontage = ResolveTransitionMontage(transitionContext, EEquipmentTransitionType::EET_Activate);
 
 		// Procedural flow: no montage configured, so external animation system is expected to call AnimAttachItem manually.
-		if (!IsValid(activationMontage))
+		if (!IsValid(transitionMontage))
 		{
-			ArmPendingActivation(ItemDefinition, transitionContext, true);
+			ArmPendingActivation(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Activate);
 			return true;
 		}
 
-		LOG_WARNING(TEXT("[Activate Equipment Item]: Failed to play activation montage. Falling back to immediate transition."))
+		LOG_WARNING(TEXT("[Activate Equipment Item]: Failed to play activation transition montage. Falling back to immediate transition."))
 	}
 
 	if (!IsAuthority())
@@ -485,23 +576,41 @@ bool UMounteaEquipmentComponent::DeactivateEquipmentItem_Implementation(const FI
 	if (!ItemDefinition.IsItemValid())
 		return false;
 
-	if (PendingActivation.IsValid())
+	if (IsTransitionInProgress())
+		return false;
+
+	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	if (!ResolveTransitionDefinition(EEquipmentTransitionType::EET_Deactivate, expectedState, newState, bResolveAsActivation))
 		return false;
 
 	FEquipmentTransitionContext transitionContext;
 	if (!BuildEquipmentTransitionContext(
 		ItemDefinition.GetGuid(),
 		TargetSlotId,
-		EEquipmentItemState::EES_Active,
-		EEquipmentItemState::EES_Equipped,
-		false,
+		expectedState,
+		newState,
+		bResolveAsActivation,
 		transitionContext))
 	{
 		return false;
 	}
 
-	if (TryStartTransitionMontage(ItemDefinition, transitionContext, false))
-		return true;
+	if (ShouldUseDeferredTransition(transitionContext, EEquipmentTransitionType::EET_Deactivate))
+	{
+		if (TryStartTransitionMontage(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Deactivate))
+			return true;
+
+		UAnimMontage* transitionMontage = ResolveTransitionMontage(transitionContext, EEquipmentTransitionType::EET_Deactivate);
+		if (!IsValid(transitionMontage))
+		{
+			ArmPendingActivation(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Deactivate);
+			return true;
+		}
+
+		LOG_WARNING(TEXT("[Deactivate Equipment Item]: Failed to play deactivation transition montage. Falling back to immediate transition."))
+	}
 
 	if (!IsAuthority())
 	{
@@ -522,15 +631,22 @@ void UMounteaEquipmentComponent::Server_DeactivateEquipmentItem_Implementation(c
 	Execute_DeactivateEquipmentItem(this, ItemDefinition, TargetSlotId);
 }
 
-void UMounteaEquipmentComponent::Server_AnimAttachItem_Implementation(const FGuid& ItemGuid, const FName& TargetSlotId, const bool bIsActivating)
+void UMounteaEquipmentComponent::Server_AnimAttachItem_Implementation(const FGuid& ItemGuid, const FName& TargetSlotId,
+	const EEquipmentTransitionType TransitionType)
 {
+	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	if (!ResolveTransitionDefinition(TransitionType, expectedState, newState, bResolveAsActivation))
+		return;
+
 	FEquipmentTransitionContext transitionContext;
 	if (!BuildEquipmentTransitionContext(
 		ItemGuid,
 		TargetSlotId,
-		bIsActivating ? EEquipmentItemState::EES_Equipped : EEquipmentItemState::EES_Active,
-		bIsActivating ? EEquipmentItemState::EES_Active : EEquipmentItemState::EES_Equipped,
-		bIsActivating,
+		expectedState,
+		newState,
+		bResolveAsActivation,
 		transitionContext))
 	{
 		return;
@@ -548,6 +664,13 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 
 	const FPendingEquipmentActivation pendingData = PendingActivation;
 	PendingActivation.Reset();
+	ResetCurrentTransitionType();
+
+	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	if (!ResolveTransitionDefinition(pendingData.TransitionType, expectedState, newState, bResolveAsActivation))
+		return false;
 
 	if (!IsAuthority())
 	{
@@ -556,15 +679,15 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 		if (BuildEquipmentTransitionContext(
 			pendingData.ItemGuid,
 			pendingData.TargetSlotId,
-			pendingData.bIsActivating ? EEquipmentItemState::EES_Equipped : EEquipmentItemState::EES_Active,
-			pendingData.bIsActivating ? EEquipmentItemState::EES_Active : EEquipmentItemState::EES_Equipped,
-			pendingData.bIsActivating,
+			expectedState,
+			newState,
+			bResolveAsActivation,
 			transitionContext))
 		{
 			ExecuteEquipmentStateTransition(transitionContext, true);
 		}
 
-		Server_AnimAttachItem(pendingData.ItemGuid, pendingData.TargetSlotId, pendingData.bIsActivating);
+		Server_AnimAttachItem(pendingData.ItemGuid, pendingData.TargetSlotId, pendingData.TransitionType);
 		return true;
 	}
 
@@ -572,9 +695,9 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 	if (!BuildEquipmentTransitionContext(
 		pendingData.ItemGuid,
 		pendingData.TargetSlotId,
-		pendingData.bIsActivating ? EEquipmentItemState::EES_Equipped : EEquipmentItemState::EES_Active,
-		pendingData.bIsActivating ? EEquipmentItemState::EES_Active : EEquipmentItemState::EES_Equipped,
-		pendingData.bIsActivating,
+		expectedState,
+		newState,
+		bResolveAsActivation,
 		transitionContext))
 	{
 		return false;
@@ -595,11 +718,10 @@ bool UMounteaEquipmentComponent::TryGetPendingEquipmentActivation(FPendingEquipm
 	return OutPendingActivation.IsValid();
 }
 
-void UMounteaEquipmentComponent::OnActivationMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+void UMounteaEquipmentComponent::OnTransitionMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	(void)Montage;
-	(void)bInterrupted;
 	PendingActivation.Reset();
+	ResetCurrentTransitionType();
 }
 
 bool UMounteaEquipmentComponent::IsAuthority() const
