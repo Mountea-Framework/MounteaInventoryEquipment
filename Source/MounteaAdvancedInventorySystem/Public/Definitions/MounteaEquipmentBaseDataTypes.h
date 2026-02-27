@@ -30,10 +30,13 @@ struct FPendingEquipmentActivation
 	FName SourceSlotId = NAME_None;
 	FName TargetSlotId = NAME_None;
 	TWeakObjectPtr<UAnimMontage> Montage;
-	bool bIsActivating = true;
+	EEquipmentTransitionType TransitionType = EEquipmentTransitionType::EET_None;
+	double TimeoutSeconds = -1.0;
 	double RequestedAtTimeSeconds = -1.0;
 
-	bool IsValid() const { return ItemGuid.IsValid(); }
+	bool IsValid() const { return ItemGuid.IsValid() && TransitionType != EEquipmentTransitionType::EET_None; }
+	bool IsActivation() const { return TransitionType == EEquipmentTransitionType::EET_Activate; }
+	bool IsDeactivation() const { return TransitionType == EEquipmentTransitionType::EET_Deactivate; }
 	void Reset() { *this = FPendingEquipmentActivation(); }
 };
 
