@@ -24,7 +24,7 @@
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
 	AutoExpandCategories=("Mountea","Equipment","Mountea|Equipment"),
-	meta=(DisplayName="Mountea Equipment Anim Notify - Equip Item"))
+	meta=(DisplayName="Mountea Equipment - Item Equip"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryAnimNotify_EquipItem : public UAnimNotify
 {
 	GENERATED_BODY()
