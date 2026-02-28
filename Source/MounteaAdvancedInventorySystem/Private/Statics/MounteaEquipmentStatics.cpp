@@ -14,11 +14,15 @@
 
 #include "Algo/Find.h"
 #include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/MounteaEquipmentComponent.h"
 #include "Definitions/MounteaAdvancedAttachmentSlot.h"
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SCS_Node.h"
 #include "Engine/SimpleConstructionScript.h"
@@ -75,6 +79,73 @@ namespace
 		}
 
 		return true;
+	}
+
+	AActor* ResolveOwningActor(UObject* Target)
+	{
+		if (AActor* ownerActor = Cast<AActor>(Target))
+			return ownerActor;
+
+		if (const UActorComponent* ownerComponent = Cast<UActorComponent>(Target))
+			return ownerComponent->GetOwner();
+
+		return nullptr;
+	}
+
+	USceneComponent* ResolveQuickUseAttachmentTarget(UObject* Outer, const FName& VisualSlotId, FName& OutSocketName)
+	{
+		OutSocketName = NAME_None;
+
+		if (IsValid(Outer) && Outer->Implements<UMounteaAdvancedAttachmentContainerInterface>() && !VisualSlotId.IsNone())
+		{
+			UMounteaAdvancedAttachmentSlot* visualSlot =
+				IMounteaAdvancedAttachmentContainerInterface::Execute_GetSlot(Outer, VisualSlotId);
+			if (IsValid(visualSlot) && IsValid(visualSlot->AttachmentTargetComponentOverride))
+			{
+				OutSocketName = visualSlot->GetAttachmentSocketName();
+				return visualSlot->AttachmentTargetComponentOverride;
+			}
+		}
+
+		AActor* owningActor = ResolveOwningActor(Outer);
+		if (!IsValid(owningActor))
+			return nullptr;
+
+		if (USkeletalMeshComponent* ownerSkeletalMesh = owningActor->FindComponentByClass<USkeletalMeshComponent>())
+			return ownerSkeletalMesh;
+
+		return owningActor->GetRootComponent();
+	}
+
+	void ApplyQuickUsePlaceholderMesh(AActor* PlaceholderActor, const FInventoryItem& ItemDefinition, const UClass* PlaceholderClass)
+	{
+		if (!IsValid(PlaceholderActor) || !ItemDefinition.IsItemValid())
+			return;
+
+		const UMounteaInventoryItemTemplate* itemTemplate = ItemDefinition.GetTemplate();
+		if (!IsValid(itemTemplate) || !IsValid(itemTemplate->ItemMesh))
+			return;
+
+		if (UStaticMesh* staticMesh = Cast<UStaticMesh>(itemTemplate->ItemMesh))
+		{
+			if (!UMounteaEquipmentStatics::SetQuickUseItemStaticMesh(PlaceholderActor, staticMesh))
+			{
+				const FString className = IsValid(PlaceholderClass) ? PlaceholderClass->GetName() : TEXT("Unknown");
+				LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Placeholder class '%s' does not expose quick-use mesh interface for static mesh setup."),
+					*className)
+			}
+			return;
+		}
+
+		if (USkeletalMesh* skeletalMesh = Cast<USkeletalMesh>(itemTemplate->ItemMesh))
+		{
+			if (!UMounteaEquipmentStatics::SetQuickUseItemSkeletalMesh(PlaceholderActor, skeletalMesh))
+			{
+				const FString className = IsValid(PlaceholderClass) ? PlaceholderClass->GetName() : TEXT("Unknown");
+				LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Placeholder class '%s' does not expose quick-use mesh interface for skeletal mesh setup."),
+					*className)
+			}
+		}
 	}
 }
 
@@ -361,6 +432,120 @@ bool UMounteaEquipmentStatics::FindEquippedItemSlotAndInterface(UObject* Outer, 
 	}
 
 	return false;
+}
+
+bool UMounteaEquipmentStatics::TryGetEquippedItemGuidFromSlot(UObject* Outer, const FName& SlotId, FGuid& OutItemGuid)
+{
+	OutItemGuid = FGuid();
+
+	if (!IsValid(Outer) || SlotId.IsNone())
+		return false;
+
+	if (!Outer->Implements<UMounteaAdvancedAttachmentContainerInterface>())
+		return false;
+
+	if (!IMounteaAdvancedAttachmentContainerInterface::Execute_IsValidSlot(Outer, SlotId))
+		return false;
+
+	const UMounteaAdvancedAttachmentSlot* slot = IMounteaAdvancedAttachmentContainerInterface::Execute_GetSlot(Outer, SlotId);
+	if (!IsValid(slot) || !slot->IsOccupied() || !IsValid(slot->Attachment))
+		return false;
+
+	const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> itemInterface = FindEquipmentItemInterface(slot->Attachment);
+	if (!itemInterface.GetObject())
+		return false;
+
+	OutItemGuid = IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(itemInterface.GetObject());
+	return OutItemGuid.IsValid();
+}
+
+bool UMounteaEquipmentStatics::TryResolveInventoryItemByGuid(UObject* Outer, const FGuid& ItemGuid, FInventoryItem& OutItemDefinition)
+{
+	OutItemDefinition = FInventoryItem();
+
+	if (!IsValid(Outer) || !ItemGuid.IsValid())
+		return false;
+
+	const auto tryResolveFromInventory = [&](const UObject* Candidate) -> bool
+	{
+		if (!IsValid(Candidate) || !Candidate->Implements<UMounteaAdvancedInventoryInterface>())
+			return false;
+
+		const FInventoryItem foundItem = IMounteaAdvancedInventoryInterface::Execute_FindItem(
+			Candidate,
+			FInventoryItemSearchParams(ItemGuid));
+		if (!foundItem.IsItemValid())
+			return false;
+
+		OutItemDefinition = foundItem;
+		return true;
+	};
+
+	if (tryResolveFromInventory(Outer))
+		return true;
+
+	AActor* owningActor = ResolveOwningActor(Outer);
+	if (tryResolveFromInventory(owningActor))
+		return true;
+
+	if (!IsValid(owningActor))
+		return false;
+
+	const TArray<UActorComponent*> inventoryComponents = owningActor->GetComponentsByInterface(
+		UMounteaAdvancedInventoryInterface::StaticClass());
+	for (UActorComponent* inventoryComponent : inventoryComponents)
+	{
+		if (tryResolveFromInventory(inventoryComponent))
+			return true;
+	}
+
+	return false;
+}
+
+AActor* UMounteaEquipmentStatics::SpawnQuickUsePlaceholderActor(UObject* Outer, const FInventoryItem& ItemDefinition,
+	const FName& VisualSlotId)
+{
+	if (!IsValid(Outer) || !ItemDefinition.IsItemValid())
+		return nullptr;
+
+	UWorld* world = Outer->GetWorld();
+	if (!IsValid(world) || world->GetNetMode() == NM_DedicatedServer)
+		return nullptr;
+
+	const TSoftClassPtr<AActor> quickUseClass = GetDefaultQuickUseItemClass();
+	if (quickUseClass.IsNull())
+		return nullptr;
+
+	UClass* quickUseActorClass = quickUseClass.LoadSynchronous();
+	if (!IsValid(quickUseActorClass))
+	{
+		LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Default quick use item class failed to load."))
+		return nullptr;
+	}
+
+	FActorSpawnParameters spawnParams;
+	spawnParams.Owner = ResolveOwningActor(Outer);
+	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* placeholderActor = world->SpawnActor<AActor>(quickUseActorClass, FTransform::Identity, spawnParams);
+	if (!IsValid(placeholderActor))
+		return nullptr;
+
+	placeholderActor->SetReplicates(false);
+	placeholderActor->SetActorEnableCollision(false);
+	ApplyQuickUsePlaceholderMesh(placeholderActor, ItemDefinition, quickUseActorClass);
+
+	FName attachmentSocket = NAME_None;
+	USceneComponent* attachmentTarget = ResolveQuickUseAttachmentTarget(Outer, VisualSlotId, attachmentSocket);
+	if (IsValid(attachmentTarget))
+	{
+		placeholderActor->AttachToComponent(
+			attachmentTarget,
+			FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+			attachmentSocket);
+	}
+
+	return placeholderActor;
 }
 
 bool UMounteaEquipmentStatics::SwitchEquippedItemSlot(UObject* Outer, UMounteaAdvancedAttachmentSlot* CurrentSlot, UMounteaAdvancedAttachmentSlot* TargetSlot)

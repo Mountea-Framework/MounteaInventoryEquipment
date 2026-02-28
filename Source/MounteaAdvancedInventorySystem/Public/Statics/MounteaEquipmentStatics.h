@@ -64,6 +64,11 @@ public:
 		DisplayName="Get Equipment Settings Config")
 	static TSet<TSoftClassPtr<USceneComponent>> GetAllowedAttachmentTargets();
 
+	/**
+	 * Gets default quick-use placeholder actor class from equipment config.
+	 *
+	 * @return  Configured quick-use actor class (soft reference), or null soft class if not configured.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Default Quick Use Item Class")
@@ -143,20 +148,77 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Is Valid Equipment Item Class")
 	static bool IsTargetClassValid(const UClass* TargetClass);
-	
+
+	/**
+	 * Validates whether an item can be equipped and resolves a usable target slot.
+	 *
+	 * If TargetSlot is null, preferred slot resolution is attempted from the item's equipment interface data.
+	 *
+	 * @param Outer  Object implementing attachment/equipment container behavior.
+	 * @param ItemDefinition  Item to validate for equipping.
+	 * @param TargetSlot  In/out resolved slot candidate.
+	 * @return  True if request is valid and TargetSlot is resolved/usable.
+	 */
 	static bool ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot*& TargetSlot);
-	
+
+	/**
+	 * Spawns an equipment actor from item template and attaches it into the specified slot.
+	 *
+	 * Also initializes equipped item GUID and initial equipment state on the spawned item interface when available.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param ItemDefinition  Item defining actor class and payload.
+	 * @param TargetSlot  Slot where actor should be attached.
+	 * @param OutSpawnedActor  Spawned actor output (nullptr on failure).
+	 * @return  True if spawn + attach succeeded.
+	 */
 	static bool CreateEquipmentItemAndAttach(UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
-	
+
+	/**
+	 * General equip entry that validates request and uses preferred slot resolution.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param ItemDefinition  Item to equip.
+	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
+	 * @return  True if equip succeeded.
+	 */
 	static bool EquipItemGeneral(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
-	
+
+	/**
+	 * Equip entry targeting a specific slot instance.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param ItemDefinition  Item to equip.
+	 * @param TargetSlot  Explicit slot to equip to.
+	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
+	 * @return  True if equip succeeded.
+	 */
 	static bool EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
 
+	/**
+	 * Performs final equip against an already resolved slot.
+	 *
+	 * Handles "already equipped" slot switching and fresh spawn/attach flow.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param ItemDefinition  Item to equip.
+	 * @param ResolvedTargetSlot  Slot previously validated/resolved.
+	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
+	 * @return  True if equip succeeded.
+	 */
 	static bool EquipItemToResolvedSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* ResolvedTargetSlot,
 		AActor*& OutSpawnedActor);
-	
+
+	/**
+	 * Validates whether an item is currently equipped, optionally in a specific slot.
+	 *
+	 * @param EquipmentComponent  Equipment component to query.
+	 * @param ItemDefinition  Item to test.
+	 * @param SlotName  Optional slot restriction (NAME_None means any slot).
+	 * @return  True if equipped per provided constraints.
+	 */
 	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition, const FName SlotName = NAME_None);
 
 	/**
@@ -210,12 +272,70 @@ public:
 		DisplayName="Switch Equipped Item Slot")
 	static bool SwitchEquippedItemSlot(UObject* Outer, UMounteaAdvancedAttachmentSlot* CurrentSlot, UMounteaAdvancedAttachmentSlot* TargetSlot);
 
+	/**
+	 * Finds slot + equipment interface pair for a specific equipped item GUID.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param ItemGuid  GUID to find.
+	 * @param OutSlot  Resolved slot output.
+	 * @param OutInterface  Resolved equipment item interface output.
+	 * @return  True if a matching equipped item was found.
+	 */
 	static bool FindEquippedItemSlotAndInterface(UObject* Outer, const FGuid& ItemGuid,
 		UMounteaAdvancedAttachmentSlot*& OutSlot,
 		TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& OutInterface);
 
+	/**
+	 * Reads equipped item GUID from a concrete slot.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param SlotId  Slot to inspect.
+	 * @param OutItemGuid  GUID output.
+	 * @return  True if slot contains valid equipment item GUID.
+	 */
+	static bool TryGetEquippedItemGuidFromSlot(UObject* Outer, const FName& SlotId, FGuid& OutItemGuid);
+
+	/**
+	 * Resolves inventory item definition by GUID from local inventory contexts.
+	 *
+	 * Search order: Outer (if inventory), owning actor (if inventory), then owning actor inventory components.
+	 *
+	 * @param Outer  Context object.
+	 * @param ItemGuid  GUID to resolve.
+	 * @param OutItemDefinition  Resolved inventory item output.
+	 * @return  True if item definition was found.
+	 */
+	static bool TryResolveInventoryItemByGuid(UObject* Outer, const FGuid& ItemGuid, FInventoryItem& OutItemDefinition);
+
+	/**
+	 * Spawns and prepares a non-replicated quick-use placeholder actor for animation visuals.
+	 *
+	 * Applies item mesh via quick-use interface helpers and attaches to resolved visual slot target (or owner fallback target).
+	 *
+	 * @param Outer  Context object.
+	 * @param ItemDefinition  Source item for mesh payload.
+	 * @param VisualSlotId  Preferred visual slot for attachment.
+	 * @return  Spawned placeholder actor, or nullptr if not spawned.
+	 */
+	static AActor* SpawnQuickUsePlaceholderActor(UObject* Outer, const FInventoryItem& ItemDefinition, const FName& VisualSlotId);
+
+	/**
+	 * Ensures target slot can accept a new equip operation.
+	 *
+	 * If occupied, existing attachment is detached and owning actor is destroyed.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param TargetSlot  Slot to prepare.
+	 * @return  True if slot is ready for equip.
+	 */
 	static bool EnsureSlotIsReadyForEquip(UObject* Outer, const UMounteaAdvancedAttachmentSlot* TargetSlot);
 
+	/**
+	 * Resolves an owning actor from an attachment object (actor or component).
+	 *
+	 * @param AttachmentObject  Attachment instance.
+	 * @return  Owning actor or nullptr.
+	 */
 	static AActor* ResolveAttachmentActor(UObject* AttachmentObject);
 
 #pragma endregion
@@ -343,12 +463,28 @@ public:
 		DisplayName="Deactivate Equipment Item")
 	static bool DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
 
+	/**
+	 * Commits pending equipment transition requested by animation notify.
+	 *
+	 * Typically consumed by equip/deequip anim notify to finalize deferred slot/state transition.
+	 *
+	 * @param Target  Target implementing equipment interface.
+	 * @return  True if notify handling succeeded.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Anim Attach Item")
 	static bool AnimAttachItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target);
 
+	/**
+	 * Commits quick-use animation notify workflow.
+	 *
+	 * Typically consumed by quick-use anim notify to finalize/destroy temporary placeholder visuals.
+	 *
+	 * @param Target  Target implementing equipment interface.
+	 * @return  True if notify handling succeeded.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
