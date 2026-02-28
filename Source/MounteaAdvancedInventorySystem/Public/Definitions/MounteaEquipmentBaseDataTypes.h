@@ -81,8 +81,15 @@ public:
 		});
 
 		TArray<FGameplayTag> blockedTags;
-		BlackedByTags.GetGameplayTagArray(blockedTags);
+		BlockedByTags.GetGameplayTagArray(blockedTags);
 		blockedTags.Sort([](const FGameplayTag& A, const FGameplayTag& B)
+		{
+			return A.GetTagName().LexicalLess(B.GetTagName());
+		});
+
+		TArray<FGameplayTag> allowedItemTypes;
+		AllowedItemTypes.GetGameplayTagArray(allowedItemTypes);
+		allowedItemTypes.Sort([](const FGameplayTag& A, const FGameplayTag& B)
 		{
 			return A.GetTagName().LexicalLess(B.GetTagName());
 		});
@@ -99,6 +106,13 @@ public:
 
 		stringBuilder.Append(TEXT("|blocked="));
 		for (const FGameplayTag& T : blockedTags)
+		{
+			stringBuilder.Append(T.GetTagName().ToString());
+			stringBuilder.AppendChar(TEXT(';'));
+		}
+
+		stringBuilder.Append(TEXT("|allowedItemTypes="));
+		for (const FGameplayTag& T : allowedItemTypes)
 		{
 			stringBuilder.Append(T.GetTagName().ToString());
 			stringBuilder.AppendChar(TEXT(';'));
@@ -137,7 +151,17 @@ public:
 		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=1))
-	FGameplayTagContainer BlackedByTags;
+	FGameplayTagContainer BlockedByTags;
+
+	/**
+	 * Allowed item types that can be equipped in this slot.
+	 * Empty container means all item types are accepted.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=2))
+	FGameplayTagContainer AllowedItemTypes;
 
 	/**
 	 * Human-readable name of the slot, used purely for UI and presentation.
@@ -145,12 +169,12 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=2))
+		meta=(DisplayPriority=3))
 	FText DisplayName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=3))
+		meta=(DisplayPriority=4))
 	FGuid SlotId;
 
 	/**
@@ -164,13 +188,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(GetOptions="GetFallbackSlotOptions"),
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=4))
+		meta=(DisplayPriority=5))
 	FName FallbackSlot;
 
 	/** Determines whether the slot is active and usable. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=5))
+		meta=(DisplayPriority=6))
 	uint8 bIsEnabled : 1;
 	
 };

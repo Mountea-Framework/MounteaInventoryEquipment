@@ -225,9 +225,17 @@ public:
 
 	/** Defines the compatible slots this template can be attached to. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+	meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=25))
 	FGameplayTagContainer AttachmentSlots;
+
+	/** Defines the equipment item type used for slot compatibility checks. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
+		meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=26))
+	FGameplayTag EquipmentItemType;
 	
 	/**
 	 * Definition of allowed Actions for specific Category.
@@ -241,14 +249,14 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Item Actions", Instanced,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=26))
+		meta=(DisplayPriority=27))
 	TArray<TObjectPtr<UMounteaSelectableInventoryItemAction>> ItemActions;
 
 	/** A reference to a special gameplay abilities or effects triggered by this item. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionInterface"),
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=27))
+		meta=(DisplayPriority=28))
 	TSet<TSoftClassPtr<UObject>> ItemSpecialAffects;
 	
 protected:
@@ -257,13 +265,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data", AdvancedDisplay,
 		meta=(Multiline), 
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=28))
+		meta=(DisplayPriority=29))
 	FString JsonManifest;
 	
 	// Asset path which defines source location where the item is located.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data", AdvancedDisplay,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=29))
+		meta=(DisplayPriority=30))
 	FFilePath ImportFilePath;
 	
 public:
