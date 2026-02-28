@@ -14,6 +14,7 @@
 #if WITH_EDITOR
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "SGraphPin.h"
 
 class SPinTypeEquipmentSlotSelector : public SGraphPin
@@ -35,6 +36,8 @@ private:
 	void BuildSlotOptions(TArray<FName>& OutSlots) const;
 	bool TryGetSlotsFromCurrentBlueprint(TArray<FName>& OutSlots) const;
 	static void GetSlotsFromSettings(TArray<FName>& OutSlots);
+	FGameplayTag ResolveRequiredItemTypeFilter() const;
+	bool PassesRequiredItemTypeFilter(const FName& SlotName, const FGameplayTag& RequiredItemType) const;
 
 	TArray<TSharedPtr<FString>> SlotOptions;
 };

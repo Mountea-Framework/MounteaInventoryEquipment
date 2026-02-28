@@ -22,6 +22,7 @@
 #include "Engine/SCS_Node.h"
 #include "Engine/SimpleConstructionScript.h"
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
+#include "K2Node_CallFunction.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Statics/MounteaEquipmentStatics.h"
@@ -74,12 +75,25 @@ void SPinTypeEquipmentSlotSelector::OnSlotSelected(TSharedPtr<FString> Selection
 		return;
 
 	const FString selectedSlot = *Selection;
-	if (GraphPinObj->GetDefaultAsString() == selectedSlot)
+	const FString currentDefault = GraphPinObj->GetDefaultAsString().TrimQuotes();
+	if (currentDefault == selectedSlot)
 		return;
 
 	const FScopedTransaction transaction(NSLOCTEXT("EquipmentSlotPin", "ChangeSlot", "Change Equipment Slot"));
 	GraphPinObj->Modify();
-	GraphPinObj->GetSchema()->TrySetDefaultValue(*GraphPinObj, selectedSlot);
+
+	const auto graphSchema = GraphPinObj->GetSchema();
+	if (!graphSchema)
+		return;
+
+	graphSchema->TrySetDefaultValue(*GraphPinObj, selectedSlot);
+	if (GraphPinObj->GetDefaultAsString().TrimQuotes() != selectedSlot)
+	{
+		const FString quotedSelection = selectedSlot.Equals(TEXT("None"), ESearchCase::IgnoreCase)
+			? FString(TEXT("None"))
+			: FString::Printf(TEXT("\"%s\""), *selectedSlot);
+		graphSchema->TrySetDefaultValue(*GraphPinObj, quotedSelection);
+	}
 }
 
 FText SPinTypeEquipmentSlotSelector::GetSelectedSlotText() const
@@ -100,6 +114,7 @@ void SPinTypeEquipmentSlotSelector::BuildSlotOptions(TArray<FName>& OutSlots) co
 {
 	OutSlots.Reset();
 	OutSlots.Add(NAME_None);
+	const FGameplayTag requiredItemType = ResolveRequiredItemTypeFilter();
 
 	TArray<FName> resolvedSlots;
 	const bool bHasLocalSource = TryGetSlotsFromCurrentBlueprint(resolvedSlots);
@@ -110,7 +125,11 @@ void SPinTypeEquipmentSlotSelector::BuildSlotOptions(TArray<FName>& OutSlots) co
 	for (const FName slotName : resolvedSlots)
 	{
 		if (!slotName.IsNone())
+		{
+			if (requiredItemType.IsValid() && !PassesRequiredItemTypeFilter(slotName, requiredItemType))
+				continue;
 			OutSlots.AddUnique(slotName);
+		}
 	}
 }
 
@@ -189,6 +208,111 @@ void SPinTypeEquipmentSlotSelector::GetSlotsFromSettings(TArray<FName>& OutSlots
 		if (!slotName.IsNone())
 			OutSlots.AddUnique(slotName);
 	}
+}
+
+FGameplayTag SPinTypeEquipmentSlotSelector::ResolveRequiredItemTypeFilter() const
+{
+	if (!GraphPinObj || !GraphPinObj->GetOwningNode())
+		return FGameplayTag();
+
+	const UK2Node_CallFunction* callFunctionNode = Cast<UK2Node_CallFunction>(GraphPinObj->GetOwningNode());
+	if (!callFunctionNode)
+		return FGameplayTag();
+
+	const UFunction* targetFunction = callFunctionNode->GetTargetFunction();
+	if (!targetFunction)
+		return FGameplayTag();
+
+	FString metadataValue;
+	if (GraphPinObj)
+	{
+		const FString pinSpecificMetadataKey = FString::Printf(TEXT("MounteaK2AllowedItemType_%s"), *GraphPinObj->PinName.ToString());
+		if (targetFunction->HasMetaData(*pinSpecificMetadataKey))
+			metadataValue = targetFunction->GetMetaData(*pinSpecificMetadataKey);
+	}
+
+	if (metadataValue.IsEmpty() && targetFunction->HasMetaData(TEXT("MounteaK2AllowedItemType")))
+		metadataValue = targetFunction->GetMetaData(TEXT("MounteaK2AllowedItemType"));
+
+	metadataValue = metadataValue.TrimStartAndEnd();
+	if (metadataValue.IsEmpty())
+		return FGameplayTag();
+
+	return FGameplayTag::RequestGameplayTag(FName(*metadataValue), false);
+}
+
+bool SPinTypeEquipmentSlotSelector::PassesRequiredItemTypeFilter(const FName& SlotName, const FGameplayTag& RequiredItemType) const
+{
+	if (!RequiredItemType.IsValid() || SlotName.IsNone())
+		return true;
+
+	if (GraphPinObj && GraphPinObj->GetOwningNode())
+	{
+		if (const UBlueprint* blueprint = FBlueprintEditorUtils::FindBlueprintForNode(GraphPinObj->GetOwningNode()))
+		{
+			const UClass* resolvedClass = blueprint->GeneratedClass ? blueprint->GeneratedClass : blueprint->SkeletonGeneratedClass;
+			const UBlueprintGeneratedClass* resolvedBlueprintClass = Cast<UBlueprintGeneratedClass>(resolvedClass);
+
+			const auto evaluateSlot = [&](const UMounteaAdvancedAttachmentSlot* slot) -> TOptional<bool>
+			{
+				if (!IsValid(slot) || slot->SlotName != SlotName)
+					return TOptional<bool>();
+
+				if (slot->AllowedItemTypes.IsEmpty())
+					return TOptional<bool>();
+
+				return slot->AllowedItemTypes.HasTag(RequiredItemType);
+			};
+
+			if (resolvedClass && resolvedClass->ImplementsInterface(UMounteaAdvancedAttachmentContainerInterface::StaticClass()))
+			{
+				if (UObject* classDefaultObject = resolvedClass->GetDefaultObject())
+				{
+					const TArray<UMounteaAdvancedAttachmentSlot*> slots =
+						IMounteaAdvancedAttachmentContainerInterface::Execute_GetAttachmentSlots(classDefaultObject);
+					for (const UMounteaAdvancedAttachmentSlot* slot : slots)
+					{
+						if (const TOptional<bool> result = evaluateSlot(slot))
+							return result.GetValue();
+					}
+				}
+			}
+
+			if (resolvedBlueprintClass && blueprint->SimpleConstructionScript)
+			{
+				for (const USCS_Node* node : blueprint->SimpleConstructionScript->GetAllNodes())
+				{
+					if (!node)
+						continue;
+
+					const UActorComponent* componentTemplate = node->GetActualComponentTemplate(
+						const_cast<UBlueprintGeneratedClass*>(resolvedBlueprintClass));
+					const auto* attachmentContainer = Cast<UMounteaAttachmentContainerComponent>(componentTemplate);
+					if (!attachmentContainer)
+						continue;
+
+					for (const UMounteaAdvancedAttachmentSlot* slot : attachmentContainer->AttachmentSlots)
+					{
+						if (const TOptional<bool> result = evaluateSlot(slot))
+							return result.GetValue();
+					}
+				}
+			}
+		}
+	}
+
+	const UMounteaAdvancedEquipmentSettingsConfig* equipmentConfig = UMounteaEquipmentStatics::GetEquipmentSettingsConfig();
+	if (!equipmentConfig)
+		return true;
+
+	const FMounteaEquipmentSlotHeaderData* headerData = equipmentConfig->AllowedEquipmentSlots.Find(SlotName);
+	if (!headerData)
+		return false;
+
+	if (headerData->AllowedItemTypes.IsEmpty())
+		return false;
+
+	return headerData->AllowedItemTypes.HasTag(RequiredItemType);
 }
 
 #endif

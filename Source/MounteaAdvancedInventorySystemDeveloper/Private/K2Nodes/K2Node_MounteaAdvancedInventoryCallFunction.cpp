@@ -126,7 +126,7 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseEquipmentSlotSelecto
 	if (!Pin)
 		return false;
 
-	if (Pin->PinName != TEXT("SlotName") && Pin->PinName != TEXT("TargetSlotId"))
+	if (Pin->PinName != TEXT("SlotName") && Pin->PinName != TEXT("SlotId") && Pin->PinName != TEXT("TargetSlotId"))
 		return false;
 
 	const UFunction* targetFunction = GetTargetFunction();
