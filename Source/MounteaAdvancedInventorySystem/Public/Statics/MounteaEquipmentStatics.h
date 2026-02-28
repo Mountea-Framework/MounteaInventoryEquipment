@@ -14,6 +14,7 @@
 #include "CoreMinimal.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
+#include "Interfaces/Equipment/MounteaAdvancedQuickUseItemInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaEquipmentStatics.generated.h"
 
@@ -21,6 +22,8 @@ class UMounteaAdvancedEquipmentSettingsConfig;
 class UMounteaAdvancedAttachmentSlot;
 class UMounteaEquipmentComponent;
 class IMounteaAdvancedEquipmentInterface;
+class USkeletalMesh;
+class UStaticMesh;
 
 /**
  * 
@@ -60,6 +63,11 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Equipment Settings Config")
 	static TSet<TSoftClassPtr<USceneComponent>> GetAllowedAttachmentTargets();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Default Quick Use Item Class")
+	static TSoftClassPtr<AActor> GetDefaultQuickUseItemClass();
 	
 #pragma endregion
 
@@ -86,6 +94,43 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Find Equipment Interface")
 	static TScriptInterface<IMounteaAdvancedEquipmentInterface> FindEquipmentInterface(UObject* Target);
+
+	/**
+	 * Finds the quick-use visual interface on the target object or its components.
+	 *
+	 * @param Target  Target object to inspect (typically an Actor or Component)
+	 * @return  First found quick-use interface, or empty if none found
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Quick Use",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find Quick Use Item Interface")
+	static TScriptInterface<IMounteaAdvancedQuickUseItemInterface> FindQuickUseItemInterface(UObject* Target);
+
+	/**
+	 * Assigns a static mesh to a quick-use visual instance.
+	 *
+	 * @param Target  Quick-use actor or component implementing quick-use interface
+	 * @param NewStaticMesh  Static mesh to apply
+	 * @return  True if mesh assignment succeeded
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Quick Use",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Set Quick Use Item Static Mesh")
+	static bool SetQuickUseItemStaticMesh(UObject* Target, UStaticMesh* NewStaticMesh);
+
+	/**
+	 * Assigns a skeletal mesh to a quick-use visual instance.
+	 *
+	 * @param Target  Quick-use actor or component implementing quick-use interface
+	 * @param NewSkeletalMesh  Skeletal mesh to apply
+	 * @return  True if mesh assignment succeeded
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Quick Use",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Set Quick Use Item Skeletal Mesh")
+	static bool SetQuickUseItemSkeletalMesh(UObject* Target, USkeletalMesh* NewSkeletalMesh);
 	
 	/**
 	 * Checks if the specified class is valid to be equipment item.
@@ -266,6 +311,23 @@ public:
 	static bool ActivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
 
 	/**
+	 * Activates a Quick Use item in the specified slot for a given target that implements the Mountea Advanced Equipment Interface.
+	 * Ensures that the provided target is valid before delegating the activation process.
+	 *
+	 * @param Target - The target object implementing the IMounteaAdvancedEquipmentInterface to activate the Quick Use item on.
+	 * @param SlotId - The name of the slot from which the Quick Use item will be activated.
+	 * @param TargetSlotId - The identifier of the target slot that may influence the activation process.
+	 * @return - Returns true if the activation succeeds, otherwise returns false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
+		meta=(MounteaK2AllowedItemType_SlotId="Mountea_Inventory.Equipment.ItemType.QuickUse"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(AutoCreateRefTerm="SlotId,TargetSlotId"),
+		DisplayName="Activate Quick Use Item")
+	static bool ActivateQuickUseItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FName& SlotId, const FName& TargetSlotId);
+
+	/**
 	 * Deactivates the specified active item, transitioning it from Active to Equipped state.
 	 * Moves the item back to its fallback/storage slot.
 	 *
@@ -286,6 +348,12 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Anim Attach Item")
 	static bool AnimAttachItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Anim Quick Item Used")
+	static bool AnimQuickItemUsed(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target);
 
 #pragma endregion 
 

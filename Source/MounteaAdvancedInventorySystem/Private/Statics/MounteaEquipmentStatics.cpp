@@ -26,9 +26,57 @@
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaAttachmentsStatics.h"
+
+namespace
+{
+	bool ValidateSlotItemTypeCompatibility(
+		const FInventoryItem& ItemDefinition,
+		const UMounteaAdvancedAttachmentSlot* TargetSlot,
+		const UMounteaAdvancedEquipmentSettingsConfig* SettingsConfig)
+	{
+		if (!IsValid(TargetSlot) || !IsValid(SettingsConfig))
+			return true;
+
+		const FGameplayTagContainer* allowedItemTypesPtr = &TargetSlot->AllowedItemTypes;
+		if (allowedItemTypesPtr->IsEmpty())
+		{
+			if (const FMounteaEquipmentSlotHeaderData* slotHeaderData = SettingsConfig->AllowedEquipmentSlots.Find(TargetSlot->SlotName))
+				allowedItemTypesPtr = &slotHeaderData->AllowedItemTypes;
+		}
+		const FGameplayTagContainer& allowedItemTypes = *allowedItemTypesPtr;
+		const UMounteaInventoryItemTemplate* itemTemplate = ItemDefinition.GetTemplate();
+		const FGameplayTag equipmentItemType = IsValid(itemTemplate) ? itemTemplate->EquipmentItemType : FGameplayTag();
+
+		if (allowedItemTypes.IsEmpty())
+		{
+			LOG_INFO(TEXT("[Validate Equipment Item Request]: Slot '%s' has empty AllowedItemTypes. Allowing all item types."),
+				*TargetSlot->SlotName.ToString());
+			return true;
+		}
+
+		if (!equipmentItemType.IsValid())
+		{
+			LOG_WARNING(TEXT("[Validate Equipment Item Request]: Item '%s' has empty EquipmentItemType. Allowing all slot types."),
+				*ItemDefinition.GetItemName().ToString());
+			return true;
+		}
+
+		if (!allowedItemTypes.HasTag(equipmentItemType))
+		{
+			LOG_WARNING(TEXT("[Validate Equipment Item Request]: Item '%s' (ItemType '%s') is not allowed in slot '%s'."),
+				*ItemDefinition.GetItemName().ToString(),
+				*equipmentItemType.ToString(),
+				*TargetSlot->SlotName.ToString());
+			return false;
+		}
+
+		return true;
+	}
+}
 
 UMounteaAdvancedEquipmentSettingsConfig* UMounteaEquipmentStatics::GetEquipmentSettingsConfig()
 {
@@ -48,6 +96,14 @@ TSet<TSoftClassPtr<USceneComponent>> UMounteaEquipmentStatics::GetAllowedAttachm
 	returnValue.Add(TSoftClassPtr<USceneComponent>(USkeletalMeshComponent::StaticClass()));
 
 	return returnValue;
+}
+
+TSoftClassPtr<AActor> UMounteaEquipmentStatics::GetDefaultQuickUseItemClass()
+{
+	if (const auto* equipmentConfig = GetEquipmentSettingsConfig())
+		return equipmentConfig->DefaultQuickUseItemClass;
+
+	return TSoftClassPtr<AActor>();
 }
 
 TScriptInterface<IMounteaAdvancedEquipmentItemInterface> UMounteaEquipmentStatics::FindEquipmentItemInterface(UObject* Target)
@@ -161,6 +217,85 @@ TScriptInterface<IMounteaAdvancedEquipmentInterface> UMounteaEquipmentStatics::F
 	}
 
 	return result;
+}
+
+TScriptInterface<IMounteaAdvancedQuickUseItemInterface> UMounteaEquipmentStatics::FindQuickUseItemInterface(UObject* Target)
+{
+	TScriptInterface<IMounteaAdvancedQuickUseItemInterface> result;
+
+	if (!IsValid(Target))
+		return result;
+
+	if (Target->GetClass()->ImplementsInterface(UMounteaAdvancedQuickUseItemInterface::StaticClass()))
+	{
+		result.SetObject(Target);
+		result.SetInterface(Cast<IMounteaAdvancedQuickUseItemInterface>(Target));
+		return result;
+	}
+
+	AActor* actor = Cast<AActor>(Target);
+	if (!IsValid(actor))
+	{
+		const UActorComponent* component = Cast<UActorComponent>(Target);
+		if (!IsValid(component))
+			return result;
+
+		actor = component->GetOwner();
+	}
+
+	if (!IsValid(actor))
+		return result;
+
+	const TArray<UActorComponent*> components = actor->GetComponentsByInterface(
+		UMounteaAdvancedQuickUseItemInterface::StaticClass());
+	if (components.Num() > 0)
+	{
+		UActorComponent* component = components[0];
+		result.SetObject(component);
+		result.SetInterface(Cast<IMounteaAdvancedQuickUseItemInterface>(component));
+		return result;
+	}
+
+	const UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(actor->GetClass());
+	if (!blueprintClass || !blueprintClass->SimpleConstructionScript)
+		return result;
+
+	for (const USCS_Node* node : blueprintClass->SimpleConstructionScript->GetAllNodes())
+	{
+		if (!node)
+			continue;
+
+		const UActorComponent* componentTemplate = node->GetActualComponentTemplate(
+			const_cast<UBlueprintGeneratedClass*>(blueprintClass));
+		if (IsValid(componentTemplate) && componentTemplate->GetClass()->ImplementsInterface(
+			UMounteaAdvancedQuickUseItemInterface::StaticClass()))
+		{
+			UActorComponent* mutableTemplate = const_cast<UActorComponent*>(componentTemplate);
+			result.SetObject(mutableTemplate);
+			result.SetInterface(Cast<IMounteaAdvancedQuickUseItemInterface>(mutableTemplate));
+			return result;
+		}
+	}
+
+	return result;
+}
+
+bool UMounteaEquipmentStatics::SetQuickUseItemStaticMesh(UObject* Target, UStaticMesh* NewStaticMesh)
+{
+	const TScriptInterface<IMounteaAdvancedQuickUseItemInterface> quickUseInterface = FindQuickUseItemInterface(Target);
+	if (!quickUseInterface.GetObject())
+		return false;
+
+	return IMounteaAdvancedQuickUseItemInterface::Execute_SetStaticMesh(quickUseInterface.GetObject(), NewStaticMesh);
+}
+
+bool UMounteaEquipmentStatics::SetQuickUseItemSkeletalMesh(UObject* Target, USkeletalMesh* NewSkeletalMesh)
+{
+	const TScriptInterface<IMounteaAdvancedQuickUseItemInterface> quickUseInterface = FindQuickUseItemInterface(Target);
+	if (!quickUseInterface.GetObject())
+		return false;
+
+	return IMounteaAdvancedQuickUseItemInterface::Execute_SetSkeletalMesh(quickUseInterface.GetObject(), NewSkeletalMesh);
 }
 
 FName UMounteaEquipmentStatics::ResolveFallbackSlotId(const FName& CurrentSlotId)
@@ -379,6 +514,10 @@ bool UMounteaEquipmentStatics::ValidateEquipmentItemRequest(const UObject* Outer
 
 	if (!IsValid(TargetSlot) || !TargetSlot->CanAttach())
 		return false;
+
+	const UMounteaAdvancedEquipmentSettingsConfig* settingsConfig = GetEquipmentSettingsConfig();
+	if (!ValidateSlotItemTypeCompatibility(ItemDefinition, TargetSlot, settingsConfig))
+		return false;
 	
 	return true;
 }
@@ -564,6 +703,14 @@ bool UMounteaEquipmentStatics::ActivateEquipmentItem(const TScriptInterface<IMou
 	return IMounteaAdvancedEquipmentInterface::Execute_ActivateEquipmentItem(Target.GetObject(), ItemDefinition, TargetSlotId);
 }
 
+bool UMounteaEquipmentStatics::ActivateQuickUseItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target,
+	const FName& SlotId, const FName& TargetSlotId)
+{
+	if (!Target.GetObject())
+		return false;
+	return IMounteaAdvancedEquipmentInterface::Execute_ActivateQuickUseItem(Target.GetObject(), SlotId, TargetSlotId);
+}
+
 bool UMounteaEquipmentStatics::DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
 {
 	if (!Target.GetObject())
@@ -576,4 +723,11 @@ bool UMounteaEquipmentStatics::AnimAttachItem(const TScriptInterface<IMounteaAdv
 	if (!Target.GetObject())
 		return false;
 	return IMounteaAdvancedEquipmentInterface::Execute_AnimAttachItem(Target.GetObject());
+}
+
+bool UMounteaEquipmentStatics::AnimQuickItemUsed(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target)
+{
+	if (!Target.GetObject())
+		return false;
+	return IMounteaAdvancedEquipmentInterface::Execute_AnimQuickItemUsed(Target.GetObject());
 }
