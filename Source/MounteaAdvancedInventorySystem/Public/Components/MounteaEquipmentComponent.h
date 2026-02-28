@@ -22,6 +22,7 @@
 class UAnimMontage;
 class UAnimInstance;
 class UMounteaAdvancedAttachmentSlot;
+class AActor;
 
 /**
  * UMounteaEquipmentComponent extends attachment containers with specialized equipment functionality.
@@ -55,9 +56,17 @@ public:
 	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
 	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const override;
 	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+	virtual bool ActivateQuickUseItem_Implementation(const FName& SlotId, const FName& TargetSlotId) override;
 	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
 	virtual bool AnimAttachItem_Implementation() override;
+	virtual bool AnimQuickItemUsed_Implementation() override;
 	virtual bool TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const override;
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Register Quick Use Placeholder Actor")
+	bool RegisterQuickUsePlaceholderActor(const FGuid& ItemGuid, AActor* PlaceholderActor);
 
 protected:
 
@@ -93,9 +102,15 @@ protected:
 	void Server_DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
 	UFUNCTION(Server, Reliable)
 	void Server_AnimAttachItem(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentTransitionType TransitionType);
+	UFUNCTION(Server, Reliable)
+	void Server_AnimQuickItemUsed(const FGuid& ItemGuid);
+
+	bool ConsumeQuickUsePlaceholderActor(const FGuid& ItemGuid, bool bIgnoreItemGuidMismatch);
 
 	FPendingEquipmentActivation PendingActivation;
 	EEquipmentTransitionType CurrentTransitionType = EEquipmentTransitionType::EET_None;
+	TWeakObjectPtr<AActor> QuickUsePlaceholderActor;
+	FGuid QuickUsePlaceholderItemGuid;
 
 	UFUNCTION()
 	void OnTransitionMontageEnded(UAnimMontage* Montage, bool bInterrupted);

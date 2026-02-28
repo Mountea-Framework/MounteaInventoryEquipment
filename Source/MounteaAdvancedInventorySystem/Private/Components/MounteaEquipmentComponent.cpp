@@ -20,8 +20,11 @@
 #include "Definitions/MounteaEquipmentBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Engine/BlueprintGeneratedClass.h"
+#include "Engine/SkeletalMesh.h"
+#include "Engine/StaticMesh.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaEquipmentStatics.h"
@@ -249,6 +252,159 @@ bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FI
 bool UMounteaEquipmentComponent::IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const
 {
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition, SlotName);
+}
+
+bool UMounteaEquipmentComponent::ActivateQuickUseItem_Implementation(const FName& SlotId, const FName& TargetSlotId)
+{
+	if (SlotId.IsNone())
+		return false;
+
+	if (!Execute_IsValidSlot(this, SlotId))
+		return false;
+
+	UMounteaAdvancedAttachmentSlot* sourceSlot = Execute_GetSlot(this, SlotId);
+	if (!IsValid(sourceSlot) || !sourceSlot->IsOccupied() || !IsValid(sourceSlot->Attachment))
+		return false;
+
+	const TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipmentItemInterface =
+		UMounteaEquipmentStatics::FindEquipmentItemInterface(sourceSlot->Attachment);
+	if (!equipmentItemInterface.GetObject())
+		return false;
+
+	const FGuid itemGuid = IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(equipmentItemInterface.GetObject());
+	if (!itemGuid.IsValid())
+		return false;
+
+	FInventoryItem quickUseItemDefinition;
+	auto tryResolveItemDefinition = [&](const UObject* Candidate) -> bool
+	{
+		if (!IsValid(Candidate) || !Candidate->Implements<UMounteaAdvancedInventoryInterface>())
+			return false;
+
+		const FInventoryItem foundItem = IMounteaAdvancedInventoryInterface::Execute_FindItem(
+			const_cast<UObject*>(Candidate),
+			FInventoryItemSearchParams(itemGuid)
+		);
+		if (!foundItem.IsItemValid())
+			return false;
+
+		quickUseItemDefinition = foundItem;
+		return true;
+	};
+
+	AActor* owningActor = GetOwner();
+	if (!tryResolveItemDefinition(this) &&
+		!tryResolveItemDefinition(owningActor))
+	{
+		if (IsValid(owningActor))
+		{
+			const TArray<UActorComponent*> inventoryComponents = owningActor->GetComponentsByInterface(
+				UMounteaAdvancedInventoryInterface::StaticClass());
+			for (UActorComponent* inventoryComponent : inventoryComponents)
+			{
+				if (tryResolveItemDefinition(inventoryComponent))
+					break;
+			}
+		}
+	}
+
+	if (!quickUseItemDefinition.IsItemValid())
+	{
+		LOG_WARNING(TEXT("[Activate Quick Use Item]: Failed to resolve inventory item definition for equipped item guid '%s'."),
+			*itemGuid.ToString());
+		return false;
+	}
+
+	FName resolvedVisualSlotId = TargetSlotId;
+	if (resolvedVisualSlotId.IsNone())
+		resolvedVisualSlotId = UMounteaEquipmentStatics::ResolveActiveSlotId(SlotId);
+
+	bool bRegisteredQuickUsePlaceholder = false;
+	const TSoftClassPtr<AActor> quickUseClass = UMounteaEquipmentStatics::GetDefaultQuickUseItemClass();
+	if (!quickUseClass.IsNull())
+	{
+		UClass* quickUseActorClass = quickUseClass.LoadSynchronous();
+		UWorld* world = GetWorld();
+		if (!IsValid(quickUseActorClass))
+		{
+			LOG_WARNING(TEXT("[Activate Quick Use Item]: Default quick use item class failed to load."))
+		}
+		else if (IsValid(world) && world->GetNetMode() != NM_DedicatedServer)
+		{
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = owningActor;
+			spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			AActor* spawnedPlaceholder = world->SpawnActor<AActor>(quickUseActorClass, FTransform::Identity, spawnParams);
+			if (IsValid(spawnedPlaceholder))
+			{
+				spawnedPlaceholder->SetReplicates(false);
+				spawnedPlaceholder->SetActorEnableCollision(false);
+
+				if (const UMounteaInventoryItemTemplate* quickUseTemplate = quickUseItemDefinition.GetTemplate())
+				{
+					if (IsValid(quickUseTemplate->ItemMesh))
+					{
+						if (UStaticMesh* staticMesh = Cast<UStaticMesh>(quickUseTemplate->ItemMesh))
+						{
+							if (!UMounteaEquipmentStatics::SetQuickUseItemStaticMesh(spawnedPlaceholder, staticMesh))
+							{
+								LOG_WARNING(TEXT("[Activate Quick Use Item]: Placeholder class '%s' does not expose quick-use mesh interface for static mesh setup."),
+									*quickUseActorClass->GetName())
+							}
+						}
+						else if (USkeletalMesh* skeletalMesh = Cast<USkeletalMesh>(quickUseTemplate->ItemMesh))
+						{
+							if (!UMounteaEquipmentStatics::SetQuickUseItemSkeletalMesh(spawnedPlaceholder, skeletalMesh))
+							{
+								LOG_WARNING(TEXT("[Activate Quick Use Item]: Placeholder class '%s' does not expose quick-use mesh interface for skeletal mesh setup."),
+									*quickUseActorClass->GetName())
+							}
+						}
+					}
+				}
+
+				USceneComponent* attachmentTarget = nullptr;
+				FName attachmentSocket = NAME_None;
+
+				if (!resolvedVisualSlotId.IsNone())
+				{
+					UMounteaAdvancedAttachmentSlot* visualSlot = Execute_GetSlot(this, resolvedVisualSlotId);
+					if (IsValid(visualSlot))
+					{
+						attachmentTarget = visualSlot->AttachmentTargetComponentOverride;
+						attachmentSocket = visualSlot->GetAttachmentSocketName();
+					}
+				}
+
+				if (!IsValid(attachmentTarget) && IsValid(owningActor))
+					attachmentTarget = owningActor->FindComponentByClass<USkeletalMeshComponent>();
+
+				if (!IsValid(attachmentTarget) && IsValid(owningActor))
+					attachmentTarget = owningActor->GetRootComponent();
+
+				if (IsValid(attachmentTarget))
+				{
+					spawnedPlaceholder->AttachToComponent(
+						attachmentTarget,
+						FAttachmentTransformRules::SnapToTargetNotIncludingScale,
+						attachmentSocket
+					);
+				}
+
+				if (!RegisterQuickUsePlaceholderActor(itemGuid, spawnedPlaceholder))
+					spawnedPlaceholder->Destroy();
+				else
+					bRegisteredQuickUsePlaceholder = true;
+			}
+		}
+	}
+
+	const bool bActivated = Execute_ActivateEquipmentItem(this, quickUseItemDefinition, TargetSlotId);
+	if (!bActivated && bRegisteredQuickUsePlaceholder)
+		ConsumeQuickUsePlaceholderActor(itemGuid, true);
+
+	return bActivated;
 }
 
 bool UMounteaEquipmentComponent::BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId,
@@ -655,6 +811,11 @@ void UMounteaEquipmentComponent::Server_AnimAttachItem_Implementation(const FGui
 	ExecuteEquipmentStateTransition(transitionContext);
 }
 
+void UMounteaEquipmentComponent::Server_AnimQuickItemUsed_Implementation(const FGuid& ItemGuid)
+{
+	ConsumeQuickUsePlaceholderActor(ItemGuid, false);
+}
+
 bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 {
 	ResetPendingActivationIfExpired();
@@ -704,6 +865,57 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 	}
 
 	return ExecuteEquipmentStateTransition(transitionContext);
+}
+
+bool UMounteaEquipmentComponent::AnimQuickItemUsed_Implementation()
+{
+	const FGuid quickUseItemGuid = QuickUsePlaceholderItemGuid;
+	const bool bConsumed = ConsumeQuickUsePlaceholderActor(quickUseItemGuid, true);
+	if (!bConsumed)
+		return false;
+
+	if (!IsAuthority())
+		Server_AnimQuickItemUsed(quickUseItemGuid);
+
+	return true;
+}
+
+bool UMounteaEquipmentComponent::RegisterQuickUsePlaceholderActor(const FGuid& ItemGuid, AActor* PlaceholderActor)
+{
+	if (!ItemGuid.IsValid() || !IsValid(PlaceholderActor))
+		return false;
+
+	if (PlaceholderActor == GetOwner())
+		return false;
+
+	if (QuickUsePlaceholderActor.IsValid() && QuickUsePlaceholderActor.Get() != PlaceholderActor)
+	{
+		LOG_WARNING(TEXT("[Register Quick Use Placeholder Actor]: Replacing existing quick use placeholder actor."))
+		if (AActor* existingPlaceholder = QuickUsePlaceholderActor.Get(); IsValid(existingPlaceholder))
+			existingPlaceholder->Destroy();
+	}
+
+	QuickUsePlaceholderActor = PlaceholderActor;
+	QuickUsePlaceholderItemGuid = ItemGuid;
+	return true;
+}
+
+bool UMounteaEquipmentComponent::ConsumeQuickUsePlaceholderActor(const FGuid& ItemGuid, const bool bIgnoreItemGuidMismatch)
+{
+	AActor* placeholderActor = QuickUsePlaceholderActor.Get();
+	if (!IsValid(placeholderActor))
+		return false;
+
+	if (!bIgnoreItemGuidMismatch && ItemGuid.IsValid() && QuickUsePlaceholderItemGuid.IsValid() && ItemGuid != QuickUsePlaceholderItemGuid)
+		return false;
+
+	QuickUsePlaceholderActor.Reset();
+	QuickUsePlaceholderItemGuid.Invalidate();
+
+	if (placeholderActor != GetOwner())
+		placeholderActor->Destroy();
+
+	return true;
 }
 
 bool UMounteaEquipmentComponent::TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const
