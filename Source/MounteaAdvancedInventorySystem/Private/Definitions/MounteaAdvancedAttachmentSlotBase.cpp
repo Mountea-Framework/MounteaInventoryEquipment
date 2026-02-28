@@ -45,6 +45,23 @@ void UMounteaAdvancedAttachmentSlotBase::InitializeAttachmentSlot(
 	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent)
 {
 	ParentContainer = Parent;
+
+	if (SlotName.IsNone())
+		return;
+
+	UMounteaAdvancedEquipmentSettingsConfig* equipmentConfig = nullptr;
+	if (const auto advancedSettings = GetDefault<UMounteaAdvancedInventorySettings>())
+		equipmentConfig = advancedSettings->AdvancedEquipmentSettingsConfig.LoadSynchronous();
+
+	if (!IsValid(equipmentConfig))
+		return;
+
+	if (const FMounteaEquipmentSlotHeaderData* headerData = equipmentConfig->AllowedEquipmentSlots.Find(SlotName))
+	{
+		SlotTags = headerData->TagContainer;
+		DisplayName = headerData->DisplayName;
+		AllowedItemTypes = headerData->AllowedItemTypes;
+	}
 }
 
 UWorld* UMounteaAdvancedAttachmentSlotBase::GetWorld() const
@@ -234,6 +251,8 @@ void UMounteaAdvancedAttachmentSlotBase::PostEditChangeProperty(struct FProperty
 				SlotTags.AppendTags(headerData->TagContainer);
 
 				DisplayName = headerData->DisplayName;
+				AllowedItemTypes.Reset();
+				AllowedItemTypes.AppendTags(headerData->AllowedItemTypes);
 			}
 		}
 	}
