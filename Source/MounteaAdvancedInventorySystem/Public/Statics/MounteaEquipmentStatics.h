@@ -20,6 +20,7 @@
 
 class UMounteaAdvancedEquipmentSettingsConfig;
 class UMounteaAdvancedAttachmentSlot;
+class UMounteaAdvancedAttachmentSlotBase;
 class UMounteaEquipmentComponent;
 class IMounteaAdvancedEquipmentInterface;
 class USkeletalMesh;
@@ -318,6 +319,34 @@ public:
 	 * @return  Spawned placeholder actor, or nullptr if not spawned.
 	 */
 	static AActor* SpawnQuickUsePlaceholderActor(UObject* Outer, const FInventoryItem& ItemDefinition, const FName& VisualSlotId);
+
+	/**
+	 * Evaluates whether target slot is currently blocked by active equipped item tags.
+	 *
+	 * Slot blocking rules are read from equipment settings header data (BlockedByTags) for the requested slot.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param TargetSlot  Slot being evaluated.
+	 * @param bIgnoreTargetSlotOccupant  If true, target slot's own occupant is ignored for block evaluation.
+	 * @return  True if slot is currently blocked and should reject new attachment/equip requests.
+	*/
+	static bool IsSlotBlockedByCurrentAttachments(const UObject* Outer, const UMounteaAdvancedAttachmentSlotBase* TargetSlot,
+		bool bIgnoreTargetSlotOccupant = true);
+
+	/**
+	 * Clears occupants from slots blocked by provided attachment tags.
+	 *
+	 * Used by activation flow to enforce multi-slot restrictions (for example two-handed usage) by
+	 * removing conflicting occupants before final state transition.
+	 *
+	 * @param Outer  Attachment/equipment container context.
+	 * @param BlockingAttachment  Attachment whose tags define what gets blocked.
+	 * @param BlockingItemGuid  Optional equipped item guid to protect from accidental self-removal.
+	 * @param IgnoredSlots  Slots that should never be processed (source/target slots of the activating item).
+	 * @return  True if blocked slots were processed successfully.
+	 */
+	static bool ClearBlockedSlotsForAttachment(UObject* Outer, UObject* BlockingAttachment, const FGuid& BlockingItemGuid,
+		const TSet<FName>& IgnoredSlots);
 
 	/**
 	 * Ensures target slot can accept a new equip operation.
