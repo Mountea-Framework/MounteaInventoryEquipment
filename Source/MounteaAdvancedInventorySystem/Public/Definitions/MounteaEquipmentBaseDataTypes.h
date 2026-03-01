@@ -14,7 +14,47 @@
 #include "CoreMinimal.h"
 #include "Hash/Blake3.h"
 #include "GameplayTagContainer.h"
+#include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
 #include "MounteaEquipmentBaseDataTypes.generated.h"
+
+class UAnimMontage;
+class UMounteaAdvancedAttachmentSlot;
+
+USTRUCT()
+struct FPendingEquipmentActivation
+{
+	GENERATED_BODY()
+
+	FGuid ItemGuid;
+	FName SourceSlotId = NAME_None;
+	FName TargetSlotId = NAME_None;
+	TWeakObjectPtr<UAnimMontage> Montage;
+	EEquipmentTransitionType TransitionType = EEquipmentTransitionType::EET_None;
+	double TimeoutSeconds = -1.0;
+	double RequestedAtTimeSeconds = -1.0;
+
+	bool IsValid() const { return ItemGuid.IsValid() && TransitionType != EEquipmentTransitionType::EET_None; }
+	bool IsActivation() const { return TransitionType == EEquipmentTransitionType::EET_Activate; }
+	bool IsDeactivation() const { return TransitionType == EEquipmentTransitionType::EET_Deactivate; }
+	void Reset() { *this = FPendingEquipmentActivation(); }
+};
+
+USTRUCT()
+struct FEquipmentTransitionContext
+{
+	GENERATED_BODY()
+
+	FGuid ItemGuid;
+	FName ResolvedTargetSlotId = NAME_None;
+	UMounteaAdvancedAttachmentSlot* CurrentSlot = nullptr;
+	UMounteaAdvancedAttachmentSlot* TargetSlot = nullptr;
+	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> EquipItemInterface;
+	EEquipmentItemState ExpectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState NewState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	bool bNeedsSlotSwitch = false;
+};
 
 /**
  * 
@@ -41,8 +81,15 @@ public:
 		});
 
 		TArray<FGameplayTag> blockedTags;
-		BlackedByTags.GetGameplayTagArray(blockedTags);
+		BlockedByTags.GetGameplayTagArray(blockedTags);
 		blockedTags.Sort([](const FGameplayTag& A, const FGameplayTag& B)
+		{
+			return A.GetTagName().LexicalLess(B.GetTagName());
+		});
+
+		TArray<FGameplayTag> allowedItemTypes;
+		AllowedItemTypes.GetGameplayTagArray(allowedItemTypes);
+		allowedItemTypes.Sort([](const FGameplayTag& A, const FGameplayTag& B)
 		{
 			return A.GetTagName().LexicalLess(B.GetTagName());
 		});
@@ -59,6 +106,13 @@ public:
 
 		stringBuilder.Append(TEXT("|blocked="));
 		for (const FGameplayTag& T : blockedTags)
+		{
+			stringBuilder.Append(T.GetTagName().ToString());
+			stringBuilder.AppendChar(TEXT(';'));
+		}
+
+		stringBuilder.Append(TEXT("|allowedItemTypes="));
+		for (const FGameplayTag& T : allowedItemTypes)
 		{
 			stringBuilder.Append(T.GetTagName().ToString());
 			stringBuilder.AppendChar(TEXT(';'));
@@ -97,7 +151,17 @@ public:
 		meta=(Categories="Mountea_Inventory.AttachmentSlots,Slot,Attachment"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=1))
-	FGameplayTagContainer BlackedByTags;
+	FGameplayTagContainer BlockedByTags;
+
+	/**
+	 * Allowed item types that can be equipped in this slot.
+	 * Empty container means all item types are accepted.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,
+		meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=2))
+	FGameplayTagContainer AllowedItemTypes;
 
 	/**
 	 * Human-readable name of the slot, used purely for UI and presentation.
@@ -105,12 +169,12 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=2))
+		meta=(DisplayPriority=3))
 	FText DisplayName;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=3))
+		meta=(DisplayPriority=4))
 	FGuid SlotId;
 
 	/**
@@ -124,13 +188,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(GetOptions="GetFallbackSlotOptions"),
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=4))
+		meta=(DisplayPriority=5))
 	FName FallbackSlot;
 
 	/** Determines whether the slot is active and usable. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=5))
+		meta=(DisplayPriority=6))
 	uint8 bIsEnabled : 1;
 	
 };

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedEquipmentInterface.generated.h"
 
@@ -69,5 +70,31 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
 	bool IsEquipmentItemEquippedInSlot(const FInventoryItem& ItemDefinition, const FName& SlotName) const;
 	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool ActivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool ActivateQuickUseItem(const FName& SlotId, const FName& TargetSlotId);
+	virtual bool ActivateQuickUseItem_Implementation(const FName& SlotId, const FName& TargetSlotId) { return false; }
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool AnimAttachItem();
+	virtual bool AnimAttachItem_Implementation() = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
+	bool AnimQuickItemUsed();
+	virtual bool AnimQuickItemUsed_Implementation() { return false; }
+
+	virtual bool TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const
+	{
+		OutPendingActivation = FPendingEquipmentActivation();
+		return false;
+	}
 };
 

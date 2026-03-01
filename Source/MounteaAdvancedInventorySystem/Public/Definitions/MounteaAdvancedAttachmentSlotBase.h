@@ -53,11 +53,18 @@ public:
 		meta=(DisplayPriority=1))
 	FText DisplayName;
 
+	/** Allowed equipment item types that can be used with this slot. Empty means all item types are accepted. */
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
+		meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=2))
+	FGameplayTagContainer AllowedItemTypes;
+
 	/** Reference to the container that owns this slot */
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=2))
+		meta=(DisplayPriority=3))
 	TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> ParentContainer;
 	
 	/** Unique identifier for this attachment slot */
@@ -71,26 +78,26 @@ public:
 	UPROPERTY(Transient, BlueprintReadOnly, Category="Debug", AdvancedDisplay,
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=3))
+		meta=(DisplayPriority=4))
 	TObjectPtr<UObject> LastAttachment;
 	
 	/** Currently attached object (replicated to clients) */
 	UPROPERTY(SaveGame, Replicated, VisibleAnywhere, BlueprintReadOnly, Category="Information",
 		meta=(DisplayThumbnail=false),
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=4))
+		meta=(DisplayPriority=5))
 	TObjectPtr<UObject> Attachment;	
 
 	/** Current state of the attachment slot (Empty, Occupied, Locked) */
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_State, VisibleAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=6))
+		meta=(DisplayPriority=7))
 	EAttachmentSlotState State;
 	
 	/** Type of attachment this slot supports (Socket, Component) */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Settings",
 		meta=(NoResetToDefault),
-		meta=(DisplayPriority=7))
+		meta=(DisplayPriority=8))
 	EAttachmentSlotType SlotType;
 
 protected:

@@ -56,9 +56,7 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 			for (UFunction* itrFunction : classFunctions)
 			{
 				if (!itrFunction->HasAnyFunctionFlags(FUNC_BlueprintEvent))
-				{
 					itrFunction->SetMetaData(TEXT("BlueprintInternalUseOnly"), TEXT("true"));
-				}
 
 				UBlueprintNodeSpawner* nodeSpawner = UBlueprintNodeSpawner::Create(GetClass());
 				nodeSpawner->CustomizeNodeDelegate = UBlueprintNodeSpawner::FCustomizeNodeDelegate::CreateStatic(customizeNodeLambda, itrFunction, relevantClass);
@@ -121,6 +119,25 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseCommandSelector(UEdG
 	}
     
 	return false;
+}
+
+bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseEquipmentSlotSelector(UEdGraphPin* Pin) const
+{
+	if (!Pin)
+		return false;
+
+	if (Pin->PinName != TEXT("SlotName") && Pin->PinName != TEXT("SlotId") && Pin->PinName != TEXT("TargetSlotId"))
+		return false;
+
+	const UFunction* targetFunction = GetTargetFunction();
+	if (!targetFunction)
+		return false;
+
+	if (!targetFunction->HasMetaData(TEXT("CustomTag")))
+		return false;
+
+	const FString customTagValue = targetFunction->GetMetaData(TEXT("CustomTag"));
+	return customTagValue.Contains(TEXT("MounteaK2EquipmentSlot"));
 }
 
 bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const

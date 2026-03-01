@@ -17,6 +17,8 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedEquipmentSettingsConfig.generated.h"
 
+class AActor;
+
 /**
  * UMounteaAdvancedEquipmentSettingsConfig manages configuration for the Mountea Advanced Equipment System.
  * Equipment settings define allowed equipment slots with metadata for comprehensive equipment
@@ -49,6 +51,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
 		meta=(TitleProperty="Allowed Attachment Targets"))
 	TSet<TSoftClassPtr<USceneComponent>> AllowedAttachmentTargets;
+
+	/** Default visual actor class for quick-use items (temporary placeholder consumed by animation notifies). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="⚡ Quick Use",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedQuickUseItemInterface"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=0))
+	TSoftClassPtr<AActor> DefaultQuickUseItemClass = nullptr;
 
 protected:
 	

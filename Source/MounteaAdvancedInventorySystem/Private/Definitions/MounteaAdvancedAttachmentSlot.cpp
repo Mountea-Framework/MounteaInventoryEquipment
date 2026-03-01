@@ -88,6 +88,9 @@ bool UMounteaAdvancedAttachmentSlot::PerformAttachmentLogic(UObject* NewAttachme
 	if (!ValidateAttachmentSlot(attachmentTarget))
 		return false;
 
+	if (IsValid(Attachment) && Attachment != NewAttachment)
+		PerformDetachment();
+
 	if (!PerformPhysicalAttachment(NewAttachment, attachmentTarget))
 		return false;
 	

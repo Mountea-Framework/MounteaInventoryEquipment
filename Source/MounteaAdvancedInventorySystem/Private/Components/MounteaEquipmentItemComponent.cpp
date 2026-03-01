@@ -17,10 +17,12 @@
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Statics/MounteaEquipmentStatics.h"
 
-UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() : 
+UMounteaEquipmentItemComponent::UMounteaEquipmentItemComponent() :
 	EquipmentItemState(EEquipmentItemState::EES_Idle),
 	bAutoActivates(1),
-	bRequiresActivationEvent(0)
+	bRequiresActivationEvent(0),
+	bReplicateActivationAnimation(0),
+	bUseDeactivationAnimation(0)
 {
 	bAutoActivate = true;
 	
@@ -54,7 +56,7 @@ bool UMounteaEquipmentItemComponent::SetAutoActive_Implementation(const bool bVa
 
 bool UMounteaEquipmentItemComponent::DoesRequireActivationEvent_Implementation() const
 {
-	return bRequiresActivationEvent && ActivationAnimation.ToSoftObjectPath().IsValid();
+	return bRequiresActivationEvent; // && ActivationAnimation.ToSoftObjectPath().IsValid();
 }
 
 bool UMounteaEquipmentItemComponent::SetRequiresActivationEvent_Implementation(const bool bValue)
@@ -67,18 +69,49 @@ bool UMounteaEquipmentItemComponent::SetRequiresActivationEvent_Implementation(c
 	return false;
 }
 
-UAnimationAsset* UMounteaEquipmentItemComponent::GetActivationAnimation_Implementation() const
+UAnimMontage* UMounteaEquipmentItemComponent::GetActivationAnimation_Implementation() const
 {
 	if (ActivationAnimation.ToSoftObjectPath().IsValid())
-		return Cast<UAnimationAsset>(ActivationAnimation.LoadSynchronous());
+		return ActivationAnimation.LoadSynchronous();
 	return nullptr;
 }
 
-bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnimationAsset* NewActivateAnimation)
+bool UMounteaEquipmentItemComponent::SetActivationAnimation_Implementation(UAnimMontage* NewActivateAnimation)
 {
 	if (ActivationAnimation != NewActivateAnimation)
 	{
 		ActivationAnimation = NewActivateAnimation;
+		return true;
+	}
+	return false;
+}
+
+bool UMounteaEquipmentItemComponent::SetUseDeactivationAnimation_Implementation(const bool bValue)
+{
+	if (bUseDeactivationAnimation != bValue)
+	{
+		bUseDeactivationAnimation = bValue;
+		return true;
+	}
+	return false;
+}
+
+UAnimMontage* UMounteaEquipmentItemComponent::GetDeactivationAnimation_Implementation() const
+{
+	if (!bUseDeactivationAnimation)
+		return GetActivationAnimation_Implementation();
+
+	if (DeactivationAnimation.ToSoftObjectPath().IsValid())
+		return DeactivationAnimation.LoadSynchronous();
+
+	return GetActivationAnimation_Implementation();
+}
+
+bool UMounteaEquipmentItemComponent::SetDeactivationAnimation_Implementation(UAnimMontage* NewDeactivateAnimation)
+{
+	if (DeactivationAnimation != NewDeactivateAnimation)
+	{
+		DeactivationAnimation = NewDeactivateAnimation;
 		return true;
 	}
 	return false;
