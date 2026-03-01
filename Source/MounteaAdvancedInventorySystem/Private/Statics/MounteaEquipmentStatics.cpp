@@ -137,10 +137,18 @@ namespace
 		{
 			UMounteaAdvancedAttachmentSlot* visualSlot =
 				IMounteaAdvancedAttachmentContainerInterface::Execute_GetSlot(Outer, VisualSlotId);
-			if (IsValid(visualSlot) && IsValid(visualSlot->AttachmentTargetComponentOverride))
+			if (IsValid(visualSlot))
 			{
 				OutSocketName = visualSlot->GetAttachmentSocketName();
-				return visualSlot->AttachmentTargetComponentOverride;
+
+				if (IsValid(visualSlot->AttachmentTargetComponentOverride))
+					return visualSlot->AttachmentTargetComponentOverride;
+
+				if (visualSlot->ParentContainer.GetObject())
+					return IMounteaAdvancedAttachmentContainerInterface::Execute_GetAttachmentTargetComponent(
+						visualSlot->ParentContainer.GetObject());
+
+				return IMounteaAdvancedAttachmentContainerInterface::Execute_GetAttachmentTargetComponent(Outer);
 			}
 		}
 
@@ -163,58 +171,13 @@ namespace
 		if (!IsValid(itemTemplate) || !IsValid(itemTemplate->ItemMesh))
 			return;
 
-		const auto applyStaticMeshFallback = [&PlaceholderActor](UStaticMesh* StaticMeshAsset) -> bool
-		{
-			if (!IsValid(StaticMeshAsset))
-				return false;
-
-			UStaticMeshComponent* staticMeshComponent = PlaceholderActor->FindComponentByClass<UStaticMeshComponent>();
-			USkeletalMeshComponent* skeletalMeshComponent = PlaceholderActor->FindComponentByClass<USkeletalMeshComponent>();
-			if (!IsValid(staticMeshComponent))
-				return false;
-
-			if (IsValid(skeletalMeshComponent))
-			{
-				skeletalMeshComponent->SetSkeletalMesh(nullptr);
-				skeletalMeshComponent->SetVisibility(false, true);
-			}
-
-			staticMeshComponent->SetStaticMesh(StaticMeshAsset);
-			staticMeshComponent->SetVisibility(true, true);
-			return true;
-		};
-
-		const auto applySkeletalMeshFallback = [&PlaceholderActor](USkeletalMesh* SkeletalMeshAsset) -> bool
-		{
-			if (!IsValid(SkeletalMeshAsset))
-				return false;
-
-			UStaticMeshComponent* staticMeshComponent = PlaceholderActor->FindComponentByClass<UStaticMeshComponent>();
-			USkeletalMeshComponent* skeletalMeshComponent = PlaceholderActor->FindComponentByClass<USkeletalMeshComponent>();
-			if (!IsValid(skeletalMeshComponent))
-				return false;
-
-			if (IsValid(staticMeshComponent))
-			{
-				staticMeshComponent->SetStaticMesh(nullptr);
-				staticMeshComponent->SetVisibility(false, true);
-			}
-
-			skeletalMeshComponent->SetSkeletalMesh(SkeletalMeshAsset);
-			skeletalMeshComponent->SetVisibility(true, true);
-			return true;
-		};
-
 		if (UStaticMesh* staticMesh = Cast<UStaticMesh>(itemTemplate->ItemMesh))
 		{
 			if (!UMounteaEquipmentStatics::SetQuickUseItemStaticMesh(PlaceholderActor, staticMesh))
 			{
-				if (!applyStaticMeshFallback(staticMesh))
-				{
-					const FString className = IsValid(PlaceholderClass) ? PlaceholderClass->GetName() : TEXT("Unknown");
-					LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Placeholder class '%s' does not expose quick-use mesh setup path for static mesh."),
-						*className)
-				}
+				const FString className = IsValid(PlaceholderClass) ? PlaceholderClass->GetName() : TEXT("Unknown");
+				LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Placeholder class '%s' does not expose quick-use mesh interface for static mesh setup."),
+					*className)
 			}
 			return;
 		}
@@ -223,12 +186,9 @@ namespace
 		{
 			if (!UMounteaEquipmentStatics::SetQuickUseItemSkeletalMesh(PlaceholderActor, skeletalMesh))
 			{
-				if (!applySkeletalMeshFallback(skeletalMesh))
-				{
-					const FString className = IsValid(PlaceholderClass) ? PlaceholderClass->GetName() : TEXT("Unknown");
-					LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Placeholder class '%s' does not expose quick-use mesh setup path for skeletal mesh."),
-						*className)
-				}
+				const FString className = IsValid(PlaceholderClass) ? PlaceholderClass->GetName() : TEXT("Unknown");
+				LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Placeholder class '%s' does not expose quick-use mesh interface for skeletal mesh setup."),
+					*className)
 			}
 		}
 	}
@@ -597,27 +557,14 @@ AActor* UMounteaEquipmentStatics::SpawnQuickUsePlaceholderActor(UObject* Outer, 
 	if (!IsValid(world) || world->GetNetMode() == NM_DedicatedServer)
 		return nullptr;
 
-	UClass* quickUseActorClass = nullptr;
 	const TSoftClassPtr<AActor> quickUseClass = GetDefaultQuickUseItemClass();
-	if (!quickUseClass.IsNull())
-		quickUseActorClass = quickUseClass.LoadSynchronous();
+	if (quickUseClass.IsNull())
+		return nullptr;
 
+	UClass* quickUseActorClass = quickUseClass.LoadSynchronous();
 	if (!IsValid(quickUseActorClass))
 	{
-		const UMounteaInventoryItemTemplate* itemTemplate = ItemDefinition.GetTemplate();
-		if (IsValid(itemTemplate) && !itemTemplate->SpawnActor.IsNull())
-		{
-			quickUseActorClass = itemTemplate->SpawnActor.LoadSynchronous();
-			if (IsValid(quickUseActorClass))
-			{
-				LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Using Item Template SpawnActor as fallback placeholder class. Configure DefaultQuickUseItemClass to avoid fallback path."))
-			}
-		}
-	}
-
-	if (!IsValid(quickUseActorClass))
-	{
-		LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Failed to resolve placeholder class from DefaultQuickUseItemClass and ItemTemplate SpawnActor fallback."))
+		LOG_WARNING(TEXT("[Spawn Quick Use Placeholder Actor]: Default quick use item class failed to load."))
 		return nullptr;
 	}
 

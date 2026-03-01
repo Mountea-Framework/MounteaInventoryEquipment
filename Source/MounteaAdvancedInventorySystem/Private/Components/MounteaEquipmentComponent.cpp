@@ -266,9 +266,10 @@ bool UMounteaEquipmentComponent::ActivateQuickUseItem_Implementation(const FName
 		return false;
 	}
 
-	const FName resolvedVisualSlotId = TargetSlotId.IsNone()
-		? UMounteaEquipmentStatics::ResolveActiveSlotId(SlotId)
-		: TargetSlotId;
+	const FName resolvedActiveSlotId = UMounteaEquipmentStatics::ResolveActiveSlotId(SlotId);
+	const FName resolvedVisualSlotId = !TargetSlotId.IsNone()
+		? TargetSlotId
+		: (!resolvedActiveSlotId.IsNone() ? resolvedActiveSlotId : SlotId);
 
 	AActor* quickUsePlaceholderActor = UMounteaEquipmentStatics::SpawnQuickUsePlaceholderActor(
 		this,
@@ -279,12 +280,12 @@ bool UMounteaEquipmentComponent::ActivateQuickUseItem_Implementation(const FName
 
 	if (IsValid(quickUsePlaceholderActor) && !bRegisteredQuickUsePlaceholder)
 	{
-		LOG_WARNING(TEXT("[Activate Quick Use Item]: Failed to register placeholder actor for item '%s'. Keeping proxy alive temporarily for animation visibility."),
+		LOG_WARNING(TEXT("[Activate Quick Use Item]: Failed to register quick-use placeholder actor for '%s'. Actor will be kept alive temporarily."),
 			*itemGuid.ToString());
 		quickUsePlaceholderActor->SetLifeSpan(3.0f);
 	}
 
-	const bool bActivated = Execute_ActivateEquipmentItem(this, quickUseItemDefinition, TargetSlotId);
+	const bool bActivated = Execute_ActivateEquipmentItem(this, quickUseItemDefinition, resolvedVisualSlotId);
 	if (!bActivated && bRegisteredQuickUsePlaceholder)
 		ConsumeQuickUsePlaceholderActor(itemGuid, true);
 
