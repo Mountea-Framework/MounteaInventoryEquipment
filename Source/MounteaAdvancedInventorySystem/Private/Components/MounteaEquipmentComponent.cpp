@@ -278,7 +278,11 @@ bool UMounteaEquipmentComponent::ActivateQuickUseItem_Implementation(const FName
 		&& RegisterQuickUsePlaceholderActor(itemGuid, quickUsePlaceholderActor);
 
 	if (IsValid(quickUsePlaceholderActor) && !bRegisteredQuickUsePlaceholder)
-		quickUsePlaceholderActor->Destroy();
+	{
+		LOG_WARNING(TEXT("[Activate Quick Use Item]: Failed to register placeholder actor for item '%s'. Keeping proxy alive temporarily for animation visibility."),
+			*itemGuid.ToString());
+		quickUsePlaceholderActor->SetLifeSpan(3.0f);
+	}
 
 	const bool bActivated = Execute_ActivateEquipmentItem(this, quickUseItemDefinition, TargetSlotId);
 	if (!bActivated && bRegisteredQuickUsePlaceholder)
@@ -359,6 +363,24 @@ bool UMounteaEquipmentComponent::ExecuteEquipmentStateTransition(const FEquipmen
 		return false;
 
 	TScriptInterface<IMounteaAdvancedEquipmentItemInterface> equipItemInterface = Context.EquipItemInterface;
+	if (!bLocalOnly && Context.NewState == EEquipmentItemState::EES_Active)
+	{
+		TSet<FName> ignoredSlots;
+		if (IsValid(Context.CurrentSlot))
+			ignoredSlots.Add(Context.CurrentSlot->SlotName);
+		if (IsValid(Context.TargetSlot))
+			ignoredSlots.Add(Context.TargetSlot->SlotName);
+
+		if (!UMounteaEquipmentStatics::ClearBlockedSlotsForAttachment(
+			this,
+			Context.CurrentSlot->Attachment,
+			Context.ItemGuid,
+			ignoredSlots))
+		{
+			return false;
+		}
+	}
+
 	if (Context.bNeedsSlotSwitch)
 	{
 		if (!IsValid(Context.TargetSlot))
