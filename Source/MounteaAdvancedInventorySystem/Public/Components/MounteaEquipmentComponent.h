@@ -14,9 +14,15 @@
 #include "CoreMinimal.h"
 #include "MounteaAttachmentContainerComponent.h"
 #include "Components/ActorComponent.h"
+#include "Definitions/MounteaEquipmentBaseEnums.h"
+#include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
 #include "MounteaEquipmentComponent.generated.h"
 
+class UAnimMontage;
+class UAnimInstance;
+class UMounteaAdvancedAttachmentSlot;
+class AActor;
 
 /**
  * UMounteaEquipmentComponent extends attachment containers with specialized equipment functionality.
@@ -49,8 +55,39 @@ public:
 	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
 	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
 	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const override;
-	
+	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+	virtual bool ActivateQuickUseItem_Implementation(const FName& SlotId, const FName& TargetSlotId) override;
+	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+	virtual bool AnimAttachItem_Implementation() override;
+	virtual bool AnimQuickItemUsed_Implementation() override;
+	virtual bool TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const override;
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Setter"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Register Quick Use Placeholder Actor")
+	bool RegisterQuickUsePlaceholderActor(const FGuid& ItemGuid, AActor* PlaceholderActor);
+
 protected:
+
+	bool BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
+		EEquipmentItemState NewState, bool bResolveAsActivation, FEquipmentTransitionContext& OutContext);
+	bool ResolveTransitionDefinition(EEquipmentTransitionType TransitionType, EEquipmentItemState& OutExpectedState,
+		EEquipmentItemState& OutNewState, bool& OutResolveAsActivation) const;
+	bool ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, bool bLocalOnly = false);
+	bool ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, EEquipmentTransitionType TransitionType) const;
+	void ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+		EEquipmentTransitionType TransitionType, UAnimMontage* Montage = nullptr, float MontageDuration = -1.f);
+	double ResolvePendingTransitionTimeout(UAnimMontage* Montage, float MontageDuration) const;
+	bool IsPendingActivationExpired() const;
+	void ResetPendingActivationIfExpired();
+	bool IsTransitionInProgress(EEquipmentTransitionType RequestedTransitionType = EEquipmentTransitionType::EET_None) const;
+	void SetCurrentTransitionType(EEquipmentTransitionType NewTransitionType);
+	void ResetCurrentTransitionType();
+	UAnimInstance* ResolveOwnerAnimInstance() const;
+	UAnimMontage* ResolveTransitionMontage(const FEquipmentTransitionContext& Context, EEquipmentTransitionType TransitionType) const;
+	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+		EEquipmentTransitionType TransitionType);
 	
 	bool IsAuthority() const;
 	UFUNCTION(Server, Reliable)
@@ -59,9 +96,39 @@ protected:
 	void Server_EquipItemToSlot(const FInventoryItem& ItemDefinition, const FName& SlotId);
 	UFUNCTION(Server, Reliable)
 	void Server_UnequipItem(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot);
-	
+	UFUNCTION(Server, Reliable)
+	void Server_ActivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	UFUNCTION(Server, Reliable)
+	void Server_DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	UFUNCTION(Server, Reliable)
+	void Server_AnimAttachItem(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentTransitionType TransitionType);
+	UFUNCTION(Server, Reliable)
+	void Server_AnimQuickItemUsed(const FGuid& ItemGuid);
+
+	bool ConsumeQuickUsePlaceholderActor(const FGuid& ItemGuid, bool bIgnoreItemGuidMismatch);
+
+	FPendingEquipmentActivation PendingActivation;
+	EEquipmentTransitionType CurrentTransitionType = EEquipmentTransitionType::EET_None;
+	TWeakObjectPtr<AActor> QuickUsePlaceholderActor;
+	FGuid QuickUsePlaceholderItemGuid;
+
+	UFUNCTION()
+	void OnTransitionMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
+		meta=(ClampMin="0.0", UIMin="0.0", ForceUnits="s"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=20))
+	float PendingActivationTimeoutSeconds = 1.f;
+
+	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
+		meta=(ClampMin="0.0", UIMin="0.0"),
+		meta=(NoResetToDefault),
+		meta=(DisplayPriority=21))
+	float PendingActivationTimeoutMarginPercent = 0.2f;
+
 public:
-	
+
 	UPROPERTY(EditAnywhere, Category="Mountea|Equipment",
 		meta=(FunctionReference, AllowFunctionLibraries, PrototypeFunction="/Script/MounteaAdvancedInventorySystem.MounteaEquipmentStatics.Prototype_EquipItem"),
 		meta=(DefaultBindingName="On Equip Item Requested"),

@@ -50,3 +50,15 @@ enum class EEquipmentItemState : uint8
 
 	Default        UMETA(Hidden)
 };
+
+UENUM(BlueprintType)
+enum class EEquipmentTransitionType : uint8
+{
+	EET_None			UMETA(DisplayName="None"),
+	EET_Activate		UMETA(DisplayName="Activate"),
+	EET_Deactivate		UMETA(DisplayName="Deactivate"),
+	EET_Equip			UMETA(DisplayName="Equip"),
+	EET_Unequip			UMETA(DisplayName="Unequip"),
+
+	Default				UMETA(Hidden)
+};
