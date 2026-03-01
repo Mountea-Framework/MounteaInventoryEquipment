@@ -19,6 +19,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Statics/MounteaEquipmentStatics.h"
 
 UMounteaAdvancedAttachmentSlotBase::UMounteaAdvancedAttachmentSlotBase() : 
 	SlotName(NAME_None),
@@ -41,8 +42,7 @@ AActor* UMounteaAdvancedAttachmentSlotBase::GetOwningActor() const
 	return ParentContainer->Execute_GetOwningActor(ownerObject);
 }
 
-void UMounteaAdvancedAttachmentSlotBase::InitializeAttachmentSlot(
-	const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent)
+void UMounteaAdvancedAttachmentSlotBase::InitializeAttachmentSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Parent)
 {
 	ParentContainer = Parent;
 
@@ -78,8 +78,7 @@ UWorld* UMounteaAdvancedAttachmentSlotBase::GetWorld() const
 	return GetOwningActor()->GetWorld();
 }
 
-void UMounteaAdvancedAttachmentSlotBase::GetLifetimeReplicatedProps(
-	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UMounteaAdvancedAttachmentSlotBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	UObject::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -97,8 +96,7 @@ int32 UMounteaAdvancedAttachmentSlotBase::GetFunctionCallspace(UFunction* Functi
 	return GetOuter()->GetFunctionCallspace(Function, Stack);
 }
 
-bool UMounteaAdvancedAttachmentSlotBase::CallRemoteFunction(UFunction* Function, void* Parms,
-	struct FOutParmRec* OutParms, FFrame* Stack)
+bool UMounteaAdvancedAttachmentSlotBase::CallRemoteFunction(UFunction* Function, void* Parms, struct FOutParmRec* OutParms, FFrame* Stack)
 {
 	AActor* owningActor = GetOwningActor();
 	if (UNetDriver* netDriver = owningActor->GetNetDriver())
@@ -169,6 +167,13 @@ bool UMounteaAdvancedAttachmentSlotBase::CanAttachAttachable(const UObject* NewA
 	if (!MatchesTags(IMounteaAdvancedAttachmentAttachableInterface::Execute_GetTags(NewAttachment), false))
 	{
 		LOG_WARNING(TEXT("Attachable object does not match selected Slot tags!"));
+		return false;
+	}
+
+	if (ParentContainer.GetObject() &&
+		UMounteaEquipmentStatics::IsSlotBlockedByCurrentAttachments(ParentContainer.GetObject(), this, true))
+	{
+		LOG_WARNING(TEXT("Slot '%s' is currently blocked by active equipment tags."), *SlotName.ToString());
 		return false;
 	}
 	
