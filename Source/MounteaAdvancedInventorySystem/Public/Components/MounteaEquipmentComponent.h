@@ -72,10 +72,16 @@ protected:
 
 	bool BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
 		EEquipmentItemState NewState, bool bResolveAsActivation, FEquipmentTransitionContext& OutContext);
+	bool BuildTransitionContextForType(const FGuid& ItemGuid, const FName& TargetSlotId,
+		EEquipmentTransitionType TransitionType, FEquipmentTransitionContext& OutContext);
 	bool ResolveTransitionDefinition(EEquipmentTransitionType TransitionType, EEquipmentItemState& OutExpectedState,
 		EEquipmentItemState& OutNewState, bool& OutResolveAsActivation) const;
 	bool ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, bool bLocalOnly = false);
+	bool ExecuteItemTransitionRequest(const FInventoryItem& ItemDefinition, const FName& TargetSlotId,
+		EEquipmentTransitionType TransitionType);
 	bool ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, EEquipmentTransitionType TransitionType) const;
+	bool ValidateEquipRequest(const FInventoryItem& ItemDefinition) const;
+	bool TryExecuteEquipOverride(const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) const;
 	void ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
 		EEquipmentTransitionType TransitionType, UAnimMontage* Montage = nullptr, float MontageDuration = -1.f);
 	double ResolvePendingTransitionTimeout(UAnimMontage* Montage, float MontageDuration) const;
