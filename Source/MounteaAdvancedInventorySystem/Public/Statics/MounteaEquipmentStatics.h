@@ -23,8 +23,11 @@ class UMounteaAdvancedAttachmentSlot;
 class UMounteaAdvancedAttachmentSlotBase;
 class UMounteaEquipmentComponent;
 class IMounteaAdvancedEquipmentInterface;
+class UBlueprintGeneratedClass;
+class USceneComponent;
 class USkeletalMesh;
 class UStaticMesh;
+struct FMounteaEquipmentSlotHeaderData;
 
 /**
  * 
@@ -149,6 +152,96 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Is Valid Equipment Item Class")
 	static bool IsTargetClassValid(const UClass* TargetClass);
+
+	/**
+	 * Resolves and retrieves header data associated with a specific advanced attachment slot.
+	 * The resolved data provides detailed information about the slot's configuration, including its usability, tags, and related settings.
+	 *
+	 * @param Slot - A pointer to the advanced attachment slot for which the header data is being resolved.
+	 * @param SettingsConfig - A pointer to the advanced equipment settings configuration used to locate the relevant header data.
+	 * @return - A pointer to the resolved FMounteaEquipmentSlotHeaderData object associated with the given slot, or nullptr if no matching data is found.
+	 */
+	static const FMounteaEquipmentSlotHeaderData* ResolveSlotHeaderData(const UMounteaAdvancedAttachmentSlotBase* Slot, 
+		const UMounteaAdvancedEquipmentSettingsConfig* SettingsConfig);
+
+	/**
+	 * Attempts to retrieve the gameplay tags associated with the specified attachment object.
+	 * This function checks if the provided object implements the MounteaAdvancedAttachmentAttachableInterface
+	 * and extracts the associated tags if available.
+	 *
+	 * @param AttachmentObject - The object from which to retrieve the attachment tags.
+	 * @param OutTags - A reference to a GameplayTagContainer that will contain
+	 *                  the tags associated with the attachment object if the operation is successful.
+	 * @return - A boolean indicating whether the operation was successful and the tags were retrieved.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Attachments|Equipment",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Try Get Attachment Tags")
+	static bool TryGetAttachmentTags(UObject* AttachmentObject, FGameplayTagContainer& OutTags);
+
+	/**
+	 * Evaluates whether the specified attachment object is an active equipment item within the Mountea Equipment System.
+	 * Determines the item's state by leveraging the Mountea Advanced Equipment Item interface.
+	 *
+	 * @param AttachmentObject - The object to be checked, which is expected to potentially implement the equipment item interface.
+	 * @return - True if the attachment object is an active equipment item, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Attachments|Equipment",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Attachment Active Equipment Item")
+	static bool IsAttachmentActiveEquipmentItem(UObject* AttachmentObject);
+
+	/**
+	 * Validates the compatibility between an inventory item and a target equipment slot, using the provided settings configuration.
+	 * Determines if the specified item type is allowed for the target slot based on predefined constraints.
+	 *
+	 * @param ItemDefinition - The inventory item definition to be checked for compatibility.
+	 * @param TargetSlot - The equipment slot against which compatibility is being validated.
+	 * @param SettingsConfig - The configuration object containing settings and constraints for item-to-slot compatibility.
+	 * @return - A boolean value indicating whether the item is compatible with the target slot.
+	 */
+	static bool ValidateSlotItemTypeCompatibility(const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
+		const UMounteaAdvancedEquipmentSettingsConfig* SettingsConfig);
+
+	/**
+	 * Resolves the owning actor associated with a given UObject.
+	 * If the provided object is an actor, it is returned directly.
+	 * If the object is an actor component, this method retrieves its owning actor.
+	 *
+	 * @param Target - The UObject to resolve the owning actor from. Can be an actor or an actor component.
+	 * @return - A pointer to the resolved owning actor, or nullptr if the target is not associated with an actor.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Resolve Owning Actor")
+	static AActor* ResolveOwningActor(UObject* Target);
+
+	/**
+	 * Resolves and retrieves the appropriate attachment target component for quick-use functionality
+	 * in the Mountea Equipment System, using the specified slot identifier.
+	 *
+	 * @param Outer             The context object within which the resolution is performed. Typically an actor or a component.
+	 * @param VisualSlotId      The identifier of the visual slot for which the attachment target is being resolved.
+	 * @param OutSocketName     The name of the socket that corresponds to the resolved attachment target. This is updated as part of the method.
+	 *
+	 * @return                  A pointer to the resolved attachment target component, or nullptr if no valid target is found.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Quick Use",
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(AutoCreateRefTerm="VisualSlotId"),
+		DisplayName="Resolve Quick Use Attachment Target")
+	static USceneComponent* ResolveQuickUseAttachmentTarget(UObject* Outer, const FName& VisualSlotId, FName& OutSocketName);
+
+	/**
+	 * Applies a placeholder mesh to a specified actor based on the given inventory item definition and placeholder class.
+	 * Determines the appropriate mesh (static or skeletal) from the item's template and assigns it to the actor.
+	 * Logs a warning if the placeholder class does not support quick-use mesh functionality.
+	 *
+	 * @param PlaceholderActor - The actor to which the placeholder mesh will be applied. Must be valid.
+	 * @param ItemDefinition - The inventory item definition that provides the item template containing the mesh data.
+	 * @param PlaceholderClass - The class of the placeholder actor, used for logging and validation purposes.
+	 */
+	static void ApplyQuickUsePlaceholderMesh(AActor* PlaceholderActor, const FInventoryItem& ItemDefinition, const UClass* PlaceholderClass);
 
 	/**
 	 * Validates whether an item can be equipped and resolves a usable target slot.
@@ -526,4 +619,10 @@ public:
 	UFUNCTION(BlueprintInternalUseOnly)
 	bool Prototype_EquipItem(const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) { return false; };
 #endif
+
+private:
+
+	static UObject* ResolveFirstInterfaceObject(UObject* Target, const UClass* InterfaceClass, bool bResolveOwnerForComponents);
+	static UObject* ResolveFirstInterfaceObjectFromActor(AActor* Actor, const UClass* InterfaceClass);
+	static UObject* ResolveFirstInterfaceObjectFromBlueprintClass(const UBlueprintGeneratedClass* BlueprintClass, const UClass* InterfaceClass);
 };
