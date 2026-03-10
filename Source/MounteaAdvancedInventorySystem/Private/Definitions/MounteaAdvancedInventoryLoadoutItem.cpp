@@ -20,6 +20,9 @@ UMounteaAdvancedInventoryLoadoutItem::UMounteaAdvancedInventoryLoadoutItem() :
 	bUseRandomQuantity(false),
 	bAutomaticallyEquip(true)
 {
+#if WITH_EDITORONLY_DATA
+	DisplayName = IsValid(ItemTemplate) ? FName(ItemTemplate->DisplayName.ToString()) : NAME_None;
+#endif
 }
 
 TArray<FName> UMounteaAdvancedInventoryLoadoutItem::GetAvailableSlotNames()
@@ -48,6 +51,7 @@ void UMounteaAdvancedInventoryLoadoutItem::ApplyDefaults()
 	bUseRandomQuantity = false;
 	bAutomaticallyEquip = true;
 	EquipmentSlot = NAME_None;
+	DisplayName = NAME_None;
 }
 
 #if WITH_EDITOR
@@ -70,6 +74,7 @@ void UMounteaAdvancedInventoryLoadoutItem::PostEditChangeProperty(struct FProper
 				bAutomaticallyEquip = true;				
 				EquipmentSlot = UMounteaEquipmentStatics::ResolveBestSlotIdFromTags(ItemTemplate->AttachmentSlots, ItemTemplate->EquipmentItemType);
 			}
+			DisplayName = FName(ItemTemplate->DisplayName.ToString());
 		}
 	}
 }

@@ -38,25 +38,37 @@ public:
 	
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
 	TObjectPtr<UMounteaInventoryItemTemplate> ItemTemplate = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
-		meta=(EditCondition="bUseRandomQuantity"))
+		meta=(EditCondition="bUseRandomQuantity", EditConditionHides),
+		meta=(NoResetToDefault))
 	FIntPoint RandomRange = FIntPoint(1, 100);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
 	int32 BaseQuantity = 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
 	uint8 bUseRandomQuantity : 1;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
 	uint8 bAutomaticallyEquip : 1;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
-		meta=(GetOptions="GetAvailableSlotNames"))
+		meta=(GetOptions="GetAvailableSlotNames"),
+		meta=(NoResetToDefault))
 	FName EquipmentSlot = NAME_None;
+	
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
+	FName DisplayName = NAME_None;
+#endif
 	
 protected:
 	
