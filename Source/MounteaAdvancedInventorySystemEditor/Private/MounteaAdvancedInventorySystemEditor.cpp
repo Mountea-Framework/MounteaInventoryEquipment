@@ -212,10 +212,33 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigThumb);
 					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigIcon);
 				}
+				
+				FSlateImageBrush* MounteaAdvancedInventoryLoadoutConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/LoadoutConfiguration"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedInventoryLoadoutConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/LoadoutConfiguration"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedInventoryLoadoutConfigThumb && MounteaAdvancedInventoryLoadoutConfigIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryLoadout", MounteaAdvancedInventoryLoadoutConfigThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryLoadout", MounteaAdvancedInventoryLoadoutConfigIcon);
+				}
+				
+				FSlateImageBrush* MounteaAdvancedInventoryLoadoutComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/LoadoutComponent"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedInventoryLoadoutComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/LoadoutComponent"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedInventoryLoadoutComponentThumb && MounteaAdvancedInventoryLoadoutComponentIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryLoadoutComponent", MounteaAdvancedInventoryLoadoutComponentThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryLoadoutComponent", MounteaAdvancedInventoryLoadoutComponentIcon);
+				}
+				
+				FSlateImageBrush* MounteaAdvancedInventoryLoadoutItemThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/LoadoutItem"), TEXT(".png")), FVector2D(128.f, 128.f));
+				FSlateImageBrush* MounteaAdvancedInventoryLoadoutItemIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/LoadoutItem"), TEXT(".png")), FVector2D(16.f, 16.f));
+				if (MounteaAdvancedInventoryLoadoutItemThumb && MounteaAdvancedInventoryLoadoutItemIcon)
+				{
+					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryLoadoutItem", MounteaAdvancedInventoryLoadoutItemThumb);
+					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryLoadoutItem", MounteaAdvancedInventoryLoadoutItemIcon);
+				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
-
 		}
 	}
 
