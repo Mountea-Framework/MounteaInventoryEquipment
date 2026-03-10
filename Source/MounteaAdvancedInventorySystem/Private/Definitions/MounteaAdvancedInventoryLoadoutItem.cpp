@@ -14,7 +14,6 @@
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
-#include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaEquipmentStatics.h"
 
 UMounteaAdvancedInventoryLoadoutItem::UMounteaAdvancedInventoryLoadoutItem() : 
