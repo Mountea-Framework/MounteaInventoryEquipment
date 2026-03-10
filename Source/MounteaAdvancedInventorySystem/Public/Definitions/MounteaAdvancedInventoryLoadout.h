@@ -30,8 +30,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadout : publ
 	
 public:
 	
+	/**
+	 *
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault),
+		meta=(TitleProperty="DisplayName"),
+		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
+		meta=(FullyExpand=true))
 	TArray<TObjectPtr<UMounteaAdvancedInventoryLoadoutItem>> Items;
 };
