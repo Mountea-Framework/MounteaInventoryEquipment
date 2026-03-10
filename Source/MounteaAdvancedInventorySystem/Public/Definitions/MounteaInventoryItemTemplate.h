@@ -225,7 +225,7 @@ public:
 
 	/** Defines the compatible slots this template can be attached to. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
-	meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+	meta=(Categories="Mountea_Inventory.AttachmentSlots"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=25))
 	FGameplayTagContainer AttachmentSlots;
