@@ -341,6 +341,33 @@ public:
 	static FName ResolveActiveSlotId(const FName& StorageSlotId);
 
 	/**
+	 * Resolves the best matching slot id from equipment config using required slot tags.
+	 *
+	 * Match strategy:
+	 * - Only enabled config slots are evaluated.
+	 * - If EquipmentItemType is provided and slot has AllowedItemTypes, the slot must include that type.
+	 * - Slots containing all DesiredTags are preferred over partial matches.
+	 * - Then highest overlap count is preferred.
+	 * - Then the most specific slot is preferred (fewest extra tags).
+	 *
+	 * System examples:
+	 * - DesiredTags = {"Mountea_Inventory.AttachmentSlots.Hand.Right"} usually resolves "RightHand".
+	 * - DesiredTags = {"Mountea_Inventory.AttachmentSlots.Hand"} with EquipmentItemType = "Mountea_Inventory.Equipment.ItemType.QuickUse"
+	 *   resolves the best enabled quick-use compatible hand slot.
+	 *
+	 * @param DesiredTags  Required slot tags to match against FMounteaEquipmentSlotHeaderData::TagContainer.
+	 * @param EquipmentItemType  Optional item type compatibility filter from item template.
+	 * @return  Best matching slot id, or NAME_None if no compatible candidate exists.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Getter,MounteaK2EquipmentSlot"),
+		meta=(AutoCreateRefTerm="DesiredTags,EquipmentItemType"),
+		DisplayName="Resolve Best Slot Id From Tags")
+	static FName ResolveBestSlotIdFromTags(
+		const FGameplayTagContainer& DesiredTags,
+		const FGameplayTag& EquipmentItemType);
+
+	/**
 	 * Finds the attachment slot where a specific equipped item lives.
 	 *
 	 * @param Outer  The equipment container to search.
@@ -622,7 +649,7 @@ public:
 
 private:
 
-	static UObject* ResolveFirstInterfaceObject(UObject* Target, const UClass* InterfaceClass, bool bResolveOwnerForComponents);
-	static UObject* ResolveFirstInterfaceObjectFromActor(AActor* Actor, const UClass* InterfaceClass);
-	static UObject* ResolveFirstInterfaceObjectFromBlueprintClass(const UBlueprintGeneratedClass* BlueprintClass, const UClass* InterfaceClass);
+	static UObject* ResolveFirstInterfaceObject(UObject* Target, TSubclassOf<UInterface> InterfaceClass, bool bResolveOwnerForComponents);
+	static UObject* ResolveFirstInterfaceObjectFromActor(AActor* Actor, TSubclassOf<UInterface> InterfaceClass);
+	static UObject* ResolveFirstInterfaceObjectFromBlueprintClass(const UBlueprintGeneratedClass* BlueprintClass, TSubclassOf<UInterface> InterfaceClass);
 };
