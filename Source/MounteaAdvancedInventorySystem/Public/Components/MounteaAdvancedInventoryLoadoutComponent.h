@@ -47,6 +47,7 @@ protected:
 	void Server_LoadLoadout();
 
 protected:
+	void InitializeInventoryAndEquipment();
 	virtual void BeginPlay() override;
 	
 protected:
