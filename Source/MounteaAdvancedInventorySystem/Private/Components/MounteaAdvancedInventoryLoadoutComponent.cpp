@@ -52,10 +52,8 @@ static void LogFailedLoadoutItems(const TArray<UMounteaAdvancedInventoryLoadoutI
 	});
 }
 
-static void LoadItemsToInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
-	const TArray<UMounteaAdvancedInventoryLoadoutItem*>& SourceItems,
-	TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutLoadedItems,
-	TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutFailedItems)
+static void LoadItemsToInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory, const TArray<UMounteaAdvancedInventoryLoadoutItem*>& SourceItems,
+	TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutLoadedItems, TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutFailedItems)
 {
 	OutLoadedItems.Reserve(SourceItems.Num());
 	OutFailedItems.Reserve(SourceItems.Num());
@@ -94,8 +92,7 @@ static TArray<UMounteaAdvancedInventoryLoadoutItem*> CollectItemsToEquip(const T
 	return itemsToEquip;
 }
 
-static TArray<FResolvedLoadoutItem> ResolveInventoryItemsForEquip(
-	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+static TArray<FResolvedLoadoutItem> ResolveInventoryItemsForEquip(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
 	const TArray<UMounteaAdvancedInventoryLoadoutItem*>& ItemsToEquip)
 {
 	TArray<FResolvedLoadoutItem> inventoryItems;
@@ -112,8 +109,7 @@ static TArray<FResolvedLoadoutItem> ResolveInventoryItemsForEquip(
 	return inventoryItems;
 }
 
-static void EquipResolvedInventoryItems(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Equipment,
-	const TArray<FResolvedLoadoutItem>& InventoryItems,
+static void EquipResolvedInventoryItems(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Equipment, const TArray<FResolvedLoadoutItem>& InventoryItems,
 	TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutFailedEquipments)
 {
 	OutFailedEquipments.Reserve(InventoryItems.Num());
@@ -138,7 +134,8 @@ static void EquipResolvedInventoryItems(const TScriptInterface<IMounteaAdvancedE
 	});
 }
 
-UMounteaAdvancedInventoryLoadoutComponent::UMounteaAdvancedInventoryLoadoutComponent()
+UMounteaAdvancedInventoryLoadoutComponent::UMounteaAdvancedInventoryLoadoutComponent() :
+	bAutoLoad(true)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
@@ -161,7 +158,7 @@ bool UMounteaAdvancedInventoryLoadoutComponent::LoadLoadout_Implementation()
 		return true;
 	}
 	
-	if (!IsValid(LoadoutConfiguration))
+	if (!IsValid(LoadoutConfiguration.LoadSynchronous()))
 	{
 		LOG_WARNING(TEXT("[LoadLoadout] Loadout configuration is invalid!"))
 		return false;
@@ -210,7 +207,7 @@ bool UMounteaAdvancedInventoryLoadoutComponent::LoadLoadout_Implementation()
 
 TArray<UMounteaAdvancedInventoryLoadoutItem*> UMounteaAdvancedInventoryLoadoutComponent::GetLoadoutItems_Implementation() const
 {
-	if (!IsValid(LoadoutConfiguration))
+	if (!IsValid(LoadoutConfiguration.LoadSynchronous()))
 		return {};
 	return LoadoutConfiguration->Items;
 }
@@ -245,10 +242,9 @@ void UMounteaAdvancedInventoryLoadoutComponent::BeginPlay()
 {
 	Super::BeginPlay();	
 	
-	if (GetOwner() && GetOwner()->HasAuthority())
-	{		
-		InitializeInventoryAndEquipment();
+	InitializeInventoryAndEquipment();
+	
+	if ( bAutoLoad && GetOwner() && GetOwner()->HasAuthority())
 		Execute_LoadLoadout(this);
-	}
 }
 

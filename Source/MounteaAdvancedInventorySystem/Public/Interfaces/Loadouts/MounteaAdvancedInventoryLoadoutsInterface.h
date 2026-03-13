@@ -41,4 +41,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Loadouts")
 	TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems() const;
 	virtual TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Loadouts")
+	bool ShouldLoadAutomatically() const;
+	virtual bool ShouldLoadAutomatically_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Loadouts")
+	void SetAutomaticLoad(const bool bNewValue);
+	virtual void SetAutomaticLoad_Implementation(const bool bNewValue) = 0;
 };

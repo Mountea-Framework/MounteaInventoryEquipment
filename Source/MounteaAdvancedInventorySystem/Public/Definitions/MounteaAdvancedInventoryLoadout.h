@@ -33,7 +33,7 @@ public:
 	/**
 	 * Represents a collection of advanced inventory loadout items used in the Mountea inventory system.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,
 		meta=(NoResetToDefault),
 		meta=(TitleProperty="item: {DisplayName} | slot: {EquipmentSlot}"),
