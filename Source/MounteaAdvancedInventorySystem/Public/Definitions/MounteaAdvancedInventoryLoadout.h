@@ -31,7 +31,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadout : publ
 public:
 	
 	/**
-	 *
+	 * Represents a collection of advanced inventory loadout items used in the Mountea inventory system.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,

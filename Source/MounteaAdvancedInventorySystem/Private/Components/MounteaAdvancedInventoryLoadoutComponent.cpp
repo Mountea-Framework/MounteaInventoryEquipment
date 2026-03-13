@@ -12,13 +12,131 @@
 
 #include "Components/MounteaAdvancedInventoryLoadoutComponent.h"
 
+#include "Algo/ForEach.h"
+#include "Algo/Transform.h"
 #include "Definitions/MounteaAdvancedInventoryLoadout.h"
 #include "Definitions/MounteaAdvancedInventoryLoadoutItem.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
-#include "Statics/MounteaInventorySystemStatics.h"
+#include "Statics/MounteaEquipmentStatics.h"
+#include "Statics/MounteaInventoryStatics.h"
+
+using FResolvedLoadoutItem = TPair<UMounteaAdvancedInventoryLoadoutItem*, FInventoryItem>;
+
+static FString GetLoadoutItemDebugName(const UMounteaAdvancedInventoryLoadoutItem* Item)
+{
+	if (!IsValid(Item))
+		return TEXT("<InvalidItem>");
+
+#if WITH_EDITORONLY_DATA
+	if (Item->DisplayName != NAME_None)
+		return Item->DisplayName.ToString();
+#endif
+
+	return IsValid(Item->ItemTemplate) ? Item->ItemTemplate->DisplayName.ToString() : TEXT("<MissingTemplate>");
+}
+
+static void LogFailedLoadoutItems(const TArray<UMounteaAdvancedInventoryLoadoutItem*>& FailedItems, const TCHAR* InvalidItemMessage, const TCHAR* FailedItemMessage)
+{
+	Algo::ForEach(FailedItems, [InvalidItemMessage, FailedItemMessage](const UMounteaAdvancedInventoryLoadoutItem* Failure)
+	{
+		if (!IsValid(Failure))
+		{
+			LOG_WARNING(TEXT("%s"), InvalidItemMessage)
+			return;
+		}
+
+		LOG_WARNING(TEXT("%s\n%s"), FailedItemMessage, *GetLoadoutItemDebugName(Failure))
+	});
+}
+
+static void LoadItemsToInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const TArray<UMounteaAdvancedInventoryLoadoutItem*>& SourceItems,
+	TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutLoadedItems,
+	TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutFailedItems)
+{
+	OutLoadedItems.Reserve(SourceItems.Num());
+	OutFailedItems.Reserve(SourceItems.Num());
+
+	Algo::ForEach(SourceItems, [&Inventory, &OutLoadedItems, &OutFailedItems](UMounteaAdvancedInventoryLoadoutItem* Item)
+	{
+		const bool bAdded = IsValid(Item) && UMounteaInventoryStatics::AddItemFromTemplate(Inventory, Item->ItemTemplate, Item->BaseQuantity, Item->BaseDurability);
+		if (bAdded)
+		{
+			OutLoadedItems.Add(Item);
+			return;
+		}
+
+		OutFailedItems.Add(Item);
+	});
+}
+
+static bool IsLoadoutItemEquippable(const UMounteaAdvancedInventoryLoadoutItem* Item)
+{
+	if (!IsValid(Item) || !Item->bAutomaticallyEquip)
+		return false;
+
+	const UMounteaInventoryItemTemplate* itemTemplate = Item->ItemTemplate;
+	return IsValid(itemTemplate) && itemTemplate->EquipmentItemType.IsValid() && !itemTemplate->AttachmentSlots.IsEmpty();
+}
+
+static TArray<UMounteaAdvancedInventoryLoadoutItem*> CollectItemsToEquip(const TArray<UMounteaAdvancedInventoryLoadoutItem*>& LoadedItems)
+{
+	TArray<UMounteaAdvancedInventoryLoadoutItem*> itemsToEquip;
+	itemsToEquip.Reserve(LoadedItems.Num());
+
+	Algo::TransformIf(LoadedItems, itemsToEquip,
+		[](const UMounteaAdvancedInventoryLoadoutItem* Item) { return IsLoadoutItemEquippable(Item); },
+		[](UMounteaAdvancedInventoryLoadoutItem* Item) { return Item; });
+
+	return itemsToEquip;
+}
+
+static TArray<FResolvedLoadoutItem> ResolveInventoryItemsForEquip(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const TArray<UMounteaAdvancedInventoryLoadoutItem*>& ItemsToEquip)
+{
+	TArray<FResolvedLoadoutItem> inventoryItems;
+	inventoryItems.Reserve(ItemsToEquip.Num());
+
+	Algo::Transform(ItemsToEquip, inventoryItems, [&Inventory](UMounteaAdvancedInventoryLoadoutItem* Item)
+	{
+		return FResolvedLoadoutItem(
+			Item,
+			UMounteaInventoryStatics::FindItem(Inventory, FInventoryItemSearchParams(Item->ItemTemplate))
+		);
+	});
+
+	return inventoryItems;
+}
+
+static void EquipResolvedInventoryItems(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Equipment,
+	const TArray<FResolvedLoadoutItem>& InventoryItems,
+	TArray<UMounteaAdvancedInventoryLoadoutItem*>& OutFailedEquipments)
+{
+	OutFailedEquipments.Reserve(InventoryItems.Num());
+
+	Algo::ForEach(InventoryItems, [&Equipment, &OutFailedEquipments](const FResolvedLoadoutItem& ItemPair)
+	{
+		if (!ItemPair.Value.IsItemValid())
+		{
+			OutFailedEquipments.Add(ItemPair.Key);
+			return;
+		}
+
+		bool bEquipped = false;
+		if (IsValid(ItemPair.Key) && ItemPair.Key->EquipmentSlot != NAME_None)
+			bEquipped = UMounteaEquipmentStatics::EquipItemToSlot(Equipment, ItemPair.Value, ItemPair.Key->EquipmentSlot);
+
+		if (!bEquipped)
+			bEquipped = UMounteaEquipmentStatics::EquipItem(Equipment, ItemPair.Value);
+
+		if (!bEquipped)
+			OutFailedEquipments.Add(ItemPair.Key);
+	});
+}
 
 UMounteaAdvancedInventoryLoadoutComponent::UMounteaAdvancedInventoryLoadoutComponent()
 {
@@ -37,11 +155,6 @@ UMounteaAdvancedInventoryLoadoutComponent::UMounteaAdvancedInventoryLoadoutCompo
 
 bool UMounteaAdvancedInventoryLoadoutComponent::LoadLoadout_Implementation()
 {
-	// TODO: 
-	// 1. Get all items
-	// 2. Load them all to inventory
-	// 3. From the Inventory get all
-	// 4. Attach those that are relevant to Equipment
 	if (!GetOwner()->HasAuthority())
 	{
 		Server_LoadLoadout();
@@ -58,58 +171,40 @@ bool UMounteaAdvancedInventoryLoadoutComponent::LoadLoadout_Implementation()
 		LOG_WARNING(TEXT("[LoadLoadout] Inventory is invalid!"))
 		return false;
 	}
-	const auto items = Execute_GetLoadoutItems(this);
-	if (items.Num() == 0)
+	const TArray<UMounteaAdvancedInventoryLoadoutItem*> items = Execute_GetLoadoutItems(this);
+	if (items.IsEmpty())
 	{
 		LOG_WARNING(TEXT("[LoadLoadout] No items to load!"))
 		return false;
 	}
-	
-	TMap<int32, bool> failedItems;
-	failedItems.Reserve(items.Num());
-	for (const auto& item : items)
-	{
-		if (!RelatedInventory->Execute_AddItemFromTemplate(RelatedInventory.GetObject(), item->ItemTemplate, item->BaseQuantity, item->BaseDurability))
-			failedItems.Add(items.Find(item), false);
-	}
-	
-	for (const auto& failure : failedItems)
-	{
-		if (!items.IsValidIndex(failure.Key))
-			continue;
-		LOG_WARNING(TEXT("[LoadLoadout] Failed to load item from Loadout:\n%s"), *(items[failure.Key]->DisplayName.ToString()))
-	}
-	
-	if (!IsValid(RelatedEquipment.GetObject()))
-		return failedItems.Num() == 0;
 
-	TArray<UMounteaAdvancedInventoryLoadoutItem*> itemsToEquip = {};
-	itemsToEquip.Reserve(items.Num());
-	for (const auto& item : items)
-	{
-		if (failedItems.Contains(items.Find(item)))
-			continue;
-		if (!IsValid(item->ItemTemplate))
-			continue;
-		if (!item->ItemTemplate->EquipmentItemType.IsValid() || item->ItemTemplate->AttachmentSlots.Num() == 0)
-			continue;
-		itemsToEquip.Add(item);
-	}
-	
-	TArray<FInventoryItem> inventoryItems = {};
-	inventoryItems.Reserve(itemsToEquip.Num());
-	for (const auto& item : itemsToEquip)
-	{
-		const auto inventoryItem = RelatedInventory->Execute_FindItem(RelatedInventory.GetObject(), FInventoryItemSearchParams(item->ItemTemplate));
-		if (inventoryItem.IsItemValid())
-			inventoryItems.Add(inventoryItem);
-	}
-	
-	// TODO: make it work with pre-defined slots!
-	for (const auto& item : inventoryItems)
-	{
-		RelatedEquipment->Execute_EquipItem(RelatedEquipment.GetObject(), item);
-	}
+	TArray<UMounteaAdvancedInventoryLoadoutItem*> loadedItems;
+	TArray<UMounteaAdvancedInventoryLoadoutItem*> failedItems;
+
+	LoadItemsToInventory(RelatedInventory, items, loadedItems, failedItems);
+	LogFailedLoadoutItems(
+		failedItems,
+		TEXT("[LoadLoadout] Failed to load invalid/null item from Loadout!"),
+		TEXT("[LoadLoadout] Failed to load item from Loadout:")
+	);
+
+	if (!IsValid(RelatedEquipment.GetObject()))
+		return failedItems.IsEmpty();
+
+	const TArray<UMounteaAdvancedInventoryLoadoutItem*> itemsToEquip = CollectItemsToEquip(loadedItems);
+	if (itemsToEquip.IsEmpty())
+		return true;
+
+	const TArray<FResolvedLoadoutItem> inventoryItems = ResolveInventoryItemsForEquip(RelatedInventory, itemsToEquip);
+
+	TArray<UMounteaAdvancedInventoryLoadoutItem*> failedEquipments;
+	EquipResolvedInventoryItems(RelatedEquipment, inventoryItems, failedEquipments);
+	LogFailedLoadoutItems(
+		failedEquipments,
+		TEXT("[LoadLoadout] Failed to equip invalid/null item from Loadout!"),
+		TEXT("[LoadLoadout] Failed to equip item from Loadout:")
+	);
+
 	return true;
 }
 
