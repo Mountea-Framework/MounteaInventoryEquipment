@@ -36,7 +36,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,
 		meta=(NoResetToDefault),
-		meta=(TitleProperty="DisplayName"),
+		meta=(TitleProperty="item: {DisplayName} | slot: {EquipmentSlot}"),
 		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
 		meta=(FullyExpand=true))
 	TArray<TObjectPtr<UMounteaAdvancedInventoryLoadoutItem>> Items;
