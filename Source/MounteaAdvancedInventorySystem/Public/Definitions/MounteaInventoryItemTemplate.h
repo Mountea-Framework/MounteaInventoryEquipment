@@ -232,7 +232,7 @@ public:
 
 	/** Defines the equipment item type used for slot compatibility checks. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
-		meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+		meta=(Categories="Mountea_Inventory.Equipment.ItemType,Mountea_Inventory.Category"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=26))
 	FGameplayTag EquipmentItemType;
