@@ -53,6 +53,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
+	int32 BaseDurability = 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
 	uint8 bUseRandomQuantity : 1;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",

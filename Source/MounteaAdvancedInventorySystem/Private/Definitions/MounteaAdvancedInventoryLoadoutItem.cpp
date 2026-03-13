@@ -12,13 +12,15 @@
 
 #include "Definitions/MounteaAdvancedInventoryLoadoutItem.h"
 
+#include "Definitions/MounteaInventoryBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
 #include "Statics/MounteaEquipmentStatics.h"
+#include "Statics/MounteaInventorySystemStatics.h"
 
 UMounteaAdvancedInventoryLoadoutItem::UMounteaAdvancedInventoryLoadoutItem() : 
 	bUseRandomQuantity(false),
-	bAutomaticallyEquip(true)
+	bAutomaticallyEquip(false)
 {
 #if WITH_EDITORONLY_DATA
 	DisplayName = IsValid(ItemTemplate) ? FName(ItemTemplate->DisplayName.ToString()) : NAME_None;
@@ -48,8 +50,9 @@ void UMounteaAdvancedInventoryLoadoutItem::ApplyDefaults()
 	ItemTemplate = nullptr;
 	RandomRange = FIntPoint(1, 100);
 	BaseQuantity = 1;
+	BaseDurability = 1;
 	bUseRandomQuantity = false;
-	bAutomaticallyEquip = true;
+	bAutomaticallyEquip = false;
 	EquipmentSlot = NAME_None;
 	DisplayName = NAME_None;
 }
@@ -63,12 +66,12 @@ void UMounteaAdvancedInventoryLoadoutItem::PostEditChangeProperty(struct FProper
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventoryLoadoutItem, ItemTemplate))
 	{
 		if (!IsValid(ItemTemplate))
-		{
 			ApplyDefaults();
-		}
 		else
 		{
 			BaseQuantity = ItemTemplate->MaxQuantity;
+			BaseDurability = (ItemTemplate->bHasDurability && UMounteaInventorySystemStatics::HasFlag(ItemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Durable)) 
+				? ItemTemplate->MaxDurability : -1;;
 			if (!ItemTemplate->AttachmentSlots.IsEmpty())
 			{
 				bAutomaticallyEquip = true;				
@@ -76,6 +79,21 @@ void UMounteaAdvancedInventoryLoadoutItem::PostEditChangeProperty(struct FProper
 			}
 			DisplayName = FName(ItemTemplate->DisplayName.ToString());
 		}
+	}
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventoryLoadoutItem, BaseQuantity))
+	{
+		if (!IsValid(ItemTemplate))
+			ApplyDefaults();
+		else
+			BaseQuantity = FMath::Min(ItemTemplate->MaxQuantity, BaseQuantity);
+	}
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventoryLoadoutItem, BaseDurability))
+	{
+		if (!IsValid(ItemTemplate))
+			ApplyDefaults();
+		else
+			BaseDurability = (ItemTemplate->bHasDurability && UMounteaInventorySystemStatics::HasFlag(ItemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Durable)) 
+					? ItemTemplate->MaxDurability : -1;;
 	}
 }
 #endif
