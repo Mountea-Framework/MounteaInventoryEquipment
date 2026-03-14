@@ -29,7 +29,7 @@ FText FMounteaAdvancedInventoryLoadoutConfigs_AssetAction::GetName() const
 
 FColor FMounteaAdvancedInventoryLoadoutConfigs_AssetAction::GetTypeColor() const
 {
-	return FColor::Orange;
+	return FColor::White;
 }
 
 UClass* FMounteaAdvancedInventoryLoadoutConfigs_AssetAction::GetSupportedClass() const
@@ -51,7 +51,7 @@ const TArray<FText>& FMounteaAdvancedInventoryLoadoutConfigs_AssetAction::GetSub
 {
 	static const TArray<FText> AssetTypeActionSubMenu
 	{
-		MounteaAdvancedInventoryBaseTypes::ConfigurationMenuEntry
+		MounteaAdvancedInventoryBaseTypes::LoadoutClassesMenuEntry
 	};
 	return AssetTypeActionSubMenu;
 }
