@@ -15,7 +15,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryLoadoutsInterface.generated.h"
 
-class UMounteaAdvancedInventoryLoadout;
+class UMounteaAdvancedInventoryLoadoutConfig;
 class UMounteaAdvancedInventoryLoadoutItem;
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
@@ -35,8 +35,8 @@ public:
 	virtual bool LoadLoadout_Implementation() = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Loadouts")
-	UMounteaAdvancedInventoryLoadout* GetLoadout() const;
-	virtual UMounteaAdvancedInventoryLoadout* GetLoadout_Implementation() const = 0;
+	UMounteaAdvancedInventoryLoadoutConfig* GetLoadout() const;
+	virtual UMounteaAdvancedInventoryLoadoutConfig* GetLoadout_Implementation() const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Loadouts")
 	TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems() const;

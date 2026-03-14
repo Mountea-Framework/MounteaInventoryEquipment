@@ -14,7 +14,7 @@
 
 #include "Algo/ForEach.h"
 #include "Algo/Transform.h"
-#include "Definitions/MounteaAdvancedInventoryLoadout.h"
+#include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Definitions/MounteaAdvancedInventoryLoadoutItem.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentInterface.h"

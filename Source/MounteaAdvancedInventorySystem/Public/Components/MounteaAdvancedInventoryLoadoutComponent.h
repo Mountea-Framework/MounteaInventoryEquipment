@@ -41,7 +41,7 @@ public:
 public:
 	
 	virtual bool LoadLoadout_Implementation() override;
-	virtual UMounteaAdvancedInventoryLoadout* GetLoadout_Implementation() const override
+	virtual UMounteaAdvancedInventoryLoadoutConfig* GetLoadout_Implementation() const override
 	{ return LoadoutConfiguration.LoadSynchronous(); };
 	virtual TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems_Implementation() const override;
 	virtual bool ShouldLoadAutomatically_Implementation() const override
@@ -60,15 +60,19 @@ protected:
 	
 protected:
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration",
+		meta=(NoEditInline))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> RelatedInventory;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration",
+		meta=(NoEditInline))
 	TScriptInterface<IMounteaAdvancedEquipmentInterface> RelatedEquipment;
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Configuration")
-	TSoftObjectPtr<UMounteaAdvancedInventoryLoadout> LoadoutConfiguration;
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Configuration",
+		meta=(NoEditInline))
+	TSoftObjectPtr<UMounteaAdvancedInventoryLoadoutConfig> LoadoutConfiguration;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Configuration")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Configuration",
+		meta=(NoEditInline))
 	uint8 bAutoLoad : 1;
 };

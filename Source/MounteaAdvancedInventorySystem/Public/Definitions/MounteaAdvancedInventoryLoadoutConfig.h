@@ -13,7 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "MounteaAdvancedInventoryLoadout.generated.h"
+#include "MounteaAdvancedInventoryLoadoutConfig.generated.h"
 
 class UMounteaAdvancedInventoryLoadoutItem;
 
@@ -24,7 +24,7 @@ class UMounteaAdvancedInventoryLoadoutItem;
  * to define predefined loadouts for the Mountea inventory system, enabling easier management of item sets.
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName = "Mountea Loadout"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadout : public UPrimaryDataAsset
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadoutConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	

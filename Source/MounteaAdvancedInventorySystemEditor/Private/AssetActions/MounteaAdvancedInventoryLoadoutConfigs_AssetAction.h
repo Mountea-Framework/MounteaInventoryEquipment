@@ -9,7 +9,19 @@
 //
 // For more information, visit: https://mountea.tools
 
+#pragma once
 
-#include "Definitions/MounteaAdvancedInventoryLoadout.h"
+#include "CoreMinimal.h"
+#include "AssetTypeActions_Base.h"
 
+class  FMounteaAdvancedInventoryLoadoutConfigs_AssetAction : public FAssetTypeActions_Base
+{
+public:
+	FMounteaAdvancedInventoryLoadoutConfigs_AssetAction();
 
+	virtual FText GetName() const override;
+	virtual FColor GetTypeColor() const override;
+	virtual UClass* GetSupportedClass() const override;
+	virtual uint32 GetCategories() override;
+	virtual const TArray<FText>& GetSubMenus() const override;
+};
