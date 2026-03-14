@@ -23,7 +23,8 @@ class UMounteaAdvancedInventoryLoadoutItem;
  * This class functions as a data asset that encapsulates a collection of inventory items. It can be used
  * to define predefined loadouts for the Mountea inventory system, enabling easier management of item sets.
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName = "Mountea Loadout"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, 
+	meta=(DisplayName = "Mountea Loadout Configuration"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadoutConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
