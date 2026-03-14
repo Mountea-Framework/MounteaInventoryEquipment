@@ -41,4 +41,8 @@ public:
 		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
 		meta=(FullyExpand=true))
 	TArray<TObjectPtr<UMounteaAdvancedInventoryLoadoutItem>> Items;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
+#endif
 };

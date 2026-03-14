@@ -18,6 +18,7 @@
 
 class IMounteaAdvancedEquipmentInterface;
 class IMounteaAdvancedInventoryInterface;
+class UMounteaAdvancedInventoryLoadoutConfig;
 
 /**
  * This component allows actors to have specific loadouts with items that can be loaded, managed,
