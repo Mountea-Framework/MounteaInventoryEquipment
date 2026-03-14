@@ -53,6 +53,7 @@
 #include "Editor/UnrealEdEngine.h"
 #include "UnrealEdGlobals.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutConfigs_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryLoadoutItem_AssetAction.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -110,7 +111,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaSelectableInventoryItemAction"), TEXT("ItemActionIcon") },
 					{ TEXT("MounteaCallbackInventoryItemAction"), TEXT("ItemActionCallbackIcon") },
 					{ TEXT("MounteaAdvancedInventoryPayloadsConfig"), TEXT("PayloadConfigIcon") },
-					{ TEXT("MounteaAdvancedInventoryLoadout"), TEXT("LoadoutConfiguration") },
+					{ TEXT("MounteaAdvancedInventoryLoadoutConfig"), TEXT("LoadoutConfiguration") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutComponent"), TEXT("LoadoutComponent") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutItem"), TEXT("LoadoutItem") }
 				};
@@ -152,7 +153,8 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryPayloadConfigs_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetEnvironmentConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutConfigs_AssetAction>());
-
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutItem_AssetAction>());
+		
 		for (const auto& Itr : AssetActions)
 		{
 			FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(Itr.ToSharedRef());
