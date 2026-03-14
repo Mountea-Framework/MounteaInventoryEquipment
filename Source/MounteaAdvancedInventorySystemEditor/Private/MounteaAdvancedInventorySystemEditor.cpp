@@ -52,6 +52,7 @@
 #include "Components/MounteaAttachmentContainerComponent.h"
 #include "Editor/UnrealEdEngine.h"
 #include "UnrealEdGlobals.h"
+#include "AssetActions/MounteaAdvancedInventoryLoadoutComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutItem_AssetAction.h"
 
@@ -154,6 +155,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetEnvironmentConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutConfigs_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutItem_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutComponent_AssetAction>());
 		
 		for (const auto& Itr : AssetActions)
 		{
