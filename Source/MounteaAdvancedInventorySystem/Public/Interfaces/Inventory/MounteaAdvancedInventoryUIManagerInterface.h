@@ -39,7 +39,7 @@ class UMounteaAdvancedInventoryUIManagerInterface : public UInterface
  * UI interfaces handle widget creation, visibility management, category selection, item interaction,
  * notification display, and grid slot management for comprehensive inventory interface control.
  *
- * @see [Inventory UI Interface](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see [Inventory UI Interface](https://mountea.tools/docs/advancedinventoryequipmentsystem/userinterface/userinterface/)
  * @see UMounteaInventoryUIComponent
  * @see FMounteaInventoryGridSlot
  */

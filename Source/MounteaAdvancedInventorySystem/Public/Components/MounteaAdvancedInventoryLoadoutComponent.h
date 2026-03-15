@@ -21,11 +21,13 @@ class IMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryLoadoutConfig;
 
 /**
- * This component allows actors to have specific loadouts with items that can be loaded, managed,
- * and equipped dynamically at runtime. It integrates with the inventory and equipment systems,
- * ensuring seamless interaction within the Mountea Advanced Inventory System.
+ * UMounteaAdvancedInventoryLoadoutComponent applies predefined item sets to an actor at runtime.
+ * It resolves the owner's inventory and equipment interfaces, adds configured loadout items to
+ * inventory, and optionally equips compatible items after they are loaded.
  *
- * The loadout is configurable via the editor, enabling persistent and modular inventory setups.
+ * @see [Loadout System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/LoadoutSystem)
+ * @see IMounteaAdvancedInventoryLoadoutsInterface
+ * @see UMounteaAdvancedInventoryLoadoutConfig
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
 	AutoExpandCategories=("Mountea","Loadout","Mountea|Loadout"),
@@ -61,18 +63,41 @@ protected:
 	
 protected:
 	
+	/**
+	 * Cached inventory interface found on the owning actor.
+	 *
+	 * This is initialized during BeginPlay and used as the target inventory when loading
+	 * items from the configured loadout.
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration",
 		meta=(NoEditInline))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> RelatedInventory;
 	
+	/**
+	 * Cached equipment interface found on the owning actor.
+	 *
+	 * When valid, loadout items marked for automatic equip are equipped through this interface
+	 * after they are successfully added to inventory.
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration",
 		meta=(NoEditInline))
 	TScriptInterface<IMounteaAdvancedEquipmentInterface> RelatedEquipment;
 	
+	/**
+	 * Soft reference to the loadout configuration asset used by this component.
+	 *
+	 * The asset defines which items should be granted (and optionally equipped) when the
+	 * loadout is executed.
+	 */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Configuration",
 		meta=(NoEditInline))
 	TSoftObjectPtr<UMounteaAdvancedInventoryLoadoutConfig> LoadoutConfiguration;
 	
+	/**
+	 * If true, the component attempts to load the configured loadout automatically on BeginPlay.
+	 *
+	 * Automatic loading is authority-driven and runs only on the owning actor's authoritative instance.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Configuration",
 		meta=(NoEditInline))
 	uint8 bAutoLoad : 1;

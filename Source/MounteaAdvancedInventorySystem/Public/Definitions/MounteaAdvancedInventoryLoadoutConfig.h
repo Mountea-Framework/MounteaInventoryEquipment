@@ -18,10 +18,13 @@
 class UMounteaAdvancedInventoryLoadoutItem;
 
 /**
- * Represents an advanced inventory loadout for the Mountea inventory system.
+ * UMounteaAdvancedInventoryLoadoutConfig stores a predefined set of loadout entries as a data asset.
+ * It defines which items should be granted by a loadout component, including per-item setup such as
+ * quantity, durability, and optional equipment slot preferences.
  *
- * This class functions as a data asset that encapsulates a collection of inventory items. It can be used
- * to define predefined loadouts for the Mountea inventory system, enabling easier management of item sets.
+ * @see [Loadout System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/LoadoutSystem)
+ * @see UMounteaAdvancedInventoryLoadoutComponent
+ * @see UMounteaAdvancedInventoryLoadoutItem
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, 
 	meta=(DisplayName = "Mountea Loadout Configuration"))
@@ -32,7 +35,11 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadoutConfig 
 public:
 	
 	/**
-	 * Represents a collection of advanced inventory loadout items used in the Mountea inventory system.
+	 * Ordered list of item entries that make up this loadout configuration.
+	 *
+	 * Each entry describes one item to add when the loadout is executed. Entries are instanced inline
+	 * for direct editing in the asset and are consumed by UMounteaAdvancedInventoryLoadoutComponent
+	 * during LoadLoadout.
 	 */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,

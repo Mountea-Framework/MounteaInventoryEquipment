@@ -27,7 +27,7 @@ enum class EInventoryType : uint8;
  * Inventory components provide item storage, modification, searching, and notification systems
  * with efficient delta replication for multiplayer inventory management.
  *
- * @see [Inventory System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see [Inventory System](https://mountea.tools/docs/advancedinventoryequipmentsystem/inventorysystem/inventorysystem/)
  * @see IMounteaAdvancedInventoryInterface
  * @see FInventoryItem
  */
