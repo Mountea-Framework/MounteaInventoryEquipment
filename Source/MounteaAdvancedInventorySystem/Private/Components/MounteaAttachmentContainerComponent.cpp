@@ -326,6 +326,34 @@ void UMounteaAttachmentContainerComponent::PostEditChangeProperty(FPropertyChang
 	}
 }
 
+void UMounteaAttachmentContainerComponent::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeChainProperty(PropertyChangedEvent);
+	
+	const FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaAttachmentContainerComponent, AttachmentSlots))
+	{
+		if (!(PropertyChangedEvent.ChangeType & (EPropertyChangeType::ArrayAdd | EPropertyChangeType::Duplicate)))
+			return;
+
+		const int32 slotIndex = PropertyChangedEvent.GetArrayIndex(GET_MEMBER_NAME_STRING_CHECKED(UMounteaAttachmentContainerComponent, AttachmentSlots));
+		int32 resolvedSlotIndex = slotIndex;
+		if (!AttachmentSlots.IsValidIndex(resolvedSlotIndex))
+		{
+			resolvedSlotIndex = AttachmentSlots.IndexOfByPredicate([](const TObjectPtr<UMounteaAdvancedAttachmentSlot>& Slot)
+			{
+				return Slot == nullptr;
+			});
+		}
+
+		if (!AttachmentSlots.IsValidIndex(resolvedSlotIndex) || AttachmentSlots[resolvedSlotIndex] != nullptr)
+			return;
+
+		AttachmentSlots[resolvedSlotIndex] = NewObject<UMounteaAdvancedAttachmentSlot>(this, UMounteaAdvancedAttachmentSlot::StaticClass(), NAME_None, RF_Transactional);
+		Modify();
+	}
+}
+
 EDataValidationResult UMounteaAttachmentContainerComponent::IsDataValid(FDataValidationContext& Context) const
 {
 	for (const auto& slot : AttachmentSlots)
