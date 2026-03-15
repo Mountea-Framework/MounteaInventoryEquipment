@@ -23,7 +23,7 @@ class UMounteaInventoryItemTemplate;
 UCLASS(ClassGroup=(Mountea), BlueprintType, DefaultToInstanced, EditInlineNew,
 	AutoExpandCategories=("Mountea"),
 	HideCategories=("Cooking","Collision","Private"),
-	meta=(DisplayName="Mountea Inventory Recipe Item Ingredient"))
+	meta=(DisplayName="Mountea Inventory Recipe Ingredient"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeIngredient : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -32,7 +32,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
-	TObjectPtr<UMounteaInventoryItemTemplate> IngredientSource = nullptr;
+	TSoftObjectPtr<UMounteaInventoryItemTemplate> IngredientSource = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))

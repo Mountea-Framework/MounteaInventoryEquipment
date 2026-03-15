@@ -16,6 +16,7 @@
 #include "MounteaRecipeTemplate.generated.h"
 
 class UMounteaRecipeIngredientsList;
+class UMounteaInventoryItemTemplate;
 
 /**
  * 
@@ -27,6 +28,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeTemplate : public UPrimar
 	GENERATED_BODY()
 	
 public:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
+	TSoftObjectPtr<UMounteaInventoryItemTemplate> ResultItem = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
+	int32 QuantityPerCreation = 1;
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,
