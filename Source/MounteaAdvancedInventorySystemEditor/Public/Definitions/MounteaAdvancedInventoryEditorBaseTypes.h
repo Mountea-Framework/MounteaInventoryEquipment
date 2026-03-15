@@ -20,5 +20,6 @@ namespace MounteaAdvancedInventoryBaseTypes
 	inline const FText EquipmentBaseClassesMenuEntry =	FText::FromString(TEXT("3. Base Classes (Equipment)"));
 	inline const FText AssetActionsMenuEntry =			FText::FromString(TEXT("4. Item Actions"));
 	inline const FText LoadoutClassesMenuEntry =		FText::FromString(TEXT("5. Loadouts Configuration"));
+	inline const FText CraftingClassesMenuEntry =		FText::FromString(TEXT("5. Crafting Configuration"));
 	inline const FText ConfigurationMenuEntry =			FText::FromString(TEXT("666. Configuration"));
 }

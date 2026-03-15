@@ -55,6 +55,9 @@
 #include "AssetActions/MounteaAdvancedInventoryLoadoutComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutItem_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryRecipeIngredientsList_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryRecipeIngredient_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryRecipeTemplate_AssetAction.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -159,6 +162,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutConfigs_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutItem_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutComponent_AssetAction>());
+		
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeTemplate_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredientsList_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredient_AssetAction>());
 		
 		for (const auto& Itr : AssetActions)
 		{
