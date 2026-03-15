@@ -10,36 +10,34 @@
 // For more information, visit: https://mountea.tools
 
 
-#include "Definitions/MounteaRecipeTemplate.h"
-
 #include "Definitions/MounteaRecipeIngredientsList.h"
+
+#include "Definitions/MounteaRecipeItemIngredient.h"
 
 #if WITH_EDITOR
 
-void UMounteaRecipeTemplate::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
+void UMounteaRecipeIngredientsList::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
 {
-	Super::PostEditChangeChainProperty(PropertyChangedEvent);
-
 	const FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaRecipeTemplate, RecipeIngredientOptions))
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaRecipeIngredientsList, RecipeIngredients))
 	{
 		if (!(PropertyChangedEvent.ChangeType & (EPropertyChangeType::ArrayAdd | EPropertyChangeType::Duplicate)))
 			return;
 
-		const int32 itemIndex = PropertyChangedEvent.GetArrayIndex(GET_MEMBER_NAME_STRING_CHECKED(UMounteaRecipeTemplate, RecipeIngredientOptions));
+		const int32 itemIndex = PropertyChangedEvent.GetArrayIndex(GET_MEMBER_NAME_STRING_CHECKED(UMounteaRecipeIngredientsList, RecipeIngredients));
 		int32 resolvedItemIndex = itemIndex;
-		if (!RecipeIngredientOptions.IsValidIndex(resolvedItemIndex))
+		if (!RecipeIngredients.IsValidIndex(resolvedItemIndex))
 		{
-			resolvedItemIndex = RecipeIngredientOptions.IndexOfByPredicate([](const TObjectPtr<UMounteaRecipeIngredientsList>& Item)
+			resolvedItemIndex = RecipeIngredients.IndexOfByPredicate([](const TObjectPtr<UMounteaRecipeItemIngredient>& Item)
 			{
 				return Item == nullptr;
 			});
 		}
 
-		if (!RecipeIngredientOptions.IsValidIndex(resolvedItemIndex) || RecipeIngredientOptions[resolvedItemIndex] != nullptr)
+		if (!RecipeIngredients.IsValidIndex(resolvedItemIndex) || RecipeIngredients[resolvedItemIndex] != nullptr)
 			return;
 
-		RecipeIngredientOptions[resolvedItemIndex] = NewObject<UMounteaRecipeIngredientsList>(this, UMounteaRecipeIngredientsList::StaticClass(), NAME_None, RF_Transactional);
+		RecipeIngredients[resolvedItemIndex] = NewObject<UMounteaRecipeItemIngredient>(this, UMounteaRecipeIngredientsList::StaticClass(), NAME_None, RF_Transactional);
 		Modify();
 	}
 }

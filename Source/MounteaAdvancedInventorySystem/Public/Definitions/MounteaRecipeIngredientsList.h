@@ -13,16 +13,18 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "MounteaRecipeTemplate.generated.h"
+#include "MounteaRecipeIngredientsList.generated.h"
 
-class UMounteaRecipeIngredientsList;
+class UMounteaRecipeItemIngredient;
 
 /**
  * 
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, 
-	meta=(DisplayName = "Inventory Recipe Template"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeTemplate : public UPrimaryDataAsset
+UCLASS(ClassGroup=(Mountea), BlueprintType, DefaultToInstanced, EditInlineNew,
+	AutoExpandCategories=("Mountea"),
+	HideCategories=("Cooking","Collision","Private"),
+	meta=(DisplayName="Mountea Inventory Recipe Item"))
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeIngredientsList : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	
@@ -34,7 +36,7 @@ public:
 		//meta=(TitleProperty="item: {DisplayName} | slot: {EquipmentSlot}"),
 		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
 		meta=(FullyExpand=true))
-	TArray<TObjectPtr<UMounteaRecipeIngredientsList>> RecipeIngredientOptions;
+	TArray<TObjectPtr<UMounteaRecipeItemIngredient>> RecipeIngredients;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
