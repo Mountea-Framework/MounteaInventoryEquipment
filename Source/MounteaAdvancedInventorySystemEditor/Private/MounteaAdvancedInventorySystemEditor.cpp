@@ -114,7 +114,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaAdvancedInventoryPayloadsConfig"), TEXT("PayloadConfigIcon") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutConfig"), TEXT("LoadoutConfiguration") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutComponent"), TEXT("LoadoutComponent") },
-					{ TEXT("MounteaAdvancedInventoryLoadoutItem"), TEXT("LoadoutItem") }
+					{ TEXT("MounteaAdvancedInventoryLoadoutItem"), TEXT("LoadoutItem") },
+					{ TEXT("MounteaRecipeTemplate"), TEXT("RecipeBook") },
+					{ TEXT("MounteaRecipeIngredientsList"), TEXT("RecipeIngredientsList") },
+					{ TEXT("MounteaRecipeIngredient"), TEXT("MounteaRecipeIngredients") }
 				};
 
 				const auto RegisterClassIcon = [this](const TCHAR* ClassName, const TCHAR* ResourceName)

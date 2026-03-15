@@ -21,7 +21,7 @@ class UMounteaRecipeIngredientsList;
  * 
  */
 UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, 
-	meta=(DisplayName = "Inventory Recipe Template"))
+	meta=(DisplayName = "Inventory Recipe Entry"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeTemplate : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

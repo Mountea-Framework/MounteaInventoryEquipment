@@ -13,7 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "MounteaRecipeItemIngredient.generated.h"
+#include "MounteaRecipeIngredient.generated.h"
 
 class UMounteaInventoryItemTemplate;
 
@@ -24,7 +24,7 @@ UCLASS(ClassGroup=(Mountea), BlueprintType, DefaultToInstanced, EditInlineNew,
 	AutoExpandCategories=("Mountea"),
 	HideCategories=("Cooking","Collision","Private"),
 	meta=(DisplayName="Mountea Inventory Recipe Item Ingredient"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeItemIngredient : public UPrimaryDataAsset
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeIngredient : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 	

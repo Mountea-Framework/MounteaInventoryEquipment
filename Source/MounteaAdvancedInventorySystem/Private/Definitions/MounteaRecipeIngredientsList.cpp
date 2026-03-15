@@ -12,7 +12,7 @@
 
 #include "Definitions/MounteaRecipeIngredientsList.h"
 
-#include "Definitions/MounteaRecipeItemIngredient.h"
+#include "Definitions/MounteaRecipeIngredient.h"
 
 #if WITH_EDITOR
 
@@ -28,7 +28,7 @@ void UMounteaRecipeIngredientsList::PostEditChangeChainProperty(FPropertyChanged
 		int32 resolvedItemIndex = itemIndex;
 		if (!RecipeIngredients.IsValidIndex(resolvedItemIndex))
 		{
-			resolvedItemIndex = RecipeIngredients.IndexOfByPredicate([](const TObjectPtr<UMounteaRecipeItemIngredient>& Item)
+			resolvedItemIndex = RecipeIngredients.IndexOfByPredicate([](const TObjectPtr<UMounteaRecipeIngredient>& Item)
 			{
 				return Item == nullptr;
 			});
@@ -37,7 +37,7 @@ void UMounteaRecipeIngredientsList::PostEditChangeChainProperty(FPropertyChanged
 		if (!RecipeIngredients.IsValidIndex(resolvedItemIndex) || RecipeIngredients[resolvedItemIndex] != nullptr)
 			return;
 
-		RecipeIngredients[resolvedItemIndex] = NewObject<UMounteaRecipeItemIngredient>(this, UMounteaRecipeIngredientsList::StaticClass(), NAME_None, RF_Transactional);
+		RecipeIngredients[resolvedItemIndex] = NewObject<UMounteaRecipeIngredient>(this, UMounteaRecipeIngredient::StaticClass(), NAME_None, RF_Transactional);
 		Modify();
 	}
 }
