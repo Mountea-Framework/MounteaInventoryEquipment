@@ -142,9 +142,10 @@ public:
 	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
 
 	/**
-	 * Returns the Main Wrapper Widget.
+	 * Returns the currently active main wrapper widget.
+	 *
 	 * @param Target The UI Manager to get Wrapper widget from.
-	 * @return UI if UI exists, otherwise nullptr.
+	 * @return Wrapper widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
 		meta=(CustomTag="MounteaK2Getter"),
@@ -179,9 +180,10 @@ public:
 	static bool CreateInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
-	 * Returns the Inventory Widget.
+	 * Returns the currently active inventory widget.
+	 *
 	 * @param Target The UI Manager to get Inventory widget from.
-	 * @return UI if UI exists, otherwise nullptr.
+	 * @return Inventory widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory", 
 		meta=(CustomTag="MounteaK2Getter"),
@@ -234,7 +236,7 @@ public:
 	 * Retrieves local custom items map.
 	 * 
 	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @return Custom Items Mpa if any specified.
+	 * @return Custom items map if any entries are present.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Getter"),
@@ -282,7 +284,7 @@ public:
 	 *
 	 * @param Target    UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param ItemTag   Gameplay tag representing the custom item key to remove.
-	 * @param ItemId	Guide of the item to be removed.
+	 * @param ItemId	Guid of the item to be removed.
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
@@ -310,10 +312,10 @@ public:
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
 	
 	/**
-	 * This function allows UI Manager to listen to external systems which might want to process Widget Commands.
-	 * Example might to a request to refresh item count when Item Action consumes it.
+	 * Executes a widget command routed through the UI manager hierarchy.
+	 * Use this to notify UI layers about external events (for example refreshing item count after an item action).
 	 * 
-	 * Chain of hierarchy is respected, so commands are given to root and then based on the selection passed down.
+	 * Command routing should respect wrapper-to-child hierarchy, so parent managers can delegate to active views.
 	 * 
 	 * @param Target UI Manager to execute the logic on
 	 * @param Command Command to Process

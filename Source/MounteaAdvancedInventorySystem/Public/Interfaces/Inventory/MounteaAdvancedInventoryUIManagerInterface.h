@@ -39,7 +39,7 @@ class UMounteaAdvancedInventoryUIManagerInterface : public UInterface
  * UI interfaces handle widget creation, visibility management, category selection, item interaction,
  * notification display, and grid slot management for comprehensive inventory interface control.
  *
- * @see [Inventory UI Interface](https://mountea.tools/docs/advancedinventoryequipmentsystem/userinterface/userinterface/)
+ * @see [Inventory UI Interface](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
  * @see UMounteaInventoryUIComponent
  * @see FMounteaInventoryGridSlot
  */
@@ -68,39 +68,43 @@ public:
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
 	
 	/**
-	 * Creates the inventory UI.
-	 * @return True if UI was successfully created, otherwise false.
+	 * Creates and initializes the main wrapper widget for the inventory UI.
+	 *
+	 * @return True if the wrapper widget was created successfully, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	bool CreateWrapperWidget();
 	virtual bool CreateWrapperWidget_Implementation() = 0;
 
 	/**
-	 * Returns the inventory UI.
-	 * @return UI if UI exists, otherwise nullptr.
+	 * Returns the currently active main wrapper widget.
+	 *
+	 * @return Wrapper widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	UUserWidget* GetWrapperWidget() const;
 	virtual UUserWidget* GetWrapperWidget_Implementation() const = 0;
 
 	/**
-	 * Removes the inventory UI.
+	 * Removes and cleans up the main wrapper widget.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
 	void RemoveWrapperWidget();
 	virtual void RemoveWrapperWidget_Implementation() = 0;
 	
 	/**
-	 * Creates the inventory UI.
-	 * @return True if UI was successfully created, otherwise false.
+	 * Creates and initializes the inventory widget inside the wrapper.
+	 *
+	 * @return True if the inventory widget was created successfully, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	bool CreateInventoryWidget();
 	virtual bool CreateInventoryWidget_Implementation() = 0;
 
 	/**
-	 * Returns the inventory UI.
-	 * @return UI if UI exists, otherwise nullptr.
+	 * Returns the currently active inventory widget.
+	 *
+	 * @return Inventory widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	UUserWidget* GetInventoryWidget() const;
@@ -115,7 +119,7 @@ public:
 	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) = 0;
 
 	/**
-	 * Removes the inventory UI.
+	 * Removes and cleans up the inventory widget.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	void RemoveInventoryWidget();
@@ -239,7 +243,7 @@ public:
 	/**
 	 * Retrieves local custom items map.
 	 * 
-	 * @return Custom Items Mpa if any specified.
+	 * @return Custom items map if any entries are present.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
 	TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap() const;
@@ -300,10 +304,10 @@ public:
 	// --- General
 	
 	/**
-	 * This function allows UI Manager to listen to external systems which might want to process Widget Commands.
-	 * Example might to a request to refresh item count when Item Action consumes it.
+	 * Executes a widget command routed through the UI manager hierarchy.
+	 * Use this to notify UI layers about external events (for example refreshing item count after an item action).
 	 * 
-	 * Chain of hierarchy is respected, so commands are given to root and then based on the selection passed down.
+	 * Command routing should respect wrapper-to-child hierarchy, so parent managers can delegate to active views.
 	 * 
 	 * @param Command Command to Process
 	 * @param OptionalPayload Optional Payload to pass with the command
