@@ -34,7 +34,8 @@ enum class EInventoryItemFlags : uint8;
  * @see FInventoryItem
  * @see UMounteaInventoryManagerComponent
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName = "Inventory Item Template"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, 
+	meta=(DisplayName = "Inventory Item Template"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemTemplate : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

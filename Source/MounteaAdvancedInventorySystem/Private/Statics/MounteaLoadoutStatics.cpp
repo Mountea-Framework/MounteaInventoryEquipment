@@ -16,7 +16,7 @@
 
 bool UMounteaLoadoutStatics::IsValidLoadout(const UObject* Target)
 {
-	return IsValid(Target) && Target->Implements<IMounteaAdvancedInventoryLoadoutsInterface>();
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryLoadoutsInterface>();
 }
 
 bool UMounteaLoadoutStatics::LoadLoadout(UObject* Target)
