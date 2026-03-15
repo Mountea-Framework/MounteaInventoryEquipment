@@ -43,22 +43,38 @@ public:
 	
 public:
 	
+	
 	virtual bool LoadLoadout_Implementation() override;
+	
 	virtual UMounteaAdvancedInventoryLoadoutConfig* GetLoadout_Implementation() const override
 	{ return LoadoutConfiguration.LoadSynchronous(); };
+	
 	virtual TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems_Implementation() const override;
+	
 	virtual bool ShouldLoadAutomatically_Implementation() const override
 	{ return bAutoLoad; };
+	
 	virtual void SetAutomaticLoad_Implementation(const bool bNewValue) override
 	{ if (bNewValue != bAutoLoad) bAutoLoad = bNewValue; }
 	
 protected:
 	
+	/**
+	 * Server RPC that executes loadout processing on authority.
+	 */
 	UFUNCTION(Server, Reliable)
 	void Server_LoadLoadout();
 
 protected:
+	
+	/**
+	 * Resolves and caches related inventory/equipment interfaces from the owner.
+	 */
 	void InitializeInventoryAndEquipment();
+	
+	/**
+	 * Initializes runtime references and optionally auto-loads loadout on authority.
+	 */
 	virtual void BeginPlay() override;
 	
 protected:
