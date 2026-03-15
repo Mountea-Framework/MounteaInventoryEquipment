@@ -28,7 +28,7 @@ public:
 	};
 	virtual FColor GetTypeColor() const override
 	{
-		return FColor::Emerald;
+		return FColor::White;
 	};
 	virtual UClass* GetSupportedClass() const override
 	{
