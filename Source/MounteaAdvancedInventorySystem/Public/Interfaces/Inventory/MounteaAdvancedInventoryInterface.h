@@ -138,7 +138,7 @@ class UMounteaAdvancedInventoryInterface : public UInterface
  * Inventory interfaces provide item addition, removal, searching, quantity management, durability handling,
  * and notification processing with event broadcasting for complete inventory system functionality.
  *
- * @see [Inventory Interface](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see [Inventory Interface](https://mountea.tools/docs/advancedinventoryequipmentsystem/inventorysystem/inventorysystem/)
  * @see UMounteaInventoryComponent
  * @see FInventoryItem
  */

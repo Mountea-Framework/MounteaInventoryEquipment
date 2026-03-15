@@ -12,7 +12,10 @@
 
 #include "Statics/MounteaEquipmentStatics.h"
 
+#include "Algo/Count.h"
 #include "Algo/Find.h"
+#include "Algo/Sort.h"
+#include "Algo/Transform.h"
 #include "Components/ActorComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -191,13 +194,14 @@ void UMounteaEquipmentStatics::ApplyQuickUsePlaceholderMesh(AActor* PlaceholderA
 	}
 }
 
-UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObject(UObject* Target, const UClass* InterfaceClass,
+UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObject(UObject* Target, TSubclassOf<UInterface> InterfaceClass,
 	const bool bResolveOwnerForComponents)
 {
-	if (!IsValid(Target) || !IsValid(InterfaceClass))
+	const UClass* interfaceClassPtr = InterfaceClass.Get();
+	if (!IsValid(Target) || !IsValid(interfaceClassPtr))
 		return nullptr;
 
-	if (Target->GetClass()->ImplementsInterface(InterfaceClass))
+	if (Target->GetClass()->ImplementsInterface(interfaceClassPtr))
 		return Target;
 
 	AActor* actor = Cast<AActor>(Target);
@@ -210,12 +214,13 @@ UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObject(UObject* Target, 
 	return ResolveFirstInterfaceObjectFromActor(actor, InterfaceClass);
 }
 
-UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObjectFromActor(AActor* Actor, const UClass* InterfaceClass)
+UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObjectFromActor(AActor* Actor, TSubclassOf<UInterface> InterfaceClass)
 {
-	if (!IsValid(Actor) || !IsValid(InterfaceClass))
+	const UClass* interfaceClassPtr = InterfaceClass.Get();
+	if (!IsValid(Actor) || !IsValid(interfaceClassPtr))
 		return nullptr;
 
-	const TArray<UActorComponent*> components = Actor->GetComponentsByInterface(InterfaceClass->StaticClass());
+	const TArray<UActorComponent*> components = Actor->GetComponentsByInterface(InterfaceClass);
 	if (!components.IsEmpty())
 		return components[0];
 
@@ -225,9 +230,10 @@ UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObjectFromActor(AActor* 
 
 UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObjectFromBlueprintClass(
 	const UBlueprintGeneratedClass* BlueprintClass,
-	const UClass* InterfaceClass)
+	TSubclassOf<UInterface> InterfaceClass)
 {
-	if (!IsValid(BlueprintClass) || !IsValid(InterfaceClass) || !BlueprintClass->SimpleConstructionScript)
+	const UClass* interfaceClassPtr = InterfaceClass.Get();
+	if (!IsValid(BlueprintClass) || !IsValid(interfaceClassPtr) || !BlueprintClass->SimpleConstructionScript)
 		return nullptr;
 
 	for (const USCS_Node* node : BlueprintClass->SimpleConstructionScript->GetAllNodes())
@@ -237,7 +243,7 @@ UObject* UMounteaEquipmentStatics::ResolveFirstInterfaceObjectFromBlueprintClass
 
 		const UActorComponent* componentTemplate = node->GetActualComponentTemplate(
 			const_cast<UBlueprintGeneratedClass*>(BlueprintClass));
-		if (IsValid(componentTemplate) && componentTemplate->GetClass()->ImplementsInterface(InterfaceClass))
+		if (IsValid(componentTemplate) && componentTemplate->GetClass()->ImplementsInterface(interfaceClassPtr))
 			return const_cast<UActorComponent*>(componentTemplate);
 	}
 
@@ -367,6 +373,100 @@ FName UMounteaEquipmentStatics::ResolveActiveSlotId(const FName& StorageSlotId)
 	}
 
 	return NAME_None;
+}
+
+FName UMounteaEquipmentStatics::ResolveBestSlotIdFromTags(const FGameplayTagContainer& DesiredTags,
+	const FGameplayTag& EquipmentItemType)
+{
+	const UMounteaAdvancedEquipmentSettingsConfig* settingsConfig = GetEquipmentSettingsConfig();
+	if (!IsValid(settingsConfig))
+		return NAME_None;
+	if (DesiredTags.IsEmpty())
+		return NAME_None;
+	if (settingsConfig->AllowedEquipmentSlots.IsEmpty())
+		return NAME_None;
+
+	struct FSlotCandidate
+	{
+		FName SlotName = NAME_None;
+		bool bHasAllDesiredTags = false;
+		int32 OverlapCount = 0;
+		int32 ExtraTags = 0;
+	};
+
+	TArray<FGameplayTag> desiredTags;
+	DesiredTags.GetGameplayTagArray(desiredTags);
+
+	const auto isSlotCompatible = [&desiredTags, &settingsConfig, &EquipmentItemType](const FName& slotName)
+	{
+		const FMounteaEquipmentSlotHeaderData* slotData = settingsConfig->AllowedEquipmentSlots.Find(slotName);
+		if (!slotData)
+			return false;
+
+		if (!slotData->bIsEnabled)
+			return false;
+
+		if (EquipmentItemType.IsValid() &&
+			!slotData->AllowedItemTypes.IsEmpty() &&
+			!slotData->AllowedItemTypes.HasTag(EquipmentItemType))
+		{
+			return false;
+		}
+
+		const int32 overlapCount = Algo::CountIf(desiredTags, [slotData](const FGameplayTag& desiredTag)
+		{
+			return slotData->TagContainer.HasTag(desiredTag);
+		});
+
+		return overlapCount > 0;
+	};
+
+	TArray<FName> slotNames;
+	settingsConfig->AllowedEquipmentSlots.GetKeys(slotNames);
+
+	TArray<FSlotCandidate> candidates;
+	candidates.Reserve(slotNames.Num());
+
+	Algo::TransformIf(
+		slotNames,
+		candidates,
+		isSlotCompatible,
+		[&desiredTags, &settingsConfig, &DesiredTags](const FName& slotName)
+		{
+			const FMounteaEquipmentSlotHeaderData* slotData = settingsConfig->AllowedEquipmentSlots.Find(slotName);
+			check(slotData);
+
+			const int32 overlapCount = Algo::CountIf(desiredTags, [slotData](const FGameplayTag& desiredTag)
+			{
+				return slotData->TagContainer.HasTag(desiredTag);
+			});
+
+			FSlotCandidate candidate;
+			candidate.SlotName = slotName;
+			candidate.bHasAllDesiredTags = slotData->TagContainer.HasAll(DesiredTags);
+			candidate.OverlapCount = overlapCount;
+			candidate.ExtraTags = slotData->TagContainer.Num() - overlapCount;
+			return candidate;
+		});
+
+	if (candidates.IsEmpty())
+		return NAME_None;
+
+	Algo::Sort(candidates, [](const FSlotCandidate& left, const FSlotCandidate& right)
+	{
+		if (left.bHasAllDesiredTags != right.bHasAllDesiredTags)
+			return left.bHasAllDesiredTags;
+
+		if (left.OverlapCount != right.OverlapCount)
+			return left.OverlapCount > right.OverlapCount;
+
+		if (left.ExtraTags != right.ExtraTags)
+			return left.ExtraTags < right.ExtraTags;
+
+		return left.SlotName.LexicalLess(right.SlotName);
+	});
+
+	return candidates[0].SlotName;
 }
 
 UMounteaAdvancedAttachmentSlot* UMounteaEquipmentStatics::FindSlotWithEquippedItem(UObject* Outer, const FGuid& ItemGuid)
@@ -710,8 +810,8 @@ bool UMounteaEquipmentStatics::IsTargetClassValid(const UClass* TargetClass)
 	if (!IsValid(TargetClass))
 		return false;
 
-	const auto equipmentItemInterfaceClass = UMounteaAdvancedEquipmentItemInterface::StaticClass();
-	if (TargetClass->ImplementsInterface(equipmentItemInterfaceClass))
+	const TSubclassOf<UInterface> equipmentItemInterfaceClass = UMounteaAdvancedEquipmentItemInterface::StaticClass();
+	if (TargetClass->ImplementsInterface(equipmentItemInterfaceClass.Get()))
 		return true;
 
 	const AActor* targetActor = Cast<AActor>(TargetClass->GetDefaultObject());

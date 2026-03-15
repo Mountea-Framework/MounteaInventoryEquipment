@@ -30,7 +30,7 @@ class AActor;
  * systems with additional equipment-specific interfaces and behaviors.
  * Enhances Attachable System.
  *
- * @see [Equipment System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/EquipmentSystem)
+ * @see [Equipment System](https://mountea.tools/docs/advancedinventoryequipmentsystem/equipmentsystem/equipmentsystem/)
  * @see UMounteaAttachmentContainerComponent
  * @see IMounteaAdvancedEquipmentInterface
  */

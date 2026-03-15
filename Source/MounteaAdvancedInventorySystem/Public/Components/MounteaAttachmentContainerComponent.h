@@ -21,9 +21,10 @@ enum class EAttachmentSlotState : uint8;
 class UMounteaAdvancedAttachmentSlot;
 
 /**
- * UMounteaAttachmentContainerComponent manages dynamic attachment systems for equipment at runtime.
- * Container components provide slot-based attachment management with network replication, event broadcasting,
- * and comprehensive attachment operations for flexible equipment systems on actors.
+ * UMounteaAttachmentContainerComponent is a runtime attachment container for actors.
+ * It owns a set of attachment slots, resolves a default scene target, and handles attach/detach
+ * operations while keeping state synchronized over the network. The component also exposes
+ * events so gameplay code and UI can react to attachment and slot state changes.
  *
  * @see [Attachment Containers](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/AttachmentSystem)
  * @see IMounteaAdvancedAttachmentContainerInterface
@@ -90,7 +91,13 @@ protected:
 	
 public:
 	
-	// Does not support runtime addition/removal of slots.
+	/**
+	 * Slot definitions managed by this container.
+	 *
+	 * Each slot describes attachment rules, current occupancy, and target socket/component
+	 * configuration. Slot objects are instanced on the component, persisted in SaveGame data,
+	 * and replicated so attachment state is synchronized in multiplayer sessions.
+	 */
 	UPROPERTY(SaveGame, Replicated, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
 		Instanced,
 		meta=(TitleProperty="DisplayName"),
@@ -99,19 +106,34 @@ public:
 		meta=(DisplayPriority=2))
 	TArray<TObjectPtr<UMounteaAdvancedAttachmentSlot>> AttachmentSlots;
 	
+	/**
+	 * Name of the default scene component used as an attachment target.
+	 *
+	 * This value is resolved at runtime into DefaultAttachmentTargetComponent during BeginPlay.
+	 * The options list is populated from the owning actor's available scene components.
+	 */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadWrite, Category="Mountea|Attachment Container",
 		meta=(GetOptions="GetAvailableTargetNames"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=0))
 	FName DefaultAttachmentTarget;
 
+	/**
+	 * Cached scene component resolved from DefaultAttachmentTarget.
+	 *
+	 * This runtime reference is used by slot attachment operations and is updated when
+	 * SetDefaultAttachmentTargetComponent is called.
+	 */
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category="Mountea|Attachment Container",
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=1))
 	TObjectPtr<USceneComponent> DefaultAttachmentTargetComponent = nullptr;
 	
 	/**
-	 * Event triggered when an attachment is added or removed from the container.
+	 * Broadcast when an attachment change occurs in any slot.
+	 *
+	 * Triggered after successful attach operations and provides slot identifier plus old/new
+	 * attachment values for listeners.
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
@@ -119,7 +141,9 @@ public:
 	FOnAttachmentChanged OnAttachmentChanged;
 
 	/**
-	 * Event triggered when the state of a slot changes.
+	 * Broadcast when a slot changes its enabled/disabled state.
+	 *
+	 * Typically emitted when slot availability is modified at runtime.
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
@@ -127,7 +151,10 @@ public:
 	FOnSlotStateChanged OnSlotStateChanged;
 
 	/**
-	 * Event triggered when the container is cleared of all attachments.
+	 * Broadcast when the container is cleared of attachments.
+	 *
+	 * Use this event to refresh UI, gameplay state, or dependent systems after mass detach
+	 * operations.
 	 */
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Mountea|Attachment Container",
 		meta=(IsBindableEvent=true),
@@ -144,6 +171,7 @@ protected:
 #if WITH_EDITOR
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 	virtual EDataValidationResult IsDataValid(class FDataValidationContext& Context) const override;
 	
 #endif

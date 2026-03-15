@@ -25,7 +25,9 @@ class IMounteaAdvancedAttachmentContainerInterface;
 class IMounteaAdvancedAttachmentAttachableInterface;
 
 /**
- * 
+ * Helper library for attachment containers and attachable objects.
+ * Provides Blueprint wrappers around attachment interfaces plus utility queries for
+ * components, sockets, and slot/tag-driven attachment operations.
  */
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAttachmentsStatics : public UBlueprintFunctionLibrary
@@ -201,7 +203,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Try Dettach")
+		DisplayName="Try Detach")
 	static bool TryDetach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
@@ -270,23 +272,25 @@ public:
 	static void ClearAll(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 	/**
-	 * Gets the first emtpy slot ID.
+	 * Gets the first empty slot ID.
 	 * 
-	 * @param Target  Target to clear all attachments from
+	 * @param Target  Target attachment container.
+	 * @return Slot name of the first empty slot, or NAME_None if none is available.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Find Frist Empty Slot")
+		DisplayName="Find First Empty Slot")
 	static FName GetFirstEmptySlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 	/**
-	 * Gets all Slots in the Attachment Container.
+	 * Gets all slots in the attachment container.
 	 * 
-	 * @param Target  Target to clear all attachments from
+	 * @param Target  Target attachment container.
+	 * @return Array of attachment slots configured on the container.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Get All Attachments Slots")
+		DisplayName="Get All Attachment Slots")
 	static TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 #pragma endregion
@@ -418,7 +422,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(CustomTag="MounteaK2Validate"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Can Attachable be Attached")
+		DisplayName="Can Attachable Be Attached")
 	static bool CanAttach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**

@@ -27,7 +27,7 @@ class UStaticMeshComponent;
  * Equipment Item actors contain an attachable component that enables them to be attached to
  * attachment containers, providing a foundation for equipment items, weapons, and other attachable objects.
  *
- * @see [Equipment System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/EquipmentSystem)
+ * @see [Equipment System](https://mountea.tools/docs/advancedinventoryequipmentsystem/equipmentsystem/equipmentsystem/)
  * @see UMounteaEquipmentItemComponent
  * @see UMounteaAttachableComponent
  */

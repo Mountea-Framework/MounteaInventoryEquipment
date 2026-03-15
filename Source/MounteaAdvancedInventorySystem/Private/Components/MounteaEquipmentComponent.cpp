@@ -198,7 +198,7 @@ bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem
 			continue;
 
 		if (IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(equipmentItemInterface.GetObject()) != ItemDefinition.GetGuid())
-		continue;
+			continue;
 
 		return Execute_UnequipItemFromSlot(this, slot->SlotName, bUseFallbackSlot);
 	}
