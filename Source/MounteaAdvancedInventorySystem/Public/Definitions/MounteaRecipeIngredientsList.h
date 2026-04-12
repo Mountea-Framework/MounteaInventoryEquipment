@@ -33,7 +33,6 @@ public:
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,
 		meta=(NoResetToDefault),
-		//meta=(TitleProperty="item: {DisplayName} | slot: {EquipmentSlot}"),
 		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
 		meta=(FullyExpand=true))
 	TArray<TObjectPtr<UMounteaRecipeIngredient>> RecipeIngredients;

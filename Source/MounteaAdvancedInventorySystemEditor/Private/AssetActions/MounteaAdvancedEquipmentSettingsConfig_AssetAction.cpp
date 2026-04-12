@@ -40,9 +40,7 @@ UClass* FMounteaAdvancedEquipmentSettingsConfig_AssetAction::GetSupportedClass()
 uint32 FMounteaAdvancedEquipmentSettingsConfig_AssetAction::GetCategories()
 {
 	if (FModuleManager::Get().IsModuleLoaded("AssetTools"))
-	{
 		return FAssetToolsModule::GetModule().Get().FindAdvancedAssetCategory(FName("MounteaAdvancedInventorySystem"));
-	}
 
 	return EAssetTypeCategories::Misc;
 }
