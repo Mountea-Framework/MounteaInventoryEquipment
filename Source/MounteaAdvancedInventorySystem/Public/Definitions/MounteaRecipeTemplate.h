@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "MounteaRecipeTemplate.generated.h"
 
@@ -28,6 +29,16 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeTemplate : public UPrimar
 	GENERATED_BODY()
 	
 public:
+	
+	/**
+	 * OPTIONAL
+	 * 
+	 * If crafting requires a specific place, specify the tag which is required.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault),
+		meta=(Categories="Mountea_Inventory.Crafting,Crafting"))
+	FGameplayTag RequiredCraftingPlace;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
