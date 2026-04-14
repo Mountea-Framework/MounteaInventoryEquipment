@@ -1,0 +1,45 @@
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "UObject/Interface.h"
+#include "MounteaAdvancedCraftingPlaceInterface.generated.h"
+
+UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
+class UMounteaAdvancedCraftingPlaceInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+/**
+ * 
+ */
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingPlaceInterface
+{
+	GENERATED_BODY()
+
+public:
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	FGameplayTag GetCraftingPlaceType() const;
+	virtual FGameplayTag GetCraftingPlaceType_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool IsCraftingPlaceOccupied() const;
+	virtual bool IsCraftingPlaceOccupied_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	int32 GetCraftingPlaceCapacity() const;
+	virtual int32 GetCraftingPlaceCapacity_Implementation() const = 0;
+};
