@@ -13,7 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "MounteaAdvancedCraftingHandlerInterface.generated.h"
+#include "MounteaAdvancedCraftingParticipantInterface.generated.h"
 
 struct FGameplayTag;
 
@@ -25,7 +25,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeLearned, const UMounteaReci
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeForgotten, const UMounteaRecipeTemplate*, RecipeTemplate);
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
-class UMounteaAdvancedCraftingHandlerInterface : public UInterface
+class UMounteaAdvancedCraftingParticipantInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -33,7 +33,7 @@ class UMounteaAdvancedCraftingHandlerInterface : public UInterface
 /**
  * 
  */
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingHandlerInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingParticipantInterface
 {
 	GENERATED_BODY()
 
