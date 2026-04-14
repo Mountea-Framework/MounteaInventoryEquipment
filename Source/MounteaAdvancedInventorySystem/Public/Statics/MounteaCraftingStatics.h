@@ -17,7 +17,7 @@
 
 class UMounteaRecipeTemplate;
 class UMounteaRecipeIngredientsList;
-class IMounteaAdvancedCraftingHandlerInterface;
+class IMounteaAdvancedCraftingParticipantInterface;
 
 struct FGameplayTag;
 struct FMounteaCraftingResult;
@@ -80,7 +80,12 @@ public:
 	
 public:
 	
-	static bool CraftItem(const TScriptInterface<IMounteaAdvancedCraftingHandlerInterface>& Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get All Recipe Templates")
+	static TSet<UMounteaRecipeTemplate*> GetAllRecipeTemplates();
+	
+	static FMounteaCraftingResult CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 	
 /**
  * CRAFTING PLACE
