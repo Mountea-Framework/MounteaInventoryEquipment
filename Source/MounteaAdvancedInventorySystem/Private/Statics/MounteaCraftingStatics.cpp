@@ -15,9 +15,39 @@
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingHandlerInterface.h"
 
+bool UMounteaCraftingStatics::IsValidRecipeHandler(const UObject* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingHandlerInterface>();
+}
+
+TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetKnownRecipes(UObject* Target)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_GetKnownRecipes(Target) : TSet<UMounteaRecipeTemplate*>();
+}
+
+UMounteaRecipeTemplate* UMounteaCraftingStatics::GetRecipe(UObject* Target, const FGuid& RecipeGuid)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_GetRecipe(Target, RecipeGuid) : nullptr;
+}
+
+bool UMounteaCraftingStatics::IsRecipeKnown(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_IsRecipeKnown(Target, RecipeTemplate) : false;
+}
+
+bool UMounteaCraftingStatics::LearnRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_LearnRecipe(Target, RecipeTemplate) : false;
+}
+
+bool UMounteaCraftingStatics::ForgetRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_ForgetRecipe(Target, RecipeTemplate) : false;
+}
+
 bool UMounteaCraftingStatics::IsCraftingPossible(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft)
 {
-	return IsValid(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_IsCraftingPossible(Target, TemplateToCraft) : false;
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_IsCraftingPossible(Target, TemplateToCraft) : false;
 }
 
 FMounteaCraftingResult UMounteaCraftingStatics::StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)

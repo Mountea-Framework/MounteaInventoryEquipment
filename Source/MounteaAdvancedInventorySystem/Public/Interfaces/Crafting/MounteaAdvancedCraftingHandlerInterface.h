@@ -18,6 +18,10 @@
 class UMounteaRecipeTemplate;
 class UMounteaRecipeIngredientsList;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCraftingFinished, const FMounteaCraftingResult&, Result);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeLearned, const UMounteaRecipeTemplate*, RecipeTemplate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeForgotten, const UMounteaRecipeTemplate*, RecipeTemplate);
+
 UINTERFACE()
 class UMounteaAdvancedCraftingHandlerInterface : public UInterface
 {
@@ -34,10 +38,36 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingHandlerInterfac
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
-	bool IsCraftingPossible(UMounteaRecipeTemplate* TemplateToCraft);
-	virtual bool IsCraftingPossible_Implementation(UMounteaRecipeTemplate* TemplateToCraft) = 0;
+	TSet<UMounteaRecipeTemplate*> GetKnownRecipes() const;
+	virtual TSet<UMounteaRecipeTemplate*> GetKnownRecipes_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	UMounteaRecipeTemplate* GetRecipe(const FGuid& RecipeGuid) const;
+	virtual UMounteaRecipeTemplate* GetRecipe_Implementation(const FGuid& RecipeGuid) const = 0;
+
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool IsRecipeKnown(UMounteaRecipeTemplate* RecipeTemplate) const;
+	virtual bool IsRecipeKnown_Implementation(UMounteaRecipeTemplate* RecipeTemplate) const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool LearnRecipe(UMounteaRecipeTemplate* RecipeTemplate);
+	virtual bool LearnRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool ForgetRecipe(UMounteaRecipeTemplate* RecipeTemplate);
+	virtual bool ForgetRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool IsCraftingPossible(UMounteaRecipeTemplate* TemplateToCraft) const;
+	virtual bool IsCraftingPossible_Implementation(UMounteaRecipeTemplate* TemplateToCraft) const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	FMounteaCraftingResult StartCrafting(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 	virtual FMounteaCraftingResult StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients) = 0;
+	
+public:
+	
+	virtual FOnCraftingFinished& GetOnCraftingFinishedEventHandle() = 0;
+	virtual FOnRecipeLearned& GetOnRecipeLearnedEventHandle() = 0;
+	virtual FOnRecipeForgotten& GetOnRecipeForgottenEventHandle() = 0;
 };

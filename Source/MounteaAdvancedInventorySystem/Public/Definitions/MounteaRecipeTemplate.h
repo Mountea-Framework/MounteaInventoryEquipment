@@ -35,23 +35,28 @@ public:
 	 * 
 	 * If crafting requires a specific place, specify the tag which is required.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault),
 		meta=(Categories="Mountea_Inventory.Crafting,Crafting"))
 	FGameplayTag RequiredCraftingPlace;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
 	TSoftObjectPtr<UMounteaInventoryItemTemplate> ResultItem = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
 	int32 QuantityPerCreation = 1;
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault),
+		meta=(UIMin=0.f, ClampMin=0.f),
+		meta=(Units="seconds"))
+	float CraftingTime = 1.0f;
+	
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,
 		meta=(NoResetToDefault),
-		//meta=(TitleProperty="item: {DisplayName} | slot: {EquipmentSlot}"),
 		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
 		meta=(FullyExpand=true))
 	TArray<TObjectPtr<UMounteaRecipeIngredientsList>> RecipeIngredientOptions;

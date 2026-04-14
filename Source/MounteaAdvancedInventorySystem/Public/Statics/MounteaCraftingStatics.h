@@ -31,13 +31,40 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingStatics : public UBluep
 	
 public:
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Is Crafting Possible")
-	static bool IsCraftingPossible(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft);
+	static bool IsValidRecipeHandler(const UObject* Target);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
 		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get All Known Recipes")
+	static TSet<UMounteaRecipeTemplate*> GetKnownRecipes(UObject* Target);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Recipe")
+	static UMounteaRecipeTemplate* GetRecipe(UObject* Target, const FGuid& RecipeGuid);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Recipe Known")
+	static bool IsRecipeKnown(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
+	
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Learn Recipe")
+	static bool LearnRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
+	
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Forget Recipe")
+	static bool ForgetRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Crafting Possible")
+	static bool IsCraftingPossible(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft);
+	
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Start Crafting")
 	static FMounteaCraftingResult StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 	
