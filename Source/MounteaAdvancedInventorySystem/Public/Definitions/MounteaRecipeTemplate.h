@@ -52,7 +52,7 @@ public:
 		meta=(NoResetToDefault),
 		meta=(UIMin=0.f, ClampMin=0.f),
 		meta=(Units="seconds"))
-	float CraftingTime = 1.0f;
+	float CraftingTime = 0.f;
 	
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		Instanced,
@@ -60,6 +60,10 @@ public:
 		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
 		meta=(FullyExpand=true))
 	TArray<TObjectPtr<UMounteaRecipeIngredientsList>> RecipeIngredientOptions;
+	
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
+	FGuid RecipeGuid;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
