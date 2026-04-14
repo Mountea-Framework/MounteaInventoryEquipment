@@ -19,6 +19,7 @@ class UMounteaRecipeTemplate;
 class UMounteaRecipeIngredientsList;
 class IMounteaAdvancedCraftingHandlerInterface;
 
+struct FGameplayTag;
 struct FMounteaCraftingResult;
 
 /**
@@ -29,41 +30,50 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingStatics : public UBluep
 {
 	GENERATED_BODY()
 	
+/**
+ * CRAFTING PARTICIPANT
+ */
+	
 public:
 	
 	static bool IsValidRecipeHandler(const UObject* Target);
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get All Known Recipes")
 	static TSet<UMounteaRecipeTemplate*> GetKnownRecipes(UObject* Target);
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Recipe")
 	static UMounteaRecipeTemplate* GetRecipe(UObject* Target, const FGuid& RecipeGuid);
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Recipes")
+	static TArray<UMounteaRecipeTemplate*> GetRecipes(UObject* Target, const FGameplayTag& CraftingStationType);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Is Recipe Known")
 	static bool IsRecipeKnown(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
 	
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Learn Recipe")
 	static bool LearnRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
 	
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Forget Recipe")
 	static bool ForgetRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Is Crafting Possible")
 	static bool IsCraftingPossible(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft);
 	
-	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Start Crafting")
 	static FMounteaCraftingResult StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
@@ -71,4 +81,27 @@ public:
 public:
 	
 	static bool CraftItem(const TScriptInterface<IMounteaAdvancedCraftingHandlerInterface>& Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	
+/**
+ * CRAFTING PLACE
+ */
+	
+public:
+	
+	static bool IsValidCraftingPlace(const UObject* Target);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Crafting Place Type")
+	static FGameplayTag GetCraftingPlaceType(UObject* Target);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Crafting Place Occupied")
+	static bool IsCraftingPlaceOccupied(UObject* Target);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Crafting Place Capacity")
+	static int32 GetCraftingPlaceCapacity(UObject* Target);
 };

@@ -15,6 +15,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedCraftingHandlerInterface.generated.h"
 
+struct FGameplayTag;
+
 class UMounteaRecipeTemplate;
 class UMounteaRecipeIngredientsList;
 
@@ -22,7 +24,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCraftingFinished, const FMounteaC
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeLearned, const UMounteaRecipeTemplate*, RecipeTemplate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeForgotten, const UMounteaRecipeTemplate*, RecipeTemplate);
 
-UINTERFACE()
+UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedCraftingHandlerInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -40,6 +42,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	TSet<UMounteaRecipeTemplate*> GetKnownRecipes() const;
 	virtual TSet<UMounteaRecipeTemplate*> GetKnownRecipes_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	TArray<UMounteaRecipeTemplate*> GetRecipes(const FGameplayTag& CraftingStationType) const;
+	virtual TArray<UMounteaRecipeTemplate*> GetRecipes_Implementation(const FGameplayTag& CraftingStationType) const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	UMounteaRecipeTemplate* GetRecipe(const FGuid& RecipeGuid) const;

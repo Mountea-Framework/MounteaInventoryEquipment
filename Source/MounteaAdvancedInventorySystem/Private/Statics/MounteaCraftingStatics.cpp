@@ -14,6 +14,11 @@
 
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingHandlerInterface.h"
+#include "Interfaces/Crafting/MounteaAdvancedCraftingPlaceInterface.h"
+
+/**
+ * CRAFTING PARTICIPANT
+ */
 
 bool UMounteaCraftingStatics::IsValidRecipeHandler(const UObject* Target)
 {
@@ -28,6 +33,11 @@ TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetKnownRecipes(UObject* 
 UMounteaRecipeTemplate* UMounteaCraftingStatics::GetRecipe(UObject* Target, const FGuid& RecipeGuid)
 {
 	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_GetRecipe(Target, RecipeGuid) : nullptr;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetRecipes(UObject* Target, const FGameplayTag& CraftingStationType)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingHandlerInterface::Execute_GetRecipes(Target, CraftingStationType) : TArray<UMounteaRecipeTemplate*>();
 }
 
 bool UMounteaCraftingStatics::IsRecipeKnown(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate)
@@ -69,4 +79,28 @@ bool UMounteaCraftingStatics::CraftItem(const TScriptInterface<IMounteaAdvancedC
 	// otherwise all was good, return true
 	
 	return false;
+}
+
+/**
+ * CRAFTING PLACE
+ */
+
+bool UMounteaCraftingStatics::IsValidCraftingPlace(const UObject* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingPlaceInterface>();
+}
+
+FGameplayTag UMounteaCraftingStatics::GetCraftingPlaceType(UObject* Target)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingPlaceInterface::Execute_GetCraftingPlaceType(Target) : FGameplayTag();
+}
+
+bool UMounteaCraftingStatics::IsCraftingPlaceOccupied(UObject* Target)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingPlaceInterface::Execute_IsCraftingPlaceOccupied(Target) : false;
+}
+
+int32 UMounteaCraftingStatics::GetCraftingPlaceCapacity(UObject* Target)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingPlaceInterface::Execute_GetCraftingPlaceCapacity(Target) : INDEX_NONE;
 }
