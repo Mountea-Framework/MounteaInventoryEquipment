@@ -17,6 +17,8 @@
 #define IMAGE_BRUSH( RelativePath, ... ) FSlateImageBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
 #define BOX_BRUSH( RelativePath, ... ) FSlateBoxBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
 #define BORDER_BRUSH( RelativePath, ... ) FSlateBorderBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".png") ), __VA_ARGS__ )
+#define SVG_BRUSH( RelativePath, ... ) FSlateVectorImageBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".svg") ), __VA_ARGS__ )
+#define SVG_BRUSH_TINT( RelativePath, Size, Tint ) FSlateVectorImageBrush( StyleSet->RootToContentDir( RelativePath, TEXT(".svg") ), Size, Tint )
 #define DEFAULT_FONT(...) FCoreStyle::GetDefaultFontStyle(__VA_ARGS__)
 
 TSharedPtr<FSlateStyleSet> FMounteaAdvancedInventoryEditorStyle::StyleSet = nullptr;
@@ -24,66 +26,41 @@ TSharedPtr<FSlateStyleSet> FMounteaAdvancedInventoryEditorStyle::StyleSet = null
 void FMounteaAdvancedInventoryEditorStyle::Create()
 {
 	const FVector2D Icon12x12(12.0f, 12.0f);
+	const FVector2D Icon14x14(14.0f, 14.0f);
 	const FVector2D Icon16x16(16.0f, 16.0f);
+	const FVector2D Icon24x24(24.0f, 24.0f);
 	const FVector2D Icon40x40(40.0f, 40.0f);
-	const FVector2D Icon64x64(64.0f, 64.0f);
-	const FVector2D Icon128x128(128.f, 128.f);
-	const FVector2D Icon200x70(200.f, 70.f);
+	(void)Icon14x14;
+	(void)Icon24x24;
 	
 	StyleSet = MakeShareable(new FSlateStyleSet(GetAppStyleSetName()));
 	StyleSet->SetContentRoot(IPluginManager::Get().FindPlugin("MounteaAdvancedInventorySystem")->GetBaseDir() / TEXT("Resources"));
 
-	StyleSet->Set("MAISStyleSet.MounteaLogo.Small", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon16x16));
 	StyleSet->Set("MAISStyleSet.MounteaLogo", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon40x40));
 
-	StyleSet->Set("MAISStyleSet.K2Node_ValidateIcon.Small", new IMAGE_BRUSH(TEXT("K2Node_ValidateIcon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.K2Node_ValidateIcon", new IMAGE_BRUSH(TEXT("K2Node_ValidateIcon"), Icon40x40));
+	StyleSet->Set("MAISStyleSet.K2Node_ValidateIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/shield-check"), Icon40x40, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon40x40, FLinearColor::White));	
+	StyleSet->Set("MAISStyleSet.K2Node_GetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunset"), Icon40x40, FLinearColor::White));
 
-	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon.Small", new IMAGE_BRUSH(TEXT("K2Node_SetterIcon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon", new IMAGE_BRUSH(TEXT("K2Node_SetterIcon"), Icon40x40));
-	
-	StyleSet->Set("MAISStyleSet.K2Node_GetterIcon.Small", new IMAGE_BRUSH(TEXT("K2Node_GetterIcon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.K2Node_GetterIcon", new IMAGE_BRUSH(TEXT("K2Node_GetterIcon"), Icon40x40));
-
-	StyleSet->Set("MAISStyleSet.Help", new IMAGE_BRUSH(TEXT("Help_Icon"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Help.Small", new IMAGE_BRUSH(TEXT("Help_Icon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Help.large", new IMAGE_BRUSH(TEXT("Help_Icon"), Icon64x64));
+	StyleSet->Set("MAISStyleSet.Help", new SVG_BRUSH_TINT(TEXT("WebIcons/message-circle-question-mark"), Icon40x40, FLinearColor::White));
 
 	StyleSet->Set("MAISStyleSet.Dialoguer", new IMAGE_BRUSH(TEXT("Dialoguer_Icon"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Dialoguer.Small", new IMAGE_BRUSH(TEXT("Dialoguer_Icon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Dialoguer.large", new IMAGE_BRUSH(TEXT("Dialoguer_Icon"), Icon64x64));
-
 	StyleSet->Set("MAISStyleSet.Launcher", new IMAGE_BRUSH(TEXT("MPLIcon"), Icon40x40));
 	StyleSet->Set("MAISStyleSet.InventoryManager", new IMAGE_BRUSH(TEXT("MounteaInventoryManager_Icon"), Icon40x40));
-
-	StyleSet->Set("MAISStyleSet.Wiki", new IMAGE_BRUSH(TEXT("Wiki_Icon"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Wiki.Small", new IMAGE_BRUSH(TEXT("Wiki_Icon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Wiki.large", new IMAGE_BRUSH(TEXT("Wiki_Icon"), Icon64x64));
-
-	StyleSet->Set("MAISStyleSet.Youtube", new IMAGE_BRUSH(TEXT("youtube_icon"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Youtube.Small", new IMAGE_BRUSH(TEXT("youtube_icon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Youtube.large", new IMAGE_BRUSH(TEXT("youtube_icon"), Icon64x64));
-
-	StyleSet->Set("MAISStyleSet.Settings", new IMAGE_BRUSH(TEXT("settings_icon"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Settings.Small", new IMAGE_BRUSH(TEXT("settings_icon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Settings.large", new IMAGE_BRUSH(TEXT("settings_icon"), Icon64x64));
-
-	StyleSet->Set("MAISStyleSet.Config", new IMAGE_BRUSH(TEXT("configIcon"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Config.Small", new IMAGE_BRUSH(TEXT("configIcon"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Config.large", new IMAGE_BRUSH(TEXT("configIcon"), Icon64x64));
-	
 	StyleSet->Set("MAISStyleSet.Builder", new IMAGE_BRUSH(TEXT("unreal_builder"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Builder.Small", new IMAGE_BRUSH(TEXT("unreal_builder"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Builder.large", new IMAGE_BRUSH(TEXT("unreal_builder"), Icon64x64));
 
-	StyleSet->Set("MAISStyleSet.Level", new IMAGE_BRUSH(TEXT("LevelIcon"), Icon40x40));
-	StyleSet->Set("MAISStyleSet.Folder", new IMAGE_BRUSH(TEXT("FolderIcon"), Icon40x40));
+	StyleSet->Set("MAISStyleSet.Wiki", new SVG_BRUSH_TINT(TEXT("WebIcons/book-open-text"), Icon40x40, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Youtube", new SVG_BRUSH_TINT(TEXT("WebIcons/brand-youtube"), Icon12x12, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Settings", new SVG_BRUSH_TINT(TEXT("WebIcons/settings"), Icon12x12, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Config", new SVG_BRUSH_TINT(TEXT("WebIcons/settings-2"), Icon12x12, FLinearColor::White));	
+
+	StyleSet->Set("MAISStyleSet.Level", new SVG_BRUSH_TINT(TEXT("WebIcons/mountain-snow"), Icon40x40, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Folder", new SVG_BRUSH_TINT(TEXT("WebIcons/folder-open"), Icon40x40, FLinearColor::White));
 	
-	StyleSet->Set("MAISStyleSet.Import", new IMAGE_BRUSH(TEXT("EditorIcons/Import"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Export", new IMAGE_BRUSH(TEXT("EditorIcons/Export"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Close", new IMAGE_BRUSH(TEXT("EditorIcons/Close"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.SaveMultiple", new IMAGE_BRUSH(TEXT("EditorIcons/SaveMultiple"), Icon16x16));
-	StyleSet->Set("MAISStyleSet.Help", new IMAGE_BRUSH(TEXT("EditorIcons/Help"), Icon16x16));
+	StyleSet->Set("MAISStyleSet.Import", new SVG_BRUSH_TINT(TEXT("WebIcons/import"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Export", new SVG_BRUSH_TINT(TEXT("WebIcons/export"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Close", new SVG_BRUSH_TINT(TEXT("WebIcons/x"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.SaveMultiple", new SVG_BRUSH_TINT(TEXT("WebIcons/save-all"), Icon16x16, FLinearColor::White));
 
 	StyleSet->Set("MAISStyleSet.InventorySystemIcon", new IMAGE_BRUSH(TEXT("InventorySystem_Icon"), Icon16x16));
 
