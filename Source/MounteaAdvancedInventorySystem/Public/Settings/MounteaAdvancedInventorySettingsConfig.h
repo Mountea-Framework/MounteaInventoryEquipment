@@ -64,7 +64,6 @@ public:
 	// --- Templates ------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🏗 Templates", 
-		meta=(NoResetToDefault),
 		meta=(NoResetToDefault))
 	TMap<FString,TSoftObjectPtr<UPrimaryDataAsset>> TemplatesConfig;
 	

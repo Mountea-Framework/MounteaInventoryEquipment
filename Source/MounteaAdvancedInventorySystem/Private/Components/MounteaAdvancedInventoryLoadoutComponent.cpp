@@ -244,7 +244,7 @@ void UMounteaAdvancedInventoryLoadoutComponent::BeginPlay()
 	
 	InitializeInventoryAndEquipment();
 	
-	if ( bAutoLoad && GetOwner() && GetOwner()->HasAuthority())
+	if (bAutoLoad && GetOwner() && GetOwner()->HasAuthority())
 		Execute_LoadLoadout(this);
 }
 

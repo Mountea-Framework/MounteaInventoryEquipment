@@ -86,7 +86,8 @@ protected:
 	 * items from the configured loadout.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration",
-		meta=(NoEditInline))
+		meta=(NoResetToDefault),
+		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> RelatedInventory;
 	
 	/**
@@ -96,7 +97,8 @@ protected:
 	 * after they are successfully added to inventory.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration",
-		meta=(NoEditInline))
+		meta=(NoResetToDefault),
+		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedEquipmentInterface> RelatedEquipment;
 	
 	/**
@@ -106,7 +108,7 @@ protected:
 	 * loadout is executed.
 	 */
 	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category="Configuration",
-		meta=(NoEditInline))
+		meta=(NoResetToDefault))
 	TSoftObjectPtr<UMounteaAdvancedInventoryLoadoutConfig> LoadoutConfiguration;
 	
 	/**
@@ -115,6 +117,6 @@ protected:
 	 * Automatic loading is authority-driven and runs only on the owning actor's authoritative instance.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Configuration",
-		meta=(NoEditInline))
+		meta=(NoResetToDefault))
 	uint8 bAutoLoad : 1;
 };

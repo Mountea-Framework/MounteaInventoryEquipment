@@ -26,6 +26,19 @@ struct FPendingEquipmentActivation
 {
 	GENERATED_BODY()
 
+	FPendingEquipmentActivation() = default;
+
+	FPendingEquipmentActivation(const FPendingEquipmentActivation& Other)
+		: ItemGuid(Other.ItemGuid)
+		, SourceSlotId(Other.SourceSlotId)
+		, TargetSlotId(Other.TargetSlotId)
+		, Montage(Other.Montage)
+		, TransitionType(Other.TransitionType)
+		, TimeoutSeconds(Other.TimeoutSeconds)
+		, RequestedAtTimeSeconds(Other.RequestedAtTimeSeconds)
+	{
+	}
+
 	FGuid ItemGuid;
 	FName SourceSlotId = NAME_None;
 	FName TargetSlotId = NAME_None;

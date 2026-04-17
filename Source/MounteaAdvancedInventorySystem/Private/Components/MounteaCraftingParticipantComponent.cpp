@@ -14,16 +14,42 @@
 
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaRecipeTemplate.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaCraftingStatics.h"
 
 UMounteaCraftingParticipantComponent::UMounteaCraftingParticipantComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
+
+	UMounteaCraftingParticipantComponent::SetComponentTickEnabled(false);
+	
+	bAutoActivate = true;
+	
+	SetIsReplicatedByDefault(true);
+	SetActiveFlag(true);
+
+	ComponentTags.Append( { TEXT("Mountea"), TEXT("Crafting") } );
 }
 
 void UMounteaCraftingParticipantComponent::BeginPlay()
 {
 	Super::BeginPlay();	
+	
+	InitializeInventoryAndEquipment();
+}
+
+void UMounteaCraftingParticipantComponent::InitializeInventoryAndEquipment()
+{
+	auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
+	if (!IsValid(inventoryComponent))
+		LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! Loadouts will NOT work!"))
+	else
+	{
+		RelatedInventory = inventoryComponent;
+		ensureMsgf(RelatedInventory.GetObject() != nullptr, TEXT("[MounteaAdvancedInventoryLoadoutComponent] Failed to update 'RelatedInventory'"));
+	}
 }
 
 TSet<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::GetKnownRecipes_Implementation() const

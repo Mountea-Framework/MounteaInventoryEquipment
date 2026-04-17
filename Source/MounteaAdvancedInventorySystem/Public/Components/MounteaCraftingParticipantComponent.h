@@ -17,7 +17,11 @@
 #include "MounteaCraftingParticipantComponent.generated.h"
 
 struct FMounteaCraftingResult;
+class IMounteaAdvancedInventoryInterface;
 
+/**
+ * 
+ */
 UCLASS(ClassGroup=(Mountea), Blueprintable,
 	AutoExpandCategories=("Mountea","Crafting","Mountea|Crafting"),
 	HideCategories=("Cooking","Collision"),
@@ -31,6 +35,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void InitializeInventoryAndEquipment();
 
 public:
 	
@@ -73,4 +78,15 @@ public:
 	UPROPERTY(SaveGame, VisibleDefaultsOnly, BlueprintReadOnly, Category="Crafting",
 		meta=(NoResetToDefault))
 	TSet<FGuid> KnownRecipes;
+	
+	/**
+	 * Cached inventory interface found on the owning actor.
+	 *
+	 * This is initialized during BeginPlay and used as the target inventory when loading
+	 * items from the configured loadout.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Configuration",
+		meta=(NoResetToDefault),
+		meta=(DisplayThumbnail=false))
+	TScriptInterface<IMounteaAdvancedInventoryInterface> RelatedInventory;
 };
