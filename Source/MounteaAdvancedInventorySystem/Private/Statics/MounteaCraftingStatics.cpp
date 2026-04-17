@@ -18,7 +18,7 @@
 #include "Definitions/MounteaRecipeIngredientsList.h"
 #include "Definitions/MounteaRecipeTemplate.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
-#include "Interfaces/Crafting/MounteaAdvancedCraftingPlaceInterface.h"
+#include "Interfaces/Crafting/MounteaAdvancedCraftingStationInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Settings/MounteaAdvancedCraftingConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
@@ -162,20 +162,20 @@ FMounteaCraftingResult UMounteaCraftingStatics::CraftItem(const TScriptInterface
 
 bool UMounteaCraftingStatics::IsValidCraftingPlace(const UObject* Target)
 {
-	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingPlaceInterface>();
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingStationInterface>();
 }
 
 FGameplayTag UMounteaCraftingStatics::GetCraftingPlaceType(UObject* Target)
 {
-	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingPlaceInterface::Execute_GetCraftingPlaceType(Target) : FGameplayTag();
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_GetCraftingPlaceType(Target) : FGameplayTag();
 }
 
 bool UMounteaCraftingStatics::IsCraftingPlaceOccupied(UObject* Target)
 {
-	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingPlaceInterface::Execute_IsCraftingPlaceOccupied(Target) : false;
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_IsCraftingPlaceOccupied(Target) : false;
 }
 
 int32 UMounteaCraftingStatics::GetCraftingPlaceCapacity(UObject* Target)
 {
-	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingPlaceInterface::Execute_GetCraftingPlaceCapacity(Target) : INDEX_NONE;
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_GetCraftingPlaceCapacity(Target) : INDEX_NONE;
 }

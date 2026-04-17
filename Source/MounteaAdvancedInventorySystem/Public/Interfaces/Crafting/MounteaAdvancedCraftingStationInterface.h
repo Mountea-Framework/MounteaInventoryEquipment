@@ -14,10 +14,10 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
-#include "MounteaAdvancedCraftingPlaceInterface.generated.h"
+#include "MounteaAdvancedCraftingStationInterface.generated.h"
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
-class UMounteaAdvancedCraftingPlaceInterface : public UInterface
+class UMounteaAdvancedCraftingStationInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -25,7 +25,7 @@ class UMounteaAdvancedCraftingPlaceInterface : public UInterface
 /**
  * 
  */
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingPlaceInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingStationInterface
 {
 	GENERATED_BODY()
 

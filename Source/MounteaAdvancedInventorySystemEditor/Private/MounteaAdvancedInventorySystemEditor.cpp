@@ -123,6 +123,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaRecipeIngredientsList"), TEXT("RecipeIngredientsList") },
 					{ TEXT("MounteaRecipeIngredient"), TEXT("MounteaRecipeIngredients") },
 					{ TEXT("MounteaCraftingParticipantComponent"), TEXT("CraftingParticipantIcon") },
+					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
 					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") }
 				};
 
