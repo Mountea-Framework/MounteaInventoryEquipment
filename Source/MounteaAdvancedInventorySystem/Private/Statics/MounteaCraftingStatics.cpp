@@ -13,9 +13,13 @@
 #include "Statics/MounteaCraftingStatics.h"
 
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Definitions/MounteaRecipeIngredient.h"
+#include "Definitions/MounteaRecipeIngredientsList.h"
 #include "Definitions/MounteaRecipeTemplate.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingPlaceInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Settings/MounteaAdvancedCraftingConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
@@ -101,17 +105,55 @@ TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetAllRecipeTemplates()
 
 FMounteaCraftingResult UMounteaCraftingStatics::CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)
 {
-	// TODO:
-	// get inventory from Target
-	// get items from inventory
-	// prepare payload
-	// consume from inventory
-	// if fails, break
-	// if success, add new item
-	// if item add fails, break
-	// otherwise all was good, return true
-	
-	return {};
+	FMounteaCraftingResult result;
+
+	if (!Target || !IsValid(TemplateToCraft) || !IsValid(Ingredients))
+		return result;
+
+	const TScriptInterface<IMounteaAdvancedInventoryInterface> inventory =
+		IMounteaAdvancedCraftingParticipantInterface::Execute_GetParentInventory(Target.GetObject());
+	if (!inventory)
+		return result;
+
+	UMounteaInventoryItemTemplate* resultTemplate = TemplateToCraft->ResultItem.LoadSynchronous();
+	if (!IsValid(resultTemplate))
+		return result;
+
+	for (const UMounteaRecipeIngredient* ingredient : Ingredients->RecipeIngredients)
+	{
+		if (!IsValid(ingredient))
+			return result;
+
+		UMounteaInventoryItemTemplate* ingredientTemplate = ingredient->IngredientSource.LoadSynchronous();
+		if (!IsValid(ingredientTemplate))
+			return result;
+
+		const TArray<FMounteaInventoryItem> foundItems =
+			IMounteaAdvancedInventoryInterface::Execute_FindItems(inventory.GetObject(), FInventoryItemSearchParams(ingredientTemplate));
+
+		int32 totalQuantity = 0;
+		for (const FMounteaInventoryItem& item : foundItems)
+			totalQuantity += item.Quantity;
+
+		if (totalQuantity < ingredient->RequiredQuantity)
+			return result;
+	}
+
+	if (!IMounteaAdvancedInventoryInterface::Execute_CanAddItemFromTemplate(inventory.GetObject(), resultTemplate, TemplateToCraft->QuantityPerCreation))
+		return result;
+
+	for (const UMounteaRecipeIngredient* ingredient : Ingredients->RecipeIngredients)
+	{
+		UMounteaInventoryItemTemplate* ingredientTemplate = ingredient->IngredientSource.LoadSynchronous();
+		if (!IMounteaAdvancedInventoryInterface::Execute_RemoveItemFromTemplate(inventory.GetObject(), ingredientTemplate, ingredient->RequiredQuantity))
+			return result;
+	}
+
+	if (!IMounteaAdvancedInventoryInterface::Execute_AddItemFromTemplate(inventory.GetObject(), resultTemplate, TemplateToCraft->QuantityPerCreation, 1))
+		return result;
+
+	result.bCraftingSuccess = true;
+	return result;
 }
 
 /**
