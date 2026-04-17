@@ -42,7 +42,7 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon40x40, FLinearColor::White));	
 	StyleSet->Set("MAISStyleSet.K2Node_GetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunset"), Icon40x40, FLinearColor::White));
 
-	StyleSet->Set("MAISStyleSet.Help", new SVG_BRUSH_TINT(TEXT("WebIcons/message-circle-question-mark"), Icon40x40, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Help", new SVG_BRUSH_TINT(TEXT("WebIcons/message-circle-question-mark"), Icon16x16, FLinearColor::White));
 
 	StyleSet->Set("MAISStyleSet.Dialoguer", new IMAGE_BRUSH(TEXT("Dialoguer_Icon"), Icon40x40));
 	StyleSet->Set("MAISStyleSet.Launcher", new IMAGE_BRUSH(TEXT("MPLIcon"), Icon40x40));
@@ -61,6 +61,10 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Export", new SVG_BRUSH_TINT(TEXT("WebIcons/export"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Close", new SVG_BRUSH_TINT(TEXT("WebIcons/x"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.SaveMultiple", new SVG_BRUSH_TINT(TEXT("WebIcons/save-all"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Save", new SVG_BRUSH_TINT(TEXT("WebIcons/save"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Tutorial", new SVG_BRUSH_TINT(TEXT("WebIcons/graduation-cap"), Icon16x16, FLinearColor::White));
+	
+	StyleSet->Set("MAISStyleSet.TemplatesEditor",  new SVG_BRUSH_TINT(TEXT("WebIcons/template"), Icon16x16, FLinearColor::White));
 
 	StyleSet->Set("MAISStyleSet.InventorySystemIcon", new IMAGE_BRUSH(TEXT("InventorySystem_Icon"), Icon16x16));
 
