@@ -379,7 +379,7 @@ void UMounteaInventoryUIComponent::RemoveInventoryNotifications_Implementation()
 	IMounteaInventoryNotificationContainerWidgetInterface::Execute_ClearNotifications(InventoryNotificationContainerWidget);
 }
 
-void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FInventoryItem& AddedItem)
+void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FMounteaInventoryItem& AddedItem)
 {
 	if (!IsValid(InventoryWidget))
 	{
@@ -394,7 +394,7 @@ void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FInvent
 	}
 }
 
-void UMounteaInventoryUIComponent::ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem)
+void UMounteaInventoryUIComponent::ProcessItemModified_Implementation(const FMounteaInventoryItem& ModifiedItem)
 {
 	if (!IsValid(InventoryWidget))
 	{
@@ -411,7 +411,7 @@ void UMounteaInventoryUIComponent::ProcessItemModified_Implementation(const FInv
 	}
 }
 
-void UMounteaInventoryUIComponent::ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem)
+void UMounteaInventoryUIComponent::ProcessItemRemoved_Implementation(const FMounteaInventoryItem& RemovedItem)
 {
 	if (!IsValid(InventoryWidget))
 	{
@@ -473,12 +473,12 @@ void UMounteaInventoryUIComponent::AddCustomItemToMap_Implementation(const FGame
 	}	
 }
 
-void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability, const float NewDurability)
+void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FMounteaInventoryItem& Item, const float OldDurability, const float NewDurability)
 {
 	Execute_ProcessItemModified(this, Item);
 }
 
-void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
+void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FMounteaInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
 {
 	Execute_ProcessItemModified(this, Item);
 }

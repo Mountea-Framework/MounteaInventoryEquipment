@@ -17,7 +17,7 @@
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaInventoryStatics.h"
 
-bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FInventoryItem& NewTargetItem,
+bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FMounteaInventoryItem& NewTargetItem,
  const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory, UObject* ContextPayload)
 {
 	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
@@ -31,7 +31,7 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction
 	return nullptr;
 }
 
-bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
+bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const
 {
 	if (!TargetItem.IsItemValid())
 		return false;
@@ -42,7 +42,7 @@ bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FInventoryItem&
 	return false;
 }
 
-FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const
+FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FMounteaInventoryItem& TargetItem) const
 {
 	if (!TargetItem.IsItemValid())
 		return FText::FromString(TEXT("Invalid target item"));
@@ -50,7 +50,7 @@ FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FInv
 	return FText::FromString(TEXT("Action is not currently available"));
 }
 
-bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem)
+bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const FMounteaInventoryItem& TargetItem)
 {
 	if (!IsAllowed(TargetItem))
 	{

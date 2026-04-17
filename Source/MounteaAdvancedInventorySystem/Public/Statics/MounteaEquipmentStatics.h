@@ -200,7 +200,7 @@ public:
 	 * @param SettingsConfig - The configuration object containing settings and constraints for item-to-slot compatibility.
 	 * @return - A boolean value indicating whether the item is compatible with the target slot.
 	 */
-	static bool ValidateSlotItemTypeCompatibility(const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
+	static bool ValidateSlotItemTypeCompatibility(const FMounteaInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		const UMounteaAdvancedEquipmentSettingsConfig* SettingsConfig);
 
 	/**
@@ -241,7 +241,7 @@ public:
 	 * @param ItemDefinition - The inventory item definition that provides the item template containing the mesh data.
 	 * @param PlaceholderClass - The class of the placeholder actor, used for logging and validation purposes.
 	 */
-	static void ApplyQuickUsePlaceholderMesh(AActor* PlaceholderActor, const FInventoryItem& ItemDefinition, const UClass* PlaceholderClass);
+	static void ApplyQuickUsePlaceholderMesh(AActor* PlaceholderActor, const FMounteaInventoryItem& ItemDefinition, const UClass* PlaceholderClass);
 
 	/**
 	 * Validates whether an item can be equipped and resolves a usable target slot.
@@ -253,7 +253,7 @@ public:
 	 * @param TargetSlot  In/out resolved slot candidate.
 	 * @return  True if request is valid and TargetSlot is resolved/usable.
 	 */
-	static bool ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot*& TargetSlot);
+	static bool ValidateEquipmentItemRequest(const UObject* Outer, const FMounteaInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot*& TargetSlot);
 
 	/**
 	 * Spawns an equipment actor from item template and attaches it into the specified slot.
@@ -266,7 +266,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output (nullptr on failure).
 	 * @return  True if spawn + attach succeeded.
 	 */
-	static bool CreateEquipmentItemAndAttach(UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
+	static bool CreateEquipmentItemAndAttach(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
 
 	/**
@@ -277,7 +277,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
 	 * @return  True if equip succeeded.
 	 */
-	static bool EquipItemGeneral(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
+	static bool EquipItemGeneral(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
 
 	/**
 	 * Equip entry targeting a specific slot instance.
@@ -288,7 +288,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
 	 * @return  True if equip succeeded.
 	 */
-	static bool EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
+	static bool EquipItemToSlot(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
 
 	/**
@@ -302,7 +302,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
 	 * @return  True if equip succeeded.
 	 */
-	static bool EquipItemToResolvedSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* ResolvedTargetSlot,
+	static bool EquipItemToResolvedSlot(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* ResolvedTargetSlot,
 		AActor*& OutSpawnedActor);
 
 	/**
@@ -313,7 +313,7 @@ public:
 	 * @param SlotName  Optional slot restriction (NAME_None means any slot).
 	 * @return  True if equipped per provided constraints.
 	 */
-	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition, const FName SlotName = NAME_None);
+	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FMounteaInventoryItem& ItemDefinition, const FName SlotName = NAME_None);
 
 	/**
 	 * Resolves the fallback slot for the given slot from equipment settings.
@@ -426,7 +426,7 @@ public:
 	 * @param OutItemDefinition  Resolved inventory item output.
 	 * @return  True if item definition was found.
 	 */
-	static bool TryResolveInventoryItemByGuid(UObject* Outer, const FGuid& ItemGuid, FInventoryItem& OutItemDefinition);
+	static bool TryResolveInventoryItemByGuid(UObject* Outer, const FGuid& ItemGuid, FMounteaInventoryItem& OutItemDefinition);
 
 	/**
 	 * Spawns and prepares a non-replicated quick-use placeholder actor for animation visuals.
@@ -438,7 +438,7 @@ public:
 	 * @param VisualSlotId  Preferred visual slot for attachment.
 	 * @return  Spawned placeholder actor, or nullptr if not spawned.
 	 */
-	static AActor* SpawnQuickUsePlaceholderActor(UObject* Outer, const FInventoryItem& ItemDefinition, const FName& VisualSlotId);
+	static AActor* SpawnQuickUsePlaceholderActor(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, const FName& VisualSlotId);
 
 	/**
 	 * Evaluates whether target slot is currently blocked by active equipped item tags.
@@ -503,7 +503,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Equip Item")
-	static bool EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+	static bool EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition);
 
 	/**
 	 * Attempts to equip the specified inventory item to a designated equipment slot on the target object.
@@ -518,7 +518,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Equip Item to Slot")
-	static bool EquipItemToSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& SlotName);
+	static bool EquipItemToSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& SlotName);
 
 	/**
 	 * Determines if a specified inventory item is currently equipped on a target object
@@ -531,7 +531,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Is Item Equipped")
-	static bool IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+	static bool IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition);
 
 	/**
 	 * Checks if a specified inventory item is currently equipped in a specific slot on a target object.
@@ -546,7 +546,7 @@ public:
 		meta=(CustomTag="MounteaK2Validate,MounteaK2EquipmentSlot"),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Is Item Equipped In Slot")
-	static bool IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& SlotName);
+	static bool IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& SlotName);
 
 	/**
 	 * Unequips the specified inventory item from the provided target that implements the Mountea Advanced Equipment Interface.
@@ -561,7 +561,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unequip Item")
-	static bool UnequipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = true);
+	static bool UnequipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, bool bUseFallbackSlot = true);
 
 	/**
 	 * Activates the specified equipped item, transitioning it from Equipped to Active state.
@@ -577,7 +577,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Activate Equipment Item")
-	static bool ActivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	static bool ActivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
 
 	/**
 	 * Activates a Quick Use item in the specified slot for a given target that implements the Mountea Advanced Equipment Interface.
@@ -610,7 +610,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Deactivate Equipment Item")
-	static bool DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	static bool DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
 
 	/**
 	 * Commits pending equipment transition requested by animation notify.
@@ -644,7 +644,7 @@ public:
 
 #if WITH_EDITOR
 	UFUNCTION(BlueprintInternalUseOnly)
-	bool Prototype_EquipItem(const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) { return false; };
+	bool Prototype_EquipItem(const FMounteaInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) { return false; };
 #endif
 
 private:

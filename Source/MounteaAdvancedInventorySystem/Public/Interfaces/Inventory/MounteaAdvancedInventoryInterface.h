@@ -120,10 +120,10 @@ struct FInventoryItemSearchParams
 	FString RarityId;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, const FInventoryItem&, AddedItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemRemoved, const FInventoryItem&, RemovedItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemQuantityChanged, const FInventoryItem&, Item, int32, OldQuantity, int32, NewQuantity);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemDurabilityChanged, const FInventoryItem&, Item, float, OldDurability, float, NewDurability);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAdded, const FMounteaInventoryItem&, AddedItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemRemoved, const FMounteaInventoryItem&, RemovedItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemQuantityChanged, const FMounteaInventoryItem&, Item, int32, OldQuantity, int32, NewQuantity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemDurabilityChanged, const FMounteaInventoryItem&, Item, float, OldDurability, float, NewDurability);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationProcessed, const FInventoryNotificationData&, NotificationData);
 
 // This class does not need to be modified.
@@ -168,8 +168,8 @@ public:
 	* @return True if item was added successfully
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
-	bool AddItem(const FInventoryItem& Item);
-	virtual bool AddItem_Implementation(const FInventoryItem& Item) = 0;
+	bool AddItem(const FMounteaInventoryItem& Item);
+	virtual bool AddItem_Implementation(const FMounteaInventoryItem& Item) = 0;
 
 	/**
 	* Removes an item from inventory
@@ -186,8 +186,8 @@ public:
 	* @return True if item can be added
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
-	bool CanAddItem(const FInventoryItem& Item) const;
-	virtual bool CanAddItem_Implementation(const FInventoryItem& Item) const = 0;
+	bool CanAddItem(const FMounteaInventoryItem& Item) const;
+	virtual bool CanAddItem_Implementation(const FMounteaInventoryItem& Item) const = 0;
 
 	/**
 	* Adds an item from template
@@ -226,8 +226,8 @@ public:
 	* @return Found item or nullptr
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Search")
-	FInventoryItem FindItem(const FInventoryItemSearchParams& SearchParams) const;
-	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
+	FMounteaInventoryItem FindItem(const FInventoryItemSearchParams& SearchParams) const;
+	virtual FMounteaInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
 
 	/**
 	* Finds item index based on Search conditions.
@@ -244,16 +244,16 @@ public:
 	* @return Found items or empty array
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Search")
-	TArray<FInventoryItem> FindItems(const FInventoryItemSearchParams& SearchParams) const;
-	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
+	TArray<FMounteaInventoryItem> FindItems(const FInventoryItemSearchParams& SearchParams) const;
+	virtual TArray<FMounteaInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const = 0;
 
 	/**
 	* Gets all items in inventory
 	* @return Array of inventory items
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Management")
-	TArray<FInventoryItem> GetAllItems() const;
-	virtual TArray<FInventoryItem> GetAllItems_Implementation() const = 0;
+	TArray<FMounteaInventoryItem> GetAllItems() const;
+	virtual TArray<FMounteaInventoryItem> GetAllItems_Implementation() const = 0;
 
 	/**
 	* Clears all items from inventory

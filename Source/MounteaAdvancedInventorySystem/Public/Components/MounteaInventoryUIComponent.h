@@ -66,9 +66,9 @@ public:
 	virtual void CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData) override;
 	virtual void RemoveInventoryNotifications_Implementation() override;
 
-	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) override;
-	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) override;
-	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) override;
+	virtual void ProcessItemAdded_Implementation(const FMounteaInventoryItem& AddedItem) override;
+	virtual void ProcessItemModified_Implementation(const FMounteaInventoryItem& ModifiedItem) override;
+	virtual void ProcessItemRemoved_Implementation(const FMounteaInventoryItem& RemovedItem) override;
 
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
 	virtual FString GetSelectedCategoryId_Implementation() const override { return ActiveCategoryId; };
@@ -107,9 +107,9 @@ public:
 protected:
 
 	UFUNCTION()
-	void ProcessItemDurabilityChanged(const FInventoryItem& Item, const float OldDurability, const float NewDurability);
+	void ProcessItemDurabilityChanged(const FMounteaInventoryItem& Item, const float OldDurability, const float NewDurability);
 	UFUNCTION()
-	void ProcessItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
+	void ProcessItemQuantityChanged(const FMounteaInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
 
 protected:
 	

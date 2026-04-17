@@ -230,7 +230,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Items",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Inventory UI Manager - Find Item")
-	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	static FMounteaInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
 	 * Retrieves local custom items map.
@@ -610,7 +610,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Is Item UI Detached From Valid Items")
-	static bool IsItemWidgetDetachedFromValidItems(const TArray<FInventoryItem>& ValidItems, const FInventoryItemData& InventoryItemData);
+	static bool IsItemWidgetDetachedFromValidItems(const TArray<FMounteaInventoryItem>& ValidItems, const FInventoryItemData& InventoryItemData);
 	
 	/**
 	 * Validates whether the specified hardware input type is currently active for the owning local player.
@@ -1542,7 +1542,7 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Make New Inventory Inventory Item Widget Data",
 		meta=(NativeMakeFunc))
-	static FInventoryItemData MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity);
+	static FInventoryItemData MakeInventoryItemWidgetData(const FMounteaInventoryItem& Item, const int32 Quantity);
 
 	/**
 	 * Validates whether Item Widget Data has changed (Widget is Dirty for re-render).
@@ -1614,7 +1614,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item - Initialize Item Widget")
-	static void ItemWidget_InitializeItemWidget(UWidget* Target, const FInventoryItem& Item, const int32 Quantity);
+	static void ItemWidget_InitializeItemWidget(UWidget* Target, const FMounteaInventoryItem& Item, const int32 Quantity);
 	
 	/**
 	 * Retrieves the logical data currently represented by this item widget.
@@ -2158,7 +2158,7 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Find Empty Slot Index (Helper)")
 	static int32 Helper_FindEmptyGridSlotIndex(const UWidget* Target, const FGuid& ItemId, UObject* ParentInventory);
-	static int32 FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems);
+	static int32 FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FMounteaInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems);
 
 	/**
 	 * Updates the item located in a specific slot of the inventory grid.

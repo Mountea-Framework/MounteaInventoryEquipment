@@ -18,7 +18,7 @@
 
 struct FAttachmentContainer;
 struct FAttachmentSlot;
-struct FInventoryItem;
+struct FMounteaInventoryItem;
 
 class UMounteaInventoryItemTemplate;
 
@@ -54,8 +54,8 @@ public:
 	 * @return Spawned equipment actor if equipping succeeds, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	AActor* EquipItem(const FInventoryItem& ItemDefinition);
-	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) = 0; 
+	AActor* EquipItem(const FMounteaInventoryItem& ItemDefinition);
+	virtual AActor* EquipItem_Implementation(const FMounteaInventoryItem& ItemDefinition) = 0; 
 	
 	/**
 	 * Equips the specified inventory item into a designated equipment slot.
@@ -65,8 +65,8 @@ public:
 	 * @return Spawned equipment actor if equipping succeeds, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	AActor* EquipItemToSlot(const FName& SlotId, const FInventoryItem& ItemDefinition);
-	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FInventoryItem& ItemDefinition) = 0;
+	AActor* EquipItemToSlot(const FName& SlotId, const FMounteaInventoryItem& ItemDefinition);
+	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FMounteaInventoryItem& ItemDefinition) = 0;
 	
 	/**
 	 * Unequips the specified inventory item.
@@ -76,8 +76,8 @@ public:
 	 * @return True if the item was successfully unequipped, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool UnequipItem(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false);
-	virtual bool UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) = 0;
+	bool UnequipItem(const FMounteaInventoryItem& ItemDefinition, bool bUseFallbackSlot = false);
+	virtual bool UnequipItem_Implementation(const FMounteaInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) = 0;
 	
 	/**
 	 * Unequips the item currently occupying the specified slot.
@@ -97,8 +97,8 @@ public:
 	 * @return True if the item is equipped, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool IsEquipmentItemEquipped(const FInventoryItem& ItemDefinition) const;
-	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const = 0;
+	bool IsEquipmentItemEquipped(const FMounteaInventoryItem& ItemDefinition) const;
+	virtual bool IsEquipmentItemEquipped_Implementation(const FMounteaInventoryItem& ItemDefinition) const = 0;
 	
 	/**
 	 * Checks whether the specified inventory item is equipped in a particular slot.
@@ -108,8 +108,8 @@ public:
 	 * @return True if the item is equipped in the specified slot, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool IsEquipmentItemEquippedInSlot(const FInventoryItem& ItemDefinition, const FName& SlotName) const;
-	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const = 0;
+	bool IsEquipmentItemEquippedInSlot(const FMounteaInventoryItem& ItemDefinition, const FName& SlotName) const;
+	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& SlotName) const = 0;
 
 	/**
 	 * Activates the specified equipped item and transitions it from Equipped to Active state.
@@ -120,8 +120,8 @@ public:
 	 * @return True if activation was successfully initiated, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool ActivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
-	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) = 0;
+	bool ActivateEquipmentItem(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	virtual bool ActivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId) = 0;
 
 	/**
 	 * Activates a quick-use item from the specified slot.
@@ -142,8 +142,8 @@ public:
 	 * @return True if deactivation was successfully initiated, otherwise false.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Equipment")
-	bool DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
-	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) = 0;
+	bool DeactivateEquipmentItem(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	virtual bool DeactivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId) = 0;
 
 	/**
 	 * Commits pending equipment transition requested by animation notify flow.

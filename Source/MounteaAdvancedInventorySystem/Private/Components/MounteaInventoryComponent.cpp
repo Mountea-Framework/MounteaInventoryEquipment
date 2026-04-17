@@ -58,7 +58,7 @@ AActor* UMounteaInventoryComponent::GetOwningActor_Implementation() const
 	return GetOwner();
 }
 
-bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& Item)
+bool UMounteaInventoryComponent::AddItem_Implementation(const FMounteaInventoryItem& Item)
 {
 	if (!Execute_CanAddItem(this, Item))
 	{
@@ -141,7 +141,7 @@ bool UMounteaInventoryComponent::AddItem_Implementation(const FInventoryItem& It
 			}
 		}
 
-		FInventoryItem newItem = Item;
+		FMounteaInventoryItem newItem = Item;
 		if (AmountToAdd != Item.GetQuantity())
 			newItem.Quantity += AmountToAdd;
 
@@ -171,7 +171,7 @@ bool UMounteaInventoryComponent::AddItemFromTemplate_Implementation(UMounteaInve
 		return false;
 	}
 
-	return Execute_AddItem(this, FInventoryItem(Template, Quantity, Durability, nullptr));
+	return Execute_AddItem(this, FMounteaInventoryItem(Template, Quantity, Durability, nullptr));
 }
 
 bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid)
@@ -182,7 +182,7 @@ bool UMounteaInventoryComponent::RemoveItem_Implementation(const FGuid& ItemGuid
 	if (ItemIndex == INDEX_NONE)
 		return false;
 
-	const FInventoryItem RemovedItem = InventoryItems.Items[ItemIndex];
+	const FMounteaInventoryItem RemovedItem = InventoryItems.Items[ItemIndex];
 	
 	OnItemRemoved.Broadcast(RemovedItem);
 	
@@ -232,7 +232,7 @@ bool UMounteaInventoryComponent::RemoveItemFromTemplate_Implementation(UMounteaI
 	}	
 }
 
-bool UMounteaInventoryComponent::CanAddItem_Implementation(const FInventoryItem& Item) const
+bool UMounteaInventoryComponent::CanAddItem_Implementation(const FMounteaInventoryItem& Item) const
 {
 	if (!IsActive()) return false;
 	
@@ -254,12 +254,12 @@ bool UMounteaInventoryComponent::CanAddItemFromTemplate_Implementation(UMounteaI
 	if (!IsValid(Template))
 		return false;
 
-	return Execute_CanAddItem(this, FInventoryItem(Template, Quantity, Template->BaseDurability, nullptr));
+	return Execute_CanAddItem(this, FMounteaInventoryItem(Template, Quantity, Template->BaseDurability, nullptr));
 }
 
-FInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const
+FMounteaInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const
 {
-	const auto foundItem = InventoryItems.Items.FindByPredicate([&SearchParams](const FInventoryItem& Item)
+	const auto foundItem = InventoryItems.Items.FindByPredicate([&SearchParams](const FMounteaInventoryItem& Item)
 	{
 		if (SearchParams.bSearchByGuid && Item.GetGuid() != SearchParams.ItemGuid)
 			return false;
@@ -284,12 +284,12 @@ FInventoryItem UMounteaInventoryComponent::FindItem_Implementation(const FInvent
 		return true;
 	});
 
-	return foundItem ? *foundItem : FInventoryItem();
+	return foundItem ? *foundItem : FMounteaInventoryItem();
 }
 
 int32 UMounteaInventoryComponent::FindItemIndex_Implementation(const FInventoryItemSearchParams& SearchParams) const
 {
-	return InventoryItems.Items.IndexOfByPredicate([&SearchParams](const FInventoryItem& Item)
+	return InventoryItems.Items.IndexOfByPredicate([&SearchParams](const FMounteaInventoryItem& Item)
 	{
 		if (SearchParams.bSearchByGuid && Item.GetGuid() != SearchParams.ItemGuid)
 			return false;
@@ -309,9 +309,9 @@ int32 UMounteaInventoryComponent::FindItemIndex_Implementation(const FInventoryI
 	});
 }
 
-TArray<FInventoryItem> UMounteaInventoryComponent::FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const
+TArray<FMounteaInventoryItem> UMounteaInventoryComponent::FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const
 {
-	TArray<FInventoryItem> returnResult;
+	TArray<FMounteaInventoryItem> returnResult;
 	
 	if (!SearchParams.bSearchByGuid && !SearchParams.bSearchByTemplate && 
 		!SearchParams.bSearchByTags && !SearchParams.bSearchByCategory && 
@@ -320,7 +320,7 @@ TArray<FInventoryItem> UMounteaInventoryComponent::FindItems_Implementation(cons
 		return InventoryItems.Items;
 	}
     
-	Algo::CopyIf(InventoryItems.Items, returnResult, [&SearchParams](const FInventoryItem& Item) -> bool
+	Algo::CopyIf(InventoryItems.Items, returnResult, [&SearchParams](const FMounteaInventoryItem& Item) -> bool
 	{
 		if (!Item.IsItemValid())
 			return false;
@@ -357,7 +357,7 @@ TArray<FInventoryItem> UMounteaInventoryComponent::FindItems_Implementation(cons
 	return returnResult;
 }
 
-TArray<FInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() const
+TArray<FMounteaInventoryItem> UMounteaInventoryComponent::GetAllItems_Implementation() const
 {
 	return InventoryItems.Items;
 }
@@ -470,7 +470,7 @@ void UMounteaInventoryComponent::ClearInventory_Implementation()
 
 bool UMounteaInventoryComponent::HasItem_Implementation(const FInventoryItemSearchParams& SearchParams) const
 {
-	const FInventoryItem foundItem = Execute_FindItem(this, SearchParams);
+	const FMounteaInventoryItem foundItem = Execute_FindItem(this, SearchParams);
 	return foundItem.IsItemValid();
 }
 
@@ -524,7 +524,7 @@ void UMounteaInventoryComponent::ProcessInventoryNotification_Client_Implementat
 	});
 }
 
-void UMounteaInventoryComponent::AddItem_Server_Implementation(const FInventoryItem& Item)
+void UMounteaInventoryComponent::AddItem_Server_Implementation(const FMounteaInventoryItem& Item)
 {
 	Execute_AddItem(this, Item);
 }
@@ -534,7 +534,7 @@ void UMounteaInventoryComponent::RemoveItem_Server_Implementation(const FGuid& I
 	Execute_RemoveItem(this, ItemGuid);
 }
 
-void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInventoryItem& Item)
+void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FMounteaInventoryItem& Item)
 {
 	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
@@ -549,7 +549,7 @@ void UMounteaInventoryComponent::PostItemAdded_Client_Implementation(const FInve
 	OnItemAdded.Broadcast(Item);
 }
 
-void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FInventoryItem& Item)
+void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FMounteaInventoryItem& Item)
 {
 	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
@@ -564,7 +564,7 @@ void UMounteaInventoryComponent::PostItemRemoved_Client_Implementation(const FIn
 	OnItemRemoved.Broadcast(Item);
 }
 
-void UMounteaInventoryComponent::PostItemQuantityChanged_Implementation(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
+void UMounteaInventoryComponent::PostItemQuantityChanged_Implementation(const FMounteaInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
 {
 	if (IsAuthority() && UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
@@ -579,7 +579,7 @@ void UMounteaInventoryComponent::PostItemQuantityChanged_Implementation(const FI
 	OnItemQuantityChanged.Broadcast(Item, OldQuantity, NewQuantity);
 }
 
-void UMounteaInventoryComponent::PostItemDurabilityChanged_Implementation(const FInventoryItem& Item, const int32 OldDurability, const int32 NewDurability)
+void UMounteaInventoryComponent::PostItemDurabilityChanged_Implementation(const FMounteaInventoryItem& Item, const int32 OldDurability, const int32 NewDurability)
 {
 	OnItemDurabilityChanged.Broadcast(Item, OldDurability, NewDurability);
 }

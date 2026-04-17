@@ -23,7 +23,7 @@
 #include "Statics/MounteaEquipmentStatics.h"
 #include "Statics/MounteaInventoryStatics.h"
 
-using FResolvedLoadoutItem = TPair<UMounteaAdvancedInventoryLoadoutItem*, FInventoryItem>;
+using FResolvedLoadoutItem = TPair<UMounteaAdvancedInventoryLoadoutItem*, FMounteaInventoryItem>;
 
 static FString GetLoadoutItemDebugName(const UMounteaAdvancedInventoryLoadoutItem* Item)
 {

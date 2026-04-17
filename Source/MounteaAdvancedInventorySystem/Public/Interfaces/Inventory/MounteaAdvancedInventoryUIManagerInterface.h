@@ -16,7 +16,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryUIManagerInterface.generated.h"
 
-struct FInventoryItem;
+struct FMounteaInventoryItem;
 struct FInventoryNotificationData;
 
 class IMounteaAdvancedInventoryInterface;
@@ -203,24 +203,24 @@ public:
 	 * @param AddedItem The item that has been added to the inventory.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
-	void ProcessItemAdded(const FInventoryItem& AddedItem);
-	virtual void ProcessItemAdded_Implementation(const FInventoryItem& AddedItem) = 0;
+	void ProcessItemAdded(const FMounteaInventoryItem& AddedItem);
+	virtual void ProcessItemAdded_Implementation(const FMounteaInventoryItem& AddedItem) = 0;
 
 	/**
 	 * Processes an item that has been removed from the inventory.
 	 * @param RemovedItem The item that has been removed from the inventory.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
-	void ProcessItemRemoved(const FInventoryItem& RemovedItem);
-	virtual void ProcessItemRemoved_Implementation(const FInventoryItem& RemovedItem) = 0;
+	void ProcessItemRemoved(const FMounteaInventoryItem& RemovedItem);
+	virtual void ProcessItemRemoved_Implementation(const FMounteaInventoryItem& RemovedItem) = 0;
 
 	/**
 	 * Processes an item that has been modified in the inventory.
 	 * @param ModifiedItem The item that has been modified in the inventory.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
-	void ProcessItemModified(const FInventoryItem& ModifiedItem);
-	virtual void ProcessItemModified_Implementation(const FInventoryItem& ModifiedItem) = 0;
+	void ProcessItemModified(const FMounteaInventoryItem& ModifiedItem);
+	virtual void ProcessItemModified_Implementation(const FMounteaInventoryItem& ModifiedItem) = 0;
 	
 	/**
 	 * Handles the selection of an item in the inventory UI.
