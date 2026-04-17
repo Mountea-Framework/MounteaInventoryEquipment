@@ -18,6 +18,7 @@
 class UMounteaRecipeTemplate;
 class UMounteaRecipeIngredientsList;
 class IMounteaAdvancedCraftingParticipantInterface;
+class IMounteaAdvancedInventoryInterface;
 
 struct FGameplayTag;
 struct FMounteaCraftingResult;
@@ -41,7 +42,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get All Known Recipes")
-	static TSet<UMounteaRecipeTemplate*> GetKnownRecipes(UObject* Target);
+	static TArray<UMounteaRecipeTemplate*> GetKnownRecipes(UObject* Target);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
@@ -77,6 +78,16 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Start Crafting")
 	static FMounteaCraftingResult StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Crafting Possible")
+	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation(UObject* Target);
+	
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Start Crafting")
+	static bool SetParentInventory_Implementation(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	
 public:
 	

@@ -15,7 +15,9 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedCraftingParticipantInterface.generated.h"
 
+class IMounteaAdvancedInventoryInterface;
 struct FGameplayTag;
+struct FMounteaCraftingResult;
 
 class UMounteaRecipeTemplate;
 class UMounteaRecipeIngredientsList;
@@ -40,8 +42,8 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingParticipantInte
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
-	TSet<UMounteaRecipeTemplate*> GetKnownRecipes() const;
-	virtual TSet<UMounteaRecipeTemplate*> GetKnownRecipes_Implementation() const = 0;
+	TArray<UMounteaRecipeTemplate*> GetKnownRecipes() const;
+	virtual TArray<UMounteaRecipeTemplate*> GetKnownRecipes_Implementation() const = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	TArray<UMounteaRecipeTemplate*> GetRecipes(const FGameplayTag& CraftingStationType) const;
@@ -70,6 +72,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	FMounteaCraftingResult StartCrafting(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 	virtual FMounteaCraftingResult StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory() const;
+	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
+	virtual bool SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
 	
 public:
 	

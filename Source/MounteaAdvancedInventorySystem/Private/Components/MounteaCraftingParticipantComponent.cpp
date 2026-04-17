@@ -12,6 +12,7 @@
 
 #include "Components/MounteaCraftingParticipantComponent.h"
 
+#include "Net/UnrealNetwork.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaRecipeTemplate.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
@@ -35,9 +36,20 @@ UMounteaCraftingParticipantComponent::UMounteaCraftingParticipantComponent()
 
 void UMounteaCraftingParticipantComponent::BeginPlay()
 {
-	Super::BeginPlay();	
-	
+	Super::BeginPlay();
+
 	InitializeInventoryAndEquipment();
+}
+
+void UMounteaCraftingParticipantComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(UMounteaCraftingParticipantComponent, KnownRecipes, COND_InitialOrOwner);
+}
+
+void UMounteaCraftingParticipantComponent::OnRep_KnownRecipes()
+{
+	// KnownRecipes updated by replication; delegates fire via PostRecipeLearned_Client / PostRecipeForgotten_Client.
 }
 
 void UMounteaCraftingParticipantComponent::InitializeInventoryAndEquipment()
@@ -47,19 +59,19 @@ void UMounteaCraftingParticipantComponent::InitializeInventoryAndEquipment()
 		LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! Loadouts will NOT work!"))
 	else
 	{
-		RelatedInventory = inventoryComponent;
+		Execute_SetParentInventory(this, inventoryComponent);
 		ensureMsgf(RelatedInventory.GetObject() != nullptr, TEXT("[MounteaAdvancedInventoryLoadoutComponent] Failed to update 'RelatedInventory'"));
 	}
 }
 
-TSet<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::GetKnownRecipes_Implementation() const
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::GetKnownRecipes_Implementation() const
 {
 	return ResolveKnownRecipeTemplates(KnownRecipes);
 }
 
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::GetRecipes_Implementation(const FGameplayTag& CraftingStationType) const
 {
-	const TSet<UMounteaRecipeTemplate*> knownRecipes = ResolveKnownRecipeTemplates(KnownRecipes);
+	const TArray<UMounteaRecipeTemplate*> knownRecipes = ResolveKnownRecipeTemplates(KnownRecipes);
 	if (knownRecipes.Num() == 0)
 		return TArray<UMounteaRecipeTemplate*>();
 
@@ -83,8 +95,8 @@ UMounteaRecipeTemplate* UMounteaCraftingParticipantComponent::GetRecipe_Implemen
 	if (!KnownRecipes.Contains(RecipeGuid))
 		return nullptr;
 
-	const TSet<UMounteaRecipeTemplate*> knownRecipes = ResolveKnownRecipeTemplates(KnownRecipes);
-	UMounteaRecipeTemplate* const* foundRecipe = knownRecipes.Array().FindByPredicate(
+	const TArray<UMounteaRecipeTemplate*> knownRecipes = ResolveKnownRecipeTemplates(KnownRecipes);
+	UMounteaRecipeTemplate* const* foundRecipe = knownRecipes.FindByPredicate(
 		[&RecipeGuid](const UMounteaRecipeTemplate* recipe)
 		{
 			return IsValid(recipe) && recipe->RecipeGuid == RecipeGuid;
@@ -102,8 +114,15 @@ bool UMounteaCraftingParticipantComponent::LearnRecipe_Implementation(UMounteaRe
 {
 	if (Execute_IsRecipeKnown(this, RecipeTemplate))
 		return false;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		Server_LearnRecipe(RecipeTemplate);
+		return true;
+	}
+
 	KnownRecipes.Add(RecipeTemplate->RecipeGuid);
-	
+	PostRecipeLearned_Client(RecipeTemplate);
 	OnRecipeLearned.Broadcast(RecipeTemplate);
 	return true;
 }
@@ -112,9 +131,16 @@ bool UMounteaCraftingParticipantComponent::ForgetRecipe_Implementation(UMounteaR
 {
 	if (!Execute_IsRecipeKnown(this, RecipeTemplate))
 		return false;
-	OnRecipeForgotten.Broadcast(RecipeTemplate);
-	
+
+	if (!GetOwner()->HasAuthority())
+	{
+		Server_ForgetRecipe(RecipeTemplate);
+		return true;
+	}
+
 	KnownRecipes.Remove(RecipeTemplate->RecipeGuid);
+	PostRecipeForgotten_Client(RecipeTemplate);
+	OnRecipeForgotten.Broadcast(RecipeTemplate);
 	return true;
 }
 
@@ -125,23 +151,39 @@ bool UMounteaCraftingParticipantComponent::IsCraftingPossible_Implementation(UMo
 
 FMounteaCraftingResult UMounteaCraftingParticipantComponent::StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)
 {
+	if (!GetOwner()->HasAuthority())
+	{
+		Server_StartCrafting(TemplateToCraft, Ingredients);
+		return FMounteaCraftingResult{};
+	}
+
 	FMounteaCraftingResult result = UMounteaCraftingStatics::CraftItem(this, TemplateToCraft, Ingredients);
+	PostCraftingFinished_Client(result);
+	OnCraftingFinished.Broadcast(result);
 	return result;
 }
 
-TSet<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::ResolveKnownRecipeTemplates(const TSet<FGuid>& KnownRecipeGuids)
+bool UMounteaCraftingParticipantComponent::SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
+{
+	if (RelatedInventory == NewParentInventory)
+		return false;
+	RelatedInventory = NewParentInventory;
+	return true;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::ResolveKnownRecipeTemplates(const TArray<FGuid>& KnownRecipeGuids)
 {
 	if (KnownRecipeGuids.Num() == 0)
-		return TSet<UMounteaRecipeTemplate*>();
+		return TArray<UMounteaRecipeTemplate*>();
 
-	const TSet<UMounteaRecipeTemplate*> allRecipes = UMounteaCraftingStatics::GetAllRecipeTemplates();
+	const TArray<UMounteaRecipeTemplate*> allRecipes = UMounteaCraftingStatics::GetAllRecipeTemplates().Array();
 	if (allRecipes.Num() == 0)
-		return TSet<UMounteaRecipeTemplate*>();
+		return TArray<UMounteaRecipeTemplate*>();
 
-	TSet<UMounteaRecipeTemplate*> result;
+	TArray<UMounteaRecipeTemplate*> result;
 	result.Reserve(KnownRecipeGuids.Num());
 
-	const auto allRecipesArray = allRecipes.Array();
+	const auto allRecipesArray = allRecipes;
 	for (const FGuid& knownRecipeGuid : KnownRecipeGuids)
 	{
 		UMounteaRecipeTemplate* const* foundRecipe = allRecipesArray.FindByPredicate(
@@ -155,5 +197,35 @@ TSet<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::ResolveKnown
 	}
 
 	return result;
+}
+
+void UMounteaCraftingParticipantComponent::Server_LearnRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate)
+{
+	Execute_LearnRecipe(this, RecipeTemplate);
+}
+
+void UMounteaCraftingParticipantComponent::Server_ForgetRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate)
+{
+	Execute_ForgetRecipe(this, RecipeTemplate);
+}
+
+void UMounteaCraftingParticipantComponent::Server_StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)
+{
+	Execute_StartCrafting(this, TemplateToCraft, Ingredients);
+}
+
+void UMounteaCraftingParticipantComponent::PostRecipeLearned_Client_Implementation(UMounteaRecipeTemplate* RecipeTemplate)
+{
+	OnRecipeLearned.Broadcast(RecipeTemplate);
+}
+
+void UMounteaCraftingParticipantComponent::PostRecipeForgotten_Client_Implementation(UMounteaRecipeTemplate* RecipeTemplate)
+{
+	OnRecipeForgotten.Broadcast(RecipeTemplate);
+}
+
+void UMounteaCraftingParticipantComponent::PostCraftingFinished_Client_Implementation(const FMounteaCraftingResult& Result)
+{
+	OnCraftingFinished.Broadcast(Result);
 }
 

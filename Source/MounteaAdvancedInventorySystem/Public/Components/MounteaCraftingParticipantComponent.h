@@ -35,11 +35,15 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void InitializeInventoryAndEquipment();
+
+	UFUNCTION()
+	void OnRep_KnownRecipes();
 
 public:
 	
-	virtual TSet<UMounteaRecipeTemplate*> GetKnownRecipes_Implementation() const override;
+	virtual TArray<UMounteaRecipeTemplate*> GetKnownRecipes_Implementation() const override;
 	virtual TArray<UMounteaRecipeTemplate*> GetRecipes_Implementation(const FGameplayTag& CraftingStationType) const override;
 	virtual UMounteaRecipeTemplate* GetRecipe_Implementation(const FGuid& RecipeGuid) const override;
 	virtual bool IsRecipeKnown_Implementation(UMounteaRecipeTemplate* RecipeTemplate) const override;
@@ -47,6 +51,11 @@ public:
 	virtual bool ForgetRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate) override;
 	virtual bool IsCraftingPossible_Implementation(UMounteaRecipeTemplate* TemplateToCraft) const override;
 	virtual FMounteaCraftingResult StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients) override;
+	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override
+	{
+		return RelatedInventory;
+	}
+	virtual bool SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
 	
 	virtual FOnCraftingFinished& GetOnCraftingFinishedEventHandle() override
 	{
@@ -62,7 +71,7 @@ public:
 	}
 	
 protected:
-	static TSet<UMounteaRecipeTemplate*> ResolveKnownRecipeTemplates(const TSet<FGuid>& KnownRecipeGuids);
+	static TArray<UMounteaRecipeTemplate*> ResolveKnownRecipeTemplates(const TArray<FGuid>& KnownRecipeGuids);
 	
 public:
 	
@@ -75,9 +84,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Crafting")
 	FOnRecipeForgotten OnRecipeForgotten;
 	
-	UPROPERTY(SaveGame, VisibleDefaultsOnly, BlueprintReadOnly, Category="Crafting",
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_KnownRecipes, VisibleDefaultsOnly, BlueprintReadOnly, Category="Crafting",
 		meta=(NoResetToDefault))
-	TSet<FGuid> KnownRecipes;
+	TArray<FGuid> KnownRecipes;
 	
 	/**
 	 * Cached inventory interface found on the owning actor.
@@ -89,4 +98,24 @@ public:
 		meta=(NoResetToDefault),
 		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> RelatedInventory;
+
+protected:
+
+	UFUNCTION(Server, Reliable)
+	void Server_LearnRecipe(UMounteaRecipeTemplate* RecipeTemplate);
+
+	UFUNCTION(Server, Reliable)
+	void Server_ForgetRecipe(UMounteaRecipeTemplate* RecipeTemplate);
+
+	UFUNCTION(Server, Reliable)
+	void Server_StartCrafting(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+
+	UFUNCTION(Client, Unreliable)
+	void PostRecipeLearned_Client(UMounteaRecipeTemplate* RecipeTemplate);
+
+	UFUNCTION(Client, Unreliable)
+	void PostRecipeForgotten_Client(UMounteaRecipeTemplate* RecipeTemplate);
+
+	UFUNCTION(Client, Unreliable)
+	void PostCraftingFinished_Client(const FMounteaCraftingResult& Result);
 };
