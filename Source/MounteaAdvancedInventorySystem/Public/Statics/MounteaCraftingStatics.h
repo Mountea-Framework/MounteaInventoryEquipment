@@ -102,6 +102,11 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Stop Using Crafting Station")
 	static bool StopUsingCraftingStation(UObject* Target);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Stop Using Crafting Station")
+	static TScriptInterface<IMounteaAdvancedCraftingStationInterface> GetCraftingStation(UObject* Target);
 
 public:
 
@@ -110,7 +115,7 @@ public:
 		DisplayName="Get All Recipe Templates")
 	static TSet<UMounteaRecipeTemplate*> GetAllRecipeTemplates();
 
-	static FMounteaCraftingResult CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	static FMounteaCraftingResult CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 
 /**
  * CRAFTING PLACE

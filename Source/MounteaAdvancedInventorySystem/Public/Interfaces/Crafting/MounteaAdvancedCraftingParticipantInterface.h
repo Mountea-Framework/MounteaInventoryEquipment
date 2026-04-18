@@ -90,6 +90,10 @@ public:
 	bool StopUsingCraftingStation();
 	virtual bool StopUsingCraftingStation_Implementation() = 0;
 	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	TScriptInterface<IMounteaAdvancedCraftingStationInterface> GetCraftingStation() const;
+	virtual TScriptInterface<IMounteaAdvancedCraftingStationInterface> GetCraftingStation_Implementation() const = 0;
+	
 public:
 	
 	virtual FOnCraftingFinished& GetOnCraftingFinishedEventHandle() = 0;

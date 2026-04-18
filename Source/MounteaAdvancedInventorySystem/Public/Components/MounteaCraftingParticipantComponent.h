@@ -81,6 +81,10 @@ public:
 	}
 	virtual bool StartUsingCraftingStation_Implementation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station) override;
 	virtual bool StopUsingCraftingStation_Implementation() override;
+	virtual TScriptInterface<IMounteaAdvancedCraftingStationInterface> GetCraftingStation_Implementation() const override
+	{
+		return CraftingStation;
+	}
 
 protected:
 	static TArray<UMounteaRecipeTemplate*> ResolveKnownRecipeTemplates(const TArray<FGuid>& KnownRecipeGuids);

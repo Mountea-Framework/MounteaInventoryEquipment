@@ -93,6 +93,11 @@ bool UMounteaCraftingStatics::StopUsingCraftingStation(UObject* Target)
 	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_StopUsingCraftingStation(Target) : false;
 }
 
+TScriptInterface<IMounteaAdvancedCraftingStationInterface> UMounteaCraftingStatics::GetCraftingStation(UObject* Target)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_GetCraftingStation(Target) : TScriptInterface<IMounteaAdvancedCraftingStationInterface>();
+}
+
 TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetAllRecipeTemplates()
 {
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -114,11 +119,18 @@ TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetAllRecipeTemplates()
 	return returnValue;
 }
 
-FMounteaCraftingResult UMounteaCraftingStatics::CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)
+FMounteaCraftingResult UMounteaCraftingStatics::CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)
 {
 	FMounteaCraftingResult result;
 
 	if (!Target || !IsValid(TemplateToCraft) || !IsValid(Ingredients))
+		return result;
+	
+	const auto craftingStation = Target->Execute_GetCraftingStation(Target.GetObject());
+	if (TemplateToCraft->RequiredCraftingPlace.IsValid() && !IsValid(craftingStation.GetObject()))
+		return result;
+	
+	if (IsValid(craftingStation.GetObject()) && TemplateToCraft->RequiredCraftingPlace != craftingStation->Execute_GetCraftingPlaceType(craftingStation.GetObject()))
 		return result;
 
 	const TScriptInterface<IMounteaAdvancedInventoryInterface> inventory =
