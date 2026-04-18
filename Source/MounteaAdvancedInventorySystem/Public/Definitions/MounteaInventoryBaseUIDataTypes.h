@@ -34,7 +34,7 @@ class UMounteaSelectableInventoryItemAction;
  *   UISlot (slot widget)
  *     -> UISlotData (FInventorySlot)
  *         -> UIItem (child widget implementing UMounteaAdvancedInventoryItemWidgetInterface)
- *             -> UIItemData (FInventoryItemData, this struct) -> FInventoryItem
+ *             -> UIItemData (FInventoryItemData, this struct) -> FMounteaInventoryItem
  *
  * @see FInventorySlot
  * @see FMounteaInventoryGridSlot
@@ -56,7 +56,7 @@ public:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory Data", 
 		meta=(DisplayPriority=0))
-	FInventoryItem ContainingItem;
+	FMounteaInventoryItem ContainingItem;
 
 	/**
 	 * Quantity of the item represented by this data.
@@ -71,12 +71,12 @@ public:
 public:
 
 	FInventoryItemData()
-		: ContainingItem(FInventoryItem())
+		: ContainingItem(FMounteaInventoryItem())
 		, Quantity(INDEX_NONE)
 	{
 	}
 
-	FInventoryItemData(const int32 InQuantity, const FInventoryItem& InContainingItem)
+	FInventoryItemData(const int32 InQuantity, const FMounteaInventoryItem& InContainingItem)
 		: ContainingItem(InContainingItem)
 		, Quantity(InQuantity)
 	{
@@ -88,7 +88,7 @@ public:
 	void Reset()
 	{
 		Quantity = INDEX_NONE;
-		ContainingItem = FInventoryItem();
+		ContainingItem = FMounteaInventoryItem();
 	}
 
 	FString ToString() const

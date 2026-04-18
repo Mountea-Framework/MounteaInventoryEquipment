@@ -161,8 +161,8 @@ public:
 	 * @return True if the action should be shown in the user interface, false otherwise.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool IsActionVisible(const FInventoryItem& TargetItem) const;
-	virtual bool IsActionVisible_Implementation(const FInventoryItem& TargetItem) const;
+	bool IsActionVisible(const FMounteaInventoryItem& TargetItem) const;
+	virtual bool IsActionVisible_Implementation(const FMounteaInventoryItem& TargetItem) const;
 	
 	/**
 	 * Gets the callback type for this inventory item action.
@@ -210,7 +210,7 @@ public:
 	
 public:
 	
-	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const override;
+	virtual bool IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const override;
 };
 
 #undef LOCTEXT_NAMESPACE

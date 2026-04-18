@@ -23,8 +23,11 @@ class UMounteaAdvancedAttachmentSlot;
 class UMounteaAdvancedAttachmentSlotBase;
 class UMounteaEquipmentComponent;
 class IMounteaAdvancedEquipmentInterface;
+class UBlueprintGeneratedClass;
+class USceneComponent;
 class USkeletalMesh;
 class UStaticMesh;
+struct FMounteaEquipmentSlotHeaderData;
 
 /**
  * 
@@ -151,6 +154,96 @@ public:
 	static bool IsTargetClassValid(const UClass* TargetClass);
 
 	/**
+	 * Resolves and retrieves header data associated with a specific advanced attachment slot.
+	 * The resolved data provides detailed information about the slot's configuration, including its usability, tags, and related settings.
+	 *
+	 * @param Slot - A pointer to the advanced attachment slot for which the header data is being resolved.
+	 * @param SettingsConfig - A pointer to the advanced equipment settings configuration used to locate the relevant header data.
+	 * @return - A pointer to the resolved FMounteaEquipmentSlotHeaderData object associated with the given slot, or nullptr if no matching data is found.
+	 */
+	static const FMounteaEquipmentSlotHeaderData* ResolveSlotHeaderData(const UMounteaAdvancedAttachmentSlotBase* Slot, 
+		const UMounteaAdvancedEquipmentSettingsConfig* SettingsConfig);
+
+	/**
+	 * Attempts to retrieve the gameplay tags associated with the specified attachment object.
+	 * This function checks if the provided object implements the MounteaAdvancedAttachmentAttachableInterface
+	 * and extracts the associated tags if available.
+	 *
+	 * @param AttachmentObject - The object from which to retrieve the attachment tags.
+	 * @param OutTags - A reference to a GameplayTagContainer that will contain
+	 *                  the tags associated with the attachment object if the operation is successful.
+	 * @return - A boolean indicating whether the operation was successful and the tags were retrieved.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Attachments|Equipment",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Try Get Attachment Tags")
+	static bool TryGetAttachmentTags(UObject* AttachmentObject, FGameplayTagContainer& OutTags);
+
+	/**
+	 * Evaluates whether the specified attachment object is an active equipment item within the Mountea Equipment System.
+	 * Determines the item's state by leveraging the Mountea Advanced Equipment Item interface.
+	 *
+	 * @param AttachmentObject - The object to be checked, which is expected to potentially implement the equipment item interface.
+	 * @return - True if the attachment object is an active equipment item, false otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Attachments|Equipment",
+		meta=(CustomTag="MounteaK2Validate"),
+		DisplayName="Is Attachment Active Equipment Item")
+	static bool IsAttachmentActiveEquipmentItem(UObject* AttachmentObject);
+
+	/**
+	 * Validates the compatibility between an inventory item and a target equipment slot, using the provided settings configuration.
+	 * Determines if the specified item type is allowed for the target slot based on predefined constraints.
+	 *
+	 * @param ItemDefinition - The inventory item definition to be checked for compatibility.
+	 * @param TargetSlot - The equipment slot against which compatibility is being validated.
+	 * @param SettingsConfig - The configuration object containing settings and constraints for item-to-slot compatibility.
+	 * @return - A boolean value indicating whether the item is compatible with the target slot.
+	 */
+	static bool ValidateSlotItemTypeCompatibility(const FMounteaInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
+		const UMounteaAdvancedEquipmentSettingsConfig* SettingsConfig);
+
+	/**
+	 * Resolves the owning actor associated with a given UObject.
+	 * If the provided object is an actor, it is returned directly.
+	 * If the object is an actor component, this method retrieves its owning actor.
+	 *
+	 * @param Target - The UObject to resolve the owning actor from. Can be an actor or an actor component.
+	 * @return - A pointer to the resolved owning actor, or nullptr if the target is not associated with an actor.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Resolve Owning Actor")
+	static AActor* ResolveOwningActor(UObject* Target);
+
+	/**
+	 * Resolves and retrieves the appropriate attachment target component for quick-use functionality
+	 * in the Mountea Equipment System, using the specified slot identifier.
+	 *
+	 * @param Outer             The context object within which the resolution is performed. Typically an actor or a component.
+	 * @param VisualSlotId      The identifier of the visual slot for which the attachment target is being resolved.
+	 * @param OutSocketName     The name of the socket that corresponds to the resolved attachment target. This is updated as part of the method.
+	 *
+	 * @return                  A pointer to the resolved attachment target component, or nullptr if no valid target is found.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Quick Use",
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(AutoCreateRefTerm="VisualSlotId"),
+		DisplayName="Resolve Quick Use Attachment Target")
+	static USceneComponent* ResolveQuickUseAttachmentTarget(UObject* Outer, const FName& VisualSlotId, FName& OutSocketName);
+
+	/**
+	 * Applies a placeholder mesh to a specified actor based on the given inventory item definition and placeholder class.
+	 * Determines the appropriate mesh (static or skeletal) from the item's template and assigns it to the actor.
+	 * Logs a warning if the placeholder class does not support quick-use mesh functionality.
+	 *
+	 * @param PlaceholderActor - The actor to which the placeholder mesh will be applied. Must be valid.
+	 * @param ItemDefinition - The inventory item definition that provides the item template containing the mesh data.
+	 * @param PlaceholderClass - The class of the placeholder actor, used for logging and validation purposes.
+	 */
+	static void ApplyQuickUsePlaceholderMesh(AActor* PlaceholderActor, const FMounteaInventoryItem& ItemDefinition, const UClass* PlaceholderClass);
+
+	/**
 	 * Validates whether an item can be equipped and resolves a usable target slot.
 	 *
 	 * If TargetSlot is null, preferred slot resolution is attempted from the item's equipment interface data.
@@ -160,7 +253,7 @@ public:
 	 * @param TargetSlot  In/out resolved slot candidate.
 	 * @return  True if request is valid and TargetSlot is resolved/usable.
 	 */
-	static bool ValidateEquipmentItemRequest(const UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot*& TargetSlot);
+	static bool ValidateEquipmentItemRequest(const UObject* Outer, const FMounteaInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot*& TargetSlot);
 
 	/**
 	 * Spawns an equipment actor from item template and attaches it into the specified slot.
@@ -173,7 +266,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output (nullptr on failure).
 	 * @return  True if spawn + attach succeeded.
 	 */
-	static bool CreateEquipmentItemAndAttach(UObject* Outer, const FInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
+	static bool CreateEquipmentItemAndAttach(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, const UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
 
 	/**
@@ -184,7 +277,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
 	 * @return  True if equip succeeded.
 	 */
-	static bool EquipItemGeneral(UObject* Outer, const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
+	static bool EquipItemGeneral(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, AActor*& OutSpawnedActor);
 
 	/**
 	 * Equip entry targeting a specific slot instance.
@@ -195,7 +288,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
 	 * @return  True if equip succeeded.
 	 */
-	static bool EquipItemToSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
+	static bool EquipItemToSlot(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* TargetSlot, 
 		AActor*& OutSpawnedActor);
 
 	/**
@@ -209,7 +302,7 @@ public:
 	 * @param OutSpawnedActor  Spawned actor output when a new actor was created.
 	 * @return  True if equip succeeded.
 	 */
-	static bool EquipItemToResolvedSlot(UObject* Outer, const FInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* ResolvedTargetSlot,
+	static bool EquipItemToResolvedSlot(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, UMounteaAdvancedAttachmentSlot* ResolvedTargetSlot,
 		AActor*& OutSpawnedActor);
 
 	/**
@@ -220,7 +313,7 @@ public:
 	 * @param SlotName  Optional slot restriction (NAME_None means any slot).
 	 * @return  True if equipped per provided constraints.
 	 */
-	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FInventoryItem& ItemDefinition, const FName SlotName = NAME_None);
+	static bool ValidateItemEquipped(const UMounteaEquipmentComponent* EquipmentComponent, const FMounteaInventoryItem& ItemDefinition, const FName SlotName = NAME_None);
 
 	/**
 	 * Resolves the fallback slot for the given slot from equipment settings.
@@ -246,6 +339,33 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Resolve Active Slot Id")
 	static FName ResolveActiveSlotId(const FName& StorageSlotId);
+
+	/**
+	 * Resolves the best matching slot id from equipment config using required slot tags.
+	 *
+	 * Match strategy:
+	 * - Only enabled config slots are evaluated.
+	 * - If EquipmentItemType is provided and slot has AllowedItemTypes, the slot must include that type.
+	 * - Slots containing all DesiredTags are preferred over partial matches.
+	 * - Then highest overlap count is preferred.
+	 * - Then the most specific slot is preferred (fewest extra tags).
+	 *
+	 * System examples:
+	 * - DesiredTags = {"Mountea_Inventory.AttachmentSlots.Hand.Right"} usually resolves "RightHand".
+	 * - DesiredTags = {"Mountea_Inventory.AttachmentSlots.Hand"} with EquipmentItemType = "Mountea_Inventory.Equipment.ItemType.QuickUse"
+	 *   resolves the best enabled quick-use compatible hand slot.
+	 *
+	 * @param DesiredTags  Required slot tags to match against FMounteaEquipmentSlotHeaderData::TagContainer.
+	 * @param EquipmentItemType  Optional item type compatibility filter from item template.
+	 * @return  Best matching slot id, or NAME_None if no compatible candidate exists.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
+		meta=(CustomTag="MounteaK2Getter,MounteaK2EquipmentSlot"),
+		meta=(AutoCreateRefTerm="DesiredTags,EquipmentItemType"),
+		DisplayName="Resolve Best Slot Id From Tags")
+	static FName ResolveBestSlotIdFromTags(
+		const FGameplayTagContainer& DesiredTags,
+		const FGameplayTag& EquipmentItemType);
 
 	/**
 	 * Finds the attachment slot where a specific equipped item lives.
@@ -306,7 +426,7 @@ public:
 	 * @param OutItemDefinition  Resolved inventory item output.
 	 * @return  True if item definition was found.
 	 */
-	static bool TryResolveInventoryItemByGuid(UObject* Outer, const FGuid& ItemGuid, FInventoryItem& OutItemDefinition);
+	static bool TryResolveInventoryItemByGuid(UObject* Outer, const FGuid& ItemGuid, FMounteaInventoryItem& OutItemDefinition);
 
 	/**
 	 * Spawns and prepares a non-replicated quick-use placeholder actor for animation visuals.
@@ -318,7 +438,7 @@ public:
 	 * @param VisualSlotId  Preferred visual slot for attachment.
 	 * @return  Spawned placeholder actor, or nullptr if not spawned.
 	 */
-	static AActor* SpawnQuickUsePlaceholderActor(UObject* Outer, const FInventoryItem& ItemDefinition, const FName& VisualSlotId);
+	static AActor* SpawnQuickUsePlaceholderActor(UObject* Outer, const FMounteaInventoryItem& ItemDefinition, const FName& VisualSlotId);
 
 	/**
 	 * Evaluates whether target slot is currently blocked by active equipped item tags.
@@ -383,7 +503,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Equip Item")
-	static bool EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+	static bool EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition);
 
 	/**
 	 * Attempts to equip the specified inventory item to a designated equipment slot on the target object.
@@ -398,7 +518,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Equip Item to Slot")
-	static bool EquipItemToSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& SlotName);
+	static bool EquipItemToSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& SlotName);
 
 	/**
 	 * Determines if a specified inventory item is currently equipped on a target object
@@ -411,7 +531,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Is Item Equipped")
-	static bool IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition);
+	static bool IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition);
 
 	/**
 	 * Checks if a specified inventory item is currently equipped in a specific slot on a target object.
@@ -426,7 +546,7 @@ public:
 		meta=(CustomTag="MounteaK2Validate,MounteaK2EquipmentSlot"),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Is Item Equipped In Slot")
-	static bool IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& SlotName);
+	static bool IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& SlotName);
 
 	/**
 	 * Unequips the specified inventory item from the provided target that implements the Mountea Advanced Equipment Interface.
@@ -441,7 +561,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unequip Item")
-	static bool UnequipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = true);
+	static bool UnequipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, bool bUseFallbackSlot = true);
 
 	/**
 	 * Activates the specified equipped item, transitioning it from Equipped to Active state.
@@ -457,7 +577,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Activate Equipment Item")
-	static bool ActivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	static bool ActivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
 
 	/**
 	 * Activates a Quick Use item in the specified slot for a given target that implements the Mountea Advanced Equipment Interface.
@@ -490,7 +610,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Deactivate Equipment Item")
-	static bool DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	static bool DeactivateEquipmentItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
 
 	/**
 	 * Commits pending equipment transition requested by animation notify.
@@ -524,6 +644,12 @@ public:
 
 #if WITH_EDITOR
 	UFUNCTION(BlueprintInternalUseOnly)
-	bool Prototype_EquipItem(const FInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) { return false; };
+	bool Prototype_EquipItem(const FMounteaInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) { return false; };
 #endif
+
+private:
+
+	static UObject* ResolveFirstInterfaceObject(UObject* Target, TSubclassOf<UInterface> InterfaceClass, bool bResolveOwnerForComponents);
+	static UObject* ResolveFirstInterfaceObjectFromActor(AActor* Actor, TSubclassOf<UInterface> InterfaceClass);
+	static UObject* ResolveFirstInterfaceObjectFromBlueprintClass(const UBlueprintGeneratedClass* BlueprintClass, TSubclassOf<UInterface> InterfaceClass);
 };

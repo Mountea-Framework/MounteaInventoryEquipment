@@ -143,7 +143,7 @@ public:
 	{
 		return IsSlotValid() && IsOccupied();
 	}
-	FORCEINLINE virtual bool CanAttachAttachable(const UObject* NewAttachment) const;
+		virtual bool CanAttachAttachable(const UObject* NewAttachment) const;
 	FORCEINLINE virtual bool HasTag(const FGameplayTag& Tag) const
 	{
 		return SlotTags.HasTag(Tag);

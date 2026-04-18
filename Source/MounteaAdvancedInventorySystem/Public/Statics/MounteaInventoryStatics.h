@@ -55,7 +55,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Initialize Inventory Action")
-	static bool InitializeItemAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem, 
+	static bool InitializeItemAction(UMounteaInventoryItemAction* Target, const FMounteaInventoryItem& TargetItem, 
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory, UObject* ContextPayload = nullptr);
 	
 	/**
@@ -77,7 +77,7 @@ public:
 		meta=(Keywords="start"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Execute Inventory Action")
-	static bool ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem);
+	static bool ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FMounteaInventoryItem& TargetItem);
 	
 	/**
 	 * Gets the inventory interface that owns the target item.
@@ -253,7 +253,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Inventory|Helpers", 
 		meta = (Keywords = "construct,build,make", NativeMakeFunc), 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FInventoryItem NewInventoryItem(const FGuid& ItemGuid);
+	static FMounteaInventoryItem NewInventoryItem(const FGuid& ItemGuid);
 
 	/**
 	 * Checks if the specified flags are set in the value.
@@ -286,7 +286,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Management", 
 		meta=(CustomTag="MounteaK2Setter"), 
 		meta=(ExpandBoolAsExecs="ReturnValue"))
-	static bool AddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item);
+	static bool AddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItem& Item);
 
 	/**
 	 * Removes an item from inventory
@@ -307,7 +307,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", 
 		meta=(CustomTag="MounteaK2Validate"))
-	static bool CanAddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item);
+	static bool CanAddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItem& Item);
 
 	/**
 	 * Adds an item from template
@@ -356,7 +356,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	static FMounteaInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
 	/**
 	 * Finds item index based on Search conditions.
@@ -376,7 +376,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Search", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static TArray<FInventoryItem> FindItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	static TArray<FMounteaInventoryItem> FindItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 
 	/**
 	 * Gets all items in inventory
@@ -385,7 +385,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Management", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static TArray<FInventoryItem> GetAllItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
+	static TArray<FMounteaInventoryItem> GetAllItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target);
 
 	/**
 	 * Clears all items from inventory
@@ -488,7 +488,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FString InventoryItemToString(const FInventoryItem& Item);
+	static FString InventoryItemToString(const FMounteaInventoryItem& Item);
 
 	/**
 	 * 
@@ -497,7 +497,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FInventoryCategory GetInventoryCategory(const FInventoryItem& Item);
+	static FInventoryCategory GetInventoryCategory(const FMounteaInventoryItem& Item);
 
 	/**
 	 * 
@@ -506,7 +506,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FString GetInventoryCategoryKey(const FInventoryItem& Item);
+	static FString GetInventoryCategoryKey(const FMounteaInventoryItem& Item);
 
 	/**
 	 * 
@@ -515,11 +515,11 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FInventoryRarity GetInventoryRarity(const FInventoryItem& Item);
+	static FInventoryRarity GetInventoryRarity(const FMounteaInventoryItem& Item);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FString GetInventoryRarityKey(const FInventoryItem& Item);
+	static FString GetInventoryRarityKey(const FMounteaInventoryItem& Item);
 
 	/**
 	 * Retrieves the display name of the specified inventory item.
@@ -530,7 +530,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FText GetInventoryItemName(const FInventoryItem& Item);
+	static FText GetInventoryItemName(const FMounteaInventoryItem& Item);
 
 	/**
 	 * Retrieves a short descriptive text for the specified inventory item.
@@ -541,7 +541,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FText GetInventoryItemShortInfo(const FInventoryItem& Item);
+	static FText GetInventoryItemShortInfo(const FMounteaInventoryItem& Item);
 
 	/**
 	 * Retrieves a detailed description of the specified inventory item.
@@ -552,7 +552,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static FText GetInventoryItemLongInfo(const FInventoryItem& Item);
+	static FText GetInventoryItemLongInfo(const FMounteaInventoryItem& Item);
 
 	/**
 	 * Retrieves the cover image associated with a specified inventory item.
@@ -563,7 +563,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static UTexture2D* GetInventoryItemCover(const FInventoryItem& Item);
+	static UTexture2D* GetInventoryItemCover(const FMounteaInventoryItem& Item);
 	
 	/**
 	 * Determines whether the provided inventory item is valid.
@@ -574,7 +574,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Validate"))
-	static bool IsInventoryItemValid(const FInventoryItem& Item);
+	static bool IsInventoryItemValid(const FMounteaInventoryItem& Item);
 
 	/**
 	 * Retrieves the actions associated with a specified inventory item.
@@ -586,7 +586,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static TArray<UMounteaCallbackInventoryItemAction*> GetItemActions(const FInventoryItem& Item);
+	static TArray<UMounteaCallbackInventoryItemAction*> GetItemActions(const FMounteaInventoryItem& Item);
 	
 	/**
 	 * Retrieves the actions associated with a specified inventory item which are allowed to be displayed in UI.
@@ -599,7 +599,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(Keywords="selectable,display"))
-	static TArray<UMounteaSelectableInventoryItemAction*> GetDisplayableItemActions(const FInventoryItem& Item);
+	static TArray<UMounteaSelectableInventoryItemAction*> GetDisplayableItemActions(const FMounteaInventoryItem& Item);
 	
 	/**
 	 * Retrieves the Custom Data Tags Container, which serves a purpose of being a write/read container for
@@ -611,7 +611,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Item - Get Item Custom Data")
-	static FGameplayTagContainer GetItemCustomData(const FInventoryItem& Item);
+	static FGameplayTagContainer GetItemCustomData(const FMounteaInventoryItem& Item);
 
 	// --- Items
 	
@@ -630,7 +630,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static TArray<FInventoryItem> SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
+	static TArray<FMounteaInventoryItem> SortInventoryItems(const TArray<FMounteaInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
 	
 #pragma region ItemTemplate
 

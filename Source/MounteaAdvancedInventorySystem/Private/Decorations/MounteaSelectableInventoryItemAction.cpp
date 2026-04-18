@@ -14,7 +14,7 @@
 
 #include "Statics/MounteaInventoryStatics.h"
 
-bool UMounteaSelectableInventoryItemAction::IsAllowed_Implementation(const FInventoryItem& TargetItem) const
+bool UMounteaSelectableInventoryItemAction::IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const
 {
 	if (!Super::IsAllowed_Implementation(TargetItem) && IsActionVisible(TargetItem))
 		return false;
@@ -34,7 +34,7 @@ void UMounteaSelectableInventoryItemAction::ExecuteQueuedAction_Implementation(U
 	OnSelectableActionQueueExecuted.Broadcast(this, OptionalPayload);
 }
 
-bool UMounteaSelectableInventoryItemAction::IsActionVisible_Implementation(const FInventoryItem& TargetItem) const
+bool UMounteaSelectableInventoryItemAction::IsActionVisible_Implementation(const FMounteaInventoryItem& TargetItem) const
 {
 	return true;
 }

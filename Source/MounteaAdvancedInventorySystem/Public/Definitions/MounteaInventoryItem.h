@@ -35,17 +35,17 @@ struct FInventoryItemSnapshot
 
 	FInventoryItemSnapshot() = default;
     
-	explicit FInventoryItemSnapshot(const struct FInventoryItem& Item);
+	explicit FInventoryItemSnapshot(const struct FMounteaInventoryItem& Item);
 
-	bool HasQuantityChanged(const FInventoryItem& Current) const;
+	bool HasQuantityChanged(const FMounteaInventoryItem& Current) const;
 
-	int32 GetQuantityDelta(const FInventoryItem& Current) const;
+	int32 GetQuantityDelta(const FMounteaInventoryItem& Current) const;
 
-	bool HasDurabilityChanged(const FInventoryItem& Current) const;
+	bool HasDurabilityChanged(const FMounteaInventoryItem& Current) const;
 
-	float GetDurabilityDelta(const FInventoryItem& Current) const;
+	float GetDurabilityDelta(const FMounteaInventoryItem& Current) const;
 
-	bool HasCustomDataChanged(const FInventoryItem& Current) const;
+	bool HasCustomDataChanged(const FMounteaInventoryItem& Current) const;
 
 private:
 	int32 Quantity = INDEX_NONE;
@@ -54,7 +54,7 @@ private:
 };
 
 /**
- * FInventoryItem represents a runtime instance of an inventory item with network replication support.
+ * FMounteaInventoryItem represents a runtime instance of an inventory item with network replication support.
  * Item instances contain template references, current quantity, durability, custom data, and affector slots.
  * Implements FastArraySerializer for efficient delta replication in multiplayer environments.
  *
@@ -63,7 +63,7 @@ private:
  * @see IMounteaAdvancedInventoryInterface
  */
 USTRUCT(BlueprintType,meta=(HasNativeMake="/Script/MounteaAdvancedInventorySystem.MounteaInventoryStatics.NewInventoryItem"))
-struct FInventoryItem : public FFastArraySerializerItem
+struct FMounteaInventoryItem : public FFastArraySerializerItem
 {
 	GENERATED_BODY()
 
@@ -75,9 +75,9 @@ public:
 
 public:
 	
-	FInventoryItem();
-	FInventoryItem(const FGuid& ItemGuid) : Guid(ItemGuid) {};
-	explicit FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity = 1,
+	FMounteaInventoryItem();
+	FMounteaInventoryItem(const FGuid& ItemGuid) : Guid(ItemGuid) {};
+	explicit FMounteaInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity = 1,
 							const float InDurability = 1.f,
 							TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory = nullptr);
 	
@@ -253,7 +253,7 @@ public:
 	 * @param Other The other inventory item to compare with
 	 * @return True if items have matching GUIDs and Templates
 	 */
-	bool operator==(const FInventoryItem& Other) const
+	bool operator==(const FMounteaInventoryItem& Other) const
 	{
 		return Guid == Other.Guid && Template == Other.Template;
 	}
@@ -263,7 +263,7 @@ public:
 	 * @param Other The other inventory item to compare with
 	 * @return True if either GUID or Template differs
 	 */
-	bool operator!=(const FInventoryItem& Other) const
+	bool operator!=(const FMounteaInventoryItem& Other) const
 	{
 		return !(*this == Other);
 	}
@@ -356,11 +356,11 @@ struct FInventoryItemArray : public FFastArraySerializer
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", 
 		meta=(DisplayPriority=0))
-	TArray<FInventoryItem> Items;
+	TArray<FMounteaInventoryItem> Items;
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 	{
-		return FastArrayDeltaSerialize<FInventoryItem>(Items, DeltaParams, *this);
+		return FastArrayDeltaSerialize<FMounteaInventoryItem>(Items, DeltaParams, *this);
 	}
 };
 
@@ -374,7 +374,7 @@ struct TStructOpsTypeTraits< FInventoryItemArray > : public TStructOpsTypeTraits
 };
 
 template<>
-struct TStructOpsTypeTraits<FInventoryItem> : public TStructOpsTypeTraitsBase2<FInventoryItem>
+struct TStructOpsTypeTraits<FMounteaInventoryItem> : public TStructOpsTypeTraitsBase2<FMounteaInventoryItem>
 {
 	enum 
 	{

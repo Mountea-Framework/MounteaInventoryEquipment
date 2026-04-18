@@ -27,7 +27,7 @@ enum class EInventoryType : uint8;
  * Inventory components provide item storage, modification, searching, and notification systems
  * with efficient delta replication for multiplayer inventory management.
  *
- * @see [Inventory System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/InventorySystem)
+ * @see [Inventory System](https://mountea.tools/docs/advancedinventoryequipmentsystem/inventorysystem/inventorysystem/)
  * @see IMounteaAdvancedInventoryInterface
  * @see FInventoryItem
  */
@@ -57,16 +57,16 @@ protected:
 	// --- Interface Functions ------------------------------
 protected:
 	virtual AActor* GetOwningActor_Implementation() const override;
-	virtual bool AddItem_Implementation(const FInventoryItem& Item) override;
+	virtual bool AddItem_Implementation(const FMounteaInventoryItem& Item) override;
 	virtual bool AddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1, const float Durability = 1.f) override;
 	virtual bool RemoveItem_Implementation(const FGuid& ItemGuid) override;
 	virtual bool RemoveItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) override;
-	virtual bool CanAddItem_Implementation(const FInventoryItem& Item) const override;
+	virtual bool CanAddItem_Implementation(const FMounteaInventoryItem& Item) const override;
 	virtual bool CanAddItemFromTemplate_Implementation(UMounteaInventoryItemTemplate* Template, const int32 Quantity = 1) const override;
-	virtual FInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
+	virtual FMounteaInventoryItem FindItem_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
 	virtual int32 FindItemIndex_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
-	virtual TArray<FInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
-	virtual TArray<FInventoryItem> GetAllItems_Implementation() const override;
+	virtual TArray<FMounteaInventoryItem> FindItems_Implementation(const FInventoryItemSearchParams& SearchParams) const override;
+	virtual TArray<FMounteaInventoryItem> GetAllItems_Implementation() const override;
 	virtual bool IncreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
 	virtual bool DecreaseItemQuantity_Implementation(const FGuid& ItemGuid, const int32 Amount = 1) override;
 	virtual bool ModifyItemDurability_Implementation(const FGuid& ItemGuid, const float DeltaDurability) override;
@@ -79,7 +79,7 @@ protected:
 	bool IsAuthority() const;
 	
 	UFUNCTION(Server, Reliable)
-	void AddItem_Server(const FInventoryItem& Item);
+	void AddItem_Server(const FMounteaInventoryItem& Item);
 	UFUNCTION(Server, Reliable)
 	void RemoveItem_Server(const FGuid& ItemGuid);
 	UFUNCTION(Server, Reliable)
@@ -90,13 +90,13 @@ protected:
 	UFUNCTION(Client, Unreliable)
 	void ProcessInventoryNotification_Client(const FGuid& TargetItem, const FString& NotifType, const int32 QuantityDelta);
 	UFUNCTION(Client, Unreliable)
-	void PostItemAdded_Client(const FInventoryItem& Item);
+	void PostItemAdded_Client(const FMounteaInventoryItem& Item);
 	UFUNCTION(Client, Unreliable)
-	void PostItemRemoved_Client(const FInventoryItem& Item);
+	void PostItemRemoved_Client(const FMounteaInventoryItem& Item);
 	UFUNCTION(Client, Unreliable)
-	void PostItemQuantityChanged(const FInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
+	void PostItemQuantityChanged(const FMounteaInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity);
 	UFUNCTION(Client, Unreliable)
-	void PostItemDurabilityChanged(const FInventoryItem& Item, const int32 OldDurability, const int32 NewDurability);
+	void PostItemDurabilityChanged(const FMounteaInventoryItem& Item, const int32 OldDurability, const int32 NewDurability);
 
 	// --- Events ------------------------------
 protected:

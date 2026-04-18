@@ -94,7 +94,7 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUIInternal(UWidget* Target,
 	IMounteaAdvancedBaseInventoryWidgetInterface::Execute_SetOwningInventoryUI(Target, NewOwningInventoryUI);
 }
 
-bool UMounteaInventoryUIStatics::IsItemWidgetDetachedFromValidItems(const TArray<FInventoryItem>& ValidItems,
+bool UMounteaInventoryUIStatics::IsItemWidgetDetachedFromValidItems(const TArray<FMounteaInventoryItem>& ValidItems,
 	const FInventoryItemData& InventoryItemData)
 {
 	if (ValidItems.IsEmpty())
@@ -102,7 +102,7 @@ bool UMounteaInventoryUIStatics::IsItemWidgetDetachedFromValidItems(const TArray
 	if (!InventoryItemData.ContainingItem.IsItemValid())
 		return true;
 	
-	return !ValidItems.ContainsByPredicate([&InventoryItemData](const FInventoryItem& Item)
+	return !ValidItems.ContainsByPredicate([&InventoryItemData](const FMounteaInventoryItem& Item)
 	{
 		return Item.Guid == InventoryItemData.ContainingItem.Guid;
 	});
@@ -370,7 +370,7 @@ FString UMounteaInventoryUIStatics::GetActiveCategoryId(UWidget* Target)
 		? IMounteaAdvancedInventoryCategoriesWrapperWidgetInterface::Execute_GetActiveCategoryId(Target) : TEXT("none");
 }
 
-FInventoryItem UMounteaInventoryUIStatics::FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+FMounteaInventoryItem UMounteaInventoryUIStatics::FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 	const FInventoryItemSearchParams& SearchParams)
 {
 	if (!IsValid(Target.GetObject()))
@@ -897,7 +897,7 @@ void UMounteaInventoryUIStatics::SetActiveState(UWidget* Target, const bool bIsA
 		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetActiveState(Target, bIsActive);
 }
 
-FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity)
+FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const FMounteaInventoryItem& Item, const int32 Quantity)
 {
 	return FInventoryItemData(Quantity, Item);
 }
@@ -941,7 +941,7 @@ void UMounteaInventoryUIStatics::SetItemOwningInventoryUI(UWidget* Target,
 	SetOwningInventoryUIInternal(Target, OwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::ItemWidget_InitializeItemWidget(UWidget* Target, const FInventoryItem& Item,
+void UMounteaInventoryUIStatics::ItemWidget_InitializeItemWidget(UWidget* Target, const FMounteaInventoryItem& Item,
 	const int32 Quantity)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemWidgetInterface>())
@@ -1402,7 +1402,7 @@ int32 UMounteaInventoryUIStatics::Helper_FindEmptyGridSlotIndex(const UWidget* T
 }
 
 int32 UMounteaInventoryUIStatics::FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, 
-	const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, 
+	const FMounteaInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, 
 	const bool bAlwaysStackItems)
 {
 	return INDEX_NONE;

@@ -477,9 +477,7 @@ FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowOpenFileDialog(
 {
     IDesktopPlatform* desktopPlatform = FDesktopPlatformModule::Get();
     if (!desktopPlatform)
-    {
         return FString();
-    }
 
     TArray<FString> openFilenames;
     const bool bFileSelected = desktopPlatform->OpenFileDialog(
@@ -556,13 +554,14 @@ FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowContentBrowserPa
         selectedPath = Path;
     });
 
-    TSharedRef<SWidget> pathPicker = contentBrowserModule.Get().CreatePathPicker(pathPickerConfig);
-    
-    TSharedRef<SWindow> pickerWindow = SNew(SWindow)
-        .Title(FText::FromString(DialogTitle))
-        .ClientSize(FVector2D(450, 600))
-        .SupportsMaximize(false)
-        .SupportsMinimize(false)
+	    TSharedRef<SWidget> pathPicker = contentBrowserModule.Get().CreatePathPicker(pathPickerConfig);
+	    
+	    TSharedPtr<SWindow> pickerWindow;
+	    pickerWindow = SNew(SWindow)
+	        .Title(FText::FromString(DialogTitle))
+	        .ClientSize(FVector2D(450, 600))
+	        .SupportsMaximize(false)
+	        .SupportsMinimize(false)
         [
             SNew(SVerticalBox)
             + SVerticalBox::Slot()
@@ -583,34 +582,37 @@ FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowContentBrowserPa
                 + SHorizontalBox::Slot()
                 .AutoWidth()
                 .Padding(5, 0)
-                [
-                    SNew(SButton)
-                    .Text(FText::FromString(TEXT("OK")))
-                    .OnClicked_Lambda([&pickerWindow]()
-                    {
-                        pickerWindow->RequestDestroyWindow();
-                        return FReply::Handled();
-                    })
-                ]
+	                [
+	                    SNew(SButton)
+	                    .Text(FText::FromString(TEXT("OK")))
+	                    .OnClicked_Lambda([&pickerWindow]()
+	                    {
+	                        if (pickerWindow.IsValid())
+                                pickerWindow->RequestDestroyWindow();
+	                        return FReply::Handled();
+	                    })
+	                ]
                 + SHorizontalBox::Slot()
                 .AutoWidth()
                 [
-                    SNew(SButton)
-                    .Text(FText::FromString(TEXT("Cancel")))
-                    .OnClicked_Lambda([&pickerWindow, &selectedPath]()
-                    {
-                        selectedPath.Empty();
-                        pickerWindow->RequestDestroyWindow();
-                        return FReply::Handled();
-                    })
-                ]
-            ]
-        ];
+	                    SNew(SButton)
+	                    .Text(FText::FromString(TEXT("Cancel")))
+	                    .OnClicked_Lambda([&pickerWindow, &selectedPath]()
+	                    {
+	                        selectedPath.Empty();
+	                        if (pickerWindow.IsValid())
+                                pickerWindow->RequestDestroyWindow();
+	                        return FReply::Handled();
+	                    })
+	                ]
+	            ]
+	        ];
 
-    GEditor->EditorAddModalWindow(pickerWindow);
-    
-    return selectedPath;
-}
+	    if (pickerWindow.IsValid())
+	        GEditor->EditorAddModalWindow(pickerWindow.ToSharedRef());
+	    
+	    return selectedPath;
+	}
 
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::DeserializeTemplateFromJson(
     const TSharedPtr<FJsonObject>& JsonObject, 

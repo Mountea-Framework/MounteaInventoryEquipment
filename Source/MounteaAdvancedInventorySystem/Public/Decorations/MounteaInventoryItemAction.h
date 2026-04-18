@@ -49,9 +49,9 @@ public:
 	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool InitializeItemAction(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+	bool InitializeItemAction(const FMounteaInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
 		UObject* ContextPayload = nullptr);
-	virtual bool InitializeItemAction_Implementation(const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+	virtual bool InitializeItemAction_Implementation(const FMounteaInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
 		UObject* ContextPayload = nullptr);
 
 	/**
@@ -80,8 +80,8 @@ public:
 	 * @return True if the action can be executed, false if it's currently blocked.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool IsAllowed(const FInventoryItem& TargetItem) const;
-	virtual bool IsAllowed_Implementation(const FInventoryItem& TargetItem) const;
+	bool IsAllowed(const FMounteaInventoryItem& TargetItem) const;
+	virtual bool IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const;
 
 	/**
 	 * Gets a user-friendly reason explaining why the action is not allowed.
@@ -91,8 +91,8 @@ public:
 	 * @return Localized text explaining why the action is disabled or unavailable.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	FText GetDisallowedReason(const FInventoryItem& TargetItem) const;
-	virtual FText GetDisallowedReason_Implementation(const FInventoryItem& TargetItem) const;
+	FText GetDisallowedReason(const FMounteaInventoryItem& TargetItem) const;
+	virtual FText GetDisallowedReason_Implementation(const FMounteaInventoryItem& TargetItem) const;
 
 	/**
 	 * Executes the inventory action on the specified target item.
@@ -108,8 +108,8 @@ public:
 	 * @note Always call InitializeItemAction() before executing actions to ensure proper context.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool ExecuteInventoryAction(const FInventoryItem& TargetItem);
-	virtual bool ExecuteInventoryAction_Implementation(const FInventoryItem& TargetItem);
+	bool ExecuteInventoryAction(const FMounteaInventoryItem& TargetItem);
+	virtual bool ExecuteInventoryAction_Implementation(const FMounteaInventoryItem& TargetItem);
 
 	/**
 	 * Cancels the Inventory Action. This should be called mostly from delayed Actions!

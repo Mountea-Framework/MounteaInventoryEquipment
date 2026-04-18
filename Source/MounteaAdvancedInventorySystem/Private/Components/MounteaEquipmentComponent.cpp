@@ -21,7 +21,6 @@
 #include "GameFramework/Actor.h"
 #include "Interfaces/Equipment/MounteaAdvancedEquipmentItemInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
-#include "Statics/MounteaAttachmentsStatics.h"
 #include "Statics/MounteaEquipmentStatics.h"
 
 UMounteaEquipmentComponent::UMounteaEquipmentComponent()
@@ -29,56 +28,115 @@ UMounteaEquipmentComponent::UMounteaEquipmentComponent()
 	ComponentTags.Append( { TEXT("Equipment") } );
 }
 
-void UMounteaEquipmentComponent::Server_EquipItem_Implementation(const FInventoryItem& ItemDefinition)
+void UMounteaEquipmentComponent::Server_EquipItem_Implementation(const FMounteaInventoryItem& ItemDefinition)
 {
 	Execute_EquipItem(this, ItemDefinition);
 }
 
-void UMounteaEquipmentComponent::Server_EquipItemToSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotId)
+void UMounteaEquipmentComponent::Server_EquipItemToSlot_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& SlotId)
 {
 	Execute_EquipItemToSlot(this, SlotId, ItemDefinition);
 }
 
-void UMounteaEquipmentComponent::Server_UnequipItem_Implementation(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot)
+void UMounteaEquipmentComponent::Server_UnequipItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const bool bUseFallbackSlot)
 {
 	Execute_UnequipItem(this, ItemDefinition, bUseFallbackSlot);
 }
 
-AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FInventoryItem& ItemDefinition)
+bool UMounteaEquipmentComponent::ValidateEquipRequest(const FMounteaInventoryItem& ItemDefinition) const
 {
 	if (!ItemDefinition.IsItemValid())
 	{
 		LOG_WARNING(TEXT("[Equip Item]: Item Data not valid. No equipment will happen."))
-		return nullptr;
+		return false;
 	}
 
 	const UMounteaInventoryItemTemplate* templateAsset = ItemDefinition.GetTemplate();
 	if (!IsValid(templateAsset))
 	{
 		LOG_WARNING(TEXT("[Equip Item]: Item Template not valid. No equipment will happen."))
-		return nullptr;
+		return false;
 	}
 	
 	const auto spawnActorClass = templateAsset->SpawnActor;
 	if (spawnActorClass.IsNull())
 	{
 		LOG_WARNING(TEXT("[Equip Item]: Spawn Actor not valid. No equipment will happen."))
-		return nullptr;
+		return false;
 	}
 
 	UClass* spawnClass = spawnActorClass.LoadSynchronous();
 	if (!IsValid(spawnClass))
 	{
 		LOG_WARNING(TEXT("[Equip Item]: Spawn Actor class failed to load. No equipment will happen."))
-		return nullptr;
+		return false;
 	}
 
-	if (!UMounteaAttachmentsStatics::IsTargetClassValid(spawnClass))
+	if (!UMounteaEquipmentStatics::IsTargetClassValid(spawnClass))
 	{
-		LOG_WARNING(TEXT("[Equip Item]: Spawn Actor '%s' does not implement IMounteaAdvancedAttachmentAttachableInterface and has no component that does."),
-			*spawnClass->GetName());
-		return nullptr;
+		LOG_WARNING(TEXT("[Equip Item]: Spawn Actor '%s' is not a valid equipment item class."), *spawnClass->GetName());
+		return false;
 	}
+
+	return true;
+}
+
+bool UMounteaEquipmentComponent::TryExecuteEquipOverride(const FMounteaInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) const
+{
+	OutSpawnedActor = nullptr;
+	if (OverrideEquipItemFunction.GetMemberName() == NAME_None)
+		return false;
+
+	UClass* scopeClass = OverrideEquipItemFunction.GetMemberParentClass();
+	if (!IsValid(scopeClass))
+		return false;
+
+	UFunction* targetFunction = scopeClass->FindFunctionByName(OverrideEquipItemFunction.GetMemberName());
+	if (!IsValid(targetFunction))
+		return false;
+
+	struct FParams
+	{
+		FMounteaInventoryItem ItemDefinition;
+		AActor* OutSpawnedActor;
+		bool ReturnValue;
+	};
+
+	FParams params;
+	params.ItemDefinition = ItemDefinition;
+	params.OutSpawnedActor = nullptr;
+	params.ReturnValue = false;
+
+	UObject* targetObject = nullptr;
+	if (targetFunction->HasAnyFunctionFlags(FUNC_Static))
+	{
+		targetObject = scopeClass->GetDefaultObject();
+	}
+	else
+	{
+		UMounteaEquipmentComponent* mutableThis = const_cast<UMounteaEquipmentComponent*>(this);
+		if (mutableThis->IsA(scopeClass))
+		{
+			targetObject = mutableThis;
+		}
+		else if (AActor* owner = GetOwner(); IsValid(owner) && owner->IsA(scopeClass))
+		{
+			targetObject = owner;
+		}
+	}
+
+	if (!IsValid(targetObject))
+		return false;
+
+	targetObject->ProcessEvent(targetFunction, &params);
+	OutSpawnedActor = params.OutSpawnedActor;
+	return params.ReturnValue;
+}
+
+AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FMounteaInventoryItem& ItemDefinition)
+{
+	if (!ValidateEquipRequest(ItemDefinition))
+		return nullptr;
 	
 	if (!IsAuthority())
 	{
@@ -87,56 +145,15 @@ AActor* UMounteaEquipmentComponent::EquipItem_Implementation(const FInventoryIte
 	}
 	
 	AActor* spawnedActor = nullptr;
-
-	// Try override binding first
-	if (OverrideEquipItemFunction.GetMemberName() != NAME_None)
-	{
-		if (UClass* scopeClass = OverrideEquipItemFunction.GetMemberParentClass())
-		{
-			if (UFunction* targetFunction = scopeClass->FindFunctionByName(OverrideEquipItemFunction.GetMemberName()))
-			{
-				struct FParams
-				{
-					FInventoryItem ItemDefinition;
-					AActor* OutSpawnedActor;
-					bool ReturnValue;
-				};
-
-				FParams params;
-				params.ItemDefinition = ItemDefinition;
-				params.OutSpawnedActor = nullptr;
-				params.ReturnValue = false;
-
-				UObject* targetObject = nullptr;
-
-				if (targetFunction->HasAnyFunctionFlags(FUNC_Static))
-					targetObject = scopeClass->GetDefaultObject();
-				else
-				{
-					// Member function: call on something that is-a scopeClass.
-					// In our case, we want the component itself or its owner.
-					if (const_cast<UMounteaEquipmentComponent*>(this)->IsA(scopeClass))
-						targetObject = const_cast<UMounteaEquipmentComponent*>(this);
-					else if (AActor* owner = GetOwner(); owner && owner->IsA(scopeClass))
-						targetObject = owner;
-				}
-
-				if (targetObject)
-				{
-					targetObject->ProcessEvent(targetFunction, &params);
-					if (params.ReturnValue)
-						return params.OutSpawnedActor;
-				}
-			}
-		}
-	}
+	if (TryExecuteEquipOverride(ItemDefinition, spawnedActor))
+		return spawnedActor;
 
 	// Fallback
 	const bool bResult = UMounteaEquipmentStatics::EquipItemGeneral(this, ItemDefinition, spawnedActor);
 	return bResult ? spawnedActor : nullptr;
 }
 
-AActor* UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& SlotId, const FInventoryItem& ItemDefinition)
+AActor* UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& SlotId, const FMounteaInventoryItem& ItemDefinition)
 {
 	if (SlotId.IsNone())
 		return nullptr;
@@ -159,7 +176,7 @@ AActor* UMounteaEquipmentComponent::EquipItemToSlot_Implementation(const FName& 
 	return bResult ? spawnedActor : nullptr;
 }
 
-bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot)
+bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const bool bUseFallbackSlot)
 {
 	if (!ItemDefinition.IsItemValid())
 		return false;
@@ -181,7 +198,7 @@ bool UMounteaEquipmentComponent::UnequipItem_Implementation(const FInventoryItem
 			continue;
 
 		if (IMounteaAdvancedEquipmentItemInterface::Execute_GetEquippedItemId(equipmentItemInterface.GetObject()) != ItemDefinition.GetGuid())
-		continue;
+			continue;
 
 		return Execute_UnequipItemFromSlot(this, slot->SlotName, bUseFallbackSlot);
 	}
@@ -225,7 +242,6 @@ bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName&
 			}
 
 			LOG_WARNING(TEXT("[Unequip Item From Slot]: Failed to switch slots. Falling back to detaching from current slot."));
-			return false;
 		}
 	}
 
@@ -239,12 +255,12 @@ bool UMounteaEquipmentComponent::UnequipItemFromSlot_Implementation(const FName&
 	return true;
 }
 
-bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const
+bool UMounteaEquipmentComponent::IsEquipmentItemEquipped_Implementation(const FMounteaInventoryItem& ItemDefinition) const
 {
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition);
 }
 
-bool UMounteaEquipmentComponent::IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const
+bool UMounteaEquipmentComponent::IsEquipmentItemEquippedInSlot_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& SlotName) const
 {
 	return UMounteaEquipmentStatics::ValidateItemEquipped(this, ItemDefinition, SlotName);
 }
@@ -258,7 +274,7 @@ bool UMounteaEquipmentComponent::ActivateQuickUseItem_Implementation(const FName
 	if (!UMounteaEquipmentStatics::TryGetEquippedItemGuidFromSlot(this, SlotId, itemGuid))
 		return false;
 
-	FInventoryItem quickUseItemDefinition;
+	FMounteaInventoryItem quickUseItemDefinition;
 	if (!UMounteaEquipmentStatics::TryResolveInventoryItemByGuid(this, itemGuid, quickUseItemDefinition))
 	{
 		LOG_WARNING(TEXT("[Activate Quick Use Item]: Failed to resolve inventory item definition for equipped item guid '%s'."),
@@ -332,6 +348,24 @@ bool UMounteaEquipmentComponent::BuildEquipmentTransitionContext(const FGuid& It
 	}
 
 	return true;
+}
+
+bool UMounteaEquipmentComponent::BuildTransitionContextForType(const FGuid& ItemGuid, const FName& TargetSlotId,
+	const EEquipmentTransitionType TransitionType, FEquipmentTransitionContext& OutContext)
+{
+	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
+	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
+	bool bResolveAsActivation = false;
+	if (!ResolveTransitionDefinition(TransitionType, expectedState, newState, bResolveAsActivation))
+		return false;
+
+	return BuildEquipmentTransitionContext(
+		ItemGuid,
+		TargetSlotId,
+		expectedState,
+		newState,
+		bResolveAsActivation,
+		OutContext);
 }
 
 bool UMounteaEquipmentComponent::ResolveTransitionDefinition(const EEquipmentTransitionType TransitionType,
@@ -435,7 +469,7 @@ bool UMounteaEquipmentComponent::ShouldUseDeferredTransition(const FEquipmentTra
 	return !bItemAutoActivates && bRequiresEvent;
 }
 
-void UMounteaEquipmentComponent::ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+void UMounteaEquipmentComponent::ArmPendingActivation(const FMounteaInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
 	const EEquipmentTransitionType TransitionType, UAnimMontage* Montage, const float MontageDuration)
 {
 	PendingActivation.ItemGuid = ItemDefinition.GetGuid();
@@ -547,7 +581,7 @@ UAnimMontage* UMounteaEquipmentComponent::ResolveTransitionMontage(const FEquipm
 	}
 }
 
-bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem& ItemDefinition,
+bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FMounteaInventoryItem& ItemDefinition,
 	const FEquipmentTransitionContext& Context, const EEquipmentTransitionType TransitionType)
 {
 	if (!ShouldUseDeferredTransition(Context, TransitionType))
@@ -573,7 +607,8 @@ bool UMounteaEquipmentComponent::TryStartTransitionMontage(const FInventoryItem&
 	return true;
 }
 
-bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+bool UMounteaEquipmentComponent::ExecuteItemTransitionRequest(const FMounteaInventoryItem& ItemDefinition,
+	const FName& TargetSlotId, const EEquipmentTransitionType TransitionType)
 {
 	ResetPendingActivationIfExpired();
 
@@ -583,109 +618,59 @@ bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FInv
 	if (IsTransitionInProgress())
 		return false;
 
-	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
-	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
-	bool bResolveAsActivation = false;
-	if (!ResolveTransitionDefinition(EEquipmentTransitionType::EET_Activate, expectedState, newState, bResolveAsActivation))
-		return false;
-
 	FEquipmentTransitionContext transitionContext;
-	if (!BuildEquipmentTransitionContext(
-		ItemDefinition.GetGuid(),
-		TargetSlotId,
-		expectedState,
-		newState,
-		bResolveAsActivation,
-		transitionContext))
-	{
+	if (!BuildTransitionContextForType(ItemDefinition.GetGuid(), TargetSlotId, TransitionType, transitionContext))
 		return false;
-	}
 
-	if (ShouldUseDeferredTransition(transitionContext, EEquipmentTransitionType::EET_Activate))
+	if (ShouldUseDeferredTransition(transitionContext, TransitionType))
 	{
-		// Montage-driven flow: transition is committed by AnimAttachItem notify callback.
-		if (TryStartTransitionMontage(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Activate))
+		if (TryStartTransitionMontage(ItemDefinition, transitionContext, TransitionType))
 			return true;
 
-		UAnimMontage* transitionMontage = ResolveTransitionMontage(transitionContext, EEquipmentTransitionType::EET_Activate);
-
-		// Procedural flow: no montage configured, so external animation system is expected to call AnimAttachItem manually.
+		UAnimMontage* transitionMontage = ResolveTransitionMontage(transitionContext, TransitionType);
 		if (!IsValid(transitionMontage))
 		{
-			ArmPendingActivation(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Activate);
+			ArmPendingActivation(ItemDefinition, transitionContext, TransitionType);
 			return true;
 		}
 
-		LOG_WARNING(TEXT("[Activate Equipment Item]: Failed to play activation transition montage. Falling back to immediate transition."))
+		const TCHAR* transitionLabel = TransitionType == EEquipmentTransitionType::EET_Activate
+			? TEXT("Activate Equipment Item")
+			: TEXT("Deactivate Equipment Item");
+		LOG_WARNING(TEXT("[%s]: Failed to play transition montage. Falling back to immediate transition."), transitionLabel)
 	}
 
 	if (!IsAuthority())
 	{
-		Server_ActivateEquipmentItem(ItemDefinition, transitionContext.ResolvedTargetSlotId);
+		if (TransitionType == EEquipmentTransitionType::EET_Activate)
+			Server_ActivateEquipmentItem(ItemDefinition, transitionContext.ResolvedTargetSlotId);
+		else if (TransitionType == EEquipmentTransitionType::EET_Deactivate)
+			Server_DeactivateEquipmentItem(ItemDefinition, transitionContext.ResolvedTargetSlotId);
+		else
+			return false;
+
 		return true;
 	}
 
 	return ExecuteEquipmentStateTransition(transitionContext);
 }
 
-bool UMounteaEquipmentComponent::DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+bool UMounteaEquipmentComponent::ActivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId)
 {
-	ResetPendingActivationIfExpired();
-
-	if (!ItemDefinition.IsItemValid())
-		return false;
-
-	if (IsTransitionInProgress())
-		return false;
-
-	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
-	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
-	bool bResolveAsActivation = false;
-	if (!ResolveTransitionDefinition(EEquipmentTransitionType::EET_Deactivate, expectedState, newState, bResolveAsActivation))
-		return false;
-
-	FEquipmentTransitionContext transitionContext;
-	if (!BuildEquipmentTransitionContext(
-		ItemDefinition.GetGuid(),
-		TargetSlotId,
-		expectedState,
-		newState,
-		bResolveAsActivation,
-		transitionContext))
-	{
-		return false;
-	}
-
-	if (ShouldUseDeferredTransition(transitionContext, EEquipmentTransitionType::EET_Deactivate))
-	{
-		if (TryStartTransitionMontage(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Deactivate))
-			return true;
-
-		UAnimMontage* transitionMontage = ResolveTransitionMontage(transitionContext, EEquipmentTransitionType::EET_Deactivate);
-		if (!IsValid(transitionMontage))
-		{
-			ArmPendingActivation(ItemDefinition, transitionContext, EEquipmentTransitionType::EET_Deactivate);
-			return true;
-		}
-
-		LOG_WARNING(TEXT("[Deactivate Equipment Item]: Failed to play deactivation transition montage. Falling back to immediate transition."))
-	}
-
-	if (!IsAuthority())
-	{
-		Server_DeactivateEquipmentItem(ItemDefinition, transitionContext.ResolvedTargetSlotId);
-		return true;
-	}
-
-	return ExecuteEquipmentStateTransition(transitionContext);
+	return ExecuteItemTransitionRequest(ItemDefinition, TargetSlotId, EEquipmentTransitionType::EET_Activate);
 }
 
-void UMounteaEquipmentComponent::Server_ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+bool UMounteaEquipmentComponent::DeactivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId)
+{
+	return ExecuteItemTransitionRequest(ItemDefinition, TargetSlotId, EEquipmentTransitionType::EET_Deactivate);
+}
+
+void UMounteaEquipmentComponent::Server_ActivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId)
 {
 	Execute_ActivateEquipmentItem(this, ItemDefinition, TargetSlotId);
 }
 
-void UMounteaEquipmentComponent::Server_DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId)
+void UMounteaEquipmentComponent::Server_DeactivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId)
 {
 	Execute_DeactivateEquipmentItem(this, ItemDefinition, TargetSlotId);
 }
@@ -693,23 +678,9 @@ void UMounteaEquipmentComponent::Server_DeactivateEquipmentItem_Implementation(c
 void UMounteaEquipmentComponent::Server_AnimAttachItem_Implementation(const FGuid& ItemGuid, const FName& TargetSlotId,
 	const EEquipmentTransitionType TransitionType)
 {
-	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
-	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
-	bool bResolveAsActivation = false;
-	if (!ResolveTransitionDefinition(TransitionType, expectedState, newState, bResolveAsActivation))
-		return;
-
 	FEquipmentTransitionContext transitionContext;
-	if (!BuildEquipmentTransitionContext(
-		ItemGuid,
-		TargetSlotId,
-		expectedState,
-		newState,
-		bResolveAsActivation,
-		transitionContext))
-	{
+	if (!BuildTransitionContextForType(ItemGuid, TargetSlotId, TransitionType, transitionContext))
 		return;
-	}
 
 	ExecuteEquipmentStateTransition(transitionContext);
 }
@@ -730,22 +701,14 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 	PendingActivation.Reset();
 	ResetCurrentTransitionType();
 
-	EEquipmentItemState expectedState = EEquipmentItemState::EES_Idle;
-	EEquipmentItemState newState = EEquipmentItemState::EES_Idle;
-	bool bResolveAsActivation = false;
-	if (!ResolveTransitionDefinition(pendingData.TransitionType, expectedState, newState, bResolveAsActivation))
-		return false;
-
 	if (!IsAuthority())
 	{
 		// Client-side prediction prevents temporary world-space floating before server replication arrives.
 		FEquipmentTransitionContext transitionContext;
-		if (BuildEquipmentTransitionContext(
+		if (BuildTransitionContextForType(
 			pendingData.ItemGuid,
 			pendingData.TargetSlotId,
-			expectedState,
-			newState,
-			bResolveAsActivation,
+			pendingData.TransitionType,
 			transitionContext))
 		{
 			ExecuteEquipmentStateTransition(transitionContext, true);
@@ -756,12 +719,10 @@ bool UMounteaEquipmentComponent::AnimAttachItem_Implementation()
 	}
 
 	FEquipmentTransitionContext transitionContext;
-	if (!BuildEquipmentTransitionContext(
+	if (!BuildTransitionContextForType(
 		pendingData.ItemGuid,
 		pendingData.TargetSlotId,
-		expectedState,
-		newState,
-		bResolveAsActivation,
+		pendingData.TransitionType,
 		transitionContext))
 	{
 		return false;

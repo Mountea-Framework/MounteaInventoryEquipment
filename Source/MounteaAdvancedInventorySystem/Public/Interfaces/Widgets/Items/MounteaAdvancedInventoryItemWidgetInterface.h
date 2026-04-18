@@ -63,8 +63,8 @@ public:
 	 * @param Quantity Initial quantity of the item to display.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
-	void InitializeItemWidget(const FInventoryItem& Item, const int32 Quantity);
-	virtual void InitializeItemWidget_Implementation(const FInventoryItem& Item, const int32 Quantity) = 0;
+	void InitializeItemWidget(const FMounteaInventoryItem& Item, const int32 Quantity);
+	virtual void InitializeItemWidget_Implementation(const FMounteaInventoryItem& Item, const int32 Quantity) = 0;
 	
 	/**
 	 * Selects this inventory item in the UI.

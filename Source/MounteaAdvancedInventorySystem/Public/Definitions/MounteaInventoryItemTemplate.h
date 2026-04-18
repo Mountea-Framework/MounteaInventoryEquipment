@@ -34,7 +34,8 @@ enum class EInventoryItemFlags : uint8;
  * @see FInventoryItem
  * @see UMounteaInventoryManagerComponent
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName = "Inventory Item Template"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, 
+	meta=(DisplayName = "Inventory Item Template"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemTemplate : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -225,14 +226,14 @@ public:
 
 	/** Defines the compatible slots this template can be attached to. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
-	meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+	meta=(Categories="Mountea_Inventory.AttachmentSlots"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=25))
 	FGameplayTagContainer AttachmentSlots;
 
 	/** Defines the equipment item type used for slot compatibility checks. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Secondary Data",
-		meta=(Categories="Mountea_Inventory.Equipment.ItemType"),
+		meta=(Categories="Mountea_Inventory.Equipment.ItemType,Mountea_Inventory.Category"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=26))
 	FGameplayTag EquipmentItemType;

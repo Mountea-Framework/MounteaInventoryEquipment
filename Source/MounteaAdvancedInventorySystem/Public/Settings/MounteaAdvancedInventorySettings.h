@@ -21,6 +21,7 @@ class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedEquipmentSettingsConfig;
 class UInputMappingContext;
 class UMounteaAdvancedInventorySettingsConfig;
+class UMounteaAdvancedCraftingConfig;
 
 /**
  * UMounteaAdvancedInventorySettings provides centralized configuration for the Mountea Advanced Inventory System.
@@ -99,6 +100,15 @@ public:
 		DisplayName="Advanced Inventory UI Settings Config")
 	TSoftObjectPtr<UMounteaAdvancedInventoryUIConfig> AdvancedInventoryUISettingsConfig;
 
+	/**
+	 * Holds a reference to the configuration settings for Mountea Advanced Crafting.
+	 * This reference is used to define and load crafting-specific configurations.
+	 */
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftObjectPtr<UMounteaAdvancedCraftingConfig> AdvancedCraftingSettingsConfig;
+	
 	/**
 	 * Defines logging level that is allowed to be shown.
 	 * Affects on-screen messages.

@@ -1281,7 +1281,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("Icons.Save"))
+					.Image(FAppStyle::GetBrush("MAISStyleSet.Save"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			
@@ -1518,7 +1518,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 			SNew(SButton)
 			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
 			.ForegroundColor(FSlateColor::UseForeground())
-			.ToolTipText(LOCTEXT("HelpTooltip", "Show a quick help window explaining how to work with the Item Template Editor."))
+			.ToolTipText(LOCTEXT("HelpTooltip", "Show a quick tutorial window explaining how to work with the Item Template Editor."))
 			.OnClicked(this, &SMounteaInventoryTemplateEditor::ShowHelpModal)
 			.IsEnabled_Lambda([this]() 
 			{ 
@@ -1533,7 +1533,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("MAISStyleSet.Help"))
+					.Image(FAppStyle::GetBrush("MAISStyleSet.Tutorial"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			
@@ -1543,7 +1543,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(0, 0, 4, 0)
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("Help", "Show Help"))
+					.Text(LOCTEXT("Help", "Show Tutorial"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 					.Visibility_Lambda([this]()
 					{

@@ -27,13 +27,13 @@
 #pragma region ItemActions
 
 bool UMounteaInventoryStatics::InitializeItemAction(UMounteaInventoryItemAction* Target,
-	const FInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
+	const FMounteaInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
 	UObject* ContextPayload)
 {
 	return IsValid(Target) ? Target->InitializeItemAction(TargetItem, OwningInventory, ContextPayload) : false;
 }
 
-bool UMounteaInventoryStatics::ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FInventoryItem& TargetItem)
+bool UMounteaInventoryStatics::ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FMounteaInventoryItem& TargetItem)
 {
 	return IsValid(Target) ? Target->ExecuteInventoryAction(TargetItem) : false;
 }
@@ -125,9 +125,9 @@ FPayloadConfig UMounteaInventoryStatics::FindPayloadConfig(const FGameplayTag Cr
 	return {};
 }
 
-FInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
+FMounteaInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)
 {
-	return FInventoryItem(ItemGuid);
+	return FMounteaInventoryItem(ItemGuid);
 }
 
 AActor* UMounteaInventoryStatics::GetOwningActor(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
@@ -135,7 +135,7 @@ AActor* UMounteaInventoryStatics::GetOwningActor(const TScriptInterface<IMountea
 	return Target.GetObject() ? Target->Execute_GetOwningActor(Target.GetObject()) : nullptr;
 }
 
-bool UMounteaInventoryStatics::AddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item)
+bool UMounteaInventoryStatics::AddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItem& Item)
 {
 	return Target.GetObject() ? Target->Execute_AddItem(Target.GetObject(), Item) : false;
 }
@@ -145,7 +145,7 @@ bool UMounteaInventoryStatics::RemoveItem(const TScriptInterface<IMounteaAdvance
 	return Target.GetObject() ? Target->Execute_RemoveItem(Target.GetObject(), ItemGuid) : false;
 }
 
-bool UMounteaInventoryStatics::CanAddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItem& Item)
+bool UMounteaInventoryStatics::CanAddItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItem& Item)
 {
 	return Target.GetObject() ? Target->Execute_CanAddItem(Target.GetObject(), Item) : false;
 }
@@ -165,9 +165,9 @@ bool UMounteaInventoryStatics::CanAddItemFromTemplate(const TScriptInterface<IMo
 	return Target.GetObject() ? Target->Execute_CanAddItemFromTemplate(Target.GetObject(), Template, Quantity) : false;
 }
 
-FInventoryItem UMounteaInventoryStatics::FindItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams)
+FMounteaInventoryItem UMounteaInventoryStatics::FindItem(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams)
 {
-	return Target.GetObject() ? Target->Execute_FindItem(Target.GetObject(), SearchParams) : FInventoryItem();
+	return Target.GetObject() ? Target->Execute_FindItem(Target.GetObject(), SearchParams) : FMounteaInventoryItem();
 }
 
 int32 UMounteaInventoryStatics::FindItemIndex(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams)
@@ -175,14 +175,14 @@ int32 UMounteaInventoryStatics::FindItemIndex(const TScriptInterface<IMounteaAdv
 	return Target.GetObject() ? Target->Execute_FindItemIndex(Target.GetObject(), SearchParams) : INDEX_NONE;
 }
 
-TArray<FInventoryItem> UMounteaInventoryStatics::FindItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams)
+TArray<FMounteaInventoryItem> UMounteaInventoryStatics::FindItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FInventoryItemSearchParams& SearchParams)
 {
-	return Target.GetObject() ? Target->Execute_FindItems(Target.GetObject(), SearchParams) : TArray<FInventoryItem>();
+	return Target.GetObject() ? Target->Execute_FindItems(Target.GetObject(), SearchParams) : TArray<FMounteaInventoryItem>();
 }
 
-TArray<FInventoryItem> UMounteaInventoryStatics::GetAllItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
+TArray<FMounteaInventoryItem> UMounteaInventoryStatics::GetAllItems(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
 {
-	return Target.GetObject() ? Target->Execute_GetAllItems(Target.GetObject()) : TArray<FInventoryItem>();
+	return Target.GetObject() ? Target->Execute_GetAllItems(Target.GetObject()) : TArray<FMounteaInventoryItem>();
 }
 
 void UMounteaInventoryStatics::ClearInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target)
@@ -223,7 +223,7 @@ FString UMounteaInventoryStatics::InventoryToString(const TScriptInterface<IMoun
 	if (!Target.GetObject() || !Target.GetObject()->Implements<UMounteaAdvancedInventoryInterface>())
 		return FString();
 	
-	TArray<FInventoryItem> allItems = GetAllItems(Target);
+	TArray<FMounteaInventoryItem> allItems = GetAllItems(Target);
 	AActor* inventoryOwner = GetOwningActor(Target);
 	
 	FString returnValue = FString::Printf(TEXT("Inventory [Owner: %s, Items: %d]\n"),
@@ -239,12 +239,12 @@ FString UMounteaInventoryStatics::InventoryToString(const TScriptInterface<IMoun
 	return returnValue;
 }
 
-FString UMounteaInventoryStatics::InventoryItemToString(const FInventoryItem& Item)
+FString UMounteaInventoryStatics::InventoryItemToString(const FMounteaInventoryItem& Item)
 {
 	return Item.ToString();
 }
 
-FInventoryCategory UMounteaInventoryStatics::GetInventoryCategory(const FInventoryItem& Item)
+FInventoryCategory UMounteaInventoryStatics::GetInventoryCategory(const FMounteaInventoryItem& Item)
 {
 	if (!Item.Template) return FInventoryCategory();
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -255,13 +255,13 @@ FInventoryCategory UMounteaInventoryStatics::GetInventoryCategory(const FInvento
 	return advancedInventorySettingsConfig->AllowedCategories.Contains(categoryKey) ? advancedInventorySettingsConfig->AllowedCategories.FindChecked(categoryKey) : FInventoryCategory();
 }
 
-FString UMounteaInventoryStatics::GetInventoryCategoryKey(const FInventoryItem& Item)
+FString UMounteaInventoryStatics::GetInventoryCategoryKey(const FMounteaInventoryItem& Item)
 {
 	if (!Item.Template) return TEXT("");
 	return Item.Template->ItemCategory;
 }
 
-FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryItem& Item)
+FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FMounteaInventoryItem& Item)
 {
 	if (!Item.Template) return FInventoryRarity();
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
@@ -272,38 +272,38 @@ FInventoryRarity UMounteaInventoryStatics::GetInventoryRarity(const FInventoryIt
 	return advancedInventorySettingsConfig->AllowedRarities.Contains(rarityKey) ? advancedInventorySettingsConfig->AllowedRarities.FindChecked(rarityKey) : FInventoryRarity();
 }
 
-FString UMounteaInventoryStatics::GetInventoryRarityKey(const FInventoryItem& Item)
+FString UMounteaInventoryStatics::GetInventoryRarityKey(const FMounteaInventoryItem& Item)
 {
 	if (!Item.Template) return TEXT("");
 	return Item.Template->ItemCategory;
 }
 
-FText UMounteaInventoryStatics::GetInventoryItemName(const FInventoryItem& Item)
+FText UMounteaInventoryStatics::GetInventoryItemName(const FMounteaInventoryItem& Item)
 {
 	return Item.GetItemName();
 }
 
-FText UMounteaInventoryStatics::GetInventoryItemShortInfo(const FInventoryItem& Item)
+FText UMounteaInventoryStatics::GetInventoryItemShortInfo(const FMounteaInventoryItem& Item)
 {
 	return Item.GetItemShortInfo();
 }
 
-FText UMounteaInventoryStatics::GetInventoryItemLongInfo(const FInventoryItem& Item)
+FText UMounteaInventoryStatics::GetInventoryItemLongInfo(const FMounteaInventoryItem& Item)
 {
 	return Item.GetItemLongInfo();
 }
 
-UTexture2D* UMounteaInventoryStatics::GetInventoryItemCover(const FInventoryItem& Item)
+UTexture2D* UMounteaInventoryStatics::GetInventoryItemCover(const FMounteaInventoryItem& Item)
 {
 	return Item.GetCover();
 }
 
-bool UMounteaInventoryStatics::IsInventoryItemValid(const FInventoryItem& Item)
+bool UMounteaInventoryStatics::IsInventoryItemValid(const FMounteaInventoryItem& Item)
 {
 	return Item.IsItemValid();
 }
 
-TArray<UMounteaCallbackInventoryItemAction*> UMounteaInventoryStatics::GetItemActions(const FInventoryItem& Item)
+TArray<UMounteaCallbackInventoryItemAction*> UMounteaInventoryStatics::GetItemActions(const FMounteaInventoryItem& Item)
 {	
 	const auto itemTemplate = Item.GetTemplate();
 	if (!itemTemplate) return {};
@@ -327,7 +327,7 @@ TArray<UMounteaCallbackInventoryItemAction*> UMounteaInventoryStatics::GetItemAc
 	return validActions;
 }
 
-TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FInventoryItem& Item)
+TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisplayableItemActions(const FMounteaInventoryItem& Item)
 {	
 	const auto itemTemplate = Item.GetTemplate();
 	if (!itemTemplate) return {};
@@ -350,21 +350,21 @@ TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisp
 	return validActions;
 }
 
-FGameplayTagContainer UMounteaInventoryStatics::GetItemCustomData(const FInventoryItem& Item)
+FGameplayTagContainer UMounteaInventoryStatics::GetItemCustomData(const FMounteaInventoryItem& Item)
 {
 	if (!Item.IsItemValid()) return {};
 	return Item.GetCustomData();
 }
 
-TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
+TArray<FMounteaInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray<FMounteaInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria)
 {
 	if (Items.Num() < 1 || SortingCriteria.Num() == 0)
-		return TArray<FInventoryItem>();
+		return TArray<FMounteaInventoryItem>();
 	
 	if (Items.Num() == 1)
 		return Items;
 
-	TArray<FInventoryItem> returnValue = Items;
+	TArray<FMounteaInventoryItem> returnValue = Items;
 	enum class ESortKey : uint8 { Name, Value, Weight, Rarity, Unknown };
 	
 	auto getSortKey = [](const FString& Key) -> ESortKey
@@ -386,7 +386,7 @@ TArray<FInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const TArray
 	{
 		const ESortKey sortKey = getSortKey(Criteria.SortingKey);
 		
-		Algo::StableSort(returnValue, [sortKey](const FInventoryItem& A, const FInventoryItem& B)
+		Algo::StableSort(returnValue, [sortKey](const FMounteaInventoryItem& A, const FMounteaInventoryItem& B)
 		{
 			switch (sortKey)
 			{

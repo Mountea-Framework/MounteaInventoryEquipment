@@ -22,7 +22,7 @@
  * Equipment components inherits all behaviour from Attachable Component, and extends the behaviour
  * by providing Equipment State logic.
  *
- * @see [Equipment Components](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/EquipmentSystem)
+ * @see [Equipment Components](https://mountea.tools/docs/advancedinventoryequipmentsystem/equipmentsystem/equipmentsystem/)
  * @see IMounteaAdvancedEquipmentItemInterface
  * @see UMounteaAttachableComponent
  */

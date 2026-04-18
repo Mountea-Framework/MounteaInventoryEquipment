@@ -17,42 +17,42 @@
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Statics/MounteaInventoryStatics.h"
 
-FInventoryItemSnapshot::FInventoryItemSnapshot(const struct FInventoryItem& Item)
+FInventoryItemSnapshot::FInventoryItemSnapshot(const struct FMounteaInventoryItem& Item)
 	: Quantity(Item.GetQuantity())
 	, Durability(Item.GetDurability())
 	, CustomData(Item.GetCustomData())
 {}
 
-bool FInventoryItemSnapshot::HasQuantityChanged(const FInventoryItem& Current) const
+bool FInventoryItemSnapshot::HasQuantityChanged(const FMounteaInventoryItem& Current) const
 {
 	return Quantity != Current.GetQuantity();
 }
 
-int32 FInventoryItemSnapshot::GetQuantityDelta(const FInventoryItem& Current) const
+int32 FInventoryItemSnapshot::GetQuantityDelta(const FMounteaInventoryItem& Current) const
 {
 	return Current.GetQuantity() - Quantity;
 }
 
-bool FInventoryItemSnapshot::HasDurabilityChanged(const FInventoryItem& Current) const
+bool FInventoryItemSnapshot::HasDurabilityChanged(const FMounteaInventoryItem& Current) const
 {
 	return !FMath::IsNearlyEqual(Durability, Current.GetDurability());
 }
 
-float FInventoryItemSnapshot::GetDurabilityDelta(const FInventoryItem& Current) const
+float FInventoryItemSnapshot::GetDurabilityDelta(const FMounteaInventoryItem& Current) const
 {
 	return Current.GetDurability() - Durability;
 }
 
-bool FInventoryItemSnapshot::HasCustomDataChanged(const FInventoryItem& Current) const
+bool FInventoryItemSnapshot::HasCustomDataChanged(const FMounteaInventoryItem& Current) const
 {
 	return CustomData != Current.GetCustomData();
 }
 
-FInventoryItem::FInventoryItem() : Guid(FGuid()),  Template(nullptr), OwningInventory(nullptr), Quantity(-1), Durability(-1.f)
+FMounteaInventoryItem::FMounteaInventoryItem() : Guid(FGuid()),  Template(nullptr), OwningInventory(nullptr), Quantity(-1), Durability(-1.f)
 {
 }
 
-FInventoryItem::FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity, const float InDurability, TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory)
+FMounteaInventoryItem::FMounteaInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity, const float InDurability, TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory)
 	: Guid(FGuid())
 	, Template(nullptr)
 	, OwningInventory(InOwningInventory)
@@ -70,17 +70,17 @@ FInventoryItem::FInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const 
 		Durability = FMath::Clamp(InDurability, 0.f, Template->MaxDurability);
 }
 
-bool FInventoryItem::IsItemValid() const
+bool FMounteaInventoryItem::IsItemValid() const
 {
 	return Guid.IsValid() && IsValid(Template);
 }
 
-bool FInventoryItem::IsItemInInventory() const
+bool FMounteaInventoryItem::IsItemInInventory() const
 {
 	return OwningInventory != nullptr;
 }
 
-FString FInventoryItem::ToString() const
+FString FMounteaInventoryItem::ToString() const
 {
 	//FString Builder;
 	TStringBuilder<512> Builder;
@@ -124,27 +124,27 @@ FString FInventoryItem::ToString() const
 	return Builder.ToString();
 }
 
-FText FInventoryItem::GetItemName() const
+FText FMounteaInventoryItem::GetItemName() const
 {
 	return IsValid(Template) ? Template->DisplayName : NSLOCTEXT("InventoryItem", "InvalidName", "Invalid");
 }
 
-FText FInventoryItem::GetItemShortInfo() const
+FText FMounteaInventoryItem::GetItemShortInfo() const
 {
 	return IsValid(Template) ? Template->ItemShortInfo : NSLOCTEXT("InventoryItem", "InvalidShortInfo", "Invalid");
 }
 
-FText FInventoryItem::GetItemLongInfo() const
+FText FMounteaInventoryItem::GetItemLongInfo() const
 {
 	return IsValid(Template) ? Template->ItemLongInfo : NSLOCTEXT("InventoryItem", "ItemLongInfo", "Invalid");
 }
 
-UTexture2D* FInventoryItem::GetCover() const
+UTexture2D* FMounteaInventoryItem::GetCover() const
 {
 	return IsValid(Template) ? Template->ItemCover.LoadSynchronous() : nullptr;
 }
 
-bool FInventoryItem::SetTemplate(UMounteaInventoryItemTemplate* InTemplate)
+bool FMounteaInventoryItem::SetTemplate(UMounteaInventoryItemTemplate* InTemplate)
 {
 	if (InTemplate != Template && IsValid(InTemplate))
 	{
@@ -154,7 +154,7 @@ bool FInventoryItem::SetTemplate(UMounteaInventoryItemTemplate* InTemplate)
 	return false;
 }
 
-bool FInventoryItem::SetQuantity(const int32 InQuantity)
+bool FMounteaInventoryItem::SetQuantity(const int32 InQuantity)
 {
 	if (InQuantity == Quantity || !IsValid(Template))
 		return false;
@@ -168,7 +168,7 @@ bool FInventoryItem::SetQuantity(const int32 InQuantity)
 	return false;
 }
 
-bool FInventoryItem::SetDurability(const float InDurability)
+bool FMounteaInventoryItem::SetDurability(const float InDurability)
 {
 	if (InDurability == Durability || !IsValid(Template))
 		return false;
@@ -185,7 +185,7 @@ bool FInventoryItem::SetDurability(const float InDurability)
 	return false;
 }
 
-bool FInventoryItem::SetAffectorSlots(const TMap<FGameplayTag, FGuid>& InAffectorSlots)
+bool FMounteaInventoryItem::SetAffectorSlots(const TMap<FGameplayTag, FGuid>& InAffectorSlots)
 {
 	if (InAffectorSlots.Num() != AffectorSlots.Num())
 	{
@@ -224,7 +224,7 @@ bool FInventoryItem::SetAffectorSlots(const TMap<FGameplayTag, FGuid>& InAffecto
 	return false;
 }
 
-bool FInventoryItem::SetOwningInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& InOwningInventory)
+bool FMounteaInventoryItem::SetOwningInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& InOwningInventory)
 {
 	if (InOwningInventory == OwningInventory)
 		return false;
@@ -233,7 +233,7 @@ bool FInventoryItem::SetOwningInventory(const TScriptInterface<IMounteaAdvancedI
 	return true;
 }
 
-bool FInventoryItem::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FMounteaInventoryItem::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Ar << Guid;
 	Ar << Template;
@@ -281,7 +281,7 @@ bool FInventoryItem::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bO
 	return true;
 }
 
-void FInventoryItem::PostReplicatedAdd(const struct FInventoryItemArray& InArraySerializer)
+void FMounteaInventoryItem::PostReplicatedAdd(const struct FInventoryItemArray& InArraySerializer)
 {
 	if (IsValid(OwningInventory.GetObject()))
 	{
@@ -300,7 +300,7 @@ void FInventoryItem::PostReplicatedAdd(const struct FInventoryItemArray& InArray
 	}
 }
 
-void FInventoryItem::PostReplicatedChange(const FInventoryItemArray& InArraySerializer)
+void FMounteaInventoryItem::PostReplicatedChange(const FInventoryItemArray& InArraySerializer)
 {
 	if (!IsValid(OwningInventory.GetObject()))
 	{
@@ -401,7 +401,7 @@ void FInventoryItem::PostReplicatedChange(const FInventoryItemArray& InArraySeri
 	CapturePreReplicationSnapshot();
 }
 
-void FInventoryItem::PreReplicatedRemove(const struct FInventoryItemArray& InArraySerializer)
+void FMounteaInventoryItem::PreReplicatedRemove(const struct FInventoryItemArray& InArraySerializer)
 {
 	if (IsValid(OwningInventory.GetObject()))
 	{

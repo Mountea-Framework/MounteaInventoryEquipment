@@ -142,9 +142,10 @@ public:
 	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
 
 	/**
-	 * Returns the Main Wrapper Widget.
+	 * Returns the currently active main wrapper widget.
+	 *
 	 * @param Target The UI Manager to get Wrapper widget from.
-	 * @return UI if UI exists, otherwise nullptr.
+	 * @return Wrapper widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
 		meta=(CustomTag="MounteaK2Getter"),
@@ -179,9 +180,10 @@ public:
 	static bool CreateInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
-	 * Returns the Inventory Widget.
+	 * Returns the currently active inventory widget.
+	 *
 	 * @param Target The UI Manager to get Inventory widget from.
-	 * @return UI if UI exists, otherwise nullptr.
+	 * @return Inventory widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory", 
 		meta=(CustomTag="MounteaK2Getter"),
@@ -228,13 +230,13 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Items",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Inventory UI Manager - Find Item")
-	static FInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
+	static FMounteaInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
 	
 	/**
 	 * Retrieves local custom items map.
 	 * 
 	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @return Custom Items Mpa if any specified.
+	 * @return Custom items map if any entries are present.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
 		meta=(CustomTag="MounteaK2Getter"),
@@ -282,7 +284,7 @@ public:
 	 *
 	 * @param Target    UI component implementing MounteaAdvancedInventoryUIManagerInterface.
 	 * @param ItemTag   Gameplay tag representing the custom item key to remove.
-	 * @param ItemId	Guide of the item to be removed.
+	 * @param ItemId	Guid of the item to be removed.
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
@@ -310,10 +312,10 @@ public:
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
 	
 	/**
-	 * This function allows UI Manager to listen to external systems which might want to process Widget Commands.
-	 * Example might to a request to refresh item count when Item Action consumes it.
+	 * Executes a widget command routed through the UI manager hierarchy.
+	 * Use this to notify UI layers about external events (for example refreshing item count after an item action).
 	 * 
-	 * Chain of hierarchy is respected, so commands are given to root and then based on the selection passed down.
+	 * Command routing should respect wrapper-to-child hierarchy, so parent managers can delegate to active views.
 	 * 
 	 * @param Target UI Manager to execute the logic on
 	 * @param Command Command to Process
@@ -608,7 +610,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Helpers", 
 		meta=(CustomTag="MounteaK2Validate"),
 		DisplayName="Is Item UI Detached From Valid Items")
-	static bool IsItemWidgetDetachedFromValidItems(const TArray<FInventoryItem>& ValidItems, const FInventoryItemData& InventoryItemData);
+	static bool IsItemWidgetDetachedFromValidItems(const TArray<FMounteaInventoryItem>& ValidItems, const FInventoryItemData& InventoryItemData);
 	
 	/**
 	 * Validates whether the specified hardware input type is currently active for the owning local player.
@@ -1540,7 +1542,7 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Make New Inventory Inventory Item Widget Data",
 		meta=(NativeMakeFunc))
-	static FInventoryItemData MakeInventoryItemWidgetData(const FInventoryItem& Item, const int32 Quantity);
+	static FInventoryItemData MakeInventoryItemWidgetData(const FMounteaInventoryItem& Item, const int32 Quantity);
 
 	/**
 	 * Validates whether Item Widget Data has changed (Widget is Dirty for re-render).
@@ -1612,7 +1614,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Item - Initialize Item Widget")
-	static void ItemWidget_InitializeItemWidget(UWidget* Target, const FInventoryItem& Item, const int32 Quantity);
+	static void ItemWidget_InitializeItemWidget(UWidget* Target, const FMounteaInventoryItem& Item, const int32 Quantity);
 	
 	/**
 	 * Retrieves the logical data currently represented by this item widget.
@@ -2156,7 +2158,7 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Items Grid - Find Empty Slot Index (Helper)")
 	static int32 Helper_FindEmptyGridSlotIndex(const UWidget* Target, const FGuid& ItemId, UObject* ParentInventory);
-	static int32 FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems);
+	static int32 FindEmptyGridSlotRecursive(TScriptInterface<IMounteaAdvancedInventoryInterface>& InventoryInterface, const FMounteaInventoryItem& InventoryItem, const TArray<FMounteaInventoryGridSlot>& GridSlots, const bool bIsStackable, const bool bAlwaysStackItems);
 
 	/**
 	 * Updates the item located in a specific slot of the inventory grid.

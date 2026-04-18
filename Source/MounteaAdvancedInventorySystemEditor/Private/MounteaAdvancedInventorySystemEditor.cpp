@@ -52,6 +52,13 @@
 #include "Components/MounteaAttachmentContainerComponent.h"
 #include "Editor/UnrealEdEngine.h"
 #include "UnrealEdGlobals.h"
+#include "AssetActions/MounteaAdvancedInventoryCraftingConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryLoadoutComponent_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryLoadoutConfigs_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryLoadoutItem_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryRecipeIngredientsList_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryRecipeIngredient_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryRecipeTemplate_AssetAction.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -75,147 +82,69 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	{
 		AdvancedInventorySet = MakeShareable(new FSlateStyleSet("MounteaAdvancedInventorySet"));
 
-		const TSharedPtr<IPlugin> PluginPtr = IPluginManager::Get().FindPlugin("MounteaAdvancedInventorySystem");
+		const TSharedPtr<IPlugin> pluginPtr = IPluginManager::Get().FindPlugin("MounteaAdvancedInventorySystem");
 
-		if (PluginPtr.IsValid())
+		if (pluginPtr.IsValid())
 		{
-			const FString ContentDir = IPluginManager::Get().FindPlugin("MounteaAdvancedInventorySystem")->GetBaseDir();
+			const FString contentDir = pluginPtr->GetBaseDir();
 			
 			// Advanced Inventory specific icons
 			{
-				AdvancedInventorySet->SetContentRoot(ContentDir);
+				AdvancedInventorySet->SetContentRoot(contentDir);
 
-				FSlateImageBrush* MounteaInventoryItemTemplateThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaInventoryItemTemplate"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* MounteaInventoryItemTemplateClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaInventoryItemTemplate"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (MounteaInventoryItemTemplateThumb && MounteaInventoryItemTemplateClassIcon)
+				struct FClassIconMapping
 				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaInventoryItemTemplate", MounteaInventoryItemTemplateThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryItemTemplate", MounteaInventoryItemTemplateClassIcon);
-				}
-				
-				FSlateImageBrush* MounteaAdvancedInventorySettingsConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventorySettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* MounteaAdvancedInventorySettingsConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventorySettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (MounteaAdvancedInventorySettingsConfigClassIcon && MounteaAdvancedInventorySettingsConfigClassThumb)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventorySettingsConfig", MounteaAdvancedInventorySettingsConfigClassThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventorySettingsConfig", MounteaAdvancedInventorySettingsConfigClassIcon);
-				}
+					const TCHAR* ClassName;
+					const TCHAR* ResourceName;
+				};
 
-				FSlateImageBrush* MounteaAdvancedEquipmentSettingsConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedEquipmentSettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* MounteaAdvancedEquipmentSettingsConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedEquipmentSettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (MounteaAdvancedEquipmentSettingsConfigClassIcon && MounteaAdvancedEquipmentSettingsConfigClassThumb)
+				const FClassIconMapping classIconMappings[] =
 				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedEquipmentSettingsConfig", MounteaAdvancedEquipmentSettingsConfigClassThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedEquipmentSettingsConfig", MounteaAdvancedEquipmentSettingsConfigClassIcon);
-				}
+					{ TEXT("MounteaInventoryItemTemplate"), TEXT("MounteaInventoryItemTemplate") },
+					{ TEXT("MounteaAdvancedInventorySettingsConfig"), TEXT("MounteaAdvancedInventorySettingsConfig") },
+					{ TEXT("MounteaAdvancedEquipmentSettingsConfig"), TEXT("MounteaAdvancedEquipmentSettingsConfig") },
+					{ TEXT("MounteaAdvancedInventoryThemeConfig"), TEXT("ThemeConfigClassIcon") },
+					{ TEXT("MounteaAdvancedInventoryInteractiveWidgetConfig"), TEXT("InteractiveWidgetConfigIcon") },
+					{ TEXT("MounteaAttachmentContainerComponent"), TEXT("AttachmentContainerIcon") },
+					{ TEXT("MounteaEquipmentComponent"), TEXT("EquipmentComponentIcon") },
+					{ TEXT("MounteaInventoryComponent"), TEXT("InventoryComponentIcon") },
+					{ TEXT("MounteaInventoryUIComponent"), TEXT("InventoryUIComponentIcon") },
+					{ TEXT("MounteaAttachableComponent"), TEXT("AttachableComponentIcon") },
+					{ TEXT("MounteaAdvancedAttachmentSlot"), TEXT("AttachmentSlotIcon") },
+					{ TEXT("MounteaAdvancedInventoryUIConfig"), TEXT("MounteaAdvancedInventoryUISettingsConfig") },
+					{ TEXT("MounteaAdvancedInventoryPreviewEnvironmentSettings"), TEXT("PreviewEnvironmentSettingsIcon") },
+					{ TEXT("MounteaSelectableInventoryItemAction"), TEXT("ItemActionIcon") },
+					{ TEXT("MounteaCallbackInventoryItemAction"), TEXT("ItemActionCallbackIcon") },
+					{ TEXT("MounteaAdvancedInventoryPayloadsConfig"), TEXT("PayloadConfigIcon") },
+					{ TEXT("MounteaAdvancedInventoryLoadoutConfig"), TEXT("LoadoutConfiguration") },
+					{ TEXT("MounteaAdvancedInventoryLoadoutComponent"), TEXT("LoadoutComponent") },
+					{ TEXT("MounteaAdvancedInventoryLoadoutItem"), TEXT("LoadoutItem") },
+					{ TEXT("MounteaRecipeTemplate"), TEXT("RecipeBook") },
+					{ TEXT("MounteaRecipeIngredientsList"), TEXT("RecipeIngredientsList") },
+					{ TEXT("MounteaRecipeIngredient"), TEXT("MounteaRecipeIngredients") },
+					{ TEXT("MounteaCraftingParticipantComponent"), TEXT("CraftingParticipantIcon") },
+					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
+					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") }
+				};
 
-				FSlateImageBrush* MounteaAdvancedInventoryThemeConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ThemeConfigClassIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* MounteaAdvancedInventoryThemeConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ThemeConfigClassIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (MounteaAdvancedInventoryThemeConfigClassIcon && MounteaAdvancedInventoryThemeConfigClassThumb)
+				const auto RegisterClassIcon = [this](const TCHAR* ClassName, const TCHAR* ResourceName)
 				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryThemeConfig", MounteaAdvancedInventoryThemeConfigClassThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryThemeConfig", MounteaAdvancedInventoryThemeConfigClassIcon);
-				}
+					const FString resourcePath = FString::Printf(TEXT("Resources/ClassIcons/%s"), ResourceName);
+					const FString brushPath = AdvancedInventorySet->RootToContentDir(*resourcePath, TEXT(".png"));
+					const FString thumbnailKey = FString::Printf(TEXT("ClassThumbnail.%s"), ClassName);
+					const FString iconKey = FString::Printf(TEXT("ClassIcon.%s"), ClassName);
 
-				FSlateImageBrush* MounteaAdvancedInventoryInteractiveWidgetConfigClassThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InteractiveWidgetConfigIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* MounteaAdvancedInventoryInteractiveWidgetConfigClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InteractiveWidgetConfigIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (MounteaAdvancedInventoryInteractiveWidgetConfigClassIcon && MounteaAdvancedInventoryInteractiveWidgetConfigClassThumb)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryInteractiveWidgetConfig", MounteaAdvancedInventoryInteractiveWidgetConfigClassThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryInteractiveWidgetConfig", MounteaAdvancedInventoryInteractiveWidgetConfigClassIcon);
-				}
+					AdvancedInventorySet->Set(*thumbnailKey, new FSlateImageBrush(brushPath, FVector2D(128.f, 128.f)));
+					AdvancedInventorySet->Set(*iconKey, new FSlateImageBrush(brushPath, FVector2D(16.f, 16.f)));
+				};
 
-				FSlateImageBrush* AttachmentContainerThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentContainerIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* AttachmentContainerIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentContainerIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (AttachmentContainerThumb && AttachmentContainerIcon)
+				for (const FClassIconMapping& classIconMapping : classIconMappings)
 				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAttachmentContainerComponent", AttachmentContainerThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAttachmentContainerComponent", AttachmentContainerIcon);
-				}
-
-				FSlateImageBrush* EquipmentComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/EquipmentComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* EquipmentComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/EquipmentComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (EquipmentComponentThumb && EquipmentComponentIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaEquipmentComponent", EquipmentComponentThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaEquipmentComponent", EquipmentComponentIcon);
-				}
-
-				FSlateImageBrush* InventoryComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* InventoryComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (InventoryComponentThumb && InventoryComponentIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaInventoryComponent", InventoryComponentThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryComponent", InventoryComponentIcon);
-				}
-
-				FSlateImageBrush* MounteaInventoryUIComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUIComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* MounteaInventoryUIComponentClassIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/InventoryUIComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (MounteaInventoryUIComponentThumb && MounteaInventoryUIComponentClassIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaInventoryUIComponent", MounteaInventoryUIComponentThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaInventoryUIComponent", MounteaInventoryUIComponentClassIcon);
-				}
-
-				FSlateImageBrush* AttachableComponentThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachableComponentIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* AttachableComponentIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachableComponentIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (AttachableComponentThumb && AttachableComponentIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAttachableComponent", AttachableComponentThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAttachableComponent", AttachableComponentIcon);
-				}
-
-				FSlateImageBrush* AttachableSlotThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentSlotIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* AttachableSlotIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/AttachmentSlotIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (AttachableSlotThumb && AttachableSlotIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedAttachmentSlot", AttachableSlotThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedAttachmentSlot", AttachableSlotIcon);
-				}
-				
-				FSlateImageBrush* InventoryUIConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventoryUISettingsConfig"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* InventoryUIConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/MounteaAdvancedInventoryUISettingsConfig"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (InventoryUIConfigThumb && InventoryUIConfigIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryUIConfig", InventoryUIConfigThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryUIConfig", InventoryUIConfigIcon);
-				}
-				
-				FSlateImageBrush* InteractiveWidgetEnvironmentConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PreviewEnvironmentSettingsIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* InteractiveWidgetEnvironmentConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PreviewEnvironmentSettingsIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (InteractiveWidgetEnvironmentConfigThumb && InteractiveWidgetEnvironmentConfigIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPreviewEnvironmentSettings", InteractiveWidgetEnvironmentConfigIcon);
-				}
-				
-				FSlateImageBrush* InventorySelectableInventoryItemActionThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* InventorySelectableInventoryItemActionIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (InventorySelectableInventoryItemActionThumb && InventorySelectableInventoryItemActionIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaSelectableInventoryItemAction", InventorySelectableInventoryItemActionThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaSelectableInventoryItemAction", InventorySelectableInventoryItemActionIcon);
-				}
-				
-				FSlateImageBrush* InventoryCallbackInventoryItemActionThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionCallbackIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* InventoryCallbackInventoryItemActionIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/ItemActionCallbackIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (InventoryCallbackInventoryItemActionThumb && InventoryCallbackInventoryItemActionIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaCallbackInventoryItemAction", InventoryCallbackInventoryItemActionIcon);
-				}
-				
-				FSlateImageBrush* MounteaAdvancedInventoryPayloadsConfigThumb = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PayloadConfigIcon"), TEXT(".png")), FVector2D(128.f, 128.f));
-				FSlateImageBrush* MounteaAdvancedInventoryPayloadsConfigIcon = new FSlateImageBrush(AdvancedInventorySet->RootToContentDir(TEXT("Resources/ClassIcons/PayloadConfigIcon"), TEXT(".png")), FVector2D(16.f, 16.f));
-				if (MounteaAdvancedInventoryPayloadsConfigThumb && MounteaAdvancedInventoryPayloadsConfigIcon)
-				{
-					AdvancedInventorySet->Set("ClassThumbnail.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigThumb);
-					AdvancedInventorySet->Set("ClassIcon.MounteaAdvancedInventoryPayloadsConfig", MounteaAdvancedInventoryPayloadsConfigIcon);
+					RegisterClassIcon(classIconMapping.ClassName, classIconMapping.ResourceName);
 				}
 
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
-
 		}
 	}
 
@@ -234,7 +163,15 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction>());	
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryPayloadConfigs_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetEnvironmentConfig_AssetAction>());
-
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutConfigs_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutItem_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutComponent_AssetAction>());
+		
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeTemplate_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredientsList_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredient_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingConfig_AssetAction>());
+		
 		for (const auto& Itr : AssetActions)
 		{
 			FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(Itr.ToSharedRef());
@@ -304,56 +241,58 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	}
 	
 	// Validate WebBrowserWidget
-	if (!FModuleManager::Get().IsModuleLoaded("WebBrowserWidget"))
 	{
-		FText errorTitle = NSLOCTEXT("MounteaInventory", "WebBrowserMissing", "⚠ Missing Plugin ⚠");
-		FText errorMessage = NSLOCTEXT("MounteaInventory", "WebBrowserMissingMessage", 
-			"The 'Web Browser Widget' plugin is required for the Item Template Editor system.\n\n"
-			"We need to enable the plugin and restart the Editor. Sorry for the inconvenience.");
-		
-		FMessageDialog::Open(EAppMsgType::Ok, errorMessage, errorTitle);
-		
-		FString projectFilePath = FPaths::ProjectDir() / FApp::GetProjectName() + TEXT(".uproject");			
-		FString jsonString;
-		if (FFileHelper::LoadFileToString(jsonString, *projectFilePath))
+		if (!FModuleManager::Get().IsModuleLoaded("WebBrowserWidget"))
 		{
-			TSharedPtr<FJsonObject> jsonObject;
-			TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(jsonString);
-				
-			if (FJsonSerializer::Deserialize(reader, jsonObject) && jsonObject.IsValid())
+			FText errorTitle = NSLOCTEXT("MounteaInventory", "WebBrowserMissing", "⚠ Missing Plugin ⚠");
+			FText errorMessage = NSLOCTEXT("MounteaInventory", "WebBrowserMissingMessage", 
+				"The 'Web Browser Widget' plugin is required for the Item Template Editor system.\n\n"
+				"We need to enable the plugin and restart the Editor. Sorry for the inconvenience.");
+		
+			FMessageDialog::Open(EAppMsgType::Ok, errorMessage, errorTitle);
+		
+			FString projectFilePath = FPaths::ProjectDir() / FApp::GetProjectName() + TEXT(".uproject");			
+			FString jsonString;
+			if (FFileHelper::LoadFileToString(jsonString, *projectFilePath))
 			{
-				TArray<TSharedPtr<FJsonValue>> pluginsArray;
-				if (jsonObject->HasField(TEXT("Plugins")))
-					pluginsArray = jsonObject->GetArrayField(TEXT("Plugins"));
-					
-				bool bExists = false;
-				for (const TSharedPtr<FJsonValue>& plugin : pluginsArray)
+				TSharedPtr<FJsonObject> jsonObject;
+				TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(jsonString);
+				
+				if (FJsonSerializer::Deserialize(reader, jsonObject) && jsonObject.IsValid())
 				{
-					TSharedPtr<FJsonObject> pluginObj = plugin->AsObject();
-					if (pluginObj.IsValid() && pluginObj->GetStringField(TEXT("Name")) == TEXT("WebBrowserWidget"))
+					TArray<TSharedPtr<FJsonValue>> pluginsArray;
+					if (jsonObject->HasField(TEXT("Plugins")))
+						pluginsArray = jsonObject->GetArrayField(TEXT("Plugins"));
+					
+					bool bExists = false;
+					for (const TSharedPtr<FJsonValue>& plugin : pluginsArray)
 					{
-						pluginObj->SetBoolField(TEXT("Enabled"), true);
-						bExists = true;
-						break;
+						TSharedPtr<FJsonObject> pluginObj = plugin->AsObject();
+						if (pluginObj.IsValid() && pluginObj->GetStringField(TEXT("Name")) == TEXT("WebBrowserWidget"))
+						{
+							pluginObj->SetBoolField(TEXT("Enabled"), true);
+							bExists = true;
+							break;
+						}
 					}
-				}
 					
-				if (!bExists)
-				{
-					TSharedPtr<FJsonObject> newPlugin = MakeShareable(new FJsonObject());
-					newPlugin->SetStringField(TEXT("Name"), TEXT("WebBrowserWidget"));
-					newPlugin->SetBoolField(TEXT("Enabled"), true);
-					pluginsArray.Add(MakeShareable(new FJsonValueObject(newPlugin)));
-				}
+					if (!bExists)
+					{
+						TSharedPtr<FJsonObject> newPlugin = MakeShareable(new FJsonObject());
+						newPlugin->SetStringField(TEXT("Name"), TEXT("WebBrowserWidget"));
+						newPlugin->SetBoolField(TEXT("Enabled"), true);
+						pluginsArray.Add(MakeShareable(new FJsonValueObject(newPlugin)));
+					}
 					
-				jsonObject->SetArrayField(TEXT("Plugins"), pluginsArray);
+					jsonObject->SetArrayField(TEXT("Plugins"), pluginsArray);
 					
-				FString outputString;
-				TSharedRef<TJsonWriter<>> writer = TJsonWriterFactory<>::Create(&outputString);
-				if (FJsonSerializer::Serialize(jsonObject.ToSharedRef(), writer))
-				{
-					if (FFileHelper::SaveStringToFile(outputString, *projectFilePath))
-						FUnrealEdMisc::Get().RestartEditor(false);
+					FString outputString;
+					TSharedRef<TJsonWriter<>> writer = TJsonWriterFactory<>::Create(&outputString);
+					if (FJsonSerializer::Serialize(jsonObject.ToSharedRef(), writer))
+					{
+						if (FFileHelper::SaveStringToFile(outputString, *projectFilePath))
+							FUnrealEdMisc::Get().RestartEditor(false);
+					}
 				}
 			}
 		}
@@ -412,7 +351,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterTabSpawners()
 	)
 	.SetDisplayName(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
 	.SetTooltipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Open the Mountea Inventory Template Editor"))
-	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon")); 
+	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor")); 
 }
 
 void FMounteaAdvancedInventorySystemEditor::UnregisterTabSpawners()
@@ -448,6 +387,8 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 		[
 			newEditor
 		];
+	
+	newTab->SetTabIcon(FAppStyle::GetBrush("MAISStyleSet.TemplatesEditor"));
 
 	return newTab;
 }
@@ -536,12 +477,12 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 {
 	FMenuBuilder MenuBuilder(true, PluginCommands);
 
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Editor", "🎨 Mountea Item Templates Editor"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Editor", "Mountea Item Templates Editor"));
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_TemplateEditorButton_Label", "Mountea Inventory Template Editor"),
 			LOCTEXT("MounteaSystemEditor_TemplateEditorButton_ToolTip", "🎨 Open Mountea Inventory Template Editor\n\n❔ Create and edit Mountea Inventory Item Templates with a comprehensive visual editor. Design items with properties, assets, materials, and custom attributes.\n\n💡 Features include:\n- Visual template creation\n- Asset management\n- Property validation\n- Items import/export"),
-			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.InventorySystemIcon"),
+			FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor"),
 			FUIAction(
 				FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::OpenInventoryTemplateEditor)
 			)
@@ -549,7 +490,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Content", "📦 Mountea Plugin Content"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Content", "Mountea Plugin Content"));
 	MenuBuilder.AddMenuEntry(
 				LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Label", "Open Example Level"),
 				LOCTEXT("MounteaSystemEditor_OpenExampleLevel_ToolTip", "🌄 Opens an example level demonstrating Mountea Advanced Inventory & Equipment System"),
@@ -590,7 +531,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	);
 	MenuBuilder.EndSection();
 	
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Config", "📄 Mountea Advanced Inventory Configs"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Config", "Mountea Advanced Inventory Configs"));
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_ConfigButton_Label", "Mountea Advanced Inventory Config"),
@@ -621,7 +562,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 	
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "⚙ Mountea Advanced Inventory Settings"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Settings", "Mountea Advanced Inventory Settings"));
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_SettingsButton_Label", "Mountea Advanced Inventory Settings"),
@@ -643,7 +584,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 
-	MenuBuilder.BeginSection("MounteaMenu_Links", LOCTEXT("MounteaMenuOptions_Options", "🌐 Mountea Links"));
+	MenuBuilder.BeginSection("MounteaMenu_Links", LOCTEXT("MounteaMenuOptions_Options", "Mountea Links"));
 	{
 		MenuBuilder.AddMenuEntry(
 			LOCTEXT("MounteaSystemEditor_SupportButton_Label", "Mountea Support"),
@@ -665,7 +606,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 				FExecuteAction::CreateLambda([this]()-> void
 				{
 					FPlatformProcess::LaunchURL(
-						TEXT("https://github.com/Mountea-Framework/MounteaInventoryEquipment/wiki/Getting-Started"), nullptr, nullptr);						
+						TEXT("https://mountea.tools/docs/advancedinventoryequipmentsystem/overview/"), nullptr, nullptr);						
 				})
 			)
 		);
@@ -684,7 +625,7 @@ TSharedRef<SWidget> FMounteaAdvancedInventorySystemEditor::MakeMounteaMenuWidget
 	}
 	MenuBuilder.EndSection();
 
-	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Tools", "⚒ Mountea Tools"));
+	MenuBuilder.BeginSection("MounteaMenu_Tools", LOCTEXT("MounteaMenuOptions_Tools", "Mountea Tools"));
 	{
 		MenuBuilder.AddMenuEntry(
 		LOCTEXT("MounteaSystemEditor_InventoryManagerButton_Label", "Mountea Inventory Manager"),

@@ -30,7 +30,7 @@ class AActor;
  * systems with additional equipment-specific interfaces and behaviors.
  * Enhances Attachable System.
  *
- * @see [Equipment System](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/EquipmentSystem)
+ * @see [Equipment System](https://mountea.tools/docs/advancedinventoryequipmentsystem/equipmentsystem/equipmentsystem/)
  * @see UMounteaAttachmentContainerComponent
  * @see IMounteaAdvancedEquipmentInterface
  */
@@ -49,15 +49,15 @@ public:
 	
 public:
 	
-	virtual AActor* EquipItem_Implementation(const FInventoryItem& ItemDefinition) override;
-	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FInventoryItem& ItemDefinition) override;
-	virtual bool UnequipItem_Implementation(const FInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) override;
+	virtual AActor* EquipItem_Implementation(const FMounteaInventoryItem& ItemDefinition) override;
+	virtual AActor* EquipItemToSlot_Implementation(const FName& SlotId, const FMounteaInventoryItem& ItemDefinition) override;
+	virtual bool UnequipItem_Implementation(const FMounteaInventoryItem& ItemDefinition, bool bUseFallbackSlot = false) override;
 	virtual bool UnequipItemFromSlot_Implementation(const FName& SlotId, bool bUseFallbackSlot = false) override;
-	virtual bool IsEquipmentItemEquipped_Implementation(const FInventoryItem& ItemDefinition) const override;
-	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FInventoryItem& ItemDefinition, const FName& SlotName) const override;
-	virtual bool ActivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+	virtual bool IsEquipmentItemEquipped_Implementation(const FMounteaInventoryItem& ItemDefinition) const override;
+	virtual bool IsEquipmentItemEquippedInSlot_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& SlotName) const override;
+	virtual bool ActivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
 	virtual bool ActivateQuickUseItem_Implementation(const FName& SlotId, const FName& TargetSlotId) override;
-	virtual bool DeactivateEquipmentItem_Implementation(const FInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
+	virtual bool DeactivateEquipmentItem_Implementation(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId) override;
 	virtual bool AnimAttachItem_Implementation() override;
 	virtual bool AnimQuickItemUsed_Implementation() override;
 	virtual bool TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const override;
@@ -72,11 +72,17 @@ protected:
 
 	bool BuildEquipmentTransitionContext(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentItemState ExpectedState,
 		EEquipmentItemState NewState, bool bResolveAsActivation, FEquipmentTransitionContext& OutContext);
+	bool BuildTransitionContextForType(const FGuid& ItemGuid, const FName& TargetSlotId,
+		EEquipmentTransitionType TransitionType, FEquipmentTransitionContext& OutContext);
 	bool ResolveTransitionDefinition(EEquipmentTransitionType TransitionType, EEquipmentItemState& OutExpectedState,
 		EEquipmentItemState& OutNewState, bool& OutResolveAsActivation) const;
 	bool ExecuteEquipmentStateTransition(const FEquipmentTransitionContext& Context, bool bLocalOnly = false);
+	bool ExecuteItemTransitionRequest(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId,
+		EEquipmentTransitionType TransitionType);
 	bool ShouldUseDeferredTransition(const FEquipmentTransitionContext& Context, EEquipmentTransitionType TransitionType) const;
-	void ArmPendingActivation(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+	bool ValidateEquipRequest(const FMounteaInventoryItem& ItemDefinition) const;
+	bool TryExecuteEquipOverride(const FMounteaInventoryItem& ItemDefinition, AActor*& OutSpawnedActor) const;
+	void ArmPendingActivation(const FMounteaInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
 		EEquipmentTransitionType TransitionType, UAnimMontage* Montage = nullptr, float MontageDuration = -1.f);
 	double ResolvePendingTransitionTimeout(UAnimMontage* Montage, float MontageDuration) const;
 	bool IsPendingActivationExpired() const;
@@ -86,20 +92,20 @@ protected:
 	void ResetCurrentTransitionType();
 	UAnimInstance* ResolveOwnerAnimInstance() const;
 	UAnimMontage* ResolveTransitionMontage(const FEquipmentTransitionContext& Context, EEquipmentTransitionType TransitionType) const;
-	bool TryStartTransitionMontage(const FInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
+	bool TryStartTransitionMontage(const FMounteaInventoryItem& ItemDefinition, const FEquipmentTransitionContext& Context,
 		EEquipmentTransitionType TransitionType);
 	
 	bool IsAuthority() const;
 	UFUNCTION(Server, Reliable)
-	void Server_EquipItem(const FInventoryItem& ItemDefinition);
+	void Server_EquipItem(const FMounteaInventoryItem& ItemDefinition);
 	UFUNCTION(Server, Reliable)
-	void Server_EquipItemToSlot(const FInventoryItem& ItemDefinition, const FName& SlotId);
+	void Server_EquipItemToSlot(const FMounteaInventoryItem& ItemDefinition, const FName& SlotId);
 	UFUNCTION(Server, Reliable)
-	void Server_UnequipItem(const FInventoryItem& ItemDefinition, const bool bUseFallbackSlot);
+	void Server_UnequipItem(const FMounteaInventoryItem& ItemDefinition, const bool bUseFallbackSlot);
 	UFUNCTION(Server, Reliable)
-	void Server_ActivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	void Server_ActivateEquipmentItem(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
 	UFUNCTION(Server, Reliable)
-	void Server_DeactivateEquipmentItem(const FInventoryItem& ItemDefinition, const FName& TargetSlotId);
+	void Server_DeactivateEquipmentItem(const FMounteaInventoryItem& ItemDefinition, const FName& TargetSlotId);
 	UFUNCTION(Server, Reliable)
 	void Server_AnimAttachItem(const FGuid& ItemGuid, const FName& TargetSlotId, EEquipmentTransitionType TransitionType);
 	UFUNCTION(Server, Reliable)
