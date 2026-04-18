@@ -201,7 +201,7 @@ ECraftingStationState UMounteaCraftingStatics::GetCraftingStationState(UObject* 
 	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_GetCraftingStationState(Target) : ECraftingStationState::EASS_Inactive;
 }
 
-bool UMounteaCraftingStatics::SetCraftingStationState(UObject* Target, ECraftingStationState NewState)
+bool UMounteaCraftingStatics::SetCraftingStationState(UObject* Target, const ECraftingStationState NewState)
 {
 	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_SetCraftingStationState(Target, NewState) : false;
 }

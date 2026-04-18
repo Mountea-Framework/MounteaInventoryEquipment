@@ -33,22 +33,22 @@ void FMounteaAdvancedInventoryDeveloperStyle::Create()
 	StyleSet = MakeShareable(new FSlateStyleSet(GetAppStyleSetName()));
 	StyleSet->SetContentRoot(IPluginManager::Get().FindPlugin("MounteaAdvancedInventorySystem")->GetBaseDir() / TEXT("Resources"));
 
-	StyleSet->Set("MAISStyleSet.MounteaLogo.Small", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon16x16));
+	StyleSet->Set("MAISStyleSet.MounteaLogo.small", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon16x16));
 	StyleSet->Set("MAISStyleSet.MounteaLogo", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon40x40));
 
-	StyleSet->Set("MDSStyleSet.K2Node_ValidateIcon.Small", new SVG_BRUSH_TINT(TEXT("WebIcons/shield-check"), Icon20x20, FLinearColor::White));
-	StyleSet->Set("MDSStyleSet.K2Node_ValidateIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/shield-check"), Icon40x40, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_ValidateIcon.small", new SVG_BRUSH_TINT(TEXT("WebIcons/shield-check"), Icon20x20, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_ValidateIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/shield-check"), Icon40x40, FLinearColor::White));
 
-	StyleSet->Set("MDSStyleSet.K2Node_SetterIcon.Small", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon20x20, FLinearColor::White));
-	StyleSet->Set("MDSStyleSet.K2Node_SetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon40x40, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon.small", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon20x20, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon40x40, FLinearColor::White));
 	
-	StyleSet->Set("MDSStyleSet.K2Node_GetterIcon.Small", new SVG_BRUSH_TINT(TEXT("WebIcons/sunset"), Icon20x20, FLinearColor::White));
-	StyleSet->Set("MDSStyleSet.K2Node_GetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunset"), Icon40x40, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_GetterIcon.small", new SVG_BRUSH_TINT(TEXT("WebIcons/sunset"), Icon20x20, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_GetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunset"), Icon40x40, FLinearColor::White));
 	
-	StyleSet->Set("MAISStyleSet.K2Node_SwitchIcon.Small", new SVG_BRUSH_TINT(TEXT("WebIcons/trending-up-down"), Icon20x20, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_SwitchIcon.small", new SVG_BRUSH_TINT(TEXT("WebIcons/trending-up-down"), Icon20x20, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.K2Node_SwitchIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/trending-up-down"), Icon40x40, FLinearColor::White));
 	
-	StyleSet->Set("MAISStyleSet.K2Node_SetPropertyByName.Small", new SVG_BRUSH_TINT(TEXT("WebIcons/circuit-board"), Icon20x20, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_SetPropertyByName.small", new SVG_BRUSH_TINT(TEXT("WebIcons/circuit-board"), Icon20x20, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.K2Node_SetPropertyByName", new SVG_BRUSH_TINT(TEXT("WebIcons/circuit-board"), Icon40x40, FLinearColor::White));
 }
 

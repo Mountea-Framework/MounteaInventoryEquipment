@@ -48,11 +48,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
+		meta=(AutoCreateRefTerm="RecipeGuid"),
 		DisplayName="Get Recipe")
 	static UMounteaRecipeTemplate* GetRecipe(UObject* Target, const FGuid& RecipeGuid);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
+		meta=(AutoCreateRefTerm="CraftingStationType"),
 		DisplayName="Get Recipes")
 	static TArray<UMounteaRecipeTemplate*> GetRecipes(UObject* Target, const FGameplayTag& CraftingStationType);
 
@@ -145,6 +147,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(CustomTag="MounteaK2Setter"),
+		meta=(AutoCreateRefTerm="NewState"),
 		DisplayName="Set Crafting Station State")
 	static bool SetCraftingStationState(UObject* Target, ECraftingStationState NewState);
 
