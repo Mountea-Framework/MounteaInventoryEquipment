@@ -1,9 +1,9 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
 //
-// - You may use this solution in commercial products, provided the product is not 
+// - You may use this solution in commercial products, provided the product is not
 //   this solution itself (or unless significant modifications have been made to the solution).
 // - You may not resell or redistribute the original, unmodified solution.
 //
@@ -13,6 +13,7 @@
 #include "Statics/MounteaCraftingStatics.h"
 
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
+#include "Definitions/MounteaCraftingBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaRecipeIngredient.h"
 #include "Definitions/MounteaRecipeIngredientsList.h"
@@ -72,14 +73,24 @@ FMounteaCraftingResult UMounteaCraftingStatics::StartCrafting(UObject* Target, U
 	return IMounteaAdvancedCraftingParticipantInterface::Execute_StartCrafting(Target, TemplateToCraft, Ingredients);
 }
 
-TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaCraftingStatics::GetParentInventory_Implementation(UObject* Target)
+TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaCraftingStatics::GetParentInventory(UObject* Target)
 {
 	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_GetParentInventory(Target) : TScriptInterface<IMounteaAdvancedInventoryInterface>();
 }
 
-bool UMounteaCraftingStatics::SetParentInventory_Implementation(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
+bool UMounteaCraftingStatics::SetParentInventory(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
 	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_SetParentInventory(Target, NewParentInventory) : false;
+}
+
+bool UMounteaCraftingStatics::StartUsingCraftingStation(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_StartUsingCraftingStation(Target, Station) : false;
+}
+
+bool UMounteaCraftingStatics::StopUsingCraftingStation(UObject* Target)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_StopUsingCraftingStation(Target) : false;
 }
 
 TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetAllRecipeTemplates()
@@ -91,15 +102,15 @@ TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetAllRecipeTemplates()
 	if (!IsValid(craftingConfig))
 		return TSet<UMounteaRecipeTemplate*>();
 	const auto& allowedRecipes = craftingConfig->AllowedRecipes;
-	
+
 	TSet<UMounteaRecipeTemplate*> returnValue;
 	returnValue.Reserve(allowedRecipes.Num());
-	
+
 	for(const auto& recipe : allowedRecipes)
 	{
 		returnValue.Add(recipe.Get());
 	}
-	
+
 	return returnValue;
 }
 
@@ -178,4 +189,29 @@ bool UMounteaCraftingStatics::IsCraftingPlaceOccupied(UObject* Target)
 int32 UMounteaCraftingStatics::GetCraftingPlaceCapacity(UObject* Target)
 {
 	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_GetCraftingPlaceCapacity(Target) : INDEX_NONE;
+}
+
+bool UMounteaCraftingStatics::CanBeUsed(UObject* Target)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_CanBeUsed(Target) : false;
+}
+
+ECraftingStationState UMounteaCraftingStatics::GetCraftingStationState(UObject* Target)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_GetCraftingStationState(Target) : ECraftingStationState::EASS_Inactive;
+}
+
+bool UMounteaCraftingStatics::SetCraftingStationState(UObject* Target, ECraftingStationState NewState)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_SetCraftingStationState(Target, NewState) : false;
+}
+
+bool UMounteaCraftingStatics::StartUsing(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_StartUsing(Target, Participant) : false;
+}
+
+bool UMounteaCraftingStatics::StopUsing(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant)
+{
+	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_StopUsing(Target, Participant) : false;
 }
