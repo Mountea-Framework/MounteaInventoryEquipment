@@ -15,6 +15,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedCraftingParticipantInterface.generated.h"
 
+class IMounteaAdvancedCraftingStationInterface;
 class IMounteaAdvancedInventoryInterface;
 struct FGameplayTag;
 struct FMounteaCraftingResult;
@@ -80,6 +81,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	bool SetParentInventory(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 	virtual bool SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool StartUsingCraftingStation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station);
+	virtual bool StartUsingCraftingStation_Implementation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool StopUsingCraftingStation();
+	virtual bool StopUsingCraftingStation_Implementation() = 0;
 	
 public:
 	

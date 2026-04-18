@@ -1,9 +1,9 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
 //
-// - You may use this solution in commercial products, provided the product is not 
+// - You may use this solution in commercial products, provided the product is not
 //   this solution itself (or unless significant modifications have been made to the solution).
 // - You may not resell or redistribute the original, unmodified solution.
 //
@@ -14,7 +14,9 @@
 
 #include "Net/UnrealNetwork.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
+#include "Definitions/MounteaCraftingBaseEnums.h"
 #include "Definitions/MounteaRecipeTemplate.h"
+#include "Interfaces/Crafting/MounteaAdvancedCraftingStationInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Statics/MounteaCraftingStatics.h"
@@ -25,9 +27,9 @@ UMounteaCraftingParticipantComponent::UMounteaCraftingParticipantComponent()
 	PrimaryComponentTick.bStartWithTickEnabled = false;
 
 	UMounteaCraftingParticipantComponent::SetComponentTickEnabled(false);
-	
+
 	bAutoActivate = true;
-	
+
 	SetIsReplicatedByDefault(true);
 	SetActiveFlag(true);
 
@@ -45,11 +47,16 @@ void UMounteaCraftingParticipantComponent::GetLifetimeReplicatedProps(TArray<FLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(UMounteaCraftingParticipantComponent, KnownRecipes, COND_InitialOrOwner);
+	DOREPLIFETIME_CONDITION(UMounteaCraftingParticipantComponent, CraftingStation, COND_InitialOrOwner);
 }
 
 void UMounteaCraftingParticipantComponent::OnRep_KnownRecipes()
 {
 	// KnownRecipes updated by replication; delegates fire via PostRecipeLearned_Client / PostRecipeForgotten_Client.
+}
+
+void UMounteaCraftingParticipantComponent::OnRep_CraftingStation()
+{
 }
 
 void UMounteaCraftingParticipantComponent::InitializeInventoryAndEquipment()
@@ -81,7 +88,7 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::GetRecipes
 	for (UMounteaRecipeTemplate* recipe : knownRecipes)
 	{
 		if (!IsValid(recipe))
-		continue;
+			continue;
 
 		if (!CraftingStationType.IsValid() || recipe->RequiredCraftingPlace == CraftingStationType)
 			result.Add(recipe);
@@ -171,6 +178,40 @@ bool UMounteaCraftingParticipantComponent::SetParentInventory_Implementation(con
 	return true;
 }
 
+bool UMounteaCraftingParticipantComponent::StartUsingCraftingStation_Implementation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station)
+{
+	if (!IsValid(Station.GetObject()))
+		return false;
+	if (Station == CraftingStation)
+		return false;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		Server_StartUsingCraftingStation(Station);
+		return true;
+	}
+
+	CraftingStation = Station;
+	IMounteaAdvancedCraftingStationInterface::Execute_StartUsing(Station.GetObject(), this);
+	return true;
+}
+
+bool UMounteaCraftingParticipantComponent::StopUsingCraftingStation_Implementation()
+{
+	if (!IsValid(CraftingStation.GetObject()))
+		return false;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		Server_StopUsingCraftingStation();
+		return true;
+	}
+
+	IMounteaAdvancedCraftingStationInterface::Execute_StopUsing(CraftingStation.GetObject(), this);
+	CraftingStation = nullptr;
+	return true;
+}
+
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::ResolveKnownRecipeTemplates(const TArray<FGuid>& KnownRecipeGuids)
 {
 	if (KnownRecipeGuids.Num() == 0)
@@ -214,6 +255,16 @@ void UMounteaCraftingParticipantComponent::Server_StartCrafting_Implementation(U
 	Execute_StartCrafting(this, TemplateToCraft, Ingredients);
 }
 
+void UMounteaCraftingParticipantComponent::Server_StartUsingCraftingStation_Implementation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station)
+{
+	Execute_StartUsingCraftingStation(this, Station);
+}
+
+void UMounteaCraftingParticipantComponent::Server_StopUsingCraftingStation_Implementation()
+{
+	Execute_StopUsingCraftingStation(this);
+}
+
 void UMounteaCraftingParticipantComponent::PostRecipeLearned_Client_Implementation(UMounteaRecipeTemplate* RecipeTemplate)
 {
 	OnRecipeLearned.Broadcast(RecipeTemplate);
@@ -228,4 +279,3 @@ void UMounteaCraftingParticipantComponent::PostCraftingFinished_Client_Implement
 {
 	OnCraftingFinished.Broadcast(Result);
 }
-
