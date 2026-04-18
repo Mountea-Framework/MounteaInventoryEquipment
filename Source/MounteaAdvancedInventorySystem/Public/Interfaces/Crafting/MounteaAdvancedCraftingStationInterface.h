@@ -16,6 +16,9 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedCraftingStationInterface.generated.h"
 
+class IMounteaAdvancedCraftingParticipantInterface;
+enum class ECraftingStationState : uint8;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedCraftingStationInterface : public UInterface
 {
@@ -32,6 +35,18 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingStationInterfac
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool CanBeUsed() const;
+	virtual bool CanBeUsed_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool StartUsing(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
+	virtual bool StartUsing_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool StopUsing(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
+	virtual bool StopUsing_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	FGameplayTag GetCraftingPlaceType() const;
 	virtual FGameplayTag GetCraftingPlaceType_Implementation() const = 0;
 	
@@ -42,4 +57,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	int32 GetCraftingPlaceCapacity() const;
 	virtual int32 GetCraftingPlaceCapacity_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	ECraftingStationState GetCraftingStationState() const;
+	virtual ECraftingStationState GetCraftingStationState_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	bool SetCraftingStationState(const ECraftingStationState NewCraftingStationState);
+	virtual bool SetCraftingStationState_Implementation(const ECraftingStationState NewCraftingStationState) = 0;
+	
+	
 };
