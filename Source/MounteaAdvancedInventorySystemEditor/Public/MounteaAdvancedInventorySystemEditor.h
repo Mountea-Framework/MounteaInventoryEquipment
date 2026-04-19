@@ -41,7 +41,6 @@ private:
 	void UIConfigButtonClicked() const;
 	void EquipmentConfigButtonClicked() const;
 	void EditorSettingsButtonClicked() const;
-	TSharedRef<SWidget> MakeMounteaMenuWidget();
 
 private:
 

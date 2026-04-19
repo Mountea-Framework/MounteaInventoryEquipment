@@ -23,3 +23,10 @@ namespace MounteaAdvancedInventoryBaseTypes
 	inline const FText CraftingClassesMenuEntry =		FText::FromString(TEXT("6. Crafting Configuration"));
 	inline const FText ConfigurationMenuEntry =			FText::FromString(TEXT("666. Configuration"));
 }
+
+namespace MounteaAdvancedInventoryToolbar
+{
+	static const FName MounteaSharedMenuName("MounteaFramework.SharedMenu");
+	static const FName MounteaSharedSectionName("MounteaFramework");
+	static const FName MounteaSharedButtonName("MounteaFrameworkButton");
+}
