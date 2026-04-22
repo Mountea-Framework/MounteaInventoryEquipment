@@ -34,6 +34,8 @@ class UMounteaAdvancedInventoryUIManagerInterface : public UInterface
 	GENERATED_BODY()
 };
 
+// TODO: Extract the wrapper to more generic global interface/subsystem that will live inside local player
+
 /**
  * IMounteaAdvancedInventoryUIManagerInterface manages user interface operations for inventory systems.
  * UI interfaces handle widget creation, visibility management, category selection, item interaction,

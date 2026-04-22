@@ -1,0 +1,87 @@
+﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+//
+// Developed for the Mountea Framework as a free tool. This solution is provided
+// for use and sharing without charge. Redistribution is allowed under the following conditions:
+//
+// - You may use this solution in commercial products, provided the product is not 
+//   this solution itself (or unless significant modifications have been made to the solution).
+// - You may not resell or redistribute the original, unmodified solution.
+//
+// For more information, visit: https://mountea.tools
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Interface.h"
+#include "MounteaAdvancedCraftingParticipantUIInterface.generated.h"
+
+UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
+class UMounteaAdvancedCraftingParticipantUIInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingParticipantUIInterface
+{
+	GENERATED_BODY()
+
+public:
+	
+	/**
+	 * Creates and initializes the main wrapper widget for the inventory UI.
+	 *
+	 * @return True if the wrapper widget was created successfully, otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	bool CreateWrapperWidget();
+	virtual bool CreateWrapperWidget_Implementation() = 0;
+
+	/**
+	 * Returns the currently active main wrapper widget.
+	 *
+	 * @return Wrapper widget if available, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	UUserWidget* GetWrapperWidget() const;
+	virtual UUserWidget* GetWrapperWidget_Implementation() const = 0;
+
+	/**
+	 * Removes and cleans up the main wrapper widget.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	void RemoveWrapperWidget();
+	virtual void RemoveWrapperWidget_Implementation() = 0;
+	
+	/**
+	 * Creates and initializes the Crafting widget inside the wrapper.
+	 *
+	 * @return True if the Crafting widget was created successfully, otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	bool CreateCraftingWidget();
+	virtual bool CreateCraftingWidget_Implementation() = 0;
+
+	/**
+	 * Returns the currently active Crafting widget.
+	 *
+	 * @return Crafting widget if available, otherwise nullptr.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	UUserWidget* GetCraftingWidget() const;
+	virtual UUserWidget* GetCraftingWidget_Implementation() const = 0;
+	
+	/**
+	 * Sets the Crafting UI from outside.
+	 * @return True if UI was successfully set, otherwise false.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	bool SetCraftingWidget(UUserWidget* NewCraftingWidget);
+	virtual bool SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget) = 0;
+
+	/**
+	 * Removes and cleans up the Crafting widget.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	void RemoveCraftingWidget();
+	virtual void RemoveCraftingWidget_Implementation() = 0;
+};
