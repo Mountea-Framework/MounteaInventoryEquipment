@@ -45,7 +45,7 @@ protected:
 public:
 	
 	virtual bool CreateWrapperWidget_Implementation() override;
-	virtual virtual UUserWidget* GetWrapperWidget_Implementation() const override;
+	virtual UUserWidget* GetWrapperWidget_Implementation() const override;
 	virtual void RemoveWrapperWidget_Implementation() override;
 	virtual bool CreateCraftingWidget_Implementation() override;
 	virtual UUserWidget* GetCraftingWidget_Implementation() const override

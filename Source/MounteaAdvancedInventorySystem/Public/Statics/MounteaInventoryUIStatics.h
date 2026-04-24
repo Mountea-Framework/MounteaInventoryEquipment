@@ -37,6 +37,7 @@ class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaAdvancedBaseInventoryWidgetInterface;
 class IMounteaInventorySystemWrapperWidgetInterface;
+class IMounteaAdvancedInventorySharedHUDInterface;
 
 UENUM(BlueprintType)
 enum class EMounteaThemeLevel : uint8
@@ -122,7 +123,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(Keywords="container,viewport,make,add"),
 		DisplayName="Create Wrapper Widget")
-	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 	/**
 	 * Initializes the Wrapper widget for the Mountea inventory system.
@@ -151,7 +152,7 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(Keywords="container,viewport"),
 		DisplayName="Get Wrapper Widget")
-	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static UWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 	/**
 	 * Removes the Wrapper UI from the viewport and cleans up resources.
@@ -163,7 +164,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(Keywords="container,viewport,destroy"),
 		DisplayName="Remove Wrapper Widget")
-	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 	
 	/**
 	 * Creates and initializes the Inventory Widget.
@@ -324,7 +325,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Commands",
 		meta=(CustomTag="MounteaK2Setter,MounteaK2Command"),
 		DisplayName="Inventory UI Manager - Execute Widget Command")
-	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 		const FString& Command, UObject* OptionalPayload);
 	
 	/**
@@ -453,7 +454,7 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Widget States")
-	static FGameplayTagContainer GetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static FGameplayTagContainer GetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 	/**
 	 * Overwrites UI Manager state tracking with a new tag container.
@@ -474,7 +475,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Widget States")
-	static void SetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static void SetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates);
 
 	/**
@@ -495,7 +496,7 @@ public:
 		meta=(AutoCreateRefTerm="Tag"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Add Widget State Tag")
-	static bool AddWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static bool AddWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
 
 	/**
@@ -514,7 +515,7 @@ public:
 		meta=(AutoCreateRefTerm="Tag"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Remove Widget State Tag")
-	static bool RemoveWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static bool RemoveWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
 
 	/**
@@ -535,7 +536,7 @@ public:
 		meta=(AutoCreateRefTerm="Tag"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Has Widget State Tag")
-	static bool HasWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static bool HasWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, bool bExactMatch = true);
 
 	/**
@@ -553,7 +554,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Clear Widget State Tags")
-	static void ClearWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static void ClearWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 	/**
 	 * Appends multiple Widget State tags to the target UI Manager's active state container.
@@ -570,7 +571,7 @@ public:
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Append Widget State Tags")
-	static bool AppendWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	static bool AppendWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend);
 	
 	/**
@@ -588,7 +589,7 @@ public:
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Has Any Widget States")
-	static bool HasAnyWidgetStates(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static bool HasAnyWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 	
 #pragma endregion
 	
@@ -945,7 +946,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Getter"))
-	static UUserWidget* GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static UWidget* GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 	/**
 	 * Sets the widget that will contain and manage inventory notifications.
@@ -955,7 +956,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"))
-	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, UUserWidget* NewNotificationContainer);
+	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, UWidget* NewNotificationContainer);
 
 	/**
 	 * Creates and displays a new inventory notification based on the provided data.
@@ -965,7 +966,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"))
-	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryNotificationData& NotificationData);
+	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, const FInventoryNotificationData& NotificationData);
 
 	/**
 	 * Removes all currently active inventory notifications from the UI.
@@ -974,7 +975,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(DefaultToSelf="Target"))
-	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
+	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 #pragma endregion
 		
