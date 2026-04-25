@@ -53,6 +53,7 @@
 #include "Slate/MounteaInventoryScrollBox.h"
 
 #include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
+#include "Subsystems/MounteaAdvancedInventorySharedHUDSubsystem.h"
 #include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
@@ -766,33 +767,31 @@ UObject* UMounteaInventoryUIStatics::GetInventoryUIManager(AActor* FromActor)
 	return localSubsystem ? localSubsystem->GetInventoryUIManager() : nullptr;
 }
 
-UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUISubsystem(APlayerController* FromPlayerController)
-{
-	if (!FromPlayerController) return nullptr;
-
-	UMounteaAdvancedInventoryUISubsystem* localSubsystem = FromPlayerController->GetLocalPlayer()->GetSubsystem<
-		UMounteaAdvancedInventoryUISubsystem>();
-	return localSubsystem;
-}
-
-UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUISubsystem_Generic(UObject* Context)
+UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUISubsystem(UObject* Context)
 {
 	if (!IsValid(Context))
 		return nullptr;
 
 	APlayerController* playerController = nullptr;
 
-	if (AActor* actor = Cast<AActor>(Context))
-		playerController = FindPlayerController(actor, 3);
-	else if (const UActorComponent* actorComp = Cast<UActorComponent>(Context))
+	if (playerController != Cast<APlayerController>(Context))
 	{
-		if (AActor* ownerActor = actorComp->GetOwner())
-			playerController = FindPlayerController(ownerActor, 3);
+		if (AActor* actor = Cast<AActor>(Context))
+			playerController = FindPlayerController(actor, 3);
+		else if (const UActorComponent* actorComp = Cast<UActorComponent>(Context))
+		{
+			if (AActor* ownerActor = actorComp->GetOwner())
+				playerController = FindPlayerController(ownerActor, 3);
+		}
+		else if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
+			playerController = FindPlayerController(userWidget->GetOwningPlayer(), 2);
 	}
-	else if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
-		playerController = FindPlayerController(userWidget->GetOwningPlayer(), 2);
 
-	return IsValid(playerController) ? GetInventoryUISubsystem(playerController) : nullptr;
+	if (!IsValid(playerController))
+		return nullptr;
+
+	const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
+	return IsValid(localPlayer) ? localPlayer->GetSubsystem<UMounteaAdvancedInventoryUISubsystem>() : nullptr;
 }
 
 int32 UMounteaInventoryUIStatics::MounteaInventoryScrollBox_GetChildrenCount(
@@ -870,6 +869,32 @@ void UMounteaInventoryUIStatics::SetSourceInventory(
 bool UMounteaInventoryUIStatics::IsValidWrapperWidget(const UObject* Target)
 {
 	return IsValid(Target) && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>();
+}
+
+UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIStatics::GetSharedHUDSubsystem(UObject* Context)
+{
+	if (!IsValid(Context))
+		return nullptr;
+
+	APlayerController* playerController = nullptr;
+	if (playerController != Cast<APlayerController>(Context))
+	{
+		if (AActor* actor = Cast<AActor>(Context))
+			playerController = FindPlayerController(actor, 3);
+		else if (const UActorComponent* actorComp = Cast<UActorComponent>(Context))
+		{
+			if (AActor* ownerActor = actorComp->GetOwner())
+				playerController = FindPlayerController(ownerActor, 3);
+		}
+		else if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
+			playerController = FindPlayerController(userWidget->GetOwningPlayer(), 2);
+	}
+
+	if (!IsValid(playerController))
+		return nullptr;
+
+	const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
+	return IsValid(localPlayer) ? localPlayer->GetSubsystem<UMounteaAdvancedInventorySharedHUDSubsystem>() : nullptr;
 }
 
 #pragma endregion 
