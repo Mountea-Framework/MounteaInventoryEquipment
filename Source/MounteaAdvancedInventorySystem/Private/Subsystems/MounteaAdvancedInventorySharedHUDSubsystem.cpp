@@ -108,8 +108,6 @@ bool UMounteaAdvancedInventorySharedHUDSubsystem::CreateWrapperWidget_Implementa
 	SharedUserInterface = newWidget;
 	ensure(SharedUserInterface != nullptr);
 	
-	SharedUserInterface->SetFocus();
-	
 	IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(SharedUserInterface, this);
 	
 	if (SharedUserInterface->Implements<UMounteaInventoryGenericWidgetInterface>())
