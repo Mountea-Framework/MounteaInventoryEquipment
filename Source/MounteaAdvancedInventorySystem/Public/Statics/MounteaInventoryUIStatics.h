@@ -72,7 +72,21 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIStatics : public UBl
 {
 	GENERATED_BODY()
 
-public:	
+public:
+	
+	/**
+	 * Attempts to find the Player Controller associated with the given Actor.
+	 *
+	 * The function recursively traverses the ownership hierarchy of the provided Actor
+	 * until it identifies an associated Player Controller or reaches the specified recursion depth limit.
+	 *
+	 * @param Actor The Actor from which to start searching for the Player Controller.
+	 * @param SearchDepth The current recursion depth used to prevent infinite loops (ideally starts at 0).
+	 * @return APlayerController if one is found; nullptr otherwise.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Find Player Controller")
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI);
 	
@@ -140,7 +154,7 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		meta=(Keywords="container,viewport,start"),
 		DisplayName="Initialize Wrapper Widget")
-	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
+	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent);
 
 	/**
 	 * Returns the currently active main wrapper widget.
@@ -152,7 +166,7 @@ public:
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(Keywords="container,viewport"),
 		DisplayName="Get Wrapper Widget")
-	static UWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
+	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 	/**
 	 * Removes the Wrapper UI from the viewport and cleans up resources.

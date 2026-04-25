@@ -110,10 +110,7 @@ bool UMounteaAdvancedInventorySharedHUDSubsystem::CreateWrapperWidget_Implementa
 	
 	SharedUserInterface->SetFocus();
 	
-	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> sharedUserInterface = SharedUserInterface;
-	ensure(sharedUserInterface.GetObject() != nullptr);
-	
-	sharedUserInterface->Execute_InitializeWrapperWidget(SharedUserInterface, this);
+	IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(SharedUserInterface, this);
 	
 	if (SharedUserInterface->Implements<UMounteaInventoryGenericWidgetInterface>())
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(SharedUserInterface, InventoryUICommands::Wrapper::Create, nullptr);

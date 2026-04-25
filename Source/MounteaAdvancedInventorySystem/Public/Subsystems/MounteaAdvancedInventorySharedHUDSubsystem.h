@@ -33,7 +33,7 @@ public:
 	virtual void Deinitialize() override;
 	
 	virtual bool CreateWrapperWidget_Implementation() override;
-	virtual UWidget* GetWrapperWidget_Implementation() const override
+	virtual UUserWidget* GetWrapperWidget_Implementation() const override
 	{
 		return SharedUserInterface;
 	};
@@ -73,7 +73,7 @@ protected:
 	TObjectPtr<UWidget> InventoryNotificationContainerWidget;
 	
 	UPROPERTY(BlueprintReadOnly, Category="HUD")
-	TObjectPtr<UWidget> SharedUserInterface;
+	TObjectPtr<UUserWidget> SharedUserInterface;
 	
 	UPROPERTY(BlueprintReadOnly, Category="HUD")
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;

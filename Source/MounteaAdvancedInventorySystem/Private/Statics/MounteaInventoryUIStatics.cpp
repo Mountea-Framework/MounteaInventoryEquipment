@@ -257,7 +257,7 @@ bool UMounteaInventoryUIStatics::CreateWrapperWidget(const TScriptInterface<IMou
 	return Target.GetObject() ? Target->Execute_CreateWrapperWidget(Target.GetObject()) : false;
 }
 
-UWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
+UUserWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_GetWrapperWidget(Target.GetObject()) : nullptr;
 }
@@ -851,7 +851,7 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 }
 
 void UMounteaInventoryUIStatics::InitializeWrapperWidget(UObject* Target,
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent)
+	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent)
 {
 	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
 		IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(Target, Parent);

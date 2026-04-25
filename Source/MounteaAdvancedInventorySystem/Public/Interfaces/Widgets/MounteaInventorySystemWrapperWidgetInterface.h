@@ -18,7 +18,7 @@
 struct FGameplayTagContainer;
 struct FGameplayTag;
 class IMounteaAdvancedInventoryInterface;
-class IMounteaAdvancedInventoryUIManagerInterface;
+class IMounteaAdvancedInventorySharedHUDInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventorySystemWrapperWidgetInterface : public UInterface
@@ -51,8 +51,8 @@ public:
 	 * @param Parent The parent UI Manager that implements the IMounteaAdvancedInventoryUIManagerInterface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
-	void InitializeWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
-	virtual void InitializeWrapperWidget_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent) = 0;
+	void InitializeWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent);
+	virtual void InitializeWrapperWidget_Implementation(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent) = 0;
 
 	/**
 	 * Removes the Wrapper UI from the viewport and cleans up resources.

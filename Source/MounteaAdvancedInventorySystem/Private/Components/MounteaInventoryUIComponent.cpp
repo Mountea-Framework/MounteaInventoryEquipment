@@ -66,7 +66,6 @@ void UMounteaInventoryUIComponent::BeginPlay()
 	{
 		UIConfig = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 		Execute_EmptyItemActionsQueue(this); // Do NOT receive any queue items
-		
 		{
 			auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
 			if (!IsValid(inventoryComponent))

@@ -51,8 +51,8 @@ public:
 	 * @return Wrapper widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Manager")
-	UWidget* GetWrapperWidget() const;
-	virtual UWidget* GetWrapperWidget_Implementation() const = 0;
+	UUserWidget* GetWrapperWidget() const;
+	virtual UUserWidget* GetWrapperWidget_Implementation() const = 0;
 
 	/**
 	 * Removes and cleans up the main wrapper widget.
