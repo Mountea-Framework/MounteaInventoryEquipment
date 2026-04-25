@@ -22,7 +22,8 @@ class UMounteaAdvancedInventoryUIConfig;
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup=(Mountea),
+	meta=(DisplayName="Mountea Inventory & Equipment Shared HUD Subsystem"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventorySharedHUDSubsystem : public ULocalPlayerSubsystem, public IMounteaAdvancedInventorySharedHUDInterface
 {
 	GENERATED_BODY()

@@ -20,7 +20,8 @@ class IMounteaAdvancedInventoryUIManagerInterface;
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup=(Mountea),
+	meta=(DisplayName="Mountea Inventory UI Subsystem"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryUISubsystem : public ULocalPlayerSubsystem
 {
 	GENERATED_BODY()
