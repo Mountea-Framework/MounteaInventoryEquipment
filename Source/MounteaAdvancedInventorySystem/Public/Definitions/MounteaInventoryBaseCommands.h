@@ -63,6 +63,30 @@ namespace InventoryUICommands
 			Close
 		};
 	}
+	
+	namespace Crafting
+	{
+		inline const FString Open(TEXT("OpenCraftingWidget"));
+		inline const FString Close(TEXT("CloseCraftingWidget"));
+		inline const FString Toggle(TEXT("ToggleCraftingWidget"));
+
+		inline const FString Refresh(TEXT("RefreshCrafting"));
+
+		inline const FString SortItems(TEXT("SortCraftingItems"));
+		inline const FString FilterItems(TEXT("FilterCraftingItems"));
+
+		inline const FString ClearSelection(TEXT("ClearCraftingSelection"));
+
+		inline const TSet<FString> All = {
+			Open,
+			Close,
+			Toggle,
+			Refresh,
+			SortItems,
+			FilterItems,
+			ClearSelection
+		};
+	}
 
 	// Modal windows
 	namespace Modal
@@ -161,6 +185,7 @@ namespace InventoryUICommands
 		Result.Append(Notifications::All);
 		Result.Append(General::All);
 		Result.Append(ItemPreview::All);
+		Result.Append(Crafting::All);
 
 		return Result;
 	}();
