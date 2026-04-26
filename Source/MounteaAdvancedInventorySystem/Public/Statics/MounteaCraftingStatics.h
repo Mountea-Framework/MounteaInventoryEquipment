@@ -165,4 +165,16 @@ public:
 		meta=(CustomTag="MounteaK2Setter"),
 		DisplayName="Stop Using Station")
 	static bool StopUsing(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
+	
+/**
+ * HELPERS
+ */
+
+public:
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(AutoCreateRefTerm="CategoryTag"),
+		DisplayName="Get Recipes By Category")
+	static TArray<UMounteaRecipeTemplate*> GetRecipesByCategory(UObject* Target, UPARAM(meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category")) const FGameplayTag& CategoryTag);
 };
