@@ -13,6 +13,11 @@
 #include "Components/MounteaCraftingParticipantUIComponent.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Engine/LocalPlayer.h"
+#include "Statics/MounteaInventorySystemStatics.h"
+#include "Statics/MounteaInventoryUIStatics.h"
+#include "Subsystems/MounteaAdvancedCraftingUISubsystem.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 
 
 UMounteaCraftingParticipantUIComponent::UMounteaCraftingParticipantUIComponent()
@@ -31,7 +36,72 @@ UMounteaCraftingParticipantUIComponent::UMounteaCraftingParticipantUIComponent()
 }
 void UMounteaCraftingParticipantUIComponent::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
+
+	if (GetOwner() &&
+		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) &&
+		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+	{
+		APlayerController* playerController = UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3);
+		if (!IsValid(playerController))
+		{
+			LOG_ERROR(TEXT("[MounteaCraftingParticipantUIComponent] Cannot find valid Player Controller. Crafting UI Subsystem registration failed!"))
+			return;
+		}
+
+		const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
+		UMounteaAdvancedCraftingUISubsystem* craftingUISubsystem = IsValid(localPlayer)
+			? localPlayer->GetSubsystem<UMounteaAdvancedCraftingUISubsystem>()
+			: nullptr;
+		if (!IsValid(craftingUISubsystem))
+		{
+			LOG_ERROR(TEXT("[MounteaCraftingParticipantUIComponent] Cannot find 'Crafting UI Subsystem'. UI might not work properly!"))
+			return;
+		}
+
+		craftingUISubsystem->RegisterCraftingUIManager(this);
+	}
+}
+
+void UMounteaCraftingParticipantUIComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	switch (EndPlayReason)
+	{
+		case EEndPlayReason::EndPlayInEditor:
+			break;
+		case EEndPlayReason::RemovedFromWorld:
+		case EEndPlayReason::Destroyed:
+		case EEndPlayReason::LevelTransition:
+		case EEndPlayReason::Quit:
+		{
+			if (GetOwner() &&
+				(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) &&
+				UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
+			{
+				APlayerController* playerController = UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3);
+				if (!IsValid(playerController))
+				{
+					LOG_ERROR(TEXT("[MounteaCraftingParticipantUIComponent] Cannot find valid Player Controller. Crafting UI Subsystem unregistration failed!"))
+					break;
+				}
+
+				const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
+				UMounteaAdvancedCraftingUISubsystem* craftingUISubsystem = IsValid(localPlayer)
+					? localPlayer->GetSubsystem<UMounteaAdvancedCraftingUISubsystem>()
+					: nullptr;
+				if (!IsValid(craftingUISubsystem))
+				{
+					LOG_ERROR(TEXT("[MounteaCraftingParticipantUIComponent] Cannot find 'Crafting UI Subsystem'. UI will UNREGISTER improperly!"))
+					break;
+				}
+
+				craftingUISubsystem->UnregisterCraftingUIManager(this);
+			}
+			break;
+		}
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 bool UMounteaCraftingParticipantUIComponent::CreateWrapperWidget_Implementation()

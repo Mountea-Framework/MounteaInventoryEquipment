@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
@@ -22,10 +21,13 @@ enum class ECommonInputType : uint8;
 struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
 struct FMounteaItemActionData;
+struct FGameplayTagContainer;
+struct FGameplayTag;
 
 class UMounteaAdvancedInventoryUISubsystem;
 class UMounteaAdvancedInventorySharedHUDSubsystem;
 
+class UUserWidget;
 class UMounteaSelectableInventoryItemAction;
 class UMounteaInventoryScrollBox;
 class UVerticalBoxSlot;
@@ -39,31 +41,6 @@ class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaAdvancedBaseInventoryWidgetInterface;
 class IMounteaInventorySystemWrapperWidgetInterface;
 class IMounteaAdvancedInventorySharedHUDInterface;
-
-UENUM(BlueprintType)
-enum class EMounteaThemeLevel : uint8
-{
-	Primary		UMETA(DisplayName = "Primary"),
-	Secondary	UMETA(DisplayName = "Secondary"),
-	Tertiary	UMETA(DisplayName = "Tertiary")
-};
-
-UENUM(BlueprintType)
-enum class EMounteaThemeState : uint8
-{
-	Normal		UMETA(DisplayName = "Normal"),
-	Hovered		UMETA(DisplayName = "Hovered"),
-	Active		UMETA(DisplayName = "Active"),
-	Disabled	UMETA(DisplayName = "Disabled")
-};
-
-UENUM(BlueprintType)
-enum class EMounteaThemeType : uint8
-{
-	Text UMETA(DisplayName="Text"),
-	Background UMETA(DisplayName="Background"),
-	Default UMETA(DisplayName="Default")
-};
 
 /**
  * 

@@ -12,8 +12,38 @@
 
 #include "Statics/MounteaCraftingUIStatics.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Settings/MounteaAdvancedCraftingUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Statics/MounteaInventoryUIStatics.h"
+#include "Subsystems/MounteaAdvancedCraftingUISubsystem.h"
+
+UMounteaAdvancedCraftingUISubsystem* UMounteaCraftingUIStatics::GetCraftingUISubsystem(UObject* Context)
+{
+	if (!IsValid(Context))
+		return nullptr;
+
+	APlayerController* playerController = nullptr;
+
+	if (playerController != Cast<APlayerController>(Context))
+	{
+		if (AActor* actor = Cast<AActor>(Context))
+			playerController = UMounteaInventoryUIStatics::FindPlayerController(actor, 3);
+		else if (const UActorComponent* actorComp = Cast<UActorComponent>(Context))
+		{
+			if (AActor* ownerActor = actorComp->GetOwner())
+				playerController = UMounteaInventoryUIStatics::FindPlayerController(ownerActor, 3);
+		}
+		else if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
+			playerController = UMounteaInventoryUIStatics::FindPlayerController(userWidget->GetOwningPlayer(), 2);
+	}
+
+	if (!IsValid(playerController))
+		return nullptr;
+
+	const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
+	return IsValid(localPlayer) ? localPlayer->GetSubsystem<UMounteaAdvancedCraftingUISubsystem>() : nullptr;
+}
 
 UMounteaAdvancedCraftingUIConfig* UMounteaCraftingUIStatics::GetCraftingUISettingsConfig()
 {

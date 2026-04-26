@@ -16,6 +16,7 @@
 #include "MounteaCraftingUIStatics.generated.h"
 
 class UMounteaAdvancedCraftingUIConfig;
+class UMounteaAdvancedCraftingUISubsystem;
 
 /**
  * 
@@ -26,8 +27,24 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingUIStatics : public UBlu
 	GENERATED_BODY()
 	
 public:
+	/**
+	 * Retrieves the crafting UI subsystem associated with the provided context.
+	 *
+	 * This function determines the player controller tied to the given context and returns
+	 * the associated Mountea advanced crafting UI subsystem if available.
+	 *
+	 * @param Context The context object used to locate the player controller. This can be an actor,
+	 *                actor component, or user widget. If invalid, the function returns nullptr.
+	 * @return A pointer to the UMounteaAdvancedCraftingUISubsystem if found; otherwise, nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Subsystems", 
+		meta=(CustomTag="MounteaK2Getter"),
+		meta=(DefaultToSelf="Context"),
+		meta=(CompactNodeTitle="Inventory UI Subsystem"),
+		DisplayName="Get Inventory UI Subsystem")
+	static UMounteaAdvancedCraftingUISubsystem* GetCraftingUISubsystem(UObject* Context);
 	
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config", 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Crafting UI Config")
 	static UMounteaAdvancedCraftingUIConfig* GetCraftingUISettingsConfig();
