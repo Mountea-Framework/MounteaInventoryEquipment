@@ -153,6 +153,13 @@ public:
 		DisplayName="Get Assets")
 	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
 	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers", 
+		meta=(ClassFilter = "Interface"), 
+		meta=(DeterminesOutputType = "InterfaceFilter"), 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Single Component By Interface")
+	static UActorComponent* GetSingleComponentByInterface(const AActor* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
+	
 #pragma region K2NodeHelpers
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")

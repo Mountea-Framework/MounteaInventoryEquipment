@@ -179,6 +179,17 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 	return returnValue;
 }
 
+UActorComponent* UMounteaInventorySystemStatics::GetSingleComponentByInterface(const AActor* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult)
+{
+	bResult = false;
+	if (Target == nullptr) 
+		return nullptr;
+
+	TArray<UActorComponent*> tempComps = Target->GetComponentsByInterface(InterfaceFilter);
+	bResult = !tempComps.IsEmpty();
+	return tempComps.IsEmpty() ? nullptr : tempComps[0];
+}
+
 #pragma region K2NodeHelpers
 
 bool UMounteaInventorySystemStatics::SetIntPropertyValue(UObject* Target, const FName PropertyName, const int32 Value)

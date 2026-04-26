@@ -342,7 +342,7 @@ public:
 	 *                This can be an Actor, Actor Component, or User Widget.
 	 * @return A pointer to the UMounteaAdvancedInventoryUISubsystem if found, or nullptr otherwise.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Subsystems", 
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(DefaultToSelf="Context"),
 		meta=(CompactNodeTitle="Inventory UI Subsystem"),

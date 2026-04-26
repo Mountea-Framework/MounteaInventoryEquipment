@@ -105,7 +105,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Stop Using Crafting Station")
+		DisplayName="Get Crafting Station")
 	static TScriptInterface<IMounteaAdvancedCraftingStationInterface> GetCraftingStation(UObject* Target);
 
 public:

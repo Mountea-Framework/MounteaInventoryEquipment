@@ -40,8 +40,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Subsystems", 
 		meta=(CustomTag="MounteaK2Getter"),
 		meta=(DefaultToSelf="Context"),
-		meta=(CompactNodeTitle="Inventory UI Subsystem"),
-		DisplayName="Get Inventory UI Subsystem")
+		meta=(CompactNodeTitle="Crafting UI Subsystem"),
+		DisplayName="Get Crafting UI Subsystem")
 	static UMounteaAdvancedCraftingUISubsystem* GetCraftingUISubsystem(UObject* Context);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config", 
