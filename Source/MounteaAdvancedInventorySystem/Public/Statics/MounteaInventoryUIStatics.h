@@ -41,6 +41,7 @@ class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaAdvancedBaseInventoryWidgetInterface;
 class IMounteaInventorySystemWrapperWidgetInterface;
 class IMounteaAdvancedInventorySharedHUDInterface;
+class IMounteaAdvancedInventoryUIManagerInterface;
 
 /**
  * 

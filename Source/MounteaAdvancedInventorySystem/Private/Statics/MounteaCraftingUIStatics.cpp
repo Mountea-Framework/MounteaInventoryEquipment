@@ -13,10 +13,16 @@
 #include "Statics/MounteaCraftingUIStatics.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
 #include "Settings/MounteaAdvancedCraftingUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 #include "Subsystems/MounteaAdvancedCraftingUISubsystem.h"
+
+bool UMounteaCraftingUIStatics::IsValidCraftingUIHandler(const UObject* Target)
+{
+	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>();
+}
 
 UMounteaAdvancedCraftingUISubsystem* UMounteaCraftingUIStatics::GetCraftingUISubsystem(UObject* Context)
 {
@@ -50,4 +56,25 @@ UMounteaAdvancedCraftingUIConfig* UMounteaCraftingUIStatics::GetCraftingUISettin
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return nullptr;
 	return settings->AdvancedCraftingUISettingsConfig.LoadSynchronous();
+}
+
+bool UMounteaCraftingUIStatics::CreateCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target)
+{
+	return IsValidCraftingUIHandler(Target.GetObject()) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_CreateCraftingWidget(Target.GetObject()) : false;
+}
+
+UUserWidget* UMounteaCraftingUIStatics::GetCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target)
+{
+	return IsValidCraftingUIHandler(Target.GetObject()) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_GetCraftingWidget(Target.GetObject()) : nullptr;
+}
+
+bool UMounteaCraftingUIStatics::SetCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target, UUserWidget* NewCraftingWidget)
+{
+	return IsValidCraftingUIHandler(Target.GetObject()) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_SetCraftingWidget(Target.GetObject(), NewCraftingWidget) : false;
+}
+
+void UMounteaCraftingUIStatics::RemoveCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target)
+{
+	if (IsValidCraftingUIHandler(Target.GetObject()))
+		IMounteaAdvancedCraftingParticipantUIInterface::Execute_RemoveCraftingWidget(Target.GetObject());
 }

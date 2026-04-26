@@ -16,6 +16,7 @@
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
 #include "MounteaCraftingParticipantUIComponent.generated.h"
 
+class UMounteaAdvancedInventorySharedHUDSubsystem;
 
 /**
  * UMounteaCraftingParticipantUIComponent represents an actor capable of displaying the crafting interface.
@@ -45,9 +46,6 @@ protected:
 	
 public:
 	
-	virtual bool CreateWrapperWidget_Implementation() override;
-	virtual UUserWidget* GetWrapperWidget_Implementation() const override;
-	virtual void RemoveWrapperWidget_Implementation() override;
 	virtual bool CreateCraftingWidget_Implementation() override;
 	virtual UUserWidget* GetCraftingWidget_Implementation() const override
 	{
@@ -55,8 +53,10 @@ public:
 	}
 	virtual void RemoveCraftingWidget_Implementation() override;
 	virtual bool SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget) override;
-	
+
 protected:
+
+	UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem() const;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
