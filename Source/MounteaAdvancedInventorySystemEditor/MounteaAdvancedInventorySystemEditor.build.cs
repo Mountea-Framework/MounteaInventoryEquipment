@@ -54,6 +54,7 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				"MainFrame",
 
 				"InputCore",
+				"EnhancedInput",
 				"GameplayTags",
 				"GameplayTagsEditor",
 				"UMGEditor",
