@@ -12,6 +12,7 @@
 
 #include "Statics/MounteaCraftingStatics.h"
 
+#include "Algo/Copy.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaCraftingBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
@@ -226,4 +227,44 @@ bool UMounteaCraftingStatics::StartUsing(UObject* Target, const TScriptInterface
 bool UMounteaCraftingStatics::StopUsing(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant)
 {
 	return IsValidCraftingPlace(Target) ? IMounteaAdvancedCraftingStationInterface::Execute_StopUsing(Target, Participant) : false;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetRecipesByCategory(UObject* Target, const FGameplayTag& CategoryTag)
+{
+	if (!IsValidRecipeHandler(Target))
+		return {};
+	
+	const auto knownRecipes = IMounteaAdvancedCraftingParticipantInterface::Execute_GetKnownRecipes(Target);
+	if (knownRecipes.Num() == 0)
+		return {};
+	
+	TArray<UMounteaRecipeTemplate*> returnValue;
+	returnValue.Reserve(knownRecipes.Num());
+	
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(inventorySettings))
+		return returnValue;
+	
+	const auto& allowedCategories = inventorySettings->GetAllowedCategories();
+	if (allowedCategories.Num() == 0)
+		return returnValue;
+
+	const auto IsRecipeInCategory = [&allowedCategories, &CategoryTag](const UMounteaRecipeTemplate* recipe) -> bool
+	{
+		if (!IsValid(recipe))
+			return false;
+		
+		const UMounteaInventoryItemTemplate* targetItem = recipe->ResultItem.LoadSynchronous();
+		if (!IsValid(targetItem))
+			return false;
+
+		if (const FInventoryCategory* allowedCategory = allowedCategories.Find(targetItem->ItemCategory))
+			return allowedCategory->CategoryData.CategoryTags.HasTag(CategoryTag);
+		
+		return false;
+	};
+
+	Algo::CopyIf(knownRecipes, returnValue, IsRecipeInCategory);
+	
+	return returnValue;
 }
