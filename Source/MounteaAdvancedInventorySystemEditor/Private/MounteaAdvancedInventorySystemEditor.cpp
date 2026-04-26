@@ -81,15 +81,12 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	// Thumbnails and Icons
 	{
 		AdvancedInventorySet = MakeShareable(new FSlateStyleSet("MounteaAdvancedInventorySet"));
-
 		const TSharedPtr<IPlugin> pluginPtr = IPluginManager::Get().FindPlugin("MounteaAdvancedInventorySystem");
 
 		if (pluginPtr.IsValid())
 		{
-			const FString contentDir = pluginPtr->GetBaseDir();
-			
-			// Advanced Inventory specific icons
 			{
+				const FString contentDir = pluginPtr->GetBaseDir();
 				AdvancedInventorySet->SetContentRoot(contentDir);
 
 				struct FClassIconMapping
@@ -123,6 +120,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaRecipeIngredientsList"), TEXT("RecipeIngredientsList") },
 					{ TEXT("MounteaRecipeIngredient"), TEXT("MounteaRecipeIngredients") },
 					{ TEXT("MounteaCraftingParticipantComponent"), TEXT("CraftingParticipantIcon") },
+					{ TEXT("MounteaCraftingParticipantUIComponent"), TEXT("CraftingParticipantUIIcon") },
 					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
 					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") }
 				};
