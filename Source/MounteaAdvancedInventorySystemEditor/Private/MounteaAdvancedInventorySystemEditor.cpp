@@ -23,6 +23,7 @@
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetEnvConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryCraftingUIConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryPayloadConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySelectableInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
@@ -122,7 +123,8 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaCraftingParticipantComponent"), TEXT("CraftingParticipantIcon") },
 					{ TEXT("MounteaCraftingParticipantUIComponent"), TEXT("CraftingParticipantUIIcon") },
 					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
-					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") }
+					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") },
+					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") }
 				};
 
 				const auto RegisterClassIcon = [this](const TCHAR* ClassName, const TCHAR* ResourceName)
@@ -169,6 +171,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredientsList_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredient_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingUIConfig_AssetAction>());
 		
 		for (const auto& Itr : AssetActions)
 		{
