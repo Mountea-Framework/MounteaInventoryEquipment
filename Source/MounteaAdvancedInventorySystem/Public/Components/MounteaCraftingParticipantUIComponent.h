@@ -63,11 +63,7 @@ public:
 protected:
 
 	UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem() const;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
-		meta=(NoResetToDefault))
-	TObjectPtr<UUserWidget> WrapperWidget;
-	
+		
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
 	TObjectPtr<UUserWidget> CraftingWidget;
