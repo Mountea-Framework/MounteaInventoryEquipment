@@ -172,23 +172,23 @@ public:
 	static UActorComponent* GetSingleComponentByInterface(const AActor* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
 
 	/**
-	 * Finds the first implementation of the requested interface on the target actor and returns it as a script interface.
+	 * Finds the first implementation of the requested interface on the target object and returns it as a script interface.
 	 *
-	 * This helper first checks whether the actor itself implements InterfaceFilter.
-	 * If not, it queries actor components implementing InterfaceFilter and wraps the first match
+	 * This helper first checks whether the target object itself implements InterfaceFilter.
+	 * If not and the target is an actor, it queries actor components implementing InterfaceFilter and wraps the first match
 	 * into TScriptInterface, preserving both object and interface pointers for Blueprint/C++ interface calls.
 	 *
-	 * @param Target			Actor whose components will be searched.
+	 * @param Target			Object to inspect. If this is an actor, actor components are also searched.
 	 * @param InterfaceFilter	Interface class used as the search filter.
 	 * @param bResult			(Out) True if at least one matching component was found; false otherwise.
-	 * @return					The actor interface (if implemented by actor), otherwise first matching component interface, or null interface.
+	 * @return					Target interface (if implemented by target), otherwise first matching actor component interface, or null interface.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers", 
 		meta=(ClassFilter = "Interface"), 
 		meta=(DeterminesOutputType = "InterfaceFilter"), 
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get Single Interface By Class")
-	static TScriptInterface<IInterface> GetSingleInterfaceByClass(const AActor* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
+	static TScriptInterface<IInterface> GetSingleInterfaceByClass(const UObject* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
 	
 #pragma region K2NodeHelpers
 	
