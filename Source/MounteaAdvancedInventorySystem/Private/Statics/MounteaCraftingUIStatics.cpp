@@ -29,9 +29,9 @@ UMounteaAdvancedCraftingUISubsystem* UMounteaCraftingUIStatics::GetCraftingUISub
 	if (!IsValid(Context))
 		return nullptr;
 
-	APlayerController* playerController = nullptr;
+	APlayerController* playerController = Cast<APlayerController>(Context);
 
-	if (playerController != Cast<APlayerController>(Context))
+	if (!IsValid(playerController))
 	{
 		if (AActor* actor = Cast<AActor>(Context))
 			playerController = UMounteaInventoryUIStatics::FindPlayerController(actor, 3);

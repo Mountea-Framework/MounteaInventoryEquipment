@@ -122,6 +122,12 @@ void UMounteaCraftingParticipantUIComponent::EndPlay(const EEndPlayReason::Type 
 
 bool UMounteaCraftingParticipantUIComponent::CreateCraftingWidget_Implementation()
 {
+	if (IsValid(CraftingWidget))
+	{
+		LOG_INFO(TEXT("[CreateCraftingWidget] Crafting Widget already exists. Early return."))
+		return true;
+	}
+	
 	const UMounteaAdvancedCraftingUIConfig* craftingUIConfig = UMounteaCraftingUIStatics::GetCraftingUISettingsConfig();
 	if (!craftingUIConfig)
 	{
@@ -188,7 +194,7 @@ bool UMounteaCraftingParticipantUIComponent::CreateCraftingWidget_Implementation
 			IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(CraftingWidget, InventoryUICommands::General::Create, nullptr);
 	}
 	else
-		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::General::Create, CraftingWidget);
+		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::Crafting::Open, CraftingWidget);
 
 	return true;
 }
