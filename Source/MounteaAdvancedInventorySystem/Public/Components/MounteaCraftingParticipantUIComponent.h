@@ -16,6 +16,7 @@
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
 #include "MounteaCraftingParticipantUIComponent.generated.h"
 
+class IMounteaAdvancedCraftingParticipantInterface;
 class UMounteaAdvancedInventorySharedHUDSubsystem;
 
 /**
@@ -53,6 +54,11 @@ public:
 	}
 	virtual void RemoveCraftingWidget_Implementation() override;
 	virtual bool SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget) override;
+	virtual TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant_Implementation() const override
+	{
+		return CraftingParticipant;
+	}
+	virtual bool SetCraftingParticipant_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant) override;
 
 protected:
 
@@ -65,4 +71,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
 	TObjectPtr<UUserWidget> CraftingWidget;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing", 
+		meta=(AllowPrivateAccess), 
+		meta=(ExposeOnSpawn),
+		meta=(DisplayThumbnail=false))
+	TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> CraftingParticipant;
 };

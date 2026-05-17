@@ -15,6 +15,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedCraftingParticipantUIInterface.generated.h"
 
+class IMounteaAdvancedCraftingParticipantInterface;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedCraftingParticipantUIInterface : public UInterface
 {
@@ -59,4 +61,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
 	void RemoveCraftingWidget();
 	virtual void RemoveCraftingWidget_Implementation() = 0;
+
+	/**
+	 * Returns Parent Crafting Participant which owns this UI. As UI is always used by Player only, 
+	 * the Player Pawn must provide Crafting Participant directly or by using component.
+	 * 
+	 * @return Returns Parent Crafting Participant which owns this UI or nullptr
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant() const;
+	virtual TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	bool SetCraftingParticipant(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
+	virtual bool SetCraftingParticipant_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant) = 0;
 };

@@ -15,6 +15,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryBaseCommands.h"
 #include "Engine/LocalPlayer.h"
+#include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
 #include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
@@ -49,6 +50,14 @@ void UMounteaCraftingParticipantUIComponent::BeginPlay()
 		(GetOwnerRole() == ROLE_Authority || GetOwnerRole() == ROLE_AutonomousProxy) &&
 		UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(GetWorld()))
 	{
+		const auto craftingParticipant = GetOwner()->FindComponentByInterface(UMounteaAdvancedCraftingParticipantInterface::StaticClass());
+		if (!IsValid(craftingParticipant))
+		{
+			LOG_ERROR(TEXT("[Crafting UI] Unable to find Crafting Participant for Actor %s, component disabled"), *(GetOwner() ? GetOwner()->GetName() : TEXT("'no owner'")))
+			return;
+		}
+		Execute_SetCraftingParticipant(this, craftingParticipant);
+		
 		APlayerController* playerController = UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), 3);
 		if (!IsValid(playerController))
 		{
@@ -64,7 +73,7 @@ void UMounteaCraftingParticipantUIComponent::BeginPlay()
 		{
 			LOG_ERROR(TEXT("[MounteaCraftingParticipantUIComponent] Cannot find 'Crafting UI Subsystem'. UI might not work properly!"))
 			return;
-		}
+		}	
 
 		craftingUISubsystem->RegisterCraftingUIManager(this);
 	}
@@ -198,6 +207,14 @@ bool UMounteaCraftingParticipantUIComponent::SetCraftingWidget_Implementation(UU
 	if (CraftingWidget == NewCraftingWidget)
 		return false;
 	CraftingWidget = NewCraftingWidget;
+	return true;
+}
+
+bool UMounteaCraftingParticipantUIComponent::SetCraftingParticipant_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant)
+{
+	if (Participant == CraftingParticipant)
+		return false;
+	CraftingParticipant = Participant;
 	return true;
 }
 
