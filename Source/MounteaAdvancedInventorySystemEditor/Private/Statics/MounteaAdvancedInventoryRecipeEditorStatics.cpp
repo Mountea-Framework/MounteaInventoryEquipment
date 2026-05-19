@@ -11,6 +11,7 @@
 
 #include "Statics/MounteaAdvancedInventoryRecipeEditorStatics.h"
 
+#include "Helpers/MounteaInventoryImportHelpers.h"
 #include "Helpers/MounteaInventoryZipHelper.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 
@@ -26,33 +27,6 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "UObject/SavePackage.h"
-
-// ---------------------------------------------------------------------------
-// Internal helpers
-// ---------------------------------------------------------------------------
-
-static TMap<FGuid, UMounteaInventoryItemTemplate*> BuildProjectItemMap()
-{
-	TMap<FGuid, UMounteaInventoryItemTemplate*> map;
-	for (UMounteaInventoryItemTemplate* t : UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates())
-	{
-		if (IsValid(t))
-			map.Add(t->Guid, t);
-	}
-	return map;
-}
-
-static TSet<FGuid> ParseBundledItemGuids(const TArray<FString>& ItemJsons)
-{
-	TSet<FGuid> guids;
-	for (const FString& json : ItemJsons)
-	{
-		const FGuid g = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(json);
-		if (g.IsValid())
-			guids.Add(g);
-	}
-	return guids;
-}
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -102,7 +76,8 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 	TArray<FParsedRecipe> parsed;
 	parsed.Reserve(singleZips.Num());
 
-	const TMap<FGuid, UMounteaInventoryItemTemplate*> projectItems = BuildProjectItemMap();
+	const TMap<FGuid, UMounteaInventoryItemTemplate*> projectItems =
+		FMounteaInventoryImportHelpers::BuildProjectItemGuidMap();
 
 	for (const TArray<uint8>& zipBlob : singleZips)
 	{
@@ -122,7 +97,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 			return false;
 		}
 
-		entry.BundledGuids = ParseBundledItemGuids(entry.BundledItemJsons);
+		entry.BundledGuids = FMounteaInventoryImportHelpers::ParseBundledGuids(entry.BundledItemJsons);
 
 		TSet<FGuid> knownGuids = entry.BundledGuids;
 		for (const auto& kv : projectItems)
@@ -144,47 +119,10 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 
 	for (FParsedRecipe& entry : parsed)
 	{
-		TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
 		const FString folderToUse = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
 
-		// Import bundled items
-		for (const FString& itemJson : entry.BundledItemJsons)
-		{
-			const FGuid g = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(itemJson);
-			if (!g.IsValid())
-				continue;
-
-			if (itemsByGuid.Contains(g))
-				continue;
-
-			const TArray<UMounteaInventoryItemTemplate*> existing = UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates();
-
-			if (UMounteaInventoryItemTemplate* found = UMounteaAdvancedInventoryItemTemplateEditorStatics::FindTemplateByGuid(existing, g))
-				itemsByGuid.Add(g, found);
-			else
-			{
-				FString nameStr = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(itemJson);
-				FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"),
-					nameStr.IsEmpty() ? *g.ToString(EGuidFormats::Short) : *nameStr);
-
-				FString createError;
-				UMounteaInventoryItemTemplate* newTemplate =
-					UMounteaAdvancedInventoryItemTemplateEditorStatics::CreateTemplateAsset(
-						folderToUse, assetName, createError);
-
-				if (newTemplate)
-				{
-					FString parseErr;
-					UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(
-						itemJson, newTemplate, parseErr);
-					newTemplate->ReloadItemActions();
-					newTemplate->CalculateJson();
-					UMounteaAdvancedInventoryItemTemplateEditorStatics::SaveTemplateAsset(
-						newTemplate, FPaths::Combine(folderToUse, assetName));
-					itemsByGuid.Add(g, newTemplate);
-				}
-			}
-		}
+		TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
+		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, itemsByGuid);
 
 		// Find or create recipe asset
 		const FGuid recipeGuid = ExtractGuidFromRecipeJson(entry.RecipeJson);
@@ -286,24 +224,6 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipe(
 		return false;
 	}
 
-	auto checkGuid = [&](const FString& guidString, const FString& context) -> bool
-	{
-		FGuid g;
-		if (!FGuid::Parse(guidString, g) || !g.IsValid())
-		{
-			OutErrorMessage = FString::Printf(TEXT("Invalid GUID '%s' in %s"), *guidString, *context);
-			return false;
-		}
-		if (!KnownGuids.Contains(g))
-		{
-			OutErrorMessage = FString::Printf(
-				TEXT("Item GUID %s referenced in %s not found in bundled items or project"),
-				*guidString, *context);
-			return false;
-		}
-		return true;
-	};
-
 	// Validate result item
 	const TSharedPtr<FJsonObject>* resultObj;
 	if (RecipeJson->TryGetObjectField(TEXT("result"), resultObj))
@@ -311,8 +231,13 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipe(
 		FString itemRef;
 		if ((*resultObj)->TryGetStringField(TEXT("itemRef"), itemRef) && !itemRef.IsEmpty())
 		{
-			if (!checkGuid(itemRef, TEXT("result.itemRef")))
+			FString checkError;
+			if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
+				itemRef, TEXT("result.itemRef"), KnownGuids, checkError))
+			{
+				OutErrorMessage = checkError;
 				return false;
+			}
 		}
 	}
 
@@ -341,8 +266,16 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipe(
 				if ((*ingObj)->TryGetObjectField(TEXT("ref"), refObj) &&
 					(*refObj)->TryGetStringField(TEXT("guid"), refGuid))
 				{
-					if (!checkGuid(refGuid, FString::Printf(TEXT("groups[%d].ingredients[%d]"), gi, ii)))
+					FString checkError;
+					if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
+						refGuid,
+						FString::Printf(TEXT("groups[%d].ingredients[%d]"), gi, ii),
+						KnownGuids,
+						checkError))
+					{
+						OutErrorMessage = checkError;
 						return false;
+					}
 				}
 			}
 		}
@@ -432,8 +365,6 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::DeserializeRecipeFromJson(
 		FString stationName;
 		if ((*reqsObj)->TryGetStringField(TEXT("station"), stationName) && !stationName.IsEmpty())
 		{
-			// Look up the GameplayTag from taxonomy/crafting-stations.json if present.
-			// Fall back to requesting the tag by name directly (assumes the tag string is a tag itself).
 			const FGameplayTag tag = FGameplayTag::RequestGameplayTag(FName(*stationName), false);
 			if (tag.IsValid())
 				Recipe->RequiredCraftingPlace = tag;
@@ -506,23 +437,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::SaveRecipeAsset(
 	UMounteaRecipeTemplate* Recipe,
 	const FString& PackagePath)
 {
-	if (!IsValid(Recipe))
-		return false;
-
-	UPackage* pkg = Recipe->GetOutermost();
-	pkg->FullyLoad();
-	pkg->MarkPackageDirty();
-
-	FSavePackageArgs saveArgs;
-	saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-	saveArgs.SaveFlags     = SAVE_NoError;
-
-	const FString fileName = FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
-	if (!UPackage::SavePackage(pkg, Recipe, *fileName, saveArgs))
-		return false;
-
-	FAssetRegistryModule::AssetCreated(Recipe);
-	return true;
+	return FMounteaInventoryImportHelpers::SaveNewAssetPackage(Recipe, PackagePath);
 }
 
 bool UMounteaAdvancedInventoryRecipeEditorStatics::UpdateExistingRecipe(
@@ -540,27 +455,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::UpdateExistingRecipe(
 	if (!DeserializeRecipeFromJson(JsonObject, Recipe, ItemsByGuid, OutErrorMessage))
 		return false;
 
-	UPackage* pkg = Recipe->GetOutermost();
-	if (!pkg)
-	{
-		OutErrorMessage = TEXT("Recipe has no valid package");
-		return false;
-	}
-
-	pkg->MarkPackageDirty();
-
-	FSavePackageArgs saveArgs;
-	saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-	saveArgs.SaveFlags     = SAVE_NoError;
-
-	const FString fileName = FPackageName::LongPackageNameToFilename(pkg->GetName(), FPackageName::GetAssetPackageExtension());
-	if (!UPackage::SavePackage(pkg, Recipe, *fileName, saveArgs))
-	{
-		OutErrorMessage = TEXT("Failed to save updated recipe");
-		return false;
-	}
-
-	return true;
+	return FMounteaInventoryImportHelpers::SaveExistingAssetPackage(Recipe, OutErrorMessage);
 }
 
 // ---------------------------------------------------------------------------
@@ -569,17 +464,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::UpdateExistingRecipe(
 
 FGuid UMounteaAdvancedInventoryRecipeEditorStatics::ExtractGuidFromRecipeJson(const FString& JsonString)
 {
-	TSharedPtr<FJsonObject> obj;
-	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(JsonString);
-	if (!FJsonSerializer::Deserialize(reader, obj) || !obj.IsValid())
-		return FGuid();
-
-	FString guidStr;
-	FGuid guid;
-	if (obj->TryGetStringField(TEXT("guid"), guidStr) && FGuid::Parse(guidStr, guid))
-		return guid;
-
-	return FGuid();
+	return FMounteaInventoryImportHelpers::ExtractGuidFromJsonField(JsonString, TEXT("guid"));
 }
 
 FString UMounteaAdvancedInventoryRecipeEditorStatics::ExtractNameFromRecipeJson(const FString& JsonString)
@@ -589,19 +474,9 @@ FString UMounteaAdvancedInventoryRecipeEditorStatics::ExtractNameFromRecipeJson(
 	if (!FJsonSerializer::Deserialize(reader, obj) || !obj.IsValid())
 		return TEXT("");
 
-	// Recipes don't have a top-level displayName — use result item's name if available
-	const TSharedPtr<FJsonObject>* resultObj;
-	if (obj->TryGetObjectField(TEXT("result"), resultObj))
-	{
-		// Try to find the item name via itemRef — just return the GUID short form for now
-	}
-
 	FString name;
 	if (obj->TryGetStringField(TEXT("name"), name))
-	{
-		name.RemoveSpacesInline();
 		return name;
-	}
 
 	return TEXT("");
 }

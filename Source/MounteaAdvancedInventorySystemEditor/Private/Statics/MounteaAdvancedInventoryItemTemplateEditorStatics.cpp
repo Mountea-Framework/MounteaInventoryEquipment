@@ -11,6 +11,7 @@
 
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 
+#include "Helpers/MounteaInventoryImportHelpers.h"
 #include "Helpers/MounteaInventoryZipHelper.h"
 #include "ContentBrowserModule.h"
 #include "DesktopPlatformModule.h"
@@ -366,26 +367,7 @@ FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(
 
     FString displayName;
     if (jsonObject->TryGetStringField(TEXT("displayName"), displayName))
-    {
-        displayName.RemoveSpacesInline();
-
-        const FRegexPattern InvalidCharsPattern(TEXT("[\\\\:\\*\\?\"<>\\| ,.&!~@#']"));
-        FRegexMatcher Matcher(InvalidCharsPattern, displayName);
-
-        FString Sanitized;
-        Sanitized.Reserve(displayName.Len());
-
-        int32 LastIndex = 0;
-        while (Matcher.FindNext())
-        {
-            const int32 MatchBegin = Matcher.GetMatchBeginning();
-            Sanitized += displayName.Mid(LastIndex, MatchBegin - LastIndex);
-            LastIndex = Matcher.GetMatchEnding();
-        }
-        Sanitized += displayName.Mid(LastIndex);
-
-        return Sanitized;
-    }
+        return FMounteaInventoryImportHelpers::SanitizeAssetName(displayName);
 
     return TEXT("");
 }
@@ -484,28 +466,10 @@ UMounteaInventoryItemTemplate* UMounteaAdvancedInventoryItemTemplateEditorStatic
 }
 
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::SaveTemplateAsset(
-    UMounteaInventoryItemTemplate* Template, 
+    UMounteaInventoryItemTemplate* Template,
     const FString& PackagePath)
 {
-    if (!IsValid(Template))
-        return false;
-
-    UPackage* templatePackage = Template->GetOutermost();
-    templatePackage->FullyLoad();
-    templatePackage->MarkPackageDirty();
-
-    FSavePackageArgs saveArgs;
-    saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-    saveArgs.SaveFlags = SAVE_NoError;
-
-    const FString packageFileName = FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
-    
-    if (!UPackage::SavePackage(templatePackage, Template, *packageFileName, saveArgs))
-        return false;
-
-    FAssetRegistryModule::AssetCreated(Template);
-    
-    return true;
+    return FMounteaInventoryImportHelpers::SaveNewAssetPackage(Template, PackagePath);
 }
 
 FString UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowOpenFileDialog(

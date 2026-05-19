@@ -11,6 +11,7 @@
 
 #include "Statics/MounteaAdvancedInventoryLoadoutEditorStatics.h"
 
+#include "Helpers/MounteaInventoryImportHelpers.h"
 #include "Helpers/MounteaInventoryZipHelper.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 
@@ -24,33 +25,6 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "UObject/SavePackage.h"
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-static TMap<FGuid, UMounteaInventoryItemTemplate*> BuildProjectItemGuidMap()
-{
-	TMap<FGuid, UMounteaInventoryItemTemplate*> map;
-	for (UMounteaInventoryItemTemplate* t : UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates())
-	{
-		if (IsValid(t))
-			map.Add(t->Guid, t);
-	}
-	return map;
-}
-
-static TSet<FGuid> ParseBundledGuids(const TArray<FString>& BundledItemJsons)
-{
-	TSet<FGuid> guids;
-	for (const FString& json : BundledItemJsons)
-	{
-		const FGuid guid = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(json);
-		if (guid.IsValid())
-			guids.Add(guid);
-	}
-	return guids;
-}
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -101,7 +75,8 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 	TArray<FParsedLoadout> parsed;
 	parsed.Reserve(singleZips.Num());
 
-	const TMap<FGuid, UMounteaInventoryItemTemplate*> projectItems = BuildProjectItemGuidMap();
+	const TMap<FGuid, UMounteaInventoryItemTemplate*> projectItems =
+		FMounteaInventoryImportHelpers::BuildProjectItemGuidMap();
 
 	for (const TArray<uint8>& zipBlob : singleZips)
 	{
@@ -121,7 +96,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 			return false;
 		}
 
-		entry.BundledGuids = ParseBundledGuids(entry.BundledItemJsons);
+		entry.BundledGuids = FMounteaInventoryImportHelpers::ParseBundledGuids(entry.BundledItemJsons);
 
 		// Build combined set: bundled + project
 		TSet<FGuid> knownGuids = entry.BundledGuids;
@@ -144,51 +119,10 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 
 	for (FParsedLoadout& entry : parsed)
 	{
-		// Import bundled items first so they're available for the loadout
+		const FString folderToUse = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
+
 		TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
-		for (const FString& itemJson : entry.BundledItemJsons)
-		{
-			TArray<UMounteaInventoryItemTemplate*> importedItems;
-			FString itemError;
-			// Write bundled items to a temp location; they land next to the loadout
-			FString folder = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
-			UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromZipBytes(
-				TArray<uint8>(), folder, importedItems, itemError);
-			// Direct JSON import for bundled items
-			const FGuid guid = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(itemJson);
-			if (guid.IsValid())
-			{
-				if (UMounteaInventoryItemTemplate* existing = UMounteaAdvancedInventoryItemTemplateEditorStatics::FindTemplateByGuid(
-					UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates(), guid))
-				{
-					itemsByGuid.Add(guid, existing);
-				}
-				else
-				{
-					// Create new template from bundled JSON
-					FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"), *UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(itemJson));
-					if (assetName == TEXT("ImportedTemplate_"))
-						assetName = FString::Printf(TEXT("ImportedTemplate_%s"), *guid.ToString(EGuidFormats::Short));
-
-					FString createError;
-					UMounteaInventoryItemTemplate* newTemplate =
-						UMounteaAdvancedInventoryItemTemplateEditorStatics::CreateTemplateAsset(
-							TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder, assetName, createError);
-
-					if (newTemplate)
-					{
-						FString parseErr;
-						UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(
-							itemJson, newTemplate, parseErr);
-						newTemplate->ReloadItemActions();
-						newTemplate->CalculateJson();
-						UMounteaAdvancedInventoryItemTemplateEditorStatics::SaveTemplateAsset(
-							newTemplate, FPaths::Combine(TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder, assetName));
-						itemsByGuid.Add(guid, newTemplate);
-					}
-				}
-			}
-		}
+		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, itemsByGuid);
 
 		// Find or create loadout asset
 		const FGuid loadoutGuid = ExtractGuidFromLoadoutJson(entry.LoadoutJson);
@@ -207,10 +141,6 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 			const FString name = ExtractNameFromLoadoutJson(entry.LoadoutJson);
 			const FString assetName = FString::Printf(TEXT("ImportedLoadout_%s"),
 				name.IsEmpty() ? *loadoutGuid.ToString(EGuidFormats::Short) : *name);
-
-			FString folderToUse = TargetFolder;
-			if (folderToUse.IsEmpty())
-				folderToUse = TEXT("/Game/");
 
 			FString createError;
 			loadout = CreateLoadoutAsset(folderToUse, assetName, createError);
@@ -295,24 +225,6 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(
 		return false;
 	}
 
-	auto checkGuid = [&](const FString& guidString, const FString& context) -> bool
-	{
-		FGuid guid;
-		if (!FGuid::Parse(guidString, guid) || !guid.IsValid())
-		{
-			OutErrorMessage = FString::Printf(TEXT("Invalid GUID '%s' in %s"), *guidString, *context);
-			return false;
-		}
-		if (!KnownGuids.Contains(guid))
-		{
-			OutErrorMessage = FString::Printf(
-				TEXT("Item GUID %s referenced in %s not found in bundled items or project"),
-				*guidString, *context);
-			return false;
-		}
-		return true;
-	};
-
 	// Validate items[] array
 	const TArray<TSharedPtr<FJsonValue>>* itemsArray;
 	if (LoadoutJson->TryGetArrayField(TEXT("items"), itemsArray))
@@ -329,8 +241,13 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(
 				FString refGuid;
 				if ((*refObj)->TryGetStringField(TEXT("guid"), refGuid))
 				{
-					if (!checkGuid(refGuid, TEXT("items[]")))
+					FString checkError;
+					if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
+						refGuid, TEXT("items[]"), KnownGuids, checkError))
+					{
+						OutErrorMessage = checkError;
 						return false;
+					}
 				}
 			}
 		}
@@ -349,8 +266,13 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(
 			FString slotGuid;
 			if ((*slotVal)->TryGetStringField(TEXT("guid"), slotGuid))
 			{
-				if (!checkGuid(slotGuid, FString::Printf(TEXT("slots[%s]"), *slotKv.Key)))
+				FString checkError;
+				if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
+					slotGuid, FString::Printf(TEXT("slots[%s]"), *slotKv.Key), KnownGuids, checkError))
+				{
+					OutErrorMessage = checkError;
 					return false;
+				}
 			}
 		}
 	}
@@ -476,7 +398,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::DeserializeLoadoutFromJson(
 
 			if (UMounteaAdvancedInventoryLoadoutItem** existingItem = loadoutItemsByItemGuid.Find(slotItemGuid))
 			{
-				(*existingItem)->EquipmentSlot    = FName(*slotName);
+				(*existingItem)->EquipmentSlot       = FName(*slotName);
 				(*existingItem)->bAutomaticallyEquip = true;
 			}
 			else
@@ -511,23 +433,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::SaveLoadoutAsset(
 	UMounteaAdvancedInventoryLoadoutConfig* Loadout,
 	const FString& PackagePath)
 {
-	if (!IsValid(Loadout))
-		return false;
-
-	UPackage* pkg = Loadout->GetOutermost();
-	pkg->FullyLoad();
-	pkg->MarkPackageDirty();
-
-	FSavePackageArgs saveArgs;
-	saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-	saveArgs.SaveFlags     = SAVE_NoError;
-
-	const FString fileName = FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
-	if (!UPackage::SavePackage(pkg, Loadout, *fileName, saveArgs))
-		return false;
-
-	FAssetRegistryModule::AssetCreated(Loadout);
-	return true;
+	return FMounteaInventoryImportHelpers::SaveNewAssetPackage(Loadout, PackagePath);
 }
 
 bool UMounteaAdvancedInventoryLoadoutEditorStatics::UpdateExistingLoadout(
@@ -545,27 +451,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::UpdateExistingLoadout(
 	if (!DeserializeLoadoutFromJson(JsonObject, Loadout, ItemsByGuid, OutErrorMessage))
 		return false;
 
-	UPackage* pkg = Loadout->GetOutermost();
-	if (!pkg)
-	{
-		OutErrorMessage = TEXT("Loadout has no valid package");
-		return false;
-	}
-
-	pkg->MarkPackageDirty();
-
-	FSavePackageArgs saveArgs;
-	saveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-	saveArgs.SaveFlags     = SAVE_NoError;
-
-	const FString fileName = FPackageName::LongPackageNameToFilename(pkg->GetName(), FPackageName::GetAssetPackageExtension());
-	if (!UPackage::SavePackage(pkg, Loadout, *fileName, saveArgs))
-	{
-		OutErrorMessage = TEXT("Failed to save updated loadout");
-		return false;
-	}
-
-	return true;
+	return FMounteaInventoryImportHelpers::SaveExistingAssetPackage(Loadout, OutErrorMessage);
 }
 
 // ---------------------------------------------------------------------------
@@ -574,17 +460,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::UpdateExistingLoadout(
 
 FGuid UMounteaAdvancedInventoryLoadoutEditorStatics::ExtractGuidFromLoadoutJson(const FString& JsonString)
 {
-	TSharedPtr<FJsonObject> obj;
-	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(JsonString);
-	if (!FJsonSerializer::Deserialize(reader, obj) || !obj.IsValid())
-		return FGuid();
-
-	FString guidStr;
-	FGuid guid;
-	if (obj->TryGetStringField(TEXT("guid"), guidStr) && FGuid::Parse(guidStr, guid))
-		return guid;
-
-	return FGuid();
+	return FMounteaInventoryImportHelpers::ExtractGuidFromJsonField(JsonString, TEXT("guid"));
 }
 
 FString UMounteaAdvancedInventoryLoadoutEditorStatics::ExtractNameFromLoadoutJson(const FString& JsonString)
@@ -596,21 +472,8 @@ FString UMounteaAdvancedInventoryLoadoutEditorStatics::ExtractNameFromLoadoutJso
 
 	FString name;
 	if (obj->TryGetStringField(TEXT("displayName"), name))
-	{
-		name.RemoveSpacesInline();
-		const FRegexPattern invalidChars(TEXT("[\\\\:\\*\\?\"<>\\| ,.&!~@#']"));
-		FRegexMatcher matcher(invalidChars, name);
-		FString sanitized;
-		sanitized.Reserve(name.Len());
-		int32 last = 0;
-		while (matcher.FindNext())
-		{
-			sanitized += name.Mid(last, matcher.GetMatchBeginning() - last);
-			last = matcher.GetMatchEnding();
-		}
-		sanitized += name.Mid(last);
-		return sanitized;
-	}
+		return FMounteaInventoryImportHelpers::SanitizeAssetName(name);
+
 	return TEXT("");
 }
 
