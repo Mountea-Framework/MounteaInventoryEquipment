@@ -1,3 +1,4 @@
+using System.IO;
 using UnrealBuildTool;
 
 public class MounteaAdvancedInventorySystemEditor : ModuleRules
@@ -6,8 +7,18 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		// ZIP library (zip.h / zip.c / miniz.h)
+		PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "ThirdParty", "zip"));
+		PublicDefinitions.Add("ZIP_STATIC");
+
+		var mzPlatform = "0";
+		if (Target.Platform == UnrealTargetPlatform.Win64)  mzPlatform = "1";
+		else if (Target.Platform == UnrealTargetPlatform.Mac)   mzPlatform = "2";
+		else if (Target.Platform == UnrealTargetPlatform.Linux) mzPlatform = "3";
+		PublicDefinitions.Add("MZ_PLATFORM=" + mzPlatform);
+
 		PublicIncludePaths.AddRange(
-			new string[] 
+			new string[]
 			{
 			}
 		);
