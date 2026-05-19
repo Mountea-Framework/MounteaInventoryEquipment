@@ -11,6 +11,7 @@
 
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 
+#include "Helpers/MounteaInventoryZipHelper.h"
 #include "ContentBrowserModule.h"
 #include "DesktopPlatformModule.h"
 #include "IContentBrowserSingleton.h"
@@ -40,18 +41,54 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFilePath(
     const FString& FilePath,
     const FString& TargetFolder,
-    TArray<UMounteaInventoryItemTemplate*>& OutTemplates, 
+    TArray<UMounteaInventoryItemTemplate*>& OutTemplates,
     FString& OutErrorMessage)
 {
-    FString fileContent;
-    if (!FFileHelper::LoadFileToString(fileContent, *FilePath))
+    TArray<uint8> fileBytes;
+    if (!FMounteaInventoryZipHelper::LoadFileToBytes(FilePath, fileBytes))
     {
         OutErrorMessage = FString::Printf(TEXT("Failed to read file: %s"), *FilePath);
         return false;
     }
 
+    // ZIP-format path (web companion export)
+    if (FMounteaInventoryZipHelper::IsZipFile(fileBytes))
+    {
+        const bool bIsBundle = FilePath.EndsWith(TEXT(".mnteaitems"));
+        if (bIsBundle)
+        {
+            TArray<TArray<uint8>> innerZips;
+            if (!FMounteaInventoryZipHelper::ExpandBundle(fileBytes, TEXT("mnteaitem"), innerZips))
+            {
+                OutErrorMessage = TEXT("Failed to expand .mnteaitems bundle");
+                return false;
+            }
+            for (const TArray<uint8>& inner : innerZips)
+            {
+                FString innerError;
+                ImportTemplatesFromZipBytes(inner, TargetFolder, OutTemplates, innerError);
+                if (!innerError.IsEmpty())
+                    OutErrorMessage += innerError + TEXT("\n");
+            }
+        }
+        else
+        {
+            if (!ImportTemplatesFromZipBytes(fileBytes, TargetFolder, OutTemplates, OutErrorMessage))
+                return false;
+        }
+
+        if (OutTemplates.Num() == 0)
+        {
+            OutErrorMessage = TEXT("No templates were successfully imported");
+            return false;
+        }
+        return true;
+    }
+
+    // Legacy raw-JSON path (backward compat)
+    const FString fileContent = FMounteaInventoryZipHelper::BytesToString(fileBytes.GetData(), fileBytes.Num());
     const bool bIsMultipleFile = FilePath.EndsWith(TEXT(".mnteaitems"));
-    
+
     TArray<FString> itemJsons;
     if (bIsMultipleFile)
     {
@@ -781,6 +818,87 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::DeserializeGameplayTagC
     }
 
     return true;
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseItemJsonFromZip(
+    const TArray<uint8>& ZipBytes,
+    FString& OutItemJson,
+    FString& OutErrorMessage)
+{
+    TMap<FString, FString> textFiles;
+    TMap<FString, TArray<uint8>> binaryFiles;
+
+    if (!FMounteaInventoryZipHelper::ExtractEntries(ZipBytes, textFiles, binaryFiles))
+    {
+        OutErrorMessage = TEXT("Failed to extract ZIP entries");
+        return false;
+    }
+
+    const FString* itemJson = textFiles.Find(TEXT("item.json"));
+    if (!itemJson)
+    {
+        OutErrorMessage = TEXT("item.json not found in ZIP");
+        return false;
+    }
+
+    OutItemJson = *itemJson;
+    return true;
+}
+
+bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromZipBytes(
+    const TArray<uint8>& ZipBytes,
+    const FString& TargetFolder,
+    TArray<UMounteaInventoryItemTemplate*>& OutTemplates,
+    FString& OutErrorMessage)
+{
+    FString itemJson;
+    if (!ParseItemJsonFromZip(ZipBytes, itemJson, OutErrorMessage))
+        return false;
+
+    const FGuid itemGuid = ExtractGuidFromJson(itemJson);
+    TArray<UMounteaInventoryItemTemplate*> existingTemplates = LoadAllExistingTemplates();
+
+    if (UMounteaInventoryItemTemplate* existing = FindTemplateByGuid(existingTemplates, itemGuid))
+    {
+        if (UpdateExistingTemplate(existing, itemJson, OutErrorMessage))
+            OutTemplates.Add(existing);
+        return OutTemplates.Num() > 0;
+    }
+
+    FString folderToUse = TargetFolder;
+    if (folderToUse.IsEmpty())
+    {
+        folderToUse = ShowContentBrowserPathPicker(
+            NSLOCTEXT("UMounteaAdvancedInventoryItemTemplateEditorStatics", "Import_TargetFolder",
+                "Select Target Folder for New Template").ToString(),
+            TEXT("/Game/")
+        );
+        if (folderToUse.IsEmpty())
+        {
+            OutErrorMessage = TEXT("No target folder selected");
+            return false;
+        }
+    }
+
+    const FString displayName = ExtractNameFromJson(itemJson);
+    const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"),
+        displayName.IsEmpty() ? *itemGuid.ToString(EGuidFormats::Short) : *displayName);
+
+    UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(folderToUse, assetName, OutErrorMessage);
+    if (!newTemplate)
+        return false;
+
+    if (ParseSingleTemplateJson(itemJson, newTemplate, OutErrorMessage))
+    {
+        newTemplate->ReloadItemActions();
+        newTemplate->CalculateJson();
+
+        const FString packagePath = FPaths::Combine(folderToUse, assetName);
+        if (SaveTemplateAsset(newTemplate, packagePath))
+            OutTemplates.Add(newTemplate);
+    }
+
+    return OutTemplates.Num() > 0;
 }
 
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::DeserializeSoftClassPtrSet(
