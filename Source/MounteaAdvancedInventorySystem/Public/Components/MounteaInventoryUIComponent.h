@@ -102,25 +102,26 @@ protected:
 protected:
 	
 	// Custom stored map, can be used to store unique Items, like Coins, Favourites etc.
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Inventory", 
 		meta=(NoResetToDefault))
 	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
 	
 	FActionsQueue ActionsQueue;
 	
 	// Currently active category in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory", 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Inventory", 
 		meta=(NoResetToDefault))
 	FString ActiveCategoryId;
 
 	// Currently active item in UI.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Mountea|Inventory", 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient,  Category="Inventory", 
 		meta=(NoResetToDefault))
 	FGuid ActiveItemGuid;
 
 	// Currently active item Widget.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Mountea|Inventory", 
-		meta=(NoResetToDefault))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Inventory", 
+		meta=(NoResetToDefault),
+		meta=(DisplayThumbnail=false))
 	TObjectPtr<UWidget> ActiveItemWidget;
 
 private:
@@ -132,17 +133,20 @@ private:
 	 * It enables communication between the inventory UI component and the parent inventory for functions such as handling item modifications,
 	 * notifications, and other inventory-related operations.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", 
 		meta=(AllowPrivateAccess), 
-		meta=(ExposeOnSpawn))
+		meta=(ExposeOnSpawn),
+		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedInventoryInterface> ParentInventory;
 		
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory", 
-		meta=(AllowPrivateAccess))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", 
+		meta=(AllowPrivateAccess),
+		meta=(DisplayThumbnail=false))
 	TObjectPtr<UUserWidget> InventoryWidget;	
 	
-	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Inventory",
-		meta=(AllowPrivateAccess))
+	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Inventory",
+		meta=(AllowPrivateAccess),
+		meta=(DisplayThumbnail=false))
 	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
 	
 protected:

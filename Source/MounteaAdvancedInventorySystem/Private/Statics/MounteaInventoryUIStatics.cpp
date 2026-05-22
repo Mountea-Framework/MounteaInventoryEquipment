@@ -31,8 +31,8 @@
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
-#include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
 #include "Interfaces/Widgets/BaseWidget/MounteaAdvancedBaseInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
@@ -772,9 +772,9 @@ UMounteaAdvancedInventoryUISubsystem* UMounteaInventoryUIStatics::GetInventoryUI
 	if (!IsValid(Context))
 		return nullptr;
 
-	APlayerController* playerController = nullptr;
+	APlayerController* playerController = Cast<APlayerController>(Context);
 
-	if (playerController != Cast<APlayerController>(Context))
+	if (!IsValid(playerController))
 	{
 		if (AActor* actor = Cast<AActor>(Context))
 			playerController = FindPlayerController(actor, 3);
@@ -876,8 +876,8 @@ UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIStatics::GetShar
 	if (!IsValid(Context))
 		return nullptr;
 
-	APlayerController* playerController = nullptr;
-	if (playerController != Cast<APlayerController>(Context))
+	APlayerController* playerController = Cast<APlayerController>(Context);
+	if (!IsValid(playerController))
 	{
 		if (AActor* actor = Cast<AActor>(Context))
 			playerController = FindPlayerController(actor, 3);

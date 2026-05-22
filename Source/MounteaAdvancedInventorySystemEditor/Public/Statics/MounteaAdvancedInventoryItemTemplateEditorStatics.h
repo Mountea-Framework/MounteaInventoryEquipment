@@ -43,6 +43,10 @@ public:
 	
 	static bool ParseSingleTemplateJson(const FString& JsonString, UMounteaInventoryItemTemplate* Template, FString& OutErrorMessage);
 	static bool ParseMultipleTemplatesJson(const FString& JsonString, TArray<FString>& OutItemJsons, FString& OutErrorMessage);
+
+	// ZIP-format import (web companion export)
+	static bool ParseItemJsonFromZip(const TArray<uint8>& ZipBytes, FString& OutItemJson, FString& OutErrorMessage);
+	static bool ImportTemplatesFromZipBytes(const TArray<uint8>& ZipBytes, const FString& TargetFolder, TArray<UMounteaInventoryItemTemplate*>& OutTemplates, FString& OutErrorMessage);
     
 	static UMounteaInventoryItemTemplate* CreateTemplateAsset(const FString& TargetFolder, const FString& AssetName, FString& OutErrorMessage);
 	static bool SaveTemplateAsset(UMounteaInventoryItemTemplate* Template, const FString& PackagePath);

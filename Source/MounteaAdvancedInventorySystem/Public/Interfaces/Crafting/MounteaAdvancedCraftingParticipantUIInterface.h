@@ -15,6 +15,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedCraftingParticipantUIInterface.generated.h"
 
+class IMounteaAdvancedCraftingParticipantInterface;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedCraftingParticipantUIInterface : public UInterface
 {
@@ -26,31 +28,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedCraftingParticipantUIIn
 	GENERATED_BODY()
 
 public:
-	
-	/**
-	 * Creates and initializes the main wrapper widget for the inventory UI.
-	 *
-	 * @return True if the wrapper widget was created successfully, otherwise false.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
-	bool CreateWrapperWidget();
-	virtual bool CreateWrapperWidget_Implementation() = 0;
-
-	/**
-	 * Returns the currently active main wrapper widget.
-	 *
-	 * @return Wrapper widget if available, otherwise nullptr.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
-	UUserWidget* GetWrapperWidget() const;
-	virtual UUserWidget* GetWrapperWidget_Implementation() const = 0;
-
-	/**
-	 * Removes and cleans up the main wrapper widget.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
-	void RemoveWrapperWidget();
-	virtual void RemoveWrapperWidget_Implementation() = 0;
 	
 	/**
 	 * Creates and initializes the Crafting widget inside the wrapper.
@@ -84,4 +61,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
 	void RemoveCraftingWidget();
 	virtual void RemoveCraftingWidget_Implementation() = 0;
+
+	/**
+	 * Returns Parent Crafting Participant which owns this UI. As UI is always used by Player only, 
+	 * the Player Pawn must provide Crafting Participant directly or by using component.
+	 * 
+	 * @return Returns Parent Crafting Participant which owns this UI or nullptr
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant() const;
+	virtual TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant_Implementation() const = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	bool SetCraftingParticipant(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
+	virtual bool SetCraftingParticipant_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant) = 0;
 };

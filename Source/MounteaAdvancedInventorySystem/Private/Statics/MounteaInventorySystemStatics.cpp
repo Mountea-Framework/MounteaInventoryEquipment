@@ -179,6 +179,49 @@ TArray<UObject*> UMounteaInventorySystemStatics::GetAssets(const TSubclassOf<UOb
 	return returnValue;
 }
 
+UActorComponent* UMounteaInventorySystemStatics::GetSingleComponentByInterface(const AActor* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult)
+{
+	bResult = false;
+	if (Target == nullptr) 
+		return nullptr;
+
+	TArray<UActorComponent*> tempComps = Target->GetComponentsByInterface(InterfaceFilter);
+	bResult = !tempComps.IsEmpty();
+	return tempComps.IsEmpty() ? nullptr : tempComps[0];
+}
+
+TScriptInterface<IInterface> UMounteaInventorySystemStatics::GetSingleInterfaceByClass(const UObject* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult)
+{
+	TScriptInterface<IInterface> result = nullptr;
+	bResult = false;
+	
+	if (Target == nullptr || InterfaceFilter == nullptr)
+		return result;
+
+	if (Target->GetClass()->ImplementsInterface(InterfaceFilter))
+	{
+		UObject* interfaceObject = const_cast<UObject*>(Target);
+		result.SetObject(interfaceObject);
+		result.SetInterface(static_cast<IInterface*>(interfaceObject->GetInterfaceAddress(InterfaceFilter)));
+		bResult = true;
+		return result;
+	}
+
+	if (const AActor* targetActor = Cast<AActor>(Target))
+	{
+		const TArray<UActorComponent*> tempComps = targetActor->GetComponentsByInterface(InterfaceFilter);
+		if (tempComps.IsEmpty() || tempComps[0] == nullptr)
+			return result;
+
+		UActorComponent* component = tempComps[0];
+		result.SetObject(component);
+		result.SetInterface(static_cast<IInterface*>(component->GetInterfaceAddress(InterfaceFilter)));
+		bResult = true;
+	}
+	
+	return result;
+}
+
 #pragma region K2NodeHelpers
 
 bool UMounteaInventorySystemStatics::SetIntPropertyValue(UObject* Target, const FName PropertyName, const int32 Value)

@@ -41,6 +41,14 @@ public:
 public:
 	
 	/**
+	 * Unique identifier for this loadout entry, matching the referenced item template's GUID.
+	 * Used by the import pipeline to match and update existing entries without loading the template.
+	 */
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
+	FGuid Guid;
+
+	/**
 	 * Item template to spawn into inventory when this loadout entry is processed.
 	 *
 	 * This template drives default quantity, durability, and possible equipment targeting.

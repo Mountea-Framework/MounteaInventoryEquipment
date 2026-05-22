@@ -16,6 +16,8 @@
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
 #include "MounteaCraftingParticipantUIComponent.generated.h"
 
+class IMounteaAdvancedCraftingParticipantInterface;
+class UMounteaAdvancedInventorySharedHUDSubsystem;
 
 /**
  * UMounteaCraftingParticipantUIComponent represents an actor capable of displaying the crafting interface.
@@ -41,12 +43,10 @@ public:
 protected:
 	
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	
 public:
 	
-	virtual bool CreateWrapperWidget_Implementation() override;
-	virtual UUserWidget* GetWrapperWidget_Implementation() const override;
-	virtual void RemoveWrapperWidget_Implementation() override;
 	virtual bool CreateCraftingWidget_Implementation() override;
 	virtual UUserWidget* GetCraftingWidget_Implementation() const override
 	{
@@ -54,14 +54,23 @@ public:
 	}
 	virtual void RemoveCraftingWidget_Implementation() override;
 	virtual bool SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget) override;
-	
+	virtual TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant_Implementation() const override
+	{
+		return CraftingParticipant;
+	}
+	virtual bool SetCraftingParticipant_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant) override;
+
 protected:
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
-		meta=(NoResetToDefault))
-	TObjectPtr<UUserWidget> WrapperWidget;
-	
+
+	UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem() const;
+		
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
 	TObjectPtr<UUserWidget> CraftingWidget;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing", 
+		meta=(AllowPrivateAccess), 
+		meta=(ExposeOnSpawn),
+		meta=(DisplayThumbnail=false))
+	TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> CraftingParticipant;
 };
