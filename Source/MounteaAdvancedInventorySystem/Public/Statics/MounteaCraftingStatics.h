@@ -40,6 +40,11 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingStatics : public UBluep
 public:
 
 	static bool IsValidRecipeHandler(const UObject* Target);
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get All Available Recipes")
+	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipes(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
