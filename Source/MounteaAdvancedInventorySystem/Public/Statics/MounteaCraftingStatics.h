@@ -17,12 +17,16 @@
 
 class UMounteaRecipeTemplate;
 class UMounteaRecipeIngredientsList;
+class UMounteaRecipeIngredient;
+class UMounteaInventoryItemTemplate;
+class UMounteaInventoryItemTemplate_Recipe;
 class IMounteaAdvancedCraftingParticipantInterface;
 class IMounteaAdvancedCraftingStationInterface;
 class IMounteaAdvancedInventoryInterface;
 
 struct FGameplayTag;
 struct FMounteaCraftingResult;
+struct FMounteaCraftingRecipeSearchFilter;
 enum class ECraftingStationState : uint8;
 
 /**
@@ -43,8 +47,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
+		meta=(AutoCreateRefTerm="SearchFilter"),
 		DisplayName="Get All Available Recipes")
-	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipes(UObject* Target);
+	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipes(UObject* Target, const FMounteaCraftingRecipeSearchFilter& SearchFilter);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
@@ -121,6 +126,47 @@ public:
 	static TSet<UMounteaRecipeTemplate*> GetAllRecipeTemplates();
 
 	static FMounteaCraftingResult CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	
+	static bool HasInventoryItemForRecipeSourceCached(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		UMounteaInventoryItemTemplate_Recipe* RecipeSource,
+		TMap<UMounteaInventoryItemTemplate_Recipe*, bool>& RecipeSourcePresenceCache);
+	
+	static TArray<UMounteaRecipeTemplate*> ApplyRecipeSourceGrantFilter(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const TArray<UMounteaRecipeTemplate*>& SourceRecipes);
+
+	static int32 GetIngredientQuantityCached(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		UMounteaInventoryItemTemplate* IngredientTemplate,
+		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+
+	static bool IsIngredientSatisfied(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const UMounteaRecipeIngredient* Ingredient,
+		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+
+	static bool IsIngredientGroupSatisfied(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const UMounteaRecipeIngredientsList* IngredientGroup,
+		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+
+	static bool IsRecipeSatisfiedByIngredients(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const UMounteaRecipeTemplate* Recipe,
+		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+
+	static TArray<UMounteaRecipeTemplate*> ApplyIngredientAvailabilityFilter(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const TArray<UMounteaRecipeTemplate*>& SourceRecipes);
+
+	static TArray<UMounteaRecipeTemplate*> ApplyStationTypeFilter(
+		const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
+		const FGameplayTag& StationType);
+
+	static TArray<UMounteaRecipeTemplate*> ApplyRecipeSourceFilter(
+		const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
+		const UMounteaRecipeTemplate* RecipeSource);
 
 /**
  * CRAFTING PLACE
