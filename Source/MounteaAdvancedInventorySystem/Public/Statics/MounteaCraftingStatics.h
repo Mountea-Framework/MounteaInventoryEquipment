@@ -62,7 +62,7 @@ public:
 		meta=(AutoCreateRefTerm="CategoryTag"),
 		DisplayName="Get All Available Recipes By Category")
 	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipesByCategory(
-		UObject* Target,
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category")) const FGameplayTag& CategoryTag);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
