@@ -29,6 +29,7 @@
 
 #include "Components/PanelWidget.h"
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
+#include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
 
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
@@ -895,6 +896,22 @@ UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIStatics::GetShar
 
 	const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
 	return IsValid(localPlayer) ? localPlayer->GetSubsystem<UMounteaAdvancedInventorySharedHUDSubsystem>() : nullptr;
+}
+
+TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> UMounteaInventoryUIStatics::GetParentCraftingParticipant(const UObject* Target)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>())
+		return nullptr;
+		
+	return IMounteaAdvancedCraftingParticipantUIInterface::Execute_GetParentCraftingParticipant(Target);
+}
+
+bool UMounteaInventoryUIStatics::SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>())
+		return false;
+
+	return IMounteaAdvancedCraftingParticipantUIInterface::Execute_SetCraftingParticipant(Target, Participant);
 }
 
 #pragma endregion 

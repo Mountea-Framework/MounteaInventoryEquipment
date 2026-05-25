@@ -15,6 +15,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+class IMounteaAdvancedCraftingParticipantInterface;
 enum class EMounteaWidgetInputPhase : uint8;
 enum class ECommonInputType : uint8;
 
@@ -73,7 +74,7 @@ public:
 #pragma region SharedHUDSubsystem
 	
 	static bool IsValidWrapperWidget(const UObject* Target);
-
+	
 	/**
 	 * Retrieves the shared HUD subsystem associated with the given context.
 	 *
@@ -90,6 +91,37 @@ public:
 		meta=(CompactNodeTitle="Inventory & Equipment Shared HUD Subsystem"),
 		DisplayName="Get Inventory & Equipment Shared HUD Subsystem")
 	static UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem(UObject* Context);
+
+	/**
+	 * Retrieves the parent crafting participant associated with a specified object.
+	 *
+	 * This function checks if the given object is valid and implements the
+	 * MounteaAdvancedCraftingParticipantUIInterface. If so, it retrieves the parent crafting participant from the object.
+	 *
+	 * @param Target The object for which to retrieve the parent crafting participant.
+	 * @return A TScriptInterface of IMounteaAdvancedCraftingParticipantInterface
+	 *         if a parent crafting participant exists, or nullptr if the object is invalid
+	 *         or does not implement the required interface.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Parent Crafting Participant")
+	static TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant(const UObject* Target);
+
+	/**
+	 * Attempts to associate a crafting participant with a target object that implements the required interface.
+	 *
+	 * This function verifies the validity of the provided target object and checks if it implements the
+	 * UMounteaAdvancedCraftingParticipantUIInterface. If the target is valid and compatible, it sets the crafting participant for the target object.
+	 *
+	 * @param Target The object to which the crafting participant will be assigned. Must implement UMounteaAdvancedCraftingParticipantUIInterface.
+	 * @param Participant The crafting participant to be associated with the target.
+	 * @return True if the crafting participant was successfully set; otherwise, false.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager", 
+		meta=(CustomTag="MounteaK2Setter"),
+		DisplayName="Set Parent Crafting Participant")
+	static bool SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
 	
 	/**
 	 * Creates and initializes the Main Viewport Widget which contains all
