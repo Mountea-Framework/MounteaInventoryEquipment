@@ -42,8 +42,9 @@ struct FMounteaCraftingResult
  * Search parameters for filtering known crafting recipes.
  * Filters can be stacked and are expected to run in this order:
  * 1) Available ingredients
- * 2) Station type
- * 3) Recipe source
+ * 2) Category
+ * 3) Station type
+ * 4) Recipe source
  */
 USTRUCT(BlueprintType)
 struct FMounteaCraftingRecipeSearchFilter
@@ -53,6 +54,7 @@ struct FMounteaCraftingRecipeSearchFilter
 	FMounteaCraftingRecipeSearchFilter()
 		: bSearchByStationType(false)
 		, bSearchByAvailableIngredients(false)
+		, bSearchByCategory(false)
 		, bSearchByRecipeSource(false)
 		, RecipeSource(nullptr)
 	{
@@ -62,6 +64,7 @@ struct FMounteaCraftingRecipeSearchFilter
 		: bSearchByStationType(true)
 		, StationType(InStationType)
 		, bSearchByAvailableIngredients(false)
+		, bSearchByCategory(false)
 		, bSearchByRecipeSource(false)
 		, RecipeSource(nullptr)
 	{
@@ -70,6 +73,7 @@ struct FMounteaCraftingRecipeSearchFilter
 	explicit FMounteaCraftingRecipeSearchFilter(UMounteaRecipeTemplate* InRecipeSource)
 		: bSearchByStationType(false)
 		, bSearchByAvailableIngredients(false)
+		, bSearchByCategory(false)
 		, bSearchByRecipeSource(true)
 		, RecipeSource(InRecipeSource)
 	{
@@ -84,6 +88,13 @@ struct FMounteaCraftingRecipeSearchFilter
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
 	uint8 bSearchByAvailableIngredients : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
+	uint8 bSearchByCategory : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search",
+		meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category"))
+	FGameplayTag CategoryTag;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Search")
 	uint8 bSearchByRecipeSource : 1;

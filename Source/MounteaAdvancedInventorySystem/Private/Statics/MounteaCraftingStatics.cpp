@@ -13,8 +13,10 @@
 #include "Statics/MounteaCraftingStatics.h"
 
 #include "Algo/Copy.h"
+#include "Algo/ForEach.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaCraftingBaseEnums.h"
+#include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaInventoryItemTemplate_Recipe.h"
 #include "Definitions/MounteaRecipeIngredient.h"
@@ -171,6 +173,86 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyIngredientAvailabi
 	return result;
 }
 
+bool UMounteaCraftingStatics::IsRecipeInCategory(
+	const UMounteaRecipeTemplate* Recipe,
+	const FGameplayTag& CategoryTag)
+{
+	if (!IsValid(Recipe) || !CategoryTag.IsValid())
+		return false;
+
+	const UMounteaInventoryItemTemplate* resultItem = Recipe->ResultItem.LoadSynchronous();
+	if (!IsValid(resultItem))
+		return false;
+
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(inventorySettings))
+		return false;
+
+	const TMap<FString, FInventoryCategory>& allowedCategories = inventorySettings->GetAllowedCategories();
+	const FInventoryCategory* allowedCategory = allowedCategories.Find(resultItem->ItemCategory);
+	if (!allowedCategory)
+		return false;
+
+	return allowedCategory->CategoryData.CategoryTags.HasTag(CategoryTag);
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyCategoryFilter(
+	const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
+	const FGameplayTag& CategoryTag)
+{
+	if (!CategoryTag.IsValid() || !IsAllowedInventoryCategoryTag(CategoryTag))
+		return {};
+
+	TArray<UMounteaRecipeTemplate*> result;
+	result.Reserve(SourceRecipes.Num());
+	Algo::CopyIf(SourceRecipes, result,
+		[&CategoryTag](const UMounteaRecipeTemplate* recipe) -> bool
+		{
+			return IsRecipeInCategory(recipe, CategoryTag);
+		});
+
+	return result;
+}
+
+void UMounteaCraftingStatics::GetAllowedInventoryCategoryTags(TArray<FGameplayTag>& OutCategoryTags)
+{
+	OutCategoryTags.Empty();
+
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(inventorySettings))
+		return;
+
+	const TMap<FString, FInventoryCategory>& allowedCategories = inventorySettings->GetAllowedCategories();
+	FGameplayTagContainer allowedCategoryTags;
+	Algo::ForEach(allowedCategories,
+		[&allowedCategoryTags](const TPair<FString, FInventoryCategory>& allowedCategory)
+		{
+			allowedCategoryTags.AppendTags(allowedCategory.Value.CategoryData.CategoryTags);
+		});
+
+	allowedCategoryTags.GetGameplayTagArray(OutCategoryTags);
+	OutCategoryTags.RemoveAll([](const FGameplayTag& categoryTag)
+	{
+		return !categoryTag.IsValid();
+	});
+
+	OutCategoryTags.Sort([](const FGameplayTag& Left, const FGameplayTag& Right)
+	{
+		return Left.ToString() < Right.ToString();
+	});
+}
+
+bool UMounteaCraftingStatics::IsAllowedInventoryCategoryTag(const FGameplayTag& CategoryTag)
+{
+	if (!CategoryTag.IsValid())
+		return false;
+
+	TArray<FGameplayTag> allowedCategoryTags;
+	GetAllowedInventoryCategoryTags(allowedCategoryTags);
+
+	return allowedCategoryTags.Contains(CategoryTag);
+}
+
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyStationTypeFilter(
 	const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
 	const FGameplayTag& StationType)
@@ -228,10 +310,19 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetFilteredRecipes(UObj
 
 	// Apply stacked filters in this order:
 	// 1) ingredients
-	// 2) station type
-	// 3) recipe source
+	// 2) category
+	// 3) station type
+	// 4) recipe source
 	if (SearchFilter.bSearchByAvailableIngredients)
 		filteredRecipes = ApplyIngredientAvailabilityFilter(parentInventory, filteredRecipes);
+
+	if (SearchFilter.bSearchByCategory)
+	{
+		if (!SearchFilter.CategoryTag.IsValid())
+			return {};
+
+		filteredRecipes = ApplyCategoryFilter(filteredRecipes, SearchFilter.CategoryTag);
+	}
 
 	if (SearchFilter.bSearchByStationType)
 	{
@@ -250,6 +341,19 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetFilteredRecipes(UObj
 	}
 
 	return filteredRecipes;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetFilteredRecipesByCategory(UObject* Target, const FGameplayTag& CategoryTag)
+{
+	if (!CategoryTag.IsValid())
+		return {};
+
+	FMounteaCraftingRecipeSearchFilter searchFilter;
+	searchFilter.bSearchByAvailableIngredients = true;
+	searchFilter.bSearchByCategory = true;
+	searchFilter.CategoryTag = CategoryTag;
+
+	return GetFilteredRecipes(Target, searchFilter);
 }
 
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetKnownRecipes(UObject* Target)
@@ -449,40 +553,5 @@ bool UMounteaCraftingStatics::StopUsing(UObject* Target, const TScriptInterface<
 
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetRecipesByCategory(UObject* Target, const FGameplayTag& CategoryTag)
 {
-	if (!IsValidRecipeHandler(Target))
-		return {};
-	
-	const auto knownRecipes = IMounteaAdvancedCraftingParticipantInterface::Execute_GetKnownRecipes(Target);
-	if (knownRecipes.Num() == 0)
-		return {};
-	
-	TArray<UMounteaRecipeTemplate*> returnValue;
-	returnValue.Reserve(knownRecipes.Num());
-	
-	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(inventorySettings))
-		return returnValue;
-	
-	const auto& allowedCategories = inventorySettings->GetAllowedCategories();
-	if (allowedCategories.Num() == 0)
-		return returnValue;
-
-	const auto IsRecipeInCategory = [&allowedCategories, &CategoryTag](const UMounteaRecipeTemplate* recipe) -> bool
-	{
-		if (!IsValid(recipe))
-			return false;
-		
-		const UMounteaInventoryItemTemplate* targetItem = recipe->ResultItem.LoadSynchronous();
-		if (!IsValid(targetItem))
-			return false;
-
-		if (const FInventoryCategory* allowedCategory = allowedCategories.Find(targetItem->ItemCategory))
-			return allowedCategory->CategoryData.CategoryTags.HasTag(CategoryTag);
-		
-		return false;
-	};
-
-	Algo::CopyIf(knownRecipes, returnValue, IsRecipeInCategory);
-	
-	return returnValue;
+	return GetFilteredRecipesByCategory(Target, CategoryTag);
 }

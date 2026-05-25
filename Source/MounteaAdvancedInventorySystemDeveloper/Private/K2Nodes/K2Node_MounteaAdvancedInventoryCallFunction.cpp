@@ -12,6 +12,8 @@
 #include "K2Nodes/K2Node_MounteaAdvancedInventoryCallFunction.h"
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"
+#include "EdGraphSchema_K2.h"
+#include "GameplayTagContainer.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryCallFunction"
@@ -138,6 +140,31 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseEquipmentSlotSelecto
 
 	const FString customTagValue = targetFunction->GetMetaData(TEXT("CustomTag"));
 	return customTagValue.Contains(TEXT("MounteaK2EquipmentSlot"));
+}
+
+bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseInventoryCategorySelector(UEdGraphPin* Pin) const
+{
+	if (!Pin)
+		return false;
+
+	if (Pin->Direction != EGPD_Input)
+		return false;
+
+	if (Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_Struct)
+		return false;
+
+	if (Pin->PinType.PinSubCategoryObject != FGameplayTag::StaticStruct())
+		return false;
+
+	const UFunction* targetFunction = GetTargetFunction();
+	if (!targetFunction)
+		return false;
+
+	if (!targetFunction->HasMetaData(TEXT("MounteaK2InventoryCategoryPin")))
+		return false;
+
+	const FString categoryPinName = targetFunction->GetMetaData(TEXT("MounteaK2InventoryCategoryPin"));
+	return Pin->PinName == FName(*categoryPinName);
 }
 
 bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const

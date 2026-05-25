@@ -15,6 +15,7 @@
 
 #include "Slate/SPinTypeCommandSelector.h"
 #include "Slate/SPinTypeEquipmentSlotSelector.h"
+#include "Slate/SPinTypeInventoryCategorySelector.h"
 #include "EdGraph/EdGraphPin.h"
 #include "EdGraph/EdGraphNode.h"
 #include "K2Nodes/K2Node_MounteaAdvancedInventoryCallFunction.h"
@@ -27,6 +28,9 @@ TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) c
 	{
 		if (callFunctionNode->ShouldUseEquipmentSlotSelector(Pin))
 			return SNew(SPinTypeEquipmentSlotSelector, Pin);
+
+		if (callFunctionNode->ShouldUseInventoryCategorySelector(Pin))
+			return SNew(SPinTypeInventoryCategorySelector, Pin);
 
 		if (callFunctionNode->ShouldUseCommandSelector(Pin))
 			return SNew(SPinTypeCommandSelector, Pin);

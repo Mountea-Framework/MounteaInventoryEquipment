@@ -51,6 +51,20 @@ public:
 		DisplayName="Get All Available Recipes")
 	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipes(UObject* Target, const FMounteaCraftingRecipeSearchFilter& SearchFilter);
 
+	/**
+	 * Returns all recipes known by the crafting participant where the craftable item would be in specified Category.
+	 * @param Target Crafting participant to query for known recipes.
+	 * @param CategoryTag Category to search by.
+	 * @return Filtered list of available recipes by single category.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Getter", MounteaK2InventoryCategoryPin="CategoryTag"),
+		meta=(AutoCreateRefTerm="CategoryTag"),
+		DisplayName="Get All Available Recipes By Category")
+	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipesByCategory(
+		UObject* Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category")) const FGameplayTag& CategoryTag);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
 		DisplayName="Get All Known Recipes")
@@ -160,6 +174,18 @@ public:
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
 		const TArray<UMounteaRecipeTemplate*>& SourceRecipes);
 
+	static bool IsRecipeInCategory(
+		const UMounteaRecipeTemplate* Recipe,
+		const FGameplayTag& CategoryTag);
+
+	static TArray<UMounteaRecipeTemplate*> ApplyCategoryFilter(
+		const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
+		const FGameplayTag& CategoryTag);
+
+	static void GetAllowedInventoryCategoryTags(TArray<FGameplayTag>& OutCategoryTags);
+
+	static bool IsAllowedInventoryCategoryTag(const FGameplayTag& CategoryTag);
+
 	static TArray<UMounteaRecipeTemplate*> ApplyStationTypeFilter(
 		const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
 		const FGameplayTag& StationType);
@@ -224,8 +250,10 @@ public:
 public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(CustomTag="MounteaK2Getter", MounteaK2InventoryCategoryPin="CategoryTag"),
 		meta=(AutoCreateRefTerm="CategoryTag"),
 		DisplayName="Get Recipes By Category")
-	static TArray<UMounteaRecipeTemplate*> GetRecipesByCategory(UObject* Target, UPARAM(meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category")) const FGameplayTag& CategoryTag);
+	static TArray<UMounteaRecipeTemplate*> GetRecipesByCategory(
+		UObject* Target,
+		UPARAM(meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category")) const FGameplayTag& CategoryTag);
 };

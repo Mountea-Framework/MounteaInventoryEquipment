@@ -33,6 +33,7 @@ public:
 	
 	bool ShouldUseCommandSelector(UEdGraphPin* Pin) const;
 	bool ShouldUseEquipmentSlotSelector(UEdGraphPin* Pin) const;
+	bool ShouldUseInventoryCategorySelector(UEdGraphPin* Pin) const;
 	
 	// UK2Node
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const override;
