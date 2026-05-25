@@ -136,11 +136,6 @@ void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScri
 		ParentInventory = NewParentInventory;
 }
 
-void UMounteaInventoryUIComponent::BindToOnItemSelected(const FInventoryItemSelectedBinding OnItemSelectedDelegate)
-{
-	OnItemSelected.AddUnique(OnItemSelectedDelegate);
-}
-
 UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIComponent::GetSharedHUDSubsystem() const
 {
 	AActor* ownerActor = GetOwner();

@@ -85,13 +85,6 @@ public:
 	{ return OnCategorySelected; };
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
 	{ return OnItemSelected; };
-	
-	DECLARE_DYNAMIC_DELEGATE_OneParam(FInventoryItemSelectedBinding, const FGuid&, SelectedItemId);
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory",
-		meta=(CustomTag="MounteaK2Setter"),
-		meta=(MounteaBinding),
-		DisplayName="Bind On Item Selected")
-	void BindToOnItemSelected(const FInventoryItemSelectedBinding OnItemSelectedDelegate);
 
 protected:
 	
