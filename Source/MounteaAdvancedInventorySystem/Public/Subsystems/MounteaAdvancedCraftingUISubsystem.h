@@ -74,7 +74,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Crafting|Subsystem",
 		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Get Crafting UI Manager")
+		DisplayName="Get Crafting UI Manager (Interface)")
 	TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface> GetCraftingUIManager_Interface() const;
 
 private:
