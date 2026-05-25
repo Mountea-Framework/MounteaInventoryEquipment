@@ -132,7 +132,13 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIComponen
 
 void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
-	if (ParentInventory != NewParentInventory) ParentInventory = NewParentInventory;
+	if (ParentInventory != NewParentInventory) 
+		ParentInventory = NewParentInventory;
+}
+
+void UMounteaInventoryUIComponent::BindToOnItemSelected(const FInventoryItemSelectedBinding OnItemSelectedDelegate)
+{
+	OnItemSelected.AddUnique(OnItemSelectedDelegate);
 }
 
 UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIComponent::GetSharedHUDSubsystem() const

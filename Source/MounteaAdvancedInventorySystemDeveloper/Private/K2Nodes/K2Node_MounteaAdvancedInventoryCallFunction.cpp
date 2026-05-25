@@ -267,6 +267,12 @@ FSlateIcon UK2Node_MounteaAdvancedInventoryCallFunction::GetIconAndTint(FLinearC
 {
 	outColor = FLinearColor(.823f, .823f, .823f);
 	
+	const auto localFunction = GetTargetFunction();
+	if (localFunction && localFunction->HasMetaData(TEXT("MounteaBinding")))
+	{
+		return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_Binding.small");
+	}
+	
 	switch (GetFunctionRole())
 	{
 		case EFunctionRole::Validate:
