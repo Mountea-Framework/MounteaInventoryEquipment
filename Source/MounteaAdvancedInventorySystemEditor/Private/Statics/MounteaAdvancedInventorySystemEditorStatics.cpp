@@ -13,13 +13,9 @@
 #include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
 
 #include "ISettingsModule.h"
-#include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
-#include "Settings/MounteaAdvancedInventorySettings.h"
-#include "Settings/MounteaAdvancedInventorySettingsConfig.h"
-#include "Settings/MounteaAdvancedInventoryUIConfig.h"
+#include "Misc/MessageDialog.h"
 
-void UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(const FString& ContainerName,
-                                                                const FString& CategoryName, const FString& SectionName)
+void UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(const FString& ContainerName,  const FString& CategoryName, const FString& SectionName)
 {
 	FModuleManager::LoadModuleChecked<ISettingsModule>("Settings").ShowViewer(FName(ContainerName),  FName(CategoryName), FName(SectionName));
 }
@@ -29,41 +25,17 @@ void UMounteaAdvancedInventorySystemEditorStatics::OpenAsset(const FString& Asse
 	GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(AssetPath);
 }
 
-void UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig()
+void UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(const FSoftObjectPath& ConfigPath, FText& OutMessage, const FText& ErrorMessage)
 {
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->AdvancedInventorySettingsConfig.LoadSynchronous() : nullptr;
-	if (!IsValid(config))
-	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
-		return;
-	}
-	
-	OpenAsset(config->GetPathName());
-}
+	OutMessage = FText::GetEmpty();
 
-void UMounteaAdvancedInventorySystemEditorStatics::OpenEquipmentConfig()
-{
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->AdvancedEquipmentSettingsConfig.LoadSynchronous() : nullptr;
+	UObject* config = ConfigPath.TryLoad();
 	if (!IsValid(config))
 	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Equipment Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
+		OutMessage = ErrorMessage;
+		FMessageDialog::Open(EAppMsgType::Ok, OutMessage);
 		return;
 	}
 
-	OpenAsset(config->GetPathName());
-}
-
-void UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryUIConfig()
-{
-	auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	auto config = settings ? settings->AdvancedInventoryUISettingsConfig.LoadSynchronous() : nullptr;
-	if (!IsValid(config))
-	{
-		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Unable to locate the Mountea Inventory UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!")));
-		return;
-	}
-	
-	OpenAsset(config->GetPathName());
+	UMounteaAdvancedInventorySystemEditorStatics::OpenAsset(config->GetPathName());
 }

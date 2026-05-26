@@ -17,6 +17,7 @@
 #include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
 #include "Runtime/WebBrowser/Public/SWebBrowser.h"
 #include "Slate/MounteaInventoryWebBrowserWrapper.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 #include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
@@ -305,7 +306,12 @@ void SMounteaItemTemplatesEditorHelp::HandleConsoleMessage(const FString& Messag
 			}
 			else if (dataType.Equals(TEXT("inventory-configuration")))
 			{
-				UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig();
+				FText errorMessage;
+				const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+				UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+					settings ? settings->AdvancedInventorySettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
+					errorMessage,
+					LOCTEXT("InventoryConfiguration_Error", "Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
 			}
 		}
 	}

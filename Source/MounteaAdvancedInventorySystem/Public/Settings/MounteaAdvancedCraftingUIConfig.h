@@ -32,4 +32,18 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> CraftingUserInterfaceClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoriesWrapperWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> CraftingCategoriesUserInterfaceClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> CraftingCategoryUserInterfaceClass;
 };

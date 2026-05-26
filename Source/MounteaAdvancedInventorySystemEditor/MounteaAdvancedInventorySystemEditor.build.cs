@@ -37,7 +37,9 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				"CoreUObject", 
 				"Engine", 
 				"UnrealEd",
-				"AssetTools",
+				"AssetTools", 
+				
+				"MounteaAdvancedInventorySystem",
 			}
 		);
 
