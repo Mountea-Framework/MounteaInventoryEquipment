@@ -68,7 +68,7 @@ public:
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Create Crafting Widget")
 	static bool CreateCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
-
+	
 	/**
 	 * Returns the currently active Crafting widget.
 	 *

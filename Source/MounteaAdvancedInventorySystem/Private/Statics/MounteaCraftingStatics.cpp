@@ -14,6 +14,7 @@
 
 #include "Algo/Copy.h"
 #include "Algo/ForEach.h"
+#include "Algo/Transform.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaCraftingBaseEnums.h"
 #include "Definitions/MounteaInventoryBaseDataTypes.h"
@@ -354,6 +355,71 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetFilteredRecipesByCat
 	searchFilter.CategoryTag = CategoryTag;
 
 	return GetFilteredRecipes(Target, searchFilter);
+}
+
+TArray<FInventoryCategory> UMounteaCraftingStatics::GetAllowedCategoriesWithCraftableItems(UObject* Target)
+{
+	if (!IsValidRecipeHandler(Target))
+		return {};
+
+	const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings))
+		return {};
+
+	const TMap<FString, FInventoryCategory> allowedCategories = settings->GetAllowedCategories();
+	if (allowedCategories.Num() == 0)
+		return {};
+
+	FMounteaCraftingRecipeSearchFilter searchFilter;
+	searchFilter.bSearchByAvailableIngredients = true;
+
+	const TArray<UMounteaRecipeTemplate*> craftableRecipes = GetFilteredRecipes(Target, searchFilter);
+	if (craftableRecipes.Num() == 0)
+		return {};
+
+	TSet<FString> craftableCategoryIds;
+	craftableCategoryIds.Reserve(FMath::Min(craftableRecipes.Num(), allowedCategories.Num()));
+
+	for (const UMounteaRecipeTemplate* recipe : craftableRecipes)
+	{
+		if (!IsValid(recipe))
+			continue;
+
+		const UMounteaInventoryItemTemplate* resultItem = recipe->ResultItem.LoadSynchronous();
+		if (!IsValid(resultItem))
+			continue;
+
+		const FString& itemCategory = resultItem->ItemCategory;
+		if (craftableCategoryIds.Contains(itemCategory))
+			continue;
+
+		if (!allowedCategories.Contains(itemCategory))
+			continue;
+
+		craftableCategoryIds.Add(itemCategory);
+		if (craftableCategoryIds.Num() == allowedCategories.Num())
+			break;
+	}
+
+	if (craftableCategoryIds.IsEmpty())
+		return {};
+
+	TArray<FInventoryCategory> returnValue;
+	returnValue.Reserve(allowedCategories.Num());
+
+	Algo::TransformIf(
+		allowedCategories,
+		returnValue,
+		[&craftableCategoryIds](const TPair<FString, FInventoryCategory>& category)
+		{
+			return craftableCategoryIds.Contains(category.Key);
+		},
+		[](const TPair<FString, FInventoryCategory>& category)
+		{
+			return category.Value;
+		});
+
+	return returnValue;
 }
 
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetKnownRecipes(UObject* Target)

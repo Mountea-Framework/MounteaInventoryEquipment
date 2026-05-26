@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaCraftingStatics.generated.h"
 
@@ -64,6 +65,12 @@ public:
 	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipesByCategory(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target,
 		UPARAM(meta=(Categories="Mountea_Inventory.Categories,Mountea_Inventory.Category,Categories,Category")) const FGameplayTag& CategoryTag);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(CustomTag="MounteaK2Getter"),
+		DisplayName="Get Categories With Craftbale Items")
+	static TArray<FInventoryCategory> GetAllowedCategoriesWithCraftableItems(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(CustomTag="MounteaK2Getter"),
