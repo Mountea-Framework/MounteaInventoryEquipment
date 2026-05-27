@@ -173,61 +173,61 @@ public:
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Added")
-	static bool BindToOnItemAdded(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemAddedBinding& Binding);
+	static bool BindToOnItemAdded(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemAddedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Added")
-	static bool UnbindFromOnItemAdded(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemAddedBinding& Binding);
+	static bool UnbindFromOnItemAdded(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemAddedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Removed")
-	static bool BindToOnItemRemoved(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemRemovedBinding& Binding);
+	static bool BindToOnItemRemoved(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemRemovedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Removed")
-	static bool UnbindFromOnItemRemoved(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemRemovedBinding& Binding);
+	static bool UnbindFromOnItemRemoved(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemRemovedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Quantity Changed")
-	static bool BindToOnItemQuantityChanged(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemQuantityChangedBinding& Binding);
+	static bool BindToOnItemQuantityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemQuantityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Quantity Changed")
-	static bool UnbindFromOnItemQuantityChanged(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemQuantityChangedBinding& Binding);
+	static bool UnbindFromOnItemQuantityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemQuantityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Durability Changed")
-	static bool BindToOnItemDurabilityChanged(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding);
+	static bool BindToOnItemDurabilityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Durability Changed")
-	static bool UnbindFromOnItemDurabilityChanged(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding);
+	static bool UnbindFromOnItemDurabilityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Notification Processed")
-	static bool BindToOnNotificationProcessed(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryNotificationProcessedBinding& Binding);
+	static bool BindToOnNotificationProcessed(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryNotificationProcessedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Notification Processed")
-	static bool UnbindFromOnNotificationProcessed(const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target, const FMounteaInventoryNotificationProcessedBinding& Binding);
+	static bool UnbindFromOnNotificationProcessed(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryNotificationProcessedBinding& Binding);
 
 #pragma endregion
 

@@ -47,13 +47,13 @@ public:
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Equipment Item State Changed")
-	static bool BindToOnEquipmentItemStateChanged(const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
+	static bool BindToOnEquipmentItemStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedEquipmentItemInterface")) UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Equipment Item State Changed")
-	static bool UnbindFromOnEquipmentItemStateChanged(const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
+	static bool UnbindFromOnEquipmentItemStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedEquipmentItemInterface")) UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
 
 #pragma endregion
 	

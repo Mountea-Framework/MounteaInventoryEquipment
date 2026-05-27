@@ -31,18 +31,18 @@
 #include "Statics/MounteaInventoryStatics.h"
 
 #define MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
 		return false; \
-	IMounteaAdvancedCraftingParticipantInterface* nativeInterface = Cast<IMounteaAdvancedCraftingParticipantInterface>((Target).GetObject()); \
+	IMounteaAdvancedCraftingParticipantInterface* nativeInterface = Cast<IMounteaAdvancedCraftingParticipantInterface>(Target); \
 	if (!nativeInterface) \
 		return false; \
 	nativeInterface->HandleGetter().AddUnique(Binding); \
 	return true
 
 #define MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
 		return false; \
-	IMounteaAdvancedCraftingParticipantInterface* nativeInterface = Cast<IMounteaAdvancedCraftingParticipantInterface>((Target).GetObject()); \
+	IMounteaAdvancedCraftingParticipantInterface* nativeInterface = Cast<IMounteaAdvancedCraftingParticipantInterface>(Target); \
 	if (!nativeInterface) \
 		return false; \
 	nativeInterface->HandleGetter().Remove(Binding); \
@@ -313,42 +313,42 @@ bool UMounteaCraftingStatics::IsValidRecipeHandler(const UObject* Target)
 }
 
 bool UMounteaCraftingStatics::BindToOnCraftingFinished(
-	const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target,
+	UObject* Target,
 	const FMounteaCraftingFinishedBinding& Binding)
 {
 	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnCraftingFinishedEventHandle);
 }
 
 bool UMounteaCraftingStatics::UnbindFromOnCraftingFinished(
-	const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target,
+	UObject* Target,
 	const FMounteaCraftingFinishedBinding& Binding)
 {
 	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnCraftingFinishedEventHandle);
 }
 
 bool UMounteaCraftingStatics::BindToOnRecipeLearned(
-	const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target,
+	UObject* Target,
 	const FMounteaRecipeLearnedBinding& Binding)
 {
 	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeLearnedEventHandle);
 }
 
 bool UMounteaCraftingStatics::UnbindFromOnRecipeLearned(
-	const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target,
+	UObject* Target,
 	const FMounteaRecipeLearnedBinding& Binding)
 {
 	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeLearnedEventHandle);
 }
 
 bool UMounteaCraftingStatics::BindToOnRecipeForgotten(
-	const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target,
+	UObject* Target,
 	const FMounteaRecipeForgottenBinding& Binding)
 {
 	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeForgottenEventHandle);
 }
 
 bool UMounteaCraftingStatics::UnbindFromOnRecipeForgotten(
-	const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target,
+	UObject* Target,
 	const FMounteaRecipeForgottenBinding& Binding)
 {
 	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeForgottenEventHandle);

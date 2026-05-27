@@ -58,18 +58,18 @@
 #include "Widgets/ItemPreview/MounteaAdvancedInventoryInteractableObjectWidget.h"
 
 #define MOUNTEA_BIND_INVENTORY_UI_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
 		return false; \
-	IMounteaAdvancedInventoryUIManagerInterface* nativeInterface = Cast<IMounteaAdvancedInventoryUIManagerInterface>((Target).GetObject()); \
+	IMounteaAdvancedInventoryUIManagerInterface* nativeInterface = Cast<IMounteaAdvancedInventoryUIManagerInterface>(Target); \
 	if (!nativeInterface) \
 		return false; \
 	nativeInterface->HandleGetter().AddUnique(Binding); \
 	return true
 
 #define MOUNTEA_UNBIND_INVENTORY_UI_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
 		return false; \
-	IMounteaAdvancedInventoryUIManagerInterface* nativeInterface = Cast<IMounteaAdvancedInventoryUIManagerInterface>((Target).GetObject()); \
+	IMounteaAdvancedInventoryUIManagerInterface* nativeInterface = Cast<IMounteaAdvancedInventoryUIManagerInterface>(Target); \
 	if (!nativeInterface) \
 		return false; \
 	nativeInterface->HandleGetter().Remove(Binding); \
@@ -271,28 +271,28 @@ void UMounteaInventoryUIStatics::SetParentInventory(const TScriptInterface<IMoun
 }
 
 bool UMounteaInventoryUIStatics::BindToOnCategorySelected(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UObject* Target,
 	const FMounteaInventoryCategorySelectedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnCategorySelectedHandle);
 }
 
 bool UMounteaInventoryUIStatics::UnbindFromOnCategorySelected(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UObject* Target,
 	const FMounteaInventoryCategorySelectedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnCategorySelectedHandle);
 }
 
 bool UMounteaInventoryUIStatics::BindToOnItemSelected(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UObject* Target,
 	const FMounteaInventoryItemSelectedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnItemSelectedHandle);
 }
 
 bool UMounteaInventoryUIStatics::UnbindFromOnItemSelected(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
+	UObject* Target,
 	const FMounteaInventoryItemSelectedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnItemSelectedHandle);

@@ -40,18 +40,18 @@
 #include "Statics/MounteaAttachmentsStatics.h"
 
 #define MOUNTEA_BIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
 		return false; \
-	IMounteaAdvancedEquipmentItemInterface* nativeInterface = Cast<IMounteaAdvancedEquipmentItemInterface>((Target).GetObject()); \
+	IMounteaAdvancedEquipmentItemInterface* nativeInterface = Cast<IMounteaAdvancedEquipmentItemInterface>(Target); \
 	if (!nativeInterface) \
 		return false; \
 	nativeInterface->HandleGetter().AddUnique(Binding); \
 	return true
 
 #define MOUNTEA_UNBIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
 		return false; \
-	IMounteaAdvancedEquipmentItemInterface* nativeInterface = Cast<IMounteaAdvancedEquipmentItemInterface>((Target).GetObject()); \
+	IMounteaAdvancedEquipmentItemInterface* nativeInterface = Cast<IMounteaAdvancedEquipmentItemInterface>(Target); \
 	if (!nativeInterface) \
 		return false; \
 	nativeInterface->HandleGetter().Remove(Binding); \
@@ -68,14 +68,14 @@ const FMounteaEquipmentSlotHeaderData* UMounteaEquipmentStatics::ResolveSlotHead
 }
 
 bool UMounteaEquipmentStatics::BindToOnEquipmentItemStateChanged(
-	const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& Target,
+	UObject* Target,
 	const FMounteaEquipmentItemStateChangedBinding& Binding)
 {
 	MOUNTEA_BIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, GetOnEquipmentItemStateChangedHandle);
 }
 
 bool UMounteaEquipmentStatics::UnbindFromOnEquipmentItemStateChanged(
-	const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>& Target,
+	UObject* Target,
 	const FMounteaEquipmentItemStateChangedBinding& Binding)
 {
 	MOUNTEA_UNBIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, GetOnEquipmentItemStateChangedHandle);

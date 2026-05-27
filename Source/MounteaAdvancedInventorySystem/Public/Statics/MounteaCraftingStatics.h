@@ -55,37 +55,37 @@ public:
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Crafting Finished")
-	static bool BindToOnCraftingFinished(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const FMounteaCraftingFinishedBinding& Binding);
+	static bool BindToOnCraftingFinished(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaCraftingFinishedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Crafting Finished")
-	static bool UnbindFromOnCraftingFinished(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const FMounteaCraftingFinishedBinding& Binding);
+	static bool UnbindFromOnCraftingFinished(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaCraftingFinishedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Recipe Learned")
-	static bool BindToOnRecipeLearned(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const FMounteaRecipeLearnedBinding& Binding);
+	static bool BindToOnRecipeLearned(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeLearnedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Recipe Learned")
-	static bool UnbindFromOnRecipeLearned(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const FMounteaRecipeLearnedBinding& Binding);
+	static bool UnbindFromOnRecipeLearned(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeLearnedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Recipe Forgotten")
-	static bool BindToOnRecipeForgotten(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const FMounteaRecipeForgottenBinding& Binding);
+	static bool BindToOnRecipeForgotten(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeForgottenBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Recipe Forgotten")
-	static bool UnbindFromOnRecipeForgotten(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const FMounteaRecipeForgottenBinding& Binding);
+	static bool UnbindFromOnRecipeForgotten(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeForgottenBinding& Binding);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),

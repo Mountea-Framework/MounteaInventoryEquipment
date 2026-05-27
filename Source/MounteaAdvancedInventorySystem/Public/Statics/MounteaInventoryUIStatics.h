@@ -77,25 +77,25 @@ public:
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Category Selected")
-	static bool BindToOnCategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FMounteaInventoryCategorySelectedBinding& Binding);
+	static bool BindToOnCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Category Selected")
-	static bool UnbindFromOnCategorySelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FMounteaInventoryCategorySelectedBinding& Binding);
+	static bool UnbindFromOnCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Selected")
-	static bool BindToOnItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FMounteaInventoryItemSelectedBinding& Binding);
+	static bool BindToOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Selected")
-	static bool UnbindFromOnItemSelected(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FMounteaInventoryItemSelectedBinding& Binding);
+	static bool UnbindFromOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
 	
 	// --- Shared HUD Subsystem
 #pragma region SharedHUDSubsystem
