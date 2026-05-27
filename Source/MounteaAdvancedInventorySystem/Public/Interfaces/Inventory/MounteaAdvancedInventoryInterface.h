@@ -125,6 +125,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemRemoved, const FMounteaInvent
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemQuantityChanged, const FMounteaInventoryItem&, Item, int32, OldQuantity, int32, NewQuantity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemDurabilityChanged, const FMounteaInventoryItem&, Item, float, OldDurability, float, NewDurability);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNotificationProcessed, const FInventoryNotificationData&, NotificationData);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemAddedBinding, const FMounteaInventoryItem&, AddedItem);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemRemovedBinding, const FMounteaInventoryItem&, RemovedItem);
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FMounteaInventoryItemQuantityChangedBinding, const FMounteaInventoryItem&, Item, int32, OldQuantity, int32, NewQuantity);
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FMounteaInventoryItemDurabilityChangedBinding, const FMounteaInventoryItem&, Item, float, OldDurability, float, NewDurability);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryNotificationProcessedBinding, const FInventoryNotificationData&, NotificationData);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)

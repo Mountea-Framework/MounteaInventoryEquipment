@@ -270,30 +270,22 @@ void UMounteaInventoryUIStatics::SetParentInventory(const TScriptInterface<IMoun
 		Target->Execute_SetParentInventory(Target.GetObject(), NewParentInventory);
 }
 
-bool UMounteaInventoryUIStatics::BindToOnCategorySelected(
-	UObject* Target,
-	const FMounteaInventoryCategorySelectedBinding& Binding)
+bool UMounteaInventoryUIStatics::BindToOnCategorySelected(UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnCategorySelectedHandle);
 }
 
-bool UMounteaInventoryUIStatics::UnbindFromOnCategorySelected(
-	UObject* Target,
-	const FMounteaInventoryCategorySelectedBinding& Binding)
+bool UMounteaInventoryUIStatics::UnbindFromOnCategorySelected(UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnCategorySelectedHandle);
 }
 
-bool UMounteaInventoryUIStatics::BindToOnItemSelected(
-	UObject* Target,
-	const FMounteaInventoryItemSelectedBinding& Binding)
+bool UMounteaInventoryUIStatics::BindToOnItemSelected(UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnItemSelectedHandle);
 }
 
-bool UMounteaInventoryUIStatics::UnbindFromOnItemSelected(
-	UObject* Target,
-	const FMounteaInventoryItemSelectedBinding& Binding)
+bool UMounteaInventoryUIStatics::UnbindFromOnItemSelected(UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnItemSelectedHandle);
 }

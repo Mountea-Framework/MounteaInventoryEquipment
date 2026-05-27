@@ -14,6 +14,7 @@
 #include "CoreMinimal.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaInventoryBaseDataTypes.h"
+#include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaCraftingStatics.generated.h"
 
@@ -30,10 +31,6 @@ struct FGameplayTag;
 struct FMounteaCraftingResult;
 struct FMounteaCraftingRecipeSearchFilter;
 enum class ECraftingStationState : uint8;
-
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaCraftingFinishedBinding, const FMounteaCraftingResult&, Result);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaRecipeLearnedBinding, const UMounteaRecipeTemplate*, RecipeTemplate);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaRecipeForgottenBinding, const UMounteaRecipeTemplate*, RecipeTemplate);
 
 /**
  *

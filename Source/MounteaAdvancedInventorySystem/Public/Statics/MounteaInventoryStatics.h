@@ -31,12 +31,6 @@ enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
 enum class EInventoryItemActionCallback : uint8;
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemAddedBinding, const FMounteaInventoryItem&, AddedItem);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemRemovedBinding, const FMounteaInventoryItem&, RemovedItem);
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FMounteaInventoryItemQuantityChangedBinding, const FMounteaInventoryItem&, Item, int32, OldQuantity, int32, NewQuantity);
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FMounteaInventoryItemDurabilityChangedBinding, const FMounteaInventoryItem&, Item, float, OldDurability, float, NewDurability);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryNotificationProcessedBinding, const FInventoryNotificationData&, NotificationData);
-
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryStatics : public UBlueprintFunctionLibrary
 {

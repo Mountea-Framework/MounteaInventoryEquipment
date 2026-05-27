@@ -312,44 +312,32 @@ bool UMounteaCraftingStatics::IsValidRecipeHandler(const UObject* Target)
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingParticipantInterface>();
 }
 
-bool UMounteaCraftingStatics::BindToOnCraftingFinished(
-	UObject* Target,
-	const FMounteaCraftingFinishedBinding& Binding)
+bool UMounteaCraftingStatics::BindToOnCraftingFinished(UObject* Target, const FMounteaCraftingFinishedBinding& Binding)
 {
 	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnCraftingFinishedEventHandle);
 }
 
-bool UMounteaCraftingStatics::UnbindFromOnCraftingFinished(
-	UObject* Target,
-	const FMounteaCraftingFinishedBinding& Binding)
+bool UMounteaCraftingStatics::UnbindFromOnCraftingFinished(UObject* Target, const FMounteaCraftingFinishedBinding& Binding)
 {
 	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnCraftingFinishedEventHandle);
 }
 
-bool UMounteaCraftingStatics::BindToOnRecipeLearned(
-	UObject* Target,
-	const FMounteaRecipeLearnedBinding& Binding)
+bool UMounteaCraftingStatics::BindToOnRecipeLearned(UObject* Target, const FMounteaRecipeLearnedBinding& Binding)
 {
 	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeLearnedEventHandle);
 }
 
-bool UMounteaCraftingStatics::UnbindFromOnRecipeLearned(
-	UObject* Target,
-	const FMounteaRecipeLearnedBinding& Binding)
+bool UMounteaCraftingStatics::UnbindFromOnRecipeLearned(UObject* Target, const FMounteaRecipeLearnedBinding& Binding)
 {
 	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeLearnedEventHandle);
 }
 
-bool UMounteaCraftingStatics::BindToOnRecipeForgotten(
-	UObject* Target,
-	const FMounteaRecipeForgottenBinding& Binding)
+bool UMounteaCraftingStatics::BindToOnRecipeForgotten(UObject* Target, const FMounteaRecipeForgottenBinding& Binding)
 {
 	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeForgottenEventHandle);
 }
 
-bool UMounteaCraftingStatics::UnbindFromOnRecipeForgotten(
-	UObject* Target,
-	const FMounteaRecipeForgottenBinding& Binding)
+bool UMounteaCraftingStatics::UnbindFromOnRecipeForgotten(UObject* Target, const FMounteaRecipeForgottenBinding& Binding)
 {
 	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeForgottenEventHandle);
 }

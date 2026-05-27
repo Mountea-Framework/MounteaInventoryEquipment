@@ -12,6 +12,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentAttachableInterface.h"
+#include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaAttachmentsStatics.generated.h"
 
@@ -23,12 +25,6 @@ class UMounteaAttachableComponent;
 class UMounteaAdvancedAttachmentSlot;
 class IMounteaAdvancedAttachmentContainerInterface;
 class IMounteaAdvancedAttachmentAttachableInterface;
-
-DECLARE_DYNAMIC_DELEGATE_ThreeParams(FMounteaAttachmentChangedBinding, const FName&, SlotId, UObject*, NewAttachment, UObject*, OldAttachment);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaSlotStateChangedBinding, const FName&, SlotId, bool, bIsEnabled);
-DECLARE_DYNAMIC_DELEGATE(FMounteaContainerClearedBinding);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaAttachableAttachedBinding, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container, const FName&, SlotId);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaAttachableDetachedBinding, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container);
 
 /**
  * Helper library for attachment containers and attachable objects.

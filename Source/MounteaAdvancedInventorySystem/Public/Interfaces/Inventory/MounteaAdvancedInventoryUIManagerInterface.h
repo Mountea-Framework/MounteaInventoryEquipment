@@ -26,6 +26,8 @@ class UWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&, SelectedItemId);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryCategorySelectedBinding, const FString&, SelectedCategoryId);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemSelectedBinding, const FGuid&, SelectedItemId);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)

@@ -65,72 +65,52 @@ FGameplayTagContainer UMounteaInventoryStatics::GetItemActionTags(UMounteaInvent
 
 #pragma region Bindings
 
-bool UMounteaInventoryStatics::BindToOnItemAdded(
-	UObject* Target,
-	const FMounteaInventoryItemAddedBinding& Binding)
+bool UMounteaInventoryStatics::BindToOnItemAdded(UObject* Target, const FMounteaInventoryItemAddedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemAddedEventHandle);
 }
 
-bool UMounteaInventoryStatics::UnbindFromOnItemAdded(
-	UObject* Target,
-	const FMounteaInventoryItemAddedBinding& Binding)
+bool UMounteaInventoryStatics::UnbindFromOnItemAdded(UObject* Target, const FMounteaInventoryItemAddedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemAddedEventHandle);
 }
 
-bool UMounteaInventoryStatics::BindToOnItemRemoved(
-	UObject* Target,
-	const FMounteaInventoryItemRemovedBinding& Binding)
+bool UMounteaInventoryStatics::BindToOnItemRemoved(UObject* Target, const FMounteaInventoryItemRemovedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemRemovedEventHandle);
 }
 
-bool UMounteaInventoryStatics::UnbindFromOnItemRemoved(
-	UObject* Target,
-	const FMounteaInventoryItemRemovedBinding& Binding)
+bool UMounteaInventoryStatics::UnbindFromOnItemRemoved(UObject* Target, const FMounteaInventoryItemRemovedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemRemovedEventHandle);
 }
 
-bool UMounteaInventoryStatics::BindToOnItemQuantityChanged(
-	UObject* Target,
-	const FMounteaInventoryItemQuantityChangedBinding& Binding)
+bool UMounteaInventoryStatics::BindToOnItemQuantityChanged(UObject* Target, const FMounteaInventoryItemQuantityChangedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemQuantityChangedEventHandle);
 }
 
-bool UMounteaInventoryStatics::UnbindFromOnItemQuantityChanged(
-	UObject* Target,
-	const FMounteaInventoryItemQuantityChangedBinding& Binding)
+bool UMounteaInventoryStatics::UnbindFromOnItemQuantityChanged(UObject* Target, const FMounteaInventoryItemQuantityChangedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemQuantityChangedEventHandle);
 }
 
-bool UMounteaInventoryStatics::BindToOnItemDurabilityChanged(
-	UObject* Target,
-	const FMounteaInventoryItemDurabilityChangedBinding& Binding)
+bool UMounteaInventoryStatics::BindToOnItemDurabilityChanged(UObject* Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemDurabilityChangedEventHandle);
 }
 
-bool UMounteaInventoryStatics::UnbindFromOnItemDurabilityChanged(
-	UObject* Target,
-	const FMounteaInventoryItemDurabilityChangedBinding& Binding)
+bool UMounteaInventoryStatics::UnbindFromOnItemDurabilityChanged(UObject* Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemDurabilityChangedEventHandle);
 }
 
-bool UMounteaInventoryStatics::BindToOnNotificationProcessed(
-	UObject* Target,
-	const FMounteaInventoryNotificationProcessedBinding& Binding)
+bool UMounteaInventoryStatics::BindToOnNotificationProcessed(UObject* Target, const FMounteaInventoryNotificationProcessedBinding& Binding)
 {
 	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnNotificationProcessedEventHandle);
 }
 
-bool UMounteaInventoryStatics::UnbindFromOnNotificationProcessed(
-	UObject* Target,
-	const FMounteaInventoryNotificationProcessedBinding& Binding)
+bool UMounteaInventoryStatics::UnbindFromOnNotificationProcessed(UObject* Target, const FMounteaInventoryNotificationProcessedBinding& Binding)
 {
 	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnNotificationProcessedEventHandle);
 }

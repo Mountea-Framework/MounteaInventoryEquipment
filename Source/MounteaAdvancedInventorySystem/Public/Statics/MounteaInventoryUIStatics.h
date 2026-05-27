@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
@@ -43,9 +44,6 @@ class IMounteaAdvancedBaseInventoryWidgetInterface;
 class IMounteaInventorySystemWrapperWidgetInterface;
 class IMounteaAdvancedInventorySharedHUDInterface;
 class IMounteaAdvancedInventoryUIManagerInterface;
-
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryCategorySelectedBinding, const FString&, SelectedCategoryId);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemSelectedBinding, const FGuid&, SelectedItemId);
 
 /**
  * 

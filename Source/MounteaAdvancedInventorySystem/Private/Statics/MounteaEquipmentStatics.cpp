@@ -67,16 +67,12 @@ const FMounteaEquipmentSlotHeaderData* UMounteaEquipmentStatics::ResolveSlotHead
 	return SettingsConfig->AllowedEquipmentSlots.Find(Slot->SlotName);
 }
 
-bool UMounteaEquipmentStatics::BindToOnEquipmentItemStateChanged(
-	UObject* Target,
-	const FMounteaEquipmentItemStateChangedBinding& Binding)
+bool UMounteaEquipmentStatics::BindToOnEquipmentItemStateChanged(UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding)
 {
 	MOUNTEA_BIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, GetOnEquipmentItemStateChangedHandle);
 }
 
-bool UMounteaEquipmentStatics::UnbindFromOnEquipmentItemStateChanged(
-	UObject* Target,
-	const FMounteaEquipmentItemStateChangedBinding& Binding)
+bool UMounteaEquipmentStatics::UnbindFromOnEquipmentItemStateChanged(UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding)
 {
 	MOUNTEA_UNBIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, GetOnEquipmentItemStateChangedHandle);
 }

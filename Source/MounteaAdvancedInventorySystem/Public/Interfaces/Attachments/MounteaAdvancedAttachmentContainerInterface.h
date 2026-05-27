@@ -23,6 +23,9 @@ class UMounteaAdvancedAttachmentSlot;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAttachmentChanged, const FName&, SlotId, UObject*, NewAttachment, UObject*, OldAttachment);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlotStateChanged, const FName&, SlotId, bool, bIsEnabled);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainerCleared);
+DECLARE_DYNAMIC_DELEGATE_ThreeParams(FMounteaAttachmentChangedBinding, const FName&, SlotId, UObject*, NewAttachment, UObject*, OldAttachment);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaSlotStateChangedBinding, const FName&, SlotId, bool, bIsEnabled);
+DECLARE_DYNAMIC_DELEGATE(FMounteaContainerClearedBinding);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedAttachmentContainerInterface : public UInterface

@@ -29,8 +29,6 @@ class USkeletalMesh;
 class UStaticMesh;
 struct FMounteaEquipmentSlotHeaderData;
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaEquipmentItemStateChangedBinding, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>&, EquipmentItem, const EEquipmentItemState, NewState);
-
 /**
  * 
  */

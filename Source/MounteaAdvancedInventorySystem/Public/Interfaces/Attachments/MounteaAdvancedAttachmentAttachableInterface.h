@@ -21,6 +21,8 @@ class IMounteaAdvancedAttachmentContainerInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttachableAttached, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container, const FName&, SlotId);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttachableDetached, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaAttachableAttachedBinding, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container, const FName&, SlotId);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaAttachableDetachedBinding, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>&, Container);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedAttachmentAttachableInterface : public UInterface

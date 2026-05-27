@@ -88,72 +88,52 @@ TArray<USceneComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(cons
 	return components;
 }
 
-bool UMounteaAttachmentsStatics::BindToOnAttachmentChanged(
-	UObject* Target,
-	const FMounteaAttachmentChangedBinding& Binding)
+bool UMounteaAttachmentsStatics::BindToOnAttachmentChanged(UObject* Target, const FMounteaAttachmentChangedBinding& Binding)
 {
 	MOUNTEA_BIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnAttachmentChangedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::UnbindFromOnAttachmentChanged(
-	UObject* Target,
-	const FMounteaAttachmentChangedBinding& Binding)
+bool UMounteaAttachmentsStatics::UnbindFromOnAttachmentChanged(UObject* Target, const FMounteaAttachmentChangedBinding& Binding)
 {
 	MOUNTEA_UNBIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnAttachmentChangedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::BindToOnSlotStateChanged(
-	UObject* Target,
-	const FMounteaSlotStateChangedBinding& Binding)
+bool UMounteaAttachmentsStatics::BindToOnSlotStateChanged(UObject* Target, const FMounteaSlotStateChangedBinding& Binding)
 {
 	MOUNTEA_BIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnSlotStateChangedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::UnbindFromOnSlotStateChanged(
-	UObject* Target,
-	const FMounteaSlotStateChangedBinding& Binding)
+bool UMounteaAttachmentsStatics::UnbindFromOnSlotStateChanged(UObject* Target, const FMounteaSlotStateChangedBinding& Binding)
 {
 	MOUNTEA_UNBIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnSlotStateChangedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::BindToOnContainerCleared(
-	UObject* Target,
-	const FMounteaContainerClearedBinding& Binding)
+bool UMounteaAttachmentsStatics::BindToOnContainerCleared(UObject* Target, const FMounteaContainerClearedBinding& Binding)
 {
 	MOUNTEA_BIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnContainerClearedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::UnbindFromOnContainerCleared(
-	UObject* Target,
-	const FMounteaContainerClearedBinding& Binding)
+bool UMounteaAttachmentsStatics::UnbindFromOnContainerCleared(UObject* Target, const FMounteaContainerClearedBinding& Binding)
 {
 	MOUNTEA_UNBIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnContainerClearedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::BindToOnAttachableAttached(
-	UObject* Target,
-	const FMounteaAttachableAttachedBinding& Binding)
+bool UMounteaAttachmentsStatics::BindToOnAttachableAttached(UObject* Target, const FMounteaAttachableAttachedBinding& Binding)
 {
 	MOUNTEA_BIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableAttachedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::UnbindFromOnAttachableAttached(
-	UObject* Target,
-	const FMounteaAttachableAttachedBinding& Binding)
+bool UMounteaAttachmentsStatics::UnbindFromOnAttachableAttached(UObject* Target, const FMounteaAttachableAttachedBinding& Binding)
 {
 	MOUNTEA_UNBIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableAttachedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::BindToOnAttachableDetached(
-	UObject* Target,
-	const FMounteaAttachableDetachedBinding& Binding)
+bool UMounteaAttachmentsStatics::BindToOnAttachableDetached(UObject* Target, const FMounteaAttachableDetachedBinding& Binding)
 {
 	MOUNTEA_BIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableDetachedEventHandle);
 }
 
-bool UMounteaAttachmentsStatics::UnbindFromOnAttachableDetached(
-	UObject* Target,
-	const FMounteaAttachableDetachedBinding& Binding)
+bool UMounteaAttachmentsStatics::UnbindFromOnAttachableDetached(UObject* Target, const FMounteaAttachableDetachedBinding& Binding)
 {
 	MOUNTEA_UNBIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableDetachedEventHandle);
 }
