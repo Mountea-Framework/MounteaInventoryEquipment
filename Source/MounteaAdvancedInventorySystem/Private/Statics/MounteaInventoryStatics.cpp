@@ -24,6 +24,24 @@
 #include "Settings/TemplatesConfig/MounteaAdvancedInventoryPayloadsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
+#define MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryInterface* nativeInterface = Cast<IMounteaAdvancedInventoryInterface>((Target).GetObject()); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid((Target).GetObject()) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryInterface* nativeInterface = Cast<IMounteaAdvancedInventoryInterface>((Target).GetObject()); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+	return true
+
 #pragma region ItemActions
 
 bool UMounteaInventoryStatics::InitializeItemAction(UMounteaInventoryItemAction* Target,
@@ -44,6 +62,80 @@ FGameplayTagContainer UMounteaInventoryStatics::GetItemActionTags(UMounteaInvent
 }
 
 #pragma endregion 
+
+#pragma region Bindings
+
+bool UMounteaInventoryStatics::BindToOnItemAdded(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemAddedBinding& Binding)
+{
+	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemAddedEventHandle);
+}
+
+bool UMounteaInventoryStatics::UnbindFromOnItemAdded(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemAddedBinding& Binding)
+{
+	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemAddedEventHandle);
+}
+
+bool UMounteaInventoryStatics::BindToOnItemRemoved(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemRemovedBinding& Binding)
+{
+	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemRemovedEventHandle);
+}
+
+bool UMounteaInventoryStatics::UnbindFromOnItemRemoved(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemRemovedBinding& Binding)
+{
+	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemRemovedEventHandle);
+}
+
+bool UMounteaInventoryStatics::BindToOnItemQuantityChanged(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemQuantityChangedBinding& Binding)
+{
+	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemQuantityChangedEventHandle);
+}
+
+bool UMounteaInventoryStatics::UnbindFromOnItemQuantityChanged(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemQuantityChangedBinding& Binding)
+{
+	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemQuantityChangedEventHandle);
+}
+
+bool UMounteaInventoryStatics::BindToOnItemDurabilityChanged(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemDurabilityChangedBinding& Binding)
+{
+	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemDurabilityChangedEventHandle);
+}
+
+bool UMounteaInventoryStatics::UnbindFromOnItemDurabilityChanged(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryItemDurabilityChangedBinding& Binding)
+{
+	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnItemDurabilityChangedEventHandle);
+}
+
+bool UMounteaInventoryStatics::BindToOnNotificationProcessed(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryNotificationProcessedBinding& Binding)
+{
+	MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, GetOnNotificationProcessedEventHandle);
+}
+
+bool UMounteaInventoryStatics::UnbindFromOnNotificationProcessed(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Target,
+	const FMounteaInventoryNotificationProcessedBinding& Binding)
+{
+	MOUNTEA_UNBIND_INVENTORY_DELEGATE(Target, Binding, GetOnNotificationProcessedEventHandle);
+}
+
+#pragma endregion
 
 FInventoryCategoryData UMounteaInventoryStatics::GetInventoryCategoryData(const FString& CategoryName, const FString ParentCategory, bool& bResult)
 {

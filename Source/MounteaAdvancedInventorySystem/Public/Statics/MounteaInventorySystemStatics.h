@@ -46,7 +46,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
 		meta=(ClassFilter="/Script/CoreUObject.Object"),
 		meta=(DeterminesOutputType = "ClassFilter"),
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Object By Class")
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 
@@ -61,7 +61,7 @@ public:
 	 * @return Inventory Config, or null
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Inventory Config")
 	static UMounteaAdvancedInventorySettingsConfig* GetMounteaAdvancedInventoryConfig();
 
@@ -74,7 +74,7 @@ public:
 	 * @return The modified text with the replacements applied.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Replace Regex (Text)")
 	static FText ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText);
 	static FString EscapeRegexSpecialChars(const FString& Input);
@@ -88,7 +88,7 @@ public:
 	 * @return The modified string with the replacements applied.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Replace Regex (String)")
 	static FString ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText);
 
@@ -99,7 +99,7 @@ public:
 	 * @return 
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Gameplay Tag")
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
 
@@ -109,7 +109,7 @@ public:
 	 * @return True if empty or invalid, false otherwise
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|GameplayTags",
-		meta=(CustomTag="MounteaK2Validate"),
+		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Is Tag Container Empty")
 	static bool IsTagsContainerEmpty(const FGameplayTagContainer& Source);
@@ -122,7 +122,7 @@ public:
 	 * @return An invalid FGuid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Guid",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		meta=(CompactNodeTitle="Invalid Guid"),
 		DisplayName="Invalid Guid")
 	static FGuid GetInvalidGuid() { return FGuid(); };
@@ -137,7 +137,7 @@ public:
 	 * @return The actor that owns the specified component, or nullptr if the component is invalid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Owner",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Owning Actor")
 	static AActor* GetOwningActor(const UObject* Target);
 
@@ -149,7 +149,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Assets", 
 		meta = (DeterminesOutputType = "FilterClass"),
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Assets")
 	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
 		
@@ -167,7 +167,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers", 
 		meta=(ClassFilter = "Interface"), 
 		meta=(DeterminesOutputType = "InterfaceFilter"), 
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Single Component By Interface")
 	static UActorComponent* GetSingleComponentByInterface(const AActor* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
 
@@ -186,7 +186,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers", 
 		meta=(ClassFilter = "Interface"), 
 		meta=(DeterminesOutputType = "InterfaceFilter"), 
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Single Interface By Class")
 	static TScriptInterface<IInterface> GetSingleInterfaceByClass(const UObject* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
 	

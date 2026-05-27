@@ -43,14 +43,14 @@ public:
 	 * @return A pointer to the UMounteaAdvancedCraftingUISubsystem if found; otherwise, nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Subsystems", 
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		meta=(DefaultToSelf="Context"),
 		meta=(CompactNodeTitle="Crafting UI Subsystem"),
 		DisplayName="Get Crafting UI Subsystem")
 	static UMounteaAdvancedCraftingUISubsystem* GetCraftingUISubsystem(UObject* Context);
 		
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config", 
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Crafting UI Config")
 	static UMounteaAdvancedCraftingUIConfig* GetCraftingUISettingsConfig();
 	
@@ -64,7 +64,7 @@ public:
 	 * @return True if the Crafting widget was created successfully, otherwise false.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Create Crafting Widget")
 	static bool CreateCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
@@ -75,7 +75,7 @@ public:
 	 * @return Crafting widget if available, otherwise nullptr.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|UI",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Crafting Widget")
 	static UUserWidget* GetCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
 
@@ -84,7 +84,7 @@ public:
 	 * @return True if UI was successfully set, otherwise false.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Set Crafting Widget")
 	static bool SetCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target, UUserWidget* NewCraftingWidget);
@@ -93,7 +93,7 @@ public:
 	 * Removes and cleans up the Crafting widget.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		DisplayName="Remove Crafting Widget")
 	static void RemoveCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
 };

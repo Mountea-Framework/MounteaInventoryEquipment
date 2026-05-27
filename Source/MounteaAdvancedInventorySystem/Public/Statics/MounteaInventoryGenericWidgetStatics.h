@@ -52,7 +52,8 @@ public:
 	 * @param OptionalPayload Object-based optional payloads which can hold additional data around.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter,MounteaK2Command"),
+		meta=(MounteaSetter),
+		meta=(MounteaCommand),
 		meta=(DefaultToSelf="GenericWidget"),
 		meta=(Keywords="execute"),
 		DisplayName="Process Widget Command")
@@ -74,7 +75,7 @@ public:
 	 * @param DeltaTime Frame delta time, used for frame-rate independent behavior.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Consume UI Input")
 	static void ConsumeUIInput(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target, 
@@ -91,7 +92,7 @@ public:
 	 * @param Target The UUserWidget to be refreshed. Must be valid and implement UMounteaInventoryGenericWidgetInterface.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Refresh Widget")
 	static void RefreshWidget(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);
@@ -103,7 +104,7 @@ public:
 	 * @param Target The user widget to which the theme will be applied. Must be a valid object.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Apply Widget Theme")
 	static void ApplyTheme(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);
@@ -128,7 +129,7 @@ public:
 	 * @param WidgetTag Gameplay Tag defining the widget identity/state used for Wrapper/UI tracking.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Widget Tag")
 	static void SetWidgetTag(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target,
@@ -152,7 +153,7 @@ public:
 	 * @return Gameplay Tag defining this widget identity/state used for Wrapper/UI tracking.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Generic", 
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Widget Tag")
 	static FGameplayTag GetWidgetTag(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target);

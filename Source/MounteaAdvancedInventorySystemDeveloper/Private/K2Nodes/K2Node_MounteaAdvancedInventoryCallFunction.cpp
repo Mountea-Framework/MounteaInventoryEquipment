@@ -18,6 +18,19 @@
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryCallFunction"
 
+namespace
+{
+	bool HasMounteaMetadata(const UFunction* Function)
+	{
+		return Function
+			&& (Function->HasMetaData(TEXT("MounteaBinding"))
+				|| Function->HasMetaData(TEXT("MounteaGetter"))
+				|| Function->HasMetaData(TEXT("MounteaSetter"))
+				|| Function->HasMetaData(TEXT("MounteaValidate"))
+				|| Function->HasMetaData(TEXT("MounteaCommand")));
+	}
+}
+
 void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const
 {
 	Super::GetMenuActions(actionRegistrar);
@@ -42,7 +55,7 @@ void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActi
 			{
 				UFunction* function = *FuncIt;
 				
-				if (!function->HasMetaData(TEXT("CustomTag")))
+				if (!HasMounteaMetadata(function))
 					continue;
 				
 				if (!function->HasAnyFunctionFlags(FUNC_Private))
@@ -96,12 +109,16 @@ FText UK2Node_MounteaAdvancedInventoryCallFunction::GetKeywords() const
 
 		AppendKeyword(targetFunction->GetName());
 
-		if (targetFunction->HasMetaData(TEXT("CustomTag")))
-		{
-			FString customTagValue = targetFunction->GetMetaData(TEXT("CustomTag"));
-			customTagValue.ReplaceInline(TEXT(","), TEXT(" "));
-			AppendKeyword(customTagValue);
-		}
+		if (targetFunction->HasMetaData(TEXT("MounteaBinding")))
+			AppendKeyword(TEXT("MounteaBinding Binding Bind Delegate Event"));
+		if (targetFunction->HasMetaData(TEXT("MounteaGetter")))
+			AppendKeyword(TEXT("MounteaGetter Getter Get"));
+		if (targetFunction->HasMetaData(TEXT("MounteaSetter")))
+			AppendKeyword(TEXT("MounteaSetter Setter Set"));
+		if (targetFunction->HasMetaData(TEXT("MounteaValidate")))
+			AppendKeyword(TEXT("MounteaValidate Validate Validation"));
+		if (targetFunction->HasMetaData(TEXT("MounteaCommand")))
+			AppendKeyword(TEXT("MounteaCommand Command"));
 	}
 
 	return FText::FromString(keywordsString);
@@ -113,14 +130,8 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseCommandSelector(UEdG
     
 	const UFunction* targetFunction = GetTargetFunction();
 	if (!targetFunction) return false;
-    
-	if (targetFunction->HasMetaData(TEXT("CustomTag")))
-	{
-		const FString customTagValue = targetFunction->GetMetaData(TEXT("CustomTag"));
-		return customTagValue.Contains(TEXT("MounteaK2Command"));
-	}
-    
-	return false;
+
+	return targetFunction->HasMetaData(TEXT("MounteaCommand"));
 }
 
 bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseEquipmentSlotSelector(UEdGraphPin* Pin) const
@@ -135,11 +146,7 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseEquipmentSlotSelecto
 	if (!targetFunction)
 		return false;
 
-	if (!targetFunction->HasMetaData(TEXT("CustomTag")))
-		return false;
-
-	const FString customTagValue = targetFunction->GetMetaData(TEXT("CustomTag"));
-	return customTagValue.Contains(TEXT("MounteaK2EquipmentSlot"));
+	return targetFunction->HasMetaData(TEXT("MounteaEquipmentSlot"));
 }
 
 bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseInventoryCategorySelector(UEdGraphPin* Pin) const
@@ -160,10 +167,10 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseInventoryCategorySel
 	if (!targetFunction)
 		return false;
 
-	if (!targetFunction->HasMetaData(TEXT("MounteaK2InventoryCategoryPin")))
+	if (!targetFunction->HasMetaData(TEXT("MounteaInventoryCategoryPin")))
 		return false;
 
-	const FString categoryPinName = targetFunction->GetMetaData(TEXT("MounteaK2InventoryCategoryPin"));
+	const FString categoryPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryCategoryPin"));
 	return Pin->PinName == FName(*categoryPinName);
 }
 
@@ -171,12 +178,12 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const
 {
 	if (const UFunction* localFunction = GetTargetFunction())
 	{
-		if (localFunction->HasMetaData(TEXT("CustomTag")))
-		{
-			const FString customTagValue = localFunction->GetMetaData(TEXT("CustomTag"));
-			if (customTagValue.Contains(TEXT("MounteaK2Setter"))) return false;
-			if (customTagValue.Contains(TEXT("MounteaK2Getter"))) return true;
-		}
+		if (localFunction->HasMetaData(TEXT("MounteaBinding")))
+			return false;
+		if (localFunction->HasMetaData(TEXT("MounteaSetter")))
+			return false;
+		if (localFunction->HasMetaData(TEXT("MounteaGetter")))
+			return true;
 	}
 	return Super::IsNodePure();
 }
@@ -186,32 +193,18 @@ FText UK2Node_MounteaAdvancedInventoryCallFunction::GetToolTipHeading() const
 	return LOCTEXT("MounteaAdvancedInventoryCallFunctionFunctions", "Mountea Advanced Inventory Function");
 }
 
-EFunctionCallType UK2Node_MounteaAdvancedInventoryCallFunction::GetFunctionType() const
-{
-	if (const UFunction* localFunction = GetTargetFunction())
-	{
-		if (localFunction->HasMetaData(TEXT("CustomTag")))
-		{
-			const FString customTagValue = localFunction->GetMetaData(TEXT("CustomTag"));
-			if (customTagValue.Contains(TEXT("MounteaK2Function"))) return EFunctionCallType::Function;
-			if (customTagValue.Contains(TEXT("MounteaK2Message"))) return EFunctionCallType::Message;
-			if (customTagValue.Contains(TEXT("MounteaK2Delegate"))) return EFunctionCallType::Delegate;
-		}
-	}
-	return EFunctionCallType::Unknown;
-}
-
 EFunctionRole UK2Node_MounteaAdvancedInventoryCallFunction::GetFunctionRole() const
 {
 	if (const UFunction* localFunction = GetTargetFunction())
 	{
-		if (localFunction->HasMetaData(TEXT("CustomTag")))
-		{
-			const FString customTagValue = localFunction->GetMetaData(TEXT("CustomTag"));
-			if (customTagValue.Contains(TEXT("MounteaK2Getter"))) return EFunctionRole::Get;
-			if (customTagValue.Contains(TEXT("MounteaK2Setter"))) return EFunctionRole::Set;
-			if (customTagValue.Contains(TEXT("MounteaK2Validate"))) return EFunctionRole::Validate;
-		}
+		if (localFunction->HasMetaData(TEXT("MounteaBinding")))
+			return EFunctionRole::Bind;
+		if (localFunction->HasMetaData(TEXT("MounteaGetter")))
+			return EFunctionRole::Get;
+		if (localFunction->HasMetaData(TEXT("MounteaSetter")))
+			return EFunctionRole::Set;
+		if (localFunction->HasMetaData(TEXT("MounteaValidate")))
+			return EFunctionRole::Validate;
 	}
 	return EFunctionRole::Unknown;
 }
@@ -222,6 +215,11 @@ FText UK2Node_MounteaAdvancedInventoryCallFunction::GetTooltipText() const
 	
 	switch (GetFunctionRole())
 	{
+		case EFunctionRole::Bind:
+			return FText::Format(
+				INVTEXT("{0}\n\nBinding: Binding functions subscribe or unsubscribe Blueprint events to native Mountea delegates.\nThe binding is possible even without direct class access which is required by regular events."),
+				defaultText);
+
 		case EFunctionRole::Set:
 			return FText::Format(
 				INVTEXT("{0}\n\n📥 Setter: A setter function is responsible for updating or modifying a particular value or data in an object.\nIt directly affects the state of the target by assigning a new value to one of its properties.\nSetters may include internal validation or checks to ensure that the value being assigned meets certain criteria before applying it."), 
@@ -246,10 +244,16 @@ FLinearColor UK2Node_MounteaAdvancedInventoryCallFunction::GetNodeTitleColor() c
 {
 	switch (GetFunctionRole())
 	{
-		case EFunctionRole::Validate: return FLinearColor::FromSRGBColor(FColor::FromHex(TEXT("99621e")));
-		case EFunctionRole::Set: return FLinearColor::FromSRGBColor(FColor::FromHex(TEXT("420039")));
-		case EFunctionRole::Get: return FLinearColor::FromSRGBColor(FColor::FromHex(TEXT("05204a")));
-		default: return Super::GetNodeTitleColor();
+		case EFunctionRole::Bind:
+			return FLinearColor::FromSRGBColor(FColor::FromHex(TEXT("1b4d3e")));
+		case EFunctionRole::Validate:
+			return FLinearColor::FromSRGBColor(FColor::FromHex(TEXT("99621e")));
+		case EFunctionRole::Set:
+			return FLinearColor::FromSRGBColor(FColor::FromHex(TEXT("420039")));
+		case EFunctionRole::Get:
+			return FLinearColor::FromSRGBColor(FColor::FromHex(TEXT("05204a")));
+		default:
+			return Super::GetNodeTitleColor();
 	}
 }
 
@@ -266,15 +270,11 @@ FName UK2Node_MounteaAdvancedInventoryCallFunction::GetCornerIcon() const
 FSlateIcon UK2Node_MounteaAdvancedInventoryCallFunction::GetIconAndTint(FLinearColor& outColor) const
 {
 	outColor = FLinearColor(.823f, .823f, .823f);
-	
-	const auto localFunction = GetTargetFunction();
-	if (localFunction && localFunction->HasMetaData(TEXT("MounteaBinding")))
-	{
-		return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_Binding.small");
-	}
-	
+
 	switch (GetFunctionRole())
 	{
+		case EFunctionRole::Bind:
+			return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_Binding.small");
 		case EFunctionRole::Validate:
 			return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_ValidateIcon.small");
 		case EFunctionRole::Set:
@@ -289,19 +289,17 @@ FSlateIcon UK2Node_MounteaAdvancedInventoryCallFunction::GetIconAndTint(FLinearC
 FText UK2Node_MounteaAdvancedInventoryCallFunction::GetFunctionContextString() const
 {
 	FText ContextString = LOCTEXT("MounteaAdvancedInventoryCallFunctionContext", "Source is Mountea Advanced Inventory System");
-	
+
 	const UFunction* Function = GetTargetFunction();
 	UClass* CurrentSelfClass = (Function != nullptr) ? Function->GetOwnerClass() : nullptr;
 	UClass const* TrueSelfClass = CurrentSelfClass;
+
 	if (CurrentSelfClass && CurrentSelfClass->ClassGeneratedBy)
-	{
 		TrueSelfClass = CurrentSelfClass->GetAuthoritativeClass();
-	}
 
 	if (TrueSelfClass != nullptr)
 	{
 		const FText TargetText = TrueSelfClass->GetDisplayNameText();
-
 		FFormatNamedArguments Args;
 		Args.Add(TEXT("TargetName"), TargetText);
 		ContextString = FText::Format(LOCTEXT("CallFunctionOnDifferentContext", "Source is {TargetName}"), Args);

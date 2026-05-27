@@ -13,19 +13,12 @@
 #include "Interfaces/IPluginManager.h"
 #include "UObject/Interface.h"
 
-enum class EFunctionCallType
-{
-	Function,
-	Message,
-	Delegate,
-	Unknown
-};
-
 enum class EFunctionRole
 {
 	Set,
 	Get,
 	Validate,
+	Bind,
 	Unknown
 };
 

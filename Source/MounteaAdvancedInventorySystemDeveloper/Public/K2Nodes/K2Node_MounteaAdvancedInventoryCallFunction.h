@@ -25,8 +25,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEMDEVELOPER_API UK2Node_MounteaAdvancedInvento
 	GENERATED_BODY()
 	
 public:
-	
-	EFunctionCallType GetFunctionType() const;
 	EFunctionRole GetFunctionRole() const;
 
 	void Initialize(const UFunction* relevantFunction, UClass* relevantClass);
