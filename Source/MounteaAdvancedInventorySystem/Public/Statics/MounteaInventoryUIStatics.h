@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -13,6 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
+#include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
@@ -73,24 +74,28 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Category Selected")
 	static bool BindToOnCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Category Selected")
 	static bool UnbindFromOnCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Selected")
 	static bool BindToOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Selected")
 	static bool UnbindFromOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
@@ -130,6 +135,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Parent Crafting Participant")
 	static TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant(const UObject* Target);
 
@@ -145,6 +151,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Parent Crafting Participant")
 	static bool SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
 	
@@ -177,6 +184,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager", 
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(Keywords="container,viewport,start"),
 		DisplayName="Initialize Wrapper Widget")
 	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent);
@@ -1606,7 +1614,21 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(MounteaSetter))
 	static void SetActiveState(UWidget* Target, const bool bIsActive);
-	
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Category|Bindings",
+		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Bind On Category Selected")
+	static bool BindToOnMounteaCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface")) UObject* Target, const FMounteaCategorySelectedBinding& Binding);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Category|Bindings",
+		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Unbind From Category Selected")
+	static bool UnbindFromOnMounteaCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface")) UObject* Target, const FMounteaCategorySelectedBinding& Binding);
+
 #pragma endregion	
 	
 	// --- Item Widget

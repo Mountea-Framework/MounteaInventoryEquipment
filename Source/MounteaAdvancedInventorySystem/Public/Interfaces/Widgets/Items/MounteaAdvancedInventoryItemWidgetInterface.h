@@ -18,6 +18,9 @@
 
 struct FInventorySlot;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMounteaItemSelected, const FGuid&, SelectedItemGuid);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaItemSelectedBinding, const FGuid&, SelectedItemGuid);
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemWidgetInterface : public UInterface
 {
@@ -150,4 +153,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void HighlightItem(const bool bIsSelected = false);
 	virtual void HighlightItem_Implementation(const bool bIsSelected = false) = 0;
+	
+	virtual FMounteaItemSelected& GetItemSelectedHandle() = 0;
 };

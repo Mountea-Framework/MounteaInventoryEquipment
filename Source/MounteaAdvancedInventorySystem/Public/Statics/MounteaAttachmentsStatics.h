@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -42,60 +42,70 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Attachment Changed")
 	static bool BindToOnAttachmentChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaAttachmentChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Attachment Changed")
 	static bool UnbindFromOnAttachmentChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaAttachmentChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Slot State Changed")
 	static bool BindToOnSlotStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaSlotStateChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Slot State Changed")
 	static bool UnbindFromOnSlotStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaSlotStateChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Container Cleared")
 	static bool BindToOnContainerCleared(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaContainerClearedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Container Cleared")
 	static bool UnbindFromOnContainerCleared(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaContainerClearedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Attachable Attached")
 	static bool BindToOnAttachableAttached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableAttachedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Attachable Attached")
 	static bool UnbindFromOnAttachableAttached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableAttachedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Attachable Detached")
 	static bool BindToOnAttachableDetached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableDetachedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Attachable Detached")
 	static bool UnbindFromOnAttachableDetached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableDetachedBinding& Binding);

@@ -45,6 +45,7 @@
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemsGridWidgetInterface.h"
 #include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemSlotsWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/Tooltip/MounteaAdvancedInventoryTooltipWidgetInterface.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
@@ -74,6 +75,24 @@
 		return false; \
 	nativeInterface->HandleGetter().Remove(Binding); \
 	return true
+
+#define MOUNTEA_BIND_CATEGORY_UI_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryCategoryWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryCategoryWidgetInterface>(Target); \
+		if (!nativeInterface) \
+			return false; \
+		nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_CATEGORY_UI_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryCategoryWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryCategoryWidgetInterface>(Target); \
+		if (!nativeInterface) \
+			return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+		return true
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
 {
@@ -977,6 +996,16 @@ void UMounteaInventoryUIStatics::SetActiveState(UWidget* Target, const bool bIsA
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())
 		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetActiveState(Target, bIsActive);
+}
+
+bool UMounteaInventoryUIStatics::BindToOnMounteaCategorySelected(UObject* Target, const FMounteaCategorySelectedBinding& Binding)
+{
+	MOUNTEA_BIND_CATEGORY_UI_DELEGATE(Target, Binding, GetCategorySelectedHandle);
+}
+
+bool UMounteaInventoryUIStatics::UnbindFromOnMounteaCategorySelected(UObject* Target, const FMounteaCategorySelectedBinding& Binding)
+{
+	MOUNTEA_UNBIND_CATEGORY_UI_DELEGATE(Target, Binding, GetCategorySelectedHandle);
 }
 
 FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const FMounteaInventoryItem& Item, const int32 Quantity)

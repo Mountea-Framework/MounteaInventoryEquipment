@@ -50,18 +50,21 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Crafting Finished")
 	static bool BindToOnCraftingFinished(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaCraftingFinishedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Crafting Finished")
 	static bool UnbindFromOnCraftingFinished(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaCraftingFinishedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Recipe Learned")
 	static bool BindToOnRecipeLearned(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeLearnedBinding& Binding);
@@ -69,24 +72,28 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Unbind From On Recipe Learned")
 	static bool UnbindFromOnRecipeLearned(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeLearnedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Bind On Recipe Forgotten")
 	static bool BindToOnRecipeForgotten(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeForgottenBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Bindings",
 		meta=(MounteaBinding),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Unbind From On Recipe Forgotten")
 	static bool UnbindFromOnRecipeForgotten(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target, const FMounteaRecipeForgottenBinding& Binding);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
 		meta=(AutoCreateRefTerm="SearchFilter"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get All Available Recipes")
 	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipes(UObject* Target, const FMounteaCraftingRecipeSearchFilter& SearchFilter);
 
@@ -99,6 +106,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter, MounteaInventoryCategoryPin="CategoryTag"),
 		meta=(AutoCreateRefTerm="CategoryTag"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get All Available Recipes By Category")
 	static TArray<UMounteaRecipeTemplate*> GetFilteredRecipesByCategory(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target,
@@ -106,74 +114,87 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Categories With Craftbale Items")
-	static TArray<FInventoryCategory> GetAllowedCategoriesWithCraftableItems(
-		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target);
+	static TArray<FInventoryCategory> GetAllowedCategoriesWithCraftableItems(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get All Known Recipes")
 	static TArray<UMounteaRecipeTemplate*> GetKnownRecipes(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(AutoCreateRefTerm="RecipeGuid"),
 		DisplayName="Get Recipe")
 	static UMounteaRecipeTemplate* GetRecipe(UObject* Target, const FGuid& RecipeGuid);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(AutoCreateRefTerm="CraftingStationType"),
 		DisplayName="Get Recipes")
 	static TArray<UMounteaRecipeTemplate*> GetRecipes(UObject* Target, const FGameplayTag& CraftingStationType);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaValidate),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Is Recipe Known")
 	static bool IsRecipeKnown(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Learn Recipe")
 	static bool LearnRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Forget Recipe")
 	static bool ForgetRecipe(UObject* Target, UMounteaRecipeTemplate* RecipeTemplate);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaValidate),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Is Crafting Possible")
 	static bool IsCraftingPossible(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Start Crafting")
 	static FMounteaCraftingResult StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Parent Inventory")
 	static TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Parent Inventory")
 	static bool SetParentInventory(UObject* Target, const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Start Using Crafting Station")
 	static bool StartUsingCraftingStation(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Stop Using Crafting Station")
 	static bool StopUsingCraftingStation(UObject* Target);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Crafting Station")
 	static TScriptInterface<IMounteaAdvancedCraftingStationInterface> GetCraftingStation(UObject* Target);
 
@@ -249,42 +270,50 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Crafting Place Type")
 	static FGameplayTag GetCraftingPlaceType(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaValidate),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Is Crafting Place Occupied")
 	static bool IsCraftingPlaceOccupied(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Crafting Place Capacity")
 	static int32 GetCraftingPlaceCapacity(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaValidate),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Can Be Used")
 	static bool CanBeUsed(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Crafting Station State")
 	static ECraftingStationState GetCraftingStationState(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(AutoCreateRefTerm="NewState"),
 		DisplayName="Set Crafting Station State")
 	static bool SetCraftingStationState(UObject* Target, ECraftingStationState NewState);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Start Using Station")
 	static bool StartUsing(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Station",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Stop Using Station")
 	static bool StopUsing(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
 	
@@ -296,6 +325,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
 		meta=(MounteaGetter, MounteaInventoryCategoryPin="CategoryTag"),
+		meta=(DefaultToSelf="Target"),
 		meta=(AutoCreateRefTerm="CategoryTag"),
 		DisplayName="Get Recipes By Category")
 	static TArray<UMounteaRecipeTemplate*> GetRecipesByCategory(

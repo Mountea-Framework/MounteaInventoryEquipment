@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -46,6 +46,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Loadout",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Load Loadout")
 	static bool LoadLoadout(UObject* Target);
 	
@@ -57,6 +58,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Loadout",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Loadout")
 	static UMounteaAdvancedInventoryLoadoutConfig* GetLoadout(UObject* Target);
 	
@@ -68,6 +70,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Loadout",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Loadout Items")
 	static TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems(UObject* Target);
 	
@@ -79,6 +82,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Loadout",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Should Load Automatically")
 	static bool ShouldLoadAutomatically(UObject* Target);
 	
@@ -90,6 +94,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Loadout",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Load Automatically")
 	static void SetAutomaticLoad(UObject* Target, const bool bNewValue);
 };

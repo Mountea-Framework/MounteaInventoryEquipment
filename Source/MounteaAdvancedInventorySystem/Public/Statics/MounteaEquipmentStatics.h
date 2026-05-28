@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -43,12 +43,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Equipment Item State Changed")
 	static bool BindToOnEquipmentItemStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedEquipmentItemInterface")) UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Equipment Item State Changed")
 	static bool UnbindFromOnEquipmentItemStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedEquipmentItemInterface")) UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
@@ -106,6 +108,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Find Equipment Item Interface")
 	static TScriptInterface<IMounteaAdvancedEquipmentItemInterface> FindEquipmentItemInterface(UObject* Target);
 
@@ -117,6 +120,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Find Equipment Interface")
 	static TScriptInterface<IMounteaAdvancedEquipmentInterface> FindEquipmentInterface(UObject* Target);
 
@@ -128,6 +132,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Quick Use",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Find Quick Use Item Interface")
 	static TScriptInterface<IMounteaAdvancedQuickUseItemInterface> FindQuickUseItemInterface(UObject* Target);
 
@@ -140,6 +145,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Quick Use",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Set Quick Use Item Static Mesh")
 	static bool SetQuickUseItemStaticMesh(UObject* Target, UStaticMesh* NewStaticMesh);
@@ -153,6 +159,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Quick Use",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Set Quick Use Item Skeletal Mesh")
 	static bool SetQuickUseItemSkeletalMesh(UObject* Target, USkeletalMesh* NewSkeletalMesh);
@@ -229,6 +236,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Resolve Owning Actor")
 	static AActor* ResolveOwningActor(UObject* Target);
 

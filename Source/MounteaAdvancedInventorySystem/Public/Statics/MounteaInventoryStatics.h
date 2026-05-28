@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -165,60 +165,70 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Added")
 	static bool BindToOnItemAdded(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemAddedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Added")
 	static bool UnbindFromOnItemAdded(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemAddedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Removed")
 	static bool BindToOnItemRemoved(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemRemovedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Removed")
 	static bool UnbindFromOnItemRemoved(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemRemovedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Quantity Changed")
 	static bool BindToOnItemQuantityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemQuantityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Quantity Changed")
 	static bool UnbindFromOnItemQuantityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemQuantityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Item Durability Changed")
 	static bool BindToOnItemDurabilityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Item Durability Changed")
 	static bool UnbindFromOnItemDurabilityChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryItemDurabilityChangedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Bind On Notification Processed")
 	static bool BindToOnNotificationProcessed(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryNotificationProcessedBinding& Binding);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Bindings",
 		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unbind From On Notification Processed")
 	static bool UnbindFromOnNotificationProcessed(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryInterface")) UObject* Target, const FMounteaInventoryNotificationProcessedBinding& Binding);
