@@ -59,10 +59,30 @@ public:
 		return CraftingParticipant;
 	}
 	virtual bool SetCraftingParticipant_Implementation(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant) override;
+	virtual bool CraftingCategorySelected_Implementation(const FString& SelectedCategoryId) override;
+	virtual FString GetCraftingSelectedCategoryId_Implementation() const override
+	{
+		return SelectedCategory;
+	}
+	virtual bool CraftableItemSelected_Implementation(const FGuid& NewSelectedItem) override;
+	virtual FGuid GetActiveCraftableItemGuid_Implementation() const override
+	{
+		return SelectedItem;
+	}
 
 protected:
 
 	UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem() const;
+	
+protected:
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
+		meta=(NoResetToDefault))
+	FString SelectedCategory;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
+		meta=(NoResetToDefault))
+	FGuid SelectedItem;
 		
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))

@@ -61,6 +61,38 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
 	void RemoveCraftingWidget();
 	virtual void RemoveCraftingWidget_Implementation() = 0;
+	
+	/**
+	 * Handles the selection of a Crafting category in the Crafting UI.
+	 * @param SelectedCategoryId The ID of the selected category.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	bool CraftingCategorySelected(const FString& SelectedCategoryId);
+	virtual bool CraftingCategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
+
+	/**
+	 * Retrieves the currently selected Crafting category ID.
+	 * @return The ID of the currently selected Crafting category.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	FString GetCraftingSelectedCategoryId() const;
+	virtual FString GetCraftingSelectedCategoryId_Implementation() const = 0;
+	
+	/**
+	 * Handles the selection of a Craftable item in the Crafting UI.
+	 * @param SelectedItem The GUID of the selected Craftable item.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	bool CraftableItemSelected(const FGuid& SelectedItem);
+	virtual bool CraftableItemSelected_Implementation(const FGuid& SelectedItem) = 0;
+
+	/**
+	 * Retrieves the currently active Craftable item GUID.
+	 * @return The GUID of the currently active Craftable item.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
+	FGuid GetActiveCraftableItemGuid() const;
+	virtual FGuid GetActiveCraftableItemGuid_Implementation() const = 0;
 
 	/**
 	 * Returns Parent Crafting Participant which owns this UI. As UI is always used by Player only, 

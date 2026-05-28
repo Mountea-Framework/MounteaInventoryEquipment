@@ -224,6 +224,23 @@ bool UMounteaCraftingParticipantUIComponent::SetCraftingParticipant_Implementati
 	return true;
 }
 
+bool UMounteaCraftingParticipantUIComponent::CraftingCategorySelected_Implementation(const FString& SelectedCategoryId)
+{
+	const bool bSuccess = SelectedCategoryId.Equals(SelectedCategory, ESearchCase::IgnoreCase);
+	if (bSuccess)
+		SelectedCategory = SelectedCategoryId;
+	return bSuccess;
+}
+
+bool UMounteaCraftingParticipantUIComponent::CraftableItemSelected_Implementation(const FGuid& NewSelectedItem)
+{
+	if (SelectedItem == NewSelectedItem)
+		return false;
+
+	SelectedItem = NewSelectedItem;
+	return true;
+}
+
 UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaCraftingParticipantUIComponent::GetSharedHUDSubsystem() const
 {
 	AActor* ownerActor = GetOwner();

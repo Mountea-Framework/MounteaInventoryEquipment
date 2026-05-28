@@ -78,3 +78,23 @@ void UMounteaCraftingUIStatics::RemoveCraftingWidget(const TScriptInterface<IMou
 	if (IsValidCraftingUIHandler(Target.GetObject()))
 		IMounteaAdvancedCraftingParticipantUIInterface::Execute_RemoveCraftingWidget(Target.GetObject());
 }
+
+FString UMounteaCraftingUIStatics::GetCraftingSelectedCategoryId(UObject* Target)
+{
+	return IsValidCraftingUIHandler(Target) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_GetCraftingSelectedCategoryId(Target) : TEXT("none");
+}
+
+bool UMounteaCraftingUIStatics::CraftingCategorySelected(UObject* Target,const FString& SelectedCategoryId)
+{
+	return IsValidCraftingUIHandler(Target) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_CraftingCategorySelected(Target, SelectedCategoryId) : false;
+}
+
+FGuid UMounteaCraftingUIStatics::GetActiveCraftableItemGuid_Implementation(UObject* Target)
+{
+	return IsValidCraftingUIHandler(Target) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_GetActiveCraftableItemGuid(Target) : FGuid();
+}
+
+bool UMounteaCraftingUIStatics::CraftableItemSelected(UObject* Target, const FGuid& SelectedItem)
+{
+	return IsValidCraftingUIHandler(Target) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_CraftableItemSelected(Target, SelectedItem) : false;
+}

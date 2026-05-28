@@ -13,7 +13,6 @@
 
 #include "CoreMinimal.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
-#include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryUIStatics.generated.h"
 

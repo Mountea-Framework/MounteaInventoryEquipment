@@ -96,4 +96,48 @@ public:
 		meta=(MounteaSetter),
 		DisplayName="Remove Crafting Widget")
 	static void RemoveCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
+
+	/**
+	 * Retrieves the currently selected Crafting category ID.
+	 * 
+	 * @param Target The Crafting Participant UI object to retrieve the activecategory from.
+	 * @return The ID of the currently selected Crafting category.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
+		meta=(MounteaGetter),
+		DisplayName="Get Selected Crafting Category")
+	static FString GetCraftingSelectedCategoryId(UObject* Target);
+	
+	/**
+	 * Handles the selection of a Crafting category in the Crafting UI.
+	 * 
+	 * @param Target The Crafting Participant UI object.
+	 * @param SelectedCategoryId The ID of the selected category.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
+		meta=(MounteaSetter),
+		DisplayName="Select Crafting Category")
+	static bool CraftingCategorySelected(UObject* Target, const FString& SelectedCategoryId);
+
+	/**
+	 * Retrieves the currently active Craftable item GUID.
+	 *
+	 * @param Target The Crafting Participan tUI object to retrieve the active craftable item's GUID from.
+	 * @return  The GUID of the currently active Craftable item.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
+		meta=(MounteaGetter),
+		DisplayName="Get Active Craftable Item Guid")
+	static FGuid GetActiveCraftableItemGuid_Implementation(UObject* Target);
+	
+	/**
+	 * Handles the selection of a Craftable item in the Crafting UI.
+	 * 
+	 * @param Target The Crafting Participant UI object.
+	 * @param SelectedItem The GUID of the selected Craftable item.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
+		meta=(MounteaSetter),
+		DisplayName="Select Craftable Item")
+	static bool CraftableItemSelected(UObject* Target, const FGuid& SelectedItem);
 };
