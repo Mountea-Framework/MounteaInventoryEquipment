@@ -17,9 +17,6 @@
 
 class IMounteaAdvancedInventoryUIManagerInterface;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMounteaCategorySelected, const FString&, SelectedCategoryId);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaCategorySelectedBinding, const FString&, SelectedCategoryId);
-
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryCategoryWidgetInterface : public UInterface
 {
@@ -64,6 +61,4 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
 	void SetActiveState(const bool bIsActive);
 	virtual void SetActiveState_Implementation(const bool bIsActive) = 0;
-	
-	virtual FMounteaCategorySelected& GetCategorySelectedHandle() = 0;
 };

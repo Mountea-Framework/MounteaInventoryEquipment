@@ -998,16 +998,6 @@ void UMounteaInventoryUIStatics::SetActiveState(UWidget* Target, const bool bIsA
 		IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SetActiveState(Target, bIsActive);
 }
 
-bool UMounteaInventoryUIStatics::BindToOnMounteaCategorySelected(UObject* Target, const FMounteaCategorySelectedBinding& Binding)
-{
-	MOUNTEA_BIND_CATEGORY_UI_DELEGATE(Target, Binding, GetCategorySelectedHandle);
-}
-
-bool UMounteaInventoryUIStatics::UnbindFromOnMounteaCategorySelected(UObject* Target, const FMounteaCategorySelectedBinding& Binding)
-{
-	MOUNTEA_UNBIND_CATEGORY_UI_DELEGATE(Target, Binding, GetCategorySelectedHandle);
-}
-
 FInventoryItemData UMounteaInventoryUIStatics::MakeInventoryItemWidgetData(const FMounteaInventoryItem& Item, const int32 Quantity)
 {
 	return FInventoryItemData(Quantity, Item);

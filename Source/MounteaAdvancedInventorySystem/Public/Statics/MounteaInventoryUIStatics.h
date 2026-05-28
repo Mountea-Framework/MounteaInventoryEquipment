@@ -1615,20 +1615,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories", meta=(MounteaSetter))
 	static void SetActiveState(UWidget* Target, const bool bIsActive);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Category|Bindings",
-		meta=(MounteaBinding),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Category Selected")
-	static bool BindToOnMounteaCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface")) UObject* Target, const FMounteaCategorySelectedBinding& Binding);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Category|Bindings",
-		meta=(MounteaBinding),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From Category Selected")
-	static bool UnbindFromOnMounteaCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface")) UObject* Target, const FMounteaCategorySelectedBinding& Binding);
-
 #pragma endregion	
 	
 	// --- Item Widget
