@@ -342,6 +342,11 @@ bool UMounteaCraftingStatics::UnbindFromOnRecipeForgotten(UObject* Target, const
 	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeForgottenEventHandle);
 }
 
+bool UMounteaCraftingStatics::DoesHaveAnyRecipes(UObject* Target)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_GetKnownRecipes(Target).Num() > 0 : false;
+}
+
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetFilteredRecipes(UObject* Target, const FMounteaCraftingRecipeSearchFilter& SearchFilter)
 {
 	if (!IsValidRecipeHandler(Target))
