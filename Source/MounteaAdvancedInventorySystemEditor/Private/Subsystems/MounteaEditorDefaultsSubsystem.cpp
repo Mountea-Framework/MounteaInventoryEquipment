@@ -16,6 +16,7 @@
 #include "Settings/MounteaAdvancedCraftingConfig.h"
 #include "Settings/MounteaAdvancedCraftingUIConfig.h"
 #include "Settings/MounteaAdvancedEquipmentSettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
@@ -45,6 +46,7 @@ void UMounteaEditorDefaultsSubsystem::ApplyDefaultsIfNeeded() const
 	bAnyChange |= TryAssignMissing(settings->AdvancedInventorySettingsConfig, InventorySettingsConfigPath, TEXT("AdvancedInventorySettingsConfig"));
 	bAnyChange |= TryAssignMissing(settings->AdvancedEquipmentSettingsConfig, EquipmentSettingsConfigPath, TEXT("AdvancedEquipmentSettingsConfig"));
 	bAnyChange |= TryAssignMissing(settings->AdvancedInventoryUISettingsConfig, InventoryUISettingsConfigPath, TEXT("AdvancedInventoryUISettingsConfig"));
+	bAnyChange |= TryAssignMissing(settings->GlobalUIConfig, GlobalUIConfigPath, TEXT("GlobalUIConfig"));
 	bAnyChange |= TryAssignMissing(settings->AdvancedCraftingSettingsConfig, CraftingSettingsConfigPath, TEXT("AdvancedCraftingSettingsConfig"));
 	bAnyChange |= TryAssignMissing(settings->AdvancedCraftingUISettingsConfig, CraftingUISettingsConfigPath, TEXT("AdvancedCraftingUISettingsConfig"));
 
@@ -54,4 +56,3 @@ void UMounteaEditorDefaultsSubsystem::ApplyDefaultsIfNeeded() const
 		LOG_INFO(TEXT("[Editor Defaults] Saved updated inventory defaults to config."));
 	}
 }
-

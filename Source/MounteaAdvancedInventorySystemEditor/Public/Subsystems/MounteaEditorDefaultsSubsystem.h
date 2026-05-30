@@ -47,6 +47,8 @@ private:
 		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultEquipmentConfig.DefaultEquipmentConfig");
 	static constexpr const TCHAR* InventoryUISettingsConfigPath =
 		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultInventoryUIConfig.DefaultInventoryUIConfig");
+	static constexpr const TCHAR* GlobalUIConfigPath =
+		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultGlobalUIConfig.DefaultGlobalUIConfig");
 	static constexpr const TCHAR* CraftingSettingsConfigPath =
 		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultMounteaCraftingConfig.DefaultMounteaCraftingConfig");
 	static constexpr const TCHAR* CraftingUISettingsConfigPath =
