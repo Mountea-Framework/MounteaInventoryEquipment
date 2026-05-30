@@ -17,6 +17,7 @@
 #include "Logs/MounteaAdvancedInventorySystemLogTypes.h"
 #include "MounteaAdvancedInventorySettings.generated.h"
 
+class UMounteaAdvancedInventoryGlobalUIConfig;
 class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedEquipmentSettingsConfig;
 class UInputMappingContext;
@@ -118,6 +119,15 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftObjectPtr<UMounteaAdvancedCraftingUIConfig> AdvancedCraftingUISettingsConfig;
+
+	/**
+	 * Holds a reference to the configuration settings for Mountea Advanced Inventory & Equipment Global UI.
+	 * This reference is used to define and load global UI specific configurations.
+	 */
+	UPROPERTY(Config, EditAnywhere, Category="Config", 
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftObjectPtr<UMounteaAdvancedInventoryGlobalUIConfig> GlobalUIConfig;
 	
 	/**
 	 * Defines logging level that is allowed to be shown.

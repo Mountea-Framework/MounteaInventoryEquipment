@@ -57,6 +57,7 @@
 #include "AssetActions/MounteaAdvancedInventoryLoadoutComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutItem_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryModalsDataTable_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeIngredientsList_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeIngredient_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeTemplate_AssetAction.h"
@@ -125,7 +126,8 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaCraftingParticipantUIComponent"), TEXT("CraftingParticipantUIIcon") },
 					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
 					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") },
-					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") }
+					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") },
+					{ TEXT("MounteaAdvancedInventoryModalsDataTable"), TEXT("ModalsDataTableIcon") }
 				};
 
 				const auto RegisterClassIcon = [this](const TCHAR* ClassName, const TCHAR* ResourceName)
@@ -167,6 +169,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutConfigs_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutItem_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutComponent_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryModalsDataTable_AssetAction>());
 		
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeTemplate_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredientsList_AssetAction>());
@@ -510,6 +513,37 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 					{
 						FToolMenuSection& configSection = subMenu->FindOrAddSection("MounteaInventory_Config");
 						configSection.Label = LOCTEXT("InvConfig_Label", "Mountea Advanced Inventory Configs");
+						
+						// Global UI Config
+						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
+							"MounteaInventory_Config_GlobalConfigSubMenu",
+							LOCTEXT("MounteaSystemEditor_GlobalConfigSubMenu_Label", "Shared Config"),
+							LOCTEXT("MounteaSystemEditor_GlobalConfigSubMenu_ToolTip", "📄 Open Mountea Inventory & Equipment shared configuration menus."),
+							FNewToolMenuDelegate::CreateLambda([](UToolMenu* globalConfigSubMenu)
+							{
+								FToolMenuSection& inventoryConfigSection = globalConfigSubMenu->FindOrAddSection("MounteaInventory_Config_GlobalConfig");
+								inventoryConfigSection.Label = LOCTEXT("InvConfigGlobalConfig_Label", "Global UI Config");
+								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_Config",
+									LOCTEXT("MounteaSystemEditor_GlobalConfigButton_Label", "Global UI Config"),
+									LOCTEXT("MounteaSystemEditor_GlobalConfigButton_ToolTip", "📄 Open Mountea Inventory & Equipment Global UI Configuration\n\n❔ Define shared UI elements, like Theme, Fonts, Modals etc."),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->GlobalUIConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_GlobalConfigButton_Error", "Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+							}),
+							false,
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
+						));
+						
+						// Inventory Config
 						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
 							"MounteaInventory_Config_InventorySubMenu",
 							LOCTEXT("MounteaSystemEditor_InventoryConfigSubMenu_Label", "Inventory"),
@@ -552,6 +586,8 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							false,
 							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
 						));
+						
+						// Equipment Config
 						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
 							"MounteaInventory_Config_EquipmentSubMenu",
 							LOCTEXT("MounteaSystemEditor_EquipmentConfigSubMenu_Label", "Equipment"),
@@ -579,6 +615,8 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							false,
 							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
 						));
+						
+						// Crafting Config
 						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
 							"MounteaInventory_Config_CraftingSubMenu",
 							LOCTEXT("MounteaSystemEditor_CraftingConfigSubMenu_Label", "Crafting"),
