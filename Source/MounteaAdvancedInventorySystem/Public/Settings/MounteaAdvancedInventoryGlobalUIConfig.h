@@ -15,6 +15,9 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryGlobalUIConfig.generated.h"
 
+class UDataTable;
+class UUserWidget;
+
 /**
  * UMounteaAdvancedInventoryGlobalUIConfig manages global UI configuration for 
  * the Mountea Advanced Inventory & Equipment System.
@@ -28,6 +31,10 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryGlobalUIConfig
 {
 	GENERATED_BODY()
 	
+public:
+
+	UMounteaAdvancedInventoryGlobalUIConfig();
+
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
@@ -47,13 +54,17 @@ public:
 	
 protected:
 
+	static const TArray<FString>& GetDefaultModalTypes();
+	void ValidateModalTypes();
+
 	UFUNCTION()
-	FORCEINLINE TArray<FString> GetModalTypes() const
-	{
-		TArray<FString> returnValues;
-		returnValues.Reserve(ModalTypes.Num() + 1);
-		returnValues.Add(TEXT("none"));
-		returnValues.Append(ModalTypes.Array());
-		return returnValues;
-	};
+	TArray<FString> GetModalTypes() const;
+
+#if WITH_EDITOR
+public:
+	UFUNCTION(CallInEditor, Category="Default Values")
+	void SetDefaultModalTypes();
+	
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 };
