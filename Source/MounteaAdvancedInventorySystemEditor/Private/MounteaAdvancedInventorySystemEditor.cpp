@@ -128,7 +128,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
 					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") },
 					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") },
-					{ TEXT("UMounteaAdvancedInventoryGlobalUIConfig"), TEXT("GlobalUIConfig") },
+					{ TEXT("MounteaAdvancedInventoryGlobalUIConfig"), TEXT("GlobalUIConfig") },
 					{ TEXT("MounteaAdvancedInventoryModalsDataTable"), TEXT("ModalsDataTableIcon") }
 				};
 
