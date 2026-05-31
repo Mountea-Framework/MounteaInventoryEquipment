@@ -31,7 +31,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryModalStatics : public 
 public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
-		meta=(MounteaGetter),
+		meta=(MounteaSetter),
+		meta=(WorldContext="Context"),
+		meta=(DefaultToSelf="Context"),
+		meta=(DisplayName="Modal - Create Modal Window Widget"))
+	static UUserWidget* CreateModalWindowWidget(UObject* Context);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
+		meta=(MounteaSetter),
 		meta=(MounteaModalType),
 		meta=(MounteaModalTypePin="ModalType"),
 		meta=(MounteaModalRow),
@@ -40,34 +47,29 @@ public:
 		meta=(DefaultToSelf="Context"),
 		meta=(DisplayName="Modal - Create Modal Content Widget"))
 	static UUserWidget* CreateModalContentWidget(
-		UObject* Context,
-		const FString& ModalType,
-		const FString& Key,
-		UObject* OptionalPayload);
+		UObject* Context, const FString& ModalType, const FString& Key, UObject* OptionalPayload);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
-		meta=(DisplayName="Modal - Construct Modals Content"))
-	static void ConstructModalsContent(
+		meta=(DisplayName="Modal Window - Create Modal Content"))
+	static UUserWidget* CreateModalContentForWindow(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface")) UObject* Target,
-		const FDataTableRowHandle& DataTableData,
-		UObject* OptionalPayload,
-		const FString& ModalContentType);
+		const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal|Content",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
-		meta=(DisplayName="Modal Content - Construct Content"))
+		meta=(DisplayName="Modal Content - Construct Modal Content"))
 	static void ConstructModalContent(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalContentWidgetInterface")) UObject* Target,
-		const FDataTableRowHandle& DataTableData,
-		UObject* OptionalPayload,
-		const FString& ModalContentType);
+		const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
 
 private:
 
+	static FDataTableRowHandle ResolveModalDataTableRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key);
 	static UDataTable* FindModalDataTableForRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key);
+	static UUserWidget* CreateWidgetFromClass(UObject* Context, TSubclassOf<UUserWidget> WidgetClass);
 	static APlayerController* ResolveOwningPlayer(UObject* Context);
 	static UMounteaAdvancedInventoryGlobalUIConfig* GetGlobalUIConfig();
 };

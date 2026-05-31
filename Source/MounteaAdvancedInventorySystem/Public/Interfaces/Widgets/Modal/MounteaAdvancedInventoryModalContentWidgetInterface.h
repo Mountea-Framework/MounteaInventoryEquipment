@@ -32,6 +32,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryModalContentWi
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal|Content")
-	void ConstructContent(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalContentType);
-	virtual void ConstructContent_Implementation(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalContentType) = 0;
+	void ConstructModalContent(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
+	virtual void ConstructModalContent_Implementation(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType) = 0;
 };

@@ -16,6 +16,8 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryModalWidgetInterface.generated.h"
 
+class UUserWidget;
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryModalWidgetInterface : public UInterface
 {
@@ -28,6 +30,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryModalWidgetInt
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal")
-	void ConstructModalsContent(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalContentType);
-	virtual void ConstructModalsContent_Implementation(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalContentType) = 0;
+	UUserWidget* CreateModalContentWidget(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
+	virtual UUserWidget* CreateModalContentWidget_Implementation(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType) = 0;
 };
