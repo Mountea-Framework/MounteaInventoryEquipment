@@ -32,5 +32,5 @@ public:
 	int32 PayloadIndex = INDEX_NONE;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
-	TArray<int32> PayloadQuantities;;
+	TArray<int32> PayloadQuantities;
 };
