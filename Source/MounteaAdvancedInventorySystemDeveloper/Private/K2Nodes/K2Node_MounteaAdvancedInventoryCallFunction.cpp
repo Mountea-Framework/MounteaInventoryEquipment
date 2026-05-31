@@ -18,17 +18,14 @@
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryCallFunction"
 
-namespace
+bool UK2Node_MounteaAdvancedInventoryCallFunction::HasMounteaMetadata(const UFunction* Function)
 {
-	bool HasMounteaMetadata(const UFunction* Function)
-	{
-		return Function
-			&& (Function->HasMetaData(TEXT("MounteaBinding"))
-				|| Function->HasMetaData(TEXT("MounteaGetter"))
-				|| Function->HasMetaData(TEXT("MounteaSetter"))
-				|| Function->HasMetaData(TEXT("MounteaValidate"))
-				|| Function->HasMetaData(TEXT("MounteaCommand")));
-	}
+	return Function
+		&& (Function->HasMetaData(TEXT("MounteaBinding"))
+			|| Function->HasMetaData(TEXT("MounteaGetter"))
+			|| Function->HasMetaData(TEXT("MounteaSetter"))
+			|| Function->HasMetaData(TEXT("MounteaValidate"))
+			|| Function->HasMetaData(TEXT("MounteaCommand")));
 }
 
 void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const
@@ -172,6 +169,56 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseInventoryCategorySel
 
 	const FString categoryPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryCategoryPin"));
 	return Pin->PinName == FName(*categoryPinName);
+}
+
+bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseModalTypeSelector(UEdGraphPin* Pin) const
+{
+	if (!Pin)
+		return false;
+
+	if (Pin->Direction != EGPD_Input)
+		return false;
+
+	if (Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_String)
+		return false;
+
+	const UFunction* targetFunction = GetTargetFunction();
+	if (!targetFunction)
+		return false;
+
+	if (!targetFunction->HasMetaData(TEXT("MounteaModalType")))
+		return false;
+
+	const FString modalTypePinName = targetFunction->HasMetaData(TEXT("MounteaModalTypePin"))
+		? targetFunction->GetMetaData(TEXT("MounteaModalTypePin"))
+		: FString(TEXT("ModalType"));
+
+	return Pin->PinName == FName(*modalTypePinName);
+}
+
+bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseModalRowSelector(UEdGraphPin* Pin) const
+{
+	if (!Pin)
+		return false;
+
+	if (Pin->Direction != EGPD_Input)
+		return false;
+
+	if (Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_String)
+		return false;
+
+	const UFunction* targetFunction = GetTargetFunction();
+	if (!targetFunction)
+		return false;
+
+	if (!targetFunction->HasMetaData(TEXT("MounteaModalRow")))
+		return false;
+
+	const FString modalRowPinName = targetFunction->HasMetaData(TEXT("MounteaModalRowPin"))
+		? targetFunction->GetMetaData(TEXT("MounteaModalRowPin"))
+		: FString(TEXT("Key"));
+
+	return Pin->PinName == FName(*modalRowPinName);
 }
 
 bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const

@@ -32,6 +32,8 @@ public:
 	bool ShouldUseCommandSelector(UEdGraphPin* Pin) const;
 	bool ShouldUseEquipmentSlotSelector(UEdGraphPin* Pin) const;
 	bool ShouldUseInventoryCategorySelector(UEdGraphPin* Pin) const;
+	bool ShouldUseModalTypeSelector(UEdGraphPin* Pin) const;
+	bool ShouldUseModalRowSelector(UEdGraphPin* Pin) const;
 	
 	// UK2Node
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const override;
@@ -45,4 +47,7 @@ public:
 	virtual FName GetCornerIcon() const override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& outColor) const override;
 	virtual FText GetFunctionContextString() const override;
+
+private:
+	static bool HasMounteaMetadata(const UFunction* Function);
 };
