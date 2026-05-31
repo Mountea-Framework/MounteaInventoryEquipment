@@ -31,10 +31,8 @@
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
 
-#include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
-#include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
 #include "Interfaces/Widgets/BaseWidget/MounteaAdvancedBaseInventoryWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoriesWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/Category/MounteaAdvancedInventoryCategoryWidgetInterface.h"
@@ -308,105 +306,6 @@ bool UMounteaInventoryUIStatics::UnbindFromOnItemSelected(UObject* Target, const
 {
 	MOUNTEA_UNBIND_INVENTORY_UI_DELEGATE(Target, Binding, GetOnItemSelectedHandle);
 }
-
-#pragma region UIManager
-
-bool UMounteaInventoryUIStatics::CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{
-	return Target.GetObject() ? Target->Execute_CreateWrapperWidget(Target.GetObject()) : false;
-}
-
-UUserWidget* UMounteaInventoryUIStatics::GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{
-	return Target.GetObject() ? Target->Execute_GetWrapperWidget(Target.GetObject()) : nullptr;
-}
-
-void UMounteaInventoryUIStatics::RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{
-	if (Target.GetObject())
-		Target->Execute_RemoveWrapperWidget(Target.GetObject());
-}
-
-UWidget* UMounteaInventoryUIStatics::GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{
-	return Target.GetObject() ? Target->Execute_GetNotificationContainer(Target.GetObject()) : nullptr;
-}
-
-void UMounteaInventoryUIStatics::SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, UWidget* NewNotificationContainer)
-{
-	if (Target.GetObject())
-		Target->Execute_SetNotificationContainer(Target.GetObject(), NewNotificationContainer);
-}
-
-void UMounteaInventoryUIStatics::CreateInventoryNotification(
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-	const FInventoryNotificationData& NotificationData)
-{
-	if (Target.GetObject())
-		Target->Execute_CreateInventoryNotification(Target.GetObject(), NotificationData);
-}
-
-void UMounteaInventoryUIStatics::RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{
-	if (Target.GetObject())
-		Target->Execute_RemoveInventoryNotifications(Target.GetObject());
-}
-
-void UMounteaInventoryUIStatics::ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, 
-	const FString& Command, UObject* OptionalPayload)
-{
-	if (Target.GetObject())
-		return IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(Target.GetObject(), Command, OptionalPayload);
-}
-
-FGameplayTagContainer UMounteaInventoryUIStatics::GetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{
-	return Target.GetObject() ? 
-		IMounteaAdvancedInventorySharedHUDInterface::Execute_GetWidgetStates(Target.GetObject()) : FGameplayTagContainer();
-}
-
-void UMounteaInventoryUIStatics::SetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, const FGameplayTagContainer& NewStates)
-{
-	if (Target.GetObject())
-		return IMounteaAdvancedInventorySharedHUDInterface::Execute_SetWidgetStates(Target.GetObject(), NewStates);
-}
-
-bool UMounteaInventoryUIStatics::AddWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, const FGameplayTag& Tag)
-{
-	return Target.GetObject() ? 
-		IMounteaAdvancedInventorySharedHUDInterface::Execute_AddWidgetStateTag(Target.GetObject(), Tag) : false;
-}
-
-bool UMounteaInventoryUIStatics::RemoveWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, const FGameplayTag& Tag)
-{
-	return Target.GetObject() ? 
-		IMounteaAdvancedInventorySharedHUDInterface::Execute_RemoveWidgetStateTag(Target.GetObject(), Tag) : false;
-}
-
-bool UMounteaInventoryUIStatics::HasWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, const FGameplayTag& Tag, const bool bExactMatch)
-{
-	return Target.GetObject() ? 
-		IMounteaAdvancedInventorySharedHUDInterface::Execute_HasWidgetStateTag(Target.GetObject(), Tag, bExactMatch) : false;
-}
-
-void UMounteaInventoryUIStatics::ClearWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{
-	if (Target.GetObject())
-		return IMounteaAdvancedInventorySharedHUDInterface::Execute_ClearWidgetStateTags(Target.GetObject());
-}
-
-bool UMounteaInventoryUIStatics::AppendWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, const FGameplayTagContainer& TagsToAppend)
-{
-	return Target.GetObject() ? 
-		IMounteaAdvancedInventorySharedHUDInterface::Execute_AppendWidgetStateTags(Target.GetObject(), TagsToAppend) : false;
-}
-
-bool UMounteaInventoryUIStatics::HasAnyWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
-{	
-	return Target.GetObject() ? GetManagerWidgetStates(Target).IsEmpty() : false;
-}
-
-#pragma endregion
 
 #pragma region InventoryWidget
 
@@ -907,52 +806,12 @@ void UMounteaInventoryUIStatics::SetOwningInventoryUI(UWidget* Target,
 	SetOwningInventoryUIInternal(Target, NewOwningInventoryUI);
 }
 
-void UMounteaInventoryUIStatics::InitializeWrapperWidget(UObject* Target,
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent)
-{
-	if (Target && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
-		IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(Target, Parent);
-}
-
 void UMounteaInventoryUIStatics::SetSourceInventory(
 	const TScriptInterface<IMounteaAdvancedBaseInventoryWidgetInterface>& Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& ParentInventory)
 {
 	if (Target.GetObject())
 		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
-}
-
-#pragma region Wrapper
-
-bool UMounteaInventoryUIStatics::IsValidWrapperWidget(const UObject* Target)
-{
-	return IsValid(Target) && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>();
-}
-
-UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIStatics::GetSharedHUDSubsystem(UObject* Context)
-{
-	if (!IsValid(Context))
-		return nullptr;
-
-	APlayerController* playerController = Cast<APlayerController>(Context);
-	if (!IsValid(playerController))
-	{
-		if (AActor* actor = Cast<AActor>(Context))
-			playerController = FindPlayerController(actor, 3);
-		else if (const UActorComponent* actorComp = Cast<UActorComponent>(Context))
-		{
-			if (AActor* ownerActor = actorComp->GetOwner())
-				playerController = FindPlayerController(ownerActor, 3);
-		}
-		else if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
-			playerController = FindPlayerController(userWidget->GetOwningPlayer(), 2);
-	}
-
-	if (!IsValid(playerController))
-		return nullptr;
-
-	const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
-	return IsValid(localPlayer) ? localPlayer->GetSubsystem<UMounteaAdvancedInventorySharedHUDSubsystem>() : nullptr;
 }
 
 TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> UMounteaInventoryUIStatics::GetParentCraftingParticipant(const UObject* Target)

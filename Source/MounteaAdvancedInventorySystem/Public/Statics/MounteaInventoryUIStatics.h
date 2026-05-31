@@ -27,7 +27,6 @@ struct FGameplayTagContainer;
 struct FGameplayTag;
 
 class UMounteaAdvancedInventoryUISubsystem;
-class UMounteaAdvancedInventorySharedHUDSubsystem;
 
 class UUserWidget;
 class UMounteaSelectableInventoryItemAction;
@@ -41,8 +40,6 @@ class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
 class IMounteaAdvancedBaseInventoryWidgetInterface;
-class IMounteaInventorySystemWrapperWidgetInterface;
-class IMounteaAdvancedInventorySharedHUDInterface;
 class IMounteaAdvancedInventoryUIManagerInterface;
 
 /**
@@ -99,27 +96,8 @@ public:
 		DisplayName="Unbind From On Item Selected")
 	static bool UnbindFromOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
 	
-	// --- Shared HUD Subsystem
-#pragma region SharedHUDSubsystem
-	
-	static bool IsValidWrapperWidget(const UObject* Target);
-	
-	/**
-	 * Retrieves the shared HUD subsystem associated with the given context.
-	 *
-	 * This function attempts to locate the `UMounteaAdvancedInventorySharedHUDSubsystem` for a specific context,
-	 * such as an Actor, Actor Component, or User Widget. It derives the appropriate Player Controller and obtains
-	 * the subsystem from the associated Local Player.
-	 *
-	 * @param Context The UObject context to derive the Player Controller from. Valid types include AActor, UActorComponent, and UUserWidget.
-	 * @return A pointer to `UMounteaAdvancedInventorySharedHUDSubsystem` if found; nullptr otherwise.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
-		meta=(MounteaGetter),
-		meta=(DefaultToSelf="Context"),
-		meta=(CompactNodeTitle="Inventory & Equipment Shared HUD Subsystem"),
-		DisplayName="Get Inventory & Equipment Shared HUD Subsystem")
-	static UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem(UObject* Context);
+	// --- Crafting Participant
+#pragma region CraftingParticipant
 
 	/**
 	 * Retrieves the parent crafting participant associated with a specified object.
@@ -153,233 +131,6 @@ public:
 		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Parent Crafting Participant")
 	static bool SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
-	
-	/**
-	 * Creates and initializes the Main Viewport Widget which contains all
-	 * child widgets, like Inventory, Equipment, Health, Crafting and others.
-	 * This is the main UI screen/container which should handle all UI related
-	 * visual logic, like creating Inventory etc.
-	 * 
-	 * @param Target The UI Manager to create the Main Wrapper UI for
-	 * @return True if UI was successfully created and initialized, otherwise false
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(MounteaSetter),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		meta=(Keywords="container,viewport,make,add"),
-		DisplayName="Create Wrapper Widget")
-	static bool CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-
-	/**
-	 * Initializes the Wrapper widget for the Mountea inventory system.
-	 * UI Manager (IMounteaAdvancedInventoryUIManagerInterface) knows this wrapper/container
-	 * and knows it processes all internal logic.
-	 * 
-	 * This is the main UI screen/container which should handle all UI related
-	 * visual logic, like creating Inventory etc.
-	 *
-	 * @param Target The target widget that implements the IMounteaInventorySystemBaseWidgetInterface.
-	 * @param Parent The parent UI Manager that implements the IMounteaAdvancedInventoryUIManagerInterface.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager", 
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		meta=(Keywords="container,viewport,start"),
-		DisplayName="Initialize Wrapper Widget")
-	static void InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent);
-
-	/**
-	 * Returns the currently active main wrapper widget.
-	 *
-	 * @param Target The UI Manager to get Wrapper widget from.
-	 * @return Wrapper widget if available, otherwise nullptr.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
-		meta=(MounteaGetter),
-		meta=(Keywords="container,viewport"),
-		DisplayName="Get Wrapper Widget")
-	static UUserWidget* GetWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-
-	/**
-	 * Removes the Wrapper UI from the viewport and cleans up resources.
-	 * This will destroy all child UI elements inside the Main Wrapper!
-	 * 
-	 * @param Target The UI Manager to remove the Wrapper UI from
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager", 
-		meta=(MounteaSetter),
-		meta=(Keywords="container,viewport,destroy"),
-		DisplayName="Remove Wrapper Widget")
-	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-	
-	/**
-	 * Executes a widget command routed through the UI manager hierarchy.
-	 * Use this to notify UI layers about external events (for example refreshing item count after an item action).
-	 * 
-	 * Command routing should respect wrapper-to-child hierarchy, so parent managers can delegate to active views.
-	 * 
-	 * @param Target UI Manager to execute the logic on
-	 * @param Command Command to Process
-	 * @param OptionalPayload Optional Payload to pass with the command
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Commands",
-		meta=(MounteaSetter),
-		meta=(MounteaCommand),
-		DisplayName="Inventory UI Manager - Execute Widget Command")
-	static void ExecuteWidgetCommandFromManager(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-		const FString& Command, UObject* OptionalPayload);
-	
-	/**
-	 * Returns all currently active Widget State tags tracked by the target UI Manager.
-	 *
-	 * UI Manager states are used to keep track of which UI widgets are currently active/visible/in use
-	 * within the Wrapper (for example Modal Window, Tooltip, Context Menu, Inventory Panel, etc.).
-	 * Each widget that is created/added to the Wrapper should contribute its predefined Gameplay Tag
-	 * so the Wrapper and UI Manager can quickly query what is active and react accordingly.
-	 *
-	 * @param Target The target UI Manager interface from which the active state container will be retrieved.
-	 * @return Container of Gameplay Tags representing active UI states/widgets currently tracked by the UI Manager.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaGetter),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Get Widget States")
-	static FGameplayTagContainer GetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-
-	/**
-	 * Overwrites UI Manager state tracking with a new tag container.
-	 *
-	 * This function replaces the current tracked Widget State tags with the provided container.
-	 * It exists primarily as a write-back mechanism for systems that manipulate state tags in bulk
-	 * (including helper functions such as AddWidgetStateTag, RemoveWidgetStateTag, ClearWidgetStateTags
-	 * or AppendWidgetStateTags).
-	 *
-	 * @note
-	 * - This function only updates state tracking. It should not be assumed to create/destroy widgets by itself.
-	 * - Implementations should ensure the stored state remains consistent with actual active widgets.
-	 *
-	 * @param Target The target Wrapper widget interface whose states will be overwritten.
-	 * @param NewStates Container of Gameplay Tags that will become the UI Manager's active widget states.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Set Widget States")
-	static void SetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& NewStates);
-
-	/**
-	 * Adds a new Widget State tag to the target UI Manager's active state container.
-	 *
-	 * Expected flow:
-	 * - A child widget (e.g., ModalWindow) is created/added to the UI Manager.
-	 * - That widget provides its state tag definition.
-	 * - UI Manager registers the tag so the system can track that the widget is now active.
-	 *
-	 * @param Target The target UI Manager that will receive the state tag.
-	 * @param Tag The Gameplay Tag describing the widget state to add.
-	 * @return True if the tag was added (was not present before). False if invalid or already present.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		meta=(AutoCreateRefTerm="Tag"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Add Widget State Tag")
-	static bool AddWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
-
-	/**
-	 * Removes an existing Widget State tag from the target UI Manager's active state container.
-	 *
-	 * This should be called when a UI element is removed/hidden/destroyed so the Wrapper no longer reports
-	 * it as active, preventing stale state and enabling correct UI Manager decisions.
-	 *
-	 * @param Target The target UI Manager interface from which the state tag will be removed.
-	 * @param Tag The Gameplay Tag describing the widget state to remove.
-	 * @return True if the tag was removed. False if invalid or not found.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		meta=(AutoCreateRefTerm="Tag"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Remove Widget State Tag")
-	static bool RemoveWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag);
-
-	/**
-	 * Checks whether the target UI Manager currently contains a given Widget State tag.
-	 *
-	 * Used for querying whether a particular UI element/state is currently active within the Wrapper.
-	 * Example: prevent opening another modal if "UI.Modal.Active" is already present, or change input rules.
-	 *
-	 * @param Target The target UI Manager interface to query.
-	 * @param Tag The Gameplay Tag describing the widget state to check.
-	 * @param bExactMatch If true, requires an exact tag match. If false, allows hierarchical matching
-	 *                    (e.g., checking "UI.Modal" would match "UI.Modal.Active").
-	 * @return True if the UI Manager currently reports the tag as active; otherwise false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaValidate),
-		meta=(DefaultToSelf="Target"),
-		meta=(AutoCreateRefTerm="Tag"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Has Widget State Tag")
-	static bool HasWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& Tag, bool bExactMatch = true);
-
-	/**
-	 * Clears all Widget State tags tracked by the target UI Manager.
-	 *
-	 * Typically used during full teardown/reset scenarios such as RemoveWrapperWidget, rebuilding the UI,
-	 * or when the UI Manager needs to force the Wrapper into a clean baseline state.
-	 *
-	 * Note:
-	 * - This does not automatically destroy UI widgets by itself. It only clears the tracked state tags.
-	 *
-	 * @param Target The target UI Manager interface whose states will be cleared.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Clear Widget State Tags")
-	static void ClearWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-
-	/**
-	 * Appends multiple Widget State tags to the target UI Manager's active state container.
-	 *
-	 * Useful when adding a composite widget (or UI mode) that activates multiple tracked states at once,
-	 * or when synchronizing the UI Manager to a known set of states provided by another system.
-	 *
-	 * @param Target The target UI Manager interface that will receive the state tags.
-	 * @param TagsToAppend Container of Gameplay Tags to add to the UI Manager's active state container.
-	 * @return True if at least one new tag was added. False if empty or all tags were already present.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Append Widget State Tags")
-	static bool AppendWidgetStateTags(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-		UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTagContainer& TagsToAppend);
-	
-	/**
-	 * Returns whether Widget State has any flag at all.
-	 *
-	 * Useful when validating UI related tasks, such as inputs etc., as empty Widget States suggest that
-	 * the Manager UI has no custom UI components, therefore is "idling".
-	 *
-	 * @param Target The target UI Manager interface that will receive the state tags.
-	 * 
-	 * @return True if at least one tag is in the Widget States. False if empty.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Wrapper",
-		meta=(MounteaValidate),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Has Any Widget States")
-	static bool HasAnyWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
 
 #pragma endregion
 	
@@ -1016,49 +767,6 @@ public:
 
 #pragma endregion
 	
-	// --- Notification
-#pragma region Notification
-	
-	/**
-	 * Retrieves the widget that contains and manages inventory notifications.
-	 * @param Target The UI interface to get the notification container from
-	 * @return A pointer to the user widget that serves as the notification container
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Notifications", 
-		meta=(MounteaGetter))
-	static UWidget* GetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-
-	/**
-	 * Sets the widget that will contain and manage inventory notifications.
-	 * @param Target The UI interface to set the notification container for
-	 * @param NewNotificationContainer The user widget to use as the notification container
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"))
-	static void SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, UWidget* NewNotificationContainer);
-
-	/**
-	 * Creates and displays a new inventory notification based on the provided data.
-	 * @param Target The UI interface to create the notification in
-	 * @param NotificationData The data structure containing all notification parameters (text, duration, etc.)
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"))
-	static void CreateInventoryNotification(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target, const FInventoryNotificationData& NotificationData);
-
-	/**
-	 * Removes all currently active inventory notifications from the UI.
-	 * @param Target The UI interface to remove notifications from
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Notifications", 
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"))
-	static void RemoveInventoryNotifications(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-
-#pragma endregion
-		
 	// --- Items Preview
 #pragma region ItemsPreview
 
