@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "GameplayTagContainer.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryBaseUIStatics.generated.h"
