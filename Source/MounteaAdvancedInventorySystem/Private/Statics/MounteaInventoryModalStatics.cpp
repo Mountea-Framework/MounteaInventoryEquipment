@@ -11,31 +11,123 @@
 
 #include "Statics/MounteaInventoryModalStatics.h"
 
+#include "Blueprint/UserWidget.h"
+#include "Engine/DataTable.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalContentWidgetInterface.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalWidgetInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
 
-void UMounteaInventoryModalStatics::ConstructModalsContent(
-	UObject* Target,
-	UDataTable* DataTable,
-	UObject* OptionalPayload,
-	const FString& Key)
+UUserWidget* UMounteaInventoryModalStatics::CreateModalContentWidget(UObject* Context, const FString& ModalType, const FString& Key, UObject* OptionalPayload)
+{
+	if (!IsValid(Context))
+		return nullptr;
+
+	UMounteaAdvancedInventoryGlobalUIConfig* globalUIConfig = GetGlobalUIConfig();
+	if (!IsValid(globalUIConfig))
+		return nullptr;
+
+	if (ModalType.IsEmpty() || ModalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return nullptr;
+
+	if (Key.IsEmpty() || Key.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return nullptr;
+
+	FDataTableRowHandle dataTableData;
+	dataTableData.DataTable = FindModalDataTableForRow(globalUIConfig, Key);
+	dataTableData.RowName = FName(*Key);
+
+	if (!IsValid(dataTableData.DataTable))
+		return nullptr;
+
+	const TSoftClassPtr<UUserWidget>* modalWidgetClass = globalUIConfig->Modals.Find(ModalType);
+	if (!modalWidgetClass || modalWidgetClass->IsNull())
+		return nullptr;
+
+	TSubclassOf<UUserWidget> widgetClass = modalWidgetClass->LoadSynchronous();
+	if (!widgetClass || !widgetClass->ImplementsInterface(UMounteaAdvancedInventoryModalContentWidgetInterface::StaticClass()))
+		return nullptr;
+
+	UUserWidget* newWidget = nullptr;
+	if (APlayerController* owningPlayer = ResolveOwningPlayer(Context))
+		newWidget = CreateWidget<UUserWidget>(owningPlayer, widgetClass);
+	else if (UWorld* World = Context->GetWorld())
+		newWidget = CreateWidget<UUserWidget>(World, widgetClass);
+
+	if (!IsValid(newWidget))
+		return nullptr;
+
+	IMounteaAdvancedInventoryModalContentWidgetInterface::Execute_ConstructContent(newWidget, dataTableData, OptionalPayload, ModalType);
+
+	return newWidget;
+}
+
+void UMounteaInventoryModalStatics::ConstructModalsContent(UObject* Target, const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalContentType)
 {
 	if (!IsValid(Target))
 		return;
 
 	if (Target->Implements<UMounteaAdvancedInventoryModalWidgetInterface>())
-		IMounteaAdvancedInventoryModalWidgetInterface::Execute_ConstructModalsContent(Target, DataTable, OptionalPayload, Key);
+		IMounteaAdvancedInventoryModalWidgetInterface::Execute_ConstructModalsContent(Target, DataTableData, OptionalPayload, ModalContentType);
 }
 
 void UMounteaInventoryModalStatics::ConstructModalContent(
 	UObject* Target,
-	UDataTable* DataTable,
+	const FDataTableRowHandle& DataTableData,
 	UObject* OptionalPayload,
-	const FString& Key)
+	const FString& ModalContentType)
 {
 	if (!IsValid(Target))
 		return;
 
 	if (Target->Implements<UMounteaAdvancedInventoryModalContentWidgetInterface>())
-		IMounteaAdvancedInventoryModalContentWidgetInterface::Execute_ConstructContent(Target, DataTable, OptionalPayload, Key);
+		IMounteaAdvancedInventoryModalContentWidgetInterface::Execute_ConstructContent(Target, DataTableData, OptionalPayload, ModalContentType);
+}
+
+UDataTable* UMounteaInventoryModalStatics::FindModalDataTableForRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key)
+{
+	if (!IsValid(GlobalUIConfig) || Key.IsEmpty() || Key.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return nullptr;
+
+	const FName rowName(*Key);
+	for (const TSoftObjectPtr<UDataTable>& modalDataTable : GlobalUIConfig->ModalsData)
+	{
+		UDataTable* dataTable = modalDataTable.LoadSynchronous();
+		if (!IsValid(dataTable))
+			continue;
+
+		if (dataTable->GetRowNames().Contains(rowName))
+			return dataTable;
+	}
+
+	return nullptr;
+}
+
+APlayerController* UMounteaInventoryModalStatics::ResolveOwningPlayer(UObject* Context)
+{
+	if (!IsValid(Context))
+		return nullptr;
+
+	if (APlayerController* playerController = Cast<APlayerController>(Context))
+		return playerController;
+
+	if (const UUserWidget* userWidget = Cast<UUserWidget>(Context))
+	{
+		if (APlayerController* owningPlayer = userWidget->GetOwningPlayer())
+			return owningPlayer;
+	}
+
+	return UGameplayStatics::GetPlayerController(Context, 0);
+}
+
+UMounteaAdvancedInventoryGlobalUIConfig* UMounteaInventoryModalStatics::GetGlobalUIConfig()
+{
+	const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings))
+		return nullptr;
+
+	return settings->GlobalUIConfig.LoadSynchronous();
 }

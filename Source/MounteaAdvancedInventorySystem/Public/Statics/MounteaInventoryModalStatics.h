@@ -12,10 +12,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryModalStatics.generated.h"
 
-class UDataTable;
+class APlayerController;
+class UMounteaAdvancedInventoryGlobalUIConfig;
+class UUserWidget;
 
 /**
  * 
@@ -28,14 +31,29 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryModalStatics : public 
 public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
+		meta=(MounteaGetter),
+		meta=(MounteaModalType),
+		meta=(MounteaModalTypePin="ModalType"),
+		meta=(MounteaModalRow),
+		meta=(MounteaModalRowPin="Key"),
+		meta=(WorldContext="Context"),
+		meta=(DefaultToSelf="Context"),
+		meta=(DisplayName="Modal - Create Modal Content Widget"))
+	static UUserWidget* CreateModalContentWidget(
+		UObject* Context,
+		const FString& ModalType,
+		const FString& Key,
+		UObject* OptionalPayload);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
 		meta=(DisplayName="Modal - Construct Modals Content"))
 	static void ConstructModalsContent(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface")) UObject* Target,
-		UDataTable* DataTable,
+		const FDataTableRowHandle& DataTableData,
 		UObject* OptionalPayload,
-		const FString& Key);
+		const FString& ModalContentType);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal|Content",
 		meta=(MounteaSetter),
@@ -43,7 +61,13 @@ public:
 		meta=(DisplayName="Modal Content - Construct Content"))
 	static void ConstructModalContent(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalContentWidgetInterface")) UObject* Target,
-		UDataTable* DataTable,
+		const FDataTableRowHandle& DataTableData,
 		UObject* OptionalPayload,
-		const FString& Key);
+		const FString& ModalContentType);
+
+private:
+
+	static UDataTable* FindModalDataTableForRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key);
+	static APlayerController* ResolveOwningPlayer(UObject* Context);
+	static UMounteaAdvancedInventoryGlobalUIConfig* GetGlobalUIConfig();
 };
