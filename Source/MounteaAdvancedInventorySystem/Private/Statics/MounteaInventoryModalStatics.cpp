@@ -15,6 +15,7 @@
 #include "Engine/DataTable.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Helpers/MounteaModalsPayload.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalContentWidgetInterface.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalWidgetInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -44,23 +45,20 @@ UUserWidget* UMounteaInventoryModalStatics::CreateModalWindowWidget(UObject* Con
 	return newWidget;
 }
 
-UUserWidget* UMounteaInventoryModalStatics::CreateModalContentWidget(UObject* Context, const FString& ModalType, const FString& Key, UObject* OptionalPayload)
+UUserWidget* UMounteaInventoryModalStatics::CreateModalContentWidget(UObject* Context, UMounteaModalsPayload* Payload)
 {
-	if (!IsValid(Context))
+	if (!IsValid(Context) || !IsValid(Payload))
 		return nullptr;
 
 	UMounteaAdvancedInventoryGlobalUIConfig* globalUIConfig = GetGlobalUIConfig();
 	if (!IsValid(globalUIConfig))
 		return nullptr;
 
-	if (ModalType.IsEmpty() || ModalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+	const FString& modalType = Payload->ModalType;
+	if (modalType.IsEmpty() || modalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
 		return nullptr;
 
-	FDataTableRowHandle dataTableData = ResolveModalDataTableRow(globalUIConfig, Key);
-	if (!IsValid(dataTableData.DataTable))
-		return nullptr;
-
-	const TSoftClassPtr<UUserWidget>* modalWidgetClass = globalUIConfig->Modals.Find(ModalType);
+	const TSoftClassPtr<UUserWidget>* modalWidgetClass = globalUIConfig->Modals.Find(modalType);
 	if (!modalWidgetClass || modalWidgetClass->IsNull())
 		return nullptr;
 
@@ -72,25 +70,59 @@ UUserWidget* UMounteaInventoryModalStatics::CreateModalContentWidget(UObject* Co
 	if (!IsValid(newWidget))
 		return nullptr;
 
-	IMounteaAdvancedInventoryModalContentWidgetInterface::Execute_ConstructModalContent(newWidget, dataTableData, OptionalPayload, ModalType);
+	IMounteaAdvancedInventoryModalContentWidgetInterface::Execute_ConstructModalContent(newWidget, Payload);
 
 	return newWidget;
 }
 
-void UMounteaInventoryModalStatics::AddModalContentToModalWindow(
-	UObject* Target,
-	UUserWidget* ModalContentWidget)
+void UMounteaInventoryModalStatics::AddModalContentToModalWindow(UObject* Target, UUserWidget* ModalContentWidget, UMounteaModalsPayload* Payload)
 {
 	if (!IsValid(Target) || !IsValid(ModalContentWidget))
 		return;
 
 	if (Target->Implements<UMounteaAdvancedInventoryModalWidgetInterface>())
-		IMounteaAdvancedInventoryModalWidgetInterface::Execute_AddModalContentToModalWindow(Target, ModalContentWidget);
+		IMounteaAdvancedInventoryModalWidgetInterface::Execute_AddModalContentToModalWindow(Target, ModalContentWidget, Payload);
 }
 
-FDataTableRowHandle UMounteaInventoryModalStatics::ResolveModalDataTableRow(
-	const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig,
-	const FString& Key)
+UMounteaModalsPayload* UMounteaInventoryModalStatics::ConstructModalPayload(UObject* Target, const FString& ModalType, const FString& Key, UObject* OptionalPayload)
+{
+	if (!IsValid(Target))
+		return nullptr;
+
+	const auto modalsConfig = GetGlobalUIConfig();
+	if (!IsValid(modalsConfig))
+		return nullptr;
+
+	if (ModalType.IsEmpty() || ModalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return nullptr;
+
+	if (!modalsConfig->Modals.Contains(ModalType))
+		return nullptr;
+
+	const FDataTableRowHandle dataTableData = ResolveModalDataTableRow(modalsConfig, Key);
+	if (!IsValid(dataTableData.DataTable) || dataTableData.RowName.IsNone())
+		return nullptr;
+
+	const FMounteaModalsConfig* modalConfig = dataTableData.DataTable->FindRow<FMounteaModalsConfig>(dataTableData.RowName, TEXT("ConstructModalPayload"));
+	if (!modalConfig)
+		return nullptr;
+
+	const auto modalsPayloadClass = modalsConfig->ModalPayloadClass.LoadSynchronous();
+	if (!IsValid(modalsPayloadClass))
+		return nullptr;
+
+	const auto returnValue = NewObject<UMounteaModalsPayload>(Target, modalsPayloadClass);
+	if (!IsValid(returnValue))
+		return nullptr;
+
+	returnValue->ModalConfig = *modalConfig;
+	returnValue->ModalType = ModalType;
+	returnValue->OptionalPayload = OptionalPayload;
+
+	return returnValue;
+}
+
+FDataTableRowHandle UMounteaInventoryModalStatics::ResolveModalDataTableRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key)
 {
 	FDataTableRowHandle dataTableData;
 	if (!IsValid(GlobalUIConfig) || Key.IsEmpty() || Key.Equals(TEXT("none"), ESearchCase::IgnoreCase))

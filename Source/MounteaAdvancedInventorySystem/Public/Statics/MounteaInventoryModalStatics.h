@@ -19,6 +19,7 @@
 class APlayerController;
 class UMounteaAdvancedInventoryGlobalUIConfig;
 class UUserWidget;
+class UMounteaModalsPayload;
 
 /**
  * 
@@ -39,15 +40,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
 		meta=(MounteaSetter),
-		meta=(MounteaModalType),
-		meta=(MounteaModalTypePin="ModalType"),
-		meta=(MounteaModalRow),
-		meta=(MounteaModalRowPin="Key"),
 		meta=(WorldContext="Context"),
 		meta=(DefaultToSelf="Context"),
 		meta=(DisplayName="Modal - Create Modal Content Widget"))
-	static UUserWidget* CreateModalContentWidget(
-		UObject* Context, const FString& ModalType, const FString& Key, UObject* OptionalPayload);
+	static UUserWidget* CreateModalContentWidget(UObject* Context, UMounteaModalsPayload* Payload);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
 		meta=(MounteaSetter),
@@ -55,7 +51,18 @@ public:
 		meta=(DisplayName="Modal Window - Add Modal Content"))
 	static void AddModalContentToModalWindow(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface")) UObject* Target,
-		UUserWidget* ModalContentWidget);
+		UUserWidget* ModalContentWidget, UMounteaModalsPayload* Payload);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
+		meta=(MounteaSetter),
+		meta=(MounteaModalType),
+		meta=(MounteaModalTypePin="ModalType"),
+		meta=(MounteaModalRow),
+		meta=(MounteaModalRowPin="Key"),
+		meta=(WorldContext="Target"),
+		meta=(DefaultToSelf="Target"),
+		meta=(DisplayName="Modal - Construct Payload"))
+	static UMounteaModalsPayload* ConstructModalPayload(UObject* Target, const FString& ModalType, const FString& Key, UObject* OptionalPayload);
 
 private:
 
