@@ -40,4 +40,14 @@ struct FMounteaModalsConfig : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
 		meta=(NoResetToDefault))
 	TSoftObjectPtr<UTexture2D> Icon;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
+		meta=(NoResetToDefault))
+	uint8 bAutoClose : 1;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
+		meta=(NoResetToDefault),
+		meta=(EditCondition="bAutoClose", EditConditionHides),
+		meta=(UIMin=0,ClampMin=0))
+	int32 ModalDuration = INDEX_NONE;
 };

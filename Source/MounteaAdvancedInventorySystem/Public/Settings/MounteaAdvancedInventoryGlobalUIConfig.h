@@ -15,6 +15,7 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryGlobalUIConfig.generated.h"
 
+class UMounteaModalsPayload;
 class UDataTable;
 class UUserWidget;
 
@@ -45,6 +46,10 @@ public:
 		meta=(NoResetToDefault),
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"))
 	TSoftClassPtr<UUserWidget> ModalWindowWidgetClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
+		meta=(NoResetToDefault))
+	TSoftClassPtr<UMounteaModalsPayload> ModalPayloadClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),
