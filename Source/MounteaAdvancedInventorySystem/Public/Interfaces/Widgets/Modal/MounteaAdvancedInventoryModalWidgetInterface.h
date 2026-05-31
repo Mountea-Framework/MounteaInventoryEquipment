@@ -12,10 +12,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryModalWidgetInterface.generated.h"
-
-class UDataTable;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryModalWidgetInterface : public UInterface
