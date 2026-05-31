@@ -43,13 +43,19 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"))
+	TSoftClassPtr<UUserWidget> ModalWindowWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
+		meta=(NoResetToDefault),
 		meta=(ShowOnlyInnerProperties),
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalContentWidgetInterface"),
 		meta=(GetKeyOptions="GetModalTypes"))
 	TMap<FString,TSoftClassPtr<UUserWidget>> Modals;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),
-		meta=(RequiredAssetDataTags = "RowStructure=/Script/MounteaAdvancedInventorySystem.MounteaModalsData"))
+		meta=(RequiredAssetDataTags="RowStructure=/Script/MounteaAdvancedInventorySystem.MounteaModalsData"))
 	TSet<TSoftObjectPtr<UDataTable>> ModalsData;
 	
 protected:
