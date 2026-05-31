@@ -77,32 +77,15 @@ UUserWidget* UMounteaInventoryModalStatics::CreateModalContentWidget(UObject* Co
 	return newWidget;
 }
 
-UUserWidget* UMounteaInventoryModalStatics::CreateModalContentForWindow(
+void UMounteaInventoryModalStatics::AddModalContentToModalWindow(
 	UObject* Target,
-	const FDataTableRowHandle& DataTableData,
-	UObject* OptionalPayload,
-	const FString& ModalType)
+	UUserWidget* ModalContentWidget)
 {
-	if (!IsValid(Target))
-		return nullptr;
-
-	if (Target->Implements<UMounteaAdvancedInventoryModalWidgetInterface>())
-		return IMounteaAdvancedInventoryModalWidgetInterface::Execute_CreateModalContentWidget(Target, DataTableData, OptionalPayload, ModalType);
-
-	return nullptr;
-}
-
-void UMounteaInventoryModalStatics::ConstructModalContent(
-	UObject* Target,
-	const FDataTableRowHandle& DataTableData,
-	UObject* OptionalPayload,
-	const FString& ModalType)
-{
-	if (!IsValid(Target))
+	if (!IsValid(Target) || !IsValid(ModalContentWidget))
 		return;
 
-	if (Target->Implements<UMounteaAdvancedInventoryModalContentWidgetInterface>())
-		IMounteaAdvancedInventoryModalContentWidgetInterface::Execute_ConstructModalContent(Target, DataTableData, OptionalPayload, ModalType);
+	if (Target->Implements<UMounteaAdvancedInventoryModalWidgetInterface>())
+		IMounteaAdvancedInventoryModalWidgetInterface::Execute_AddModalContentToModalWindow(Target, ModalContentWidget);
 }
 
 FDataTableRowHandle UMounteaInventoryModalStatics::ResolveModalDataTableRow(

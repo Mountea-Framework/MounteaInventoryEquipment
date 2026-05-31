@@ -52,18 +52,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
-		meta=(DisplayName="Modal Window - Create Modal Content"))
-	static UUserWidget* CreateModalContentForWindow(
+		meta=(DisplayName="Modal Window - Add Modal Content"))
+	static void AddModalContentToModalWindow(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface")) UObject* Target,
-		const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal|Content",
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		meta=(DisplayName="Modal Content - Construct Modal Content"))
-	static void ConstructModalContent(
-		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalContentWidgetInterface")) UObject* Target,
-		const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
+		UUserWidget* ModalContentWidget);
 
 private:
 
