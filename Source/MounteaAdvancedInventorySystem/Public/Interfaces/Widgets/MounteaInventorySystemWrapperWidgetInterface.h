@@ -61,4 +61,21 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
 	void RemoveWrapperWidget();
 	virtual void RemoveWrapperWidget_Implementation() = 0;
+
+	/**
+	 * Adds new modal widget to global UI wrapper.
+	 * @param ModalWindow Modal window to display.
+	 * @return True if modal window is valid and modal can be displayed.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
+	bool AddModalWindow(UUserWidget* ModalWindow);
+	virtual bool AddModalWindow_Implementation(UUserWidget* ModalWindow) = 0;
+
+	/**
+	 * Clears currently displayed modal window.
+	 * @return False if no window is present to be cleared OR something goes wrong.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
+	bool CleanupModalWindow() const;
+	virtual bool CleanupModalWindow_Implementation() const = 0;
 };

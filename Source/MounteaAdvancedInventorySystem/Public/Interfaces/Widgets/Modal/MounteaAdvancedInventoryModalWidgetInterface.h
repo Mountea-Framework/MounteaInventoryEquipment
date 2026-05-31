@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataTable.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryModalWidgetInterface.generated.h"
 
@@ -30,6 +29,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryModalWidgetInt
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal")
-	UUserWidget* CreateModalContentWidget(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
-	virtual UUserWidget* CreateModalContentWidget_Implementation(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType) = 0;
+	void AddModalContentToModalWindow(UUserWidget* ModalContentWidget);
+	virtual void AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget) = 0;
 };
