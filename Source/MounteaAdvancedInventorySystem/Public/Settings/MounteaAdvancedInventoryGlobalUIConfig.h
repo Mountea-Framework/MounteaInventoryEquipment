@@ -55,7 +55,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),
-		meta=(RequiredAssetDataTags="RowStructure=/Script/MounteaAdvancedInventorySystem.MounteaModalsData"))
+		meta=(RequiredAssetDataTags="RowStructure=/Script/MounteaAdvancedInventorySystem.MounteaModalsConfig"))
 	TSet<TSoftObjectPtr<UDataTable>> ModalsData;
 	
 protected:
