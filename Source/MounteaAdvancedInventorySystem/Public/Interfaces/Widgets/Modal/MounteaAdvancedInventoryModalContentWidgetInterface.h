@@ -12,9 +12,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataTable.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryModalContentWidgetInterface.generated.h"
+
+class UMounteaModalsPayload;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryModalContentWidgetInterface : public UInterface
@@ -32,6 +33,6 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryModalContentWi
 public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal|Content")
-	void ConstructModalContent(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType);
-	virtual void ConstructModalContent_Implementation(const FDataTableRowHandle& DataTableData, UObject* OptionalPayload, const FString& ModalType) = 0;
+	void ConstructModalContent(UMounteaModalsPayload* Payload);
+	virtual void ConstructModalContent_Implementation(UMounteaModalsPayload* Payload) = 0;
 };
