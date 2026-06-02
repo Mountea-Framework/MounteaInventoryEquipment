@@ -190,12 +190,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Start Using Crafting Station")
 	static bool StartUsingCraftingStation(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station);
 
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Stop Using Crafting Station")
 	static bool StopUsingCraftingStation(UObject* Target);
 	
