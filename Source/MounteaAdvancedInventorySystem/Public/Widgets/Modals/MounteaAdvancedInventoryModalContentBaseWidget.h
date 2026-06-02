@@ -28,6 +28,11 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryModalContentBa
 	public IMounteaAdvancedInventoryModalContentWidgetInterface, public IMounteaInventoryGenericWidgetInterface
 {
 	GENERATED_BODY()
+	
+protected:
+	
+	UFUNCTION()
+	void OnModalExpired();
 
 public:
 
@@ -55,15 +60,20 @@ public:
 		if (WidgetTag != NewWidgetTag)
 			WidgetTag = NewWidgetTag;
 	};
+	
+public:
+		
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	FTimerHandle ModalContentExpiryTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
 		meta=(NoResetToDefault),
 		meta=(Categories="Mountea_Inventory.WidgetState.Modal,State"))
 	FGameplayTag WidgetTag;
 
-	UPROPERTY(BlueprintAssignable, Category="Events|Modal Content")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Events|Modal Content")
 	FOnModalContentConfirmed OnModalContentConfirmed;
 
-	UPROPERTY(BlueprintAssignable, Category="Events|Modal Content")
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Events|Modal Content")
 	FOnModalContentCancelled OnModalContentCancelled;
 };

@@ -11,7 +11,25 @@
 
 #include "Widgets/Modals/MounteaAdvancedInventoryModalContentBaseWidget.h"
 
+#include "Helpers/MounteaModalsPayload.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
+
+void UMounteaAdvancedInventoryModalContentBaseWidget::OnModalExpired()
+{
+	OnModalContentCancelled.Broadcast();
+}
+
 void UMounteaAdvancedInventoryModalContentBaseWidget::ConstructModalContent_Implementation(UMounteaModalsPayload* Payload)
 {
-	// ... implement in child classes
+	if (!IsValid(Payload))
+	{
+		LOG_ERROR(TEXT("[Construct Modal Content] Invalid Modal Payload Provided."))
+		return;
+	}
+	
+	if (Payload->ModalConfig.bAutoClose && Payload->ModalConfig.ModalDuration > 0)
+	{
+		ModalContentExpiryTimerHandle.Invalidate();
+		GetWorld()->GetTimerManager().SetTimer(ModalContentExpiryTimerHandle, this, &UMounteaAdvancedInventoryModalContentBaseWidget::OnModalExpired, Payload->ModalConfig.ModalDuration);
+	}
 }

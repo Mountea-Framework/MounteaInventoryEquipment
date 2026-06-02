@@ -33,9 +33,19 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryModalBaseWidge
 public:
 
 	virtual void AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaModalsPayload* Payload) override;
+	virtual void ModalContentConfirmed_Implementation(UObject* Payload) override {};
+	virtual void ModalContentCancelled_Implementation() override {};
 	virtual FOnModalContentAddedToModalWindow& GetOnModalContentAddedToModalWindowHandle() override
 	{
 		return OnModalContentAddedToModalWindow;
+	};
+	virtual FOnModalConfirmed& GetOnModalConfirmedHandle() override
+	{
+		return OnModalConfirmed;
+	};
+	virtual FOnModalCancelled& GetOnModalCancelledHandle() override
+	{
+		return OnModalCancelled;
 	};
 
 	virtual void ProcessInventoryWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload = nullptr) override {};
@@ -59,8 +69,22 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Events|Modal")
 	FOnModalContentAddedToModalWindow OnModalContentAddedToModalWindow;
 
+	UPROPERTY(BlueprintAssignable, Category="Events|Modal")
+	FOnModalConfirmed OnModalConfirmed;
+
+	UPROPERTY(BlueprintAssignable, Category="Events|Modal")
+	FOnModalCancelled OnModalCancelled;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
 		meta=(NoResetToDefault),
 		meta=(Categories="Mountea_Inventory.WidgetState.Modal,State"))
 	FGameplayTag WidgetTag;
+
+protected:
+
+	UFUNCTION()
+	void HandleModalContentConfirmed(UObject* Payload);
+
+	UFUNCTION()
+	void HandleModalContentCancelled();
 };

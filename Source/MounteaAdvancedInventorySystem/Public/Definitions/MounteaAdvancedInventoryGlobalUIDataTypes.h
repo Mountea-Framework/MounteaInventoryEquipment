@@ -48,6 +48,7 @@ struct FMounteaModalsConfig : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
 		meta=(NoResetToDefault),
 		meta=(EditCondition="bAutoClose", EditConditionHides),
+		meta=(Units="s"),
 		meta=(UIMin=0,ClampMin=0))
 	int32 ModalDuration = INDEX_NONE;
 };
