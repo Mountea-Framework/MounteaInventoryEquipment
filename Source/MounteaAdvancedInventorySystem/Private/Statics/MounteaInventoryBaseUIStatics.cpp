@@ -182,7 +182,7 @@ bool UMounteaInventoryBaseUIStatics::AppendWidgetStateTags(
 
 bool UMounteaInventoryBaseUIStatics::HasAnyWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
 {
-	return Target.GetObject() ? GetManagerWidgetStates(Target).IsEmpty() : false;
+	return Target.GetObject() ? !GetManagerWidgetStates(Target).IsEmpty() : false;
 }
 
 void UMounteaInventoryBaseUIStatics::InitializeWrapperWidget(
