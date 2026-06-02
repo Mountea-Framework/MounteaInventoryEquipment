@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+﻿// Copyright (C) 2026 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -17,6 +17,11 @@
 
 class UMounteaModalsPayload;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnModalContentConfirmed, UObject*, Payload);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnModalContentCancelled);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaModalContentConfirmedBinding, UObject*, Payload);
+DECLARE_DYNAMIC_DELEGATE(FMounteaModalContentCancelledBinding);
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryModalContentWidgetInterface : public UInterface
 {
@@ -24,15 +29,18 @@ class UMounteaAdvancedInventoryModalContentWidgetInterface : public UInterface
 };
 
 /**
- * 
+ *
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryModalContentWidgetInterface
 {
 	GENERATED_BODY()
 
 public:
-	
+
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal|Content")
 	void ConstructModalContent(UMounteaModalsPayload* Payload);
 	virtual void ConstructModalContent_Implementation(UMounteaModalsPayload* Payload) = 0;
+
+	virtual FOnModalContentConfirmed& GetOnModalContentConfirmedHandle() = 0;
+	virtual FOnModalContentCancelled& GetOnModalContentCancelledHandle() = 0;
 };
