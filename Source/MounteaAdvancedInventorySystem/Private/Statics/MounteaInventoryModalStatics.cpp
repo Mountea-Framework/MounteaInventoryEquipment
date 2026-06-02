@@ -214,7 +214,8 @@ UMounteaModalsPayload* UMounteaInventoryModalStatics::ConstructModalPayload(UObj
 	if (!IsValid(dataTableData.DataTable) || dataTableData.RowName.IsNone())
 		return nullptr;
 
-	const FMounteaModalsConfig* modalConfig = dataTableData.DataTable->FindRow<FMounteaModalsConfig>(dataTableData.RowName, TEXT("ConstructModalPayload"));
+	FString contextString;
+	const FMounteaModalsConfig* modalConfig = dataTableData.DataTable->FindRow<FMounteaModalsConfig>(dataTableData.RowName, contextString);
 	if (!modalConfig)
 		return nullptr;
 
