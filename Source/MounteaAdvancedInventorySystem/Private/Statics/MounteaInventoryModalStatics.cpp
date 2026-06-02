@@ -22,6 +22,42 @@
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 
+#define MOUNTEA_BIND_MODAL_CONTENT_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryModalContentWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryModalContentWidgetInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_MODAL_CONTENT_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryModalContentWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryModalContentWidgetInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+	return true
+
+#define MOUNTEA_BIND_MODAL_WINDOW_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryModalWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryModalWidgetInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_MODAL_WINDOW_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedInventoryModalWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryModalWidgetInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+	return true
+
 UUserWidget* UMounteaInventoryModalStatics::CreateModalWindowWidget(UObject* Context)
 {
 	if (!IsValid(Context))
@@ -82,6 +118,76 @@ void UMounteaInventoryModalStatics::AddModalContentToModalWindow(UObject* Target
 
 	if (Target->Implements<UMounteaAdvancedInventoryModalWidgetInterface>())
 		IMounteaAdvancedInventoryModalWidgetInterface::Execute_AddModalContentToModalWindow(Target, ModalContentWidget, Payload);
+}
+
+bool UMounteaInventoryModalStatics::BindToOnModalContentAddedToModalWindow(
+	UObject* Target,
+	const FMounteaModalContentAddedToModalWindowBinding& Binding)
+{
+	MOUNTEA_BIND_MODAL_WINDOW_DELEGATE(Target, Binding, GetOnModalContentAddedToModalWindowHandle);
+}
+
+bool UMounteaInventoryModalStatics::UnbindFromOnModalContentAddedToModalWindow(
+	UObject* Target,
+	const FMounteaModalContentAddedToModalWindowBinding& Binding)
+{
+	MOUNTEA_UNBIND_MODAL_WINDOW_DELEGATE(Target, Binding, GetOnModalContentAddedToModalWindowHandle);
+}
+
+bool UMounteaInventoryModalStatics::BindToOnModalConfirmed(
+	UObject* Target,
+	const FMounteaModalConfirmedBinding& Binding)
+{
+	MOUNTEA_BIND_MODAL_WINDOW_DELEGATE(Target, Binding, GetOnModalConfirmedHandle);
+}
+
+bool UMounteaInventoryModalStatics::UnbindFromOnModalConfirmed(
+	UObject* Target,
+	const FMounteaModalConfirmedBinding& Binding)
+{
+	MOUNTEA_UNBIND_MODAL_WINDOW_DELEGATE(Target, Binding, GetOnModalConfirmedHandle);
+}
+
+bool UMounteaInventoryModalStatics::BindToOnModalCancelled(
+	UObject* Target,
+	const FMounteaModalCancelledBinding& Binding)
+{
+	MOUNTEA_BIND_MODAL_WINDOW_DELEGATE(Target, Binding, GetOnModalCancelledHandle);
+}
+
+bool UMounteaInventoryModalStatics::UnbindFromOnModalCancelled(
+	UObject* Target,
+	const FMounteaModalCancelledBinding& Binding)
+{
+	MOUNTEA_UNBIND_MODAL_WINDOW_DELEGATE(Target, Binding, GetOnModalCancelledHandle);
+}
+
+bool UMounteaInventoryModalStatics::BindToOnModalContentConfirmed(
+	UObject* Target,
+	const FMounteaModalContentConfirmedBinding& Binding)
+{
+	MOUNTEA_BIND_MODAL_CONTENT_DELEGATE(Target, Binding, GetOnModalContentConfirmedHandle);
+}
+
+bool UMounteaInventoryModalStatics::UnbindFromOnModalContentConfirmed(
+	UObject* Target,
+	const FMounteaModalContentConfirmedBinding& Binding)
+{
+	MOUNTEA_UNBIND_MODAL_CONTENT_DELEGATE(Target, Binding, GetOnModalContentConfirmedHandle);
+}
+
+bool UMounteaInventoryModalStatics::BindToOnModalContentCancelled(
+	UObject* Target,
+	const FMounteaModalContentCancelledBinding& Binding)
+{
+	MOUNTEA_BIND_MODAL_CONTENT_DELEGATE(Target, Binding, GetOnModalContentCancelledHandle);
+}
+
+bool UMounteaInventoryModalStatics::UnbindFromOnModalContentCancelled(
+	UObject* Target,
+	const FMounteaModalContentCancelledBinding& Binding)
+{
+	MOUNTEA_UNBIND_MODAL_CONTENT_DELEGATE(Target, Binding, GetOnModalContentCancelledHandle);
 }
 
 UMounteaModalsPayload* UMounteaInventoryModalStatics::ConstructModalPayload(UObject* Target, const FString& ModalType, const FString& Key, UObject* OptionalPayload)
