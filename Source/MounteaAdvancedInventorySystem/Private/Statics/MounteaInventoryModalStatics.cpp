@@ -12,10 +12,12 @@
 #include "Statics/MounteaInventoryModalStatics.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Definitions/MounteaInventoryBaseCommands.h"
 #include "Engine/DataTable.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "Helpers/MounteaModalsPayload.h"
+#include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalContentWidgetInterface.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalWidgetInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -78,6 +80,9 @@ UUserWidget* UMounteaInventoryModalStatics::CreateModalWindowWidget(UObject* Con
 	if (!IsValid(newWidget))
 		return nullptr;
 
+	if (newWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(newWidget, InventoryUICommands::General::Create, nullptr);
+	
 	return newWidget;
 }
 
