@@ -32,7 +32,7 @@ void UMounteaAdvancedInventoryModalBaseWidget::AddModalContentToModalWindow_Impl
 		newContent->GetOnModalContentConfirmedHandle().AddUniqueDynamic(this, &UMounteaAdvancedInventoryModalBaseWidget::HandleModalContentConfirmed);
 		newContent->GetOnModalContentCancelledHandle().AddUniqueDynamic(this, &UMounteaAdvancedInventoryModalBaseWidget::HandleModalContentCancelled);
 	}
-
+	
 	OnModalContentAddedToModalWindow.Broadcast(ModalContentWidget, Payload);
 }
 

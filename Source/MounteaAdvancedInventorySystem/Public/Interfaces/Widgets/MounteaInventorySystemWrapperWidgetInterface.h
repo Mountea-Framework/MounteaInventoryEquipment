@@ -76,6 +76,6 @@ public:
 	 * @return False if no window is present to be cleared OR something goes wrong.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
-	bool CleanupModalWindow() const;
-	virtual bool CleanupModalWindow_Implementation() const = 0;
+	bool CleanupModalWindow();
+	virtual bool CleanupModalWindow_Implementation() = 0;
 };
