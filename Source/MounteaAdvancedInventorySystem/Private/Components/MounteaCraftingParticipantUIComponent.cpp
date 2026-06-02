@@ -42,6 +42,7 @@ UMounteaCraftingParticipantUIComponent::UMounteaCraftingParticipantUIComponent()
 
 	ComponentTags.Append( { TEXT("Mountea"), TEXT("Crafting"), TEXT("UI") } );
 }
+
 void UMounteaCraftingParticipantUIComponent::BeginPlay()
 {
 	Super::BeginPlay();
