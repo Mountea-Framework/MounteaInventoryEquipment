@@ -63,7 +63,7 @@ public:
 	virtual bool TryGetPendingEquipmentActivation(FPendingEquipmentActivation& OutPendingActivation) const override;
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Register Quick Use Placeholder Actor")
 	bool RegisterQuickUsePlaceholderActor(const FGuid& ItemGuid, AActor* PlaceholderActor);

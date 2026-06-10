@@ -26,6 +26,9 @@ class UMounteaRecipeIngredientsList;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCraftingFinished, const FMounteaCraftingResult&, Result);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeLearned, const UMounteaRecipeTemplate*, RecipeTemplate);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeForgotten, const UMounteaRecipeTemplate*, RecipeTemplate);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaCraftingFinishedBinding, const FMounteaCraftingResult&, Result);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaRecipeLearnedBinding, const UMounteaRecipeTemplate*, RecipeTemplate);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaRecipeForgottenBinding, const UMounteaRecipeTemplate*, RecipeTemplate);
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedCraftingParticipantInterface : public UInterface

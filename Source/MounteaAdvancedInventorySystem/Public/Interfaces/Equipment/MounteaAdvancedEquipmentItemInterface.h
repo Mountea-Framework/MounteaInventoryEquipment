@@ -19,6 +19,7 @@ class UAnimMontage;
 enum class EEquipmentItemState : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentItemStateChanged, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>&, EquipmentItem, const EEquipmentItemState, NewState);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaEquipmentItemStateChangedBinding, const TScriptInterface<IMounteaAdvancedEquipmentItemInterface>&, EquipmentItem, const EEquipmentItemState, NewState);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UMounteaAdvancedEquipmentItemInterface : public UInterface

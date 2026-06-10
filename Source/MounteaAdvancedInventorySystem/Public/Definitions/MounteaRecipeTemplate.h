@@ -18,6 +18,7 @@
 
 class UMounteaRecipeIngredientsList;
 class UMounteaInventoryItemTemplate;
+class UMounteaInventoryItemTemplate_Recipe;
 
 /**
  * 
@@ -64,6 +65,15 @@ public:
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
 	FGuid RecipeGuid;
+
+	/**
+	 * Holds reference of Item (Recipe), which granted this Recipe to known recipes.
+	 * Some Items grant only temporary knowledge, and if the related item is NOT in the inventory (grimoire, for example),
+	 * then we must not allow this recipe to be visible.
+	 */
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
+	TSoftObjectPtr<UMounteaInventoryItemTemplate_Recipe> RecipeSource;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;

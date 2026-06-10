@@ -19,6 +19,42 @@
 #include "Interfaces/Attachments/MounteaAdvancedAttachmentContainerInterface.h"
 #include "Statics/MounteaEquipmentStatics.h"
 
+#define MOUNTEA_BIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedAttachmentContainerInterface* nativeInterface = Cast<IMounteaAdvancedAttachmentContainerInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedAttachmentContainerInterface* nativeInterface = Cast<IMounteaAdvancedAttachmentContainerInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+	return true
+
+#define MOUNTEA_BIND_ATTACHABLE_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedAttachmentAttachableInterface* nativeInterface = Cast<IMounteaAdvancedAttachmentAttachableInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_ATTACHABLE_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedAttachmentAttachableInterface* nativeInterface = Cast<IMounteaAdvancedAttachmentAttachableInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+	return true
+
 static void GatherSCSSceneComponentTemplates(const AActor* CDO, TArray<USceneComponent*>& Out)
 {
 	UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(CDO->GetClass());
@@ -50,6 +86,56 @@ TArray<USceneComponent*> UMounteaAttachmentsStatics::GetAvailableComponents(cons
 #endif
 	
 	return components;
+}
+
+bool UMounteaAttachmentsStatics::BindToOnAttachmentChanged(UObject* Target, const FMounteaAttachmentChangedBinding& Binding)
+{
+	MOUNTEA_BIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnAttachmentChangedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::UnbindFromOnAttachmentChanged(UObject* Target, const FMounteaAttachmentChangedBinding& Binding)
+{
+	MOUNTEA_UNBIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnAttachmentChangedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::BindToOnSlotStateChanged(UObject* Target, const FMounteaSlotStateChangedBinding& Binding)
+{
+	MOUNTEA_BIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnSlotStateChangedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::UnbindFromOnSlotStateChanged(UObject* Target, const FMounteaSlotStateChangedBinding& Binding)
+{
+	MOUNTEA_UNBIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnSlotStateChangedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::BindToOnContainerCleared(UObject* Target, const FMounteaContainerClearedBinding& Binding)
+{
+	MOUNTEA_BIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnContainerClearedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::UnbindFromOnContainerCleared(UObject* Target, const FMounteaContainerClearedBinding& Binding)
+{
+	MOUNTEA_UNBIND_ATTACHMENT_CONTAINER_DELEGATE(Target, Binding, GetOnContainerClearedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::BindToOnAttachableAttached(UObject* Target, const FMounteaAttachableAttachedBinding& Binding)
+{
+	MOUNTEA_BIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableAttachedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::UnbindFromOnAttachableAttached(UObject* Target, const FMounteaAttachableAttachedBinding& Binding)
+{
+	MOUNTEA_UNBIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableAttachedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::BindToOnAttachableDetached(UObject* Target, const FMounteaAttachableDetachedBinding& Binding)
+{
+	MOUNTEA_BIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableDetachedEventHandle);
+}
+
+bool UMounteaAttachmentsStatics::UnbindFromOnAttachableDetached(UObject* Target, const FMounteaAttachableDetachedBinding& Binding)
+{
+	MOUNTEA_UNBIND_ATTACHABLE_DELEGATE(Target, Binding, GetOnAttachableDetachedEventHandle);
 }
 
 TArray<FName> UMounteaAttachmentsStatics::GetAvailableComponentNames(const AActor* Target)

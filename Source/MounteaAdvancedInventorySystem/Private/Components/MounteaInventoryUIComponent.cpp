@@ -15,12 +15,14 @@
 #include "Algo/AnyOf.h"
 #include "Blueprint/UserWidget.h"
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
+#include "Engine/LocalPlayer.h"
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
 
 #include "Helpers/MounteaAdvancedInventoryWidgetPayload.h"
 
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/Inventory/MounteaAdvancedInventoryWidgetInterface.h"
@@ -35,6 +37,7 @@
 #include "Statics/MounteaInventorySystemStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 #include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
+#include "Subsystems/MounteaAdvancedInventorySharedHUDSubsystem.h"
 
 class UMounteaAdvancedInventorySettings;
 
@@ -63,7 +66,6 @@ void UMounteaInventoryUIComponent::BeginPlay()
 	{
 		UIConfig = GetDefault<UMounteaAdvancedInventorySettings>()->AdvancedInventoryUISettingsConfig.LoadSynchronous();
 		Execute_EmptyItemActionsQueue(this); // Do NOT receive any queue items
-		
 		{
 			auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
 			if (!IsValid(inventoryComponent))
@@ -73,7 +75,7 @@ void UMounteaInventoryUIComponent::BeginPlay()
 				Execute_SetParentInventory(this, inventoryComponent);
 				ensureMsgf(ParentInventory.GetObject() != nullptr, TEXT("[MounteaInventoryUIComponent] Failed to update 'ParentInventory'"));
 
-				ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::CreateInventoryNotification);
+				ParentInventory->GetOnNotificationProcessedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ForwardInventoryNotificationToSubsystem);
 			
 				ParentInventory->GetOnItemAddedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemAdded);
 				ParentInventory->GetOnItemRemovedEventHandle().AddUniqueDynamic(this, &UMounteaInventoryUIComponent::ProcessItemRemoved);
@@ -130,94 +132,22 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIComponen
 
 void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
-	if (ParentInventory != NewParentInventory) ParentInventory = NewParentInventory;
+	if (ParentInventory != NewParentInventory) 
+		ParentInventory = NewParentInventory;
 }
 
-bool UMounteaInventoryUIComponent::CreateWrapperWidget_Implementation()
+UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIComponent::GetSharedHUDSubsystem() const
 {
-	const UMounteaAdvancedInventoryUIConfig* inventoryUIConfig = UMounteaInventoryUIStatics::GetInventoryUISettingsConfig();
-	if (!inventoryUIConfig)
-	{
-		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load Inventory Config!"))
-		return false;
-	}
+	AActor* ownerActor = GetOwner();
+	if (!IsValid(ownerActor))
+		return nullptr;
 
-	auto widgetClass = inventoryUIConfig->UserInterfaceWrapperClass.LoadSynchronous();
-	if (!IsValid(widgetClass))
-	{
-		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load UI Wrapper Class from Config!"))
-		return false;
-	}
-	if (!widgetClass->ImplementsInterface(UMounteaInventorySystemWrapperWidgetInterface::StaticClass()))
-	{
-		LOG_ERROR(TEXT("[CreateWrapperWidget] Base UI Wrapper Class must implement `MounteaInventorySystemBaseWidgetInterface`!"))
-		return false;
-	}
+	const APlayerController* playerController = UMounteaInventoryUIStatics::FindPlayerController(ownerActor, 3);
+	if (!IsValid(playerController))
+		return nullptr;
 
-	FString Message = TEXT("");
-	bool bSuccess = true;
-	
-	int seachDepth = 0;
-	APlayerController* playerController = UMounteaInventoryUIStatics::FindPlayerController(GetOwner(), seachDepth);
-	if (!playerController || !playerController->IsLocalController())
-	{
-		Message = !playerController ? TEXT("Invalid Player Controller!") : TEXT("UI can be shown only to Local Players!");
-		bSuccess = false;
-	}
-	if (!bSuccess)
-	{
-		LOG_ERROR(TEXT("[CreateWrapperWidget] Failed to find Player Controller. Message:\n%s"), *Message)
-		return false;
-	}
-
-	if (!playerController->IsLocalController())
-	{
-		LOG_WARNING(TEXT("[CreateWrapperWidget] UI Wrapper Can be created for Local Players only!"))
-		return false;
-	}
-
-	auto newWidget = CreateWidget<UUserWidget>(playerController, widgetClass);
-	if (!newWidget)
-	{
-		LOG_ERROR(TEXT("[CreateWrapperWidget] Failed to create Wrapper Widget!"))
-		return false;
-	}
-	if (!newWidget->Implements<UMounteaInventorySystemWrapperWidgetInterface>())
-	{
-		LOG_ERROR(TEXT("[CreateWrapperWidget] Base UI wrapper must implement `MounteaInventorySystemBaseWidgetInterface`!"))
-		return false;
-	}
-
-	WrapperWidget = newWidget;
-	ensure(WrapperWidget != nullptr);
-	
-	WrapperWidget->SetIsFocusable(true);
-	
-	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> wrapperWidget = WrapperWidget;
-	ensure(wrapperWidget.GetObject() != nullptr);
-	
-	wrapperWidget->Execute_InitializeWrapperWidget(WrapperWidget, this);
-	
-	if (WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, InventoryUICommands::Wrapper::Create, nullptr);
-
-	return true;
-}
-
-void UMounteaInventoryUIComponent::RemoveWrapperWidget_Implementation()
-{
-	TScriptInterface<IMounteaInventorySystemWrapperWidgetInterface> wrapperInterface = WrapperWidget;
-	ensure(wrapperInterface.GetObject() != nullptr);
-	
-	wrapperInterface->Execute_RemoveWrapperWidget(WrapperWidget);
-	
-	if (WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, InventoryUICommands::Wrapper::Remove, nullptr);
-	else
-	{
-		WrapperWidget->RemoveFromParent();
-		WrapperWidget = nullptr;
-	}
+	const ULocalPlayer* localPlayer = playerController->GetLocalPlayer();
+	return IsValid(localPlayer) ? localPlayer->GetSubsystem<UMounteaAdvancedInventorySharedHUDSubsystem>() : nullptr;
 }
 
 bool UMounteaInventoryUIComponent::CreateInventoryWidget_Implementation()
@@ -279,25 +209,34 @@ bool UMounteaInventoryUIComponent::CreateInventoryWidget_Implementation()
 	
 	TScriptInterface<IMounteaAdvancedInventoryWidgetInterface> inventoryWidget = InventoryWidget;
 	ensure(inventoryWidget.GetObject() != nullptr);
-	
-	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::General::Create, nullptr);
+
+	const auto sharedHUDSubsystem = GetSharedHUDSubsystem();
+	if (!IsValid(sharedHUDSubsystem) || !IsValid(IMounteaAdvancedInventorySharedHUDInterface::Execute_GetWrapperWidget(sharedHUDSubsystem)))
+	{
+		LOG_WARNING(TEXT("[MounteaInventoryUIComponent] Cannot find 'Shared HUD Subsystem'. UI might not work properly"))
+		if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+			IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::General::Create, nullptr);
+	}
+	else
+		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::General::Create, InventoryWidget);
 
 	return true;
 }
 
 void UMounteaInventoryUIComponent::RemoveInventoryWidget_Implementation()
 {
-	TScriptInterface<IMounteaAdvancedInventoryWidgetInterface> inventoryWrapper = InventoryWidget;
-	ensure(inventoryWrapper.GetObject() != nullptr);
+	if (!IsValid(InventoryWidget))
+		return;
 	
-	if (WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::General::Remove, nullptr);
-	else
+	const auto sharedHUDSubsystem = GetSharedHUDSubsystem();
+	if (!IsValid(sharedHUDSubsystem) || !IsValid(IMounteaAdvancedInventorySharedHUDInterface::Execute_GetWrapperWidget(sharedHUDSubsystem)))
 	{
+		LOG_WARNING(TEXT("[MounteaInventoryUIComponent] Cannot find 'Shared HUD Subsystem'. UI might not work properly"))
 		InventoryWidget->RemoveFromParent();
 		InventoryWidget = nullptr;
-	}
+	}	
+	else
+		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::General::Remove, InventoryWidget);
 }
 
 bool UMounteaInventoryUIComponent::SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget)
@@ -316,67 +255,6 @@ void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* N
 	
 	if (UIConfig && UIConfig->bAllowAutoFocus && ActiveItemWidget)
 		ActiveItemWidget->SetFocus();	
-}
-
-UUserWidget* UMounteaInventoryUIComponent::GetNotificationContainer_Implementation() const
-{
-	return InventoryNotificationContainerWidget;
-}
-
-void UMounteaInventoryUIComponent::SetNotificationContainer_Implementation(UUserWidget* NewNotificationContainer)
-{
-	if (InventoryNotificationContainerWidget != NewNotificationContainer)
-		InventoryNotificationContainerWidget = NewNotificationContainer;
-}
-
-void UMounteaInventoryUIComponent::CreateInventoryNotification_Implementation(const FInventoryNotificationData& NotificationData)
-{
-	if (!IsValid(InventoryNotificationContainerWidget))
-	{
-		LOG_WARNING(TEXT("[CreateInventoryNotification] Invalid Notification Container!"))
-		return;
-	}
-
-	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
-	ensure(notificationContainerInterface.GetObject() != nullptr);
-	
-	if (!UIConfig)
-	{
-		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))
-		return;
-	}
-
-	if (UIConfig->NotificationWidgetClass.IsNull())
-	{
-		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load `NotificationWidgetClass` from Config!"))
-		return;
-	}
-	
-	auto notificationClass = UIConfig->NotificationWidgetClass.LoadSynchronous();
-	auto notificationWidget = CreateWidget(InventoryNotificationContainerWidget, notificationClass);
-	if (!IsValid(notificationWidget))
-	{
-		LOG_ERROR(TEXT("[CreateInventoryNotification] Failed to Create Inventory Notification!"))
-		return;
-	}
-
-	IMounteaInventoryNotificationWidgetInterface::Execute_CreateNotification(notificationWidget, NotificationData, InventoryNotificationContainerWidget);
-
-	notificationContainerInterface->Execute_AddNotification(InventoryNotificationContainerWidget, notificationWidget);
-}
-
-void UMounteaInventoryUIComponent::RemoveInventoryNotifications_Implementation()
-{
-	if (!IsValid(InventoryNotificationContainerWidget))
-	{
-		LOG_WARNING(TEXT("[CreateInventoryNotification] Invalid Notification Container!"))
-		return;
-	}
-
-	TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface> notificationContainerInterface = InventoryNotificationContainerWidget;
-	ensure(notificationContainerInterface.GetObject() != nullptr);
-
-	IMounteaInventoryNotificationContainerWidgetInterface::Execute_ClearNotifications(InventoryNotificationContainerWidget);
 }
 
 void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FMounteaInventoryItem& AddedItem)
@@ -478,6 +356,18 @@ void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FMounteaIn
 	Execute_ProcessItemModified(this, Item);
 }
 
+void UMounteaInventoryUIComponent::ForwardInventoryNotificationToSubsystem(const FInventoryNotificationData& NotificationData)
+{
+	const auto sharedHUDSubsystem = GetSharedHUDSubsystem();
+	if (!IsValid(sharedHUDSubsystem) || !IsValid(IMounteaAdvancedInventorySharedHUDInterface::Execute_GetWrapperWidget(sharedHUDSubsystem)))
+	{
+		LOG_WARNING(TEXT("[MounteaInventoryUIComponent] Cannot find 'Shared HUD Subsystem'. Notification cannot be displayed"))
+		return;
+	}
+
+	IMounteaAdvancedInventorySharedHUDInterface::Execute_CreateInventoryNotification(sharedHUDSubsystem, NotificationData);
+}
+
 void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FMounteaInventoryItem& Item, const int32 OldQuantity, const int32 NewQuantity)
 {
 	Execute_ProcessItemModified(this, Item);
@@ -512,12 +402,6 @@ bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const 
 	});
 }
 
-void UMounteaInventoryUIComponent::ExecuteWidgetCommand_Implementation(const FString& Command, UObject* OptionalPayload)
-{
-	if (WrapperWidget && WrapperWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(WrapperWidget, Command, OptionalPayload);
-}
-
 bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
 {
 	if (!IsValid(ItemAction))
@@ -549,36 +433,6 @@ void UMounteaInventoryUIComponent::CancelQueuedAction_Implementation(UMounteaSel
 	
 	ItemAction->CancelInventoryAction();
 	ActionsQueue.Remove(ItemAction);
-}
-
-void UMounteaInventoryUIComponent::SetWidgetStates_Implementation(const FGameplayTagContainer& NewStates)
-{
-	if (WidgetStatesContainer != NewStates)
-		WidgetStatesContainer = NewStates;
-}
-
-bool UMounteaInventoryUIComponent::AddWidgetStateTag_Implementation(const FGameplayTag& Tag)
-{
-	if (WidgetStatesContainer.HasTag(Tag))
-		return false;
-	WidgetStatesContainer.AddTag(Tag);
-	return true;
-}
-
-bool UMounteaInventoryUIComponent::RemoveWidgetStateTag_Implementation(const FGameplayTag& Tag)
-{
-	return WidgetStatesContainer.RemoveTag(Tag);
-}
-
-bool UMounteaInventoryUIComponent::HasWidgetStateTag_Implementation(const FGameplayTag& Tag, bool bExactMatch) const
-{
-	return bExactMatch ? WidgetStatesContainer.HasTagExact(Tag) : WidgetStatesContainer.HasTag(Tag);
-}
-
-bool UMounteaInventoryUIComponent::AppendWidgetStateTags_Implementation(const FGameplayTagContainer& TagsToAppend)
-{
-	WidgetStatesContainer.AppendTags(TagsToAppend);
-	return true;
 }
 
 void UMounteaInventoryUIComponent::EmptyItemActionsQueue_Implementation()

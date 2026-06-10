@@ -14,8 +14,9 @@
 
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
 
-UMounteaAdvancedInventorySettings::UMounteaAdvancedInventorySettings() : AdvancedInventorySettingsConfig(nullptr),
-																		 LogVerbosity(14)
+UMounteaAdvancedInventorySettings::UMounteaAdvancedInventorySettings() : 
+	AdvancedInventorySettingsConfig(nullptr),
+	LogVerbosity(14)
 {
 	CategoryName = TEXT("Mountea Framework");
 	SectionName = TEXT("Mountea Inventory System");
@@ -81,8 +82,7 @@ TMap<FString, FInventoryCategory> UMounteaAdvancedInventorySettings::GetAllowedC
 }
 
 
-TSoftObjectPtr<UInputMappingContext> UMounteaAdvancedInventorySettings::
-GetAdvancedInventoryEquipmentInputMapping() const
+TSoftObjectPtr<UInputMappingContext> UMounteaAdvancedInventorySettings::GetAdvancedInventoryEquipmentInputMapping() const
 {
 	return AdvancedInventoryEquipmentInputMapping;
 }

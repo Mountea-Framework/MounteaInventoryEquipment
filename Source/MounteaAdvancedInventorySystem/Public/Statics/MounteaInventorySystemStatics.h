@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -46,7 +46,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
 		meta=(ClassFilter="/Script/CoreUObject.Object"),
 		meta=(DeterminesOutputType = "ClassFilter"),
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Object By Class")
 	static UObject* GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult);
 
@@ -61,7 +61,7 @@ public:
 	 * @return Inventory Config, or null
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Configuration",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Inventory Config")
 	static UMounteaAdvancedInventorySettingsConfig* GetMounteaAdvancedInventoryConfig();
 
@@ -74,7 +74,7 @@ public:
 	 * @return The modified text with the replacements applied.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Replace Regex (Text)")
 	static FText ReplaceRegexInText(const FString& Regex, const FText& Replacement, const FText& SourceText);
 	static FString EscapeRegexSpecialChars(const FString& Input);
@@ -88,7 +88,7 @@ public:
 	 * @return The modified string with the replacements applied.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Text",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Replace Regex (String)")
 	static FString ReplaceRegexInString(const FString& Regex, const FString& Replacement, const FString& SourceText);
 
@@ -99,7 +99,7 @@ public:
 	 * @return 
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|GameplayTags",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Gameplay Tag")
 	static FGameplayTag GetGameplayTag(const FGameplayTagContainer& Source, const int TagIndex = 0);
 
@@ -109,7 +109,7 @@ public:
 	 * @return True if empty or invalid, false otherwise
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|GameplayTags",
-		meta=(CustomTag="MounteaK2Validate"),
+		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Is Tag Container Empty")
 	static bool IsTagsContainerEmpty(const FGameplayTagContainer& Source);
@@ -122,7 +122,7 @@ public:
 	 * @return An invalid FGuid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Guid",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		meta=(CompactNodeTitle="Invalid Guid"),
 		DisplayName="Invalid Guid")
 	static FGuid GetInvalidGuid() { return FGuid(); };
@@ -137,7 +137,8 @@ public:
 	 * @return The actor that owns the specified component, or nullptr if the component is invalid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Owner",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Owning Actor")
 	static AActor* GetOwningActor(const UObject* Target);
 
@@ -149,80 +150,141 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Assets", 
 		meta = (DeterminesOutputType = "FilterClass"),
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Assets")
 	static TArray<UObject*> GetAssets(const TSubclassOf<UObject> FilterClass);
+		
+	/**
+	 * Finds the first component on the target actor that implements the requested interface.
+	 *
+	 * This helper queries all actor components implementing InterfaceFilter and returns the first match.
+	 * Use this when you need direct access to the component object itself.
+	 *
+	 * @param Target			Actor whose components will be searched.
+	 * @param InterfaceFilter	Interface class used as the search filter.
+	 * @param bResult			(Out) True if at least one matching component was found; false otherwise.
+	 * @return					The first matching component, or nullptr if no component matches.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers", 
+		meta=(ClassFilter = "Interface"), 
+		meta=(DeterminesOutputType = "InterfaceFilter"), 
+		meta=(MounteaGetter),
+		DisplayName="Get Single Component By Interface")
+	static UActorComponent* GetSingleComponentByInterface(const AActor* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
+
+	/**
+	 * Finds the first implementation of the requested interface on the target object and returns it as a script interface.
+	 *
+	 * This helper first checks whether the target object itself implements InterfaceFilter.
+	 * If not and the target is an actor, it queries actor components implementing InterfaceFilter and wraps the first match
+	 * into TScriptInterface, preserving both object and interface pointers for Blueprint/C++ interface calls.
+	 *
+	 * @param Target			Object to inspect. If this is an actor, actor components are also searched.
+	 * @param InterfaceFilter	Interface class used as the search filter.
+	 * @param bResult			(Out) True if at least one matching component was found; false otherwise.
+	 * @return					Target interface (if implemented by target), otherwise first matching actor component interface, or null interface.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers", 
+		meta=(ClassFilter = "Interface"),
+		meta=(DefaultToSelf="Target"),
+		meta=(DeterminesOutputType = "InterfaceFilter"), 
+		meta=(MounteaGetter),
+		DisplayName="Get Single Interface By Class")
+	static TScriptInterface<IInterface> GetSingleInterfaceByClass(const UObject* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
 	
 #pragma region K2NodeHelpers
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetIntPropertyValue(UObject* Target, FName PropertyName, int32 Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly,Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly,Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetFloatPropertyValue(UObject* Target, FName PropertyName, float Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetStringPropertyValue(UObject* Target, FName PropertyName, const FString& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetBoolPropertyValue(UObject* Target, FName PropertyName, bool Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetNamePropertyValue(UObject* Target, FName PropertyName, const FName& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetBytePropertyValue(UObject* Target, FName PropertyName, uint8 Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject* Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetSoftObjectPropertyValue(UObject* Target, FName PropertyName, const TSoftObjectPtr<UObject>& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetClassPropertyValue(UObject* Target, FName PropertyName, const TSubclassOf<UObject> Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool SetSoftClassPropertyValue(UObject* Target, FName PropertyName, const TSoftClassPtr<UObject>& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"))
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"),
+		meta=(DefaultToSelf="Target"))
 	static bool SetGenericStructPropertyValue(UObject* Target, FName PropertyName, const int32& Value);
 
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetIntPropertyValue(UObject* Target, FName PropertyName, int32& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetInt64PropertyValue(UObject* Target, FName PropertyName, int64& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetFloatPropertyValue(UObject* Target, FName PropertyName, float& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetStringPropertyValue(UObject* Target, FName PropertyName, FString& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetBoolPropertyValue(UObject* Target, FName PropertyName, bool& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetNamePropertyValue(UObject* Target, FName PropertyName, FName& Value);
 
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetBytePropertyValue(UObject* Target, FName PropertyName, uint8& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetObjectPropertyValue(UObject* Target, const FName PropertyName, UObject*& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetSoftObjectPropertyValue(UObject* Target, FName PropertyName, TSoftObjectPtr<UObject>& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetClassPropertyValue(UObject* Target, FName PropertyName, TSubclassOf<UObject>& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads")
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",
+		meta=(DefaultToSelf="Target"))
 	static bool GetSoftClassPropertyValue(UObject* Target, FName PropertyName, TSoftClassPtr<UObject>& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"))
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"),
+		meta=(DefaultToSelf="Target"))
 	static bool GetGenericStructPropertyValue(UObject* Target, FName PropertyName, int32& Value);
 
 	

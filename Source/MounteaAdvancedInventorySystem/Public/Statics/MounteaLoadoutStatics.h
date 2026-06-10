@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -45,7 +45,8 @@ public:
 	 * @return True if loadout execution succeeded.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Loadout",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Load Loadout")
 	static bool LoadLoadout(UObject* Target);
 	
@@ -56,7 +57,8 @@ public:
 	 * @return Loadout configuration asset, or nullptr if unavailable.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Loadout",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Loadout")
 	static UMounteaAdvancedInventoryLoadoutConfig* GetLoadout(UObject* Target);
 	
@@ -67,7 +69,8 @@ public:
 	 * @return Array of loadout items, or empty array when target/configuration is invalid.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Loadout",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Get Loadout Items")
 	static TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems(UObject* Target);
 	
@@ -78,7 +81,8 @@ public:
 	 * @return True if automatic load is enabled.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Loadout",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Should Load Automatically")
 	static bool ShouldLoadAutomatically(UObject* Target);
 	
@@ -89,7 +93,8 @@ public:
 	 * @param bNewValue New automatic load flag value.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Loadout",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Set Load Automatically")
 	static void SetAutomaticLoad(UObject* Target, const bool bNewValue);
 };

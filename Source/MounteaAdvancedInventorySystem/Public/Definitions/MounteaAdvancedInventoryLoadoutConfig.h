@@ -35,6 +35,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadoutConfig 
 public:
 	
 	/**
+	 * Unique identifier for this Loadout Config entry, matching the referenced item template's GUID.
+	 * Used by the import pipeline to match and update existing entries without loading the template.
+	 */
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault))
+	FGuid Guid;
+	
+	/**
 	 * Ordered list of item entries that make up this loadout configuration.
 	 *
 	 * Each entry describes one item to add when the loadout is executed. Entries are instanced inline

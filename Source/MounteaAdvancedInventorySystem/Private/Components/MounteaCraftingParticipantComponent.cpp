@@ -185,6 +185,9 @@ bool UMounteaCraftingParticipantComponent::StartUsingCraftingStation_Implementat
 	if (Station == CraftingStation)
 		return false;
 
+	if (!UMounteaCraftingStatics::DoesHaveAnyRecipes(this))
+		return false;
+	
 	if (!GetOwner()->HasAuthority())
 	{
 		Server_StartUsingCraftingStation(Station);

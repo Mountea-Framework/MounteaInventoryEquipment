@@ -50,6 +50,9 @@ void FMounteaAdvancedInventoryDeveloperStyle::Create()
 	
 	StyleSet->Set("MAISStyleSet.K2Node_SetPropertyByName.small", new SVG_BRUSH_TINT(TEXT("WebIcons/circuit-board"), Icon20x20, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.K2Node_SetPropertyByName", new SVG_BRUSH_TINT(TEXT("WebIcons/circuit-board"), Icon40x40, FLinearColor::White));
+	
+	StyleSet->Set("MAISStyleSet.K2Node_Binding.small", new SVG_BRUSH_TINT(TEXT("WebIcons/connection"), Icon20x20, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.K2Node_Binding", new SVG_BRUSH_TINT(TEXT("WebIcons/connection"), Icon40x40, FLinearColor::White));
 }
 
 void FMounteaAdvancedInventoryDeveloperStyle::Initialize()

@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -38,6 +38,24 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaEquipmentStatics : public UBlue
 	GENERATED_BODY()
 	
 public:
+
+#pragma region Bindings
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment|Bindings",
+		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Bind On Equipment Item State Changed")
+	static bool BindToOnEquipmentItemStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedEquipmentItemInterface")) UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment|Bindings",
+		meta=(MounteaBinding),
+		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Unbind From On Equipment Item State Changed")
+	static bool UnbindFromOnEquipmentItemStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedEquipmentItemInterface")) UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding);
+
+#pragma endregion
 	
 #pragma region Settings
 
@@ -48,7 +66,7 @@ public:
 	 * @return - A pointer to the Mountea Advanced Equipment Settings configuration object
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Equipment Settings Config")
 	static UMounteaAdvancedEquipmentSettingsConfig* GetEquipmentSettingsConfig();
 
@@ -64,7 +82,7 @@ public:
 	 * @return - A set of soft class pointers representing allowed attachment target classes for equipment.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Equipment Settings Config")
 	static TSet<TSoftClassPtr<USceneComponent>> GetAllowedAttachmentTargets();
 
@@ -74,7 +92,7 @@ public:
 	 * @return  Configured quick-use actor class (soft reference), or null soft class if not configured.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Default Quick Use Item Class")
 	static TSoftClassPtr<AActor> GetDefaultQuickUseItemClass();
 	
@@ -89,7 +107,8 @@ public:
 	 * @return  First found equipment item interface, or empty if none found
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Find Equipment Item Interface")
 	static TScriptInterface<IMounteaAdvancedEquipmentItemInterface> FindEquipmentItemInterface(UObject* Target);
 
@@ -100,7 +119,8 @@ public:
 	 * @return  First found equipment interface, or empty if none found
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Find Equipment Interface")
 	static TScriptInterface<IMounteaAdvancedEquipmentInterface> FindEquipmentInterface(UObject* Target);
 
@@ -111,7 +131,8 @@ public:
 	 * @return  First found quick-use interface, or empty if none found
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Quick Use",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Find Quick Use Item Interface")
 	static TScriptInterface<IMounteaAdvancedQuickUseItemInterface> FindQuickUseItemInterface(UObject* Target);
 
@@ -123,7 +144,8 @@ public:
 	 * @return  True if mesh assignment succeeded
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Quick Use",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Set Quick Use Item Static Mesh")
 	static bool SetQuickUseItemStaticMesh(UObject* Target, UStaticMesh* NewStaticMesh);
@@ -136,7 +158,8 @@ public:
 	 * @return  True if mesh assignment succeeded
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Quick Use",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Set Quick Use Item Skeletal Mesh")
 	static bool SetQuickUseItemSkeletalMesh(UObject* Target, USkeletalMesh* NewSkeletalMesh);
@@ -148,7 +171,7 @@ public:
 	 * @return  True if the class is valid, false otherwise
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Equipment",
-		meta=(CustomTag="MounteaK2Validate"),
+		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Is Valid Equipment Item Class")
 	static bool IsTargetClassValid(const UClass* TargetClass);
@@ -175,7 +198,7 @@ public:
 	 * @return - A boolean indicating whether the operation was successful and the tags were retrieved.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Attachments|Equipment",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Try Get Attachment Tags")
 	static bool TryGetAttachmentTags(UObject* AttachmentObject, FGameplayTagContainer& OutTags);
 
@@ -187,7 +210,7 @@ public:
 	 * @return - True if the attachment object is an active equipment item, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Attachments|Equipment",
-		meta=(CustomTag="MounteaK2Validate"),
+		meta=(MounteaValidate),
 		DisplayName="Is Attachment Active Equipment Item")
 	static bool IsAttachmentActiveEquipmentItem(UObject* AttachmentObject);
 
@@ -212,7 +235,8 @@ public:
 	 * @return - A pointer to the resolved owning actor, or nullptr if the target is not associated with an actor.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Resolve Owning Actor")
 	static AActor* ResolveOwningActor(UObject* Target);
 
@@ -227,7 +251,7 @@ public:
 	 * @return                  A pointer to the resolved attachment target component, or nullptr if no valid target is found.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Quick Use",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		meta=(AutoCreateRefTerm="VisualSlotId"),
 		DisplayName="Resolve Quick Use Attachment Target")
 	static USceneComponent* ResolveQuickUseAttachmentTarget(UObject* Outer, const FName& VisualSlotId, FName& OutSocketName);
@@ -323,7 +347,7 @@ public:
 	 * @return  The fallback slot name, or NAME_None if not found.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Resolve Fallback Slot Id")
 	static FName ResolveFallbackSlotId(const FName& CurrentSlotId);
 
@@ -336,7 +360,7 @@ public:
 	 * @return  The active slot name, or NAME_None if not found.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Resolve Active Slot Id")
 	static FName ResolveActiveSlotId(const FName& StorageSlotId);
 
@@ -360,7 +384,8 @@ public:
 	 * @return  Best matching slot id, or NAME_None if no compatible candidate exists.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Getter,MounteaK2EquipmentSlot"),
+		meta=(MounteaGetter),
+		meta=(MounteaEquipmentSlot),
 		meta=(AutoCreateRefTerm="DesiredTags,EquipmentItemType"),
 		DisplayName="Resolve Best Slot Id From Tags")
 	static FName ResolveBestSlotIdFromTags(
@@ -375,7 +400,7 @@ public:
 	 * @return  The slot containing the item, or nullptr if not found.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Find Slot With Equipped Item")
 	static UMounteaAdvancedAttachmentSlot* FindSlotWithEquippedItem(UObject* Outer, const FGuid& ItemGuid);
 
@@ -388,7 +413,7 @@ public:
 	 * @return  True if the switch was successful.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Switch Equipped Item Slot")
 	static bool SwitchEquippedItemSlot(UObject* Outer, UMounteaAdvancedAttachmentSlot* CurrentSlot, UMounteaAdvancedAttachmentSlot* TargetSlot);
@@ -500,7 +525,7 @@ public:
 	 * @return  True if the item was successfully equipped, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Equip Item")
 	static bool EquipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition);
@@ -514,7 +539,8 @@ public:
 	 * @return - True if the item was successfully equipped to the slot, otherwise false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
+		meta=(MounteaSetter),
+		meta=(MounteaEquipmentSlot),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Equip Item to Slot")
@@ -529,7 +555,7 @@ public:
 	 * @return  True if the item is equipped on the target, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Validate"),
+		meta=(MounteaValidate),
 		DisplayName="Is Item Equipped")
 	static bool IsItemEquipped(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition);
 
@@ -543,7 +569,7 @@ public:
 	 * @return  True if the item is equipped in the specified slot on the target, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Validate,MounteaK2EquipmentSlot"),
+		meta=(MounteaValidate, MounteaEquipmentSlot),
 		meta=(AutoCreateRefTerm="SlotName"),
 		DisplayName="Is Item Equipped In Slot")
 	static bool IsItemEquippedInSlot(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, const FName& SlotName);
@@ -558,7 +584,7 @@ public:
 	 * @return  True if the item was successfully unequipped, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Unequip Item")
 	static bool UnequipItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target, const FMounteaInventoryItem& ItemDefinition, bool bUseFallbackSlot = true);
@@ -573,7 +599,8 @@ public:
 	 * @return  True if activation was initiated, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
+		meta=(MounteaSetter),
+		meta=(MounteaEquipmentSlot),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Activate Equipment Item")
@@ -589,8 +616,9 @@ public:
 	 * @return - Returns true if the activation succeeds, otherwise returns false.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
-		meta=(MounteaK2AllowedItemType_SlotId="Mountea_Inventory.Equipment.ItemType.QuickUse"),
+		meta=(MounteaSetter),
+		meta=(MounteaEquipmentSlot),
+		meta=(MounteaAllowedItemType_SlotId="Mountea_Inventory.Equipment.ItemType.QuickUse"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotId,TargetSlotId"),
 		DisplayName="Activate Quick Use Item")
@@ -606,7 +634,8 @@ public:
 	 * @return  True if deactivation was initiated, false otherwise.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter,MounteaK2EquipmentSlot"),
+		meta=(MounteaSetter),
+		meta=(MounteaEquipmentSlot),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="TargetSlotId"),
 		DisplayName="Deactivate Equipment Item")
@@ -621,7 +650,7 @@ public:
 	 * @return  True if notify handling succeeded.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Anim Attach Item")
 	static bool AnimAttachItem(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target);
@@ -635,7 +664,7 @@ public:
 	 * @return  True if notify handling succeeded.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Equipment",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Anim Quick Item Used")
 	static bool AnimQuickItemUsed(const TScriptInterface<IMounteaAdvancedEquipmentInterface>& Target);

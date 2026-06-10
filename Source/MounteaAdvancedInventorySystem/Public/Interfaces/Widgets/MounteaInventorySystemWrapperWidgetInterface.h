@@ -18,7 +18,7 @@
 struct FGameplayTagContainer;
 struct FGameplayTag;
 class IMounteaAdvancedInventoryInterface;
-class IMounteaAdvancedInventoryUIManagerInterface;
+class IMounteaAdvancedInventorySharedHUDInterface;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaInventorySystemWrapperWidgetInterface : public UInterface
@@ -51,8 +51,8 @@ public:
 	 * @param Parent The parent UI Manager that implements the IMounteaAdvancedInventoryUIManagerInterface.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
-	void InitializeWrapperWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent);
-	virtual void InitializeWrapperWidget_Implementation(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Parent) = 0;
+	void InitializeWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent);
+	virtual void InitializeWrapperWidget_Implementation(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent) = 0;
 
 	/**
 	 * Removes the Wrapper UI from the viewport and cleans up resources.
@@ -61,4 +61,21 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
 	void RemoveWrapperWidget();
 	virtual void RemoveWrapperWidget_Implementation() = 0;
+
+	/**
+	 * Adds new modal widget to global UI wrapper.
+	 * @param ModalWindow Modal window to display.
+	 * @return True if modal window is valid and modal can be displayed.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
+	bool AddModalWindow(UUserWidget* ModalWindow);
+	virtual bool AddModalWindow_Implementation(UUserWidget* ModalWindow) = 0;
+
+	/**
+	 * Clears currently displayed modal window.
+	 * @return False if no window is present to be cleared OR something goes wrong.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Wrapper")
+	bool CleanupModalWindow();
+	virtual bool CleanupModalWindow_Implementation() = 0;
 };
