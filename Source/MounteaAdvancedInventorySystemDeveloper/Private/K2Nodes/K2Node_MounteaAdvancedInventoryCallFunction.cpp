@@ -25,7 +25,8 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::HasMounteaMetadata(const UFun
 			|| Function->HasMetaData(TEXT("MounteaGetter"))
 			|| Function->HasMetaData(TEXT("MounteaSetter"))
 			|| Function->HasMetaData(TEXT("MounteaValidate"))
-			|| Function->HasMetaData(TEXT("MounteaCommand")));
+			|| Function->HasMetaData(TEXT("MounteaCommand"))
+			|| Function->HasMetaData(TEXT("MounteaPayloadConstructor")));
 }
 
 void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const
