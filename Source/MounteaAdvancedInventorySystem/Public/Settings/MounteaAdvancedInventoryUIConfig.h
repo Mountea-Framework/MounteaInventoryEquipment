@@ -106,7 +106,7 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemActionsContainerWidgetClass;
-	
+
 	/** Widget class used to display individual Item Actions. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionWidgetInterface"),
@@ -114,17 +114,7 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemActionWidgetClass;
-	
-	// ---- Modal
-	
-	/** Widget class used to display Modal Window. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Modals",
-		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"),
-		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent),
-		meta=(ForceShowEngineContent))
-	TSoftClassPtr<UUserWidget> InventoryModalWidgetClass;
-		
+
 	// ---- Settings
 	
 	/**
