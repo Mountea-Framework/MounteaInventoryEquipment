@@ -15,8 +15,8 @@
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
-#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "K2Node_SwitchWidgetCommand"
@@ -121,11 +121,11 @@ void UK2Node_SwitchWidgetCommand::GetWidgetCommandsFromSettings(TArray<FName>& O
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return;
 	
-	const UMounteaAdvancedInventoryUIConfig* uiConfig = settings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
-	if (!uiConfig)
+	const UMounteaAdvancedInventoryGlobalUIConfig* globalUIConfig = settings->GlobalUIConfig.LoadSynchronous();
+	if (!globalUIConfig)
 	return;
 
-	TArray<FString> widgetCommands = uiConfig->WidgetCommands.Array();
+	TArray<FString> widgetCommands = globalUIConfig->WidgetCommands.Array();
 	widgetCommands.Sort();
 	
 	for (const FString& Command : widgetCommands)

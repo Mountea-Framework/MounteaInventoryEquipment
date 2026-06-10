@@ -17,8 +17,8 @@
 #include "Widgets/Text/STextBlock.h"
 #include "EdGraph/EdGraphPin.h"
 #include "EdGraph/EdGraphSchema.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
-#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 
 void SPinTypeCommandSelector::Construct(const FArguments& InArgs, UEdGraphPin* InGraphPinObj)
 {
@@ -44,11 +44,11 @@ void SPinTypeCommandSelector::GetWidgetCommandsFromSettings(TArray<FName>& OutCo
     const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
     if (!settings) return;
 	
-    const UMounteaAdvancedInventoryUIConfig* uiConfig = settings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
-    if (!uiConfig)
+    const UMounteaAdvancedInventoryGlobalUIConfig* globalUIConfig = settings->GlobalUIConfig.LoadSynchronous();
+    if (!globalUIConfig)
         return;
 
-    TArray<FString> widgetCommands = uiConfig->WidgetCommands.Array();
+    TArray<FString> widgetCommands = globalUIConfig->WidgetCommands.Array();
     widgetCommands.Sort();
 	
     for (const FString& Command : widgetCommands)
