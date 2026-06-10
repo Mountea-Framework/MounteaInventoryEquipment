@@ -133,20 +133,20 @@ public:
 	 * Then other non-filled slot will be found and so on, until no empty slots are available and/or input quantity if reached.
 	 * Improves inventory organization by reducing the number of individual item slots occupied.
 	 *
-	 * ⚠ Can result in performance impact on lower-end machines, especially with huge amounts of items!
+	 * Can result in performance impact on lower-end machines, especially with huge amounts of items!
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings", 
-		DisplayName="⚠ Always Stack Stackable Items",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="Config & Settings",
+		DisplayName="Always Stack Stackable Items",
 		meta=(NoResetToDefault))
 	uint8 bAlwaysStackStackableItems : 1;
 
 	/** Determines if the inventory system allows drag-and-drop operations for items. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="Config & Settings",
 		meta=(NoResetToDefault))
 	uint8 bAllowDragAndDrop : 1;
 	
 	/** Determines whether focus will be automatically passed to Active Widget or not. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="Config & Settings",
 		meta=(NoResetToDefault))
 	uint8 bAllowAutoFocus : 1;
 	

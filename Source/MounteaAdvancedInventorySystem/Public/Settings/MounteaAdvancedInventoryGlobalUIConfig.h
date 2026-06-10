@@ -43,7 +43,7 @@ public:
 	// --- UI Inputs
 
 	/** Discrete UI actions (Close, Confirm, ContextMenu, NextTab, PreviousTab, etc.). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🎮 Inputs",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inputs",
 		meta=(ShowOnlyInnerProperties),
 		meta=(TitleProperty="ActionTag"),
 		meta=(NoResetToDefault),
@@ -51,7 +51,7 @@ public:
 	TArray<FMounteaWidgetInputActionMapping> UIActionMappings;
 
 	/** Unified deadzone used for Analog and Wheel inputs. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🎮 Inputs|Config",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inputs|Config",
 		meta=(NoResetToDefault),
 		meta=(UIMin=0.f, ClampMin=0.f))
 	float InputDeadzone = 0.1f;
@@ -97,14 +97,14 @@ public:
 	// ---- Fonts
 
 	/** Default font settings used across the inventory user interface (labels, counters, titles). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "🔤 Font",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Font",
 		meta=(NoResetToDefault))
 	FSlateFontInfo DefaultFont;
 
 	// ---- Commands
 
 	/** Defines list of available Widget Commands. Those are available using custom ProcessWidgetCommand Node.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="⚙ Config & Settings",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Config & Settings",
 		meta=(NoResetToDefault))
 	TSet<FString> WidgetCommands;
 
