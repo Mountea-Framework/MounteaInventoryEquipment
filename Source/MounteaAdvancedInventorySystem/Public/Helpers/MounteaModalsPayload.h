@@ -64,6 +64,7 @@ public:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
 	uint8 bConfirmationType : 1;
+
 };
 
 UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Slider Modal Response Payload"))

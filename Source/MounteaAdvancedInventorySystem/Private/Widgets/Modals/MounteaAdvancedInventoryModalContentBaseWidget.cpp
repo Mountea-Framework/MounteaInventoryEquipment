@@ -32,4 +32,6 @@ void UMounteaAdvancedInventoryModalContentBaseWidget::ConstructModalContent_Impl
 		ModalContentExpiryTimerHandle.Invalidate();
 		GetWorld()->GetTimerManager().SetTimer(ModalContentExpiryTimerHandle, this, &UMounteaAdvancedInventoryModalContentBaseWidget::OnModalExpired, Payload->ModalConfig.ModalDuration);
 	}
+	
+	ModalType = Payload->ModalType;
 }
