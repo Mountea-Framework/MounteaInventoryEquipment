@@ -12,10 +12,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryGlobalUIConfig.generated.h"
 
 class UMounteaModalsPayload;
+class UMaterialInterface;
 class UDataTable;
 class UUserWidget;
 
@@ -31,22 +33,92 @@ UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Global U
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryGlobalUIConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	UMounteaAdvancedInventoryGlobalUIConfig();
 
 public:
-	
+
+	// --- UI Inputs
+
+	/** Discrete UI actions (Close, Confirm, ContextMenu, NextTab, PreviousTab, etc.). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🎮 Inputs",
+		meta=(ShowOnlyInnerProperties),
+		meta=(TitleProperty="ActionTag"),
+		meta=(NoResetToDefault),
+		DisplayName="Action Mappings for UI")
+	TArray<FMounteaWidgetInputActionMapping> UIActionMappings;
+
+	/** Unified deadzone used for Analog and Wheel inputs. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🎮 Inputs|Config",
+		meta=(NoResetToDefault),
+		meta=(UIMin=0.f, ClampMin=0.f))
+	float InputDeadzone = 0.1f;
+
+	// --- Wrapper
+
+	/** Widget class used as the main user interface wrapper (root HUD panel, container for other widgets,
+	 * like Inventory, Equipment, Crafting menu etc.). This Wrapper should be used for other UI systems to
+	 * avoid Z-oder fighting.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wrapper",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
+
+	// ---- Notifications
+
+	/** Widget class that acts as a container for all inventory notifications (list / stack of notification widgets). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> NotificationWidgetContainerClass;
+
+	/** Widget class used for a single inventory notification entry (one message / card in the notification container). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
+
+	/** Material used for rendering individual notification cards (background, styling, effects). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
+	TSoftObjectPtr<UMaterialInterface> NotificationCardMaterial = nullptr;
+
+	/** Default size (in Slate units) of the notification card widget when rendered on screen. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
+	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
+
+	// ---- Fonts
+
+	/** Default font settings used across the inventory user interface (labels, counters, titles). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "🔤 Font",
+		meta=(NoResetToDefault))
+	FSlateFontInfo DefaultFont;
+
+	// ---- Commands
+
+	/** Defines list of available Widget Commands. Those are available using custom ProcessWidgetCommand Node.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="⚙ Config & Settings",
+		meta=(NoResetToDefault))
+	TSet<FString> WidgetCommands;
+
+	// ---- Modals
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault))
 	TSet<FString> ModalTypes;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"))
 	TSoftClassPtr<UUserWidget> ModalWindowWidgetClass;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault))
 	TSoftClassPtr<UMounteaModalsPayload> ModalPayloadClass;
@@ -57,16 +129,17 @@ public:
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalContentWidgetInterface"),
 		meta=(GetKeyOptions="GetModalTypes"))
 	TMap<FString,TSoftClassPtr<UUserWidget>> Modals;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),
 		meta=(RequiredAssetDataTags="RowStructure=/Script/MounteaAdvancedInventorySystem.MounteaModalsConfig"))
 	TSet<TSoftObjectPtr<UDataTable>> ModalsData;
-	
+
 protected:
 
 	static const TArray<FString>& GetDefaultModalTypes();
 	void ValidateModalTypes();
+	void SetupWidgetCommands();
 
 	UFUNCTION()
 	TArray<FString> GetModalTypes() const;
