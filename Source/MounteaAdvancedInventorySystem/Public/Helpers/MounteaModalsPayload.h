@@ -19,9 +19,40 @@
 /**
  * 
  */
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType,
-	meta=(DisplayName="Mountea Modals Payload"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modals Payload"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalsPayload : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
+	FString ModalType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
+	FMounteaModalsConfig ModalConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Secondary Data")
+	TObjectPtr<UObject> OptionalPayload;
+};
+
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modals Payload (Slider)"))
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalSlidersPayload : public UMounteaModalsPayload
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
+	int32 MaxSliderQuantity = 99;
+};
+
+//
+// 
+//
+	
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modal Response Payload"))
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalResponsePayload : public UObject
 {
 	GENERATED_BODY()
 
