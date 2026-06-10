@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions/MounteaAdvancedInventoryGlobalUIDataTypes.h"
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryGlobalUIConfig.generated.h"
@@ -126,9 +127,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),
 		meta=(ShowOnlyInnerProperties),
-		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalContentWidgetInterface"),
 		meta=(GetKeyOptions="GetModalTypes"))
-	TMap<FString,TSoftClassPtr<UUserWidget>> Modals;
+	TMap<FString,FMounteaModalDefinition> Modals;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Modals",
 		meta=(NoResetToDefault),

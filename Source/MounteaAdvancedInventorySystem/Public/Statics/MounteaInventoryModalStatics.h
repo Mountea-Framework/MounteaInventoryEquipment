@@ -137,6 +137,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
 		meta=(MounteaSetter),
+		meta=(MounteaPayloadConstructor),
 		meta=(MounteaModalType),
 		meta=(MounteaModalTypePin="ModalType"),
 		meta=(MounteaModalRow),
@@ -148,6 +149,7 @@ public:
 
 private:
 
+	static TSubclassOf<UMounteaModalsPayload> ResolveModalPayloadClass(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& ModalType);
 	static FDataTableRowHandle ResolveModalDataTableRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key);
 	static UDataTable* FindModalDataTableForRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key);
 	static UUserWidget* CreateWidgetFromClass(UObject* Context, TSubclassOf<UUserWidget> WidgetClass);
