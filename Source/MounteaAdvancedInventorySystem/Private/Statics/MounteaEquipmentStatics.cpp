@@ -39,6 +39,24 @@
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaAttachmentsStatics.h"
 
+#define MOUNTEA_BIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedEquipmentItemInterface* nativeInterface = Cast<IMounteaAdvancedEquipmentItemInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedEquipmentItemInterface* nativeInterface = Cast<IMounteaAdvancedEquipmentItemInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+	return true
+
 const FMounteaEquipmentSlotHeaderData* UMounteaEquipmentStatics::ResolveSlotHeaderData(
 	const UMounteaAdvancedAttachmentSlotBase* Slot,
 	const UMounteaAdvancedEquipmentSettingsConfig* SettingsConfig)
@@ -47,6 +65,16 @@ const FMounteaEquipmentSlotHeaderData* UMounteaEquipmentStatics::ResolveSlotHead
 		return nullptr;
 
 	return SettingsConfig->AllowedEquipmentSlots.Find(Slot->SlotName);
+}
+
+bool UMounteaEquipmentStatics::BindToOnEquipmentItemStateChanged(UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding)
+{
+	MOUNTEA_BIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, GetOnEquipmentItemStateChangedHandle);
+}
+
+bool UMounteaEquipmentStatics::UnbindFromOnEquipmentItemStateChanged(UObject* Target, const FMounteaEquipmentItemStateChangedBinding& Binding)
+{
+	MOUNTEA_UNBIND_EQUIPMENT_ITEM_DELEGATE(Target, Binding, GetOnEquipmentItemStateChangedHandle);
 }
 
 bool UMounteaEquipmentStatics::TryGetAttachmentTags(UObject* AttachmentObject, FGameplayTagContainer& OutTags)

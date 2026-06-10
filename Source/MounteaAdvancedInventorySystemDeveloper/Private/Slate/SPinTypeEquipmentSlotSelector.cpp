@@ -226,13 +226,13 @@ FGameplayTag SPinTypeEquipmentSlotSelector::ResolveRequiredItemTypeFilter() cons
 	FString metadataValue;
 	if (GraphPinObj)
 	{
-		const FString pinSpecificMetadataKey = FString::Printf(TEXT("MounteaK2AllowedItemType_%s"), *GraphPinObj->PinName.ToString());
+		const FString pinSpecificMetadataKey = FString::Printf(TEXT("MounteaAllowedItemType_%s"), *GraphPinObj->PinName.ToString());
 		if (targetFunction->HasMetaData(*pinSpecificMetadataKey))
 			metadataValue = targetFunction->GetMetaData(*pinSpecificMetadataKey);
 	}
 
-	if (metadataValue.IsEmpty() && targetFunction->HasMetaData(TEXT("MounteaK2AllowedItemType")))
-		metadataValue = targetFunction->GetMetaData(TEXT("MounteaK2AllowedItemType"));
+	if (metadataValue.IsEmpty() && targetFunction->HasMetaData(TEXT("MounteaAllowedItemType")))
+		metadataValue = targetFunction->GetMetaData(TEXT("MounteaAllowedItemType"));
 
 	metadataValue = metadataValue.TrimStartAndEnd();
 	if (metadataValue.IsEmpty())

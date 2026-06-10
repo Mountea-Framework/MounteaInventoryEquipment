@@ -158,7 +158,7 @@ void UMounteaInventoryItemTemplate::ReloadItemActions()
 	if (const auto advancedInventorySettingsConfig = inventorySettings->AdvancedInventorySettingsConfig.LoadSynchronous())
 	{
 		auto categoryConfiguration = advancedInventorySettingsConfig->AllowedCategories.Find(ItemCategory);
-		if (categoryConfiguration->CategoryData.AllowedActions.Num() > 0)
+		if (categoryConfiguration && categoryConfiguration->CategoryData.AllowedActions.Num() > 0)
 		{
 			const auto categoryActionClasses = categoryConfiguration->CategoryData.AllowedActions;
 			const auto currentItemActions = ItemActions;

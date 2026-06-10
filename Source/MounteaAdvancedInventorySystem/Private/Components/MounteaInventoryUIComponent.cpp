@@ -132,7 +132,8 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryUIComponen
 
 void UMounteaInventoryUIComponent::SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
 {
-	if (ParentInventory != NewParentInventory) ParentInventory = NewParentInventory;
+	if (ParentInventory != NewParentInventory) 
+		ParentInventory = NewParentInventory;
 }
 
 UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIComponent::GetSharedHUDSubsystem() const

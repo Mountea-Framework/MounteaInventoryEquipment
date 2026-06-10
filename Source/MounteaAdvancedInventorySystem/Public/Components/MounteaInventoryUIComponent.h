@@ -42,7 +42,7 @@ public:
 
 	UMounteaInventoryUIComponent();
 
-protected:
+public:
 	
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -52,11 +52,17 @@ public:
 	virtual void SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory) override;
 	
 	virtual bool CreateInventoryWidget_Implementation() override;
-	virtual UUserWidget* GetInventoryWidget_Implementation() const override { return InventoryWidget; };
+	virtual UUserWidget* GetInventoryWidget_Implementation() const override
+	{
+		return InventoryWidget;
+	};
 	virtual void RemoveInventoryWidget_Implementation() override;
 	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) override;
 
-	virtual UWidget* GetActiveItemWidget_Implementation() const override { return ActiveItemWidget; };
+	virtual UWidget* GetActiveItemWidget_Implementation() const override
+	{
+		return ActiveItemWidget;
+	};
 	virtual void SetActiveItemWidget_Implementation(UWidget* NewActiveItemWidget) override;	
 
 	virtual void ProcessItemAdded_Implementation(const FMounteaInventoryItem& AddedItem) override;
@@ -64,14 +70,29 @@ public:
 	virtual void ProcessItemRemoved_Implementation(const FMounteaInventoryItem& RemovedItem) override;
 
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) override;
-	virtual FString GetSelectedCategoryId_Implementation() const override { return ActiveCategoryId; };
+	virtual FString GetSelectedCategoryId_Implementation() const override
+	{
+		return ActiveCategoryId;
+	};
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) override;
-	virtual FGuid GetActiveItemGuid_Implementation() const override { return ActiveItemGuid; };
+	virtual FGuid GetActiveItemGuid_Implementation() const override
+	{
+		return ActiveItemGuid;
+	};
 	
-	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const override { return CustomItemsMap; };
+	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const override
+	{
+		return CustomItemsMap;
+	};
 	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
-	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override { CustomItemsMap.Append(OtherItems); };
-	virtual void ClearCustomItemsMap_Implementation() override { CustomItemsMap.Reset(); };
+	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override
+	{
+		CustomItemsMap.Append(OtherItems);
+	};
+	virtual void ClearCustomItemsMap_Implementation() override
+	{
+		CustomItemsMap.Reset();
+	};
 	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	
@@ -142,7 +163,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", 
 		meta=(AllowPrivateAccess),
 		meta=(DisplayThumbnail=false))
-	TObjectPtr<UUserWidget> InventoryWidget;	
+	TObjectPtr<UUserWidget> InventoryWidget;
 	
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category="Inventory",
 		meta=(AllowPrivateAccess),

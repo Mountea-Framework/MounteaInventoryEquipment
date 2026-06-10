@@ -42,6 +42,7 @@ UMounteaCraftingParticipantUIComponent::UMounteaCraftingParticipantUIComponent()
 
 	ComponentTags.Append( { TEXT("Mountea"), TEXT("Crafting"), TEXT("UI") } );
 }
+
 void UMounteaCraftingParticipantUIComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -221,6 +222,23 @@ bool UMounteaCraftingParticipantUIComponent::SetCraftingParticipant_Implementati
 	if (Participant == CraftingParticipant)
 		return false;
 	CraftingParticipant = Participant;
+	return true;
+}
+
+bool UMounteaCraftingParticipantUIComponent::CraftingCategorySelected_Implementation(const FString& SelectedCategoryId)
+{
+	const bool bSuccess = SelectedCategoryId.Equals(SelectedCategory, ESearchCase::IgnoreCase);
+	if (bSuccess)
+		SelectedCategory = SelectedCategoryId;
+	return bSuccess;
+}
+
+bool UMounteaCraftingParticipantUIComponent::CraftableItemSelected_Implementation(const FGuid& NewSelectedItem)
+{
+	if (SelectedItem == NewSelectedItem)
+		return false;
+
+	SelectedItem = NewSelectedItem;
 	return true;
 }
 

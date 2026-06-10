@@ -40,7 +40,7 @@ public:
 	 * @param NewCraftingUIManager Object instance to register as the Crafting UI Manager.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Crafting|Subsystem",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		DisplayName="Register Crafting UI Manager")
 	void RegisterCraftingUIManager(UObject* NewCraftingUIManager);
 
@@ -53,7 +53,7 @@ public:
 	 * @param DirtyCraftingUIManager Crafting UI Manager instance to unregister.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Crafting|Subsystem",
-		meta=(CustomTag="MounteaK2Setter"),
+		meta=(MounteaSetter),
 		DisplayName="Unregister Crafting UI Manager")
 	void UnregisterCraftingUIManager(const UObject* DirtyCraftingUIManager);
 
@@ -63,7 +63,7 @@ public:
 	 * @return The active Crafting UI Manager instance, or nullptr if none is registered.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Crafting|Subsystem",
-		meta=(CustomTag="MounteaK2Getter"),
+		meta=(MounteaGetter),
 		DisplayName="Get Crafting UI Manager")
 	UObject* GetCraftingUIManager() const;
 
@@ -73,8 +73,8 @@ public:
 	 * @return The active Crafting UI Manager instance, or nullptr if none is registered.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Crafting|Subsystem",
-		meta=(CustomTag="MounteaK2Getter"),
-		DisplayName="Get Crafting UI Manager")
+		meta=(MounteaGetter),
+		DisplayName="Get Crafting UI Manager (Interface)")
 	TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface> GetCraftingUIManager_Interface() const;
 
 private:

@@ -26,6 +26,8 @@ class UWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&, SelectedItemId);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryCategorySelectedBinding, const FString&, SelectedCategoryId);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemSelectedBinding, const FGuid&, SelectedItemId);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
@@ -108,7 +110,7 @@ public:
 	 * Handles the selection of a category in the inventory UI.
 	 * @param SelectedCategoryId The ID of the selected category.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Category")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Category")
 	void CategorySelected(const FString& SelectedCategoryId);
 	virtual void CategorySelected_Implementation(const FString& SelectedCategoryId) = 0;
 
@@ -116,7 +118,7 @@ public:
 	 * Retrieves the currently selected category ID.
 	 * @return The ID of the currently selected category.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Category")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Category")
 	FString GetSelectedCategoryId() const;
 	virtual FString GetSelectedCategoryId_Implementation() const = 0;
 	
@@ -146,7 +148,7 @@ public:
 	 * Processes an item that has been added to the inventory.
 	 * @param AddedItem The item that has been added to the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	void ProcessItemAdded(const FMounteaInventoryItem& AddedItem);
 	virtual void ProcessItemAdded_Implementation(const FMounteaInventoryItem& AddedItem) = 0;
 
@@ -154,7 +156,7 @@ public:
 	 * Processes an item that has been removed from the inventory.
 	 * @param RemovedItem The item that has been removed from the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	void ProcessItemRemoved(const FMounteaInventoryItem& RemovedItem);
 	virtual void ProcessItemRemoved_Implementation(const FMounteaInventoryItem& RemovedItem) = 0;
 
@@ -162,7 +164,7 @@ public:
 	 * Processes an item that has been modified in the inventory.
 	 * @param ModifiedItem The item that has been modified in the inventory.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	void ProcessItemModified(const FMounteaInventoryItem& ModifiedItem);
 	virtual void ProcessItemModified_Implementation(const FMounteaInventoryItem& ModifiedItem) = 0;
 	
@@ -170,7 +172,7 @@ public:
 	 * Handles the selection of an item in the inventory UI.
 	 * @param SelectedItem The GUID of the selected item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	void ItemSelected(const FGuid& SelectedItem);
 	virtual void ItemSelected_Implementation(const FGuid& SelectedItem) = 0;
 
@@ -178,7 +180,7 @@ public:
 	 * Retrieves the currently active item GUID.
 	 * @return The GUID of the currently active item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Item")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	FGuid GetActiveItemGuid() const;
 	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
 	
@@ -189,7 +191,7 @@ public:
 	 * 
 	 * @return Custom items map if any entries are present.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
 	TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap() const;
 	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const = 0;
 	
@@ -199,7 +201,7 @@ public:
 	 * @param ItemTag   Gameplay tag representing the custom item key.
 	 * @param ItemId    Guid value associated with the item.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
 	void AddCustomItemToMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 
@@ -209,14 +211,14 @@ public:
 	 *
 	 * @param OtherItems   Map of custom items to merge in.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
 	void AppendCustomItemsMap(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) = 0;
 
 	/**
 	 * Clears all entries from the custom items map.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
 	void ClearCustomItemsMap();
 	virtual void ClearCustomItemsMap_Implementation() = 0;
 
@@ -228,7 +230,7 @@ public:
 	 *
 	 * @return True if an entry was removed, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
 	bool RemoveCustomItemFromMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 
@@ -241,7 +243,7 @@ public:
 	 * @param ItemId Item guid to search for
 	 * @return True if item is stored in such container, false otherwise
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Manager|Items")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
 	bool IsItemStoredInCustomMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
 	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 	

@@ -13,9 +13,13 @@
 #include "Statics/MounteaCraftingStatics.h"
 
 #include "Algo/Copy.h"
+#include "Algo/ForEach.h"
+#include "Algo/Transform.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaCraftingBaseEnums.h"
+#include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Definitions/MounteaInventoryItemTemplate_Recipe.h"
 #include "Definitions/MounteaRecipeIngredient.h"
 #include "Definitions/MounteaRecipeIngredientsList.h"
 #include "Definitions/MounteaRecipeTemplate.h"
@@ -24,6 +28,280 @@
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Settings/MounteaAdvancedCraftingConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Statics/MounteaInventoryStatics.h"
+
+#define MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedCraftingParticipantInterface* nativeInterface = Cast<IMounteaAdvancedCraftingParticipantInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().AddUnique(Binding); \
+	return true
+
+#define MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, HandleGetter) \
+	if (!IsValid(Target) || !(Binding).IsBound()) \
+		return false; \
+	IMounteaAdvancedCraftingParticipantInterface* nativeInterface = Cast<IMounteaAdvancedCraftingParticipantInterface>(Target); \
+	if (!nativeInterface) \
+		return false; \
+	nativeInterface->HandleGetter().Remove(Binding); \
+	return true
+
+bool UMounteaCraftingStatics::HasInventoryItemForRecipeSourceCached(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	UMounteaInventoryItemTemplate_Recipe* RecipeSource,
+	TMap<UMounteaInventoryItemTemplate_Recipe*, bool>& RecipeSourcePresenceCache)
+{
+	if (!IsValid(RecipeSource))
+		return false;
+
+	if (const bool* cachedPresence = RecipeSourcePresenceCache.Find(RecipeSource))
+		return *cachedPresence;
+
+	const bool bHasRecipeItem = UMounteaInventoryStatics::FindItems(
+		Inventory,
+		FInventoryItemSearchParams(RecipeSource)).Num() > 0;
+
+	RecipeSourcePresenceCache.Add(RecipeSource, bHasRecipeItem);
+	return bHasRecipeItem;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyRecipeSourceGrantFilter(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const TArray<UMounteaRecipeTemplate*>& SourceRecipes)
+{
+	TMap<UMounteaInventoryItemTemplate_Recipe*, bool> recipeSourcePresenceCache;
+	
+	TArray<UMounteaRecipeTemplate*> result;
+	result.Reserve(SourceRecipes.Num());
+	Algo::CopyIf(SourceRecipes, result,
+		[&Inventory, &recipeSourcePresenceCache](const UMounteaRecipeTemplate* recipe) -> bool
+		{
+			if (!IsValid(recipe))
+				return false;
+
+			if (recipe->RecipeSource.IsNull())
+				return true;
+
+			UMounteaInventoryItemTemplate_Recipe* recipeSource = recipe->RecipeSource.LoadSynchronous();
+			if (!IsValid(recipeSource))
+			{
+				// invalid RecipeSource asset is treated as unavailable source and filtered out.
+				return false;
+			}
+
+			if (!recipeSource->bTemporaryGrant)
+				return true;
+
+			return HasInventoryItemForRecipeSourceCached(Inventory, recipeSource, recipeSourcePresenceCache);
+		});
+
+	return result;
+}
+
+int32 UMounteaCraftingStatics::GetIngredientQuantityCached(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	UMounteaInventoryItemTemplate* IngredientTemplate,
+	TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache)
+{
+	if (!IsValid(IngredientTemplate))
+		return 0;
+
+	if (const int32* cachedQuantity = IngredientQuantityCache.Find(IngredientTemplate))
+		return *cachedQuantity;
+
+	const TArray<FMounteaInventoryItem> matchingItems =
+		IMounteaAdvancedInventoryInterface::Execute_FindItems(
+			Inventory.GetObject(),
+			FInventoryItemSearchParams(IngredientTemplate));
+
+	int32 totalQuantity = 0;
+	for (const FMounteaInventoryItem& matchingItem : matchingItems)
+		totalQuantity += matchingItem.Quantity;
+
+	IngredientQuantityCache.Add(IngredientTemplate, totalQuantity);
+	return totalQuantity;
+}
+
+bool UMounteaCraftingStatics::IsIngredientSatisfied(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const UMounteaRecipeIngredient* Ingredient,
+	TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache)
+{
+	if (!IsValid(Ingredient))
+		return false;
+
+	UMounteaInventoryItemTemplate* ingredientTemplate = Ingredient->IngredientSource.LoadSynchronous();
+	if (!IsValid(ingredientTemplate))
+		return false;
+
+	return GetIngredientQuantityCached(Inventory, ingredientTemplate, IngredientQuantityCache) >= Ingredient->RequiredQuantity;
+}
+
+bool UMounteaCraftingStatics::IsIngredientGroupSatisfied(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const UMounteaRecipeIngredientsList* IngredientGroup,
+	TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache)
+{
+	if (!IsValid(IngredientGroup))
+	{
+		// invalid ingredient groups are treated as non-craftable options and skipped.
+		return false;
+	}
+
+	return !IngredientGroup->RecipeIngredients.ContainsByPredicate(
+		[&Inventory, &IngredientQuantityCache](const UMounteaRecipeIngredient* ingredient) -> bool
+		{
+			return !IsIngredientSatisfied(Inventory, ingredient, IngredientQuantityCache);
+		});
+}
+
+bool UMounteaCraftingStatics::IsRecipeSatisfiedByIngredients(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const UMounteaRecipeTemplate* Recipe,
+	TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache)
+{
+	if (!IsValid(Recipe))
+		return false;
+
+	if (Recipe->RecipeIngredientOptions.Num() == 0)
+		return true;
+
+	return Recipe->RecipeIngredientOptions.ContainsByPredicate(
+		[&Inventory, &IngredientQuantityCache](const UMounteaRecipeIngredientsList* ingredientGroup) -> bool
+		{
+			return IsIngredientGroupSatisfied(Inventory, ingredientGroup, IngredientQuantityCache);
+		});
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyIngredientAvailabilityFilter(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const TArray<UMounteaRecipeTemplate*>& SourceRecipes)
+{
+	TMap<UMounteaInventoryItemTemplate*, int32> ingredientQuantityCache;
+
+	TArray<UMounteaRecipeTemplate*> result;
+	result.Reserve(SourceRecipes.Num());
+	Algo::CopyIf(SourceRecipes, result,
+		[&Inventory, &ingredientQuantityCache](const UMounteaRecipeTemplate* recipe) -> bool
+		{
+			return IsRecipeSatisfiedByIngredients(Inventory, recipe, ingredientQuantityCache);
+		});
+
+	return result;
+}
+
+bool UMounteaCraftingStatics::IsRecipeInCategory(
+	const UMounteaRecipeTemplate* Recipe,
+	const FGameplayTag& CategoryTag)
+{
+	if (!IsValid(Recipe) || !CategoryTag.IsValid())
+		return false;
+
+	const UMounteaInventoryItemTemplate* resultItem = Recipe->ResultItem.LoadSynchronous();
+	if (!IsValid(resultItem))
+		return false;
+
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(inventorySettings))
+		return false;
+
+	const TMap<FString, FInventoryCategory>& allowedCategories = inventorySettings->GetAllowedCategories();
+	const FInventoryCategory* allowedCategory = allowedCategories.Find(resultItem->ItemCategory);
+	if (!allowedCategory)
+		return false;
+
+	return allowedCategory->CategoryData.CategoryTags.HasTag(CategoryTag);
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyCategoryFilter(
+	const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
+	const FGameplayTag& CategoryTag)
+{
+	if (!CategoryTag.IsValid() || !IsAllowedInventoryCategoryTag(CategoryTag))
+		return {};
+
+	TArray<UMounteaRecipeTemplate*> result;
+	result.Reserve(SourceRecipes.Num());
+	Algo::CopyIf(SourceRecipes, result,
+		[&CategoryTag](const UMounteaRecipeTemplate* recipe) -> bool
+		{
+			return IsRecipeInCategory(recipe, CategoryTag);
+		});
+
+	return result;
+}
+
+void UMounteaCraftingStatics::GetAllowedInventoryCategoryTags(TArray<FGameplayTag>& OutCategoryTags)
+{
+	OutCategoryTags.Empty();
+
+	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(inventorySettings))
+		return;
+
+	const TMap<FString, FInventoryCategory>& allowedCategories = inventorySettings->GetAllowedCategories();
+	FGameplayTagContainer allowedCategoryTags;
+	Algo::ForEach(allowedCategories,
+		[&allowedCategoryTags](const TPair<FString, FInventoryCategory>& allowedCategory)
+		{
+			allowedCategoryTags.AppendTags(allowedCategory.Value.CategoryData.CategoryTags);
+		});
+
+	allowedCategoryTags.GetGameplayTagArray(OutCategoryTags);
+	OutCategoryTags.RemoveAll([](const FGameplayTag& categoryTag)
+	{
+		return !categoryTag.IsValid();
+	});
+
+	OutCategoryTags.Sort([](const FGameplayTag& Left, const FGameplayTag& Right)
+	{
+		return Left.ToString() < Right.ToString();
+	});
+}
+
+bool UMounteaCraftingStatics::IsAllowedInventoryCategoryTag(const FGameplayTag& CategoryTag)
+{
+	if (!CategoryTag.IsValid())
+		return false;
+
+	TArray<FGameplayTag> allowedCategoryTags;
+	GetAllowedInventoryCategoryTags(allowedCategoryTags);
+
+	return allowedCategoryTags.Contains(CategoryTag);
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyStationTypeFilter(
+	const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
+	const FGameplayTag& StationType)
+{
+	TArray<UMounteaRecipeTemplate*> result;
+	result.Reserve(SourceRecipes.Num());
+	Algo::CopyIf(SourceRecipes, result,
+		[&StationType](const UMounteaRecipeTemplate* recipe) -> bool
+		{
+			return IsValid(recipe)
+				&& (!recipe->RequiredCraftingPlace.IsValid() || recipe->RequiredCraftingPlace == StationType);
+		});
+
+	return result;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::ApplyRecipeSourceFilter(
+	const TArray<UMounteaRecipeTemplate*>& SourceRecipes,
+	const UMounteaRecipeTemplate* RecipeSource)
+{
+	TArray<UMounteaRecipeTemplate*> result;
+	result.Reserve(SourceRecipes.Num());
+	Algo::CopyIf(SourceRecipes, result,
+		[RecipeSource](const UMounteaRecipeTemplate* recipe) -> bool
+		{
+			return recipe == RecipeSource;
+		});
+
+	return result;
+}
 
 /**
  * CRAFTING PARTICIPANT
@@ -32,6 +310,169 @@
 bool UMounteaCraftingStatics::IsValidRecipeHandler(const UObject* Target)
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingParticipantInterface>();
+}
+
+bool UMounteaCraftingStatics::BindToOnCraftingFinished(UObject* Target, const FMounteaCraftingFinishedBinding& Binding)
+{
+	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnCraftingFinishedEventHandle);
+}
+
+bool UMounteaCraftingStatics::UnbindFromOnCraftingFinished(UObject* Target, const FMounteaCraftingFinishedBinding& Binding)
+{
+	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnCraftingFinishedEventHandle);
+}
+
+bool UMounteaCraftingStatics::BindToOnRecipeLearned(UObject* Target, const FMounteaRecipeLearnedBinding& Binding)
+{
+	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeLearnedEventHandle);
+}
+
+bool UMounteaCraftingStatics::UnbindFromOnRecipeLearned(UObject* Target, const FMounteaRecipeLearnedBinding& Binding)
+{
+	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeLearnedEventHandle);
+}
+
+bool UMounteaCraftingStatics::BindToOnRecipeForgotten(UObject* Target, const FMounteaRecipeForgottenBinding& Binding)
+{
+	MOUNTEA_BIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeForgottenEventHandle);
+}
+
+bool UMounteaCraftingStatics::UnbindFromOnRecipeForgotten(UObject* Target, const FMounteaRecipeForgottenBinding& Binding)
+{
+	MOUNTEA_UNBIND_CRAFTING_DELEGATE(Target, Binding, GetOnRecipeForgottenEventHandle);
+}
+
+bool UMounteaCraftingStatics::DoesHaveAnyRecipes(UObject* Target)
+{
+	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_GetKnownRecipes(Target).Num() > 0 : false;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetFilteredRecipes(UObject* Target, const FMounteaCraftingRecipeSearchFilter& SearchFilter)
+{
+	if (!IsValidRecipeHandler(Target))
+		return {};
+
+	const TArray<UMounteaRecipeTemplate*> knownRecipes = GetRecipes(Target, FGameplayTag::EmptyTag);
+	if (knownRecipes.Num() == 0)
+		return {};
+
+	const TScriptInterface<IMounteaAdvancedInventoryInterface> parentInventory = GetParentInventory(Target);
+	if (!parentInventory)
+		return {};
+
+	TArray<UMounteaRecipeTemplate*> filteredRecipes = ApplyRecipeSourceGrantFilter(parentInventory, knownRecipes);
+
+	// Apply stacked filters in this order:
+	// 1) ingredients
+	// 2) category
+	// 3) station type
+	// 4) recipe source
+	if (SearchFilter.bSearchByAvailableIngredients)
+		filteredRecipes = ApplyIngredientAvailabilityFilter(parentInventory, filteredRecipes);
+
+	if (SearchFilter.bSearchByCategory)
+	{
+		if (!SearchFilter.CategoryTag.IsValid())
+			return {};
+
+		filteredRecipes = ApplyCategoryFilter(filteredRecipes, SearchFilter.CategoryTag);
+	}
+
+	if (SearchFilter.bSearchByStationType)
+	{
+		if (!SearchFilter.StationType.IsValid())
+			return {};
+		
+		filteredRecipes = ApplyStationTypeFilter(filteredRecipes, SearchFilter.StationType);
+	}
+
+	if (SearchFilter.bSearchByRecipeSource)
+	{
+		if (!IsValid(SearchFilter.RecipeSource))
+			return {};
+		
+		filteredRecipes = ApplyRecipeSourceFilter(filteredRecipes, SearchFilter.RecipeSource);
+	}
+
+	return filteredRecipes;
+}
+
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetFilteredRecipesByCategory(UObject* Target, const FGameplayTag& CategoryTag)
+{
+	if (!CategoryTag.IsValid())
+		return {};
+
+	FMounteaCraftingRecipeSearchFilter searchFilter;
+	searchFilter.bSearchByAvailableIngredients = true;
+	searchFilter.bSearchByCategory = true;
+	searchFilter.CategoryTag = CategoryTag;
+
+	return GetFilteredRecipes(Target, searchFilter);
+}
+
+TArray<FInventoryCategory> UMounteaCraftingStatics::GetAllowedCategoriesWithCraftableItems(UObject* Target)
+{
+	if (!IsValidRecipeHandler(Target))
+		return {};
+
+	const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	if (!IsValid(settings))
+		return {};
+
+	const TMap<FString, FInventoryCategory> allowedCategories = settings->GetAllowedCategories();
+	if (allowedCategories.Num() == 0)
+		return {};
+
+	FMounteaCraftingRecipeSearchFilter searchFilter;
+	searchFilter.bSearchByAvailableIngredients = true;
+
+	const TArray<UMounteaRecipeTemplate*> craftableRecipes = GetFilteredRecipes(Target, searchFilter);
+	if (craftableRecipes.Num() == 0)
+		return {};
+
+	TSet<FString> craftableCategoryIds;
+	craftableCategoryIds.Reserve(FMath::Min(craftableRecipes.Num(), allowedCategories.Num()));
+
+	for (const UMounteaRecipeTemplate* recipe : craftableRecipes)
+	{
+		if (!IsValid(recipe))
+			continue;
+
+		const UMounteaInventoryItemTemplate* resultItem = recipe->ResultItem.LoadSynchronous();
+		if (!IsValid(resultItem))
+			continue;
+
+		const FString& itemCategory = resultItem->ItemCategory;
+		if (craftableCategoryIds.Contains(itemCategory))
+			continue;
+
+		if (!allowedCategories.Contains(itemCategory))
+			continue;
+
+		craftableCategoryIds.Add(itemCategory);
+		if (craftableCategoryIds.Num() == allowedCategories.Num())
+			break;
+	}
+
+	if (craftableCategoryIds.IsEmpty())
+		return {};
+
+	TArray<FInventoryCategory> returnValue;
+	returnValue.Reserve(allowedCategories.Num());
+
+	Algo::TransformIf(
+		allowedCategories,
+		returnValue,
+		[&craftableCategoryIds](const TPair<FString, FInventoryCategory>& category)
+		{
+			return craftableCategoryIds.Contains(category.Key);
+		},
+		[](const TPair<FString, FInventoryCategory>& category)
+		{
+			return category.Value;
+		});
+
+	return returnValue;
 }
 
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetKnownRecipes(UObject* Target)
@@ -231,40 +672,5 @@ bool UMounteaCraftingStatics::StopUsing(UObject* Target, const TScriptInterface<
 
 TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetRecipesByCategory(UObject* Target, const FGameplayTag& CategoryTag)
 {
-	if (!IsValidRecipeHandler(Target))
-		return {};
-	
-	const auto knownRecipes = IMounteaAdvancedCraftingParticipantInterface::Execute_GetKnownRecipes(Target);
-	if (knownRecipes.Num() == 0)
-		return {};
-	
-	TArray<UMounteaRecipeTemplate*> returnValue;
-	returnValue.Reserve(knownRecipes.Num());
-	
-	const UMounteaAdvancedInventorySettings* inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(inventorySettings))
-		return returnValue;
-	
-	const auto& allowedCategories = inventorySettings->GetAllowedCategories();
-	if (allowedCategories.Num() == 0)
-		return returnValue;
-
-	const auto IsRecipeInCategory = [&allowedCategories, &CategoryTag](const UMounteaRecipeTemplate* recipe) -> bool
-	{
-		if (!IsValid(recipe))
-			return false;
-		
-		const UMounteaInventoryItemTemplate* targetItem = recipe->ResultItem.LoadSynchronous();
-		if (!IsValid(targetItem))
-			return false;
-
-		if (const FInventoryCategory* allowedCategory = allowedCategories.Find(targetItem->ItemCategory))
-			return allowedCategory->CategoryData.CategoryTags.HasTag(CategoryTag);
-		
-		return false;
-	};
-
-	Algo::CopyIf(knownRecipes, returnValue, IsRecipeInCategory);
-	
-	return returnValue;
+	return GetFilteredRecipesByCategory(Target, CategoryTag);
 }

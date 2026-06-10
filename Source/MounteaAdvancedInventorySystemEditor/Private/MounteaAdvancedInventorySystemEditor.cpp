@@ -54,12 +54,15 @@
 #include "Editor/UnrealEdEngine.h"
 #include "UnrealEdGlobals.h"
 #include "AssetActions/MounteaAdvancedInventoryCraftingConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryGlobalUIConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutItem_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryModalsDataTable_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeIngredientsList_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeIngredient_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeTemplate_AssetAction.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -124,7 +127,9 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaCraftingParticipantUIComponent"), TEXT("CraftingParticipantUIIcon") },
 					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
 					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") },
-					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") }
+					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") },
+					{ TEXT("MounteaAdvancedInventoryGlobalUIConfig"), TEXT("GlobalUIConfig") },
+					{ TEXT("MounteaAdvancedInventoryModalsDataTable"), TEXT("ModalsDataTableIcon") }
 				};
 
 				const auto RegisterClassIcon = [this](const TCHAR* ClassName, const TCHAR* ResourceName)
@@ -166,12 +171,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutConfigs_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutItem_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutComponent_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryModalsDataTable_AssetAction>());
 		
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeTemplate_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredientsList_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredient_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingUIConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryGlobalUIConfig_AssetAction>());
 		
 		for (const auto& Itr : AssetActions)
 		{
@@ -509,26 +516,151 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 					{
 						FToolMenuSection& configSection = subMenu->FindOrAddSection("MounteaInventory_Config");
 						configSection.Label = LOCTEXT("InvConfig_Label", "Mountea Advanced Inventory Configs");
-						configSection.AddEntry(FToolMenuEntry::InitMenuEntry(
-							"MounteaInventory_Config",
-							LOCTEXT("MounteaSystemEditor_ConfigButton_Label", "Mountea Advanced Inventory Config"),
-							LOCTEXT("MounteaSystemEditor_ConfigButton_ToolTip", "📄 Open Mountea Inventory Configuration\n\n❔ Define inventory types, rarities, categories, limits and notification behaviors used by the core system."),
-							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
-							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { ConfigButtonClicked(); })
+						
+						// Global UI Config
+						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
+							"MounteaInventory_Config_GlobalConfigSubMenu",
+							LOCTEXT("MounteaSystemEditor_GlobalConfigSubMenu_Label", "Shared Config"),
+							LOCTEXT("MounteaSystemEditor_GlobalConfigSubMenu_ToolTip", "📄 Open Mountea Inventory & Equipment shared configuration menus."),
+							FNewToolMenuDelegate::CreateLambda([](UToolMenu* globalConfigSubMenu)
+							{
+								FToolMenuSection& inventoryConfigSection = globalConfigSubMenu->FindOrAddSection("MounteaInventory_Config_GlobalConfig");
+								inventoryConfigSection.Label = LOCTEXT("InvConfigGlobalConfig_Label", "Global UI Config");
+								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_Config",
+									LOCTEXT("MounteaSystemEditor_GlobalConfigButton_Label", "Global UI Config"),
+									LOCTEXT("MounteaSystemEditor_GlobalConfigButton_ToolTip", "📄 Open Mountea Inventory & Equipment Global UI Configuration\n\n❔ Define shared UI elements, like Theme, Fonts, Modals etc."),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->GlobalUIConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_GlobalConfigButton_Error", "Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+							}),
+							false,
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
 						));
-						configSection.AddEntry(FToolMenuEntry::InitMenuEntry(
-							"MounteaInventory_UIConfig",
-							LOCTEXT("MounteaSystemEditor_UIConfigButton_Label", "Mountea Advanced Inventory UI Config"),
-							LOCTEXT("MounteaSystemEditor_UIConfigButton_ToolTip", "📄 Open Mountea Inventory UI Configuration\n\n❔ Define inventory UI classes, styles and themes."),
-							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
-							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { UIConfigButtonClicked(); })
+						
+						// Inventory Config
+						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
+							"MounteaInventory_Config_InventorySubMenu",
+							LOCTEXT("MounteaSystemEditor_InventoryConfigSubMenu_Label", "Inventory"),
+							LOCTEXT("MounteaSystemEditor_InventoryConfigSubMenu_ToolTip", "📄 Open Mountea Inventory configuration menus."),
+							FNewToolMenuDelegate::CreateLambda([](UToolMenu* inventoryConfigSubMenu)
+							{
+								FToolMenuSection& inventoryConfigSection = inventoryConfigSubMenu->FindOrAddSection("MounteaInventory_Config_Inventory");
+								inventoryConfigSection.Label = LOCTEXT("InvConfigInventory_Label", "Inventory");
+								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_Config",
+									LOCTEXT("MounteaSystemEditor_ConfigButton_Label", "Mountea Advanced Inventory Config"),
+									LOCTEXT("MounteaSystemEditor_ConfigButton_ToolTip", "📄 Open Mountea Inventory Configuration\n\n❔ Define inventory types, rarities, categories, limits and notification behaviors used by the core system."),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->AdvancedInventorySettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_ConfigButton_Error", "Unable to locate the Mountea Inventory Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_UIConfig",
+									LOCTEXT("MounteaSystemEditor_UIConfigButton_Label", "Mountea Advanced Inventory UI Config"),
+									LOCTEXT("MounteaSystemEditor_UIConfigButton_ToolTip", "📄 Open Mountea Inventory UI Configuration\n\n❔ Define inventory UI classes, styles and themes."),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->AdvancedInventoryUISettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_UIConfigButton_Error", "Unable to locate the Mountea Inventory UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+							}),
+							false,
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
 						));
-						configSection.AddEntry(FToolMenuEntry::InitMenuEntry(
-							"MounteaInventory_EquipmentConfig",
-							LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_Label", "Mountea Advanced Equipment Config"),
-							LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_ToolTip", "📄 Open Mountea Equipment Configuration\n\n❔ Define Equipment types, slots, rules and other configuration."),
-							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
-							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { EquipmentConfigButtonClicked(); })
+						
+						// Equipment Config
+						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
+							"MounteaInventory_Config_EquipmentSubMenu",
+							LOCTEXT("MounteaSystemEditor_EquipmentConfigSubMenu_Label", "Equipment"),
+							LOCTEXT("MounteaSystemEditor_EquipmentConfigSubMenu_ToolTip", "📄 Open Mountea Equipment configuration menus."),
+							FNewToolMenuDelegate::CreateLambda([](UToolMenu* equipmentConfigSubMenu)
+							{
+								FToolMenuSection& equipmentConfigSection = equipmentConfigSubMenu->FindOrAddSection("MounteaInventory_Config_Equipment");
+								equipmentConfigSection.Label = LOCTEXT("InvConfigEquipment_Label", "Equipment");
+								equipmentConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_EquipmentConfig",
+									LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_Label", "Mountea Advanced Equipment Config"),
+									LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_ToolTip", "📄 Open Mountea Equipment Configuration\n\n❔ Define Equipment types, slots, rules and other configuration."),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->AdvancedEquipmentSettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_Error", "Unable to locate the Mountea Equipment Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+							}),
+							false,
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
+						));
+						
+						// Crafting Config
+						configSection.AddEntry(FToolMenuEntry::InitSubMenu(
+							"MounteaInventory_Config_CraftingSubMenu",
+							LOCTEXT("MounteaSystemEditor_CraftingConfigSubMenu_Label", "Crafting"),
+							LOCTEXT("MounteaSystemEditor_CraftingConfigSubMenu_ToolTip", "📄 Open Mountea Crafting configuration menus."),
+							FNewToolMenuDelegate::CreateLambda([](UToolMenu* equipmentConfigSubMenu)
+							{
+								FToolMenuSection& equipmentConfigSection = equipmentConfigSubMenu->FindOrAddSection("MounteaInventory_Config_Crafting");
+								equipmentConfigSection.Label = LOCTEXT("InvConfigCrafting_Label", "Crafting");
+								equipmentConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_CraftingConfig",
+									LOCTEXT("MounteaSystemEditor_CraftingConfigButton_Label", "Mountea Advanced Crafting Config"),
+									LOCTEXT("MounteaSystemEditor_CraftingConfigButton_ToolTip", "Open Mountea Crafting Configuration"),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->AdvancedCraftingSettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_CraftingConfigButton_Error", "Unable to locate the Mountea Crafting Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+								equipmentConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_CraftingUIConfig",
+									LOCTEXT("MounteaSystemEditor_CraftingUIConfigButton_Label", "Mountea Advanced Crafting UI Config"),
+									LOCTEXT("MounteaSystemEditor_CraftingUIConfigButton_ToolTip", "Open Mountea Crafting UI Configuration"),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->AdvancedCraftingUISettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_CraftingUIConfigButton_Error", "Unable to locate the Mountea Crafting UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+							}),
+							false,
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
 						));
 					}
 
@@ -540,14 +672,20 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							LOCTEXT("MounteaSystemEditor_SettingsButton_Label", "Mountea Advanced Inventory Settings"),
 							LOCTEXT("MounteaSystemEditor_SettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Settings\n\n❔ Configure core Advanced Inventory system settings including default behaviors, performance options, and Advanced Inventory flow parameters. Customize your Advanced Inventory system's foundation here."),
 							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Settings"),
-							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { SettingsButtonClicked(); })
+							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&)
+							{
+								UMounteaAdvancedInventorySystemEditorStatics::OpenSettings("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
+							})
 						));
 						settingsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
 							"MounteaInventory_EditorSettings",
 							LOCTEXT("MounteaSystemEditor_EditorSettingsButton_Label", "Mountea Advanced Inventory Editor Settings"),
 							LOCTEXT("MounteaSystemEditor_EditorSettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Editor Settings\n\n❔ Customize your Advanced Inventory editor experience with settings for:TBD\n\nAll settings are saved in DefaultMounteaSettings.ini"),
 							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Settings"),
-							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { EditorSettingsButtonClicked(); })
+							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&)
+							{
+								UMounteaAdvancedInventorySystemEditorStatics::OpenSettings("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
+							})
 						));
 					}
 
@@ -648,34 +786,6 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 		}
 	}
 }
-
-void FMounteaAdvancedInventorySystemEditor::SettingsButtonClicked() const
-{
-	UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
-		"Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
-}
-
-void FMounteaAdvancedInventorySystemEditor::ConfigButtonClicked() const
-{
-	UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryConfig();
-}
-
-void FMounteaAdvancedInventorySystemEditor::UIConfigButtonClicked() const
-{
-	UMounteaAdvancedInventorySystemEditorStatics::OpenInventoryUIConfig();
-}
-
-void FMounteaAdvancedInventorySystemEditor::EquipmentConfigButtonClicked() const
-{
-	UMounteaAdvancedInventorySystemEditorStatics::OpenEquipmentConfig();
-}
-
-void FMounteaAdvancedInventorySystemEditor::EditorSettingsButtonClicked() const
-{
-	UMounteaAdvancedInventorySystemEditorStatics::OpenSettings(
-		"Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
-}
-
 
 #undef LOCTEXT_NAMESPACE
 

@@ -13,6 +13,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "UObject/SoftObjectPath.h"
 #include "MounteaAdvancedInventorySystemEditorStatics.generated.h"
 
 /**
@@ -28,9 +29,5 @@ public:
 	
 	static void OpenSettings(const FString& ContainerName, const FString& CategoryName, const FString& SectionName);
 	static void OpenAsset(const FString& AssetPath);
-	
-	static void OpenInventoryConfig();
-	static void OpenEquipmentConfig();
-	
-	static void OpenInventoryUIConfig();
+	static void OpenConfig(const FSoftObjectPath& ConfigPath, FText& OutMessage, const FText& ErrorMessage);
 };

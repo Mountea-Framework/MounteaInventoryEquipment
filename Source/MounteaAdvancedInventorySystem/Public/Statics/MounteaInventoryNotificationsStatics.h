@@ -63,25 +63,25 @@ public:
 	/*************************************************************/
 	/******************* BLUEPRINTABLE *******************/
 	/*************************************************************/
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(MounteaSetter))
 	static void AddNotification(UObject* Container, UUserWidget* NewNotification);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(MounteaSetter))
 	static void RemoveNotification(UObject* Container, UUserWidget* Notification);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(MounteaSetter))
 	static void ClearNotifications(UObject* Container);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(MounteaSetter))
 	static void SetNotificationsContainerVisibility(UObject* Container, const bool bShowContainer);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(MounteaSetter))
 	static void CreateNotification(UObject* Notification, const FInventoryNotificationData& NotificationData, const TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface>& Container);
 	
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(MounteaSetter))
 	static void ExpireNotification(UObject* Notification);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(CustomTag="MounteaK2Setter"))
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification", meta=(MounteaSetter))
 	static void DeleteNotification(UObject* Notification);
 
 	
