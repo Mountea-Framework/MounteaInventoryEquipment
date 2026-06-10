@@ -22,7 +22,7 @@
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalWidgetInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
-#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 
 #define MOUNTEA_BIND_MODAL_CONTENT_DELEGATE(Target, Binding, HandleGetter) \
 	if (!IsValid(Target) || !(Binding).IsBound()) \
@@ -297,9 +297,5 @@ APlayerController* UMounteaInventoryModalStatics::ResolveOwningPlayer(UObject* C
 
 UMounteaAdvancedInventoryGlobalUIConfig* UMounteaInventoryModalStatics::GetGlobalUIConfig()
 {
-	const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings))
-		return nullptr;
-
-	return settings->GlobalUIConfig.LoadSynchronous();
+	return UMounteaInventoryBaseUIStatics::GetGlobalUIConfig();
 }
