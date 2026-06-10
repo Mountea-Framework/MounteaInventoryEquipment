@@ -21,6 +21,8 @@
 #include "GameFramework/PlayerController.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
+#include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Subsystems/MounteaAdvancedInventorySharedHUDSubsystem.h"
 
 APlayerController* UMounteaInventoryBaseUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
@@ -75,6 +77,12 @@ UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryBaseUIStatics::Get
 	return IsValid(localPlayer) ? localPlayer->GetSubsystem<UMounteaAdvancedInventorySharedHUDSubsystem>() : nullptr;
 }
 
+UMounteaAdvancedInventoryGlobalUIConfig* UMounteaInventoryBaseUIStatics::GetGlobalUIConfig()
+{
+	const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+	return IsValid(settings) ? settings->GlobalUIConfig.LoadSynchronous() : nullptr;
+}
+
 bool UMounteaInventoryBaseUIStatics::CreateWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target)
 {
 	return Target.GetObject() ? Target->Execute_CreateWrapperWidget(Target.GetObject()) : false;
@@ -105,8 +113,7 @@ UWidget* UMounteaInventoryBaseUIStatics::GetNotificationContainer(const TScriptI
 	return Target.GetObject() ? Target->Execute_GetNotificationContainer(Target.GetObject()) : nullptr;
 }
 
-void UMounteaInventoryBaseUIStatics::SetNotificationContainer(
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
+void UMounteaInventoryBaseUIStatics::SetNotificationContainer(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 	UWidget* NewNotificationContainer)
 {
 	if (Target.GetObject())
@@ -133,34 +140,29 @@ FGameplayTagContainer UMounteaInventoryBaseUIStatics::GetManagerWidgetStates(con
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_GetWidgetStates(Target.GetObject()) : FGameplayTagContainer();
 }
 
-void UMounteaInventoryBaseUIStatics::SetManagerWidgetStates(
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
+void UMounteaInventoryBaseUIStatics::SetManagerWidgetStates(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 	const FGameplayTagContainer& NewStates)
 {
 	if (Target.GetObject())
 		return IMounteaAdvancedInventorySharedHUDInterface::Execute_SetWidgetStates(Target.GetObject(), NewStates);
 }
 
-bool UMounteaInventoryBaseUIStatics::AddWidgetStateTag(
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
+bool UMounteaInventoryBaseUIStatics::AddWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 	const FGameplayTag& Tag)
 {
 	return Target.GetObject() ?
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_AddWidgetStateTag(Target.GetObject(), Tag) : false;
 }
 
-bool UMounteaInventoryBaseUIStatics::RemoveWidgetStateTag(
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
+bool UMounteaInventoryBaseUIStatics::RemoveWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
 	const FGameplayTag& Tag)
 {
 	return Target.GetObject() ?
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_RemoveWidgetStateTag(Target.GetObject(), Tag) : false;
 }
 
-bool UMounteaInventoryBaseUIStatics::HasWidgetStateTag(
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
-	const FGameplayTag& Tag,
-	const bool bExactMatch)
+bool UMounteaInventoryBaseUIStatics::HasWidgetStateTag(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target,
+	const FGameplayTag& Tag, const bool bExactMatch)
 {
 	return Target.GetObject() ?
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_HasWidgetStateTag(Target.GetObject(), Tag, bExactMatch) : false;
@@ -185,9 +187,7 @@ bool UMounteaInventoryBaseUIStatics::HasAnyWidgetStates(const TScriptInterface<I
 	return Target.GetObject() ? !GetManagerWidgetStates(Target).IsEmpty() : false;
 }
 
-void UMounteaInventoryBaseUIStatics::InitializeWrapperWidget(
-	UObject* Target,
-	const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent)
+void UMounteaInventoryBaseUIStatics::InitializeWrapperWidget(UObject* Target, const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Parent)
 {
 	if (IsValidBaseUIHandler(Target))
 		IMounteaInventorySystemWrapperWidgetInterface::Execute_InitializeWrapperWidget(Target, Parent);
