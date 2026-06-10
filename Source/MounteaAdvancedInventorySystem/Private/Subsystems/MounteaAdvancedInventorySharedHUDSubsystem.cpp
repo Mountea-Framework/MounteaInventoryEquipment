@@ -19,7 +19,8 @@
 #include "Interfaces/Widgets/Notification/MounteaInventoryNotificationContainerWidgetInterface.h"
 #include "Interfaces/Widgets/Notification/MounteaInventoryNotificationWidgetInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
-#include "Settings/MounteaAdvancedInventoryUIConfig.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 
 void UMounteaAdvancedInventorySharedHUDSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -51,13 +52,13 @@ bool UMounteaAdvancedInventorySharedHUDSubsystem::CreateWrapperWidget_Implementa
 		LOG_ERROR(TEXT("[CreateWrapperWidget] Invalid Player Controller!"))
 		return false;
 	}
-	UMounteaAdvancedInventoryUIConfig* inventoryUIConfig = UMounteaInventoryUIStatics::GetInventoryUISettingsConfig();
-	if (!inventoryUIConfig)
+	UMounteaAdvancedInventoryGlobalUIConfig* globalUIConfig = UMounteaInventoryBaseUIStatics::GetGlobalUIConfig();
+	if (!globalUIConfig)
 	{
-		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load Inventory Config!"))
+		LOG_ERROR(TEXT("[CreateWrapperWidget] Unable to load Global UI Config!"))
 		return false;
 	}
-	UIConfig = inventoryUIConfig;
+	UIConfig = globalUIConfig;
 	
 	auto widgetClass = UIConfig->UserInterfaceWrapperClass.LoadSynchronous();
 	if (!IsValid(widgetClass))
@@ -156,7 +157,7 @@ void UMounteaAdvancedInventorySharedHUDSubsystem::CreateInventoryNotification_Im
 	
 	if (!UIConfig)
 	{
-		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Inventory Config!"))
+		LOG_ERROR(TEXT("[CreateInventoryNotification] Unable to load Global UI Config!"))
 		return;
 	}
 

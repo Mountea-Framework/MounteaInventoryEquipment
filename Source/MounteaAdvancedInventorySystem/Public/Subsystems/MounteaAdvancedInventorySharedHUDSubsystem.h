@@ -17,7 +17,7 @@
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "MounteaAdvancedInventorySharedHUDSubsystem.generated.h"
 
-class UMounteaAdvancedInventoryUIConfig;
+class UMounteaAdvancedInventoryGlobalUIConfig;
 
 /**
  * 
@@ -77,5 +77,5 @@ protected:
 	TObjectPtr<UUserWidget> SharedUserInterface;
 	
 	UPROPERTY(BlueprintReadOnly, Category="HUD")
-	TObjectPtr<UMounteaAdvancedInventoryUIConfig> UIConfig;
+	TObjectPtr<UMounteaAdvancedInventoryGlobalUIConfig> UIConfig;
 };
