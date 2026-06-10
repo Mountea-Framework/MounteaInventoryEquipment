@@ -14,6 +14,38 @@
 #include "CoreMinimal.h"
 #include "MounteaAdvancedInventoryGlobalUIDataTypes.generated.h"
 
+class UMounteaModalResponsePayload;
+class UMounteaModalsPayload;
+class UUserWidget;
+
+/**
+ * Defines the content widget and payload class used by one modal type.
+ */
+USTRUCT(BlueprintType)
+struct FMounteaModalDefinition
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
+		meta=(NoResetToDefault),
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalContentWidgetInterface"),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> WidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UMounteaModalsPayload> PayloadClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UMounteaModalResponsePayload> PayloadResponseClass;
+};
+
 /**
  * A structure that represents the configuration for modal dialogs.
  *

@@ -48,7 +48,7 @@ public:
 };
 
 //
-// 
+// ANSWERS
 //
 	
 UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modal Response Payload"))
@@ -57,13 +57,22 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalResponsePayload : public U
 	GENERATED_BODY()
 
 public:
-
+	
+	/**
+	 * True: Confirmed
+	 * False: Rejected
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FString ModalType;
+	uint8 bConfirmationType : 1;
+};
 
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Slider Modal Response Payload"))
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalSliderResponsePayload : public UMounteaModalResponsePayload
+{
+	GENERATED_BODY()
+
+public:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FMounteaModalsConfig ModalConfig;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Secondary Data")
-	TObjectPtr<UObject> OptionalPayload;
+	int32 Quantity = 0;
 };
