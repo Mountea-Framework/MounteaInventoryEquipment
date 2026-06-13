@@ -20,6 +20,7 @@
 
 class APlayerController;
 class UMounteaAdvancedInventoryGlobalUIConfig;
+class UMounteaModalResponsePayload;
 class UUserWidget;
 class UMounteaModalsPayload;
 
@@ -142,14 +143,25 @@ public:
 		meta=(MounteaModalTypePin="ModalType"),
 		meta=(MounteaModalRow),
 		meta=(MounteaModalRowPin="Key"),
-		meta=(WorldContext="Target"),
 		meta=(CallableWithoutWorldContext),
+		meta=(DefaultToSelf="Target"),
 		meta=(DisplayName="Modal - Construct Payload"))
 	static UMounteaModalsPayload* ConstructModalPayload(UObject* Target, const FString& ModalType, const FString& Key, UObject* OptionalPayload);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
+		meta=(MounteaSetter),
+		meta=(MounteaPayloadConstructor),
+		meta=(MounteaModalType),
+		meta=(MounteaModalTypePin="ModalType"),
+		meta=(CallableWithoutWorldContext),
+		meta=(DefaultToSelf="Target"),
+		meta=(DisplayName="Modal - Construct Response"))
+	static UMounteaModalResponsePayload* CreateModalResponse(UObject* Target, const FString& ModalType, bool bConfirmationType);
 
 private:
 
 	static TSubclassOf<UMounteaModalsPayload> ResolveModalPayloadClass(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& ModalType);
+	static TSubclassOf<UMounteaModalResponsePayload> ResolveModalResponseClass(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& ModalType);
 	static FDataTableRowHandle ResolveModalDataTableRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key);
 	static UDataTable* FindModalDataTableForRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key);
 	static UUserWidget* CreateWidgetFromClass(UObject* Context, TSubclassOf<UUserWidget> WidgetClass);
