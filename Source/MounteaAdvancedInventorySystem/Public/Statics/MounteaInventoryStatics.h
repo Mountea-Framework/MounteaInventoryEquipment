@@ -91,62 +91,6 @@ public:
 	static FGameplayTagContainer GetItemActionTags(UMounteaInventoryItemAction* Target);
 
 	/**
-	 * Retrieves the item action flags for the specified target.
-	 * This function returns the current set of flags that indicate which item actions are available for the target.
-	 *
-	 * @param Target The Item Action for which to retrieve the item action flags.
-	 * @return The current set of item action flags as an EInventoryItemActionCallback enum value.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(MounteaGetter),
-		DisplayName="Get Inventory Action Flags")
-	static EInventoryItemActionCallback GetItemActionFlags(const UMounteaSelectableInventoryItemAction* Target);
-	
-	/**
-	 * Checks if a specific flag is set in the given flag container.
-	 *
-	 * @param Target Item Action to check for flags.
-	 * @param FlagToCheck The specific flag to test for.
-	 * @return True if the flag is set, false otherwise.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(MounteaValidate),
-		DisplayName="Has Inventory Action Flag")
-	static bool ItemAction_HasActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck);
-
-	/**
-	 * Adds a specific flag to the flag container.
-	 *
-	 * @param Target Item Action to add new flags to.
-	 * @param FlagToAdd The flag to add.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(MounteaSetter),
-		DisplayName="Add Inventory Action Flag")
-	static void ItemAction_AddActionFlag(UMounteaSelectableInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd);
-
-	/**
-	 * Removes a specific flag from the flag container.
-	 *
-	 * @param Target Item Action to remove flags from.
-	 * @param FlagToRemove The flag to clear.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(MounteaSetter),
-		DisplayName="Remove Inventory Action Flag")
-	static void ItemAction_RemoveActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove);
-
-	/**
-	 * Clears all flags.
-	 *
-	 * @param Target Item Action to clear all flags from.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
-		meta=(MounteaSetter),
-		DisplayName="Clear Inventory Action Flags")
-	static void ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target);
-
-	/**
 	 * Gets called once Action has finished/cancelled to restore resources.
 	 * 
 	 * @param Target Item Action to clear/reset.
