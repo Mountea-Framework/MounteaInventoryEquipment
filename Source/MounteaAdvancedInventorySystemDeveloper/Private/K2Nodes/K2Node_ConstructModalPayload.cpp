@@ -17,7 +17,6 @@
 #include "Helpers/MounteaModalsPayload.h"
 #include "K2Node_CallFunction.h"
 #include "K2Node_DynamicCast.h"
-#include "K2Node_Self.h"
 #include "KismetCompiler.h"
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
@@ -26,6 +25,7 @@
 
 #define LOCTEXT_NAMESPACE "K2Node_ConstructModalPayload"
 
+const FName UK2Node_ConstructModalPayload::TargetPinName(TEXT("Target"));
 const FName UK2Node_ConstructModalPayload::ModalTypePinName(TEXT("ModalType"));
 const FName UK2Node_ConstructModalPayload::KeyPinName(TEXT("Key"));
 const FName UK2Node_ConstructModalPayload::OptionalPayloadPinName(TEXT("OptionalPayload"));
@@ -44,6 +44,8 @@ void UK2Node_ConstructModalPayload::AllocateDefaultPins()
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
 	CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, FailedPinName);
+
+	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Object, UObject::StaticClass(), TargetPinName);
 
 	UEdGraphPin* modalTypePin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_String, ModalTypePinName);
 	nodeSchema->TrySetDefaultValue(*modalTypePin, TEXT("none"));
@@ -105,6 +107,7 @@ void UK2Node_ConstructModalPayload::ExpandNode(FKismetCompilerContext& CompilerC
 	UEdGraphPin* execPin = GetExecPin();
 	UEdGraphPin* thenPin = FindPinChecked(UEdGraphSchema_K2::PN_Then, EGPD_Output);
 	UEdGraphPin* failedPin = FindPinChecked(FailedPinName, EGPD_Output);
+	UEdGraphPin* targetPin = FindPinChecked(TargetPinName, EGPD_Input);
 	UEdGraphPin* modalTypePin = FindPinChecked(ModalTypePinName, EGPD_Input);
 	UEdGraphPin* keyPin = FindPinChecked(KeyPinName, EGPD_Input);
 	UEdGraphPin* optionalPayloadPin = FindPinChecked(OptionalPayloadPinName, EGPD_Input);
@@ -123,13 +126,10 @@ void UK2Node_ConstructModalPayload::ExpandNode(FKismetCompilerContext& CompilerC
 	UEdGraphPin* callReturnPin = callFunctionNode->GetReturnValuePin();
 
 	CompilerContext.MovePinLinksToIntermediate(*execPin, *callExecPin);
+	CompilerContext.MovePinLinksToIntermediate(*targetPin, *callTargetPin);
 	CompilerContext.MovePinLinksToIntermediate(*modalTypePin, *callModalTypePin);
 	CompilerContext.MovePinLinksToIntermediate(*keyPin, *callKeyPin);
 	CompilerContext.MovePinLinksToIntermediate(*optionalPayloadPin, *callOptionalPayloadPin);
-
-	UK2Node_Self* selfNode = CompilerContext.SpawnIntermediateNode<UK2Node_Self>(this, SourceGraph);
-	selfNode->AllocateDefaultPins();
-	schema->TryCreateConnection(selfNode->FindPinChecked(UEdGraphSchema_K2::PN_Self), callTargetPin);
 
 	if (modalTypePin->LinkedTo.Num() == 0)
 		callModalTypePin->DefaultValue = modalTypePin->DefaultValue;

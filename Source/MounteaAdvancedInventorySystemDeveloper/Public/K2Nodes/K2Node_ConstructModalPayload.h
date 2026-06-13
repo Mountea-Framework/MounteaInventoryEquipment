@@ -50,6 +50,7 @@ private:
 	UClass* ResolvePayloadPinClass() const;
 	UClass* ResolvePayloadPinClassFromModalType(const FString& ModalType) const;
 
+	static const FName TargetPinName;
 	static const FName ModalTypePinName;
 	static const FName KeyPinName;
 	static const FName OptionalPayloadPinName;
