@@ -143,7 +143,7 @@ public:
 		meta=(MounteaModalRow),
 		meta=(MounteaModalRowPin="Key"),
 		meta=(WorldContext="Target"),
-		meta=(DefaultToSelf="Target"),
+		meta=(CallableWithoutWorldContext),
 		meta=(DisplayName="Modal - Construct Payload"))
 	static UMounteaModalsPayload* ConstructModalPayload(UObject* Target, const FString& ModalType, const FString& Key, UObject* OptionalPayload);
 

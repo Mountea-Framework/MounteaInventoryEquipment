@@ -16,9 +16,7 @@
 #include "UObject/Object.h"
 #include "MounteaModalsPayload.generated.h"
 
-/**
- * 
- */
+
 UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modals Payload"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalsPayload : public UObject
 {
