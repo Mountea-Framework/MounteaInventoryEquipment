@@ -240,7 +240,19 @@ UClass* UK2Node_ConstructModalPayload::ResolvePayloadPinClassFromModalType(const
 
 FText UK2Node_ConstructModalPayload::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return LOCTEXT("ConstructModalPayload_Title", "Modal - Construct Payload");
+	FText functionName = LOCTEXT("ConstructModalPayload_Title", "Modal - Construct Dynamic Modal Payload");
+	
+	if(TitleType == ENodeTitleType::FullTitle)
+	{
+		FText contextString = LOCTEXT("ConstructModalPayload_Subtitle", "Source is Advanced Mountea Inventory & Equipment System");
+		
+		FFormatNamedArguments namedArgs;
+		namedArgs.Add(TEXT("FunctionName"), functionName);
+		namedArgs.Add(TEXT("ContextString"), contextString);
+		
+		return FText::Format(LOCTEXT("ConstructModalPayload_Title_WithContext", "{FunctionName}\n{ContextString}"), namedArgs);
+	}
+	return functionName;
 }
 
 FText UK2Node_ConstructModalPayload::GetTooltipText() const

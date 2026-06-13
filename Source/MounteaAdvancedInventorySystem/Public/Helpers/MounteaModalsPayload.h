@@ -42,7 +42,7 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalSlidersPayload : public UM
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Primary Data")
-	int32 MaxSliderQuantity = 99;
+	FIntPoint SliderRange = {0, 99};
 };
 
 //
