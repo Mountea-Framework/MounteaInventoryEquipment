@@ -20,6 +20,7 @@
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryGlobalConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetEnvConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
@@ -32,9 +33,11 @@
 
 #include "Commands/FMAISCommands.h"
 
+#include "Customizations/MounteaJsonObjectDefinitionFieldCustomization.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
+#include "PropertyEditorModule.h"
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 
@@ -126,6 +129,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
 					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") },
 					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") },
+					{ TEXT("MounteaAdvancedInventoryGlobalConfig"), TEXT("GlobalUIConfig") },
 					{ TEXT("MounteaAdvancedInventoryGlobalUIConfig"), TEXT("GlobalUIConfig") },
 					{ TEXT("MounteaAdvancedInventoryModalsDataTable"), TEXT("ModalsDataTableIcon") }
 				};
@@ -175,12 +179,28 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredient_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingUIConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryGlobalConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryGlobalUIConfig_AssetAction>());
 		
 		for (const auto& Itr : AssetActions)
 		{
 			FAssetToolsModule::GetModule().Get().RegisterAssetTypeActions(Itr.ToSharedRef());
 		}
+	}
+
+	// Detail Customizations
+	{
+		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		RegisteredCustomPropertyTypeLayouts =
+		{
+			TEXT("MounteaJsonObjectDefinitionField")
+		};
+
+		PropertyModule.RegisterCustomPropertyTypeLayout(
+			RegisteredCustomPropertyTypeLayouts[0],
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionFieldCustomization::MakeInstance)
+		);
+		PropertyModule.NotifyCustomizationModuleChanged();
 	}
 
 	// Register Menu Buttons
@@ -319,6 +339,18 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 			{
 				FAssetToolsModule::GetModule().Get().UnregisterAssetTypeActions(Itr.ToSharedRef());
 			}
+		}
+	}
+
+	// Detail Customizations Cleanup
+	{
+		if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
+		{
+			FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+			for (const FName& layoutName : RegisteredCustomPropertyTypeLayouts)
+				PropertyModule.UnregisterCustomPropertyTypeLayout(layoutName);
+
+			PropertyModule.NotifyCustomizationModuleChanged();
 		}
 	}
 
@@ -522,7 +554,22 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							FNewToolMenuDelegate::CreateLambda([](UToolMenu* globalConfigSubMenu)
 							{
 								FToolMenuSection& inventoryConfigSection = globalConfigSubMenu->FindOrAddSection("MounteaInventory_Config_GlobalConfig");
-								inventoryConfigSection.Label = LOCTEXT("InvConfigGlobalConfig_Label", "Global UI Config");
+								inventoryConfigSection.Label = LOCTEXT("InvConfigGlobalConfig_Label", "Shared Configs");
+								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_GlobalConfig",
+									LOCTEXT("MounteaSystemEditor_GlobalInventoryConfigButton_Label", "Global Config"),
+									LOCTEXT("MounteaSystemEditor_GlobalInventoryConfigButton_ToolTip", "📄 Open Mountea Inventory & Equipment Global Configuration\n\n❔ Define shared data definitions, including named JSON object definitions used for JSON generation and validation."),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->GlobalConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_GlobalInventoryConfigButton_Error", "Unable to locate the Mountea Inventory Global Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
 								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
 									"MounteaInventory_Config",
 									LOCTEXT("MounteaSystemEditor_GlobalConfigButton_Label", "Global UI Config"),
