@@ -20,6 +20,8 @@
 #include "Slate/SPinTypeModalTypeSelector.h"
 #include "EdGraph/EdGraphPin.h"
 #include "EdGraph/EdGraphNode.h"
+#include "K2Nodes/K2Node_CreateModalResponse.h"
+#include "K2Nodes/K2Node_ConstructModalPayload.h"
 #include "K2Nodes/K2Node_MounteaAdvancedInventoryCallFunction.h"
 
 TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) const
@@ -42,6 +44,21 @@ TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) c
 
 		if (callFunctionNode->ShouldUseModalRowSelector(Pin))
 			return SNew(SPinTypeModalRowSelector, Pin);
+	}
+
+	if (UK2Node_ConstructModalPayload* constructModalPayloadNode = Cast<UK2Node_ConstructModalPayload>(Pin->GetOwningNode()))
+	{
+		if (constructModalPayloadNode->ShouldUseModalTypeSelector(Pin))
+			return SNew(SPinTypeModalTypeSelector, Pin);
+
+		if (constructModalPayloadNode->ShouldUseModalRowSelector(Pin))
+			return SNew(SPinTypeModalRowSelector, Pin);
+	}
+
+	if (UK2Node_CreateModalResponse* createModalResponseNode = Cast<UK2Node_CreateModalResponse>(Pin->GetOwningNode()))
+	{
+		if (createModalResponseNode->ShouldUseModalTypeSelector(Pin))
+			return SNew(SPinTypeModalTypeSelector, Pin);
 	}
     
 	return nullptr;

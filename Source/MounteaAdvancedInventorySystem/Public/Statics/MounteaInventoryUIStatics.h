@@ -937,21 +937,6 @@ public:
 #pragma region ItemActions
 	
 	/**
-	 * Checks if the specified flags are set in the value.
-	 * @param Value - The value to check
-	 * @param FlagMask - The flag(s) to check for
-	 * @return - True if all flags in the mask are set in the value
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|UI|Inventory|Item Action", 
-		meta=(MounteaValidate),
-		DisplayName="Item Action - Does Have Flag")
-	static bool ItemAction_HasFlag(const uint8 Value, 
-		UPARAM(meta = (Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback")) const int32 FlagMask)
-	{
-		return (Value & FlagMask) == FlagMask;
-	}
-
-	/**
 	 * Initializes the item action widget with the Initiator UI and item action data.
 	 * 
 	 * @param Target Widget object which implements MounteaAdvancedInventoryItemActionWidgetInterface

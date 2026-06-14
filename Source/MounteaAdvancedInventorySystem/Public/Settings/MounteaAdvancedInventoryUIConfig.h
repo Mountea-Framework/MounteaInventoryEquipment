@@ -15,8 +15,6 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryUIConfig.generated.h"
 
-struct FMounteaWidgetInputActionMapping;
-
 /**
  * UMounteaAdvancedInventoryUIConfig is a data asset managing comprehensive inventory system UI configuration.
  * Settings config defines visual parameters for complete inventory system customization and behavior control.
@@ -35,34 +33,6 @@ public:
 	
 public:
 	
-	// --- UI Inputs
-	
-	/** Discrete UI actions (Close, Confirm, ContextMenu, NextTab, PreviousTab, etc.). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🎮 Inputs",
-		meta=(ShowOnlyInnerProperties),
-		meta=(TitleProperty="ActionTag"),
-		meta=(NoResetToDefault),
-		DisplayName="Action Mappings for UI")
-	TArray<FMounteaWidgetInputActionMapping> UIActionMappings;
-	
-	/** Unified deadzone used for Analog and Wheel inputs. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="🎮 Inputs|Config",
-		meta=(NoResetToDefault),
-		meta=(UIMin=0.f, ClampMin=0.f))
-	float InputDeadzone = 0.1f;
-	
-	// --- Wrapper
-	
-	/** Widget class used as the main user interface wrapper (root HUD panel, container for other widgets, 
-	 * like Inventory, Equipment, Crafting menu etc.). This Wrapper should be used for other UI systems to
-	 * avoid Z-oder fighting.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Wrapper",
-		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventorySystemWrapperWidgetInterface"),
-		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent),
-		meta=(ForceShowEngineContent))
-	TSoftClassPtr<UUserWidget> UserInterfaceWrapperClass;
-	
 	// --- Inventory
 	
 	/** Widget class used to display the inventory itself (slots, items, navigation inside the inventory). */
@@ -72,32 +42,6 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> InventoryWidgetClass;
-	
-	// ---- Notifications
-	
-	/** Widget class that acts as a container for all inventory notifications (list / stack of notification widgets). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
-		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationContainerWidgetInterface"),
-		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent),
-		meta=(ForceShowEngineContent))
-	TSoftClassPtr<UUserWidget> NotificationNotificationWidgetContainerClass;
-	
-	/** Widget class used for a single inventory notification entry (one message / card in the notification container). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
-		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaInventoryNotificationWidgetInterface"),
-		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent),
-		meta=(ForceShowEngineContent))
-	TSoftClassPtr<UUserWidget> NotificationWidgetClass;
-	
-	/** Material used for rendering individual notification cards (background, styling, effects). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
-	TSoftObjectPtr<UMaterialInterface> NotificationCardMaterial = nullptr;
-	
-	/** Default size (in Slate units) of the notification card widget when rendered on screen. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
-	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
 	
 	// ---- Categories
 	
@@ -162,7 +106,7 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemActionsContainerWidgetClass;
-	
+
 	/** Widget class used to display individual Item Actions. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionWidgetInterface"),
@@ -170,30 +114,8 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemActionWidgetClass;
-	
-	// ---- Modal
-	
-	/** Widget class used to display Modal Window. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Modals",
-		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryModalWidgetInterface"),
-		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent),
-		meta=(ForceShowEngineContent))
-	TSoftClassPtr<UUserWidget> InventoryModalWidgetClass;
-	
-	// ---- Fonts
-	
-	/** Default font settings used across the inventory user interface (labels, counters, titles). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "🔤 Font",
-		meta=(NoResetToDefault))
-	FSlateFontInfo DefaultFont;
-		
+
 	// ---- Settings
-	
-	/** Defines list of available Widget Commands. Those are available using custom ProcessWidgetCommand Node.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="⚙ Config & Settings", 
-		meta=(NoResetToDefault))
-	TSet<FString> WidgetCommands;
 	
 	/**
 	 * Determines if stackable items should always automatically stack together when added to the inventory.
@@ -201,32 +123,22 @@ public:
 	 * Then other non-filled slot will be found and so on, until no empty slots are available and/or input quantity if reached.
 	 * Improves inventory organization by reducing the number of individual item slots occupied.
 	 *
-	 * ⚠ Can result in performance impact on lower-end machines, especially with huge amounts of items!
+	 * Can result in performance impact on lower-end machines, especially with huge amounts of items!
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings", 
-		DisplayName="⚠ Always Stack Stackable Items",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="Config & Settings",
+		DisplayName="Always Stack Stackable Items",
 		meta=(NoResetToDefault))
 	uint8 bAlwaysStackStackableItems : 1;
 
 	/** Determines if the inventory system allows drag-and-drop operations for items. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="Config & Settings",
 		meta=(NoResetToDefault))
 	uint8 bAllowDragAndDrop : 1;
 	
 	/** Determines whether focus will be automatically passed to Active Widget or not. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="⚙ Config & Settings",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  Category="Config & Settings",
 		meta=(NoResetToDefault))
 	uint8 bAllowAutoFocus : 1;
-	
-public:
-	
-	void SetupWidgetCommands();
-	
-
-#if WITH_EDITOR
-protected:
-	virtual void PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent) override;
-#endif
 	
 };
 

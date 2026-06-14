@@ -19,6 +19,7 @@
 class AActor;
 class APlayerController;
 class IMounteaAdvancedInventorySharedHUDInterface;
+class UMounteaAdvancedInventoryGlobalUIConfig;
 class UMounteaAdvancedInventorySharedHUDSubsystem;
 class UUserWidget;
 class UWidget;
@@ -41,6 +42,11 @@ public:
 		meta=(CompactNodeTitle="Inventory & Equipment Shared HUD Subsystem"),
 		DisplayName="Get Inventory & Equipment Shared HUD Subsystem")
 	static UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem(UObject* Context);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Settings",
+		meta=(MounteaGetter),
+		DisplayName="Get Global UI Config")
+	static UMounteaAdvancedInventoryGlobalUIConfig* GetGlobalUIConfig();
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(MounteaSetter),

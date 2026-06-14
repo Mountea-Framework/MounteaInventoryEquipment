@@ -592,57 +592,6 @@ bool UMounteaInventoryStatics::ItemTemplate_CalculateItemTemplateJson(UMounteaIn
     return false;
 }
 
-EInventoryItemActionCallback UMounteaInventoryStatics::GetItemActionFlags(const UMounteaSelectableInventoryItemAction* Target)
-{
-	if (!IsValid(Target))
-	{
-		LOG_ERROR(TEXT("[GetItemActionFlags] Target is invalid!"))
-		return EInventoryItemActionCallback::EIIAC_None;
-	}
-	return Target->GetInventoryItemActionCallback();
-}
-
-bool UMounteaInventoryStatics::ItemAction_HasActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToCheck)
-{
-	if (!IsValid(Target))
-	{
-		LOG_ERROR(TEXT("[HasActionFlag] Target is invalid!"))
-		return false;
-	}	
-	return (static_cast<uint8>(Target->GetInventoryItemActionCallback())
-		& static_cast<uint8>(FlagToCheck)) != 0;
-}
-
-void UMounteaInventoryStatics::ItemAction_AddActionFlag(UMounteaSelectableInventoryItemAction* Target, EInventoryItemActionCallback FlagToAdd)
-{
-	if (!IsValid(Target))
-	{
-		LOG_ERROR(TEXT("[AddActionFlag] Target is invalid!"))
-		return;
-	}
-	Target->AddActionFlag(FlagToAdd);	
-}
-
-void UMounteaInventoryStatics::ItemAction_RemoveActionFlag(UMounteaSelectableInventoryItemAction* Target, const EInventoryItemActionCallback FlagToRemove)
-{
-	if (!IsValid(Target))
-	{
-		LOG_ERROR(TEXT("[RemoveActionFlag] Target is invalid!"))
-		return;
-	}
-	Target->RemoveActionFlag(FlagToRemove);
-}
-
-void UMounteaInventoryStatics::ItemAction_ClearAllActionFlags(UMounteaSelectableInventoryItemAction* Target)
-{
-	if (!IsValid(Target))
-	{
-		LOG_ERROR(TEXT("[ClearAllActionFlags] Target is invalid!"))
-		return;
-	}
-	Target->ClearAllActionFlags();
-}
-
 void UMounteaInventoryStatics::CleanupInventoryAction(UMounteaInventoryItemAction* Target)
 {
 	if (IsValid(Target))

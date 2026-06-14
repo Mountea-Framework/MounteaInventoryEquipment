@@ -38,26 +38,3 @@ bool UMounteaSelectableInventoryItemAction::IsActionVisible_Implementation(const
 {
 	return true;
 }
-
-EInventoryItemActionCallback UMounteaSelectableInventoryItemAction::GetInventoryItemActionCallback_Implementation() const
-{
-	return static_cast<EInventoryItemActionCallback>(InventoryItemActionCallback);
-}
-
-bool UMounteaSelectableInventoryItemAction::AddActionFlag_Implementation(const EInventoryItemActionCallback FlagToAdd)
-{
-	InventoryItemActionCallback |= static_cast<uint8>(FlagToAdd);
-	return true;
-}
-
-bool UMounteaSelectableInventoryItemAction::RemoveActionFlag_Implementation(const EInventoryItemActionCallback FlagToRemove)
-{
-	InventoryItemActionCallback &= ~static_cast<uint8>(FlagToRemove);
-	return true;
-}
-
-bool UMounteaSelectableInventoryItemAction::ClearAllActionFlags_Implementation()
-{
-	InventoryItemActionCallback = 0;
-	return true;
-}

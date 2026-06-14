@@ -21,8 +21,6 @@ class UTexture;
 class UTexture2D;
 class UGameplayEffect;
 
-enum class EInventoryItemActionCallback : uint8;
-
 #pragma region InventoryRarity
 #define LOCTEXT_NAMESPACE "InventoryRarity"
 

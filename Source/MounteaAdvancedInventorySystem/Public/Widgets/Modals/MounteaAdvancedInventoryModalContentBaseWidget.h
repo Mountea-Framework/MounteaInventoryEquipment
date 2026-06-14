@@ -62,7 +62,10 @@ public:
 	};
 	
 public:
-		
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	FString ModalType;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
 	FTimerHandle ModalContentExpiryTimerHandle;
 

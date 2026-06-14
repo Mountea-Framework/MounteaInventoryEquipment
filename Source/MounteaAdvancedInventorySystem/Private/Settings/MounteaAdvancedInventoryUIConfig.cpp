@@ -12,37 +12,9 @@
 
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 
-#include "Definitions/MounteaInventoryBaseCommands.h"
-#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
-
 UMounteaAdvancedInventoryUIConfig::UMounteaAdvancedInventoryUIConfig() : Super()
 	, bAlwaysStackStackableItems(true)
 	, bAllowDragAndDrop(true)
 	, bAllowAutoFocus(true)
 {
-	SetupWidgetCommands();
 }
-
-void UMounteaAdvancedInventoryUIConfig::SetupWidgetCommands()
-{
-	auto coreCommands = InventoryUICommands::GetAllCommandTypes();
-	for (const FString& command : InventoryUICommands::AllCommands)
-	{
-		if (!WidgetCommands.Contains(command))
-			WidgetCommands.Add(command);
-	}
-}
-
-#if WITH_EDITOR
-
-void UMounteaAdvancedInventoryUIConfig::PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeChainProperty(PropertyChangedEvent);
-	
-	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventoryUIConfig, WidgetCommands))
-	{
-		SetupWidgetCommands();
-	}
-}
-
-#endif

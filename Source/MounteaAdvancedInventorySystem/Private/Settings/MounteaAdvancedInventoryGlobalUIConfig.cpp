@@ -11,9 +11,12 @@
 
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 
+#include "Definitions/MounteaInventoryBaseCommands.h"
+
 UMounteaAdvancedInventoryGlobalUIConfig::UMounteaAdvancedInventoryGlobalUIConfig()
 {
 	ValidateModalTypes();
+	SetupWidgetCommands();
 }
 
 const TArray<FString>& UMounteaAdvancedInventoryGlobalUIConfig::GetDefaultModalTypes()
@@ -50,6 +53,15 @@ void UMounteaAdvancedInventoryGlobalUIConfig::ValidateModalTypes()
 	}
 }
 
+void UMounteaAdvancedInventoryGlobalUIConfig::SetupWidgetCommands()
+{
+	for (const FString& command : InventoryUICommands::AllCommands)
+	{
+		if (!WidgetCommands.Contains(command))
+			WidgetCommands.Add(command);
+	}
+}
+
 TArray<FString> UMounteaAdvancedInventoryGlobalUIConfig::GetModalTypes() const
 {
 	TArray<FString> returnValues;
@@ -71,5 +83,8 @@ void UMounteaAdvancedInventoryGlobalUIConfig::PostEditChangeProperty(FPropertyCh
 
 	if (PropertyChangedEvent.GetMemberPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventoryGlobalUIConfig, ModalTypes))
 		ValidateModalTypes();
+
+	if (PropertyChangedEvent.GetMemberPropertyName() == GET_MEMBER_NAME_CHECKED(UMounteaAdvancedInventoryGlobalUIConfig, WidgetCommands))
+		SetupWidgetCommands();
 }
 #endif
