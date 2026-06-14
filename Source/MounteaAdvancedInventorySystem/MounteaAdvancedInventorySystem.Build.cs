@@ -24,6 +24,7 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 			new string[]
 			{
 				"Core", 
+				"JsonUtilities",
 				"GameplayTags", 
 				"CommonUI", 
 				"GameplayAbilities",
