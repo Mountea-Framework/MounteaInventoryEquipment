@@ -56,8 +56,7 @@ public:
 	UMounteaSelectableInventoryItemAction() :
 		ActionDisplayName(LOCTEXT("DefaultActionName", "Default Action")),
 		ActionDescription(LOCTEXT("DefaultActionDescription", "A basic inventory item action")),
-		ActionPriority(0),
-		InventoryItemActionCallback(0)
+		ActionPriority(0)
 	{};
 	
 public:
@@ -106,14 +105,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data")
 	int32 ActionPriority = INDEX_NONE;
 	
-	/**
-	 * Callback type for this action, used to determine how the action is processed.
-	 * This can be used to trigger different behaviors based on the action type.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
-		meta=(Bitmask, BitmaskEnum="/Script/MounteaAdvancedInventorySystem.EInventoryItemActionCallback"))
-	uint8 InventoryItemActionCallback;
-
 	/**
 	 * Action which will be called if Inventory Item Action is required.
 	 */

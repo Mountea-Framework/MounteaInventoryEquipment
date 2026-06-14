@@ -29,7 +29,6 @@ struct FPayloadConfig;
 
 enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
-enum class EInventoryItemActionCallback : uint8;
 
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryStatics : public UBlueprintFunctionLibrary
