@@ -13,8 +13,10 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
 #include "MounteaAdvancedInventoryJsonStatics.generated.h"
 
+class UMounteaAdvancedInventoryGlobalConfig;
 class UMounteaJsonObject;
 
 UCLASS()
@@ -48,6 +50,36 @@ public:
 		meta=(MounteaValidate),
 		DisplayName="Is Valid Json Object")
 	static bool IsValidJsonObject(UMounteaJsonObject* Target);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|JSON|Definitions",
+		meta=(MounteaGetter),
+		DisplayName="Get Global Json Config")
+	static UMounteaAdvancedInventoryGlobalConfig* GetGlobalJsonConfig();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|JSON|Definitions",
+		meta=(MounteaGetter),
+		DisplayName="Find Json Object Definition")
+	static bool FindJsonObjectDefinition(const FString& DefinitionKey, FMounteaJsonObjectDefinition& Definition);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Definitions",
+		meta=(MounteaGetter, CallableWithoutWorldContext, DefaultToSelf="Target"),
+		DisplayName="Create Json Object From Definition")
+	static UMounteaJsonObject* CreateJsonObjectFromDefinition(UObject* Target, const FMounteaJsonObjectDefinition& Definition);
+
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Definitions",
+		meta=(MounteaGetter, CallableWithoutWorldContext, DefaultToSelf="Target"),
+		DisplayName="Create Json Object From Definition Key")
+	static UMounteaJsonObject* CreateJsonObjectFromDefinitionKey(UObject* Target, const FString& DefinitionKey);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|JSON|Definitions",
+		meta=(MounteaValidate),
+		DisplayName="Validate Json Object Against Definition")
+	static bool ValidateJsonObjectAgainstDefinition(UMounteaJsonObject* Target, const FMounteaJsonObjectDefinition& Definition, TArray<FString>& Errors);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|JSON|Definitions",
+		meta=(MounteaValidate),
+		DisplayName="Validate Json Object Against Definition Key")
+	static bool ValidateJsonObjectAgainstDefinitionKey(UMounteaJsonObject* Target, const FString& DefinitionKey, TArray<FString>& Errors);
 
 #pragma region K2NodeHelpers
 
