@@ -18,7 +18,8 @@
 
 class FJsonObject;
 
-UCLASS(ClassGroup=(Mountea), BlueprintType, meta=(DisplayName="Mountea Json Object"))
+UCLASS(ClassGroup=(Mountea), BlueprintType,
+		meta=(DisplayName="Mountea Json Object"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaJsonObject : public UObject
 {
 	GENERATED_BODY()
