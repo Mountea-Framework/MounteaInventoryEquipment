@@ -33,7 +33,9 @@
 
 #include "Commands/FMAISCommands.h"
 
+#include "Customizations/MounteaJsonObjectDefinitionCustomization.h"
 #include "Customizations/MounteaJsonObjectDefinitionFieldCustomization.h"
+#include "Customizations/MounteaJsonObjectDefinitionIncludeCustomization.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
@@ -193,12 +195,22 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 		RegisteredCustomPropertyTypeLayouts =
 		{
-			TEXT("MounteaJsonObjectDefinitionField")
+			TEXT("MounteaJsonObjectDefinition"),
+			TEXT("MounteaJsonObjectDefinitionField"),
+			TEXT("MounteaJsonObjectDefinitionInclude")
 		};
 
 		PropertyModule.RegisterCustomPropertyTypeLayout(
 			RegisteredCustomPropertyTypeLayouts[0],
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionCustomization::MakeInstance)
+		);
+		PropertyModule.RegisterCustomPropertyTypeLayout(
+			RegisteredCustomPropertyTypeLayouts[1],
 			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionFieldCustomization::MakeInstance)
+		);
+		PropertyModule.RegisterCustomPropertyTypeLayout(
+			RegisteredCustomPropertyTypeLayouts[2],
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionIncludeCustomization::MakeInstance)
 		);
 		PropertyModule.NotifyCustomizationModuleChanged();
 	}
@@ -217,12 +229,12 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 
 	// Register in Window tab
 	{
-		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Help");
+		UToolMenu* editorMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Help");
 		{
-			FToolMenuSection& Section = Menu->FindOrAddSection("MounteaFramework");
-			Section.Label = FText::FromString(TEXT("Mountea Framework"));
+			FToolMenuSection& editorMenuSection = editorMenu->FindOrAddSection("MounteaFramework");
+			editorMenuSection.Label = FText::FromString(TEXT("Mountea Framework"));
 						
-			FToolMenuEntry Entry = Section.AddMenuEntryWithCommandList
+			FToolMenuEntry menuEntry = editorMenuSection.AddMenuEntryWithCommandList
 			(
 				FMAISCommands::Get().MAI_MounteaSupportAction,
 				PluginCommands,
@@ -259,9 +271,9 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	{
 		if (GUnrealEd)
 		{
-			TSharedPtr<FComponentVisualizer> Visualizer = MakeShareable(new FMounteaEquipmentComponentVisualizer);
-			GUnrealEd->RegisterComponentVisualizer(UMounteaAttachmentContainerComponent::StaticClass()->GetFName(), Visualizer);
-			Visualizer->OnRegister();
+			TSharedPtr<FComponentVisualizer> compVisualizer = MakeShareable(new FMounteaEquipmentComponentVisualizer);
+			GUnrealEd->RegisterComponentVisualizer(UMounteaAttachmentContainerComponent::StaticClass()->GetFName(), compVisualizer);
+			compVisualizer->OnRegister();
 		}
 	}
 	
