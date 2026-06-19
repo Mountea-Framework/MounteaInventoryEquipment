@@ -20,6 +20,24 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "UObject/StructOnScope.h"
+
+namespace MounteaJsonDefinitionPinTypes
+{
+	static const FName Boolean(TEXT("bool"));
+	static const FName Byte(TEXT("byte"));
+	static const FName Class(TEXT("class"));
+	static const FName Int(TEXT("int"));
+	static const FName Int64(TEXT("int64"));
+	static const FName Name(TEXT("name"));
+	static const FName Object(TEXT("object"));
+	static const FName Real(TEXT("real"));
+	static const FName SoftClass(TEXT("softclass"));
+	static const FName SoftObject(TEXT("softobject"));
+	static const FName String(TEXT("string"));
+	static const FName Struct(TEXT("struct"));
+	static const FName Text(TEXT("text"));
+}
 
 static UObject* ResolveJsonObjectOuter(UObject* Target)
 {
@@ -38,41 +56,150 @@ static bool GetPathStringField(UMounteaJsonObject* Target, const FName FieldName
 	return UMounteaAdvancedInventoryJsonStatics::IsValidJsonObject(Target) && Target->GetStringField(FieldName, Path) && !Path.IsEmpty();
 }
 
-static EJson GetJsonTypeForDefinitionField(const EMounteaJsonDefinitionFieldType FieldType)
+static FEdGraphPinType GetLegacyPinTypeForDefinitionField(const EMounteaJsonDefinitionFieldType FieldType)
 {
+	FEdGraphPinType returnValue;
+	returnValue.ContainerType = EPinContainerType::None;
+
 	switch (FieldType)
 	{
 		case EMounteaJsonDefinitionFieldType::Int:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Int;
+			break;
+
 		case EMounteaJsonDefinitionFieldType::Int64:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Int64;
+			break;
+
 		case EMounteaJsonDefinitionFieldType::Float:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Real;
+			break;
+
 		case EMounteaJsonDefinitionFieldType::Byte:
-			return EJson::Number;
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Byte;
+			break;
 
 		case EMounteaJsonDefinitionFieldType::Bool:
-			return EJson::Boolean;
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Boolean;
+			break;
 
 		case EMounteaJsonDefinitionFieldType::String:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::String;
+			break;
+
 		case EMounteaJsonDefinitionFieldType::Name:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Name;
+			break;
+
 		case EMounteaJsonDefinitionFieldType::Text:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Text;
+			break;
+
 		case EMounteaJsonDefinitionFieldType::Object:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Object;
+			returnValue.PinSubCategoryObject = FieldType == EMounteaJsonDefinitionFieldType::JsonObject ? UMounteaJsonObject::StaticClass() : UObject::StaticClass();
+			break;
+
 		case EMounteaJsonDefinitionFieldType::SoftObject:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::SoftObject;
+			returnValue.PinSubCategoryObject = UObject::StaticClass();
+			break;
+
 		case EMounteaJsonDefinitionFieldType::Class:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Class;
+			returnValue.PinSubCategoryObject = UObject::StaticClass();
+			break;
+
 		case EMounteaJsonDefinitionFieldType::SoftClass:
-			return EJson::String;
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::SoftClass;
+			returnValue.PinSubCategoryObject = UObject::StaticClass();
+			break;
 
 		case EMounteaJsonDefinitionFieldType::JsonObject:
-		case EMounteaJsonDefinitionFieldType::Struct:
-			return EJson::Object;
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Object;
+			returnValue.PinSubCategoryObject = UMounteaJsonObject::StaticClass();
+			break;
 
+		case EMounteaJsonDefinitionFieldType::Struct:
+			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Struct;
+			break;
+			
 		default:
-			return EJson::None;
+			break;
 	}
+
+	return returnValue;
 }
 
-static FString GetDefinitionFieldTypeDisplayName(const EMounteaJsonDefinitionFieldType FieldType)
+static bool IsDefinitionPinTypeSet(const FEdGraphPinType& PinType)
 {
-	const UEnum* enumPtr = StaticEnum<EMounteaJsonDefinitionFieldType>();
-	return enumPtr ? enumPtr->GetDisplayNameTextByValue(static_cast<int64>(FieldType)).ToString() : TEXT("Unknown");
+	return !PinType.PinCategory.IsNone() && PinType.PinCategory != NAME_None;
+}
+
+static FEdGraphPinType GetEffectiveDefinitionFieldPinType(const FMounteaJsonObjectDefinitionField& Field)
+{
+	return IsDefinitionPinTypeSet(Field.FieldValueType) ? Field.FieldValueType : GetLegacyPinTypeForDefinitionField(Field.FieldType);
+}
+
+static UClass* GetDefinitionFieldClass(const FEdGraphPinType& PinType)
+{
+	return Cast<UClass>(PinType.PinSubCategoryObject.Get());
+}
+
+static UScriptStruct* GetDefinitionFieldStruct(const FEdGraphPinType& PinType)
+{
+	return Cast<UScriptStruct>(PinType.PinSubCategoryObject.Get());
+}
+
+static bool IsJsonObjectDefinitionField(const FEdGraphPinType& PinType)
+{
+	const UClass* fieldClass = GetDefinitionFieldClass(PinType);
+	return PinType.PinCategory == MounteaJsonDefinitionPinTypes::Object && fieldClass && fieldClass->IsChildOf(UMounteaJsonObject::StaticClass());
+}
+
+static EJson GetJsonTypeForDefinitionField(const FMounteaJsonObjectDefinitionField& Field)
+{
+	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
+	if (pinType.ContainerType != EPinContainerType::None)
+		return EJson::None;
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Int ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Int64 ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Real ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Byte)
+	{
+		return EJson::Number;
+	}
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Boolean)
+		return EJson::Boolean;
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::String ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Name ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Text ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Class ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftClass ||
+		(pinType.PinCategory == MounteaJsonDefinitionPinTypes::Object && !IsJsonObjectDefinitionField(pinType)))
+	{
+		return EJson::String;
+	}
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct || IsJsonObjectDefinitionField(pinType))
+		return EJson::Object;
+
+	return EJson::None;
+}
+
+static FString GetDefinitionFieldTypeDisplayName(const FMounteaJsonObjectDefinitionField& Field)
+{
+	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
+	FString returnValue = pinType.PinCategory.ToString();
+
+	if (const UObject* subCategoryObject = pinType.PinSubCategoryObject.Get())
+		returnValue += FString::Printf(TEXT(" (%s)"), *subCategoryObject->GetName());
+
+	return returnValue;
 }
 
 static FString GetJsonTypeDisplayName(const EJson JsonType)
@@ -95,42 +222,235 @@ static void SetDefinitionFieldDefaultValue(UMounteaJsonObject* Target, const FMo
 	if (!UMounteaAdvancedInventoryJsonStatics::IsValidJsonObject(Target) || Field.FieldName.IsNone())
 		return;
 
+	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
 	const FString fieldName = Field.FieldName.ToString();
 	const TSharedPtr<FJsonObject> jsonObject = Target->GetSharedJsonObject();
 	if (!jsonObject.IsValid())
 		return;
 
-	switch (Field.FieldType)
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Int ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Int64 ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Real ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Byte)
 	{
-		case EMounteaJsonDefinitionFieldType::Int:
-		case EMounteaJsonDefinitionFieldType::Int64:
-		case EMounteaJsonDefinitionFieldType::Float:
-		case EMounteaJsonDefinitionFieldType::Byte:
-			jsonObject->SetNumberField(fieldName, 0.0);
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Bool:
-			jsonObject->SetBoolField(fieldName, false);
-			break;
-
-		case EMounteaJsonDefinitionFieldType::String:
-		case EMounteaJsonDefinitionFieldType::Name:
-		case EMounteaJsonDefinitionFieldType::Text:
-		case EMounteaJsonDefinitionFieldType::Object:
-		case EMounteaJsonDefinitionFieldType::SoftObject:
-		case EMounteaJsonDefinitionFieldType::Class:
-		case EMounteaJsonDefinitionFieldType::SoftClass:
-			jsonObject->SetStringField(fieldName, FString());
-			break;
-
-		case EMounteaJsonDefinitionFieldType::JsonObject:
-		case EMounteaJsonDefinitionFieldType::Struct:
-			jsonObject->SetObjectField(fieldName, MakeShared<FJsonObject>());
-			break;
-
-		default:
-			break;
+		jsonObject->SetNumberField(fieldName, 0.0);
+		return;
 	}
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Boolean)
+	{
+		jsonObject->SetBoolField(fieldName, false);
+		return;
+	}
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct || IsJsonObjectDefinitionField(pinType))
+	{
+		jsonObject->SetObjectField(fieldName, MakeShared<FJsonObject>());
+		return;
+	}
+
+	jsonObject->SetStringField(fieldName, FString());
+}
+
+static bool IsDefinitionFieldRequiredAndEmptyString(const FMounteaJsonObjectDefinitionField& Field, const FString& FieldValue, TArray<FString>& Errors)
+{
+	if (!Field.bRequired || !FieldValue.IsEmpty())
+		return false;
+
+	Errors.Add(FString::Printf(TEXT("Required JSON field '%s' cannot be empty for definition type %s."), *Field.FieldName.ToString(), *GetDefinitionFieldTypeDisplayName(Field)));
+	return true;
+}
+
+static bool ValidateDefinitionStructField(const FMounteaJsonObjectDefinitionField& Field, const TSharedPtr<FJsonValue>& FieldValue, TArray<FString>& Errors)
+{
+	const UScriptStruct* structType = GetDefinitionFieldStruct(GetEffectiveDefinitionFieldPinType(Field));
+	if (!structType)
+		return true;
+
+	const TSharedPtr<FJsonObject> structObject = FieldValue.IsValid() ? FieldValue->AsObject() : nullptr;
+	if (!structObject.IsValid())
+		return true;
+
+	FStructOnScope structOnScope(structType);
+	FText failReason;
+	if (FJsonObjectConverter::JsonObjectToUStruct(structObject.ToSharedRef(), structType, structOnScope.GetStructMemory(), 0, 0, false, &failReason))
+		return true;
+
+	const FString reason = failReason.IsEmpty() ? TEXT("conversion failed") : failReason.ToString();
+	Errors.Add(FString::Printf(TEXT("JSON field '%s' could not be converted to struct '%s': %s."), *Field.FieldName.ToString(), *structType->GetName(), *reason));
+	return false;
+}
+
+static bool ValidateDefinitionObjectField(const FMounteaJsonObjectDefinitionField& Field, const FString& Path, TArray<FString>& Errors)
+{
+	if (IsDefinitionFieldRequiredAndEmptyString(Field, Path, Errors))
+		return false;
+
+	const UClass* baseClass = GetDefinitionFieldClass(GetEffectiveDefinitionFieldPinType(Field));
+	if (!baseClass || Path.IsEmpty())
+		return true;
+
+	UObject* loadedObject = StaticLoadObject(UObject::StaticClass(), nullptr, *Path);
+	if (!IsValid(loadedObject))
+	{
+		Errors.Add(FString::Printf(TEXT("JSON field '%s' could not load object path '%s' for base class validation."), *Field.FieldName.ToString(), *Path));
+		return false;
+	}
+
+	if (loadedObject->IsA(baseClass))
+		return true;
+
+	Errors.Add(FString::Printf(TEXT("JSON field '%s' expected object path of type '%s', but loaded '%s'."), *Field.FieldName.ToString(), *baseClass->GetName(), *loadedObject->GetClass()->GetName()));
+	return false;
+}
+
+static bool ValidateDefinitionClassField(const FMounteaJsonObjectDefinitionField& Field, const FString& Path, TArray<FString>& Errors)
+{
+	if (IsDefinitionFieldRequiredAndEmptyString(Field, Path, Errors))
+		return false;
+
+	const UClass* baseClass = GetDefinitionFieldClass(GetEffectiveDefinitionFieldPinType(Field));
+	if (!baseClass || Path.IsEmpty())
+		return true;
+
+	UClass* loadedClass = LoadObject<UClass>(nullptr, *Path);
+	if (!loadedClass)
+	{
+		Errors.Add(FString::Printf(TEXT("JSON field '%s' could not load class path '%s' for base class validation."), *Field.FieldName.ToString(), *Path));
+		return false;
+	}
+
+	if (loadedClass->IsChildOf(baseClass))
+		return true;
+
+	Errors.Add(FString::Printf(TEXT("JSON field '%s' expected class path derived from '%s', but loaded '%s'."), *Field.FieldName.ToString(), *baseClass->GetName(), *loadedClass->GetName()));
+	return false;
+}
+
+static void ValidateDefinitionFieldMetadata(const FMounteaJsonObjectDefinitionField& Field, const TSharedPtr<FJsonValue>& FieldValue, TArray<FString>& Errors)
+{
+	if (!FieldValue.IsValid())
+		return;
+
+	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct)
+	{
+		ValidateDefinitionStructField(Field, FieldValue, Errors);
+		return;
+	}
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Object && !IsJsonObjectDefinitionField(pinType))
+	{
+		ValidateDefinitionObjectField(Field, FieldValue->AsString(), Errors);
+		return;
+	}
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject)
+	{
+		ValidateDefinitionObjectField(Field, FieldValue->AsString(), Errors);
+		return;
+	}
+
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Class || pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftClass)
+		ValidateDefinitionClassField(Field, FieldValue->AsString(), Errors);
+}
+
+static bool AppendDefinitionField(const FMounteaJsonObjectDefinitionField& Field, FMounteaJsonObjectDefinition& OutDefinition, TSet<FName>& FieldNames, TArray<FString>& Errors)
+{
+	if (Field.FieldName.IsNone())
+	{
+		Errors.Add(TEXT("Definition contains a field with an empty name."));
+		return false;
+	}
+
+	if (FieldNames.Contains(Field.FieldName))
+	{
+		Errors.Add(FString::Printf(TEXT("JSON definition contains duplicate field '%s' after resolving included definitions."), *Field.FieldName.ToString()));
+		return false;
+	}
+
+	FieldNames.Add(Field.FieldName);
+	OutDefinition.Fields.Add(Field);
+	return true;
+}
+
+static bool ResolveJsonObjectDefinitionInternal(
+	const UMounteaAdvancedInventoryGlobalConfig* GlobalConfig,
+	const FString& DefinitionKey,
+	const FMounteaJsonObjectDefinition& Definition,
+	FMounteaJsonObjectDefinition& OutDefinition,
+	TSet<FName>& FieldNames,
+	TArray<FString>& Errors,
+	TSet<FString>& VisitingKeys,
+	TSet<FString>& VisitedKeys)
+{
+	if (!DefinitionKey.IsEmpty())
+	{
+		if (VisitingKeys.Contains(DefinitionKey))
+		{
+			Errors.Add(FString::Printf(TEXT("Circular JSON definition include detected at '%s'."), *DefinitionKey));
+			return false;
+		}
+
+		if (VisitedKeys.Contains(DefinitionKey))
+			return true;
+
+		VisitingKeys.Add(DefinitionKey);
+	}
+
+	bool bReturnValue = true;
+	for (const FMounteaJsonObjectDefinitionInclude& include : Definition.IncludedDefinitions)
+	{
+		if (!include.IsValid())
+		{
+			Errors.Add(TEXT("JSON definition contains an empty included definition key."));
+			bReturnValue = false;
+			continue;
+		}
+
+		if (!IsValid(GlobalConfig))
+		{
+			Errors.Add(FString::Printf(TEXT("Cannot resolve included JSON definition '%s' without a Global Json Config."), *include.DefinitionKey));
+			bReturnValue = false;
+			continue;
+		}
+
+		const FMounteaJsonObjectDefinition* includedDefinition = GlobalConfig->JsonObjectDefinitions.Find(include.DefinitionKey);
+		if (!includedDefinition)
+		{
+			Errors.Add(FString::Printf(TEXT("Could not find included JSON definition '%s'."), *include.DefinitionKey));
+			bReturnValue = false;
+			continue;
+		}
+
+		if (!ResolveJsonObjectDefinitionInternal(GlobalConfig, include.DefinitionKey, *includedDefinition, OutDefinition, FieldNames, Errors, VisitingKeys, VisitedKeys))
+			bReturnValue = false;
+	}
+
+	for (const FMounteaJsonObjectDefinitionField& field : Definition.Fields)
+	{
+		if (!AppendDefinitionField(field, OutDefinition, FieldNames, Errors))
+			bReturnValue = false;
+	}
+
+	if (!DefinitionKey.IsEmpty())
+	{
+		VisitingKeys.Remove(DefinitionKey);
+		VisitedKeys.Add(DefinitionKey);
+	}
+
+	return bReturnValue;
+}
+
+static bool ResolveJsonObjectDefinition(const FString& DefinitionKey, const FMounteaJsonObjectDefinition& Definition, FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors)
+{
+	OutDefinition = FMounteaJsonObjectDefinition();
+
+	TSet<FName> fieldNames;
+	TSet<FString> visitingKeys;
+	TSet<FString> visitedKeys;
+	const UMounteaAdvancedInventoryGlobalConfig* globalConfig = UMounteaAdvancedInventoryJsonStatics::GetGlobalJsonConfig();
+	return ResolveJsonObjectDefinitionInternal(globalConfig, DefinitionKey, Definition, OutDefinition, fieldNames, Errors, visitingKeys, visitedKeys);
 }
 
 UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::CreateJsonObject(UObject* Target)
@@ -204,11 +524,16 @@ bool UMounteaAdvancedInventoryJsonStatics::FindJsonObjectDefinition(const FStrin
 
 UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinition(UObject* Target, const FMounteaJsonObjectDefinition& Definition)
 {
+	FMounteaJsonObjectDefinition resolvedDefinition;
+	TArray<FString> errors;
+	if (!ResolveJsonObjectDefinition(FString(), Definition, resolvedDefinition, errors))
+		return nullptr;
+
 	UMounteaJsonObject* returnValue = CreateJsonObject(Target);
 	if (!IsValidJsonObject(returnValue))
 		return nullptr;
 
-	for (const FMounteaJsonObjectDefinitionField& field : Definition.Fields)
+	for (const FMounteaJsonObjectDefinitionField& field : resolvedDefinition.Fields)
 		SetDefinitionFieldDefaultValue(returnValue, field);
 
 	return returnValue;
@@ -217,12 +542,31 @@ UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDe
 UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinitionKey(UObject* Target, const FString& DefinitionKey)
 {
 	FMounteaJsonObjectDefinition definition;
-	return FindJsonObjectDefinition(DefinitionKey, definition) ? CreateJsonObjectFromDefinition(Target, definition) : nullptr;
+	if (!FindJsonObjectDefinition(DefinitionKey, definition))
+		return nullptr;
+
+	FMounteaJsonObjectDefinition resolvedDefinition;
+	TArray<FString> errors;
+	if (!ResolveJsonObjectDefinition(DefinitionKey, definition, resolvedDefinition, errors))
+		return nullptr;
+
+	UMounteaJsonObject* returnValue = CreateJsonObject(Target);
+	if (!IsValidJsonObject(returnValue))
+		return nullptr;
+
+	for (const FMounteaJsonObjectDefinitionField& field : resolvedDefinition.Fields)
+		SetDefinitionFieldDefaultValue(returnValue, field);
+
+	return returnValue;
 }
 
 bool UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinition(UMounteaJsonObject* Target, const FMounteaJsonObjectDefinition& Definition, TArray<FString>& Errors)
 {
 	Errors.Reset();
+
+	FMounteaJsonObjectDefinition resolvedDefinition;
+	if (!ResolveJsonObjectDefinition(FString(), Definition, resolvedDefinition, Errors))
+		return false;
 
 	if (!IsValidJsonObject(Target))
 	{
@@ -237,7 +581,7 @@ bool UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinition(U
 		return false;
 	}
 
-	for (const FMounteaJsonObjectDefinitionField& field : Definition.Fields)
+	for (const FMounteaJsonObjectDefinitionField& field : resolvedDefinition.Fields)
 	{
 		if (field.FieldName.IsNone())
 		{
@@ -255,10 +599,10 @@ bool UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinition(U
 			continue;
 		}
 
-		const EJson expectedType = GetJsonTypeForDefinitionField(field.FieldType);
+		const EJson expectedType = GetJsonTypeForDefinitionField(field);
 		if (expectedType == EJson::None)
 		{
-			Errors.Add(FString::Printf(TEXT("Definition field '%s' has unsupported type '%s'."), *fieldName, *GetDefinitionFieldTypeDisplayName(field.FieldType)));
+			Errors.Add(FString::Printf(TEXT("Definition field '%s' has unsupported type '%s'."), *fieldName, *GetDefinitionFieldTypeDisplayName(field)));
 			continue;
 		}
 
@@ -268,10 +612,13 @@ bool UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinition(U
 				TEXT("JSON field '%s' expected %s for definition type %s, but found %s."),
 				*fieldName,
 				*GetJsonTypeDisplayName(expectedType),
-				*GetDefinitionFieldTypeDisplayName(field.FieldType),
+				*GetDefinitionFieldTypeDisplayName(field),
 				*GetJsonTypeDisplayName(fieldValue->Type)
 			));
+			continue;
 		}
+
+		ValidateDefinitionFieldMetadata(field, fieldValue, Errors);
 	}
 
 	return Errors.Num() == 0;
@@ -288,7 +635,11 @@ bool UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinitionKe
 		return false;
 	}
 
-	return ValidateJsonObjectAgainstDefinition(Target, definition, Errors);
+	FMounteaJsonObjectDefinition resolvedDefinition;
+	if (!ResolveJsonObjectDefinition(DefinitionKey, definition, resolvedDefinition, Errors))
+		return false;
+
+	return ValidateJsonObjectAgainstDefinition(Target, resolvedDefinition, Errors);
 }
 
 bool UMounteaAdvancedInventoryJsonStatics::SetIntJsonField(UMounteaJsonObject* Target, const FName FieldName, const int32 Value, UMounteaJsonObject*& JsonObject)
