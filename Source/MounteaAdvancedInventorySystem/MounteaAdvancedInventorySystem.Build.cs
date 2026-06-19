@@ -24,6 +24,7 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 			new string[]
 			{
 				"Core", 
+				"Engine",
 				"JsonUtilities",
 				"GameplayTags", 
 				"CommonUI", 
@@ -37,7 +38,6 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine",
 				"Slate",
 				"SlateCore",
 				
