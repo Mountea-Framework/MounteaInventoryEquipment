@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EdGraph/EdGraphPin.h"
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryGlobalConfig.generated.h"
 
@@ -41,13 +42,23 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaJsonObjectDefinitionField
 
 public:
 
+	FMounteaJsonObjectDefinitionField()
+	{
+		FieldValueType.PinCategory = TEXT("string");
+		FieldValueType.ContainerType = EPinContainerType::None;
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
 		meta=(NoResetToDefault))
 	FName FieldName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
-		meta=(NoResetToDefault))
+		meta=(NoResetToDefault, HideInDetailPanel))
 	EMounteaJsonDefinitionFieldType FieldType = EMounteaJsonDefinitionFieldType::String;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
+		meta=(NoResetToDefault))
+	FEdGraphPinType FieldValueType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
 		meta=(NoResetToDefault))
@@ -62,11 +73,35 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaJsonObjectDefinitionInclude
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
+		meta=(NoResetToDefault))
+	FString DefinitionKey;
+
+public:
+
+	bool IsValid() const
+	{
+		return !DefinitionKey.IsEmpty();
+	}
+};
+
+USTRUCT(BlueprintType)
 struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaJsonObjectDefinition
 {
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
+		meta=(NoResetToDefault),
+		meta=(TitleProperty="{DefinitionKey}"))
+	TArray<FMounteaJsonObjectDefinitionInclude> IncludedDefinitions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
 		meta=(NoResetToDefault),
