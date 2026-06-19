@@ -14,18 +14,19 @@
 #include "DetailWidgetRow.h"
 #include "EdGraphSchema_K2.h"
 #include "DetailLayoutBuilder.h"
-#include "Helpers/MounteaJsonObject.h"
 #include "IDetailChildrenBuilder.h"
 #include "IPropertyUtilities.h"
 #include "PropertyCustomizationHelpers.h"
 #include "PropertyHandle.h"
 #include "SPinTypeSelector.h"
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
+#include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SCheckBox.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Input/SEditableTextBox.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
 
@@ -79,9 +80,9 @@ namespace MounteaJsonObjectDefinitionCustomization
 	{
 		switch (Status)
 		{
-			case EDefinitionStatus::Error:   return FAppStyle::GetBrush("Blueprint.CompileStatus.Overlay.Error");
-			case EDefinitionStatus::Warning: return FAppStyle::GetBrush("Blueprint.CompileStatus.Overlay.Unknown");
-			default:                         return FAppStyle::GetBrush("Blueprint.CompileStatus.Overlay.Good");
+			case EDefinitionStatus::Error:   return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Error");
+			case EDefinitionStatus::Warning: return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Warning");
+			default:                         return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Success");
 		}
 	}
 
@@ -163,31 +164,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 			PinType.PinCategory == UEdGraphSchema_K2::PC_Struct;
 	}
 
-	static EMounteaJsonDefinitionFieldType GetLegacyFieldType(const FEdGraphPinType& PinType)
-	{
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int)       return EMounteaJsonDefinitionFieldType::Int;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int64)     return EMounteaJsonDefinitionFieldType::Int64;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Real)      return EMounteaJsonDefinitionFieldType::Float;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean)   return EMounteaJsonDefinitionFieldType::Bool;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_String)    return EMounteaJsonDefinitionFieldType::String;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Name)      return EMounteaJsonDefinitionFieldType::Name;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Text)      return EMounteaJsonDefinitionFieldType::Text;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Byte)      return EMounteaJsonDefinitionFieldType::Byte;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject) return EMounteaJsonDefinitionFieldType::SoftObject;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Class)     return EMounteaJsonDefinitionFieldType::Class;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass) return EMounteaJsonDefinitionFieldType::SoftClass;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Struct)    return EMounteaJsonDefinitionFieldType::Struct;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Object)
-		{
-			const UClass* cls = Cast<UClass>(PinType.PinSubCategoryObject.Get());
-			return cls && cls->IsChildOf(UMounteaJsonObject::StaticClass())
-				? EMounteaJsonDefinitionFieldType::JsonObject
-				: EMounteaJsonDefinitionFieldType::Object;
-		}
-		return EMounteaJsonDefinitionFieldType::String;
-	}
-
-	static FEdGraphPinType GetElemFieldPinType(const TSharedRef<IPropertyHandle>& ElemHandle)
+static FEdGraphPinType GetElemFieldPinType(const TSharedRef<IPropertyHandle>& ElemHandle)
 	{
 		TArray<void*> rawData;
 		ElemHandle->AccessRawData(rawData);
@@ -224,7 +201,6 @@ namespace MounteaJsonObjectDefinitionCustomization
 			{
 				field->FieldValueType = PinType;
 				field->FieldValueType.ContainerType = EPinContainerType::None;
-				field->FieldType = GetLegacyFieldType(PinType);
 			}
 		}
 		ElemHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
@@ -294,6 +270,28 @@ namespace MounteaJsonObjectDefinitionCustomization
 		preview.TrimEndInline();
 		return FText::FromString(preview);
 	}
+
+	// ─── status icon widget (reused in header and control row) ────────────────
+
+	// SBox pins the SImage to 16×16 so VAlign_Center works correctly in all
+	// detail-panel row types (value-content and whole-row-content).
+	static TSharedRef<SWidget> MakeStatusIcon(TSharedRef<IPropertyHandle> StructHandle)
+	{
+		return SNew(SBox)
+			.WidthOverride(16.f)
+			.HeightOverride(16.f)
+			[
+				SNew(SImage)
+				.Image_Lambda([StructHandle]()
+				{
+					return GetStatusBrush(GetStatus(StructHandle));
+				})
+				.ToolTipText_Lambda([StructHandle]()
+				{
+					return GetStatusTooltip(GetStatus(StructHandle));
+				})
+			];
+	}
 }
 
 // ─── MakeInstance ─────────────────────────────────────────────────────────────
@@ -325,17 +323,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeHeader(
 		.VAlign(VAlign_Center)
 		.Padding(0.f, 0.f, 6.f, 0.f)
 		[
-			SNew(SImage)
-			.Image_Lambda([StructPropertyHandle]()
-			{
-				return MounteaJsonObjectDefinitionCustomization::GetStatusBrush(
-					MounteaJsonObjectDefinitionCustomization::GetStatus(StructPropertyHandle));
-			})
-			.ToolTipText_Lambda([StructPropertyHandle]()
-			{
-				return MounteaJsonObjectDefinitionCustomization::GetStatusTooltip(
-					MounteaJsonObjectDefinitionCustomization::GetStatus(StructPropertyHandle));
-			})
+			MounteaJsonObjectDefinitionCustomization::MakeStatusIcon(StructPropertyHandle)
 		]
 
 		+ SHorizontalBox::Slot()
@@ -375,7 +363,6 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 
 	const TSharedPtr<IPropertyUtilities> utils = StructCustomizationUtils.GetPropertyUtilities();
 
-	// Ensure NewFieldPinType is initialised on first use
 	if (!NewFieldPinType.IsValid())
 	{
 		NewFieldPinType = MakeShared<FEdGraphPinType>();
@@ -392,18 +379,12 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 	[
 		SNew(SHorizontalBox)
 
-		// Status icon (mirrors structure header status icon in StepGraph)
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.VAlign(VAlign_Center)
 		.Padding(0.f, 0.f, 6.f, 0.f)
 		[
-			SNew(SImage)
-			.Image_Lambda([StructPropertyHandle]()
-			{
-				return MounteaJsonObjectDefinitionCustomization::GetStatusBrush(
-					MounteaJsonObjectDefinitionCustomization::GetStatus(StructPropertyHandle));
-			})
+			MounteaJsonObjectDefinitionCustomization::MakeStatusIcon(StructPropertyHandle)
 		]
 
 		// Add Field button
@@ -414,38 +395,31 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 			SNew(SButton)
 			.HAlign(HAlign_Center)
 			.Text(LOCTEXT("AddField", "Add Field"))
-			.OnClicked_Lambda([fieldsHandle, fieldsArray, StructPropertyHandle, utils, this]()
+			.OnClicked_Lambda([StructPropertyHandle, utils, this]()
 			{
-				fieldsArray->AddItem();
-
-				uint32 num = 0;
-				fieldsArray->GetNumElements(num);
-				if (num > 0)
+				// Raw mutation: IPropertyHandleArray::AddItem() silently fails for
+				// arrays nested inside TMap value structs (FindComplexParent returns null).
+				StructPropertyHandle->NotifyPreChange();
+				TArray<void*> rawData;
+				StructPropertyHandle->AccessRawData(rawData);
+				for (void* data : rawData)
 				{
-					TSharedRef<IPropertyHandle> newElem = fieldsArray->GetElement(num - 1);
-					newElem->NotifyPreChange();
-					TArray<void*> rawData;
-					newElem->AccessRawData(rawData);
-					for (void* data : rawData)
+					if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
 					{
-						if (FMounteaJsonObjectDefinitionField* field = static_cast<FMounteaJsonObjectDefinitionField*>(data))
-						{
-							field->FieldValueType = *NewFieldPinType;
-							field->FieldValueType.ContainerType = EPinContainerType::None;
-							field->FieldType = MounteaJsonObjectDefinitionCustomization::GetLegacyFieldType(*NewFieldPinType);
-						}
+						FMounteaJsonObjectDefinitionField newField;
+						newField.FieldValueType = *NewFieldPinType;
+						newField.FieldValueType.ContainerType = EPinContainerType::None;
+						def->Fields.Add(newField);
 					}
-					newElem->NotifyPostChange(EPropertyChangeType::ValueSet);
 				}
-
+				StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayAdd);
 				if (utils.IsValid())
 					utils->RequestRefresh();
-
 				return FReply::Handled();
 			})
 		]
 
-		// Initial pin type selector for new fields (mirrors StepGraph's pin type pre-selector)
+		// Initial pin type selector for new fields
 		+ SHorizontalBox::Slot()
 		.AutoWidth()
 		.Padding(0.f, 0.f, 12.f, 0.f)
@@ -475,9 +449,18 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 			SNew(SButton)
 			.HAlign(HAlign_Center)
 			.Text(LOCTEXT("AddInclude", "Add Include"))
-			.OnClicked_Lambda([includesArray, utils]()
+			.OnClicked_Lambda([StructPropertyHandle, utils]()
 			{
-				includesArray->AddItem();
+				// Raw mutation: same reason as Add Field above.
+				StructPropertyHandle->NotifyPreChange();
+				TArray<void*> rawData;
+				StructPropertyHandle->AccessRawData(rawData);
+				for (void* data : rawData)
+				{
+					if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+						def->IncludedDefinitions.Add(FMounteaJsonObjectDefinitionInclude());
+				}
+				StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayAdd);
 				if (utils.IsValid())
 					utils->RequestRefresh();
 				return FReply::Handled();
@@ -513,7 +496,6 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 		[
 			SNew(SVerticalBox)
 
-			// Dropdown + remove button
 			+ SVerticalBox::Slot()
 			.AutoHeight()
 			[
@@ -560,9 +542,18 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				.Padding(4.f, 0.f, 0.f, 0.f)
 				[
 					PropertyCustomizationHelpers::MakeClearButton(
-						FSimpleDelegate::CreateLambda([includesArray, capturedI, utils]()
+						FSimpleDelegate::CreateLambda([StructPropertyHandle, capturedI, utils]()
 						{
-							includesArray->DeleteItem(capturedI);
+							StructPropertyHandle->NotifyPreChange();
+							TArray<void*> rawData;
+							StructPropertyHandle->AccessRawData(rawData);
+							for (void* data : rawData)
+							{
+								if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+									if (def->IncludedDefinitions.IsValidIndex(capturedI))
+										def->IncludedDefinitions.RemoveAt(capturedI);
+							}
+							StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayRemove);
 							if (utils.IsValid())
 								utils->RequestRefresh();
 						}),
@@ -571,7 +562,6 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				]
 			]
 
-			// Inline field preview (mirrors StepGraphPropertyCustomization showing selected graph's values)
 			+ SVerticalBox::Slot()
 			.AutoHeight()
 			.Padding(0.f, 2.f, 0.f, 0.f)
@@ -618,7 +608,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 		[
 			SNew(SHorizontalBox)
 
-			// ── Field name (SEditableTextBox, mirrors FUserDefinedStructureFieldLayout) ──
+			// ── Field name ────────────────────────────────────────────────────
 			+ SHorizontalBox::Slot()
 			.FillWidth(0.38f)
 			.Padding(0.f, 0.f, 4.f, 0.f)
@@ -644,7 +634,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				.HintText(LOCTEXT("FieldNameHint", "Field name"))
 			]
 
-			// ── Type selector ──────────────────────────────────────────────────────
+			// ── Type selector ─────────────────────────────────────────────────
 			+ SHorizontalBox::Slot()
 			.FillWidth(0.37f)
 			.Padding(0.f, 0.f, 4.f, 0.f)
@@ -666,7 +656,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				.Font(IDetailLayoutBuilder::GetDetailFont())
 			]
 
-			// ── Required checkbox ──────────────────────────────────────────────────
+			// ── Required checkbox ─────────────────────────────────────────────
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			.VAlign(VAlign_Center)
@@ -688,7 +678,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				.ToolTipText(LOCTEXT("RequiredTooltip", "Required"))
 			]
 
-			// ── Move up ────────────────────────────────────────────────────────────
+			// ── Move up ───────────────────────────────────────────────────────
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			.VAlign(VAlign_Center)
@@ -696,9 +686,20 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				SNew(SButton)
 				.ContentPadding(2.f)
 				.IsEnabled(capturedJ > 0)
-				.OnClicked_Lambda([fieldsArray, capturedJ, utils]()
+				.OnClicked_Lambda([StructPropertyHandle, capturedJ, utils]()
 				{
-					fieldsArray->MoveElementTo(capturedJ, capturedJ - 1);
+					// IPropertyHandleArray::MoveElementTo crashes for arrays nested
+					// inside TMap value structs (FindComplexParent returns null).
+					StructPropertyHandle->NotifyPreChange();
+					TArray<void*> rawData;
+					StructPropertyHandle->AccessRawData(rawData);
+					for (void* data : rawData)
+					{
+						if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+							if (def->Fields.IsValidIndex(capturedJ) && def->Fields.IsValidIndex(capturedJ - 1))
+								def->Fields.Swap(capturedJ, capturedJ - 1);
+					}
+					StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayMove);
 					if (utils.IsValid())
 						utils->RequestRefresh();
 					return FReply::Handled();
@@ -708,7 +709,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				]
 			]
 
-			// ── Move down ──────────────────────────────────────────────────────────
+			// ── Move down ─────────────────────────────────────────────────────
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			.VAlign(VAlign_Center)
@@ -716,9 +717,18 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				SNew(SButton)
 				.ContentPadding(2.f)
 				.IsEnabled(capturedJ < capturedNumFields - 1)
-				.OnClicked_Lambda([fieldsArray, capturedJ, utils]()
+				.OnClicked_Lambda([StructPropertyHandle, capturedJ, utils]()
 				{
-					fieldsArray->MoveElementTo(capturedJ, capturedJ + 1);
+					StructPropertyHandle->NotifyPreChange();
+					TArray<void*> rawData;
+					StructPropertyHandle->AccessRawData(rawData);
+					for (void* data : rawData)
+					{
+						if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+							if (def->Fields.IsValidIndex(capturedJ) && def->Fields.IsValidIndex(capturedJ + 1))
+								def->Fields.Swap(capturedJ, capturedJ + 1);
+					}
+					StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayMove);
 					if (utils.IsValid())
 						utils->RequestRefresh();
 					return FReply::Handled();
@@ -728,16 +738,25 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				]
 			]
 
-			// ── Remove ─────────────────────────────────────────────────────────────
+			// ── Remove ────────────────────────────────────────────────────────
 			+ SHorizontalBox::Slot()
 			.AutoWidth()
 			.VAlign(VAlign_Center)
 			.Padding(4.f, 0.f, 0.f, 0.f)
 			[
 				PropertyCustomizationHelpers::MakeClearButton(
-					FSimpleDelegate::CreateLambda([fieldsArray, capturedJ, utils]()
+					FSimpleDelegate::CreateLambda([StructPropertyHandle, capturedJ, utils]()
 					{
-						fieldsArray->DeleteItem(capturedJ);
+						StructPropertyHandle->NotifyPreChange();
+						TArray<void*> rawData;
+						StructPropertyHandle->AccessRawData(rawData);
+						for (void* data : rawData)
+						{
+							if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+								if (def->Fields.IsValidIndex(capturedJ))
+									def->Fields.RemoveAt(capturedJ);
+						}
+						StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayRemove);
 						if (utils.IsValid())
 							utils->RequestRefresh();
 					}),

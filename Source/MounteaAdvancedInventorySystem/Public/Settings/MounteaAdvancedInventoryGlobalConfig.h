@@ -16,24 +16,6 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryGlobalConfig.generated.h"
 
-UENUM(BlueprintType)
-enum class EMounteaJsonDefinitionFieldType : uint8
-{
-	Int			UMETA(DisplayName="Int"),
-	Int64		UMETA(DisplayName="Int64"),
-	Float		UMETA(DisplayName="Float"),
-	Bool		UMETA(DisplayName="Bool"),
-	String		UMETA(DisplayName="String"),
-	Name		UMETA(DisplayName="Name"),
-	Text		UMETA(DisplayName="Text"),
-	Byte		UMETA(DisplayName="Byte"),
-	Object		UMETA(DisplayName="Object"),
-	SoftObject	UMETA(DisplayName="Soft Object"),
-	Class		UMETA(DisplayName="Class"),
-	SoftClass	UMETA(DisplayName="Soft Class"),
-	JsonObject	UMETA(DisplayName="Json Object"),
-	Struct		UMETA(DisplayName="Struct")
-};
 
 USTRUCT(BlueprintType)
 struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaJsonObjectDefinitionField
@@ -51,10 +33,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
 		meta=(NoResetToDefault))
 	FName FieldName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
-		meta=(NoResetToDefault, HideInDetailPanel))
-	EMounteaJsonDefinitionFieldType FieldType = EMounteaJsonDefinitionFieldType::String;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
 		meta=(NoResetToDefault))
@@ -105,7 +83,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
 		meta=(NoResetToDefault),
-		meta=(TitleProperty="{FieldName} | {FieldType}"))
+		meta=(TitleProperty="{FieldName}"))
 	TArray<FMounteaJsonObjectDefinitionField> Fields;
 
 public:

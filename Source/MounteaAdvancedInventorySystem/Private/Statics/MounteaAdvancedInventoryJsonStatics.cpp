@@ -56,90 +56,6 @@ static bool GetPathStringField(UMounteaJsonObject* Target, const FName FieldName
 	return UMounteaAdvancedInventoryJsonStatics::IsValidJsonObject(Target) && Target->GetStringField(FieldName, Path) && !Path.IsEmpty();
 }
 
-static FEdGraphPinType GetLegacyPinTypeForDefinitionField(const EMounteaJsonDefinitionFieldType FieldType)
-{
-	FEdGraphPinType returnValue;
-	returnValue.ContainerType = EPinContainerType::None;
-
-	switch (FieldType)
-	{
-		case EMounteaJsonDefinitionFieldType::Int:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Int;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Int64:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Int64;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Float:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Real;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Byte:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Byte;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Bool:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Boolean;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::String:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::String;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Name:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Name;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Text:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Text;
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Object:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Object;
-			returnValue.PinSubCategoryObject = FieldType == EMounteaJsonDefinitionFieldType::JsonObject ? UMounteaJsonObject::StaticClass() : UObject::StaticClass();
-			break;
-
-		case EMounteaJsonDefinitionFieldType::SoftObject:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::SoftObject;
-			returnValue.PinSubCategoryObject = UObject::StaticClass();
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Class:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Class;
-			returnValue.PinSubCategoryObject = UObject::StaticClass();
-			break;
-
-		case EMounteaJsonDefinitionFieldType::SoftClass:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::SoftClass;
-			returnValue.PinSubCategoryObject = UObject::StaticClass();
-			break;
-
-		case EMounteaJsonDefinitionFieldType::JsonObject:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Object;
-			returnValue.PinSubCategoryObject = UMounteaJsonObject::StaticClass();
-			break;
-
-		case EMounteaJsonDefinitionFieldType::Struct:
-			returnValue.PinCategory = MounteaJsonDefinitionPinTypes::Struct;
-			break;
-			
-		default:
-			break;
-	}
-
-	return returnValue;
-}
-
-static bool IsDefinitionPinTypeSet(const FEdGraphPinType& PinType)
-{
-	return !PinType.PinCategory.IsNone() && PinType.PinCategory != NAME_None;
-}
-
-static FEdGraphPinType GetEffectiveDefinitionFieldPinType(const FMounteaJsonObjectDefinitionField& Field)
-{
-	return IsDefinitionPinTypeSet(Field.FieldValueType) ? Field.FieldValueType : GetLegacyPinTypeForDefinitionField(Field.FieldType);
-}
 
 static UClass* GetDefinitionFieldClass(const FEdGraphPinType& PinType)
 {
@@ -159,7 +75,7 @@ static bool IsJsonObjectDefinitionField(const FEdGraphPinType& PinType)
 
 static EJson GetJsonTypeForDefinitionField(const FMounteaJsonObjectDefinitionField& Field)
 {
-	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
+	const FEdGraphPinType pinType = Field.FieldValueType;
 	if (pinType.ContainerType != EPinContainerType::None)
 		return EJson::None;
 
@@ -193,7 +109,7 @@ static EJson GetJsonTypeForDefinitionField(const FMounteaJsonObjectDefinitionFie
 
 static FString GetDefinitionFieldTypeDisplayName(const FMounteaJsonObjectDefinitionField& Field)
 {
-	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
+	const FEdGraphPinType pinType = Field.FieldValueType;
 	FString returnValue = pinType.PinCategory.ToString();
 
 	if (const UObject* subCategoryObject = pinType.PinSubCategoryObject.Get())
@@ -222,7 +138,7 @@ static void SetDefinitionFieldDefaultValue(UMounteaJsonObject* Target, const FMo
 	if (!UMounteaAdvancedInventoryJsonStatics::IsValidJsonObject(Target) || Field.FieldName.IsNone())
 		return;
 
-	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
+	const FEdGraphPinType pinType = Field.FieldValueType;
 	const FString fieldName = Field.FieldName.ToString();
 	const TSharedPtr<FJsonObject> jsonObject = Target->GetSharedJsonObject();
 	if (!jsonObject.IsValid())
@@ -263,7 +179,7 @@ static bool IsDefinitionFieldRequiredAndEmptyString(const FMounteaJsonObjectDefi
 
 static bool ValidateDefinitionStructField(const FMounteaJsonObjectDefinitionField& Field, const TSharedPtr<FJsonValue>& FieldValue, TArray<FString>& Errors)
 {
-	const UScriptStruct* structType = GetDefinitionFieldStruct(GetEffectiveDefinitionFieldPinType(Field));
+	const UScriptStruct* structType = GetDefinitionFieldStruct(Field.FieldValueType);
 	if (!structType)
 		return true;
 
@@ -286,7 +202,7 @@ static bool ValidateDefinitionObjectField(const FMounteaJsonObjectDefinitionFiel
 	if (IsDefinitionFieldRequiredAndEmptyString(Field, Path, Errors))
 		return false;
 
-	const UClass* baseClass = GetDefinitionFieldClass(GetEffectiveDefinitionFieldPinType(Field));
+	const UClass* baseClass = GetDefinitionFieldClass(Field.FieldValueType);
 	if (!baseClass || Path.IsEmpty())
 		return true;
 
@@ -309,7 +225,7 @@ static bool ValidateDefinitionClassField(const FMounteaJsonObjectDefinitionField
 	if (IsDefinitionFieldRequiredAndEmptyString(Field, Path, Errors))
 		return false;
 
-	const UClass* baseClass = GetDefinitionFieldClass(GetEffectiveDefinitionFieldPinType(Field));
+	const UClass* baseClass = GetDefinitionFieldClass(Field.FieldValueType);
 	if (!baseClass || Path.IsEmpty())
 		return true;
 
@@ -332,7 +248,7 @@ static void ValidateDefinitionFieldMetadata(const FMounteaJsonObjectDefinitionFi
 	if (!FieldValue.IsValid())
 		return;
 
-	const FEdGraphPinType pinType = GetEffectiveDefinitionFieldPinType(Field);
+	const FEdGraphPinType pinType = Field.FieldValueType;
 	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct)
 	{
 		ValidateDefinitionStructField(Field, FieldValue, Errors);

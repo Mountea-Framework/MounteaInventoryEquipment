@@ -14,7 +14,6 @@
 #include "DetailWidgetRow.h"
 #include "EdGraphSchema_K2.h"
 #include "DetailLayoutBuilder.h"
-#include "Helpers/MounteaJsonObject.h"
 #include "IDetailChildrenBuilder.h"
 #include "IPropertyUtilities.h"
 #include "PropertyHandle.h"
@@ -28,105 +27,6 @@
 
 namespace MounteaJsonObjectDefinitionFieldCustomization
 {
-	static FEdGraphPinType GetLegacyPinType(const EMounteaJsonDefinitionFieldType FieldType)
-	{
-		FEdGraphPinType returnValue;
-		returnValue.ContainerType = EPinContainerType::None;
-
-		switch (FieldType)
-		{
-			case EMounteaJsonDefinitionFieldType::Int:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Int;
-				break;
-			case EMounteaJsonDefinitionFieldType::Int64:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Int64;
-				break;
-			case EMounteaJsonDefinitionFieldType::Float:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Real;
-				break;
-			case EMounteaJsonDefinitionFieldType::Bool:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Boolean;
-				break;
-			case EMounteaJsonDefinitionFieldType::String:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_String;
-				break;
-			case EMounteaJsonDefinitionFieldType::Name:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Name;
-				break;
-			case EMounteaJsonDefinitionFieldType::Text:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Text;
-				break;
-			case EMounteaJsonDefinitionFieldType::Byte:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Byte;
-				break;
-			case EMounteaJsonDefinitionFieldType::Object:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Object;
-				returnValue.PinSubCategoryObject = UObject::StaticClass();
-				break;
-			case EMounteaJsonDefinitionFieldType::SoftObject:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_SoftObject;
-				returnValue.PinSubCategoryObject = UObject::StaticClass();
-				break;
-			case EMounteaJsonDefinitionFieldType::Class:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Class;
-				returnValue.PinSubCategoryObject = UObject::StaticClass();
-				break;
-			case EMounteaJsonDefinitionFieldType::SoftClass:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_SoftClass;
-				returnValue.PinSubCategoryObject = UObject::StaticClass();
-				break;
-			case EMounteaJsonDefinitionFieldType::JsonObject:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Object;
-				returnValue.PinSubCategoryObject = UMounteaJsonObject::StaticClass();
-				break;
-			case EMounteaJsonDefinitionFieldType::Struct:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_Struct;
-				break;
-			default:
-				returnValue.PinCategory = UEdGraphSchema_K2::PC_String;
-				break;
-		}
-
-		return returnValue;
-	}
-
-	static EMounteaJsonDefinitionFieldType GetLegacyFieldType(const FEdGraphPinType& PinType)
-	{
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int)
-			return EMounteaJsonDefinitionFieldType::Int;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int64)
-			return EMounteaJsonDefinitionFieldType::Int64;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Real)
-			return EMounteaJsonDefinitionFieldType::Float;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean)
-			return EMounteaJsonDefinitionFieldType::Bool;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_String)
-			return EMounteaJsonDefinitionFieldType::String;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Name)
-			return EMounteaJsonDefinitionFieldType::Name;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Text)
-			return EMounteaJsonDefinitionFieldType::Text;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Byte)
-			return EMounteaJsonDefinitionFieldType::Byte;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject)
-			return EMounteaJsonDefinitionFieldType::SoftObject;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Class)
-			return EMounteaJsonDefinitionFieldType::Class;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass)
-			return EMounteaJsonDefinitionFieldType::SoftClass;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Struct)
-			return EMounteaJsonDefinitionFieldType::Struct;
-		if (PinType.PinCategory == UEdGraphSchema_K2::PC_Object)
-		{
-			const UClass* objectClass = Cast<UClass>(PinType.PinSubCategoryObject.Get());
-			return objectClass && objectClass->IsChildOf(UMounteaJsonObject::StaticClass()) ?
-				EMounteaJsonDefinitionFieldType::JsonObject :
-				EMounteaJsonDefinitionFieldType::Object;
-		}
-
-		return EMounteaJsonDefinitionFieldType::String;
-	}
-
 	static bool IsSupportedPinType(const FEdGraphPinType& PinType)
 	{
 		if (PinType.ContainerType != EPinContainerType::None)
@@ -149,24 +49,22 @@ namespace MounteaJsonObjectDefinitionFieldCustomization
 
 	static FEdGraphPinType GetFieldPinType(const TSharedPtr<IPropertyHandle>& StructPropertyHandle)
 	{
+		FEdGraphPinType defaultType;
+		defaultType.PinCategory = UEdGraphSchema_K2::PC_String;
+
 		if (!StructPropertyHandle.IsValid())
-			return GetLegacyPinType(EMounteaJsonDefinitionFieldType::String);
+			return defaultType;
 
 		TArray<void*> rawData;
 		StructPropertyHandle->AccessRawData(rawData);
 		if (rawData.Num() == 1)
 		{
 			const FMounteaJsonObjectDefinitionField* field = static_cast<const FMounteaJsonObjectDefinitionField*>(rawData[0]);
-			if (field)
-			{
-				if (!field->FieldValueType.PinCategory.IsNone())
-					return field->FieldValueType;
-
-				return GetLegacyPinType(field->FieldType);
-			}
+			if (field && !field->FieldValueType.PinCategory.IsNone())
+				return field->FieldValueType;
 		}
 
-		return GetLegacyPinType(EMounteaJsonDefinitionFieldType::String);
+		return defaultType;
 	}
 
 	static void SetFieldPinType(const TSharedPtr<IPropertyHandle> StructPropertyHandle, const TSharedPtr<IPropertyUtilities> PropertyUtilities, const FEdGraphPinType& PinType)
@@ -184,15 +82,12 @@ namespace MounteaJsonObjectDefinitionFieldCustomization
 			{
 				field->FieldValueType = PinType;
 				field->FieldValueType.ContainerType = EPinContainerType::None;
-				field->FieldType = GetLegacyFieldType(PinType);
 			}
 		}
 
 		StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		if (PropertyUtilities.IsValid())
-		{
 			PropertyUtilities->RequestRefresh();
-		}
 	}
 
 	class FJsonDefinitionPinTypeFilter final : public IPinTypeSelectorFilter
@@ -229,7 +124,7 @@ void FMounteaJsonObjectDefinitionFieldCustomization::CustomizeHeader(
 
 	TArray<TSharedPtr<IPinTypeSelectorFilter>> customFilters;
 	customFilters.Add(MakeShared<MounteaJsonObjectDefinitionFieldCustomization::FJsonDefinitionPinTypeFilter>());
-
+	
 	HeaderRow
 	.NameContent()
 	[
@@ -287,7 +182,7 @@ void FMounteaJsonObjectDefinitionFieldCustomization::CustomizeHeader(
 				.bAllowArrays(false)
 				.CustomFilters(customFilters)
 				.SelectorType(SPinTypeSelector::ESelectorType::Partial)
-				.TypeTreeFilter(ETypeTreeFilter::None)
+				.TypeTreeFilter(ETypeTreeFilter::IndexTypesOnly)
 				.Font(IDetailLayoutBuilder::GetDetailFont())
 			]
 		]
