@@ -114,6 +114,84 @@ namespace MounteaJsonObjectDefinitionCustomization
 		);
 	}
 
+	static const FMounteaJsonObjectDefinition* GetDefinition(const TSharedRef<IPropertyHandle>& StructHandle)
+	{
+		TArray<void*> rawData;
+		StructHandle->AccessRawData(rawData);
+		if (rawData.Num() != 1 || !rawData[0])
+			return nullptr;
+
+		return static_cast<const FMounteaJsonObjectDefinition*>(rawData[0]);
+	}
+
+	static int32 GetIncludeCount(const TSharedRef<IPropertyHandle>& StructHandle)
+	{
+		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
+		return def ? def->IncludedDefinitions.Num() : 0;
+	}
+
+	static int32 GetFieldCount(const TSharedRef<IPropertyHandle>& StructHandle)
+	{
+		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
+		return def ? def->Fields.Num() : 0;
+	}
+
+	static FString GetIncludeKey(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
+	{
+		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
+		return def && def->IncludedDefinitions.IsValidIndex(Index)
+			? def->IncludedDefinitions[Index].DefinitionKey
+			: FString();
+	}
+
+	static void SetIncludeKey(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index, const FString& Key, const TSharedPtr<IPropertyUtilities>& Utils)
+	{
+		StructHandle->NotifyPreChange();
+		TArray<void*> rawData;
+		StructHandle->AccessRawData(rawData);
+		for (void* data : rawData)
+		{
+			if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+				if (def->IncludedDefinitions.IsValidIndex(Index))
+					def->IncludedDefinitions[Index].DefinitionKey = Key;
+		}
+		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
+		if (Utils.IsValid())
+			Utils->RequestRefresh();
+	}
+
+	static FName GetFieldName(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
+	{
+		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
+		return def && def->Fields.IsValidIndex(Index)
+			? def->Fields[Index].FieldName
+			: NAME_None;
+	}
+
+	static void SetFieldName(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index, const FName Name, const TSharedPtr<IPropertyUtilities>& Utils)
+	{
+		StructHandle->NotifyPreChange();
+		TArray<void*> rawData;
+		StructHandle->AccessRawData(rawData);
+		for (void* data : rawData)
+		{
+			if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+				if (def->Fields.IsValidIndex(Index))
+					def->Fields[Index].FieldName = Name;
+		}
+		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
+		if (Utils.IsValid())
+			Utils->RequestRefresh();
+	}
+
+	static FEdGraphPinType MakeDefaultFieldPinType()
+	{
+		FEdGraphPinType pinType;
+		pinType.PinCategory = UEdGraphSchema_K2::PC_String;
+		pinType.ContainerType = EPinContainerType::None;
+		return pinType;
+	}
+
 	// ─── global config ────────────────────────────────────────────────────────
 
 	static UMounteaAdvancedInventoryGlobalConfig* ResolveGlobalConfig(const TSharedRef<IPropertyHandle>& Handle)
@@ -164,46 +242,63 @@ namespace MounteaJsonObjectDefinitionCustomization
 			PinType.PinCategory == UEdGraphSchema_K2::PC_Struct;
 	}
 
-static FEdGraphPinType GetElemFieldPinType(const TSharedRef<IPropertyHandle>& ElemHandle)
+	static FEdGraphPinType GetFieldPinType(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
 	{
-		TArray<void*> rawData;
-		ElemHandle->AccessRawData(rawData);
-		if (rawData.Num() == 1 && rawData[0])
+		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
+		if (def && def->Fields.IsValidIndex(Index))
 		{
-			const FMounteaJsonObjectDefinitionField* field = static_cast<const FMounteaJsonObjectDefinitionField*>(rawData[0]);
-			if (field)
-			{
-				if (!field->FieldValueType.PinCategory.IsNone())
-					return field->FieldValueType;
-
-				FEdGraphPinType fallback;
-				fallback.ContainerType = EPinContainerType::None;
-				fallback.PinCategory = UEdGraphSchema_K2::PC_String;
-				return fallback;
-			}
+			const FMounteaJsonObjectDefinitionField& field = def->Fields[Index];
+			if (!field.FieldValueType.PinCategory.IsNone())
+				return field.FieldValueType;
 		}
-		FEdGraphPinType def;
-		def.PinCategory = UEdGraphSchema_K2::PC_String;
-		return def;
+
+		return MakeDefaultFieldPinType();
 	}
 
-	static void SetElemFieldPinType(const TSharedRef<IPropertyHandle>& ElemHandle, const FEdGraphPinType& PinType, const TSharedPtr<IPropertyUtilities>& Utils)
+	static void SetFieldPinType(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index, const FEdGraphPinType& PinType, const TSharedPtr<IPropertyUtilities>& Utils)
 	{
 		if (!IsSupportedPinType(PinType))
 			return;
 
-		ElemHandle->NotifyPreChange();
+		StructHandle->NotifyPreChange();
 		TArray<void*> rawData;
-		ElemHandle->AccessRawData(rawData);
+		StructHandle->AccessRawData(rawData);
 		for (void* data : rawData)
 		{
-			if (FMounteaJsonObjectDefinitionField* field = static_cast<FMounteaJsonObjectDefinitionField*>(data))
+			if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
 			{
-				field->FieldValueType = PinType;
-				field->FieldValueType.ContainerType = EPinContainerType::None;
+				if (def->Fields.IsValidIndex(Index))
+				{
+					def->Fields[Index].FieldValueType = PinType;
+					def->Fields[Index].FieldValueType.ContainerType = EPinContainerType::None;
+				}
 			}
 		}
-		ElemHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
+		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
+		if (Utils.IsValid())
+			Utils->RequestRefresh();
+	}
+
+	static bool GetFieldRequired(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
+	{
+		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
+		return def && def->Fields.IsValidIndex(Index)
+			? def->Fields[Index].bRequired
+			: true;
+	}
+
+	static void SetFieldRequired(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index, bool bRequired, const TSharedPtr<IPropertyUtilities>& Utils)
+	{
+		StructHandle->NotifyPreChange();
+		TArray<void*> rawData;
+		StructHandle->AccessRawData(rawData);
+		for (void* data : rawData)
+		{
+			if (FMounteaJsonObjectDefinition* def = static_cast<FMounteaJsonObjectDefinition*>(data))
+				if (def->Fields.IsValidIndex(Index))
+					def->Fields[Index].bRequired = bRequired;
+		}
+		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		if (Utils.IsValid())
 			Utils->RequestRefresh();
 	}
@@ -220,7 +315,8 @@ static FEdGraphPinType GetElemFieldPinType(const TSharedRef<IPropertyHandle>& El
 		for (int32 i = 0; i < disallowed.Len(); ++i)
 		{
 			const TCHAR ch = disallowed[i];
-			if (Text.ToString().Contains(&ch))
+			int32 foundIndex = INDEX_NONE;
+			if (Text.ToString().FindChar(ch, foundIndex))
 				return false;
 		}
 		return true;
@@ -243,13 +339,9 @@ static FEdGraphPinType GetElemFieldPinType(const TSharedRef<IPropertyHandle>& El
 
 	// ─── include preview text ─────────────────────────────────────────────────
 
-	static FText GetIncludePreviewText(const TSharedPtr<IPropertyHandle>& KeyHandle, const TSharedRef<IPropertyHandle>& StructHandle)
+	static FText GetIncludePreviewText(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
 	{
-		if (!KeyHandle.IsValid())
-			return FText::GetEmpty();
-
-		FString key;
-		KeyHandle->GetValue(key);
+		const FString key = GetIncludeKey(StructHandle, Index);
 		if (key.IsEmpty())
 			return FText::GetEmpty();
 
@@ -347,26 +439,12 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 	IDetailChildrenBuilder& StructBuilder,
 	IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
-	const TSharedPtr<IPropertyHandle> includesHandle = StructPropertyHandle->GetChildHandle(
-		GET_MEMBER_NAME_CHECKED(FMounteaJsonObjectDefinition, IncludedDefinitions));
-	const TSharedPtr<IPropertyHandle> fieldsHandle = StructPropertyHandle->GetChildHandle(
-		GET_MEMBER_NAME_CHECKED(FMounteaJsonObjectDefinition, Fields));
-
-	if (!includesHandle.IsValid() || !fieldsHandle.IsValid())
-		return;
-
-	const TSharedPtr<IPropertyHandleArray> includesArray = includesHandle->AsArray();
-	const TSharedPtr<IPropertyHandleArray> fieldsArray   = fieldsHandle->AsArray();
-
-	if (!includesArray.IsValid() || !fieldsArray.IsValid())
-		return;
-
 	const TSharedPtr<IPropertyUtilities> utils = StructCustomizationUtils.GetPropertyUtilities();
 
 	if (!NewFieldPinType.IsValid())
 	{
-		NewFieldPinType = MakeShared<FEdGraphPinType>();
-		NewFieldPinType->PinCategory = UEdGraphSchema_K2::PC_String;
+		NewFieldPinType = MakeShared<FEdGraphPinType>(
+			MounteaJsonObjectDefinitionCustomization::MakeDefaultFieldPinType());
 	}
 
 	TArray<TSharedPtr<IPinTypeSelectorFilter>> pinFilters;
@@ -470,19 +548,14 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 
 	// ── Include rows ─────────────────────────────────────────────────────────
 
-	uint32 numIncludes = 0;
-	includesArray->GetNumElements(numIncludes);
+	const int32 numIncludes = MounteaJsonObjectDefinitionCustomization::GetIncludeCount(StructPropertyHandle);
 
-	for (uint32 i = 0; i < numIncludes; ++i)
+	for (int32 i = 0; i < numIncludes; ++i)
 	{
-		TSharedRef<IPropertyHandle> incElemHandle = includesArray->GetElement(i);
-		TSharedPtr<IPropertyHandle> incKeyHandle  = incElemHandle->GetChildHandle(
-			GET_MEMBER_NAME_CHECKED(FMounteaJsonObjectDefinitionInclude, DefinitionKey));
-
 		TSharedRef<TArray<TSharedPtr<FString>>> incOptions = MakeShared<TArray<TSharedPtr<FString>>>();
 		MounteaJsonObjectDefinitionCustomization::RebuildDefinitionOptions(StructPropertyHandle, incOptions);
 
-		const uint32 capturedI = i;
+		const int32 capturedI = i;
 
 		StructBuilder.AddCustomRow(FText::Format(LOCTEXT("IncludeRow", "Include {0}"), FText::AsNumber(i)))
 		.NameContent()
@@ -516,19 +589,17 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 							.Font(IDetailLayoutBuilder::GetDetailFont())
 							.Text(Item.IsValid() ? FText::FromString(*Item) : FText::GetEmpty());
 					})
-					.OnSelectionChanged_Lambda([incKeyHandle](const TSharedPtr<FString>& Selection, ESelectInfo::Type)
+					.OnSelectionChanged_Lambda([StructPropertyHandle, capturedI, utils](const TSharedPtr<FString>& Selection, ESelectInfo::Type)
 					{
-						if (incKeyHandle.IsValid() && Selection.IsValid())
-							incKeyHandle->SetValue(*Selection);
+						if (Selection.IsValid())
+							MounteaJsonObjectDefinitionCustomization::SetIncludeKey(StructPropertyHandle, capturedI, *Selection, utils);
 					})
 					[
 						SNew(STextBlock)
 						.Font(IDetailLayoutBuilder::GetDetailFont())
-						.Text_Lambda([incKeyHandle]()
+						.Text_Lambda([StructPropertyHandle, capturedI]()
 						{
-							FString key;
-							if (incKeyHandle.IsValid())
-								incKeyHandle->GetValue(key);
+							const FString key = MounteaJsonObjectDefinitionCustomization::GetIncludeKey(StructPropertyHandle, capturedI);
 							return key.IsEmpty()
 								? LOCTEXT("NoDefinitionSelected", "Select Definition")
 								: FText::FromString(key);
@@ -570,15 +641,13 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				.Font(IDetailLayoutBuilder::GetDetailFont())
 				.ColorAndOpacity(FSlateColor::UseSubduedForeground())
 				.AutoWrapText(false)
-				.Text_Lambda([incKeyHandle, StructPropertyHandle]()
+				.Text_Lambda([StructPropertyHandle, capturedI]()
 				{
-					return MounteaJsonObjectDefinitionCustomization::GetIncludePreviewText(incKeyHandle, StructPropertyHandle);
+					return MounteaJsonObjectDefinitionCustomization::GetIncludePreviewText(StructPropertyHandle, capturedI);
 				})
-				.Visibility_Lambda([incKeyHandle]()
+				.Visibility_Lambda([StructPropertyHandle, capturedI]()
 				{
-					FString key;
-					if (incKeyHandle.IsValid())
-						incKeyHandle->GetValue(key);
+					const FString key = MounteaJsonObjectDefinitionCustomization::GetIncludeKey(StructPropertyHandle, capturedI);
 					return key.IsEmpty() ? EVisibility::Collapsed : EVisibility::Visible;
 				})
 			]
@@ -587,20 +656,12 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 
 	// ── Field rows ────────────────────────────────────────────────────────────
 
-	uint32 numFields = 0;
-	fieldsArray->GetNumElements(numFields);
+	const int32 numFields = MounteaJsonObjectDefinitionCustomization::GetFieldCount(StructPropertyHandle);
 
-	for (uint32 j = 0; j < numFields; ++j)
+	for (int32 j = 0; j < numFields; ++j)
 	{
-		TSharedRef<IPropertyHandle> fieldElemHandle = fieldsArray->GetElement(j);
-
-		TSharedPtr<IPropertyHandle> fieldNameHandle = fieldElemHandle->GetChildHandle(
-			GET_MEMBER_NAME_CHECKED(FMounteaJsonObjectDefinitionField, FieldName));
-		TSharedPtr<IPropertyHandle> requiredHandle = fieldElemHandle->GetChildHandle(
-			GET_MEMBER_NAME_CHECKED(FMounteaJsonObjectDefinitionField, bRequired));
-
-		const uint32 capturedJ = j;
-		const uint32 capturedNumFields = numFields;
+		const int32 capturedJ = j;
+		const int32 capturedNumFields = numFields;
 
 		StructBuilder.AddCustomRow(FText::Format(LOCTEXT("FieldRow", "Field {0}"), FText::AsNumber(j)))
 		.WholeRowContent()
@@ -616,20 +677,20 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 			[
 				SNew(SEditableTextBox)
 				.Font(IDetailLayoutBuilder::GetDetailFont())
-				.Text_Lambda([fieldNameHandle]()
+				.Text_Lambda([StructPropertyHandle, capturedJ]()
 				{
-					FName value;
-					if (fieldNameHandle.IsValid())
-						fieldNameHandle->GetValue(value);
+					const FName value = MounteaJsonObjectDefinitionCustomization::GetFieldName(StructPropertyHandle, capturedJ);
 					return FText::FromName(value);
 				})
-				.OnTextCommitted_Lambda([fieldNameHandle](const FText& NewText, ETextCommit::Type)
+				.OnTextCommitted_Lambda([StructPropertyHandle, capturedJ, utils](const FText& NewText, ETextCommit::Type)
 				{
-					if (!fieldNameHandle.IsValid())
-						return;
 					if (!MounteaJsonObjectDefinitionCustomization::IsNameValid(NewText))
 						return;
-					fieldNameHandle->SetValue(FName(*NewText.ToString().TrimStartAndEnd()));
+					MounteaJsonObjectDefinitionCustomization::SetFieldName(
+						StructPropertyHandle,
+						capturedJ,
+						FName(*NewText.ToString().TrimStartAndEnd()),
+						utils);
 				})
 				.HintText(LOCTEXT("FieldNameHint", "Field name"))
 			]
@@ -641,18 +702,19 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 			.VAlign(VAlign_Center)
 			[
 				SNew(SPinTypeSelector, FGetPinTypeTree::CreateUObject(GetDefault<UEdGraphSchema_K2>(), &UEdGraphSchema_K2::GetVariableTypeTree))
-				.TargetPinType_Lambda([fieldElemHandle]()
+				.TargetPinType_Lambda([StructPropertyHandle, capturedJ]()
 				{
-					return MounteaJsonObjectDefinitionCustomization::GetElemFieldPinType(fieldElemHandle);
+					return MounteaJsonObjectDefinitionCustomization::GetFieldPinType(StructPropertyHandle, capturedJ);
 				})
-				.OnPinTypeChanged_Lambda([fieldElemHandle, utils](const FEdGraphPinType& NewType)
+				.OnPinTypeChanged_Lambda([StructPropertyHandle, capturedJ, utils](const FEdGraphPinType& NewType)
 				{
-					MounteaJsonObjectDefinitionCustomization::SetElemFieldPinType(fieldElemHandle, NewType, utils);
+					MounteaJsonObjectDefinitionCustomization::SetFieldPinType(StructPropertyHandle, capturedJ, NewType, utils);
 				})
 				.Schema(GetDefault<UEdGraphSchema_K2>())
 				.bAllowArrays(false)
 				.SelectorType(SPinTypeSelector::ESelectorType::Partial)
 				.TypeTreeFilter(ETypeTreeFilter::None)
+				.CustomFilters(pinFilters)
 				.Font(IDetailLayoutBuilder::GetDetailFont())
 			]
 
@@ -663,17 +725,18 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 			.Padding(0.f, 0.f, 6.f, 0.f)
 			[
 				SNew(SCheckBox)
-				.IsChecked_Lambda([requiredHandle]()
+				.IsChecked_Lambda([StructPropertyHandle, capturedJ]()
 				{
-					bool val = true;
-					if (requiredHandle.IsValid())
-						requiredHandle->GetValue(val);
+					const bool val = MounteaJsonObjectDefinitionCustomization::GetFieldRequired(StructPropertyHandle, capturedJ);
 					return val ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 				})
-				.OnCheckStateChanged_Lambda([requiredHandle](ECheckBoxState NewState)
+				.OnCheckStateChanged_Lambda([StructPropertyHandle, capturedJ, utils](ECheckBoxState NewState)
 				{
-					if (requiredHandle.IsValid())
-						requiredHandle->SetValue(NewState == ECheckBoxState::Checked);
+					MounteaJsonObjectDefinitionCustomization::SetFieldRequired(
+						StructPropertyHandle,
+						capturedJ,
+						NewState == ECheckBoxState::Checked,
+						utils);
 				})
 				.ToolTipText(LOCTEXT("RequiredTooltip", "Required"))
 			]
