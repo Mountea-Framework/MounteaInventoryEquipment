@@ -27,12 +27,16 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryJsonStatics : 
 public:
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON",
-		meta=(MounteaGetter, CallableWithoutWorldContext, DefaultToSelf="Target"),
+		meta=(MounteaGetter),
+		meta=(CallableWithoutWorldContext),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Create Json Object")
 	static UMounteaJsonObject* CreateJsonObject(UObject* Target);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Serialization",
-		meta=(MounteaGetter, CallableWithoutWorldContext, DefaultToSelf="Target"),
+		meta=(MounteaGetter),
+		meta=(CallableWithoutWorldContext),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Parse Json Object From String")
 	static UMounteaJsonObject* ParseJsonObjectFromString(UObject* Target, const FString& JsonString);
 
@@ -58,18 +62,26 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|JSON|Definitions",
 		meta=(MounteaGetter),
+		meta=(MounteaJsonDefinition),
+		meta=(MounteaJsonDefinitionPin="DefinitionKey"),
 		DisplayName="Find Json Object Definition")
 	static bool FindJsonObjectDefinition(const FString& DefinitionKey, FMounteaJsonObjectDefinition& Definition);
 
 	static bool ResolveJsonObjectDefinitionByKey(const FString& DefinitionKey, FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Definitions",
-		meta=(MounteaGetter, CallableWithoutWorldContext, DefaultToSelf="Target"),
+		meta=(MounteaGetter),
+		meta=(CallableWithoutWorldContext),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Create Json Object From Definition")
 	static UMounteaJsonObject* CreateJsonObjectFromDefinition(UObject* Target, const FMounteaJsonObjectDefinition& Definition);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Definitions",
-		meta=(MounteaGetter, CallableWithoutWorldContext, DefaultToSelf="Target"),
+		meta=(MounteaGetter),
+		meta=(MounteaJsonDefinition),
+		meta=(MounteaJsonDefinitionPin="DefinitionKey"),
+		meta=(CallableWithoutWorldContext),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Create Json Object From Definition Key")
 	static UMounteaJsonObject* CreateJsonObjectFromDefinitionKey(UObject* Target, const FString& DefinitionKey);
 
@@ -80,6 +92,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|JSON|Definitions",
 		meta=(MounteaValidate),
+		meta=(MounteaJsonDefinition),
+		meta=(MounteaJsonDefinitionPin="DefinitionKey"),
 		DisplayName="Validate Json Object Against Definition Key")
 	static bool ValidateJsonObjectAgainstDefinitionKey(UMounteaJsonObject* Target, const FString& DefinitionKey, TArray<FString>& Errors);
 
@@ -134,7 +148,8 @@ public:
 	static bool SetSoftClassJsonField(UMounteaJsonObject* Target, FName FieldName, const TSoftClassPtr<UObject>& Value, UMounteaJsonObject*& JsonObject);
 
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields", CustomThunk,
-		meta=(CustomStructureParam="Value", DefaultToSelf="Target"))
+		meta=(CustomStructureParam="Value"),
+		meta=(DefaultToSelf="Target"))
 	static bool SetStructJsonField(UMounteaJsonObject* Target, FName FieldName, const int32& Value, UMounteaJsonObject*& JsonObject);
 
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields",
@@ -186,7 +201,8 @@ public:
 	static bool GetSoftClassJsonField(UMounteaJsonObject* Target, FName FieldName, TSoftClassPtr<UObject>& Value);
 
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields", CustomThunk,
-		meta=(CustomStructureParam="Value", DefaultToSelf="Target"))
+		meta=(CustomStructureParam="Value"),
+		meta=(DefaultToSelf="Target"))
 	static bool GetStructJsonField(UMounteaJsonObject* Target, FName FieldName, int32& Value);
 
 	DECLARE_FUNCTION(execSetStructJsonField);
