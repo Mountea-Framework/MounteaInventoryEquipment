@@ -21,6 +21,7 @@
 #include "Slate/SPinTypeModalTypeSelector.h"
 #include "EdGraph/EdGraphPin.h"
 #include "EdGraph/EdGraphNode.h"
+#include "K2Nodes/K2Node_BreakJsonObjectByDefinition.h"
 #include "K2Nodes/K2Node_ConstructJsonObjectFromDefinition.h"
 #include "K2Nodes/K2Node_CreateModalResponse.h"
 #include "K2Nodes/K2Node_ConstructModalPayload.h"
@@ -63,6 +64,12 @@ TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) c
 	if (UK2Node_ConstructJsonObjectFromDefinition* constructJsonNode = Cast<UK2Node_ConstructJsonObjectFromDefinition>(Pin->GetOwningNode()))
 	{
 		if (constructJsonNode->ShouldUseJsonDefinitionSelector(Pin))
+			return SNew(SPinTypeJsonDefinitionSelector, Pin);
+	}
+
+	if (UK2Node_BreakJsonObjectByDefinition* breakJsonNode = Cast<UK2Node_BreakJsonObjectByDefinition>(Pin->GetOwningNode()))
+	{
+		if (breakJsonNode->ShouldUseJsonDefinitionSelector(Pin))
 			return SNew(SPinTypeJsonDefinitionSelector, Pin);
 	}
 
