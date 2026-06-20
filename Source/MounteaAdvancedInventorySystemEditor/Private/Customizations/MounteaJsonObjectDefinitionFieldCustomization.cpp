@@ -47,6 +47,21 @@ namespace MounteaJsonObjectDefinitionFieldCustomization
 			PinType.PinCategory == UEdGraphSchema_K2::PC_Struct;
 	}
 
+	static bool IsSupportedPinTypeTreeItem(const FPinTypeTreeItem& InItem)
+	{
+		if (!InItem.IsValid())
+			return false;
+
+		if (InItem->bReadOnly)
+			return true;
+
+		const FEdGraphPinType& unresolvedPinType = InItem->GetPinTypeNoResolve();
+		if (unresolvedPinType.PinCategory == UEdGraphSchema_K2::AllObjectTypes)
+			return true;
+
+		return IsSupportedPinType(unresolvedPinType);
+	}
+
 	static FEdGraphPinType GetFieldPinType(const TSharedPtr<IPropertyHandle>& StructPropertyHandle)
 	{
 		FEdGraphPinType defaultType;
@@ -96,13 +111,7 @@ namespace MounteaJsonObjectDefinitionFieldCustomization
 
 		virtual bool ShouldShowPinTypeTreeItem(FPinTypeTreeItem InItem) const override
 		{
-			if (!InItem.IsValid())
-				return false;
-
-			if (InItem->bReadOnly)
-				return true;
-
-			return IsSupportedPinType(InItem->GetPinTypeNoResolve());
+			return IsSupportedPinTypeTreeItem(InItem);
 		}
 	};
 }
