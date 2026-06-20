@@ -20,6 +20,7 @@
 #include "PropertyHandle.h"
 #include "SPinTypeSelector.h"
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
+#include "Statics/MounteaJsonDefinitionPinTypeStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Widgets/Images/SImage.h"
 #include "Widgets/Input/SButton.h"
@@ -184,14 +185,6 @@ namespace MounteaJsonObjectDefinitionCustomization
 			Utils->RequestForceRefresh();
 	}
 
-	static FEdGraphPinType MakeDefaultFieldPinType()
-	{
-		FEdGraphPinType pinType;
-		pinType.PinCategory = UEdGraphSchema_K2::PC_String;
-		pinType.ContainerType = EPinContainerType::None;
-		return pinType;
-	}
-
 	// ─── global config ────────────────────────────────────────────────────────
 
 	static UMounteaAdvancedInventoryGlobalConfig* ResolveGlobalConfig(const TSharedRef<IPropertyHandle>& Handle)
@@ -220,43 +213,6 @@ namespace MounteaJsonObjectDefinitionCustomization
 		});
 	}
 
-	// ─── pin type helpers (mirror of FieldCustomization internals) ────────────
-
-	static bool IsSupportedPinType(const FEdGraphPinType& PinType)
-	{
-		if (PinType.ContainerType != EPinContainerType::None)
-			return false;
-
-		return PinType.PinCategory == UEdGraphSchema_K2::PC_Int      ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Int64    ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Real     ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean  ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_String   ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Name     ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Text     ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Byte     ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Object   ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Class    ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Struct;
-	}
-
-	static bool IsSupportedPinTypeTreeItem(const FPinTypeTreeItem& InItem)
-	{
-		if (!InItem.IsValid())
-			return false;
-
-		if (InItem->bReadOnly)
-			return true;
-
-		const FEdGraphPinType& unresolvedPinType = InItem->GetPinTypeNoResolve();
-		if (unresolvedPinType.PinCategory == UEdGraphSchema_K2::AllObjectTypes)
-			return true;
-
-		return IsSupportedPinType(unresolvedPinType);
-	}
-
 	static FEdGraphPinType GetFieldPinType(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
 	{
 		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
@@ -267,12 +223,12 @@ namespace MounteaJsonObjectDefinitionCustomization
 				return field.FieldValueType;
 		}
 
-		return MakeDefaultFieldPinType();
+		return MounteaJsonDefinitionPinTypeStatics::MakeDefaultFieldPinType();
 	}
 
 	static void SetFieldPinType(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index, const FEdGraphPinType& PinType, const TSharedPtr<IPropertyUtilities>& Utils)
 	{
-		if (!IsSupportedPinType(PinType))
+		if (!MounteaJsonDefinitionPinTypeStatics::IsSupportedPinType(PinType))
 			return;
 
 		StructHandle->NotifyPreChange();
@@ -285,7 +241,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 				if (def->Fields.IsValidIndex(Index))
 				{
 					def->Fields[Index].FieldValueType = PinType;
-					def->Fields[Index].FieldValueType.ContainerType = EPinContainerType::None;
+					MounteaJsonDefinitionPinTypeStatics::NormalizeFieldPinType(def->Fields[Index].FieldValueType);
 				}
 			}
 		}
@@ -344,7 +300,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 	public:
 		virtual bool ShouldShowPinTypeTreeItem(FPinTypeTreeItem InItem) const override
 		{
-			return IsSupportedPinTypeTreeItem(InItem);
+			return MounteaJsonDefinitionPinTypeStatics::IsSupportedPinTypeTreeItem(InItem);
 		}
 	};
 
@@ -455,7 +411,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 	if (!NewFieldPinType.IsValid())
 	{
 		NewFieldPinType = MakeShared<FEdGraphPinType>(
-			MounteaJsonObjectDefinitionCustomization::MakeDefaultFieldPinType());
+			MounteaJsonDefinitionPinTypeStatics::MakeDefaultFieldPinType());
 	}
 
 	TArray<TSharedPtr<IPinTypeSelectorFilter>> pinFilters;
@@ -497,7 +453,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 					{
 						FMounteaJsonObjectDefinitionField newField;
 						newField.FieldValueType = *NewFieldPinType;
-						newField.FieldValueType.ContainerType = EPinContainerType::None;
+						MounteaJsonDefinitionPinTypeStatics::NormalizeFieldPinType(newField.FieldValueType);
 						def->Fields.Add(newField);
 					}
 				}
@@ -517,10 +473,10 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 			.TargetPinType_Lambda([this]() { return *NewFieldPinType; })
 			.OnPinTypeChanged_Lambda([this](const FEdGraphPinType& NewType)
 			{
-				if (MounteaJsonObjectDefinitionCustomization::IsSupportedPinType(NewType))
+				if (MounteaJsonDefinitionPinTypeStatics::IsSupportedPinType(NewType))
 				{
 					*NewFieldPinType = NewType;
-					NewFieldPinType->ContainerType = EPinContainerType::None;
+					MounteaJsonDefinitionPinTypeStatics::NormalizeFieldPinType(*NewFieldPinType);
 				}
 			})
 			.Schema(GetDefault<UEdGraphSchema_K2>())
