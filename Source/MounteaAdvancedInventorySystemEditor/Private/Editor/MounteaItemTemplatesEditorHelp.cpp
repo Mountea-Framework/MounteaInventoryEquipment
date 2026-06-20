@@ -20,6 +20,7 @@
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
 #include "Statics/MounteaAdvancedInventorySystemEditorStatics.h"
+#include "Statics/MounteaInventoryWebPageStatics.h"
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySystemEditorHelp"
@@ -199,67 +200,12 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 	
 	if (FFileHelper::LoadFileToString(htmlContent, *filePath))
 	{
-		const FString htmlWithCss = InjectSharedAssets(htmlContent);		
-		const FString baseUrl = FString::Printf(TEXT("file:///%s/"), *FPaths::GetPath(filePath).Replace(TEXT("\\"), TEXT("/")));		
+		const FString htmlWithCss = MounteaInventoryWebPageStatics::InjectSharedAssets(htmlContent);
+		const FString baseUrl = MounteaInventoryWebPageStatics::MakeFileBaseUrl(filePath);
 		WebBrowser->LoadString(htmlWithCss, *baseUrl);
 	}
 	else
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);
-}
-
-FString SMounteaItemTemplatesEditorHelp::InjectSharedAssets(const FString& HtmlContent)
-{
-	const UMounteaAdvancedInventorySettingsEditor* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>();
-	if (!editorSettings)
-		return HtmlContent;
-	
-	FString result = HtmlContent;
-	
-	// Inject CSS
-	if (!editorSettings->SharedStylesheetPath.FilePath.IsEmpty())
-	{
-		FString cssContent;
-		const FString cssPath = FPaths::ConvertRelativePathToFull(editorSettings->SharedStylesheetPath.FilePath);
-		
-		if (FFileHelper::LoadFileToString(cssContent, *cssPath))
-		{
-			const FString styleTag = FString::Printf(TEXT("<style>%s</style>"), *cssContent);
-			
-			if (!result.Contains(styleTag))
-			{
-				const int32 headEndPos = result.Find(TEXT("</head>"), ESearchCase::IgnoreCase);
-				
-				if (headEndPos != INDEX_NONE)
-					result.InsertAt(headEndPos, styleTag);
-				else
-					result = styleTag + result;
-			}
-		}
-	}
-	
-	// Inject Script
-	if (!editorSettings->SharedScriptPath.FilePath.IsEmpty())
-	{
-		FString scriptContent;
-		const FString scriptPath = FPaths::ConvertRelativePathToFull(editorSettings->SharedScriptPath.FilePath);
-		
-		if (FFileHelper::LoadFileToString(scriptContent, *scriptPath))
-		{
-			const FString scriptTag = FString::Printf(TEXT("<script>%s</script>"), *scriptContent);
-			
-			if (!result.Contains(scriptTag))
-			{
-				const int32 bodyEndPos = result.Find(TEXT("</body>"), ESearchCase::IgnoreCase);
-				
-				if (bodyEndPos != INDEX_NONE)
-					result.InsertAt(bodyEndPos, scriptTag);
-				else
-					result += scriptTag;
-			}
-		}
-	}
-	
-	return result;
 }
 
 FString SMounteaItemTemplatesEditorHelp::GetHtmlPath(const int32 PageId)
