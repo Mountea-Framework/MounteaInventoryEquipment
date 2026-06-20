@@ -63,6 +63,7 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.SaveMultiple", new SVG_BRUSH_TINT(TEXT("WebIcons/save-all"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Save", new SVG_BRUSH_TINT(TEXT("WebIcons/save"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Tutorial", new SVG_BRUSH_TINT(TEXT("WebIcons/graduation-cap"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.AutoSetup", new SVG_BRUSH_TINT(TEXT("WebIcons/sparkles-2"), Icon40x40, FLinearColor::White));
 	
 	StyleSet->Set("MAISStyleSet.Success", new SVG_BRUSH_TINT(TEXT("WebIcons/rosette-discount-check"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#90D5FF"))));
 	StyleSet->Set("MAISStyleSet.Warning", new SVG_BRUSH_TINT(TEXT("WebIcons/alert-triangle"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#FFB343"))));
