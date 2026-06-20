@@ -65,7 +65,7 @@ namespace MAISSetupDefaultsPopupInternal
 
 		for (const FMAISSetupItemResult& result : Results)
 		{
-			TSharedRef<FJsonObject> jsonResult = MakeShared<FJsonObject>();
+			TSharedPtr<FJsonObject> jsonResult = MakeShared<FJsonObject>();
 			jsonResult->SetStringField(TEXT("itemName"), result.ItemName);
 			jsonResult->SetStringField(TEXT("status"), StatusToText(result.Status));
 			jsonResult->SetStringField(TEXT("message"), result.Message);
@@ -86,17 +86,17 @@ namespace MAISSetupDefaultsPopupInternal
 		const FString playerText = Report.PlayerClassName.IsEmpty() ? TEXT("Not resolved") : Report.PlayerClassName;
 		const FString gameModeSource = Report.bIsDefaultGameMode ? TEXT("Project default GameMode fallback") : TEXT("World GameMode");
 
-		TSharedRef<FJsonObject> jsonReport = MakeShared<FJsonObject>();
+		TSharedPtr<FJsonObject> jsonReport = MakeShared<FJsonObject>();
 		jsonReport->SetStringField(TEXT("summary"), resultText);
 
-		TSharedRef<FJsonObject> metrics = MakeShared<FJsonObject>();
+		TSharedPtr<FJsonObject> metrics = MakeShared<FJsonObject>();
 		metrics->SetNumberField(TEXT("added"), addedCount);
 		metrics->SetNumberField(TEXT("alreadyPresent"), presentCount);
 		metrics->SetNumberField(TEXT("warnings"), warningCount);
 		metrics->SetNumberField(TEXT("failed"), failedCount);
 		jsonReport->SetObjectField(TEXT("metrics"), metrics);
 
-		TSharedRef<FJsonObject> context = MakeShared<FJsonObject>();
+		TSharedPtr<FJsonObject> context = MakeShared<FJsonObject>();
 		context->SetStringField(TEXT("gameMode"), gameModeText);
 		context->SetStringField(TEXT("gameModeSource"), gameModeSource);
 		context->SetStringField(TEXT("playerClass"), playerText);
@@ -108,7 +108,7 @@ namespace MAISSetupDefaultsPopupInternal
 
 		FString jsonString;
 		const TSharedRef<TJsonWriter<>> writer = TJsonWriterFactory<>::Create(&jsonString);
-		FJsonSerializer::Serialize(jsonReport, writer);
+		FJsonSerializer::Serialize(jsonReport.ToSharedRef(), writer);
 		jsonString.ReplaceInline(TEXT("</"), TEXT("<\\/"));
 		return jsonString;
 	}

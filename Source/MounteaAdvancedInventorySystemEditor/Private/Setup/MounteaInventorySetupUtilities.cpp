@@ -11,6 +11,7 @@
 
 #include "Setup/MounteaInventorySetupUtilities.h"
 
+#include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Components/MounteaAdvancedInventoryLoadoutComponent.h"
 #include "Components/MounteaCraftingParticipantComponent.h"
 #include "Components/MounteaCraftingParticipantUIComponent.h"
