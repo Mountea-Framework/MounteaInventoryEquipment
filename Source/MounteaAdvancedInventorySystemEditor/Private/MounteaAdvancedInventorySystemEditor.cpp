@@ -42,6 +42,8 @@
 #include "PropertyEditorModule.h"
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
+#include "Popups/MAISSetupDefaultsPopup.h"
+#include "Setup/MounteaInventorySetupUtilities.h"
 
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Styling/SlateStyle.h"
@@ -220,6 +222,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		FMAISCommands::Register();
 
 		PluginCommands = MakeShareable(new FUICommandList);
+		PluginCommands->MapAction(
+			FMAISCommands::Get().MAI_SetupDefaultsAction,
+			FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::SetupDefaultsButtonClicked)
+		);
 		
 		IMainFrameModule& mainFrame = FModuleManager::Get().LoadModuleChecked<IMainFrameModule>("MainFrame");
 		mainFrame.GetMainFrameCommandBindings()->Append(PluginCommands.ToSharedRef());
@@ -442,6 +448,12 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 	return newTab;
 }
 
+void FMounteaAdvancedInventorySystemEditor::SetupDefaultsButtonClicked()
+{
+	const FMAISSetupDefaultsReport report = FMounteaInventorySetupUtilities::RunSetupDefaults();
+	MAISSetupDefaultsPopup::Open(report);
+}
+
 void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 {
 	if (!UToolMenus::Get()->IsMenuRegistered(MounteaAdvancedInventoryToolbar::MounteaSharedMenuName))
@@ -504,7 +516,14 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 				{
 					{
 						FToolMenuSection& toolsSection = subMenu->FindOrAddSection("MounteaInventory_Tools");
-						toolsSection.Label = LOCTEXT("InvTools_Label", "Mountea Item Templates Editor");
+						toolsSection.Label = LOCTEXT("InvTools_Label", "Mountea Inventory Tools");
+						toolsSection.AddMenuEntryWithCommandList(
+							FMAISCommands::Get().MAI_SetupDefaultsAction,
+							PluginCommands,
+							LOCTEXT("MounteaSystemEditor_SetupDefaultsButton_Label", "Setup Defaults"),
+							LOCTEXT("MounteaSystemEditor_SetupDefaultsButton_ToolTip", "Setup missing Mountea Advanced Inventory defaults and required player components."),
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.AutoSetup")
+						);
 						toolsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
 							"MounteaInventory_TemplateEditor",
 							LOCTEXT("MounteaSystemEditor_TemplateEditorButton_Label", "Mountea Inventory Template Editor"),

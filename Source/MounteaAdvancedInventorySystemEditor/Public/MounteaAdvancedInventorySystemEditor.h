@@ -31,6 +31,7 @@ private:
 	void UnregisterTabSpawners();
 
 	void OpenInventoryTemplateEditor();
+	void SetupDefaultsButtonClicked();
 	TSharedRef<SDockTab> SpawnInventoryTemplateEditorTab(const FSpawnTabArgs& Args);
 
 	static const FName InventoryTemplateEditorTabId;
