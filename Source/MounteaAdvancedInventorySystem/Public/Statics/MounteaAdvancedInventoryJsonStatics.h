@@ -61,6 +61,8 @@ public:
 		DisplayName="Find Json Object Definition")
 	static bool FindJsonObjectDefinition(const FString& DefinitionKey, FMounteaJsonObjectDefinition& Definition);
 
+	static bool ResolveJsonObjectDefinitionByKey(const FString& DefinitionKey, FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors);
+
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Definitions",
 		meta=(MounteaGetter, CallableWithoutWorldContext, DefaultToSelf="Target"),
 		DisplayName="Create Json Object From Definition")

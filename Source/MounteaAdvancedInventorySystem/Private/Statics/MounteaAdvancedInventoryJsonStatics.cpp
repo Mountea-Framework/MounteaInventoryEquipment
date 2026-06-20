@@ -438,6 +438,21 @@ bool UMounteaAdvancedInventoryJsonStatics::FindJsonObjectDefinition(const FStrin
 	return false;
 }
 
+bool UMounteaAdvancedInventoryJsonStatics::ResolveJsonObjectDefinitionByKey(const FString& DefinitionKey, FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors)
+{
+	OutDefinition = FMounteaJsonObjectDefinition();
+	Errors.Reset();
+
+	FMounteaJsonObjectDefinition definition;
+	if (!FindJsonObjectDefinition(DefinitionKey, definition))
+	{
+		Errors.Add(FString::Printf(TEXT("Could not find JSON object definition '%s'."), *DefinitionKey));
+		return false;
+	}
+
+	return ResolveJsonObjectDefinition(DefinitionKey, definition, OutDefinition, Errors);
+}
+
 UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinition(UObject* Target, const FMounteaJsonObjectDefinition& Definition)
 {
 	FMounteaJsonObjectDefinition resolvedDefinition;
