@@ -273,7 +273,7 @@ FSlateIcon UK2Node_ConstructModalPayload::GetIconAndTint(FLinearColor& OutColor)
 
 FText UK2Node_ConstructModalPayload::GetToolTipHeading() const
 {
-	return LOCTEXT("ConstructModalPayload_ToolTipHeading", "Mountea Advanced Inventory Function");
+	return LOCTEXT("ConstructModalPayload_ToolTipHeading", "Mountea Advanced Inventory & Equipment Function");
 }
 
 FName UK2Node_ConstructModalPayload::GetCornerIcon() const

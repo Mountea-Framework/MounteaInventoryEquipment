@@ -250,7 +250,7 @@ FSlateIcon UK2Node_CreateModalResponse::GetIconAndTint(FLinearColor& OutColor) c
 
 FText UK2Node_CreateModalResponse::GetToolTipHeading() const
 {
-	return LOCTEXT("CreateModalResponse_ToolTipHeading", "Mountea Advanced Inventory Function");
+	return LOCTEXT("CreateModalResponse_ToolTipHeading", "Mountea Advanced Inventory & Equipment Function");
 }
 
 FName UK2Node_CreateModalResponse::GetCornerIcon() const

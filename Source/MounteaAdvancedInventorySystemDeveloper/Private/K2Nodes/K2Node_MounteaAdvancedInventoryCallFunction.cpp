@@ -238,7 +238,7 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const
 
 FText UK2Node_MounteaAdvancedInventoryCallFunction::GetToolTipHeading() const
 {
-	return LOCTEXT("MounteaAdvancedInventoryCallFunctionFunctions", "Mountea Advanced Inventory Function");
+	return LOCTEXT("MounteaAdvancedInventoryCallFunctionFunctions", "Mountea Advanced Inventory & Equipment Function");
 }
 
 EFunctionRole UK2Node_MounteaAdvancedInventoryCallFunction::GetFunctionRole() const

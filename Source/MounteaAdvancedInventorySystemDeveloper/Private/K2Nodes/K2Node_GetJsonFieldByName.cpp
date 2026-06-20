@@ -265,7 +265,7 @@ FText UK2Node_GetJsonFieldByName::GetTooltipText() const
 
 FText UK2Node_GetJsonFieldByName::GetToolTipHeading() const
 {
-	return LOCTEXT("GetJsonFieldByName_TooltipHeading", "Mountea Advanced Inventory Function");
+	return LOCTEXT("GetJsonFieldByName_TooltipHeading", "Mountea Advanced Inventory & Equipment Function");
 }
 
 FLinearColor UK2Node_GetJsonFieldByName::GetNodeTitleColor() const
