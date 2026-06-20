@@ -64,9 +64,12 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Save", new SVG_BRUSH_TINT(TEXT("WebIcons/save"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Tutorial", new SVG_BRUSH_TINT(TEXT("WebIcons/graduation-cap"), Icon16x16, FLinearColor::White));
 	
-	StyleSet->Set("MAISStyleSet.Success", new SVG_BRUSH_TINT(TEXT("WebIcons/rosette-discount-check"), Icon16x16, FLinearColor::White));
-	StyleSet->Set("MAISStyleSet.Warning", new SVG_BRUSH_TINT(TEXT("WebIcons/alert-triangle"), Icon16x16, FLinearColor::White));
-	StyleSet->Set("MAISStyleSet.Error", new SVG_BRUSH_TINT(TEXT("WebIcons/exclamation-circle"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Success", new SVG_BRUSH_TINT(TEXT("WebIcons/rosette-discount-check"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#90D5FF"))));
+	StyleSet->Set("MAISStyleSet.Warning", new SVG_BRUSH_TINT(TEXT("WebIcons/alert-triangle"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#FFB343"))));
+	StyleSet->Set("MAISStyleSet.Error", new SVG_BRUSH_TINT(TEXT("WebIcons/exclamation-circle"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#F92C30"))));
+	StyleSet->Set("MAISStyleSet.Success.Filled", new SVG_BRUSH_TINT(TEXT("WebIcons/rosette-discount-check_filled"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#90D5FF"))));
+	StyleSet->Set("MAISStyleSet.Warning.Filled", new SVG_BRUSH_TINT(TEXT("WebIcons/alert-triangle_filled"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#FFB343"))));
+	StyleSet->Set("MAISStyleSet.Error.Filled", new SVG_BRUSH_TINT(TEXT("WebIcons/exclamation-circle_filled"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#F92C30"))));
 	
 	StyleSet->Set("MAISStyleSet.TemplatesEditor",  new SVG_BRUSH_TINT(TEXT("WebIcons/template"), Icon16x16, FLinearColor::White));
 
