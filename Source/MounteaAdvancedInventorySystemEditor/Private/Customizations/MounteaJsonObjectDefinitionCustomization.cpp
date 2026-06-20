@@ -80,9 +80,9 @@ namespace MounteaJsonObjectDefinitionCustomization
 	{
 		switch (Status)
 		{
-			case EDefinitionStatus::Error:   return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Error");
-			case EDefinitionStatus::Warning: return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Warning");
-			default:                         return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Success");
+			case EDefinitionStatus::Error:   return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Error.Filled");
+			case EDefinitionStatus::Warning: return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Warning.Filled");
+			default:                         return FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Success.Filled");
 		}
 	}
 
@@ -157,7 +157,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 		}
 		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		if (Utils.IsValid())
-			Utils->RequestRefresh();
+			Utils->RequestForceRefresh();
 	}
 
 	static FName GetFieldName(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
@@ -181,7 +181,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 		}
 		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		if (Utils.IsValid())
-			Utils->RequestRefresh();
+			Utils->RequestForceRefresh();
 	}
 
 	static FEdGraphPinType MakeDefaultFieldPinType()
@@ -276,7 +276,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 		}
 		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		if (Utils.IsValid())
-			Utils->RequestRefresh();
+			Utils->RequestForceRefresh();
 	}
 
 	static bool GetFieldRequired(const TSharedRef<IPropertyHandle>& StructHandle, int32 Index)
@@ -300,7 +300,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 		}
 		StructHandle->NotifyPostChange(EPropertyChangeType::ValueSet);
 		if (Utils.IsValid())
-			Utils->RequestRefresh();
+			Utils->RequestForceRefresh();
 	}
 
 	// ─── name validation (mirrors StepGraph's IsNameTextValid) ────────────────
@@ -492,7 +492,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				}
 				StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayAdd);
 				if (utils.IsValid())
-					utils->RequestRefresh();
+					utils->RequestForceRefresh();
 				return FReply::Handled();
 			})
 		]
@@ -515,7 +515,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 			.Schema(GetDefault<UEdGraphSchema_K2>())
 			.bAllowArrays(false)
 			.CustomFilters(pinFilters)
-			.SelectorType(SPinTypeSelector::ESelectorType::Partial)
+			.SelectorType(SPinTypeSelector::ESelectorType::Full)
 			.TypeTreeFilter(ETypeTreeFilter::None)
 			.Font(IDetailLayoutBuilder::GetDetailFont())
 		]
@@ -540,7 +540,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				}
 				StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayAdd);
 				if (utils.IsValid())
-					utils->RequestRefresh();
+					utils->RequestForceRefresh();
 				return FReply::Handled();
 			})
 		]
@@ -626,7 +626,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 							}
 							StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayRemove);
 							if (utils.IsValid())
-								utils->RequestRefresh();
+								utils->RequestForceRefresh();
 						}),
 						LOCTEXT("RemoveInclude", "Remove Include")
 					)
@@ -712,7 +712,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				})
 				.Schema(GetDefault<UEdGraphSchema_K2>())
 				.bAllowArrays(false)
-				.SelectorType(SPinTypeSelector::ESelectorType::Partial)
+				.SelectorType(SPinTypeSelector::ESelectorType::Full)
 				.TypeTreeFilter(ETypeTreeFilter::None)
 				.CustomFilters(pinFilters)
 				.Font(IDetailLayoutBuilder::GetDetailFont())
@@ -764,7 +764,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 					}
 					StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayMove);
 					if (utils.IsValid())
-						utils->RequestRefresh();
+						utils->RequestForceRefresh();
 					return FReply::Handled();
 				})
 				[
@@ -793,7 +793,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 					}
 					StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayMove);
 					if (utils.IsValid())
-						utils->RequestRefresh();
+						utils->RequestForceRefresh();
 					return FReply::Handled();
 				})
 				[
@@ -821,7 +821,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 						}
 						StructPropertyHandle->NotifyPostChange(EPropertyChangeType::ArrayRemove);
 						if (utils.IsValid())
-							utils->RequestRefresh();
+							utils->RequestForceRefresh();
 					}),
 					LOCTEXT("RemoveField", "Remove Field")
 				)

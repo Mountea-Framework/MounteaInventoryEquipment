@@ -181,8 +181,8 @@ void FMounteaJsonObjectDefinitionFieldCustomization::CustomizeHeader(
 				.Schema(GetDefault<UEdGraphSchema_K2>())
 				.bAllowArrays(false)
 				.CustomFilters(customFilters)
-				.SelectorType(SPinTypeSelector::ESelectorType::Partial)
-				.TypeTreeFilter(ETypeTreeFilter::IndexTypesOnly)
+				.SelectorType(SPinTypeSelector::ESelectorType::Full)
+				.TypeTreeFilter(ETypeTreeFilter::None)
 				.Font(IDetailLayoutBuilder::GetDetailFont())
 			]
 		]
