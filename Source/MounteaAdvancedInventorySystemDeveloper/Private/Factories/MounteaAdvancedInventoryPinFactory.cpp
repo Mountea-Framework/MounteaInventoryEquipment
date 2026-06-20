@@ -38,6 +38,9 @@ TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) c
 		if (callFunctionNode->ShouldUseInventoryCategorySelector(Pin))
 			return SNew(SPinTypeInventoryCategorySelector, Pin);
 
+		if (callFunctionNode->ShouldUseJsonDefinitionSelector(Pin))
+			return SNew(SPinTypeJsonDefinitionSelector, Pin);
+
 		if (callFunctionNode->ShouldUseCommandSelector(Pin))
 			return SNew(SPinTypeCommandSelector, Pin);
 
