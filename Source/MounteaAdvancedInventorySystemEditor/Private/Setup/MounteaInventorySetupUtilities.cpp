@@ -121,22 +121,25 @@ namespace MounteaInventorySetupDefaults
 		return true;
 	}
 
-	bool ActorClassHasComponent(const TSubclassOf<AActor> ActorClass, const TSubclassOf<UActorComponent> ComponentClass)
+	bool BlueprintHasComponent(const UBlueprintGeneratedClass* BlueprintClass, const TSubclassOf<UActorComponent> ComponentClass)
 	{
-		if (!ActorClass || !ComponentClass)
+		if (!BlueprintClass || !ComponentClass)
 			return false;
 
-		const AActor* defaultActor = Cast<AActor>(ActorClass->GetDefaultObject());
-		if (!defaultActor)
-			return false;
-
-		TInlineComponentArray<UActorComponent*> components;
-		defaultActor->GetComponents(components);
-
-		for (const UActorComponent* component : components)
+		const UClass* currentClass = BlueprintClass;
+		while (currentClass)
 		{
-			if (IsValid(component) && component->IsA(ComponentClass))
-				return true;
+			const UBlueprintGeneratedClass* blueprintClass = Cast<UBlueprintGeneratedClass>(currentClass);
+			if (blueprintClass && blueprintClass->SimpleConstructionScript)
+			{
+				for (const USCS_Node* node : blueprintClass->SimpleConstructionScript->GetAllNodes())
+				{
+					if (node && node->ComponentClass && node->ComponentClass->IsChildOf(ComponentClass))
+						return true;
+				}
+			}
+
+			currentClass = currentClass->GetSuperClass();
 		}
 
 		return false;
@@ -404,7 +407,7 @@ void FMounteaInventorySetupUtilities::SetupPlayerComponents(FMAISSetupDefaultsRe
 	bool bBlueprintModified = false;
 	for (const TSubclassOf<UActorComponent>& componentClass : requiredComponents)
 	{
-		if (ActorClassHasComponent(playerClass, componentClass))
+		if (BlueprintHasComponent(blueprintClass, componentClass))
 		{
 			AddComponentResult(
 				Report,
