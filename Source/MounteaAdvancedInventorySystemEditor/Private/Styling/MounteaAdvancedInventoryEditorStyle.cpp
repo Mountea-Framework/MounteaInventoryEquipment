@@ -39,7 +39,7 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.MounteaLogo", new IMAGE_BRUSH(TEXT("Mountea_Logo"), Icon40x40));
 
 	StyleSet->Set("MAISStyleSet.K2Node_ValidateIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/shield-check"), Icon40x40, FLinearColor::White));
-	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon40x40, FLinearColor::White));	
+	StyleSet->Set("MAISStyleSet.K2Node_SetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunrise"), Icon40x40, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.K2Node_GetterIcon", new SVG_BRUSH_TINT(TEXT("WebIcons/sunset"), Icon40x40, FLinearColor::White));
 
 	StyleSet->Set("MAISStyleSet.Help", new SVG_BRUSH_TINT(TEXT("WebIcons/message-circle-question-mark"), Icon16x16, FLinearColor::White));
@@ -52,7 +52,7 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Wiki", new SVG_BRUSH_TINT(TEXT("WebIcons/book-open-text"), Icon40x40, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Youtube", new SVG_BRUSH_TINT(TEXT("WebIcons/brand-youtube"), Icon12x12, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Settings", new SVG_BRUSH_TINT(TEXT("WebIcons/settings"), Icon12x12, FLinearColor::White));
-	StyleSet->Set("MAISStyleSet.Config", new SVG_BRUSH_TINT(TEXT("WebIcons/settings-2"), Icon12x12, FLinearColor::White));	
+	StyleSet->Set("MAISStyleSet.Config", new SVG_BRUSH_TINT(TEXT("WebIcons/settings-2"), Icon12x12, FLinearColor::White));
 
 	StyleSet->Set("MAISStyleSet.Level", new SVG_BRUSH_TINT(TEXT("WebIcons/mountain-snow"), Icon40x40, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Folder", new SVG_BRUSH_TINT(TEXT("WebIcons/folder-open"), Icon40x40, FLinearColor::White));
@@ -63,6 +63,14 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.SaveMultiple", new SVG_BRUSH_TINT(TEXT("WebIcons/save-all"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Save", new SVG_BRUSH_TINT(TEXT("WebIcons/save"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Tutorial", new SVG_BRUSH_TINT(TEXT("WebIcons/graduation-cap"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.AutoSetup", new SVG_BRUSH_TINT(TEXT("WebIcons/sparkles-2"), Icon40x40, FLinearColor::White));
+	
+	StyleSet->Set("MAISStyleSet.Success", new SVG_BRUSH_TINT(TEXT("WebIcons/rosette-discount-check"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#90D5FF"))));
+	StyleSet->Set("MAISStyleSet.Warning", new SVG_BRUSH_TINT(TEXT("WebIcons/alert-triangle"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#FFB343"))));
+	StyleSet->Set("MAISStyleSet.Error", new SVG_BRUSH_TINT(TEXT("WebIcons/exclamation-circle"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#F92C30"))));
+	StyleSet->Set("MAISStyleSet.Success.Filled", new SVG_BRUSH_TINT(TEXT("WebIcons/rosette-discount-check_filled"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#90D5FF"))));
+	StyleSet->Set("MAISStyleSet.Warning.Filled", new SVG_BRUSH_TINT(TEXT("WebIcons/alert-triangle_filled"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#FFB343"))));
+	StyleSet->Set("MAISStyleSet.Error.Filled", new SVG_BRUSH_TINT(TEXT("WebIcons/exclamation-circle_filled"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#F92C30"))));
 	
 	StyleSet->Set("MAISStyleSet.TemplatesEditor",  new SVG_BRUSH_TINT(TEXT("WebIcons/template"), Icon16x16, FLinearColor::White));
 

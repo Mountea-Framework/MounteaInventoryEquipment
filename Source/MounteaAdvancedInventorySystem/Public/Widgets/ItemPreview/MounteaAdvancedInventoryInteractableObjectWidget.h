@@ -33,7 +33,8 @@ class AMounteaAdvancedInventoryItemPreviewRenderer;
  * @see UMounteaAdvancedInventoryBaseWidget
  * @see AMounteaAdvancedInventoryItemPreviewRenderer
  */
-UCLASS(ClassGroup=(Mountea), meta=(DisplayName="Interactable Object Widget"))
+UCLASS(ClassGroup=(Mountea),
+		meta=(DisplayName="Interactable Object Widget"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryInteractableObjectWidget : public UMounteaAdvancedInventoryBaseWidget
 {
 	GENERATED_BODY()
@@ -141,14 +142,19 @@ private:
 	bool bIsMiddleMousePressed = false;
 	bool bIsMousePressed = false;
 
-	UPROPERTY(BlueprintReadWrite, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadWrite, Category="Mountea|Preview Settings",
+		meta=(AllowPrivateAccess))
 	FGuid ActivePreviewItemGuid = FGuid();
-	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings",
+		meta=(AllowPrivateAccess))
 	float CurrentYaw   = 0.0f;
-	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings",
+		meta=(AllowPrivateAccess))
 	float CurrentPitch = 0.0f;
-	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings",
+		meta=(AllowPrivateAccess))
 	float CurrentZoom  = 1.0f;
-	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings", meta=(AllowPrivateAccess))
+	UPROPERTY(BlueprintReadOnly, Category="Mountea|Preview Settings",
+		meta=(AllowPrivateAccess))
 	float CurrentCameraHeight = 0.0f;
 };

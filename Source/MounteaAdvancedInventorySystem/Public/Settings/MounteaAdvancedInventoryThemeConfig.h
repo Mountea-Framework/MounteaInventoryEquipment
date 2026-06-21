@@ -23,7 +23,8 @@
  * @see [UI Theming](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
  * @see UMounteaAdvancedInventorySettingsConfig
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Theme Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining colours."))
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Theme Config",
+		meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining colours."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryThemeConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

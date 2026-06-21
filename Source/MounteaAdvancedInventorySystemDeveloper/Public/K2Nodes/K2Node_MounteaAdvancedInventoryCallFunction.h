@@ -32,6 +32,7 @@ public:
 	bool ShouldUseCommandSelector(UEdGraphPin* Pin) const;
 	bool ShouldUseEquipmentSlotSelector(UEdGraphPin* Pin) const;
 	bool ShouldUseInventoryCategorySelector(UEdGraphPin* Pin) const;
+	bool ShouldUseJsonDefinitionSelector(UEdGraphPin* Pin) const;
 	bool ShouldUseModalTypeSelector(UEdGraphPin* Pin) const;
 	bool ShouldUseModalRowSelector(UEdGraphPin* Pin) const;
 	

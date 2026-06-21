@@ -79,6 +79,7 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 				"EditorSubsystem", 
 				
 				"Json",
+				"EngineSettings",
 				"WebBrowser"
 			}
 		);

@@ -16,6 +16,7 @@
 void FMAISCommands::RegisterCommands()
 {
 	UI_COMMAND(MAI_MounteaSupportAction, "Mountea Support", "🆘 Opens Mountea Framework Support channel", EUserInterfaceActionType::Button, FInputChord());
+	UI_COMMAND(MAI_SetupDefaultsAction, "Setup Defaults", "Setup missing Mountea Advanced Inventory defaults and required player components.", EUserInterfaceActionType::Button, FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE

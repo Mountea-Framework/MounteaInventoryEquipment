@@ -18,6 +18,7 @@
 #include "MounteaAdvancedInventorySettings.generated.h"
 
 class UMounteaAdvancedInventoryGlobalUIConfig;
+class UMounteaAdvancedInventoryGlobalConfig;
 class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedEquipmentSettingsConfig;
 class UInputMappingContext;
@@ -128,6 +129,15 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftObjectPtr<UMounteaAdvancedInventoryGlobalUIConfig> GlobalUIConfig;
+
+	/**
+	 * Holds a reference to the global configuration asset for shared Inventory & Equipment definitions.
+	 * This includes named JSON object definitions used by JSON generation and validation helpers.
+	 */
+	UPROPERTY(Config, EditAnywhere, Category="Config",
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftObjectPtr<UMounteaAdvancedInventoryGlobalConfig> GlobalConfig;
 	
 	/**
 	 * Defines logging level that is allowed to be shown.

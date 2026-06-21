@@ -17,7 +17,8 @@
 #include "MounteaModalsPayload.generated.h"
 
 
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modals Payload"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType,
+		meta=(DisplayName="Mountea Modals Payload"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalsPayload : public UObject
 {
 	GENERATED_BODY()
@@ -34,7 +35,8 @@ public:
 	TObjectPtr<UObject> OptionalPayload;
 };
 
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modals Payload (Slider)"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType,
+		meta=(DisplayName="Mountea Modals Payload (Slider)"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalSlidersPayload : public UMounteaModalsPayload
 {
 	GENERATED_BODY()
@@ -49,7 +51,8 @@ public:
 // ANSWERS
 //
 	
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Modal Response Payload"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType,
+		meta=(DisplayName="Mountea Modal Response Payload"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalResponsePayload : public UObject
 {
 	GENERATED_BODY()
@@ -65,7 +68,8 @@ public:
 
 };
 
-UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType, meta=(DisplayName="Mountea Slider Modal Response Payload"))
+UCLASS(ClassGroup=(Mountea), Blueprintable, BlueprintType,
+		meta=(DisplayName="Mountea Slider Modal Response Payload"))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaModalSliderResponsePayload : public UMounteaModalResponsePayload
 {
 	GENERATED_BODY()
