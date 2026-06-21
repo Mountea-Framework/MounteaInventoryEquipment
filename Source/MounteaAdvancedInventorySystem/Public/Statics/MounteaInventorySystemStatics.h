@@ -234,7 +234,8 @@ public:
 		meta=(DefaultToSelf="Target"))
 	static bool SetSoftClassPropertyValue(UObject* Target, FName PropertyName, const TSoftClassPtr<UObject>& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"),
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk,
+		meta=(CustomStructureParam="Value"),
 		meta=(DefaultToSelf="Target"))
 	static bool SetGenericStructPropertyValue(UObject* Target, FName PropertyName, const int32& Value);
 
@@ -283,7 +284,8 @@ public:
 		meta=(DefaultToSelf="Target"))
 	static bool GetSoftClassPropertyValue(UObject* Target, FName PropertyName, TSoftClassPtr<UObject>& Value);
 	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk, meta=(CustomStructureParam="Value"),
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads", CustomThunk,
+		meta=(CustomStructureParam="Value"),
 		meta=(DefaultToSelf="Target"))
 	static bool GetGenericStructPropertyValue(UObject* Target, FName PropertyName, int32& Value);
 

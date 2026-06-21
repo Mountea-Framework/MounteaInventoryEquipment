@@ -30,7 +30,8 @@ class UCommonActivatableWidget;
  * @see FInventoryRarity
  * @see FInventoryCategory
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings Config", meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining inventory types, rarities and categories."))
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Settings Config",
+		meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining inventory types, rarities and categories."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventorySettingsConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -43,44 +44,48 @@ public:
 
 	// --- Types ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="⚜ Types", meta=(ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Types",
+		meta=(ForceInlineRow, NoResetToDefault))
 	TMap<EInventoryType, FInventoryTypeConfig> AllowedInventoryTypes;
 
 	// --- Rarities ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="💎 Rarities", meta=(ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Rarities",
+		meta=(ForceInlineRow, NoResetToDefault))
 	TMap<FString, FInventoryRarity> AllowedRarities;
 
 	// --- Categories ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="📚 Categories", meta=(ForceInlineRow, NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Categories",
+		meta=(ForceInlineRow, NoResetToDefault))
 	TMap<FString, FInventoryCategory> AllowedCategories;
 
 	// --- Limits ------------------------------
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="♾ Limits", meta=(NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Limits",
+		meta=(NoResetToDefault))
 	float InventoryBaseWeightLimit = 150.f;
 
 	// --- Templates ------------------------------
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🏗 Templates", 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Templates",
 		meta=(NoResetToDefault))
 	TMap<FString,TSoftObjectPtr<UPrimaryDataAsset>> TemplatesConfig;
 	
 	// --- Notifications
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🔔 Notifications|Config", 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config",
 		meta=(NoResetToDefault))
 	TSet<FString> NotificationTypes;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🔔 Notifications|Config", 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Notifications|Config",
 		meta=(ForceInlineRow), 
 		meta=(GetKeyOptions="GetNotificationTypes"))
 	TMap<FString, FInventoryNotificationConfig> NotificationConfigs;
 
 	// --- User Interface ------------------------------
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "✨ UserInterface|Theme")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Theme")
 	TSoftObjectPtr<UMounteaAdvancedInventoryThemeConfig> BaseTheme;
 	
 protected:
@@ -101,10 +106,10 @@ protected:
 #if WITH_EDITOR
 public:
 	/** Sets default values. Default values can be edited. If requested then Default values will override all `Categories` and `Rarities`! */
-	UFUNCTION(CallInEditor, Category="⚙ Default Values")
+	UFUNCTION(CallInEditor, Category="Default Values")
 	void SetDefaultValues();
 
-	UFUNCTION(CallInEditor, Category="⚙ Default Values")
+	UFUNCTION(CallInEditor, Category="Default Values")
 	void SetDefaultNotificationConfig();
 protected:
 	virtual void PostEditChangeChainProperty(struct FPropertyChangedChainEvent& PropertyChangedEvent) override;

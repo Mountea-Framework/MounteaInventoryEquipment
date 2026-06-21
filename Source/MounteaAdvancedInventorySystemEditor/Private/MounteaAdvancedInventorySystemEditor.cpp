@@ -20,11 +20,11 @@
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryGlobalConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryInteractiveWidgetEnvConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryItemTemplate_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryCraftingUIConfig_AssetAction.h"
-#include "AssetActions/MounteaAdvancedInventoryPayloadConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySelectableInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventorySettingsConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryThemeConfig_AssetAction.h"
@@ -33,11 +33,17 @@
 
 #include "Commands/FMAISCommands.h"
 
+#include "Customizations/MounteaJsonObjectDefinitionCustomization.h"
+#include "Customizations/MounteaJsonObjectDefinitionFieldCustomization.h"
+#include "Customizations/MounteaJsonObjectDefinitionIncludeCustomization.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
+#include "PropertyEditorModule.h"
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
+#include "Popups/MAISSetupDefaultsPopup.h"
+#include "Setup/MounteaInventorySetupUtilities.h"
 
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 #include "Styling/SlateStyle.h"
@@ -116,7 +122,6 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaAdvancedInventoryPreviewEnvironmentSettings"), TEXT("PreviewEnvironmentSettingsIcon") },
 					{ TEXT("MounteaSelectableInventoryItemAction"), TEXT("ItemActionIcon") },
 					{ TEXT("MounteaCallbackInventoryItemAction"), TEXT("ItemActionCallbackIcon") },
-					{ TEXT("MounteaAdvancedInventoryPayloadsConfig"), TEXT("PayloadConfigIcon") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutConfig"), TEXT("LoadoutConfiguration") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutComponent"), TEXT("LoadoutComponent") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutItem"), TEXT("LoadoutItem") },
@@ -128,6 +133,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaCraftingStationComponent"), TEXT("CraftingStationIcon") },
 					{ TEXT("MounteaAdvancedCraftingConfig"), TEXT("CraftingConfigIcon") },
 					{ TEXT("MounteaAdvancedCraftingUIConfig"), TEXT("CraftingUIConfigIcon") },
+					{ TEXT("MounteaAdvancedInventoryGlobalConfig"), TEXT("GlobalUIConfig") },
 					{ TEXT("MounteaAdvancedInventoryGlobalUIConfig"), TEXT("GlobalUIConfig") },
 					{ TEXT("MounteaAdvancedInventoryModalsDataTable"), TEXT("ModalsDataTableIcon") }
 				};
@@ -165,8 +171,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventorySelectableInventoryItemAction_AssetAction>());
-		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction>());	
-		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryPayloadConfigs_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetEnvironmentConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutConfigs_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryLoadoutItem_AssetAction>());
@@ -178,6 +183,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredient_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingUIConfig_AssetAction>());
+		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryGlobalConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryGlobalUIConfig_AssetAction>());
 		
 		for (const auto& Itr : AssetActions)
@@ -186,11 +192,40 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		}
 	}
 
+	// Detail Customizations
+	{
+		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		RegisteredCustomPropertyTypeLayouts =
+		{
+			TEXT("MounteaJsonObjectDefinition"),
+			TEXT("MounteaJsonObjectDefinitionField"),
+			TEXT("MounteaJsonObjectDefinitionInclude")
+		};
+
+		PropertyModule.RegisterCustomPropertyTypeLayout(
+			RegisteredCustomPropertyTypeLayouts[0],
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionCustomization::MakeInstance)
+		);
+		PropertyModule.RegisterCustomPropertyTypeLayout(
+			RegisteredCustomPropertyTypeLayouts[1],
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionFieldCustomization::MakeInstance)
+		);
+		PropertyModule.RegisterCustomPropertyTypeLayout(
+			RegisteredCustomPropertyTypeLayouts[2],
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionIncludeCustomization::MakeInstance)
+		);
+		PropertyModule.NotifyCustomizationModuleChanged();
+	}
+
 	// Register Menu Buttons
 	{
 		FMAISCommands::Register();
 
 		PluginCommands = MakeShareable(new FUICommandList);
+		PluginCommands->MapAction(
+			FMAISCommands::Get().MAI_SetupDefaultsAction,
+			FExecuteAction::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::SetupDefaultsButtonClicked)
+		);
 		
 		IMainFrameModule& mainFrame = FModuleManager::Get().LoadModuleChecked<IMainFrameModule>("MainFrame");
 		mainFrame.GetMainFrameCommandBindings()->Append(PluginCommands.ToSharedRef());
@@ -200,12 +235,12 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 
 	// Register in Window tab
 	{
-		UToolMenu* Menu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Help");
+		UToolMenu* editorMenu = UToolMenus::Get()->ExtendMenu("LevelEditor.MainMenu.Help");
 		{
-			FToolMenuSection& Section = Menu->FindOrAddSection("MounteaFramework");
-			Section.Label = FText::FromString(TEXT("Mountea Framework"));
+			FToolMenuSection& editorMenuSection = editorMenu->FindOrAddSection("MounteaFramework");
+			editorMenuSection.Label = FText::FromString(TEXT("Mountea Framework"));
 						
-			FToolMenuEntry Entry = Section.AddMenuEntryWithCommandList
+			FToolMenuEntry menuEntry = editorMenuSection.AddMenuEntryWithCommandList
 			(
 				FMAISCommands::Get().MAI_MounteaSupportAction,
 				PluginCommands,
@@ -242,9 +277,9 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	{
 		if (GUnrealEd)
 		{
-			TSharedPtr<FComponentVisualizer> Visualizer = MakeShareable(new FMounteaEquipmentComponentVisualizer);
-			GUnrealEd->RegisterComponentVisualizer(UMounteaAttachmentContainerComponent::StaticClass()->GetFName(), Visualizer);
-			Visualizer->OnRegister();
+			TSharedPtr<FComponentVisualizer> compVisualizer = MakeShareable(new FMounteaEquipmentComponentVisualizer);
+			GUnrealEd->RegisterComponentVisualizer(UMounteaAttachmentContainerComponent::StaticClass()->GetFName(), compVisualizer);
+			compVisualizer->OnRegister();
 		}
 	}
 	
@@ -325,6 +360,18 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 		}
 	}
 
+	// Detail Customizations Cleanup
+	{
+		if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
+		{
+			FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+			for (const FName& layoutName : RegisteredCustomPropertyTypeLayouts)
+				PropertyModule.UnregisterCustomPropertyTypeLayout(layoutName);
+
+			PropertyModule.NotifyCustomizationModuleChanged();
+		}
+	}
+
 	// Style Shutdown
 	{
 		FMounteaAdvancedInventoryEditorStyle::Shutdown();
@@ -401,6 +448,12 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 	return newTab;
 }
 
+void FMounteaAdvancedInventorySystemEditor::SetupDefaultsButtonClicked()
+{
+	const FMAISSetupDefaultsReport report = FMounteaInventorySetupUtilities::RunSetupDefaults();
+	MAISSetupDefaultsPopup::Open(report);
+}
+
 void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 {
 	if (!UToolMenus::Get()->IsMenuRegistered(MounteaAdvancedInventoryToolbar::MounteaSharedMenuName))
@@ -463,7 +516,14 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 				{
 					{
 						FToolMenuSection& toolsSection = subMenu->FindOrAddSection("MounteaInventory_Tools");
-						toolsSection.Label = LOCTEXT("InvTools_Label", "Mountea Item Templates Editor");
+						toolsSection.Label = LOCTEXT("InvTools_Label", "Mountea Inventory Tools");
+						toolsSection.AddMenuEntryWithCommandList(
+							FMAISCommands::Get().MAI_SetupDefaultsAction,
+							PluginCommands,
+							LOCTEXT("MounteaSystemEditor_SetupDefaultsButton_Label", "Setup Defaults"),
+							LOCTEXT("MounteaSystemEditor_SetupDefaultsButton_ToolTip", "Setup missing Mountea Advanced Inventory defaults and required player components."),
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.AutoSetup")
+						);
 						toolsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
 							"MounteaInventory_TemplateEditor",
 							LOCTEXT("MounteaSystemEditor_TemplateEditorButton_Label", "Mountea Inventory Template Editor"),
@@ -525,7 +585,22 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							FNewToolMenuDelegate::CreateLambda([](UToolMenu* globalConfigSubMenu)
 							{
 								FToolMenuSection& inventoryConfigSection = globalConfigSubMenu->FindOrAddSection("MounteaInventory_Config_GlobalConfig");
-								inventoryConfigSection.Label = LOCTEXT("InvConfigGlobalConfig_Label", "Global UI Config");
+								inventoryConfigSection.Label = LOCTEXT("InvConfigGlobalConfig_Label", "Shared Configs");
+								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_GlobalConfig",
+									LOCTEXT("MounteaSystemEditor_GlobalInventoryConfigButton_Label", "Global Config"),
+									LOCTEXT("MounteaSystemEditor_GlobalInventoryConfigButton_ToolTip", "📄 Open Mountea Inventory & Equipment Global Configuration\n\n❔ Define shared data definitions, including named JSON object definitions used for JSON generation and validation."),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->GlobalConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_GlobalInventoryConfigButton_Error", "Unable to locate the Mountea Inventory Global Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
 								inventoryConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
 									"MounteaInventory_Config",
 									LOCTEXT("MounteaSystemEditor_GlobalConfigButton_Label", "Global UI Config"),

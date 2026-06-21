@@ -25,7 +25,8 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::HasMounteaMetadata(const UFun
 			|| Function->HasMetaData(TEXT("MounteaGetter"))
 			|| Function->HasMetaData(TEXT("MounteaSetter"))
 			|| Function->HasMetaData(TEXT("MounteaValidate"))
-			|| Function->HasMetaData(TEXT("MounteaCommand")));
+			|| Function->HasMetaData(TEXT("MounteaCommand"))
+			|| Function->HasMetaData(TEXT("MounteaPayloadConstructor")));
 }
 
 void UK2Node_MounteaAdvancedInventoryCallFunction::GetMenuActions(FBlueprintActionDatabaseRegistrar& actionRegistrar) const
@@ -171,6 +172,31 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseInventoryCategorySel
 	return Pin->PinName == FName(*categoryPinName);
 }
 
+bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseJsonDefinitionSelector(UEdGraphPin* Pin) const
+{
+	if (!Pin)
+		return false;
+
+	if (Pin->Direction != EGPD_Input)
+		return false;
+
+	if (Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_String)
+		return false;
+
+	const UFunction* targetFunction = GetTargetFunction();
+	if (!targetFunction)
+		return false;
+
+	if (!targetFunction->HasMetaData(TEXT("MounteaJsonDefinition")))
+		return false;
+
+	const FString definitionPinName = targetFunction->HasMetaData(TEXT("MounteaJsonDefinitionPin"))
+		? targetFunction->GetMetaData(TEXT("MounteaJsonDefinitionPin"))
+		: FString(TEXT("DefinitionKey"));
+
+	return Pin->PinName == FName(*definitionPinName);
+}
+
 bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseModalTypeSelector(UEdGraphPin* Pin) const
 {
 	if (!Pin)
@@ -237,7 +263,7 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::IsNodePure() const
 
 FText UK2Node_MounteaAdvancedInventoryCallFunction::GetToolTipHeading() const
 {
-	return LOCTEXT("MounteaAdvancedInventoryCallFunctionFunctions", "Mountea Advanced Inventory Function");
+	return LOCTEXT("MounteaAdvancedInventoryCallFunctionFunctions", "Mountea Advanced Inventory & Equipment Function");
 }
 
 EFunctionRole UK2Node_MounteaAdvancedInventoryCallFunction::GetFunctionRole() const

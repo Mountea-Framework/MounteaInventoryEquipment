@@ -34,7 +34,6 @@ public:
 private:
 	TSharedRef<SWidget> CreateNavigationButton(const FText& Label, int32 PageId);
 	void SwitchToPage(int32 PageId);
-	static FString InjectSharedAssets(const FString& HtmlContent);
 	static FString GetHtmlPath(int32 PageId);
 	void HandleConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
 

@@ -31,5 +31,6 @@ public:
 public:
 	
 	TSharedPtr< FUICommandInfo > MAI_MounteaSupportAction;
+	TSharedPtr< FUICommandInfo > MAI_SetupDefaultsAction;
 	
 };

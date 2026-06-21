@@ -47,8 +47,10 @@
 
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 
 #include "Slate/MounteaInventoryScrollBox.h"
 
@@ -264,8 +266,8 @@ float UMounteaInventoryUIStatics::GetSignedStepFromPayload(const FMounteaWidgetI
 	if (FMath::IsNearlyZero(Payload.FloatValue))
 		return 0.f;
 
-	const auto* uiConfig = GetInventoryUISettingsConfig();
-	const float deadZone = IsValid(uiConfig) ? uiConfig->InputDeadzone : 0.1f;
+	const auto* globalUIConfig = UMounteaInventoryBaseUIStatics::GetGlobalUIConfig();
+	const float deadZone = IsValid(globalUIConfig) ? globalUIConfig->InputDeadzone : 0.1f;
 
 	const float returnValue = Payload.FloatValue;
 	if (FMath::Abs(returnValue) <= deadZone)
@@ -525,11 +527,11 @@ bool UMounteaInventoryUIStatics::FindUIActionMappingForItemAction(const FGamepla
 {
 	OutMapping = FMounteaWidgetInputActionMapping();
 
-	const auto uiConfig = GetInventoryUISettingsConfig();
-	if (!IsValid(uiConfig))
+	const auto globalUIConfig = UMounteaInventoryBaseUIStatics::GetGlobalUIConfig();
+	if (!IsValid(globalUIConfig))
 		return false;
 
-	const auto& definedMappings = uiConfig->UIActionMappings;
+	const auto& definedMappings = globalUIConfig->UIActionMappings;
 	if (definedMappings.Num() == 0)
 		return false;
 

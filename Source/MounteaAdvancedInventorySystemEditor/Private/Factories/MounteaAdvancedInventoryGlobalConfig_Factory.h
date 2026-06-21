@@ -1,9 +1,9 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
 //
-// - You may use this solution in commercial products, provided the product is not 
+// - You may use this solution in commercial products, provided the product is not
 //   this solution itself (or unless significant modifications have been made to the solution).
 // - You may not resell or redistribute the original, unmodified solution.
 //
@@ -13,23 +13,28 @@
 
 #include "CoreMinimal.h"
 #include "Factories/Factory.h"
-#include "MounteaAdvancedInventoryPayloadConfigs_Factory.generated.h"
+#include "MounteaAdvancedInventoryGlobalConfig_Factory.generated.h"
 
-class UMounteaAdvancedInventoryPayloadsConfig;
+class UMounteaAdvancedInventoryGlobalConfig;
 
 UCLASS()
-class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UMounteaAdvancedInventoryPayloadConfigs_Factory : public UFactory
+class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UMounteaAdvancedInventoryGlobalConfig_Factory : public UFactory
 {
 	GENERATED_BODY()
+
 public:
 
-	UMounteaAdvancedInventoryPayloadConfigs_Factory();
-	
+	UMounteaAdvancedInventoryGlobalConfig_Factory();
+
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 	virtual bool ConfigureProperties() override;
+	virtual FText GetDisplayName() const override;
+	virtual FString GetDefaultNewAssetName() const override;
+	virtual uint32 GetMenuCategories() const override;
+	virtual const TArray<FText>& GetMenuCategorySubMenus() const override;
 
 private:
-	// Holds the template of the class we are building
+
 	UPROPERTY()
-	TSubclassOf<UMounteaAdvancedInventoryPayloadsConfig> ParentClass;
+	TSubclassOf<UMounteaAdvancedInventoryGlobalConfig> ParentClass;
 };

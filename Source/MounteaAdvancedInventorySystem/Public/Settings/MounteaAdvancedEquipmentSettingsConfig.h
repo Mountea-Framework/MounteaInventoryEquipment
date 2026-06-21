@@ -41,19 +41,19 @@ public:
 	
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Slots",
 		meta=(ForceInlineRow),
 		meta=(NoResetToDefault), 
 		meta=(ShowOnlyInnerProperties),
 		meta=(TitleProperty="DisplayName"))
 	TMap<FName, FMounteaEquipmentSlotHeaderData> AllowedEquipmentSlots;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="🧩 Slots",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Slots",
 		meta=(TitleProperty="Allowed Attachment Targets"))
 	TSet<TSoftClassPtr<USceneComponent>> AllowedAttachmentTargets;
 
 	/** Default visual actor class for quick-use items (temporary placeholder consumed by animation notifies). */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="⚡ Quick Use",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Quick Use",
 		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedQuickUseItemInterface"),
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=0))

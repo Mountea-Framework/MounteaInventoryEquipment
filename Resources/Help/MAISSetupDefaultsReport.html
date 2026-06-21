@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>MAIS Setup Defaults</title>
+	</head>
+	<body>
+		<div class="doc-page">
+			<header>
+				<div class="version">Setup Defaults</div>
+				<h1 id="setup-title">MAIS Setup Defaults</h1>
+				<p id="setup-summary">
+					Settings defaults and player Blueprint component setup report.
+				</p>
+			</header>
+
+			<section>
+				<h2>Summary</h2>
+				<div id="setup-metrics"></div>
+			</section>
+
+			<section>
+				<h2>Context</h2>
+				<div id="setup-context"></div>
+			</section>
+
+			<section>
+				<h2>Settings</h2>
+				<div id="settings-results"></div>
+			</section>
+
+			<section>
+				<h2>Player Components</h2>
+				<div id="player-results"></div>
+			</section>
+		</div>
+
+		<script id="mais-setup-report-data" type="application/json">
+			__MAIS_SETUP_REPORT_JSON__
+		</script>
+
+		<script>
+			(function () {
+				function text(value) {
+					return value === undefined || value === null ? "" : String(value);
+				}
+
+				function make(tagName, className, content) {
+					const element = document.createElement(tagName);
+					if (className) {
+						element.className = className;
+					}
+					if (content !== undefined) {
+						element.textContent = text(content);
+					}
+					return element;
+				}
+
+				function parseReport() {
+					const dataElement = document.getElementById("mais-setup-report-data");
+					if (!dataElement) {
+						return {};
+					}
+
+					try {
+						return JSON.parse(dataElement.textContent || "{}");
+					} catch (error) {
+						console.warn("Unable to parse MAIS setup report.", error);
+						return {};
+					}
+				}
+
+				function statusClass(status) {
+					switch (status) {
+						case "Added":
+							return "get";
+						case "Failed":
+							return "post";
+						case "Native Class":
+							return "post";
+						default:
+							return "get";
+					}
+				}
+
+				function addMetric(container, label, value) {
+					const block = make("div", "endpoint");
+					const header = make("div", "endpoint-header");
+					header.appendChild(make("span", "path", label));
+					header.appendChild(make("span", "method get", value));
+					block.appendChild(header);
+					container.appendChild(block);
+				}
+
+				function renderMetrics(report) {
+					const container = document.getElementById("setup-metrics");
+					if (!container) {
+						return;
+					}
+
+					const metrics = report.metrics || {};
+					addMetric(container, "Added", metrics.added || 0);
+					addMetric(container, "Already Present", metrics.alreadyPresent || 0);
+					addMetric(container, "Warnings", metrics.warnings || 0);
+					addMetric(container, "Failed", metrics.failed || 0);
+				}
+
+				function renderContext(report) {
+					const container = document.getElementById("setup-context");
+					if (!container) {
+						return;
+					}
+
+					const context = report.context || {};
+					addMetric(container, "GameMode", context.gameMode || "Not resolved");
+					addMetric(container, "GameMode Source", context.gameModeSource || "World GameMode");
+					addMetric(container, "Player Pawn", context.playerClass || "Not resolved");
+					addMetric(container, "Settings Saved", context.settingsSaved ? "Yes" : "No");
+				}
+
+				function renderResults(containerId, results) {
+					const container = document.getElementById(containerId);
+					if (!container) {
+						return;
+					}
+
+					if (!results || results.length === 0) {
+						container.appendChild(make("p", "", "No items were reported for this section."));
+						return;
+					}
+
+					results.forEach(function (result) {
+						const block = make("div", "endpoint");
+						const header = make("div", "endpoint-header");
+						header.appendChild(make("span", "path", result.itemName || "Item"));
+						header.appendChild(make("span", "method " + statusClass(result.status), result.status || "Skipped"));
+
+						const body = make("div", "endpoint-body open");
+						body.appendChild(make("p", "", result.message || ""));
+
+						block.appendChild(header);
+						block.appendChild(body);
+						container.appendChild(block);
+					});
+				}
+
+				const report = parseReport();
+				const summary = document.getElementById("setup-summary");
+				if (summary && report.summary) {
+					summary.textContent = report.summary;
+				}
+
+				renderMetrics(report);
+				renderContext(report);
+				renderResults("settings-results", report.settingsResults || []);
+				renderResults("player-results", report.playerResults || []);
+			})();
+		</script>
+	</body>
+</html>

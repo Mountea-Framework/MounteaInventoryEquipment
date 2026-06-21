@@ -21,8 +21,6 @@ class UTexture;
 class UTexture2D;
 class UGameplayEffect;
 
-enum class EInventoryItemActionCallback : uint8;
-
 #pragma region InventoryRarity
 #define LOCTEXT_NAMESPACE "InventoryRarity"
 
@@ -44,29 +42,34 @@ struct FInventoryRarity
 	/**
 	 * The name of the item rarity (e.g., Common, Rare, Epic).
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=0))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity",
+		meta=(DisplayPriority=0))
 	FText RarityDisplayName = LOCTEXT("InventoryRarity_DisplayName", "");
 
 	/**
 	 * The visual color associated with the rarity for UI purposes.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=1))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity",
+		meta=(DisplayPriority=1))
 	FLinearColor RarityColor;
 	
 	// Rarity priority used for Sorting.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=2))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity",
+		meta=(DisplayPriority=2))
 	int32 RarityPriority = 0;
 
 	/**
 	 * A multiplier applied to item trade or sale prices for this rarity.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=3))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity",
+		meta=(DisplayPriority=3))
 	float BasePriceMultiplier = 1.f;
 
 	/**
 	 * Tags that define additional metadata or rules for this rarity.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity", meta=(DisplayPriority=4))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Rarity",
+		meta=(DisplayPriority=4))
 	FGameplayTagContainer RarityTags;
 };
 
@@ -95,7 +98,8 @@ struct FInventoryCategoryData
 	/**
 	 * The name of the item category (e.g., Weapon, Armor, Consumable), localized.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", meta=(DisplayPriority=0))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
+		meta=(DisplayPriority=0))
 	FText CategoryDisplayName = LOCTEXT("InventoryCategory_DisplayName", "");
 
 	/**
@@ -114,7 +118,8 @@ struct FInventoryCategoryData
 	/**
 	 * Icon used in the UI to represent this category.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", meta=(DisplayPriority=2))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
+		meta=(DisplayPriority=2))
 	TSoftObjectPtr<UTexture> DisplayIcon;
 
 	/**
@@ -129,7 +134,8 @@ struct FInventoryCategoryData
 	/**
 	 * Priority for sorting categories in UI or other contexts.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category", meta=(DisplayPriority=4))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
+		meta=(DisplayPriority=4))
 	int32 CategoryPriority = 0;
 	
 	/**
@@ -199,7 +205,8 @@ struct FInventoryTypeConfig
 	FInventoryTypeConfig();
 
 	/** The name of the inventory (e.g., Player, Merchant, Loot), localized */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="User Interface", meta=(DisplayPriority=0))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="User Interface",
+		meta=(DisplayPriority=0))
 	FText InventoryDisplayName = LOCTEXT("InventoryType_DisplayName", "");
 
 	/** Widget class to use for this inventory type */
@@ -245,7 +252,8 @@ struct FInventoryTypeConfig
 	float MaxValue = 1000.0f;
 
 	/** Tags defining special properties or restrictions for this inventory type */
-	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Tags", meta=(DisplayPriority=8))
+	UPROPERTY(EditAnywhere,  BlueprintReadOnly, Category="Tags",
+		meta=(DisplayPriority=8))
 	FGameplayTagContainer InventoryTags;
 
 	/** Configuration flags for this inventory type */
@@ -321,7 +329,8 @@ struct FInventorySortCriteria
 public:
 	
 	// If more than 1 sorting criteria are provided, sorting will happen one after another based on priority.
-	UPROPERTY(EditAnywhere, meta=(DisplayPriority=0))
+	UPROPERTY(EditAnywhere,
+		meta=(DisplayPriority=0))
 	int32 SortPriority = 0;
 	
 	/* 
@@ -332,7 +341,8 @@ public:
 	 * * Weight
 	 * * Rarity
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayPriority=1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,
+		meta=(DisplayPriority=1))
 	FString SortingKey;
 	
 };

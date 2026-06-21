@@ -15,8 +15,8 @@
 #include "EdGraphSchema_K2.h"
 #include "BlueprintGameplayTagLibrary.h"
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
-#include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #if WITH_EDITOR
@@ -162,10 +162,10 @@ void UK2Node_SwitchWidgetInputTag::GetAvailableUIActionTags(TArray<FGameplayTag>
 	const auto inventorySettings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!inventorySettings) return;
 	
-	const UMounteaAdvancedInventoryUIConfig* uiConfig = inventorySettings->AdvancedInventoryUISettingsConfig.LoadSynchronous();
-	if (!uiConfig) return;
+	const UMounteaAdvancedInventoryGlobalUIConfig* globalUIConfig = inventorySettings->GlobalUIConfig.LoadSynchronous();
+	if (!globalUIConfig) return;
 
-	for (const FMounteaWidgetInputActionMapping& inputMapping : uiConfig->UIActionMappings)
+	for (const FMounteaWidgetInputActionMapping& inputMapping : globalUIConfig->UIActionMappings)
 	{
 		if (inputMapping.ActionTag.IsValid())
 			OutTags.AddUnique(inputMapping.ActionTag);

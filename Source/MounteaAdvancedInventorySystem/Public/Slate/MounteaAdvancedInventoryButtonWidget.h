@@ -63,9 +63,11 @@ public:
 		DisplayName="Widget Tag")
 	FGameplayTag Tag;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button", meta=(NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button",
+		meta=(NoResetToDefault))
 	FGameplayTag ButtonActionTag;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button", meta=(NoResetToDefault))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Button",
+		meta=(NoResetToDefault))
 	FString ButtonActionContext;
 };

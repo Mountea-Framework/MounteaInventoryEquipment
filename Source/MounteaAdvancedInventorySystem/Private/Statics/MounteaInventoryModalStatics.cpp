@@ -22,7 +22,7 @@
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalWidgetInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
-#include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 
 #define MOUNTEA_BIND_MODAL_CONTENT_DELEGATE(Target, Binding, HandleGetter) \
 	if (!IsValid(Target) || !(Binding).IsBound()) \
@@ -99,11 +99,11 @@ UUserWidget* UMounteaInventoryModalStatics::CreateModalContentWidget(UObject* Co
 	if (modalType.IsEmpty() || modalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
 		return nullptr;
 
-	const TSoftClassPtr<UUserWidget>* modalWidgetClass = globalUIConfig->Modals.Find(modalType);
-	if (!modalWidgetClass || modalWidgetClass->IsNull())
+	const FMounteaModalDefinition* modalDefinition = globalUIConfig->Modals.Find(modalType);
+	if (!modalDefinition || modalDefinition->WidgetClass.IsNull())
 		return nullptr;
 
-	TSubclassOf<UUserWidget> widgetClass = modalWidgetClass->LoadSynchronous();
+	TSubclassOf<UUserWidget> widgetClass = modalDefinition->WidgetClass.LoadSynchronous();
 	if (!widgetClass || !widgetClass->ImplementsInterface(UMounteaAdvancedInventoryModalContentWidgetInterface::StaticClass()))
 		return nullptr;
 
@@ -219,7 +219,7 @@ UMounteaModalsPayload* UMounteaInventoryModalStatics::ConstructModalPayload(UObj
 	if (!modalConfig)
 		return nullptr;
 
-	const auto modalsPayloadClass = modalsConfig->ModalPayloadClass.LoadSynchronous();
+	const TSubclassOf<UMounteaModalsPayload> modalsPayloadClass = ResolveModalPayloadClass(modalsConfig, ModalType);
 	if (!IsValid(modalsPayloadClass))
 		return nullptr;
 
@@ -232,6 +232,68 @@ UMounteaModalsPayload* UMounteaInventoryModalStatics::ConstructModalPayload(UObj
 	returnValue->OptionalPayload = OptionalPayload;
 
 	return returnValue;
+}
+
+UMounteaModalResponsePayload* UMounteaInventoryModalStatics::CreateModalResponse(UObject* Target, const FString& ModalType, const bool bConfirmationType)
+{
+	if (!IsValid(Target))
+		return nullptr;
+
+	const auto modalsConfig = GetGlobalUIConfig();
+	if (!IsValid(modalsConfig))
+		return nullptr;
+
+	if (ModalType.IsEmpty() || ModalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return nullptr;
+
+	if (!modalsConfig->Modals.Contains(ModalType))
+		return nullptr;
+
+	const TSubclassOf<UMounteaModalResponsePayload> responseClass = ResolveModalResponseClass(modalsConfig, ModalType);
+	if (!IsValid(responseClass))
+		return nullptr;
+
+	UMounteaModalResponsePayload* returnValue = NewObject<UMounteaModalResponsePayload>(Target, responseClass);
+	if (!IsValid(returnValue))
+		return nullptr;
+
+	returnValue->bConfirmationType = bConfirmationType;
+
+	return returnValue;
+}
+
+TSubclassOf<UMounteaModalsPayload> UMounteaInventoryModalStatics::ResolveModalPayloadClass(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& ModalType)
+{
+	if (!IsValid(GlobalUIConfig) || ModalType.IsEmpty() || ModalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return nullptr;
+
+	if (const FMounteaModalDefinition* modalDefinition = GlobalUIConfig->Modals.Find(ModalType))
+	{
+		if (!modalDefinition->PayloadClass.IsNull())
+		{
+			if (TSubclassOf<UMounteaModalsPayload> payloadClass = modalDefinition->PayloadClass.LoadSynchronous())
+				return payloadClass;
+		}
+	}
+
+	return GlobalUIConfig->ModalPayloadClass.LoadSynchronous();
+}
+
+TSubclassOf<UMounteaModalResponsePayload> UMounteaInventoryModalStatics::ResolveModalResponseClass(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& ModalType)
+{
+	if (!IsValid(GlobalUIConfig) || ModalType.IsEmpty() || ModalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return nullptr;
+
+	if (const FMounteaModalDefinition* modalDefinition = GlobalUIConfig->Modals.Find(ModalType))
+	{
+		if (!modalDefinition->PayloadResponseClass.IsNull())
+		{
+			if (TSubclassOf<UMounteaModalResponsePayload> responseClass = modalDefinition->PayloadResponseClass.LoadSynchronous())
+				return responseClass;
+		}
+	}
+
+	return UMounteaModalResponsePayload::StaticClass();
 }
 
 FDataTableRowHandle UMounteaInventoryModalStatics::ResolveModalDataTableRow(const UMounteaAdvancedInventoryGlobalUIConfig* GlobalUIConfig, const FString& Key)
@@ -297,9 +359,5 @@ APlayerController* UMounteaInventoryModalStatics::ResolveOwningPlayer(UObject* C
 
 UMounteaAdvancedInventoryGlobalUIConfig* UMounteaInventoryModalStatics::GetGlobalUIConfig()
 {
-	const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings))
-		return nullptr;
-
-	return settings->GlobalUIConfig.LoadSynchronous();
+	return UMounteaInventoryBaseUIStatics::GetGlobalUIConfig();
 }

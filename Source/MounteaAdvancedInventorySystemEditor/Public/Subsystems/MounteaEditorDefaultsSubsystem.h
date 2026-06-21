@@ -13,7 +13,6 @@
 
 #include "CoreMinimal.h"
 #include "EditorSubsystem.h"
-#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "MounteaEditorDefaultsSubsystem.generated.h"
 
 /**
@@ -33,68 +32,4 @@ public:
 private:
 
 	void ApplyDefaultsIfNeeded() const;
-
-	template <typename TObjectType>
-	bool TryAssignMissing(TSoftObjectPtr<TObjectType>& TargetProperty, const TCHAR* ObjectPath, const TCHAR* PropertyName) const;
-
-private:
-
-	static constexpr const TCHAR* InputMappingPath =
-		TEXT("/MounteaAdvancedInventorySystem/Input/IMC_Inventory.IMC_Inventory");
-	static constexpr const TCHAR* InventorySettingsConfigPath =
-		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultInventoryConfig.DefaultInventoryConfig");
-	static constexpr const TCHAR* EquipmentSettingsConfigPath =
-		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultEquipmentConfig.DefaultEquipmentConfig");
-	static constexpr const TCHAR* InventoryUISettingsConfigPath =
-		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultInventoryUIConfig.DefaultInventoryUIConfig");
-	static constexpr const TCHAR* GlobalUIConfigPath =
-		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultGlobalUIConfig.DefaultGlobalUIConfig");
-	static constexpr const TCHAR* CraftingSettingsConfigPath =
-		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultMounteaCraftingConfig.DefaultMounteaCraftingConfig");
-	static constexpr const TCHAR* CraftingUISettingsConfigPath =
-		TEXT("/MounteaAdvancedInventorySystem/Data/Config/DefaultCraftingUISettingsConfig.DefaultCraftingUISettingsConfig");
 };
-
-template <typename TObjectType>
-bool UMounteaEditorDefaultsSubsystem::TryAssignMissing(
-	TSoftObjectPtr<TObjectType>& TargetProperty,
-	const TCHAR* ObjectPath,
-	const TCHAR* PropertyName
-) const
-{
-	if (!TargetProperty.ToSoftObjectPath().IsNull())
-		return false;
-
-	const FSoftObjectPath softObjectPath(ObjectPath);
-	UObject* resolvedObject = softObjectPath.ResolveObject();
-	if (!resolvedObject)
-		resolvedObject = softObjectPath.TryLoad();
-
-	if (!resolvedObject)
-	{
-		LOG_WARNING(
-			TEXT("[Editor Defaults] Missing default asset for '%s': %s"),
-			PropertyName,
-			ObjectPath
-		);
-		return false;
-	}
-
-	if (!Cast<TObjectType>(resolvedObject))
-	{
-		LOG_WARNING(
-			TEXT("[Editor Defaults] Asset type mismatch for '%s': %s"),
-			PropertyName,
-			ObjectPath
-		);
-		return false;
-	}
-
-	TargetProperty = TSoftObjectPtr<TObjectType>(softObjectPath);
-	LOG_INFO(
-		TEXT("[Editor Defaults] Applied default '%s' from %s"),
-		PropertyName,
-		ObjectPath
-	);
-	return true;
-}
