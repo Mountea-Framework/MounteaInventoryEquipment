@@ -41,7 +41,7 @@ static FMounteaJsonObjectDefinitionField MakeJsonStringDefinitionField(const FNa
 
 static FMounteaJsonObjectDefinitionField MakeJsonBooleanDefinitionField(const FName FieldName)
 {
-	return MakeJsonDefinitionField(FieldName, TEXT("boolean"));
+	return MakeJsonDefinitionField(FieldName, TEXT("Boolean"));
 }
 
 static FMounteaJsonObjectDefinitionField MakeJsonStructDefinitionField(const FName FieldName, UScriptStruct* StructType)
@@ -83,8 +83,7 @@ UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), MakeJsonObjectDefinition(
 		{
 			MakeJsonStructDefinitionField(TEXT("modalData"), TBaseStructure<FMounteaModalsConfig>::Get()),
-			MakeJsonStringDefinitionField(TEXT("modalType")),
-			MakeJsonBooleanDefinitionField(TEXT("autoClose"))
+			MakeJsonStringDefinitionField(TEXT("modalType"))
 		}
 	));
 
