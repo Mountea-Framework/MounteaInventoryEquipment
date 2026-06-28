@@ -119,10 +119,8 @@ void SPinTypeModalRowSelector::BuildModalRowOptions(TArray<FString>& OutModalRow
 		return;
 
 	const FString modalType = ResolveModalType();
-	if (modalType.IsEmpty() || modalType.Equals(TEXT("none"), ESearchCase::IgnoreCase))
-		return;
-
-	if (!globalUIConfig->ModalTypes.Contains(modalType) && !globalUIConfig->Modals.Contains(modalType))
+	const bool bHasModalTypeFilter = !modalType.IsEmpty() && !modalType.Equals(TEXT("none"), ESearchCase::IgnoreCase);
+	if (bHasModalTypeFilter && !globalUIConfig->ModalTypes.Contains(modalType) && !globalUIConfig->Modals.Contains(modalType))
 		return;
 
 	TArray<FString> rowNames;
