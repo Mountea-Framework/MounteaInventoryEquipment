@@ -11,14 +11,26 @@
 
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
 
-static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UScriptStruct* StructType = nullptr)
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
+
+static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UObject* SubCategoryObject = nullptr)
 {
 	FMounteaJsonObjectDefinitionField field;
 	field.FieldName = FieldName;
 	field.FieldValueType.PinCategory = PinCategory;
-	field.FieldValueType.PinSubCategoryObject = StructType;
+	field.FieldValueType.PinSubCategoryObject = SubCategoryObject;
 
 	return field;
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonIntDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("int"));
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonFloatDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("real"));
 }
 
 static FMounteaJsonObjectDefinitionField MakeJsonStringDefinitionField(const FName FieldName)
@@ -26,9 +38,24 @@ static FMounteaJsonObjectDefinitionField MakeJsonStringDefinitionField(const FNa
 	return MakeJsonDefinitionField(FieldName, TEXT("string"));
 }
 
+static FMounteaJsonObjectDefinitionField MakeJsonBooleanDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("boolean"));
+}
+
 static FMounteaJsonObjectDefinitionField MakeJsonStructDefinitionField(const FName FieldName, UScriptStruct* StructType)
 {
 	return MakeJsonDefinitionField(FieldName, TEXT("struct"), StructType);
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonUObjectDefinitionField(const FName FieldName, UClass* ObjectClass = nullptr)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("object"), ObjectClass ? ObjectClass : UObject::StaticClass());
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonSoftObjectPtrDefinitionField(const FName FieldName, UClass* ObjectClass = nullptr)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("softobject"), ObjectClass ? ObjectClass : UObject::StaticClass());
 }
 
 static FMounteaJsonObjectDefinitionInclude MakeJsonDefinitionInclude(const FString& DefinitionKey)
@@ -55,19 +82,21 @@ UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), MakeJsonObjectDefinition(
 		{
 			MakeJsonStringDefinitionField(TEXT("title")),
-			MakeJsonStringDefinitionField(TEXT("body"))
+			MakeJsonStringDefinitionField(TEXT("body")),
+			MakeJsonBooleanDefinitionField(TEXT("autoClose"))
 		}
 	));
 
 	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), MakeJsonObjectDefinition(
 		{
-			MakeJsonStructDefinitionField(TEXT("sliderRange"), TBaseStructure<FIntPoint>::Get())
+			MakeJsonStructDefinitionField(TEXT("sliderRange"), TBaseStructure<FVector2D>::Get())
 		}
 	));
 
 	JsonObjectDefinitions.Add(TEXT("ModalConsumeDefinition"), MakeJsonObjectDefinition(
 		{
-			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get()),
+			MakeJsonSoftObjectPtrDefinitionField(TEXT("instigatorActor"), UMounteaSelectableInventoryItemAction::StaticClass())
 		},
 		{
 			MakeJsonDefinitionInclude(TEXT("ModalBaseDefinition")),
