@@ -19,7 +19,7 @@
 #include "MounteaAdvancedInventoryModalBaseWidget.generated.h"
 
 class UPanelWidget;
-class UMounteaModalsPayload;
+class UMounteaJsonObject;
 
 /**
  * Base modal window widget capable of hosting modal content widgets.
@@ -31,8 +31,8 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryModalBaseWidge
 	GENERATED_BODY()
 
 public:
-
-	virtual void AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaModalsPayload* Payload) override;
+	
+	virtual void AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaJsonObject* Payload) override;
 	virtual void ModalContentConfirmed_Implementation(UObject* Payload) override {};
 	virtual void ModalContentCancelled_Implementation() override {};
 	virtual FOnModalContentAddedToModalWindow& GetOnModalContentAddedToModalWindowHandle() override
@@ -62,7 +62,7 @@ public:
 		if (WidgetTag != NewWidgetTag)
 			WidgetTag = NewWidgetTag;
 	};
-
+	
 	UPROPERTY(BlueprintReadOnly, Category="Widgets|Modal")
 	TObjectPtr<UUserWidget> CurrentModalContentWidget = nullptr;
 

@@ -93,10 +93,8 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|User Interface",
 		DisplayName="Consume UI Input")
-	void ConsumeUIInput(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& InputTag, 
-		const FMounteaWidgetInputPayload& Payload, float DeltaTime);
-	virtual void ConsumeUIInput_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& InputTag, 
-		const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
+	void ConsumeUIInput(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& Payload, float DeltaTime);
+	virtual void ConsumeUIInput_Implementation(UPARAM(meta=(Categories="Mountea_Inventory.WidgetState,State")) const FGameplayTag& InputTag,  const FMounteaWidgetInputPayload& Payload, float DeltaTime) = 0;
 
 	/**
 	 * Sets the Widget Tag definition for this UI element.

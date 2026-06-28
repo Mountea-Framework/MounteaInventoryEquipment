@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2026 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2026 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -11,27 +11,21 @@
 
 #include "Widgets/Modals/MounteaAdvancedInventoryModalContentBaseWidget.h"
 
-#include "Helpers/MounteaModalsPayload.h"
-#include "Logs/MounteaAdvancedInventoryLog.h"
-
 void UMounteaAdvancedInventoryModalContentBaseWidget::OnModalExpired()
 {
+	ModalContentExpiryTimerHandle.Invalidate();
 	OnModalContentCancelled.Broadcast();
 }
 
-void UMounteaAdvancedInventoryModalContentBaseWidget::ConstructModalContent_Implementation(UMounteaModalsPayload* Payload)
+void UMounteaAdvancedInventoryModalContentBaseWidget::ConstructModalContent_Implementation(UMounteaJsonObject* InPayload)
 {
-	if (!IsValid(Payload))
-	{
-		LOG_ERROR(TEXT("[Construct Modal Content] Invalid Modal Payload Provided."))
+	IncomingPayload = InPayload;
+}
+
+void UMounteaAdvancedInventoryModalContentBaseWidget::StartExpiration_Implementation(const float WidgetLifetime)
+{
+	if (!GetWorld())
 		return;
-	}
 	
-	if (Payload->ModalConfig.bAutoClose && Payload->ModalConfig.ModalDuration > 0)
-	{
-		ModalContentExpiryTimerHandle.Invalidate();
-		GetWorld()->GetTimerManager().SetTimer(ModalContentExpiryTimerHandle, this, &UMounteaAdvancedInventoryModalContentBaseWidget::OnModalExpired, Payload->ModalConfig.ModalDuration);
-	}
-	
-	ModalType = Payload->ModalType;
+	GetWorld()->GetTimerManager().SetTimer(ModalContentExpiryTimerHandle, this, &UMounteaAdvancedInventoryModalContentBaseWidget::OnModalExpired, WidgetLifetime);
 }

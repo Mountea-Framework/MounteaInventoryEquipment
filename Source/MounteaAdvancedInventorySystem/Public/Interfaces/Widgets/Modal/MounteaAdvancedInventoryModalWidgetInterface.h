@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2026 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2026 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -16,12 +16,12 @@
 #include "MounteaAdvancedInventoryModalWidgetInterface.generated.h"
 
 class UUserWidget;
-class UMounteaModalsPayload;
+class UMounteaJsonObject;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnModalContentAddedToModalWindow, UUserWidget*, ModalContentWidget, UMounteaModalsPayload*, Payload);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnModalContentAddedToModalWindow, UUserWidget*, ModalContentWidget, UMounteaJsonObject*, Payload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnModalConfirmed, UObject*, Payload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnModalCancelled);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaModalContentAddedToModalWindowBinding, UUserWidget*, ModalContentWidget, UMounteaModalsPayload*, Payload);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FMounteaModalContentAddedToModalWindowBinding, UUserWidget*, ModalContentWidget, UMounteaJsonObject*, Payload);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaModalConfirmedBinding, UObject*, Payload);
 DECLARE_DYNAMIC_DELEGATE(FMounteaModalCancelledBinding);
 
@@ -38,8 +38,8 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryModalWidgetInt
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal")
-	void AddModalContentToModalWindow(UUserWidget* ModalContentWidget, UMounteaModalsPayload* Payload);
-	virtual void AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaModalsPayload* Payload) = 0;
+	void AddModalContentToModalWindow(UUserWidget* ModalContentWidget, UMounteaJsonObject* Payload);
+	virtual void AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaJsonObject* Payload) = 0;
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal")
 	void ModalContentConfirmed(UObject* Payload);
@@ -48,7 +48,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal")
 	void ModalContentCancelled();
 	virtual void ModalContentCancelled_Implementation() = 0;
-
+	
 	virtual FOnModalContentAddedToModalWindow& GetOnModalContentAddedToModalWindowHandle() = 0;
 	virtual FOnModalConfirmed& GetOnModalConfirmedHandle() = 0;
 	virtual FOnModalCancelled& GetOnModalCancelledHandle() = 0;
