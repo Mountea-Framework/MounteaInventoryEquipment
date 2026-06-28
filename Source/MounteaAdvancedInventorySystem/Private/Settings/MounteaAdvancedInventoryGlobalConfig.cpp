@@ -13,4 +13,26 @@
 
 UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 {
+	FMounteaJsonObjectDefinitionField modalTitle;
+	modalTitle.FieldName = "title";
+	modalTitle.FieldValueType.PinCategory = TEXT("string");
+
+	FMounteaJsonObjectDefinitionField modalBody;
+	modalBody.FieldName = "body";
+	modalBody.FieldValueType.PinCategory = TEXT("string");
+
+	FMounteaJsonObjectDefinition modalDefaults;
+	modalDefaults.Fields.Add(modalTitle);
+	modalDefaults.Fields.Add(modalBody);
+
+	FMounteaJsonObjectDefinitionField sliderRange;
+	sliderRange.FieldName = "sliderRange";
+	sliderRange.FieldValueType.PinCategory = TEXT("struct");
+	sliderRange.FieldValueType.PinSubCategoryObject = TBaseStructure<FIntPoint>::Get();
+
+	FMounteaJsonObjectDefinition sliderModalDefaults;
+	sliderModalDefaults.Fields.Add(sliderRange);
+
+	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), modalDefaults);
+	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), sliderModalDefaults);
 }
