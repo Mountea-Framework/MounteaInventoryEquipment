@@ -12,6 +12,7 @@
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
 
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
+#include "Definitions/MounteaAdvancedInventoryGlobalUIDataTypes.h"
 
 static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UObject* SubCategoryObject = nullptr)
 {
@@ -81,8 +82,8 @@ UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 {
 	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), MakeJsonObjectDefinition(
 		{
-			MakeJsonStringDefinitionField(TEXT("title")),
-			MakeJsonStringDefinitionField(TEXT("body")),
+			MakeJsonStructDefinitionField(TEXT("modalData"), TBaseStructure<FMounteaModalsConfig>::Get()),
+			MakeJsonStringDefinitionField(TEXT("modalType")),
 			MakeJsonBooleanDefinitionField(TEXT("autoClose"))
 		}
 	));
