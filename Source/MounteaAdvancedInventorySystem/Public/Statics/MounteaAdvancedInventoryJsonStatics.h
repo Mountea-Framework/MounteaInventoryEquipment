@@ -19,6 +19,20 @@
 class UMounteaAdvancedInventoryGlobalConfig;
 class UMounteaJsonObject;
 
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaResolvedJsonObjectDefinitionField
+{
+	FMounteaJsonObjectDefinitionField Field;
+	FString SourceDefinitionKey;
+	TArray<FString> IncludePath;
+	int32 OccurrenceIndex = 1;
+	int32 OccurrenceCount = 1;
+
+	bool IsDuplicate() const
+	{
+		return OccurrenceCount > 1;
+	}
+};
+
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryJsonStatics : public UBlueprintFunctionLibrary
 {
@@ -68,6 +82,11 @@ public:
 	static bool FindJsonObjectDefinition(const FString& DefinitionKey, FMounteaJsonObjectDefinition& Definition);
 
 	static bool ResolveJsonObjectDefinitionByKey(const FString& DefinitionKey, FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors);
+	static bool ResolveJsonObjectDefinitionFieldsByKey(const FString& DefinitionKey, TArray<FMounteaResolvedJsonObjectDefinitionField>& OutFields, TArray<FString>& Errors);
+	static FString JoinJsonDefinitionIncludePath(const TArray<FString>& IncludePath);
+	static FName MakeJsonDefinitionFieldPinName(const FString& FieldPinPrefix, FName FieldName, int32 OccurrenceIndex, TSet<FName>& UsedPinNames);
+	static FString BuildJsonDefinitionFieldPinTooltip(const FMounteaResolvedJsonObjectDefinitionField& FieldData);
+	static FString BuildJsonDefinitionIssueText(const FString& DefinitionKey);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Definitions",
 		meta=(MounteaGetter),

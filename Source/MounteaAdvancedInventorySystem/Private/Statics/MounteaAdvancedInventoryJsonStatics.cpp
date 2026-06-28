@@ -358,6 +358,104 @@ static bool ResolveJsonObjectDefinitionInternal(
 	return bReturnValue;
 }
 
+static bool ResolveJsonObjectDefinitionFieldsInternal(
+	const UMounteaAdvancedInventoryGlobalConfig* GlobalConfig,
+	const FString& DefinitionKey,
+	const FMounteaJsonObjectDefinition& Definition,
+	const TArray<FString>& ParentPath,
+	TArray<FMounteaResolvedJsonObjectDefinitionField>& OutFields,
+	TArray<FString>& Errors,
+	TSet<FString>& VisitingKeys,
+	TSet<FString>& VisitedKeys)
+{
+	if (!DefinitionKey.IsEmpty())
+	{
+		if (VisitingKeys.Contains(DefinitionKey))
+		{
+			Errors.Add(FString::Printf(TEXT("Circular JSON definition include detected at '%s'."), *DefinitionKey));
+			return false;
+		}
+
+		if (VisitedKeys.Contains(DefinitionKey))
+			return true;
+
+		VisitingKeys.Add(DefinitionKey);
+	}
+
+	TArray<FString> definitionPath = ParentPath;
+	if (!DefinitionKey.IsEmpty())
+		definitionPath.Add(DefinitionKey);
+
+	bool bReturnValue = true;
+	for (const FMounteaJsonObjectDefinitionInclude& include : Definition.IncludedDefinitions)
+	{
+		if (!include.IsValid())
+		{
+			Errors.Add(TEXT("JSON definition contains an empty included definition key."));
+			bReturnValue = false;
+			continue;
+		}
+
+		if (!IsValid(GlobalConfig))
+		{
+			Errors.Add(FString::Printf(TEXT("Cannot resolve included JSON definition '%s' without a Global Json Config."), *include.DefinitionKey));
+			bReturnValue = false;
+			continue;
+		}
+
+		const FMounteaJsonObjectDefinition* includedDefinition = GlobalConfig->JsonObjectDefinitions.Find(include.DefinitionKey);
+		if (!includedDefinition)
+		{
+			Errors.Add(FString::Printf(TEXT("Could not find included JSON definition '%s'."), *include.DefinitionKey));
+			bReturnValue = false;
+			continue;
+		}
+
+		if (!ResolveJsonObjectDefinitionFieldsInternal(GlobalConfig, include.DefinitionKey, *includedDefinition, definitionPath, OutFields, Errors, VisitingKeys, VisitedKeys))
+			bReturnValue = false;
+	}
+
+	for (const FMounteaJsonObjectDefinitionField& field : Definition.Fields)
+	{
+		if (field.FieldName.IsNone())
+		{
+			Errors.Add(TEXT("Definition contains a field with an empty name."));
+			bReturnValue = false;
+			continue;
+		}
+
+		FMounteaResolvedJsonObjectDefinitionField& resolvedField = OutFields.AddDefaulted_GetRef();
+		resolvedField.Field = field;
+		resolvedField.SourceDefinitionKey = DefinitionKey;
+		resolvedField.IncludePath = definitionPath;
+	}
+
+	if (!DefinitionKey.IsEmpty())
+	{
+		VisitingKeys.Remove(DefinitionKey);
+		VisitedKeys.Add(DefinitionKey);
+	}
+
+	return bReturnValue;
+}
+
+static void AssignResolvedDefinitionFieldOccurrences(TArray<FMounteaResolvedJsonObjectDefinitionField>& Fields)
+{
+	TMap<FName, int32> occurrenceCounts;
+	for (const FMounteaResolvedJsonObjectDefinitionField& field : Fields)
+		occurrenceCounts.FindOrAdd(field.Field.FieldName)++;
+
+	TMap<FName, int32> currentOccurrences;
+	for (FMounteaResolvedJsonObjectDefinitionField& field : Fields)
+	{
+		int32& occurrenceIndex = currentOccurrences.FindOrAdd(field.Field.FieldName);
+		occurrenceIndex++;
+
+		field.OccurrenceIndex = occurrenceIndex;
+		field.OccurrenceCount = occurrenceCounts.FindRef(field.Field.FieldName);
+	}
+}
+
 static bool ResolveJsonObjectDefinition(const FString& DefinitionKey, const FMounteaJsonObjectDefinition& Definition, FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors)
 {
 	OutDefinition = FMounteaJsonObjectDefinition();
@@ -451,6 +549,138 @@ bool UMounteaAdvancedInventoryJsonStatics::ResolveJsonObjectDefinitionByKey(cons
 	}
 
 	return ResolveJsonObjectDefinition(DefinitionKey, definition, OutDefinition, Errors);
+}
+
+bool UMounteaAdvancedInventoryJsonStatics::ResolveJsonObjectDefinitionFieldsByKey(const FString& DefinitionKey, TArray<FMounteaResolvedJsonObjectDefinitionField>& OutFields, TArray<FString>& Errors)
+{
+	OutFields.Reset();
+	Errors.Reset();
+
+	const FString trimmedDefinitionKey = DefinitionKey.TrimStartAndEnd();
+	if (trimmedDefinitionKey.IsEmpty() || trimmedDefinitionKey.Equals(TEXT("none"), ESearchCase::IgnoreCase))
+		return false;
+
+	const UMounteaAdvancedInventoryGlobalConfig* globalConfig = GetGlobalJsonConfig();
+	if (!IsValid(globalConfig))
+	{
+		Errors.Add(TEXT("No Global Json Config is available."));
+		return false;
+	}
+
+	const FMounteaJsonObjectDefinition* definition = globalConfig->JsonObjectDefinitions.Find(trimmedDefinitionKey);
+	if (!definition)
+	{
+		Errors.Add(FString::Printf(TEXT("Could not find JSON object definition '%s'."), *trimmedDefinitionKey));
+		return false;
+	}
+
+	TSet<FString> visitingKeys;
+	TSet<FString> visitedKeys;
+	const TArray<FString> parentPath;
+	const bool bReturnValue = ResolveJsonObjectDefinitionFieldsInternal(
+		globalConfig,
+		trimmedDefinitionKey,
+		*definition,
+		parentPath,
+		OutFields,
+		Errors,
+		visitingKeys,
+		visitedKeys);
+
+	AssignResolvedDefinitionFieldOccurrences(OutFields);
+	return bReturnValue || OutFields.Num() > 0;
+}
+
+FString UMounteaAdvancedInventoryJsonStatics::JoinJsonDefinitionIncludePath(const TArray<FString>& IncludePath)
+{
+	return FString::Join(IncludePath, TEXT(" -> "));
+}
+
+FName UMounteaAdvancedInventoryJsonStatics::MakeJsonDefinitionFieldPinName(const FString& FieldPinPrefix, const FName FieldName, const int32 OccurrenceIndex, TSet<FName>& UsedPinNames)
+{
+	const FString basePinName = FieldPinPrefix + FieldName.ToString();
+	FString candidatePinName = OccurrenceIndex <= 1
+		? basePinName
+		: FString::Printf(TEXT("%s_%d"), *basePinName, OccurrenceIndex);
+
+	int32 collisionIndex = OccurrenceIndex <= 1 ? 2 : OccurrenceIndex + 1;
+	while (UsedPinNames.Contains(FName(*candidatePinName)))
+	{
+		candidatePinName = FString::Printf(TEXT("%s_%d"), *basePinName, collisionIndex++);
+	}
+
+	const FName pinName(*candidatePinName);
+	UsedPinNames.Add(pinName);
+	return pinName;
+}
+
+FString UMounteaAdvancedInventoryJsonStatics::BuildJsonDefinitionFieldPinTooltip(const FMounteaResolvedJsonObjectDefinitionField& FieldData)
+{
+	TArray<FString> tooltipLines;
+	tooltipLines.Add(FString::Printf(TEXT("JSON field: %s"), *FieldData.Field.FieldName.ToString()));
+	tooltipLines.Add(FieldData.Field.bRequired ? TEXT("Status: Required") : TEXT("Status: Optional"));
+
+	if (!FieldData.SourceDefinitionKey.IsEmpty())
+		tooltipLines.Add(FString::Printf(TEXT("Origin: %s"), *FieldData.SourceDefinitionKey));
+
+	if (FieldData.IncludePath.Num() > 1)
+		tooltipLines.Add(FString::Printf(TEXT("Include path: %s"), *JoinJsonDefinitionIncludePath(FieldData.IncludePath)));
+
+	if (FieldData.IsDuplicate())
+	{
+		tooltipLines.Add(FString::Printf(
+			TEXT("Duplicate warning: occurrence %d of %d. This definition will fail to compile until the duplicate field name is resolved."),
+			FieldData.OccurrenceIndex,
+			FieldData.OccurrenceCount));
+	}
+
+	return FString::Join(tooltipLines, TEXT("\n"));
+}
+
+FString UMounteaAdvancedInventoryJsonStatics::BuildJsonDefinitionIssueText(const FString& DefinitionKey)
+{
+	TArray<FMounteaResolvedJsonObjectDefinitionField> resolvedFields;
+	TArray<FString> errors;
+	ResolveJsonObjectDefinitionFieldsByKey(DefinitionKey, resolvedFields, errors);
+
+	TArray<FString> warnings;
+	for (const FString& error : errors)
+	{
+		if (!error.IsEmpty())
+			warnings.Add(error);
+	}
+
+	TSet<FName> reportedDuplicates;
+	for (const FMounteaResolvedJsonObjectDefinitionField& fieldData : resolvedFields)
+	{
+		if (!fieldData.IsDuplicate() || reportedDuplicates.Contains(fieldData.Field.FieldName))
+			continue;
+
+		reportedDuplicates.Add(fieldData.Field.FieldName);
+
+		TArray<FString> origins;
+		for (const FMounteaResolvedJsonObjectDefinitionField& duplicateData : resolvedFields)
+		{
+			if (duplicateData.Field.FieldName != fieldData.Field.FieldName)
+				continue;
+
+			const FString origin = duplicateData.IncludePath.Num() > 0
+				? JoinJsonDefinitionIncludePath(duplicateData.IncludePath)
+				: duplicateData.SourceDefinitionKey;
+			origins.Add(FString::Printf(TEXT("%d/%d from %s"), duplicateData.OccurrenceIndex, duplicateData.OccurrenceCount, *origin));
+		}
+
+		warnings.Add(FString::Printf(
+			TEXT("Duplicate JSON field '%s' appears %d times (%s). Runtime compilation will fail until this is resolved."),
+			*fieldData.Field.FieldName.ToString(),
+			fieldData.OccurrenceCount,
+			*FString::Join(origins, TEXT("; "))));
+	}
+
+	if (warnings.IsEmpty())
+		return FString();
+
+	return FString::Printf(TEXT("NOTE:\n%s"), *FString::Join(warnings, TEXT("\n")));
 }
 
 UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinition(UObject* Target, const FMounteaJsonObjectDefinition& Definition)
