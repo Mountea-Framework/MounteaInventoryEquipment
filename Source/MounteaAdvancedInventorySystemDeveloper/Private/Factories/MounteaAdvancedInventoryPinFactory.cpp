@@ -1,9 +1,9 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
 //
-// - You may use this solution in commercial products, provided the product is not 
+// - You may use this solution in commercial products, provided the product is not
 //   this solution itself (or unless significant modifications have been made to the solution).
 // - You may not resell or redistribute the original, unmodified solution.
 //
@@ -23,14 +23,12 @@
 #include "EdGraph/EdGraphNode.h"
 #include "K2Nodes/K2Node_BreakJsonObjectByDefinition.h"
 #include "K2Nodes/K2Node_ConstructJsonObjectFromDefinition.h"
-#include "K2Nodes/K2Node_CreateModalResponse.h"
-#include "K2Nodes/K2Node_ConstructModalPayload.h"
 #include "K2Nodes/K2Node_MounteaAdvancedInventoryCallFunction.h"
 
 TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) const
 {
 	if (!Pin) return nullptr;
-    
+
 	if (UK2Node_MounteaAdvancedInventoryCallFunction* callFunctionNode = Cast<UK2Node_MounteaAdvancedInventoryCallFunction>(Pin->GetOwningNode()))
 	{
 		if (callFunctionNode->ShouldUseEquipmentSlotSelector(Pin))
@@ -52,15 +50,6 @@ TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) c
 			return SNew(SPinTypeModalRowSelector, Pin);
 	}
 
-	if (UK2Node_ConstructModalPayload* constructModalPayloadNode = Cast<UK2Node_ConstructModalPayload>(Pin->GetOwningNode()))
-	{
-		if (constructModalPayloadNode->ShouldUseModalTypeSelector(Pin))
-			return SNew(SPinTypeModalTypeSelector, Pin);
-
-		if (constructModalPayloadNode->ShouldUseModalRowSelector(Pin))
-			return SNew(SPinTypeModalRowSelector, Pin);
-	}
-
 	if (UK2Node_ConstructJsonObjectFromDefinition* constructJsonNode = Cast<UK2Node_ConstructJsonObjectFromDefinition>(Pin->GetOwningNode()))
 	{
 		if (constructJsonNode->ShouldUseJsonDefinitionSelector(Pin))
@@ -73,12 +62,6 @@ TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) c
 			return SNew(SPinTypeJsonDefinitionSelector, Pin);
 	}
 
-	if (UK2Node_CreateModalResponse* createModalResponseNode = Cast<UK2Node_CreateModalResponse>(Pin->GetOwningNode()))
-	{
-		if (createModalResponseNode->ShouldUseModalTypeSelector(Pin))
-			return SNew(SPinTypeModalTypeSelector, Pin);
-	}
-    
 	return nullptr;
 }
 
