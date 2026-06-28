@@ -237,6 +237,15 @@ void UK2Node_ConstructJsonObjectFromDefinition::PostReconstructNode()
 		if (!IsGeneratedFieldPin(pin))
 			continue;
 
+		const FName& pinCategory = pin->PinType.PinCategory;
+		if (pinCategory == UEdGraphSchema_K2::PC_Object ||
+			pinCategory == UEdGraphSchema_K2::PC_SoftObject ||
+			pinCategory == UEdGraphSchema_K2::PC_Class ||
+			pinCategory == UEdGraphSchema_K2::PC_SoftClass)
+		{
+			continue;
+		}
+
 		TArray<UEdGraphPin*> linkedPins = pin->LinkedTo;
 		for (UEdGraphPin* linkedPin : linkedPins)
 		{
@@ -397,12 +406,46 @@ bool UK2Node_ConstructJsonObjectFromDefinition::IsGeneratedFieldPin(const UEdGra
 	return Pin && Pin->Direction == EGPD_Input && Pin->PinName.ToString().StartsWith(FieldPinPrefix);
 }
 
+namespace
+{
+	bool HasNonEmptyPinDefaultValue(const UEdGraphPin* Pin)
+	{
+		if (!Pin)
+			return false;
+
+		FString defaultValue = Pin->GetDefaultAsString().TrimStartAndEnd().TrimQuotes();
+		return !defaultValue.IsEmpty() && !defaultValue.Equals(TEXT("None"), ESearchCase::IgnoreCase);
+	}
+
+	bool HasValidSoftObjectPathDefault(const UEdGraphPin* Pin)
+	{
+		if (Pin && Pin->DefaultObject)
+			return true;
+
+		if (!HasNonEmptyPinDefaultValue(Pin))
+			return false;
+
+		const FString defaultValue = Pin->GetDefaultAsString().TrimStartAndEnd().TrimQuotes();
+		return FSoftObjectPath(defaultValue).IsValid();
+	}
+}
+
 bool UK2Node_ConstructJsonObjectFromDefinition::ShouldSkipUnconnectedFieldPin(const UEdGraphPin* Pin)
 {
-	return Pin
-		&& Pin->LinkedTo.Num() == 0
-		&& Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Object
-		&& Pin->DefaultObject == nullptr;
+	if (!Pin || Pin->LinkedTo.Num() > 0)
+		return false;
+
+	const FName& pinCategory = Pin->PinType.PinCategory;
+	if (pinCategory == UEdGraphSchema_K2::PC_Object)
+		return Pin->DefaultObject == nullptr;
+
+	if (pinCategory == UEdGraphSchema_K2::PC_Class)
+		return Pin->DefaultObject == nullptr && !HasNonEmptyPinDefaultValue(Pin);
+
+	if (pinCategory == UEdGraphSchema_K2::PC_SoftObject || pinCategory == UEdGraphSchema_K2::PC_SoftClass)
+		return !HasValidSoftObjectPathDefault(Pin);
+
+	return false;
 }
 
 void UK2Node_ConstructJsonObjectFromDefinition::CopyPinDefaults(const UEdGraphPin* SourcePin, UEdGraphPin* TargetPin)
