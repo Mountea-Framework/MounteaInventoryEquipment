@@ -11,28 +11,67 @@
 
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
 
+static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UScriptStruct* StructType = nullptr)
+{
+	FMounteaJsonObjectDefinitionField field;
+	field.FieldName = FieldName;
+	field.FieldValueType.PinCategory = PinCategory;
+	field.FieldValueType.PinSubCategoryObject = StructType;
+
+	return field;
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonStringDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("string"));
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonStructDefinitionField(const FName FieldName, UScriptStruct* StructType)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("struct"), StructType);
+}
+
+static FMounteaJsonObjectDefinitionInclude MakeJsonDefinitionInclude(const FString& DefinitionKey)
+{
+	FMounteaJsonObjectDefinitionInclude include;
+	include.DefinitionKey = DefinitionKey;
+
+	return include;
+}
+
+static FMounteaJsonObjectDefinition MakeJsonObjectDefinition(
+	TArray<FMounteaJsonObjectDefinitionField> Fields,
+	TArray<FMounteaJsonObjectDefinitionInclude> IncludedDefinitions = {})
+{
+	FMounteaJsonObjectDefinition definition;
+	definition.Fields = MoveTemp(Fields);
+	definition.IncludedDefinitions = MoveTemp(IncludedDefinitions);
+
+	return definition;
+}
+
 UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 {
-	FMounteaJsonObjectDefinitionField modalTitle;
-	modalTitle.FieldName = "title";
-	modalTitle.FieldValueType.PinCategory = TEXT("string");
+	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStringDefinitionField(TEXT("title")),
+			MakeJsonStringDefinitionField(TEXT("body"))
+		}
+	));
 
-	FMounteaJsonObjectDefinitionField modalBody;
-	modalBody.FieldName = "body";
-	modalBody.FieldValueType.PinCategory = TEXT("string");
+	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("sliderRange"), TBaseStructure<FIntPoint>::Get())
+		}
+	));
 
-	FMounteaJsonObjectDefinition modalDefaults;
-	modalDefaults.Fields.Add(modalTitle);
-	modalDefaults.Fields.Add(modalBody);
-
-	FMounteaJsonObjectDefinitionField sliderRange;
-	sliderRange.FieldName = "sliderRange";
-	sliderRange.FieldValueType.PinCategory = TEXT("struct");
-	sliderRange.FieldValueType.PinSubCategoryObject = TBaseStructure<FIntPoint>::Get();
-
-	FMounteaJsonObjectDefinition sliderModalDefaults;
-	sliderModalDefaults.Fields.Add(sliderRange);
-
-	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), modalDefaults);
-	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), sliderModalDefaults);
+	JsonObjectDefinitions.Add(TEXT("ModalConsumeDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ModalBaseDefinition")),
+			MakeJsonDefinitionInclude(TEXT("ModalSliderDefinition"))
+		}
+	));
 }
