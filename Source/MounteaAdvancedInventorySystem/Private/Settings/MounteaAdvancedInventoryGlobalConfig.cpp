@@ -103,4 +103,29 @@ UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 			MakeJsonDefinitionInclude(TEXT("ModalSliderDefinition"))
 		}
 	));
+
+	JsonObjectDefinitions.Add(TEXT("ModalResponseBaseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStringDefinitionField(TEXT("modalType")),
+			MakeJsonBooleanDefinitionField(TEXT("confirmed"))
+		}
+	));
+
+	JsonObjectDefinitions.Add(TEXT("ModalItemResponseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ModalResponseBaseDefinition"))
+		}
+	));
+
+	JsonObjectDefinitions.Add(TEXT("ModalQuantityResponseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonIntDefinitionField(TEXT("quantity"))
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ModalItemResponseDefinition"))
+		}
+	));
 }
