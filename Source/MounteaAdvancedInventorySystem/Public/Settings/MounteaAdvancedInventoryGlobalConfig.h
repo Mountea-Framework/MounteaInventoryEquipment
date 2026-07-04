@@ -101,8 +101,14 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryGlobalConfig :
 	GENERATED_BODY()
 
 public:
-
-	UMounteaAdvancedInventoryGlobalConfig();
+	
+#if WITH_EDITOR
+	
+	UFUNCTION(CallInEditor, Category="Defaults")
+	void SetupDefaults();
+	
+#endif
+	
 
 public:
 

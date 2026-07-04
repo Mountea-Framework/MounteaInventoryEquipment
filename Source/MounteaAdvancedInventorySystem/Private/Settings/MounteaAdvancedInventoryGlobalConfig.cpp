@@ -78,32 +78,46 @@ static FMounteaJsonObjectDefinition MakeJsonObjectDefinition(
 	return definition;
 }
 
-UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
+#if WITH_EDITOR
+
+void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 {
+	// ModalBaseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), MakeJsonObjectDefinition(
 		{
 			MakeJsonStructDefinitionField(TEXT("modalData"), TBaseStructure<FMounteaModalsConfig>::Get()),
 			MakeJsonStringDefinitionField(TEXT("modalType"))
 		}
 	));
-
-	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), MakeJsonObjectDefinition(
+	
+	// ModalItemDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalItemDefinition"), MakeJsonObjectDefinition(
 		{
-			MakeJsonStructDefinitionField(TEXT("sliderRange"), TBaseStructure<FVector2D>::Get())
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get()),
 		}
 	));
 
-	JsonObjectDefinitions.Add(TEXT("ModalConsumeDefinition"), MakeJsonObjectDefinition(
+	// ModalSliderDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), MakeJsonObjectDefinition(
 		{
-			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get()),
+			MakeJsonStructDefinitionField(TEXT("sliderRange"), TBaseStructure<FIntPoint>::Get())
+		}
+	));
+
+	// ModalItemQuantityDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalItemQuantityDefinition"), MakeJsonObjectDefinition(
+		{
 			MakeJsonSoftObjectPtrDefinitionField(TEXT("instigatorActor"), UMounteaSelectableInventoryItemAction::StaticClass())
 		},
 		{
 			MakeJsonDefinitionInclude(TEXT("ModalBaseDefinition")),
+			MakeJsonDefinitionInclude(TEXT("ModalItemDefinition")),
 			MakeJsonDefinitionInclude(TEXT("ModalSliderDefinition"))
 		}
 	));
 
+	
+	// ModalResponseBaseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalResponseBaseDefinition"), MakeJsonObjectDefinition(
 		{
 			MakeJsonStringDefinitionField(TEXT("modalType")),
@@ -111,6 +125,7 @@ UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 		}
 	));
 
+	// ModalItemResponseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalItemResponseDefinition"), MakeJsonObjectDefinition(
 		{
 			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
@@ -120,6 +135,7 @@ UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 		}
 	));
 
+	// ModalQuantityResponseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalQuantityResponseDefinition"), MakeJsonObjectDefinition(
 		{
 			MakeJsonIntDefinitionField(TEXT("quantity"))
@@ -129,3 +145,5 @@ UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
 		}
 	));
 }
+
+#endif
