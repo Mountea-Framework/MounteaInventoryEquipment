@@ -47,7 +47,6 @@
 #include "Setup/MounteaInventorySetupUtilities.h"
 
 #include "Styling/MounteaAdvancedInventoryEditorStyle.h"
-#include "Brushes/SlateVectorImageBrush.h"
 #include "Styling/SlateStyle.h"
 #include "Styling/SlateStyleRegistry.h"
 
