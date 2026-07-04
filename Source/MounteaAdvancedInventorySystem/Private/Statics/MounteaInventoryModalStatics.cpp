@@ -60,7 +60,7 @@
 	nativeInterface->HandleGetter().Remove(Binding); \
 	return true
 
-UUserWidget* UMounteaInventoryModalStatics::CreateModalWindowWidget(UObject* Context)
+UUserWidget* UMounteaInventoryModalStatics::CreateModalWindowWidget(UObject* Context, UObject* OptionalPayload)
 {
 	if (!IsValid(Context))
 		return nullptr;
@@ -81,7 +81,7 @@ UUserWidget* UMounteaInventoryModalStatics::CreateModalWindowWidget(UObject* Con
 		return nullptr;
 
 	if (newWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(newWidget, InventoryUICommands::General::Create, nullptr);
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(newWidget, InventoryUICommands::General::Create, OptionalPayload);
 
 	return newWidget;
 }

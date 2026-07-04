@@ -39,7 +39,7 @@ public:
 		meta=(WorldContext="Context"),
 		meta=(DefaultToSelf="Context"),
 		meta=(DisplayName="Modal - Create Modal Window Widget"))
-	static UUserWidget* CreateModalWindowWidget(UObject* Context);
+	static UUserWidget* CreateModalWindowWidget(UObject* Context, UObject* OptionalPayload);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Modal",
 		meta=(MounteaSetter),
