@@ -24,6 +24,7 @@
 #include "K2Nodes/K2Node_BreakJsonObjectByDefinition.h"
 #include "K2Nodes/K2Node_ConstructJsonObjectFromDefinition.h"
 #include "K2Nodes/K2Node_MounteaAdvancedInventoryCallFunction.h"
+#include "K2Nodes/K2Node_SwitchModalType.h"
 
 TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) const
 {
@@ -60,6 +61,12 @@ TSharedPtr<SGraphPin> FMounteaInventoryPinFactory::CreatePin(UEdGraphPin* Pin) c
 	{
 		if (breakJsonNode->ShouldUseJsonDefinitionSelector(Pin))
 			return SNew(SPinTypeJsonDefinitionSelector, Pin);
+	}
+
+	if (UK2Node_SwitchModalType* switchModalTypeNode = Cast<UK2Node_SwitchModalType>(Pin->GetOwningNode()))
+	{
+		if (switchModalTypeNode->ShouldUseModalTypeSelector(Pin))
+			return SNew(SPinTypeModalTypeSelector, Pin);
 	}
 
 	return nullptr;
