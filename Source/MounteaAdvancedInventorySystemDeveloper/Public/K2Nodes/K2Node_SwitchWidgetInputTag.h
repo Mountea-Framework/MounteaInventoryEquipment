@@ -40,6 +40,9 @@ public:
 	UPROPERTY()
 	TArray<FName> PinNames;
 
+	UPROPERTY()
+	TSet<FGameplayTag> ConfigBackedPinTags;
+
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual FText GetToolTipHeading() const override;
@@ -66,6 +69,7 @@ protected:
 	virtual void RemovePin(UEdGraphPin* TargetPin) override;
 
 private:
+	void RefreshPinTagsFromSettings();
 	static bool IsPredefinedPin(const FName& PinName);
 	void GetVisiblePinNames(TArray<FName>& OutPinNames) const;
 	static void GetAvailableUIActionTags(TArray<FGameplayTag>& OutTags);
