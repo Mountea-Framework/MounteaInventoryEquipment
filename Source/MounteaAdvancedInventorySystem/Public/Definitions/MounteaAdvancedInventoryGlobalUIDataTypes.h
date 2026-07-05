@@ -3,7 +3,7 @@
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
 //
-// - You may use this solution in commercial products, provided the product is not 
+// - You may use this solution in commercial products, provided the product is not
 //   this solution itself (or unless significant modifications have been made to the solution).
 // - You may not resell or redistribute the original, unmodified solution.
 //
@@ -14,13 +14,9 @@
 #include "CoreMinimal.h"
 #include "MounteaAdvancedInventoryGlobalUIDataTypes.generated.h"
 
-class UMounteaModalResponsePayload;
-class UMounteaModalsPayload;
 class UUserWidget;
 
-/**
- * Defines the content widget and payload class used by one modal type.
- */
+/** Defines the content widget used by one modal type. */
 USTRUCT(BlueprintType)
 struct FMounteaModalDefinition
 {
@@ -32,18 +28,6 @@ struct FMounteaModalDefinition
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> WidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
-		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent),
-		meta=(ForceShowEngineContent))
-	TSoftClassPtr<UMounteaModalsPayload> PayloadClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
-		meta=(NoResetToDefault),
-		meta=(ForceShowPluginContent),
-		meta=(ForceShowEngineContent))
-	TSoftClassPtr<UMounteaModalResponsePayload> PayloadResponseClass;
 };
 
 /**

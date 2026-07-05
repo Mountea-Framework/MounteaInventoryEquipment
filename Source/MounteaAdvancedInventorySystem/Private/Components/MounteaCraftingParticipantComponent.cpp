@@ -52,7 +52,6 @@ void UMounteaCraftingParticipantComponent::GetLifetimeReplicatedProps(TArray<FLi
 
 void UMounteaCraftingParticipantComponent::OnRep_KnownRecipes()
 {
-	// KnownRecipes updated by replication; delegates fire via PostRecipeLearned_Client / PostRecipeForgotten_Client.
 }
 
 void UMounteaCraftingParticipantComponent::OnRep_CraftingStation()
@@ -164,10 +163,33 @@ FMounteaCraftingResult UMounteaCraftingParticipantComponent::StartCrafting_Imple
 		return FMounteaCraftingResult{};
 	}
 
+	OnCraftingStarted.Broadcast(CraftingStation);
+	PostCraftingStarted_Client(CraftingStation);
 	FMounteaCraftingResult result = UMounteaCraftingStatics::CraftItem(this, TemplateToCraft, Ingredients);
+	
+	// TODO: Add possible delay IF crafting recipe takes time
+	
 	PostCraftingFinished_Client(result);
 	OnCraftingFinished.Broadcast(result);
 	return result;
+}
+
+void UMounteaCraftingParticipantComponent::StopCrafting_Implementation()
+{
+	if (!GetOwner()->HasAuthority())
+	{
+		Server_StopCrafting();
+		return;
+	}
+	
+	PostCraftingStopped_Client(CraftingStation);
+	OnCraftingStopped.Broadcast(CraftingStation);
+	
+	if (CraftingStation.GetObject())
+		Execute_StopUsingCraftingStation(this);
+	
+	CraftingStation = nullptr;
+	return;
 }
 
 bool UMounteaCraftingParticipantComponent::SetParentInventory_Implementation(const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewParentInventory)
@@ -196,6 +218,8 @@ bool UMounteaCraftingParticipantComponent::StartUsingCraftingStation_Implementat
 
 	CraftingStation = Station;
 	IMounteaAdvancedCraftingStationInterface::Execute_StartUsing(Station.GetObject(), this);
+	OnCraftingStarted.Broadcast(CraftingStation);
+	PostCraftingStarted_Client(CraftingStation);
 	return true;
 }
 
@@ -210,6 +234,8 @@ bool UMounteaCraftingParticipantComponent::StopUsingCraftingStation_Implementati
 		return true;
 	}
 
+	PostCraftingStopped_Client(CraftingStation);
+	OnCraftingStopped.Broadcast(CraftingStation);
 	IMounteaAdvancedCraftingStationInterface::Execute_StopUsing(CraftingStation.GetObject(), this);
 	CraftingStation = nullptr;
 	return true;
@@ -241,6 +267,21 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::ResolveKno
 	}
 
 	return result;
+}
+
+void UMounteaCraftingParticipantComponent::Server_StopCrafting_Implementation()
+{
+	Execute_StopCrafting(this);
+}
+
+void UMounteaCraftingParticipantComponent::PostCraftingStopped_Client_Implementation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& OptionalCraftingStation)
+{
+	OnCraftingStopped.Broadcast(OptionalCraftingStation);
+}
+
+void UMounteaCraftingParticipantComponent::PostCraftingStarted_Client_Implementation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& OptionalCraftingStation)
+{
+	OnCraftingStarted.Broadcast(OptionalCraftingStation);
 }
 
 void UMounteaCraftingParticipantComponent::Server_LearnRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate)

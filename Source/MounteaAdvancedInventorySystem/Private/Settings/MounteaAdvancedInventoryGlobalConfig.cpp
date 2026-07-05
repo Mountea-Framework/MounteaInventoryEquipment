@@ -11,6 +11,139 @@
 
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
 
-UMounteaAdvancedInventoryGlobalConfig::UMounteaAdvancedInventoryGlobalConfig()
+#include "Decorations/MounteaSelectableInventoryItemAction.h"
+#include "Definitions/MounteaAdvancedInventoryGlobalUIDataTypes.h"
+
+static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UObject* SubCategoryObject = nullptr)
 {
+	FMounteaJsonObjectDefinitionField field;
+	field.FieldName = FieldName;
+	field.FieldValueType.PinCategory = PinCategory;
+	field.FieldValueType.PinSubCategoryObject = SubCategoryObject;
+
+	return field;
 }
+
+static FMounteaJsonObjectDefinitionField MakeJsonIntDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("int"));
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonFloatDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("real"));
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonStringDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("string"));
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonBooleanDefinitionField(const FName FieldName)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("bool"));
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonStructDefinitionField(const FName FieldName, UScriptStruct* StructType)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("struct"), StructType);
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonUObjectDefinitionField(const FName FieldName, UClass* ObjectClass = nullptr)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("object"), ObjectClass ? ObjectClass : UObject::StaticClass());
+}
+
+static FMounteaJsonObjectDefinitionField MakeJsonSoftObjectPtrDefinitionField(const FName FieldName, UClass* ObjectClass = nullptr)
+{
+	return MakeJsonDefinitionField(FieldName, TEXT("softobject"), ObjectClass ? ObjectClass : UObject::StaticClass());
+}
+
+static FMounteaJsonObjectDefinitionInclude MakeJsonDefinitionInclude(const FString& DefinitionKey)
+{
+	FMounteaJsonObjectDefinitionInclude include;
+	include.DefinitionKey = DefinitionKey;
+
+	return include;
+}
+
+static FMounteaJsonObjectDefinition MakeJsonObjectDefinition(
+	TArray<FMounteaJsonObjectDefinitionField> Fields,
+	TArray<FMounteaJsonObjectDefinitionInclude> IncludedDefinitions = {})
+{
+	FMounteaJsonObjectDefinition definition;
+	definition.Fields = MoveTemp(Fields);
+	definition.IncludedDefinitions = MoveTemp(IncludedDefinitions);
+
+	return definition;
+}
+
+#if WITH_EDITOR
+
+void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
+{
+	// ModalBaseDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("modalData"), TBaseStructure<FMounteaModalsConfig>::Get()),
+			MakeJsonStringDefinitionField(TEXT("modalType"))
+		}
+	));
+	
+	// ModalItemDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalItemDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get()),
+		}
+	));
+
+	// ModalSliderDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("sliderRange"), TBaseStructure<FIntPoint>::Get())
+		}
+	));
+
+	// ModalItemQuantityDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalItemQuantityDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonSoftObjectPtrDefinitionField(TEXT("inventoryAction"), UMounteaSelectableInventoryItemAction::StaticClass())
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ModalBaseDefinition")),
+			MakeJsonDefinitionInclude(TEXT("ModalItemDefinition")),
+			MakeJsonDefinitionInclude(TEXT("ModalSliderDefinition"))
+		}
+	));
+
+	
+	// ModalResponseBaseDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalResponseBaseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStringDefinitionField(TEXT("modalType")),
+			MakeJsonBooleanDefinitionField(TEXT("confirmed"))
+		}
+	));
+
+	// ModalItemResponseDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalItemResponseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ModalResponseBaseDefinition"))
+		}
+	));
+
+	// ModalQuantityResponseDefinition
+	JsonObjectDefinitions.Add(TEXT("ModalQuantityResponseDefinition"), MakeJsonObjectDefinition(
+		{
+			MakeJsonIntDefinitionField(TEXT("quantity"))
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ModalItemResponseDefinition"))
+		}
+	));
+}
+
+#endif

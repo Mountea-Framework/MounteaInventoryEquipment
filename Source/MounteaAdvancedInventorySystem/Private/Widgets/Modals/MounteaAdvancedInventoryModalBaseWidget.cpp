@@ -14,7 +14,7 @@
 #include "Components/PanelWidget.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalContentWidgetInterface.h"
 
-void UMounteaAdvancedInventoryModalBaseWidget::AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaModalsPayload* Payload)
+void UMounteaAdvancedInventoryModalBaseWidget::AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaJsonObject* Payload)
 {
 	if (!IsValid(ModalContentWidget))
 		return;
@@ -38,12 +38,12 @@ void UMounteaAdvancedInventoryModalBaseWidget::AddModalContentToModalWindow_Impl
 
 void UMounteaAdvancedInventoryModalBaseWidget::HandleModalContentConfirmed(UObject* Payload)
 {
-	IMounteaAdvancedInventoryModalWidgetInterface::Execute_ModalContentConfirmed(this, Payload);
+	Execute_ModalContentConfirmed(this, Payload);
 	OnModalConfirmed.Broadcast(Payload);
 }
 
 void UMounteaAdvancedInventoryModalBaseWidget::HandleModalContentCancelled()
 {
-	IMounteaAdvancedInventoryModalWidgetInterface::Execute_ModalContentCancelled(this);
+	Execute_ModalContentCancelled(this);
 	OnModalCancelled.Broadcast();
 }

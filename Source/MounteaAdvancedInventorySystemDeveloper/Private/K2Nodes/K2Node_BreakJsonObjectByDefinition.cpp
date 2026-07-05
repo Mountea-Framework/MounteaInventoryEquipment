@@ -51,10 +51,7 @@ void UK2Node_BreakJsonObjectByDefinition::AllocateDefaultPins()
 	UEdGraphPin* errorsPin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_String, ErrorsPinName);
 	errorsPin->PinType.ContainerType = EPinContainerType::Array;
 
-	FMounteaJsonObjectDefinition definition;
-	TArray<FString> errors;
-	if (ResolveSelectedDefinition(definition, errors))
-		CreateFieldPins(definition);
+	CreateFieldPins();
 }
 
 void UK2Node_BreakJsonObjectByDefinition::GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const
@@ -270,6 +267,11 @@ FString UK2Node_BreakJsonObjectByDefinition::GetSelectedDefinitionKey() const
 	return CachedDefinitionKey;
 }
 
+FString UK2Node_BreakJsonObjectByDefinition::BuildDefinitionIssueText() const
+{
+	return UMounteaAdvancedInventoryJsonStatics::BuildJsonDefinitionIssueText(GetSelectedDefinitionKey());
+}
+
 bool UK2Node_BreakJsonObjectByDefinition::ResolveSelectedDefinition(FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors) const
 {
 	const FString definitionKey = GetSelectedDefinitionKey();
@@ -283,10 +285,17 @@ bool UK2Node_BreakJsonObjectByDefinition::ResolveSelectedDefinition(FMounteaJson
 	return UMounteaAdvancedInventoryJsonStatics::ResolveJsonObjectDefinitionByKey(definitionKey, OutDefinition, Errors);
 }
 
-void UK2Node_BreakJsonObjectByDefinition::CreateFieldPins(const FMounteaJsonObjectDefinition& Definition)
+void UK2Node_BreakJsonObjectByDefinition::CreateFieldPins()
 {
-	for (const FMounteaJsonObjectDefinitionField& field : Definition.Fields)
+	TArray<FMounteaResolvedJsonObjectDefinitionField> resolvedFields;
+	TArray<FString> errors;
+	if (!UMounteaAdvancedInventoryJsonStatics::ResolveJsonObjectDefinitionFieldsByKey(GetSelectedDefinitionKey(), resolvedFields, errors))
+		return;
+
+	TSet<FName> usedPinNames;
+	for (const FMounteaResolvedJsonObjectDefinitionField& fieldPinData : resolvedFields)
 	{
+		const FMounteaJsonObjectDefinitionField& field = fieldPinData.Field;
 		if (field.FieldName.IsNone())
 			continue;
 
@@ -295,9 +304,9 @@ void UK2Node_BreakJsonObjectByDefinition::CreateFieldPins(const FMounteaJsonObje
 		if (!IsSupportedFieldPinType(pinType))
 			continue;
 
-		UEdGraphPin* fieldPin = CreatePin(EGPD_Output, pinType, GetFieldPinName(field.FieldName));
+		UEdGraphPin* fieldPin = CreatePin(EGPD_Output, pinType, UMounteaAdvancedInventoryJsonStatics::MakeJsonDefinitionFieldPinName(FieldPinPrefix, field.FieldName, fieldPinData.OccurrenceIndex, usedPinNames));
 		fieldPin->PinFriendlyName = FText::FromName(field.FieldName);
-		fieldPin->PinToolTip = FText::Format(LOCTEXT("GeneratedFieldTooltip", "JSON field: {0}"), FText::FromName(field.FieldName)).ToString();
+		fieldPin->PinToolTip = UMounteaAdvancedInventoryJsonStatics::BuildJsonDefinitionFieldPinTooltip(fieldPinData);
 	}
 }
 
@@ -415,6 +424,11 @@ FText UK2Node_BreakJsonObjectByDefinition::GetTooltipText() const
 		"Output pins are generated from the merged definition, including included definitions.");
 }
 
+FText UK2Node_BreakJsonObjectByDefinition::GetVisualWarningTooltipText() const
+{
+	return FText::FromString(BuildDefinitionIssueText());
+}
+
 FText UK2Node_BreakJsonObjectByDefinition::GetToolTipHeading() const
 {
 	return LOCTEXT("BreakJsonObjectByDefinition_TooltipHeading", "Mountea Advanced Inventory & Equipment Function");
@@ -435,6 +449,11 @@ FName UK2Node_BreakJsonObjectByDefinition::GetCornerIcon() const
 {
 	const FName superName = Super::GetCornerIcon();
 	return superName == NAME_None ? TEXT("MAISStyleSet.MounteaLogo") : superName;
+}
+
+bool UK2Node_BreakJsonObjectByDefinition::ShowVisualWarning() const
+{
+	return !BuildDefinitionIssueText().IsEmpty();
 }
 
 FText UK2Node_BreakJsonObjectByDefinition::GetMenuCategory() const

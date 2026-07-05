@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="PinOptions")
 	uint32 bIsCaseSensitive : 1;
 
+	UPROPERTY()
+	TSet<FName> ConfigBackedPinNames;
+
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual FText GetToolTipHeading() const override;
@@ -54,6 +57,8 @@ public:
 	virtual bool CanEverRemoveExecutionPin() const override { return false; };
 #endif
 
+	bool ShouldUseModalTypeSelector(UEdGraphPin* Pin) const;
+
 	virtual void AddPinToSwitchNode() override;
 	virtual FName GetUniquePinName() override;
 	virtual FEdGraphPinType GetPinType() const override;
@@ -65,6 +70,7 @@ protected:
 	virtual void RemovePin(UEdGraphPin* TargetPin) override;
 
 	void SetupCaseSensitivityFunction();
+	void RefreshPinNamesFromSettings();
 	static void GetModalTypesFromSettings(TArray<FName>& OutModalTypes);
 	static bool IsPredefinedPin(const FName& PinName);
 	void GetVisiblePinNames(TArray<FName>& OutVisiblePins) const;

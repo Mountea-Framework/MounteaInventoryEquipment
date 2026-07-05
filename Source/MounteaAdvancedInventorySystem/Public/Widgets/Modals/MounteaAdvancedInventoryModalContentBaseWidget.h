@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2026 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2026 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -14,29 +14,28 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Blueprint/UserWidget.h"
+#include "Helpers/MounteaJsonObject.h"
 #include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalContentWidgetInterface.h"
 #include "MounteaAdvancedInventoryModalContentBaseWidget.generated.h"
 
-class UMounteaModalsPayload;
-
 /**
- * Base widget for modal content created from modal payload data.
+ * Base widget for modal content driven by a JSON payload.
  */
 UCLASS(Abstract, Blueprintable, BlueprintType)
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryModalContentBaseWidget : public UUserWidget,
 	public IMounteaAdvancedInventoryModalContentWidgetInterface, public IMounteaInventoryGenericWidgetInterface
 {
 	GENERATED_BODY()
-	
+
 protected:
-	
+
 	UFUNCTION()
 	void OnModalExpired();
 
 public:
 
-	virtual void ConstructModalContent_Implementation(UMounteaModalsPayload* Payload) override;
+	virtual void ConstructModalContent_Implementation(UMounteaJsonObject* InPayload) override;
 	virtual FOnModalContentConfirmed& GetOnModalContentConfirmedHandle() override
 	{
 		return OnModalContentConfirmed;
@@ -61,13 +60,12 @@ public:
 			WidgetTag = NewWidgetTag;
 	};
 	
+	virtual void StartExpiration_Implementation(const float WidgetLifetime) override;
+
 public:
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FString ModalType;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
-	FTimerHandle ModalContentExpiryTimerHandle;
+	TObjectPtr<UMounteaJsonObject> IncomingPayload;	
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Primary Data",
 		meta=(NoResetToDefault),
@@ -79,4 +77,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category="Events|Modal Content")
 	FOnModalContentCancelled OnModalContentCancelled;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Primary Data")
+	FTimerHandle ModalContentExpiryTimerHandle;
 };

@@ -378,14 +378,6 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeHeader(
 		SNew(SHorizontalBox)
 
 		+ SHorizontalBox::Slot()
-		.AutoWidth()
-		.VAlign(VAlign_Center)
-		.Padding(0.f, 0.f, 6.f, 0.f)
-		[
-			MounteaJsonObjectDefinitionCustomization::MakeStatusIcon(StructPropertyHandle)
-		]
-
-		+ SHorizontalBox::Slot()
 		.FillWidth(1.f)
 		.VAlign(VAlign_Center)
 		[

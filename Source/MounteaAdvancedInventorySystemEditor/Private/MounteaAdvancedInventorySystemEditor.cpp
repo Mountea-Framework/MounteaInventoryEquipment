@@ -154,6 +154,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					RegisterClassIcon(classIconMapping.ClassName, classIconMapping.ResourceName);
 				}
 
+				const FString jsonIconPath = AdvancedInventorySet->RootToContentDir(TEXT("Resources/WebIcons/json"), TEXT(".svg"));
+				AdvancedInventorySet->Set(TEXT("ClassThumbnail.MounteaJsonObject"), new FSlateVectorImageBrush(jsonIconPath, FVector2D(128.f, 128.f)));
+				AdvancedInventorySet->Set(TEXT("ClassIcon.MounteaJsonObject"), new FSlateVectorImageBrush(jsonIconPath, FVector2D(16.f, 16.f)));
+
 				FSlateStyleRegistry::RegisterSlateStyle(*AdvancedInventorySet.Get());
 			}
 		}

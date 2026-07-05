@@ -178,6 +178,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(Keywords="clear,reset"),
 		DisplayName="Cleanup Modal Window")
 	static bool CleanupModalWindow(UObject* Target);
