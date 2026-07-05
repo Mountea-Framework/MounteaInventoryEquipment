@@ -20,12 +20,9 @@
 
 class UMounteaAdvancedInventorySettings;
 class UMounteaAdvancedInventorySettingsConfig;
-class UMounteaAdvancedInventoryPayloadsConfig;
 class UMounteaSelectableInventoryItemAction;
 class UMounteaCallbackInventoryItemAction;
 class UMounteaInventoryItemAction;
-
-struct FPayloadConfig;
 
 enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
@@ -229,31 +226,6 @@ public:
 		meta=(MounteaGetter),
 		DisplayName="Get Template Config")
 	static UPrimaryDataAsset* GetTemplateConfig(const FString& Key);
-	
-	/**
-	 * Retrieves Payloads configuration asset from the Mountea Inventory Confiration
-	 *
-	 * @return - A pointer to the Payloads Configuration Asset or null
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
-		meta=(MounteaGetter),
-		DisplayName="Get Payloads Config")
-	static UMounteaAdvancedInventoryPayloadsConfig* GetPayloadsConfig();
-	
-	/**
-	 * Retrieves Payload Config from Config File if it exists.
-	 *
-	 * @param Creator GameplayTag of the creator Object
-	 * @param Receiver GameplayTag of the receiver
-	 * @param bSuccess Whether operation was success or not
-	 * 
-	 * @return - A data associated to key of Created and Receiver, or null
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Config", 
-		meta=(MounteaGetter),
-		DisplayName="Get Payload Config")
-	static FPayloadConfig FindPayloadConfig(UPARAM(meta=(Categories="Mountea_Inventory")) const FGameplayTag Creator, 
-		UPARAM(meta=(Categories="Mountea_Inventory")) const FGameplayTag Receiver, bool& bSuccess);
 	
 #pragma endregion
 	
