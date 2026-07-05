@@ -56,6 +56,7 @@ protected:
 	void RefreshGeneratedPins();
 	FString GetSelectedDefinitionKey() const;
 	FString BuildDefinitionIssueText() const;
+	FString BuildRequiredInputIssueText() const;
 	bool ResolveSelectedDefinition(FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors) const;
 	void CreateFieldPins();
 
@@ -64,6 +65,7 @@ protected:
 	static FName GetFieldPinName(const FName FieldName);
 	static FName GetFieldNameFromPinName(const FName PinName);
 	static bool IsGeneratedFieldPin(const UEdGraphPin* Pin);
+	static bool IsRequiredInputPinEmpty(const UEdGraphPin* Pin);
 	static bool ShouldSkipUnconnectedFieldPin(const UEdGraphPin* Pin);
 	static void CopyPinDefaults(const UEdGraphPin* SourcePin, UEdGraphPin* TargetPin);
 

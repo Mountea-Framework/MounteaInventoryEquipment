@@ -288,7 +288,61 @@ FString UK2Node_ConstructJsonObjectFromDefinition::GetSelectedDefinitionKey() co
 
 FString UK2Node_ConstructJsonObjectFromDefinition::BuildDefinitionIssueText() const
 {
-	return UMounteaAdvancedInventoryJsonStatics::BuildJsonDefinitionIssueText(GetSelectedDefinitionKey());
+	TArray<FString> warnings;
+	const FString definitionIssueText = UMounteaAdvancedInventoryJsonStatics::BuildJsonDefinitionIssueText(GetSelectedDefinitionKey());
+	if (!definitionIssueText.IsEmpty())
+	{
+		FString issueBody = definitionIssueText;
+		issueBody.RemoveFromStart(TEXT("NOTE:\n"));
+		warnings.Add(issueBody);
+	}
+
+	const FString requiredInputIssueText = BuildRequiredInputIssueText();
+	if (!requiredInputIssueText.IsEmpty())
+		warnings.Add(requiredInputIssueText);
+
+	if (warnings.IsEmpty())
+		return FString();
+
+	return FString::Printf(TEXT("NOTE:\n%s"), *FString::Join(warnings, TEXT("\n")));
+}
+
+FString UK2Node_ConstructJsonObjectFromDefinition::BuildRequiredInputIssueText() const
+{
+	TArray<FMounteaResolvedJsonObjectDefinitionField> resolvedFields;
+	TArray<FString> errors;
+	if (!UMounteaAdvancedInventoryJsonStatics::ResolveJsonObjectDefinitionFieldsByKey(GetSelectedDefinitionKey(), resolvedFields, errors))
+		return FString();
+
+	TArray<FString> emptyRequiredInputs;
+	TSet<FName> usedPinNames;
+	for (const FMounteaResolvedJsonObjectDefinitionField& fieldPinData : resolvedFields)
+	{
+		const FMounteaJsonObjectDefinitionField& field = fieldPinData.Field;
+		if (field.FieldName.IsNone())
+			continue;
+
+		FEdGraphPinType pinType = field.FieldValueType;
+		pinType.ContainerType = EPinContainerType::None;
+		if (!IsSupportedFieldPinType(pinType))
+			continue;
+
+		const FName pinName = UMounteaAdvancedInventoryJsonStatics::MakeJsonDefinitionFieldPinName(FieldPinPrefix, field.FieldName, fieldPinData.OccurrenceIndex, usedPinNames);
+		if (!field.bRequired)
+			continue;
+
+		const UEdGraphPin* fieldPin = FindPin(pinName, EGPD_Input);
+		if (IsRequiredInputPinEmpty(fieldPin))
+			emptyRequiredInputs.Add(field.FieldName.ToString());
+	}
+
+	if (emptyRequiredInputs.IsEmpty())
+		return FString();
+
+	return FString::Printf(
+		TEXT("Required JSON input pin%s empty: %s."),
+		emptyRequiredInputs.Num() == 1 ? TEXT(" is") : TEXT("s are"),
+		*FString::Join(emptyRequiredInputs, TEXT(", ")));
 }
 
 bool UK2Node_ConstructJsonObjectFromDefinition::ResolveSelectedDefinition(FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors) const
@@ -428,6 +482,31 @@ namespace
 		const FString defaultValue = Pin->GetDefaultAsString().TrimStartAndEnd().TrimQuotes();
 		return FSoftObjectPath(defaultValue).IsValid();
 	}
+}
+
+bool UK2Node_ConstructJsonObjectFromDefinition::IsRequiredInputPinEmpty(const UEdGraphPin* Pin)
+{
+	if (!Pin || Pin->LinkedTo.Num() > 0)
+		return false;
+
+	const FName& pinCategory = Pin->PinType.PinCategory;
+	if (pinCategory == UEdGraphSchema_K2::PC_Object)
+		return Pin->DefaultObject == nullptr;
+
+	if (pinCategory == UEdGraphSchema_K2::PC_Class)
+		return Pin->DefaultObject == nullptr && !HasNonEmptyPinDefaultValue(Pin);
+
+	if (pinCategory == UEdGraphSchema_K2::PC_SoftObject || pinCategory == UEdGraphSchema_K2::PC_SoftClass)
+		return !HasValidSoftObjectPathDefault(Pin);
+
+	if (pinCategory == UEdGraphSchema_K2::PC_String ||
+		pinCategory == UEdGraphSchema_K2::PC_Name ||
+		pinCategory == UEdGraphSchema_K2::PC_Text)
+	{
+		return !HasNonEmptyPinDefaultValue(Pin);
+	}
+
+	return false;
 }
 
 bool UK2Node_ConstructJsonObjectFromDefinition::ShouldSkipUnconnectedFieldPin(const UEdGraphPin* Pin)
