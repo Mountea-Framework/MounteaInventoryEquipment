@@ -63,6 +63,7 @@ public:
 	virtual bool ForgetRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate) override;
 	virtual bool IsCraftingPossible_Implementation(UMounteaRecipeTemplate* TemplateToCraft) const override;
 	virtual FMounteaCraftingResult StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients) override;
+	virtual void StopCrafting_Implementation() override;
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override
 	{
 		return RelatedInventory;
@@ -101,6 +102,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Crafting")
 	FOnRecipeForgotten OnRecipeForgotten;
+	
+	UPROPERTY(BlueprintAssignable, Category="Crafting")
+	FMounteaCraftingStarted OnCraftingStarted;
+	
+	UPROPERTY(BlueprintAssignable, Category="Crafting")
+	FMounteaCraftingStopped OnCraftingStopped;
 
 	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_KnownRecipes, VisibleAnywhere, BlueprintReadOnly, Category="Crafting",
 		meta=(NoResetToDefault))
@@ -132,6 +139,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void Server_StartCrafting(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_StopCrafting();
 
 	UFUNCTION(Server, Reliable)
 	void Server_StartUsingCraftingStation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station);
@@ -147,4 +157,10 @@ protected:
 
 	UFUNCTION(Client, Unreliable)
 	void PostCraftingFinished_Client(const FMounteaCraftingResult& Result);
+	
+	UFUNCTION(Client, Unreliable)
+	void PostCraftingStarted_Client(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& OptionalCraftingStation);
+	
+	UFUNCTION(Client, Unreliable)
+	void PostCraftingStopped_Client(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& OptionalCraftingStation);
 };
