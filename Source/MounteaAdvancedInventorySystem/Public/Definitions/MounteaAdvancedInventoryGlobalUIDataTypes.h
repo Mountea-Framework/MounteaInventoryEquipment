@@ -16,9 +16,7 @@
 
 class UUserWidget;
 
-/**
- * Defines the content widget and JSON payload definition keys used by one modal type.
- */
+/** Defines the content widget used by one modal type. */
 USTRUCT(BlueprintType)
 struct FMounteaModalDefinition
 {
@@ -30,16 +28,6 @@ struct FMounteaModalDefinition
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> WidgetClass;
-
-	/** Key into UMounteaAdvancedInventoryGlobalConfig::JsonObjectDefinitions describing the incoming payload schema. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
-		meta=(NoResetToDefault))
-	FString InPayloadDefinitionKey;
-
-	/** Key into UMounteaAdvancedInventoryGlobalConfig::JsonObjectDefinitions describing the outgoing response payload schema. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modals",
-		meta=(NoResetToDefault))
-	FString OutPayloadDefinitionKey;
 };
 
 /**

@@ -36,7 +36,6 @@
 #include "Customizations/MounteaJsonObjectDefinitionCustomization.h"
 #include "Customizations/MounteaJsonObjectDefinitionFieldCustomization.h"
 #include "Customizations/MounteaJsonObjectDefinitionIncludeCustomization.h"
-#include "Customizations/MounteaModalDefinitionCustomization.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
@@ -204,8 +203,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		{
 			TEXT("MounteaJsonObjectDefinition"),
 			TEXT("MounteaJsonObjectDefinitionField"),
-			TEXT("MounteaJsonObjectDefinitionInclude"),
-			TEXT("MounteaModalDefinition")
+			TEXT("MounteaJsonObjectDefinitionInclude")
 		};
 
 		PropertyModule.RegisterCustomPropertyTypeLayout(
@@ -219,10 +217,6 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		PropertyModule.RegisterCustomPropertyTypeLayout(
 			RegisteredCustomPropertyTypeLayouts[2],
 			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionIncludeCustomization::MakeInstance)
-		);
-		PropertyModule.RegisterCustomPropertyTypeLayout(
-			RegisteredCustomPropertyTypeLayouts[3],
-			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaModalDefinitionCustomization::MakeInstance)
 		);
 		PropertyModule.NotifyCustomizationModuleChanged();
 	}
