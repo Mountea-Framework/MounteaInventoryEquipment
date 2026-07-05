@@ -14,6 +14,7 @@
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 #include "Framework/Application/SlateApplication.h"
+#include "HAL/PlatformProcess.h"
 #include "Misc/FileHelper.h"
 #include "Setup/MounteaInventorySetupUtilities.h"
 #include "Slate/MounteaInventoryWebBrowserWrapper.h"
@@ -147,6 +148,19 @@ void MAISSetupDefaultsPopup::Open(const FMAISSetupDefaultsReport& Report)
 			[
 				SAssignNew(webBrowser, SMounteaInventoryWebBrowserWrapper)
 				.InitialURL(TEXT("about:blank"))
+				.OnConsoleMessage(FOnConsoleMessageDelegate::CreateLambda(
+					[](const FString& Message, const FString&, int32, EWebBrowserConsoleLogSeverity)
+					{
+						if (!Message.StartsWith(TEXT("MIAE_LINK:")))
+							return;
+
+						const FString data = Message.RightChop(10);
+						FString dataType;
+						FString url;
+						if (data.Split(TEXT(":"), &dataType, &url) && dataType == TEXT("external"))
+							FPlatformProcess::LaunchURL(*url, nullptr, nullptr);
+					}
+				))
 			]
 		];
 
