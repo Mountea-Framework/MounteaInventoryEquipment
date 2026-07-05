@@ -64,7 +64,7 @@ public:
 	
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
-	FGuid RecipeGuid;
+	FGuid RecipeGuid = FGuid::NewGuid();
 
 	/**
 	 * Holds reference of Item (Recipe), which granted this Recipe to known recipes.

@@ -37,10 +37,12 @@ public:
 #if WITH_EDITOR
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual FText GetTooltipText() const override;
+	virtual FText GetVisualWarningTooltipText() const override;
 	virtual FText GetToolTipHeading() const override;
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
 	virtual FName GetCornerIcon() const override;
+	virtual bool ShowVisualWarning() const override;
 	virtual FText GetMenuCategory() const override;
 	virtual FString GetDocumentationLink() const override { return TEXT("https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/K2Nodes/"); };
 #endif
@@ -53,14 +55,17 @@ protected:
 
 	void RefreshGeneratedPins();
 	FString GetSelectedDefinitionKey() const;
+	FString BuildDefinitionIssueText() const;
+	FString BuildRequiredInputIssueText() const;
 	bool ResolveSelectedDefinition(FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors) const;
-	void CreateFieldPins(const FMounteaJsonObjectDefinition& Definition);
+	void CreateFieldPins();
 
 	static bool IsSupportedFieldPinType(const FEdGraphPinType& PinType);
 	static UFunction* GetSetterFunctionForPinType(const FEdGraphPinType& PinType);
 	static FName GetFieldPinName(const FName FieldName);
 	static FName GetFieldNameFromPinName(const FName PinName);
 	static bool IsGeneratedFieldPin(const UEdGraphPin* Pin);
+	static bool IsRequiredInputPinEmpty(const UEdGraphPin* Pin);
 	static bool ShouldSkipUnconnectedFieldPin(const UEdGraphPin* Pin);
 	static void CopyPinDefaults(const UEdGraphPin* SourcePin, UEdGraphPin* TargetPin);
 

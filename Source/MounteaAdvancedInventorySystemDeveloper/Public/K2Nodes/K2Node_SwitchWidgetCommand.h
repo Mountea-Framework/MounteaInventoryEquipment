@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere, Category="PinOptions")
 	uint32 bIsCaseSensitive : 1;
 
+	UPROPERTY()
+	TSet<FName> ConfigBackedPinNames;
+
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual FText GetToolTipHeading() const override;
@@ -65,6 +68,7 @@ protected:
 	virtual void RemovePin(UEdGraphPin* TargetPin) override;
 
 	void SetupCaseSensitivityFunction();
+	void RefreshPinNamesFromSettings();
 	static void GetWidgetCommandsFromSettings(TArray<FName>& OutCommands);
 	static bool IsPredefinedPin(const FName& PinName);
 	void GetVisiblePinNames(TArray<FName>& OutVisiblePins) const;

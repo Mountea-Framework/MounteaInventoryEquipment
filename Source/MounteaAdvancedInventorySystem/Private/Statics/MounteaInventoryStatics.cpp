@@ -21,7 +21,6 @@
 #include "Definitions/MounteaEquipmentBaseDataTypes.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
-#include "Settings/TemplatesConfig/MounteaAdvancedInventoryPayloadsConfig.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
 #define MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, HandleGetter) \
@@ -167,34 +166,6 @@ UPrimaryDataAsset* UMounteaInventoryStatics::GetTemplateConfig(const FString& Ke
 	if (!config) return nullptr;
 	const auto templateConfig = config->TemplatesConfig.Find(Key);
 	return templateConfig ? templateConfig->LoadSynchronous() : nullptr;
-}
-
-UMounteaAdvancedInventoryPayloadsConfig* UMounteaInventoryStatics::GetPayloadsConfig()
-{
-	return Cast<UMounteaAdvancedInventoryPayloadsConfig>(GetTemplateConfig(TEXT("Payloads")));
-}
-
-FPayloadConfig UMounteaInventoryStatics::FindPayloadConfig(const FGameplayTag Creator, const FGameplayTag Receiver, bool& bSuccess)
-{
-	const auto payloadConfig = GetPayloadsConfig();
-	if (!IsValid(payloadConfig))
-	{
-		bSuccess = false;
-		return {};
-	}
-
-	FPayloadConfig searchKey;
-	searchKey.PayloadCreator = Creator;
-	searchKey.PayloadReceiver = Receiver;
-
-	if (const FPayloadConfig* foundConfig = payloadConfig->PayloadConfigs.Find(searchKey))
-	{
-		bSuccess = true;
-		return *foundConfig;
-	}
-
-	bSuccess = false;
-	return {};
 }
 
 FMounteaInventoryItem UMounteaInventoryStatics::NewInventoryItem(const FGuid& ItemGuid)

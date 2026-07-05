@@ -15,7 +15,7 @@
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryModalContentWidgetInterface.generated.h"
 
-class UMounteaModalsPayload;
+class UMounteaJsonObject;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnModalContentConfirmed, UObject*, Payload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnModalContentCancelled);
@@ -38,8 +38,12 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryModalContentWi
 public:
 
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal|Content")
-	void ConstructModalContent(UMounteaModalsPayload* Payload);
-	virtual void ConstructModalContent_Implementation(UMounteaModalsPayload* Payload) = 0;
+	void ConstructModalContent(UMounteaJsonObject* InPayload);
+	virtual void ConstructModalContent_Implementation(UMounteaJsonObject* InPayload) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Modal")
+	void StartExpiration(const float WidgetLifetime);
+	virtual void StartExpiration_Implementation(const float WidgetLifetime) = 0;
 
 	virtual FOnModalContentConfirmed& GetOnModalContentConfirmedHandle() = 0;
 	virtual FOnModalContentCancelled& GetOnModalContentCancelledHandle() = 0;

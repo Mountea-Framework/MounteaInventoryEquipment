@@ -29,6 +29,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRecipeForgotten, const UMounteaRe
 DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaCraftingFinishedBinding, const FMounteaCraftingResult&, Result);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaRecipeLearnedBinding, const UMounteaRecipeTemplate*, RecipeTemplate);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaRecipeForgottenBinding, const UMounteaRecipeTemplate*, RecipeTemplate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMounteaCraftingStarted, const TScriptInterface<IMounteaAdvancedCraftingStationInterface>&, CraftingStation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMounteaCraftingStopped, const TScriptInterface<IMounteaAdvancedCraftingStationInterface>&, CraftingStation);
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedCraftingParticipantInterface : public UInterface
@@ -76,6 +78,10 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	FMounteaCraftingResult StartCrafting(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 	virtual FMounteaCraftingResult StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
+	void StopCrafting();
+	virtual void StopCrafting_Implementation() = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Crafting")
 	TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory() const;

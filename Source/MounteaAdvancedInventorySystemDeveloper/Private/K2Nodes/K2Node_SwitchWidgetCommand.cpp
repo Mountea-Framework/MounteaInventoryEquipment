@@ -63,14 +63,7 @@ FName UK2Node_SwitchWidgetCommand::GetPinNameGivenIndex(const int32 Index) const
 
 void UK2Node_SwitchWidgetCommand::CreateCasePins()
 {
-	TArray<FName> predefinedCommands;
-	GetWidgetCommandsFromSettings(predefinedCommands);
-	
-	for (const FName& commandName : predefinedCommands)
-	{
-		if (!PinNames.Contains(commandName))
-			PinNames.Add(commandName, false);
-	}
+	RefreshPinNamesFromSettings();
 	
 	for (const TPair<FName, bool>& pinPair : PinNames)
 	{
@@ -112,6 +105,44 @@ void UK2Node_SwitchWidgetCommand::RemovePin(UEdGraphPin* TargetPin)
 	return;
 
 	PinNames.Remove(TargetPin->PinName);
+}
+
+void UK2Node_SwitchWidgetCommand::RefreshPinNamesFromSettings()
+{
+	TArray<FName> commands;
+	GetWidgetCommandsFromSettings(commands);
+
+	TSet<FName> currentConfigPinNames;
+	for (const FName& command : commands)
+	{
+		if (!command.IsNone())
+			currentConfigPinNames.Add(command);
+	}
+
+	if (ConfigBackedPinNames.Num() > 0)
+	{
+		for (const FName& cachedPinName : ConfigBackedPinNames)
+		{
+			if (!currentConfigPinNames.Contains(cachedPinName))
+				PinNames.Remove(cachedPinName);
+		}
+	}
+	else
+	{
+		for (auto pinNameIt = PinNames.CreateIterator(); pinNameIt; ++pinNameIt)
+		{
+			if (!pinNameIt->Value && !currentConfigPinNames.Contains(pinNameIt->Key))
+				pinNameIt.RemoveCurrent();
+		}
+	}
+
+	for (const FName& command : currentConfigPinNames)
+	{
+		if (!PinNames.Contains(command))
+			PinNames.Add(command, false);
+	}
+
+	ConfigBackedPinNames = MoveTemp(currentConfigPinNames);
 }
 
 void UK2Node_SwitchWidgetCommand::GetWidgetCommandsFromSettings(TArray<FName>& OutCommands)

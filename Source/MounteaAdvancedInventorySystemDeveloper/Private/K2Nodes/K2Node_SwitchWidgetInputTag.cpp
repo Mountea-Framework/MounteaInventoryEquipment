@@ -67,14 +67,7 @@ FName UK2Node_SwitchWidgetInputTag::GetPinNameGivenIndex(const int32 Index) cons
 
 void UK2Node_SwitchWidgetInputTag::CreateCasePins()
 {
-	TArray<FGameplayTag> predefinedTags;
-	GetAvailableUIActionTags(predefinedTags);
-	
-	for (const FGameplayTag& predefinedTag : predefinedTags)
-	{
-		if (!PinTags.Contains(predefinedTag))
-			PinTags.Add(predefinedTag, false);
-	}
+	RefreshPinTagsFromSettings();
 	
 	for (const TPair<FGameplayTag, bool>& pinPair : PinTags)
 	{
@@ -126,6 +119,44 @@ void UK2Node_SwitchWidgetInputTag::RemovePin(UEdGraphPin* TargetPin)
 			break;
 		}
 	}
+}
+
+void UK2Node_SwitchWidgetInputTag::RefreshPinTagsFromSettings()
+{
+	TArray<FGameplayTag> actionTags;
+	GetAvailableUIActionTags(actionTags);
+
+	TSet<FGameplayTag> currentConfigPinTags;
+	for (const FGameplayTag& actionTag : actionTags)
+	{
+		if (actionTag.IsValid())
+			currentConfigPinTags.Add(actionTag);
+	}
+
+	if (ConfigBackedPinTags.Num() > 0)
+	{
+		for (const FGameplayTag& cachedPinTag : ConfigBackedPinTags)
+		{
+			if (!currentConfigPinTags.Contains(cachedPinTag))
+				PinTags.Remove(cachedPinTag);
+		}
+	}
+	else
+	{
+		for (auto pinTagIt = PinTags.CreateIterator(); pinTagIt; ++pinTagIt)
+		{
+			if (!pinTagIt->Value && !currentConfigPinTags.Contains(pinTagIt->Key))
+				pinTagIt.RemoveCurrent();
+		}
+	}
+
+	for (const FGameplayTag& actionTag : currentConfigPinTags)
+	{
+		if (!PinTags.Contains(actionTag))
+			PinTags.Add(actionTag, false);
+	}
+
+	ConfigBackedPinTags = MoveTemp(currentConfigPinTags);
 }
 
 void UK2Node_SwitchWidgetInputTag::GetVisiblePinNames(TArray<FName>& OutVisiblePins) const
