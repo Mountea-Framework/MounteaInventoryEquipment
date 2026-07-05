@@ -40,9 +40,11 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingParticipantComponent : 
 public:
 	UMounteaCraftingParticipantComponent();
 
-protected:
+public:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+protected:
 	void InitializeInventoryAndEquipment();
 
 	UFUNCTION()
@@ -100,7 +102,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Crafting")
 	FOnRecipeForgotten OnRecipeForgotten;
 
-	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_KnownRecipes, VisibleDefaultsOnly, BlueprintReadOnly, Category="Crafting",
+	UPROPERTY(SaveGame, ReplicatedUsing=OnRep_KnownRecipes, VisibleAnywhere, BlueprintReadOnly, Category="Crafting",
 		meta=(NoResetToDefault))
 	TArray<FGuid> KnownRecipes;
 
