@@ -45,7 +45,6 @@ protected:
 
 	void RefreshPinTypes() const;
 	static UFunction* GetTargetFunction(const UEdGraphPin* ValuePin);
-	static bool IsSupportedValuePinType(const FEdGraphPinType& PinType);
 
 	static const FName TargetPinName;
 	static const FName FieldNamePinName;

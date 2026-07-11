@@ -301,7 +301,7 @@ void UK2Node_BreakJsonObjectByDefinition::CreateFieldPins()
 
 		FEdGraphPinType pinType = field.FieldValueType;
 		pinType.ContainerType = EPinContainerType::None;
-		if (!IsSupportedFieldPinType(pinType))
+		if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(pinType))
 			continue;
 
 		UEdGraphPin* fieldPin = CreatePin(EGPD_Output, pinType, UMounteaAdvancedInventoryJsonStatics::MakeJsonDefinitionFieldPinName(FieldPinPrefix, field.FieldName, fieldPinData.OccurrenceIndex, usedPinNames));
@@ -310,31 +310,11 @@ void UK2Node_BreakJsonObjectByDefinition::CreateFieldPins()
 	}
 }
 
-bool UK2Node_BreakJsonObjectByDefinition::IsSupportedFieldPinType(const FEdGraphPinType& PinType)
-{
-	if (PinType.ContainerType != EPinContainerType::None)
-		return false;
-
-	return PinType.PinCategory == UEdGraphSchema_K2::PC_Int ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Int64 ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Real ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_String ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Name ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Byte ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Text ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Struct ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Object ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Class ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass;
-}
-
 UFunction* UK2Node_BreakJsonObjectByDefinition::GetGetterFunctionForPinType(const FEdGraphPinType& PinType)
 {
 	const UClass* staticsClass = UMounteaAdvancedInventoryJsonStatics::StaticClass();
 
-	if (!IsSupportedFieldPinType(PinType))
+	if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(PinType))
 		return nullptr;
 
 	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int)

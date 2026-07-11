@@ -34,8 +34,6 @@
 #include "Commands/FMAISCommands.h"
 
 #include "Customizations/MounteaJsonObjectDefinitionCustomization.h"
-#include "Customizations/MounteaJsonObjectDefinitionFieldCustomization.h"
-#include "Customizations/MounteaJsonObjectDefinitionIncludeCustomization.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
@@ -201,22 +199,12 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 		RegisteredCustomPropertyTypeLayouts =
 		{
-			TEXT("MounteaJsonObjectDefinition"),
-			TEXT("MounteaJsonObjectDefinitionField"),
-			TEXT("MounteaJsonObjectDefinitionInclude")
+			TEXT("MounteaJsonObjectDefinition")
 		};
 
 		PropertyModule.RegisterCustomPropertyTypeLayout(
 			RegisteredCustomPropertyTypeLayouts[0],
 			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionCustomization::MakeInstance)
-		);
-		PropertyModule.RegisterCustomPropertyTypeLayout(
-			RegisteredCustomPropertyTypeLayouts[1],
-			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionFieldCustomization::MakeInstance)
-		);
-		PropertyModule.RegisterCustomPropertyTypeLayout(
-			RegisteredCustomPropertyTypeLayouts[2],
-			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionIncludeCustomization::MakeInstance)
 		);
 		PropertyModule.NotifyCustomizationModuleChanged();
 	}
