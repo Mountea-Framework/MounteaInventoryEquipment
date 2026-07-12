@@ -192,6 +192,11 @@ public:
 		DisplayName="Get Single Interface By Class")
 	static TScriptInterface<IInterface> GetSingleInterfaceByClass(const UObject* Target, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
 	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers", 
+		meta=(MounteaGetter),
+		DisplayName="Get Object from Interface")
+	static UObject* GetObjectFromInterface(const TScriptInterface<IInterface>& Input);
+	
 #pragma region K2NodeHelpers
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category = "Mountea|Inventory & Equipment|Payloads",

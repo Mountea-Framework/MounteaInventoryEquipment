@@ -222,6 +222,11 @@ TScriptInterface<IInterface> UMounteaInventorySystemStatics::GetSingleInterfaceB
 	return result;
 }
 
+UObject* UMounteaInventorySystemStatics::GetObjectFromInterface(const TScriptInterface<IInterface>& Input)
+{
+	return Input.GetObject();
+}
+
 #pragma region K2NodeHelpers
 
 bool UMounteaInventorySystemStatics::SetIntPropertyValue(UObject* Target, const FName PropertyName, const int32 Value)
