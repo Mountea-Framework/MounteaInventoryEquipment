@@ -58,7 +58,6 @@ protected:
 	bool ResolveSelectedDefinition(FMounteaJsonObjectDefinition& OutDefinition, TArray<FString>& Errors) const;
 	void CreateFieldPins();
 
-	static bool IsSupportedFieldPinType(const FEdGraphPinType& PinType);
 	static UFunction* GetGetterFunctionForPinType(const FEdGraphPinType& PinType);
 	static FName GetFieldPinName(const FName FieldName);
 	static bool IsGeneratedFieldPin(const UEdGraphPin* Pin);

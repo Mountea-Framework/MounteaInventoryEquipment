@@ -61,31 +61,6 @@ void UK2Node_SetJsonFieldByName::GetMenuActions(FBlueprintActionDatabaseRegistra
 	}
 }
 
-bool UK2Node_SetJsonFieldByName::IsSupportedValuePinType(const FEdGraphPinType& PinType)
-{
-	if (PinType.ContainerType != EPinContainerType::None)
-		return false;
-
-	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Int64 ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Real ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_String ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Name ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Byte ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Text ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Struct ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Object ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_Class ||
-		PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass)
-	{
-		return true;
-	}
-
-	return false;
-}
-
 bool UK2Node_SetJsonFieldByName::IsConnectionDisallowed(const UEdGraphPin* MyPin, const UEdGraphPin* OtherPin, FString& OutReason) const
 {
 	if (MyPin->PinName == ValuePinName && MyPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Wildcard)
@@ -97,7 +72,7 @@ bool UK2Node_SetJsonFieldByName::IsConnectionDisallowed(const UEdGraphPin* MyPin
 			return true;
 		}
 
-		if (!IsSupportedValuePinType(OtherPin->PinType))
+		if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(OtherPin->PinType))
 		{
 			OutReason = LOCTEXT("UnsupportedType", "Unsupported JSON field type").ToString();
 			return true;
@@ -147,7 +122,7 @@ UFunction* UK2Node_SetJsonFieldByName::GetTargetFunction(const UEdGraphPin* Valu
 		return nullptr;
 
 	const FEdGraphPinType& effectiveType = GetEffectiveType(ValuePin);
-	if (!IsSupportedValuePinType(effectiveType))
+	if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(effectiveType))
 		return nullptr;
 
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int)

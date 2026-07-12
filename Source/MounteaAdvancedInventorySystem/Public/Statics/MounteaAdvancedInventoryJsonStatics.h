@@ -87,6 +87,7 @@ public:
 	static FName MakeJsonDefinitionFieldPinName(const FString& FieldPinPrefix, FName FieldName, int32 OccurrenceIndex, TSet<FName>& UsedPinNames);
 	static FString BuildJsonDefinitionFieldPinTooltip(const FMounteaResolvedJsonObjectDefinitionField& FieldData);
 	static FString BuildJsonDefinitionIssueText(const FString& DefinitionKey);
+	static bool IsSupportedJsonDefinitionFieldPinType(const FEdGraphPinType& PinType);
 
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|JSON|Definitions",
 		meta=(MounteaGetter),

@@ -39,6 +39,26 @@ namespace MounteaJsonDefinitionPinTypes
 	static const FName Text(TEXT("text"));
 }
 
+bool UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(const FEdGraphPinType& PinType)
+{
+	if (PinType.ContainerType != EPinContainerType::None)
+		return false;
+
+	return PinType.PinCategory == MounteaJsonDefinitionPinTypes::Int ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Int64 ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Real ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Boolean ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::String ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Name ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Text ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Byte ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Object ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Class ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftClass ||
+		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct;
+}
+
 static UObject* ResolveJsonObjectOuter(UObject* Target)
 {
 	return IsValid(Target) ? Target : GetTransientPackage();
