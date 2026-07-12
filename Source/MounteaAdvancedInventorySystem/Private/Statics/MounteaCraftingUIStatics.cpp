@@ -58,6 +58,27 @@ UMounteaAdvancedCraftingUIConfig* UMounteaCraftingUIStatics::GetCraftingUISettin
 	return settings->AdvancedCraftingUISettingsConfig.LoadSynchronous();
 }
 
+TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> UMounteaCraftingUIStatics::GetParentCraftingParticipant(const UObject* Target)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>())
+		return nullptr;
+		
+	return IMounteaAdvancedCraftingParticipantUIInterface::Execute_GetParentCraftingParticipant(Target);
+}
+
+UObject* UMounteaCraftingUIStatics::GetParentCraftingParticipantObject(const UObject* Target)
+{
+	return GetParentCraftingParticipant(Target).GetObject();
+}
+
+bool UMounteaCraftingUIStatics::SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant)
+{
+	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>())
+		return false;
+
+	return IMounteaAdvancedCraftingParticipantUIInterface::Execute_SetCraftingParticipant(Target, Participant);
+}
+
 bool UMounteaCraftingUIStatics::CreateCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target)
 {
 	return IsValidCraftingUIHandler(Target.GetObject()) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_CreateCraftingWidget(Target.GetObject()) : false;
