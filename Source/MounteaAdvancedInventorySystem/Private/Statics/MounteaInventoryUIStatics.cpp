@@ -816,22 +816,6 @@ void UMounteaInventoryUIStatics::SetSourceInventory(
 		Target->Execute_SetOwningInventoryUI(Target.GetObject(), ParentInventory);
 }
 
-TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> UMounteaInventoryUIStatics::GetParentCraftingParticipant(const UObject* Target)
-{
-	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>())
-		return nullptr;
-		
-	return IMounteaAdvancedCraftingParticipantUIInterface::Execute_GetParentCraftingParticipant(Target);
-}
-
-bool UMounteaInventoryUIStatics::SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant)
-{
-	if (!IsValid(Target) || !Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>())
-		return false;
-
-	return IMounteaAdvancedCraftingParticipantUIInterface::Execute_SetCraftingParticipant(Target, Participant);
-}
-
 #pragma endregion 
 
 void UMounteaInventoryUIStatics::SetInventoryCategoryKey(UWidget* Target, const FString& CategoryId)

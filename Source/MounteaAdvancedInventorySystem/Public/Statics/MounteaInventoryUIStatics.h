@@ -96,44 +96,6 @@ public:
 		DisplayName="Unbind From On Item Selected")
 	static bool UnbindFromOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
 	
-	// --- Crafting Participant
-#pragma region CraftingParticipant
-
-	/**
-	 * Retrieves the parent crafting participant associated with a specified object.
-	 *
-	 * This function checks if the given object is valid and implements the
-	 * MounteaAdvancedCraftingParticipantUIInterface. If so, it retrieves the parent crafting participant from the object.
-	 *
-	 * @param Target The object for which to retrieve the parent crafting participant.
-	 * @return A TScriptInterface of IMounteaAdvancedCraftingParticipantInterface
-	 *         if a parent crafting participant exists, or nullptr if the object is invalid
-	 *         or does not implement the required interface.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
-		meta=(MounteaGetter),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Get Parent Crafting Participant")
-	static TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant(const UObject* Target);
-
-	/**
-	 * Attempts to associate a crafting participant with a target object that implements the required interface.
-	 *
-	 * This function verifies the validity of the provided target object and checks if it implements the
-	 * UMounteaAdvancedCraftingParticipantUIInterface. If the target is valid and compatible, it sets the crafting participant for the target object.
-	 *
-	 * @param Target The object to which the crafting participant will be assigned. Must implement UMounteaAdvancedCraftingParticipantUIInterface.
-	 * @param Participant The crafting participant to be associated with the target.
-	 * @return True if the crafting participant was successfully set; otherwise, false.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
-		meta=(MounteaSetter),
-		meta=(DefaultToSelf="Target"),
-		DisplayName="Set Parent Crafting Participant")
-	static bool SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
-
-#pragma endregion
-	
 	// --- UI Subsystem
 #pragma region UISubsystem
 	

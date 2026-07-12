@@ -12,6 +12,7 @@
 #include "Statics/MounteaJsonDefinitionPinTypeStatics.h"
 
 #include "EdGraphSchema_K2.h"
+#include "Statics/MounteaAdvancedInventoryJsonStatics.h"
 
 namespace MounteaJsonDefinitionPinTypeStatics
 {
@@ -25,22 +26,7 @@ namespace MounteaJsonDefinitionPinTypeStatics
 
 	bool IsSupportedPinType(const FEdGraphPinType& PinType)
 	{
-		if (PinType.ContainerType != EPinContainerType::None)
-			return false;
-
-		return PinType.PinCategory == UEdGraphSchema_K2::PC_Int ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Int64 ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Real ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Boolean ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_String ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Name ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Text ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Byte ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Object ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Class ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_SoftClass ||
-			PinType.PinCategory == UEdGraphSchema_K2::PC_Struct;
+		return UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(PinType);
 	}
 
 	bool IsSupportedPinTypeTreeItem(const FPinTypeTreeItem& InItem)
