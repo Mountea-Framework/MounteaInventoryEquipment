@@ -15,6 +15,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryBaseCommands.h"
 #include "Engine/LocalPlayer.h"
+#include "Helpers/MounteaCategoryWidgetEventHelpers.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
 #include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingWidgetInterface.h"
@@ -227,10 +228,27 @@ bool UMounteaCraftingParticipantUIComponent::SetCraftingParticipant_Implementati
 
 bool UMounteaCraftingParticipantUIComponent::CraftingCategorySelected_Implementation(const FString& SelectedCategoryId)
 {
-	const bool bSuccess = SelectedCategoryId.Equals(SelectedCategory, ESearchCase::IgnoreCase);
-	if (bSuccess)
-		SelectedCategory = SelectedCategoryId;
-	return bSuccess;
+	if (SelectedCategory.Equals(SelectedCategoryId, ESearchCase::IgnoreCase))
+		return false;
+	SelectedCategory = SelectedCategoryId;
+	return true;
+}
+
+bool UMounteaCraftingParticipantUIComponent::BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding)
+{
+	return FMounteaCategoryWidgetEventHelpers::BindCategoryWidgetSelected(CategoryWidgetSelectedRegistry, CategoryWidget, Binding);
+}
+
+bool UMounteaCraftingParticipantUIComponent::UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding)
+{
+	return FMounteaCategoryWidgetEventHelpers::UnbindCategoryWidgetSelected(CategoryWidgetSelectedRegistry, CategoryWidget, Binding);
+}
+
+bool UMounteaCraftingParticipantUIComponent::TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId)
+{
+	const bool bDelivered = FMounteaCategoryWidgetEventHelpers::TriggerCategoryWidgetSelected(CategoryWidgetSelectedRegistry, CategoryWidget, CategoryId);
+	Execute_CraftingCategorySelected(this, CategoryId);
+	return bDelivered;
 }
 
 bool UMounteaCraftingParticipantUIComponent::CraftableItemSelected_Implementation(const FGuid& NewSelectedItem)

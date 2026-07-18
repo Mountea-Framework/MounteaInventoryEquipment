@@ -14,6 +14,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
+#include "Interfaces/Widgets/Category/MounteaCategoryWidgetEventRegistrarInterface.h"
 #include "MounteaCraftingParticipantUIComponent.generated.h"
 
 class IMounteaAdvancedCraftingParticipantInterface;
@@ -32,7 +33,7 @@ UCLASS(ClassGroup=(Mountea), Blueprintable,
 	AutoCollapseCategories=("Variable,Sockets,Tags,Component Tick,Component Replication,Activation,Events,Replication,Asset User Data,Navigation"),
 	HideCategories=("Cooking","Collision"),
 	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Crafting Participant UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingParticipantUIComponent : public UActorComponent, public IMounteaAdvancedCraftingParticipantUIInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingParticipantUIComponent : public UActorComponent, public IMounteaAdvancedCraftingParticipantUIInterface, public IMounteaCategoryWidgetEventRegistrarInterface
 {
 	GENERATED_BODY()
 
@@ -70,6 +71,10 @@ public:
 		return SelectedItem;
 	}
 
+	virtual bool BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
+	virtual bool UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
+	virtual bool TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId) override;
+
 protected:
 
 	UMounteaAdvancedInventorySharedHUDSubsystem* GetSharedHUDSubsystem() const;
@@ -88,9 +93,13 @@ protected:
 		meta=(NoResetToDefault))
 	TObjectPtr<UUserWidget> CraftingWidget;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing", 
-		meta=(AllowPrivateAccess), 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
+		meta=(AllowPrivateAccess),
 		meta=(ExposeOnSpawn),
 		meta=(DisplayThumbnail=false))
 	TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> CraftingParticipant;
+
+	// Per-Category-widget-instance OnCategorySelected listeners, keyed by the widget itself. Not a UPROPERTY:
+	// UHT does not support delegate value types in reflected TMaps, and TWeakObjectPtr keys need no GC tracking.
+	TMap<TWeakObjectPtr<UObject>, FOnCategoryWidgetSelected> CategoryWidgetSelectedRegistry;
 };
