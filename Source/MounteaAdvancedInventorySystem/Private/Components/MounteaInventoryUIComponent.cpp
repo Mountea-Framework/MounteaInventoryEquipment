@@ -20,6 +20,7 @@
 #include "Definitions/MounteaInventoryBaseCommands.h"
 
 #include "Helpers/MounteaAdvancedInventoryWidgetPayload.h"
+#include "Helpers/MounteaCategoryWidgetEventHelpers.h"
 
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
@@ -319,6 +320,23 @@ void UMounteaInventoryUIComponent::CategorySelected_Implementation(const FString
 	}
 
 	OnCategorySelected.Broadcast(SelectedCategoryId);
+}
+
+bool UMounteaInventoryUIComponent::BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding)
+{
+	return FMounteaCategoryWidgetEventHelpers::BindCategoryWidgetSelected(CategoryWidgetSelectedRegistry, CategoryWidget, Binding);
+}
+
+bool UMounteaInventoryUIComponent::UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding)
+{
+	return FMounteaCategoryWidgetEventHelpers::UnbindCategoryWidgetSelected(CategoryWidgetSelectedRegistry, CategoryWidget, Binding);
+}
+
+bool UMounteaInventoryUIComponent::TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId)
+{
+	const bool bDelivered = FMounteaCategoryWidgetEventHelpers::TriggerCategoryWidgetSelected(CategoryWidgetSelectedRegistry, CategoryWidget, CategoryId);
+	Execute_CategorySelected(this, CategoryId);
+	return bDelivered;
 }
 
 void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& SelectedItem)

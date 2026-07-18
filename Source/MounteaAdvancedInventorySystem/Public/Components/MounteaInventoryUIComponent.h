@@ -17,6 +17,7 @@
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
+#include "Interfaces/Widgets/Category/MounteaCategoryWidgetEventRegistrarInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
 
 class UMounteaAdvancedInventoryUIConfig;
@@ -34,7 +35,7 @@ class UMounteaAdvancedInventorySharedHUDSubsystem;
 UCLASS(ClassGroup=(Mountea), Blueprintable, AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
     meta=(BlueprintSpawnableComponent),
     meta=(DisplayName="Mountea Inventory UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface, public IMounteaCategoryWidgetEventRegistrarInterface
 {
 	GENERATED_BODY()
 
@@ -107,6 +108,10 @@ public:
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
 	{ return OnItemSelected; };
 
+	virtual bool BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
+	virtual bool UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
+	virtual bool TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId) override;
+
 protected:
 	
 	
@@ -128,7 +133,11 @@ protected:
 	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
 	
 	FActionsQueue ActionsQueue;
-	
+
+	// Per-Category-widget-instance OnCategorySelected listeners, keyed by the widget itself. Not a UPROPERTY:
+	// UHT does not support delegate value types in reflected TMaps, and TWeakObjectPtr keys need no GC tracking.
+	TMap<TWeakObjectPtr<UObject>, FOnCategoryWidgetSelected> CategoryWidgetSelectedRegistry;
+
 	// Currently active category in UI.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Inventory", 
 		meta=(NoResetToDefault))
