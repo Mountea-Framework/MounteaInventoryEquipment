@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -75,24 +75,6 @@
 		return false; \
 	nativeInterface->HandleGetter().Remove(Binding); \
 	return true
-
-#define MOUNTEA_BIND_CATEGORY_UI_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid(Target) || !(Binding).IsBound()) \
-		return false; \
-	IMounteaAdvancedInventoryCategoryWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryCategoryWidgetInterface>(Target); \
-		if (!nativeInterface) \
-			return false; \
-		nativeInterface->HandleGetter().AddUnique(Binding); \
-	return true
-
-#define MOUNTEA_UNBIND_CATEGORY_UI_DELEGATE(Target, Binding, HandleGetter) \
-	if (!IsValid(Target) || !(Binding).IsBound()) \
-		return false; \
-	IMounteaAdvancedInventoryCategoryWidgetInterface* nativeInterface = Cast<IMounteaAdvancedInventoryCategoryWidgetInterface>(Target); \
-		if (!nativeInterface) \
-			return false; \
-	nativeInterface->HandleGetter().Remove(Binding); \
-		return true
 
 APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
 {
