@@ -17,6 +17,9 @@
 
 class IMounteaAdvancedInventoryUIManagerInterface;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCategoryWidgetSelected, const FString&, CategoryId);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaCategoryWidgetSelectedBinding, const FString&, CategoryId);
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryCategoryWidgetInterface : public UInterface
 {
@@ -61,4 +64,25 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
 	void SetActiveState(const bool bIsActive);
 	virtual void SetActiveState_Implementation(const bool bIsActive) = 0;
+
+	/**
+	 * Sets the object this widget will route its OnCategorySelected event through once it fires.
+	 * Set once, at widget-creation time, by whoever spawns this widget. The widget itself never
+	 * needs to know what kind of object the registrar is (Inventory UI, Crafting UI, or anything else).
+	 *
+	 * @param Registrar Object implementing IMounteaCategoryWidgetEventRegistrarInterface.
+	 * @see IMounteaCategoryWidgetEventRegistrarInterface
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
+	void SetCategoryWidgetEventRegistrar(UObject* Registrar);
+	virtual void SetCategoryWidgetEventRegistrar_Implementation(UObject* Registrar) = 0;
+
+	/**
+	 * Returns the object previously set via SetCategoryWidgetEventRegistrar.
+	 * @return Object implementing IMounteaCategoryWidgetEventRegistrarInterface, or nullptr if unset.
+	 * @see IMounteaCategoryWidgetEventRegistrarInterface
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
+	UObject* GetCategoryWidgetEventRegistrar() const;
+	virtual UObject* GetCategoryWidgetEventRegistrar_Implementation() const = 0;
 };
