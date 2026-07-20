@@ -41,27 +41,42 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryCategoryWidget
 public:
 	
 	/**
-	 * 
-	 * @param CategoryId 
-	 * @return 
+	 * Assigns the inventory category identifier represented by this widget.
+	 *
+	 * @param CategoryId Category identifier this widget should represent.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
+		meta=(DisplayName="Category UI - Set Category Key"))
 	void SetInventoryCategoryKey(const FString& CategoryId);
 	virtual void SetInventoryCategoryKey_Implementation(const FString& CategoryId) = 0;
 
 	/**
-	 * 
-	 * @return 
+	 * Returns the inventory category identifier represented by this widget.
+	 *
+	 * @return Category identifier assigned to this widget.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
+		meta=(DisplayName="Category UI - Get Category Key"))
 	FString GetInventoryCategoryKey() const;
 	virtual FString GetInventoryCategoryKey_Implementation() const = 0;
+	
+	/**
+	 * Requests this widget to select its assigned inventory category.
+	 *
+	 * @return True if the category selection was accepted or routed successfully.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
+		meta=(DisplayName="Category UI - Select Category"))
+	bool SelectCategory();
+	virtual bool SelectCategory_Implementation() = 0;
 
 	/**
-	 * 
-	 * @param bIsActive 
+	 * Updates the visual or logical active state for this category widget.
+	 *
+	 * @param bIsActive True when this widget represents the active category.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
+		meta=(DisplayName="Category UI - Set Active State"))
 	void SetActiveState(const bool bIsActive);
 	virtual void SetActiveState_Implementation(const bool bIsActive) = 0;
 
@@ -73,7 +88,8 @@ public:
 	 * @param Registrar Object implementing IMounteaCategoryWidgetEventRegistrarInterface.
 	 * @see IMounteaCategoryWidgetEventRegistrarInterface
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
+		meta=(DisplayName="Category UI - Set Event Registrar"))
 	void SetCategoryWidgetEventRegistrar(UObject* Registrar);
 	virtual void SetCategoryWidgetEventRegistrar_Implementation(UObject* Registrar) = 0;
 
@@ -82,7 +98,8 @@ public:
 	 * @return Object implementing IMounteaCategoryWidgetEventRegistrarInterface, or nullptr if unset.
 	 * @see IMounteaCategoryWidgetEventRegistrarInterface
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories")
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
+		meta=(DisplayName="Category UI - Get Event Registrar"))
 	UObject* GetCategoryWidgetEventRegistrar() const;
 	virtual UObject* GetCategoryWidgetEventRegistrar_Implementation() const = 0;
 };
