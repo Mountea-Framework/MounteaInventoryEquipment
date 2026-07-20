@@ -11,6 +11,7 @@
 
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
 
+#include "Blueprint/UserWidget.h"
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
 #include "Definitions/MounteaAdvancedInventoryGlobalUIDataTypes.h"
 
@@ -142,6 +143,29 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 		},
 		{
 			MakeJsonDefinitionInclude(TEXT("ModalItemResponseDefinition"))
+		}
+	));
+
+	// CategorySelectedRequest
+	JsonObjectDefinitions.Add(TEXT("CategorySelectedRequest"), MakeJsonObjectDefinition(
+		{
+			MakeJsonUObjectDefinitionField(TEXT("CategoryWidget")),
+			MakeJsonStringDefinitionField(TEXT("CategoryId"))
+		}
+	));
+
+	// CategorySelectedResponse
+	JsonObjectDefinitions.Add(TEXT("CategorySelectedResponse"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStringDefinitionField(TEXT("CategoryId"))
+		}
+	));
+
+	// CategoriesCreateRequest
+	JsonObjectDefinitions.Add(TEXT("CategoriesCreateRequest"), MakeJsonObjectDefinition(
+		{
+			MakeJsonDefinitionField(TEXT("CategoryWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass()),
+			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject"))
 		}
 	));
 }
