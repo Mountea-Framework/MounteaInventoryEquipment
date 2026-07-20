@@ -59,8 +59,6 @@ public:
 	};
 	virtual void RemoveInventoryWidget_Implementation() override;
 	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) override;
-	virtual void OnUIScreenOpened_Implementation() override {};
-	virtual void OnUIScreenClosed_Implementation() override {};
 
 	virtual UWidget* GetActiveItemWidget_Implementation() const override
 	{
@@ -109,6 +107,10 @@ public:
 	{ return OnCategorySelected; };
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() override
 	{ return OnItemSelected; };
+	virtual FInventoryUIScreenOpened& GetOnUIScreenOpenedHandle() override
+	{ return OnUIScreenOpened; };
+	virtual FInventoryUIScreenClosed& GetOnUIScreenClosedHandle() override
+	{ return OnUIScreenClosed; };
 
 	virtual bool BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
@@ -202,4 +204,18 @@ protected:
 	 */
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory")
 	FInventoryItemSelected OnItemSelected;
+
+	/**
+	 * Delegate triggered after the inventory UI screen has been successfully opened.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory",
+		meta=(DisplayName="Inventory UI - On UI Screen Opened"))
+	FInventoryUIScreenOpened OnUIScreenOpened;
+
+	/**
+	 * Delegate triggered when the inventory UI screen is being closed after a valid widget was present.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Inventory",
+		meta=(DisplayName="Inventory UI - On UI Screen Closed"))
+	FInventoryUIScreenClosed OnUIScreenClosed;
 };

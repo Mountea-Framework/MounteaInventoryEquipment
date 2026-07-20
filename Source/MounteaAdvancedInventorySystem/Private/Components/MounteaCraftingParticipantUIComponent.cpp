@@ -198,7 +198,7 @@ bool UMounteaCraftingParticipantUIComponent::CreateCraftingWidget_Implementation
 	else
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::Crafting::Open, CraftingWidget);
 
-	Execute_OnUIScreenOpened(this);
+	OnUIScreenOpened.Broadcast();
 
 	return true;
 }
@@ -221,7 +221,7 @@ void UMounteaCraftingParticipantUIComponent::RemoveCraftingWidget_Implementation
 		CraftingWidget = nullptr;
 	}
 
-	Execute_OnUIScreenClosed(this);
+	OnUIScreenClosed.Broadcast();
 }
 
 bool UMounteaCraftingParticipantUIComponent::SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget)

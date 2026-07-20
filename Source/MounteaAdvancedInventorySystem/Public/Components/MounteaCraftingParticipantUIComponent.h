@@ -55,8 +55,6 @@ public:
 	}
 	virtual void RemoveCraftingWidget_Implementation() override;
 	virtual bool SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget) override;
-	virtual void OnUIScreenOpened_Implementation() override {};
-	virtual void OnUIScreenClosed_Implementation() override {};
 	virtual TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant_Implementation() const override
 	{
 		return CraftingParticipant;
@@ -76,6 +74,10 @@ public:
 	virtual bool BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId) override;
+	virtual FCraftingUIScreenOpened& GetOnUIScreenOpenedHandle() override
+	{ return OnUIScreenOpened; };
+	virtual FCraftingUIScreenClosed& GetOnUIScreenClosedHandle() override
+	{ return OnUIScreenClosed; };
 
 protected:
 
@@ -104,4 +106,18 @@ protected:
 	// Per-Category-widget-instance OnCategorySelected listeners, keyed by the widget itself. Not a UPROPERTY:
 	// UHT does not support delegate value types in reflected TMaps, and TWeakObjectPtr keys need no GC tracking.
 	TMap<TWeakObjectPtr<UObject>, FOnCategoryWidgetSelected> CategoryWidgetSelectedRegistry;
+
+	/**
+	 * Delegate triggered after the crafting UI screen has been successfully opened.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Crafting",
+		meta=(DisplayName="Crafting UI - On UI Screen Opened"))
+	FCraftingUIScreenOpened OnUIScreenOpened;
+
+	/**
+	 * Delegate triggered when the crafting UI screen is being closed after a valid widget was present.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Crafting",
+		meta=(DisplayName="Crafting UI - On UI Screen Closed"))
+	FCraftingUIScreenClosed OnUIScreenClosed;
 };

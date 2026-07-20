@@ -26,6 +26,8 @@ class UWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryCategorySelected, const FString&, SelectedCategoryId);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInventoryItemSelected, const FGuid&, SelectedItemId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryUIScreenOpened);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInventoryUIScreenClosed);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryCategorySelectedBinding, const FString&, SelectedCategoryId);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaInventoryItemSelectedBinding, const FGuid&, SelectedItemId);
 
@@ -103,22 +105,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	void RemoveInventoryWidget();
 	virtual void RemoveInventoryWidget_Implementation() = 0;
-
-	/**
-	 * Called after the inventory UI screen has been successfully opened.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory",
-		meta=(DisplayName="Inventory UI - On UI Screen Opened"))
-	void OnUIScreenOpened();
-	virtual void OnUIScreenOpened_Implementation() = 0;
-
-	/**
-	 * Called when the inventory UI screen is being closed after a valid widget was present.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory",
-		meta=(DisplayName="Inventory UI - On UI Screen Closed"))
-	void OnUIScreenClosed();
-	virtual void OnUIScreenClosed_Implementation() = 0;
 	
 	// --- Categories
 	
@@ -335,4 +321,6 @@ public:
 	
 	virtual FInventoryCategorySelected& GetOnCategorySelectedHandle() = 0;
 	virtual FInventoryItemSelected& GetOnItemSelectedHandle() = 0;
+	virtual FInventoryUIScreenOpened& GetOnUIScreenOpenedHandle() = 0;
+	virtual FInventoryUIScreenClosed& GetOnUIScreenClosedHandle() = 0;
 };
