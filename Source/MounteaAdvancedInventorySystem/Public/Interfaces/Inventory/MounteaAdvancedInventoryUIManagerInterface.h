@@ -103,6 +103,22 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory")
 	void RemoveInventoryWidget();
 	virtual void RemoveInventoryWidget_Implementation() = 0;
+
+	/**
+	 * Called after the inventory UI screen has been successfully opened.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory",
+		meta=(DisplayName="Inventory UI - On UI Screen Opened"))
+	void OnUIScreenOpened();
+	virtual void OnUIScreenOpened_Implementation() = 0;
+
+	/**
+	 * Called when the inventory UI screen is being closed after a valid widget was present.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory",
+		meta=(DisplayName="Inventory UI - On UI Screen Closed"))
+	void OnUIScreenClosed();
+	virtual void OnUIScreenClosed_Implementation() = 0;
 	
 	// --- Categories
 	

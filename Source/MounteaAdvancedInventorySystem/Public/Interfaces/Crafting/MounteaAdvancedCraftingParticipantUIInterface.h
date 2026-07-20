@@ -61,6 +61,22 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting")
 	void RemoveCraftingWidget();
 	virtual void RemoveCraftingWidget_Implementation() = 0;
+
+	/**
+	 * Called after the crafting UI screen has been successfully opened.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting",
+		meta=(DisplayName="Crafting UI - On UI Screen Opened"))
+	void OnUIScreenOpened();
+	virtual void OnUIScreenOpened_Implementation() = 0;
+
+	/**
+	 * Called when the crafting UI screen is being closed after a valid widget was present.
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Crafting",
+		meta=(DisplayName="Crafting UI - On UI Screen Closed"))
+	void OnUIScreenClosed();
+	virtual void OnUIScreenClosed_Implementation() = 0;
 	
 	/**
 	 * Handles the selection of a Crafting category in the Crafting UI.
