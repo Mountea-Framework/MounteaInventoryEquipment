@@ -62,7 +62,7 @@ void UMounteaCraftingParticipantComponent::InitializeInventoryAndEquipment()
 {
 	auto inventoryComponent = GetOwner()->FindComponentByInterface(UMounteaAdvancedInventoryInterface::StaticClass());
 	if (!IsValid(inventoryComponent))
-		LOG_ERROR(TEXT("[MounteaInventoryUIComponent] Cannot find 'Inventory' component in Parent! Loadouts will NOT work!"))
+		LOG_ERROR(TEXT("[MounteaInventoryComponent] Cannot find 'Inventory' component in Parent! Loadouts will NOT work!"))
 	else
 	{
 		Execute_SetParentInventory(this, inventoryComponent);
