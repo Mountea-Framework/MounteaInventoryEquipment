@@ -545,6 +545,12 @@ FText UK2Node_ConstructJsonObjectFromDefinition::GetTooltipText() const
 		"Input pins are generated from the merged definition, including included definitions.");
 }
 
+FText UK2Node_ConstructJsonObjectFromDefinition::GetKeywords() const
+{
+	return LOCTEXT("ConstructJsonObjectFromDefinition_Keywords",
+		"json object definition construct create make build payload request response data fields schema");
+}
+
 FText UK2Node_ConstructJsonObjectFromDefinition::GetVisualWarningTooltipText() const
 {
 	return FText::FromString(BuildDefinitionIssueText());

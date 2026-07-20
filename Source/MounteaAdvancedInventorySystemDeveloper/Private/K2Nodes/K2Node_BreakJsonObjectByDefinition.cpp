@@ -404,6 +404,12 @@ FText UK2Node_BreakJsonObjectByDefinition::GetTooltipText() const
 		"Output pins are generated from the merged definition, including included definitions.");
 }
 
+FText UK2Node_BreakJsonObjectByDefinition::GetKeywords() const
+{
+	return LOCTEXT("BreakJsonObjectByDefinition_Keywords",
+		"json object definition break read get extract decode payload request response data fields schema");
+}
+
 FText UK2Node_BreakJsonObjectByDefinition::GetVisualWarningTooltipText() const
 {
 	return FText::FromString(BuildDefinitionIssueText());

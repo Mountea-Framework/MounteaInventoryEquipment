@@ -37,6 +37,7 @@ public:
 #if WITH_EDITOR
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
 	virtual FText GetTooltipText() const override;
+	virtual FText GetKeywords() const override;
 	virtual FText GetVisualWarningTooltipText() const override;
 	virtual FText GetToolTipHeading() const override;
 	virtual FLinearColor GetNodeTitleColor() const override;
