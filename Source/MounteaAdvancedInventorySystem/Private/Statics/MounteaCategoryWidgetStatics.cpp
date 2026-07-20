@@ -13,7 +13,7 @@
 
 #include "Interfaces/Widgets/Category/MounteaCategoryWidgetEventRegistrarInterface.h"
 
-UObject* UMounteaCategoryWidgetStatics::ResolveRegistrar(UObject* CategoryWidget)
+UObject* UMounteaCategoryWidgetStatics::ResolveRegistrar(const UObject* CategoryWidget)
 {
 	if (!IsValid(CategoryWidget) || !CategoryWidget->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>())
 		return nullptr;
@@ -56,4 +56,11 @@ bool UMounteaCategoryWidgetStatics::TriggerOnCategoryWidgetSelected(UObject* Cat
 
 	const FString categoryId = IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_GetInventoryCategoryKey(CategoryWidget);
 	return IMounteaCategoryWidgetEventRegistrarInterface::Execute_TriggerCategoryWidgetSelected(registrar, CategoryWidget, categoryId);
+}
+
+bool UMounteaCategoryWidgetStatics::SelectCategory(UObject* CategoryWidget)
+{
+	return IsValid(CategoryWidget) && 
+		CategoryWidget->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>() && 
+			IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SelectCategory(CategoryWidget);
 }

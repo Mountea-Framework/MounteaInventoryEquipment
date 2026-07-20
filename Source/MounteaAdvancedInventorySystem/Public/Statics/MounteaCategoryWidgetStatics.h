@@ -105,12 +105,27 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Category",
 		meta=(MounteaSetter),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(DefaultToSelf="CategoryWidget"),
 		meta=(DisplayName="Trigger On Category Widget Selected"))
 	static bool TriggerOnCategoryWidgetSelected(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface")) UObject* CategoryWidget);
+	
+	/**
+	 * Requests this widget to select its assigned inventory category.
+	 *
+	 * @param CategoryWidget  Widget implementing IMounteaAdvancedInventoryCategoryWidgetInterface.
+	 * @return True if the category selection was accepted or routed successfully.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Category",
+		meta=(MounteaSetter),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(DefaultToSelf="CategoryWidget"),
+		meta=(DisplayName="Select Category"))
+	static bool SelectCategory(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface")) UObject* CategoryWidget);
 
 private:
 
-	static UObject* ResolveRegistrar(UObject* CategoryWidget);
+	static UObject* ResolveRegistrar(const UObject* CategoryWidget);
 };
