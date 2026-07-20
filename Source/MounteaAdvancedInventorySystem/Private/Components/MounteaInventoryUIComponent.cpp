@@ -221,6 +221,8 @@ bool UMounteaInventoryUIComponent::CreateInventoryWidget_Implementation()
 	else
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::General::Create, InventoryWidget);
 
+	Execute_OnUIScreenOpened(this);
+
 	return true;
 }
 
@@ -237,7 +239,12 @@ void UMounteaInventoryUIComponent::RemoveInventoryWidget_Implementation()
 		InventoryWidget = nullptr;
 	}	
 	else
+	{
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::General::Remove, InventoryWidget);
+		InventoryWidget = nullptr;
+	}
+
+	Execute_OnUIScreenClosed(this);
 }
 
 bool UMounteaInventoryUIComponent::SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget)

@@ -59,6 +59,8 @@ public:
 	};
 	virtual void RemoveInventoryWidget_Implementation() override;
 	virtual bool SetInventoryWidget_Implementation(UUserWidget* NewInventoryWidget) override;
+	virtual void OnUIScreenOpened_Implementation() override {};
+	virtual void OnUIScreenClosed_Implementation() override {};
 
 	virtual UWidget* GetActiveItemWidget_Implementation() const override
 	{

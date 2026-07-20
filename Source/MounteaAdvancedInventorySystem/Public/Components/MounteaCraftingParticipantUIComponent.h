@@ -55,6 +55,8 @@ public:
 	}
 	virtual void RemoveCraftingWidget_Implementation() override;
 	virtual bool SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget) override;
+	virtual void OnUIScreenOpened_Implementation() override {};
+	virtual void OnUIScreenClosed_Implementation() override {};
 	virtual TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant_Implementation() const override
 	{
 		return CraftingParticipant;

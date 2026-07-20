@@ -198,16 +198,30 @@ bool UMounteaCraftingParticipantUIComponent::CreateCraftingWidget_Implementation
 	else
 		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::Crafting::Open, CraftingWidget);
 
+	Execute_OnUIScreenOpened(this);
+
 	return true;
 }
 
 void UMounteaCraftingParticipantUIComponent::RemoveCraftingWidget_Implementation()
 {
-	if (IsValid(CraftingWidget))
+	if (!IsValid(CraftingWidget))
+		return;
+
+	const auto sharedHUDSubsystem = GetSharedHUDSubsystem();
+	if (!IsValid(sharedHUDSubsystem) || !IsValid(IMounteaAdvancedInventorySharedHUDInterface::Execute_GetWrapperWidget(sharedHUDSubsystem)))
 	{
-		// TODO: execute event using generic widget etc.
+		LOG_WARNING(TEXT("[MounteaCraftingParticipantUIComponent] Cannot find 'Shared HUD Subsystem'. UI might not work properly"))
+		CraftingWidget->RemoveFromParent();
 		CraftingWidget = nullptr;
 	}
+	else
+	{
+		IMounteaAdvancedInventorySharedHUDInterface::Execute_ExecuteWidgetCommand(sharedHUDSubsystem, InventoryUICommands::Crafting::Close, CraftingWidget);
+		CraftingWidget = nullptr;
+	}
+
+	Execute_OnUIScreenClosed(this);
 }
 
 bool UMounteaCraftingParticipantUIComponent::SetCraftingWidget_Implementation(UUserWidget* NewCraftingWidget)
