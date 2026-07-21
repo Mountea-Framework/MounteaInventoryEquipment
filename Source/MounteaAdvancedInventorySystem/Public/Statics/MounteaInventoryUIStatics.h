@@ -144,7 +144,7 @@ public:
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(Keywords="make,add"),
-		DisplayName="Create Inventory Widget")
+		DisplayName="Inventory UI Manager - Create Inventory Widget")
 	static bool CreateInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
@@ -155,7 +155,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory", 
 		meta=(MounteaGetter),
-		DisplayName="Get Inventory Widget")
+		DisplayName="Inventory UI Manager - Get Inventory Widget")
 	static UUserWidget* GetInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
@@ -167,7 +167,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory", 
 		meta=(MounteaSetter),
 		meta=(Keywords="destroy"),
-		DisplayName="Remove Wrapper Widget")
+		DisplayName="Inventory UI Manager - Remove Inventory Widget")
 	static void RemoveInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
 	
 	/**
@@ -181,7 +181,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Inventory", 
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Set Inventory Widget")
+		DisplayName="Inventory UI Manager - Set Inventory Widget")
 	static bool SetInventoryWidget(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
 		UUserWidget* NewInventoryWidget);
 	
