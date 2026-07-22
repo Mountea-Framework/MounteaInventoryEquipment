@@ -104,7 +104,8 @@ public:
 	
 #if WITH_EDITOR
 	
-	UFUNCTION(CallInEditor, Category="Defaults")
+	UFUNCTION(CallInEditor, Category="Defaults",
+		DisplayName="Setup Defaults")
 	void SetupDefaults();
 	
 #endif

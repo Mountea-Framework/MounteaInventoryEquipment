@@ -141,7 +141,8 @@ protected:
 
 #if WITH_EDITOR
 public:
-	UFUNCTION(CallInEditor, Category="Default Values")
+	UFUNCTION(CallInEditor, Category="Default Values",
+		DisplayName="Setup Default Modals")
 	void SetDefaultModalTypes();
 	
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;

@@ -33,17 +33,31 @@ public:
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> CraftingUserInterfaceClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface|Categories",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoriesWrapperWidgetInterface"),
 		meta=(NoResetToDefault),
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> CraftingCategoriesUserInterfaceClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface",
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface|Categories",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface"),
 		meta=(NoResetToDefault),
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> CraftingCategoryUserInterfaceClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface|Recipes",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCraftingRecipesWrapperWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> CraftingRecipesUserInterfaceClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Interface|Recipes",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCraftingRecipeWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> CraftingRecipeUserInterfaceClass;
 };
