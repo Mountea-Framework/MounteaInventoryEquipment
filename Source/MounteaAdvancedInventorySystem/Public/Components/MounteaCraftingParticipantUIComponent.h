@@ -15,6 +15,7 @@
 #include "Components/ActorComponent.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
 #include "Interfaces/Widgets/Category/MounteaCategoryWidgetEventRegistrarInterface.h"
+#include "Interfaces/Widgets/Items/MounteaItemWidgetEventRegistrarInterface.h"
 #include "MounteaCraftingParticipantUIComponent.generated.h"
 
 class IMounteaAdvancedCraftingParticipantInterface;
@@ -33,7 +34,7 @@ UCLASS(ClassGroup=(Mountea), Blueprintable,
 	AutoCollapseCategories=("Variable,Sockets,Tags,Component Tick,Component Replication,Activation,Events,Replication,Asset User Data,Navigation"),
 	HideCategories=("Cooking","Collision"),
 	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Crafting Participant UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingParticipantUIComponent : public UActorComponent, public IMounteaAdvancedCraftingParticipantUIInterface, public IMounteaCategoryWidgetEventRegistrarInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingParticipantUIComponent : public UActorComponent, public IMounteaAdvancedCraftingParticipantUIInterface, public IMounteaCategoryWidgetEventRegistrarInterface, public IMounteaItemWidgetEventRegistrarInterface
 {
 	GENERATED_BODY()
 
@@ -74,6 +75,11 @@ public:
 	virtual bool BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId) override;
+
+	virtual bool BindItemWidgetSelected_Implementation(UObject* ItemWidget, const FMounteaItemWidgetSelectedBinding& Binding) override;
+	virtual bool UnbindItemWidgetSelected_Implementation(UObject* ItemWidget, const FMounteaItemWidgetSelectedBinding& Binding) override;
+	virtual bool TriggerItemWidgetSelected_Implementation(UObject* ItemWidget, const FGuid& ItemId) override;
+
 	virtual FCraftingUIScreenOpened& GetOnUIScreenOpenedHandle() override
 	{ return OnUIScreenOpened; };
 	virtual FCraftingUIScreenClosed& GetOnUIScreenClosedHandle() override
@@ -106,6 +112,10 @@ protected:
 	// Per-Category-widget-instance OnCategorySelected listeners, keyed by the widget itself. Not a UPROPERTY:
 	// UHT does not support delegate value types in reflected TMaps, and TWeakObjectPtr keys need no GC tracking.
 	TMap<TWeakObjectPtr<UObject>, FOnCategoryWidgetSelected> CategoryWidgetSelectedRegistry;
+
+	// Per-Item-widget-instance OnItemWidgetSelected listeners, keyed by the widget itself. Not a UPROPERTY:
+	// UHT does not support delegate value types in reflected TMaps, and TWeakObjectPtr keys need no GC tracking.
+	TMap<TWeakObjectPtr<UObject>, FOnItemWidgetSelected> ItemWidgetSelectedRegistry;
 
 	/**
 	 * Delegate triggered after the crafting UI screen has been successfully opened.

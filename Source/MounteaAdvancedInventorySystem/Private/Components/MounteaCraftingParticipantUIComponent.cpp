@@ -16,6 +16,7 @@
 #include "Definitions/MounteaInventoryBaseCommands.h"
 #include "Engine/LocalPlayer.h"
 #include "Helpers/MounteaCategoryWidgetEventHelpers.h"
+#include "Helpers/MounteaItemWidgetEventHelpers.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
 #include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingWidgetInterface.h"
@@ -262,6 +263,23 @@ bool UMounteaCraftingParticipantUIComponent::TriggerCategoryWidgetSelected_Imple
 {
 	const bool bDelivered = FMounteaCategoryWidgetEventHelpers::TriggerCategoryWidgetSelected(CategoryWidgetSelectedRegistry, CategoryWidget, CategoryId);
 	Execute_CraftingCategorySelected(this, CategoryId);
+	return bDelivered;
+}
+
+bool UMounteaCraftingParticipantUIComponent::BindItemWidgetSelected_Implementation(UObject* ItemWidget, const FMounteaItemWidgetSelectedBinding& Binding)
+{
+	return FMounteaItemWidgetEventHelpers::BindItemWidgetSelected(ItemWidgetSelectedRegistry, ItemWidget, Binding);
+}
+
+bool UMounteaCraftingParticipantUIComponent::UnbindItemWidgetSelected_Implementation(UObject* ItemWidget, const FMounteaItemWidgetSelectedBinding& Binding)
+{
+	return FMounteaItemWidgetEventHelpers::UnbindItemWidgetSelected(ItemWidgetSelectedRegistry, ItemWidget, Binding);
+}
+
+bool UMounteaCraftingParticipantUIComponent::TriggerItemWidgetSelected_Implementation(UObject* ItemWidget, const FGuid& ItemId)
+{
+	const bool bDelivered = FMounteaItemWidgetEventHelpers::TriggerItemWidgetSelected(ItemWidgetSelectedRegistry, ItemWidget, ItemId);
+	Execute_CraftableItemSelected(this, ItemId);
 	return bDelivered;
 }
 

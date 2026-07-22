@@ -18,6 +18,7 @@
 #include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
 #include "Interfaces/Widgets/Category/MounteaCategoryWidgetEventRegistrarInterface.h"
+#include "Interfaces/Widgets/Items/MounteaItemWidgetEventRegistrarInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
 
 class UMounteaAdvancedInventoryUIConfig;
@@ -35,7 +36,7 @@ class UMounteaAdvancedInventorySharedHUDSubsystem;
 UCLASS(ClassGroup=(Mountea), Blueprintable, AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
     meta=(BlueprintSpawnableComponent),
     meta=(DisplayName="Mountea Inventory UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface, public IMounteaCategoryWidgetEventRegistrarInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface, public IMounteaCategoryWidgetEventRegistrarInterface, public IMounteaItemWidgetEventRegistrarInterface
 {
 	GENERATED_BODY()
 
@@ -116,6 +117,10 @@ public:
 	virtual bool UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId) override;
 
+	virtual bool BindItemWidgetSelected_Implementation(UObject* ItemWidget, const FMounteaItemWidgetSelectedBinding& Binding) override;
+	virtual bool UnbindItemWidgetSelected_Implementation(UObject* ItemWidget, const FMounteaItemWidgetSelectedBinding& Binding) override;
+	virtual bool TriggerItemWidgetSelected_Implementation(UObject* ItemWidget, const FGuid& ItemId) override;
+
 protected:
 	
 	
@@ -141,6 +146,10 @@ protected:
 	// Per-Category-widget-instance OnCategorySelected listeners, keyed by the widget itself. Not a UPROPERTY:
 	// UHT does not support delegate value types in reflected TMaps, and TWeakObjectPtr keys need no GC tracking.
 	TMap<TWeakObjectPtr<UObject>, FOnCategoryWidgetSelected> CategoryWidgetSelectedRegistry;
+
+	// Per-Item-widget-instance OnItemWidgetSelected listeners, keyed by the widget itself. Not a UPROPERTY:
+	// UHT does not support delegate value types in reflected TMaps, and TWeakObjectPtr keys need no GC tracking.
+	TMap<TWeakObjectPtr<UObject>, FOnItemWidgetSelected> ItemWidgetSelectedRegistry;
 
 	// Currently active category in UI.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Transient, Category="Inventory", 
