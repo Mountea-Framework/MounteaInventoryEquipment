@@ -104,6 +104,9 @@ public:
 	
 #if WITH_EDITOR
 	
+	/**
+	 * Populates this global config asset with the default JSON object definitions.
+	 */
 	UFUNCTION(CallInEditor, Category="Defaults",
 		DisplayName="Setup Defaults")
 	void SetupDefaults();

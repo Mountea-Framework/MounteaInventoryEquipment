@@ -168,6 +168,29 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject"))
 		}
 	));
+
+	// ItemsCreateRequest
+	JsonObjectDefinitions.Add(TEXT("ItemsCreateRequest"), MakeJsonObjectDefinition(
+		{
+			MakeJsonDefinitionField(TEXT("ItemWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass()),
+			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject"))
+		}
+	));
+
+	// ItemSelectedRequest
+	JsonObjectDefinitions.Add(TEXT("ItemSelectedRequest"), MakeJsonObjectDefinition(
+		{
+			MakeJsonUObjectDefinitionField(TEXT("ItemWidget")),
+			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get())
+		}
+	));
+
+	// ItemSelectedResponse
+	JsonObjectDefinitions.Add(TEXT("ItemSelectedResponse"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get())
+		}
+	));
 }
 
 #endif

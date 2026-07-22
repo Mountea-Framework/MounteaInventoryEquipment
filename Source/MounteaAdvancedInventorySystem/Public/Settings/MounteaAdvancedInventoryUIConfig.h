@@ -71,7 +71,15 @@ public:
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> ItemsContainerWidgetClass;
 	
-	/** Widget class representing a single inventory item (slot visual, icon, quantity, tooltip, etc.). */
+	/** Widget class representing a single inventory slot. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemSlotWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> ItemSlotWidgetClass;
+	
+	/** Widget class representing a single inventory item. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Items",
 		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemWidgetInterface"),
 		meta=(NoResetToDefault),
