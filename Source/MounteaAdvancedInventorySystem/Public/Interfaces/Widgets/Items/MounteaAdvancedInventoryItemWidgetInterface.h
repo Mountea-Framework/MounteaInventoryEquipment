@@ -18,6 +18,9 @@
 
 struct FInventorySlot;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemWidgetSelected, const FGuid&, ItemId);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FMounteaItemWidgetSelectedBinding, const FGuid&, ItemId);
+
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemWidgetInterface : public UInterface
 {
@@ -150,4 +153,25 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
 	void HighlightItem(const bool bIsSelected = false);
 	virtual void HighlightItem_Implementation(const bool bIsSelected = false) = 0;
+
+	/**
+	 * Sets the object this widget will route its OnItemWidgetSelected event through once it fires.
+	 * Set once, at widget-creation time, by whoever spawns this widget. The widget itself never
+	 * needs to know what kind of object the registrar is (Inventory UI, Crafting UI, or anything else).
+	 *
+	 * @param Registrar Object implementing IMounteaItemWidgetEventRegistrarInterface.
+	 * @see IMounteaItemWidgetEventRegistrarInterface
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
+	void SetItemWidgetEventRegistrar(UObject* Registrar);
+	virtual void SetItemWidgetEventRegistrar_Implementation(UObject* Registrar) = 0;
+
+	/**
+	 * Returns the object previously set via SetItemWidgetEventRegistrar.
+	 * @return Object implementing IMounteaItemWidgetEventRegistrarInterface, or nullptr if unset.
+	 * @see IMounteaItemWidgetEventRegistrarInterface
+	 */
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item")
+	UObject* GetItemWidgetEventRegistrar() const;
+	virtual UObject* GetItemWidgetEventRegistrar_Implementation() const = 0;
 };
