@@ -1308,19 +1308,6 @@ public:
 		meta=(Keywords="dirty,check,validate,equal,=="),
 		DisplayName="Compare Item Widget Data")
 	static bool CompareItemWidgetData(const FInventoryItemData& NewState, const FInventoryItemData& OldState);
-	
-	/**
-	 * Selects this inventory item in the UI.
-	 * 
-	 * This method checks if the provided widget implements the MounteaAdvancedInventoryItemWidgetInterface and,
-	 * if so, calls to the Item Widget to process its selection.
-	 * 
-	 * @param Target The widget from which the Inventory Item ID is to be retrieved.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Items",
-		meta=(MounteaSetter),
-		DisplayName="Item - Select Item")
-	static void ItemWidget_SelectItem(UWidget* Target);
 
 	/**
 	 * Retrieves the Inventory Item ID associated with the given widget.
