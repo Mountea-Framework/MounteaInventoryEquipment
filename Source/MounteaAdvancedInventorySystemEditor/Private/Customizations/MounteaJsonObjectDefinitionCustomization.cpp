@@ -472,7 +472,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 				}
 			})
 			.Schema(GetDefault<UEdGraphSchema_K2>())
-			.bAllowArrays(false)
+			.bAllowArrays(true)
 			.CustomFilters(pinFilters)
 			.SelectorType(SPinTypeSelector::ESelectorType::Full)
 			.TypeTreeFilter(ETypeTreeFilter::None)
@@ -670,7 +670,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 					MounteaJsonObjectDefinitionCustomization::SetFieldPinType(StructPropertyHandle, capturedJ, NewType, utils);
 				})
 				.Schema(GetDefault<UEdGraphSchema_K2>())
-				.bAllowArrays(false)
+				.bAllowArrays(true)
 				.SelectorType(SPinTypeSelector::ESelectorType::Full)
 				.TypeTreeFilter(ETypeTreeFilter::None)
 				.CustomFilters(pinFilters)
