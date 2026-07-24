@@ -50,6 +50,14 @@ static FMounteaJsonObjectDefinitionField MakeJsonStructDefinitionField(const FNa
 	return MakeJsonDefinitionField(FieldName, TEXT("struct"), StructType);
 }
 
+static FMounteaJsonObjectDefinitionField MakeJsonArrayDefinitionField(const FName FieldName, const FName PinCategory, UObject* SubCategoryObject = nullptr)
+{
+	FMounteaJsonObjectDefinitionField field = MakeJsonDefinitionField(FieldName, PinCategory, SubCategoryObject);
+	field.FieldValueType.ContainerType = EPinContainerType::Array;
+
+	return field;
+}
+
 static FMounteaJsonObjectDefinitionField MakeJsonUObjectDefinitionField(const FName FieldName, UClass* ObjectClass = nullptr)
 {
 	return MakeJsonDefinitionField(FieldName, TEXT("object"), ObjectClass ? ObjectClass : UObject::StaticClass());
@@ -173,7 +181,28 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 	JsonObjectDefinitions.Add(TEXT("ItemsCreateRequest"), MakeJsonObjectDefinition(
 		{
 			MakeJsonDefinitionField(TEXT("ItemWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass()),
-			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject"))
+			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject")),
+			MakeJsonStringDefinitionField(TEXT("categoryId"))
+		}
+	));
+
+	// InventoryItemsCreateRequest
+	JsonObjectDefinitions.Add(TEXT("InventoryItemsCreateRequest"), MakeJsonObjectDefinition(
+		{
+			MakeJsonArrayDefinitionField(TEXT("itemGuids"), TEXT("struct"), TBaseStructure<FGuid>::Get())
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ItemsCreateRequest"))
+		}
+	));
+
+	// CraftingRecipesCreateRequest
+	JsonObjectDefinitions.Add(TEXT("CraftingRecipesCreateRequest"), MakeJsonObjectDefinition(
+		{
+			MakeJsonArrayDefinitionField(TEXT("recipesGuids"), TEXT("struct"), TBaseStructure<FGuid>::Get())
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("ItemsCreateRequest"))
 		}
 	));
 
