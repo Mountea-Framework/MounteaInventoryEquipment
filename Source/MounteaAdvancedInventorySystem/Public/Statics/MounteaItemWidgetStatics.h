@@ -113,8 +113,6 @@ public:
 
 	/**
 	 * Requests this widget to select this inventory item in the UI.
-	 * Moved here from UMounteaInventoryUIStatics::ItemWidget_SelectItem to keep this event/select
-	 * group self-contained.
 	 *
 	 * @param ItemWidget Widget implementing IMounteaAdvancedInventoryItemWidgetInterface.
 	 */

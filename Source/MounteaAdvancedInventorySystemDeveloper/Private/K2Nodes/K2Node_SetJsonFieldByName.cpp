@@ -125,6 +125,11 @@ UFunction* UK2Node_SetJsonFieldByName::GetTargetFunction(const UEdGraphPin* Valu
 	if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(effectiveType))
 		return nullptr;
 
+	if (effectiveType.ContainerType == EPinContainerType::Array)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetArrayJsonField));
+	if (effectiveType.ContainerType == EPinContainerType::Set)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetSetJsonField));
+
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetIntJsonField));
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Int64)
@@ -198,8 +203,12 @@ void UK2Node_SetJsonFieldByName::ExpandNode(FKismetCompilerContext& CompilerCont
 	CompilerContext.MovePinLinksToIntermediate(*fieldNamePin, *callFunctionNode->FindPinChecked(TEXT("FieldName")));
 
 	UEdGraphPin* callValuePin = callFunctionNode->FindPinChecked(TEXT("Value"));
-	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+	if (effectiveType.ContainerType == EPinContainerType::Array ||
+		effectiveType.ContainerType == EPinContainerType::Set ||
+		effectiveType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+	{
 		callValuePin->PinType = effectiveType;
+	}
 	CompilerContext.MovePinLinksToIntermediate(*valuePin, *callValuePin);
 
 	UEdGraphPin* callJsonObjectPin = callFunctionNode->FindPinChecked(JsonObjectPinName);
@@ -255,7 +264,8 @@ FText UK2Node_SetJsonFieldByName::GetTooltipText() const
 		"- String, Name, Text, Byte\n"
 		"- Object, Soft Object, Class, Soft Class\n"
 		"- Mountea Json Object as a nested JSON object\n"
-		"- Any UStruct as a nested JSON object");
+		"- Any UStruct as a nested JSON object\n"
+		"- Arrays and Sets of supported types");
 }
 
 FText UK2Node_SetJsonFieldByName::GetToolTipHeading() const

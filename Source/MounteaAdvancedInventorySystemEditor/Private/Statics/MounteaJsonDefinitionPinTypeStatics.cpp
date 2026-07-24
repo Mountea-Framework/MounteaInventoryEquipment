@@ -46,6 +46,7 @@ namespace MounteaJsonDefinitionPinTypeStatics
 
 	void NormalizeFieldPinType(FEdGraphPinType& PinType)
 	{
-		PinType.ContainerType = EPinContainerType::None;
+		if (PinType.ContainerType != EPinContainerType::Array && PinType.ContainerType != EPinContainerType::Set)
+			PinType.ContainerType = EPinContainerType::None;
 	}
 }

@@ -200,8 +200,12 @@ void UK2Node_ConstructJsonObjectFromDefinition::ExpandNode(FKismetCompilerContex
 		setterNode->FindPinChecked(TEXT("FieldName"))->DefaultValue = field.FieldName.ToString();
 
 		UEdGraphPin* setterValuePin = setterNode->FindPinChecked(TEXT("Value"));
-		if (field.FieldValueType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+		if (field.FieldValueType.ContainerType == EPinContainerType::Array ||
+			field.FieldValueType.ContainerType == EPinContainerType::Set ||
+			field.FieldValueType.PinCategory == UEdGraphSchema_K2::PC_Struct)
+		{
 			setterValuePin->PinType = field.FieldValueType;
+		}
 
 		if (sourceFieldPin->LinkedTo.Num() > 0)
 			CompilerContext.MovePinLinksToIntermediate(*sourceFieldPin, *setterValuePin);
@@ -323,7 +327,6 @@ FString UK2Node_ConstructJsonObjectFromDefinition::BuildRequiredInputIssueText()
 			continue;
 
 		FEdGraphPinType pinType = field.FieldValueType;
-		pinType.ContainerType = EPinContainerType::None;
 		if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(pinType))
 			continue;
 
@@ -373,7 +376,6 @@ void UK2Node_ConstructJsonObjectFromDefinition::CreateFieldPins()
 			continue;
 
 		FEdGraphPinType pinType = field.FieldValueType;
-		pinType.ContainerType = EPinContainerType::None;
 		if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(pinType))
 			continue;
 
@@ -390,6 +392,11 @@ UFunction* UK2Node_ConstructJsonObjectFromDefinition::GetSetterFunctionForPinTyp
 
 	if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(PinType))
 		return nullptr;
+
+	if (PinType.ContainerType == EPinContainerType::Array)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetArrayJsonField));
+	if (PinType.ContainerType == EPinContainerType::Set)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetSetJsonField));
 
 	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetIntJsonField));

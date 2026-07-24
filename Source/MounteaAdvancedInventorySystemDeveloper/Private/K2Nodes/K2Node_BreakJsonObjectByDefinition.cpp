@@ -300,7 +300,6 @@ void UK2Node_BreakJsonObjectByDefinition::CreateFieldPins()
 			continue;
 
 		FEdGraphPinType pinType = field.FieldValueType;
-		pinType.ContainerType = EPinContainerType::None;
 		if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(pinType))
 			continue;
 
@@ -316,6 +315,11 @@ UFunction* UK2Node_BreakJsonObjectByDefinition::GetGetterFunctionForPinType(cons
 
 	if (!UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(PinType))
 		return nullptr;
+
+	if (PinType.ContainerType == EPinContainerType::Array)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetArrayJsonField));
+	if (PinType.ContainerType == EPinContainerType::Set)
+		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetSetJsonField));
 
 	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Int)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetIntJsonField));
