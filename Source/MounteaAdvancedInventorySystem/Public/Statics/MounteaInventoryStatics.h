@@ -620,6 +620,18 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item", 
 		meta=(MounteaGetter))
 	static TArray<FMounteaInventoryItem> SortInventoryItems(const TArray<FMounteaInventoryItem>& Items, const TArray<FInventorySortCriteria>& SortingCriteria );
+
+	/**
+	 * Extracts valid item GUIDs from the provided inventory items.
+	 *
+	 * @param Items Inventory items to read GUIDs from.
+	 * @param Errors Descriptions of items skipped because they are invalid or have invalid GUIDs.
+	 * @return GUIDs from valid inventory items.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Item",
+		meta=(MounteaGetter),
+		DisplayName="Get Inventory Item Guids")
+	static TArray<FGuid> GetInventoryItemGuids(const TArray<FMounteaInventoryItem>& Items, UPARAM(DisplayName="Errors") TArray<FString>& Errors);
 	
 #pragma region ItemTemplate
 

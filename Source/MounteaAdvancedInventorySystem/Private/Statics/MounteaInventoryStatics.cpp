@@ -460,6 +460,36 @@ TArray<FMounteaInventoryItem> UMounteaInventoryStatics::SortInventoryItems(const
 	return returnValue;
 }
 
+TArray<FGuid> UMounteaInventoryStatics::GetInventoryItemGuids(const TArray<FMounteaInventoryItem>& Items, TArray<FString>& Errors)
+{
+	Errors.Reset();
+
+	TArray<FGuid> returnValue;
+	returnValue.Reserve(Items.Num());
+
+	for (int32 itemIndex = 0; itemIndex < Items.Num(); ++itemIndex)
+	{
+		const FMounteaInventoryItem& item = Items[itemIndex];
+		const FGuid itemGuid = item.GetGuid();
+
+		if (!itemGuid.IsValid())
+		{
+			Errors.Add(FString::Printf(TEXT("Item at index %d has invalid GUID."), itemIndex));
+			continue;
+		}
+
+		if (!item.IsItemValid())
+		{
+			Errors.Add(FString::Printf(TEXT("Item at index %d is invalid. GUID: %s."), itemIndex, *itemGuid.ToString()));
+			continue;
+		}
+
+		returnValue.Add(itemGuid);
+	}
+
+	return returnValue;
+}
+
 FString UMounteaInventoryStatics::ItemTemplate_GetItemTemplateJson(UMounteaInventoryItemTemplate* ItemTemplate)
 {
 	if (!ItemTemplate)
