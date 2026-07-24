@@ -20,6 +20,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "UObject/Script.h"
 #include "UObject/StructOnScope.h"
 
 namespace MounteaJsonDefinitionPinTypes
@@ -41,22 +42,25 @@ namespace MounteaJsonDefinitionPinTypes
 
 bool UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType(const FEdGraphPinType& PinType)
 {
-	if (PinType.ContainerType != EPinContainerType::None)
+	if (PinType.ContainerType == EPinContainerType::Map)
 		return false;
 
-	return PinType.PinCategory == MounteaJsonDefinitionPinTypes::Int ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Int64 ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Real ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Boolean ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::String ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Name ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Text ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Byte ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Object ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Class ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftClass ||
-		PinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct;
+	FEdGraphPinType valuePinType = PinType;
+	valuePinType.ContainerType = EPinContainerType::None;
+
+	return valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Int ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Int64 ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Real ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Boolean ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::String ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Name ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Text ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Byte ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Object ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Class ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftClass ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct;
 }
 
 static UObject* ResolveJsonObjectOuter(UObject* Target)
@@ -96,6 +100,9 @@ static bool IsJsonObjectDefinitionField(const FEdGraphPinType& PinType)
 static EJson GetJsonTypeForDefinitionField(const FMounteaJsonObjectDefinitionField& Field)
 {
 	const FEdGraphPinType pinType = Field.FieldValueType;
+	if (pinType.ContainerType == EPinContainerType::Array || pinType.ContainerType == EPinContainerType::Set)
+		return EJson::Array;
+
 	if (pinType.ContainerType != EPinContainerType::None)
 		return EJson::None;
 
@@ -135,6 +142,11 @@ static FString GetDefinitionFieldTypeDisplayName(const FMounteaJsonObjectDefinit
 	if (const UObject* subCategoryObject = pinType.PinSubCategoryObject.Get())
 		returnValue += FString::Printf(TEXT(" (%s)"), *subCategoryObject->GetName());
 
+	if (pinType.ContainerType == EPinContainerType::Array)
+		returnValue += TEXT(" Array");
+	else if (pinType.ContainerType == EPinContainerType::Set)
+		returnValue += TEXT(" Set");
+
 	return returnValue;
 }
 
@@ -163,6 +175,12 @@ static void SetDefinitionFieldDefaultValue(UMounteaJsonObject* Target, const FMo
 	const TSharedPtr<FJsonObject> jsonObject = Target->GetSharedJsonObject();
 	if (!jsonObject.IsValid())
 		return;
+
+	if (pinType.ContainerType == EPinContainerType::Array || pinType.ContainerType == EPinContainerType::Set)
+	{
+		jsonObject->SetArrayField(fieldName, {});
+		return;
+	}
 
 	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Int ||
 		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Int64 ||
@@ -269,6 +287,9 @@ static void ValidateDefinitionFieldMetadata(const FMounteaJsonObjectDefinitionFi
 		return;
 
 	const FEdGraphPinType pinType = Field.FieldValueType;
+	if (pinType.ContainerType == EPinContainerType::Array || pinType.ContainerType == EPinContainerType::Set)
+		return;
+
 	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct)
 	{
 		ValidateDefinitionStructField(Field, FieldValue, Errors);
@@ -908,6 +929,18 @@ bool UMounteaAdvancedInventoryJsonStatics::SetStructJsonField(UMounteaJsonObject
 	return false;
 }
 
+bool UMounteaAdvancedInventoryJsonStatics::SetArrayJsonField(UMounteaJsonObject* Target, FName FieldName, const TArray<int32>& Value, UMounteaJsonObject*& JsonObject)
+{
+	check(0);
+	return false;
+}
+
+bool UMounteaAdvancedInventoryJsonStatics::SetSetJsonField(UMounteaJsonObject* Target, FName FieldName, const TSet<int32>& Value, UMounteaJsonObject*& JsonObject)
+{
+	check(0);
+	return false;
+}
+
 bool UMounteaAdvancedInventoryJsonStatics::GetIntJsonField(UMounteaJsonObject* Target, const FName FieldName, int32& Value)
 {
 	return IsValidJsonObject(Target) ? Target->GetIntField(FieldName, Value) : false;
@@ -1033,6 +1066,176 @@ bool UMounteaAdvancedInventoryJsonStatics::GetStructJsonField(UMounteaJsonObject
 	return false;
 }
 
+bool UMounteaAdvancedInventoryJsonStatics::GetArrayJsonField(UMounteaJsonObject* Target, FName FieldName, TArray<int32>& Value)
+{
+	check(0);
+	return false;
+}
+
+bool UMounteaAdvancedInventoryJsonStatics::GetSetJsonField(UMounteaJsonObject* Target, FName FieldName, TSet<int32>& Value)
+{
+	check(0);
+	return false;
+}
+
+static TSharedPtr<FJsonValue> PropertyValueToJsonValue(FProperty* Property, const void* ValuePtr)
+{
+	if (!Property || !ValuePtr)
+		return nullptr;
+
+	if (const FNumericProperty* numericProperty = CastField<FNumericProperty>(Property))
+	{
+		if (numericProperty->IsInteger())
+			return MakeShared<FJsonValueNumber>(static_cast<double>(numericProperty->GetSignedIntPropertyValue(ValuePtr)));
+
+		return MakeShared<FJsonValueNumber>(numericProperty->GetFloatingPointPropertyValue(ValuePtr));
+	}
+
+	if (const FBoolProperty* boolProperty = CastField<FBoolProperty>(Property))
+		return MakeShared<FJsonValueBoolean>(boolProperty->GetPropertyValue(ValuePtr));
+
+	if (const FStrProperty* stringProperty = CastField<FStrProperty>(Property))
+		return MakeShared<FJsonValueString>(stringProperty->GetPropertyValue(ValuePtr));
+
+	if (const FNameProperty* nameProperty = CastField<FNameProperty>(Property))
+		return MakeShared<FJsonValueString>(nameProperty->GetPropertyValue(ValuePtr).ToString());
+
+	if (const FTextProperty* textProperty = CastField<FTextProperty>(Property))
+		return MakeShared<FJsonValueString>(textProperty->GetPropertyValue(ValuePtr).ToString());
+
+	if (const FSoftObjectProperty* softObjectProperty = CastField<FSoftObjectProperty>(Property))
+		return MakeShared<FJsonValueString>(softObjectProperty->GetPropertyValue(ValuePtr).ToSoftObjectPath().ToString());
+
+	if (const FObjectPropertyBase* objectProperty = CastField<FObjectPropertyBase>(Property))
+	{
+		UObject* objectValue = objectProperty->GetObjectPropertyValue(ValuePtr);
+		if (!IsValid(objectValue))
+			return MakeShared<FJsonValueString>(FString());
+
+		if (UMounteaJsonObject* jsonObjectValue = Cast<UMounteaJsonObject>(objectValue))
+		{
+			const TSharedPtr<FJsonObject> sharedObject = jsonObjectValue->GetSharedJsonObject();
+			if (!sharedObject.IsValid())
+				return nullptr;
+
+			return MakeShared<FJsonValueObject>(sharedObject);
+		}
+
+		return MakeShared<FJsonValueString>(objectValue->GetPathName());
+	}
+
+	if (const FStructProperty* structProperty = CastField<FStructProperty>(Property))
+	{
+		TSharedRef<FJsonObject> jsonObject = MakeShared<FJsonObject>();
+		if (!FJsonObjectConverter::UStructToJsonObject(structProperty->Struct, ValuePtr, jsonObject, 0, 0))
+			return nullptr;
+
+		return MakeShared<FJsonValueObject>(jsonObject);
+	}
+
+	return nullptr;
+}
+
+static bool JsonValueToPropertyValue(const TSharedPtr<FJsonValue>& JsonValue, FProperty* Property, void* ValuePtr, UObject* Outer)
+{
+	if (!JsonValue.IsValid() || !Property || !ValuePtr)
+		return false;
+
+	if (FNumericProperty* numericProperty = CastField<FNumericProperty>(Property))
+	{
+		if (JsonValue->Type != EJson::Number)
+			return false;
+
+		if (numericProperty->IsInteger())
+			numericProperty->SetIntPropertyValue(ValuePtr, static_cast<int64>(JsonValue->AsNumber()));
+		else
+			numericProperty->SetFloatingPointPropertyValue(ValuePtr, JsonValue->AsNumber());
+
+		return true;
+	}
+
+	if (FBoolProperty* boolProperty = CastField<FBoolProperty>(Property))
+	{
+		if (JsonValue->Type != EJson::Boolean)
+			return false;
+
+		boolProperty->SetPropertyValue(ValuePtr, JsonValue->AsBool());
+		return true;
+	}
+
+	if (FStrProperty* stringProperty = CastField<FStrProperty>(Property))
+	{
+		if (JsonValue->Type != EJson::String)
+			return false;
+
+		stringProperty->SetPropertyValue(ValuePtr, JsonValue->AsString());
+		return true;
+	}
+
+	if (FNameProperty* nameProperty = CastField<FNameProperty>(Property))
+	{
+		if (JsonValue->Type != EJson::String)
+			return false;
+
+		nameProperty->SetPropertyValue(ValuePtr, FName(*JsonValue->AsString()));
+		return true;
+	}
+
+	if (FTextProperty* textProperty = CastField<FTextProperty>(Property))
+	{
+		if (JsonValue->Type != EJson::String)
+			return false;
+
+		textProperty->SetPropertyValue(ValuePtr, FText::FromString(JsonValue->AsString()));
+		return true;
+	}
+
+	if (FSoftObjectProperty* softObjectProperty = CastField<FSoftObjectProperty>(Property))
+	{
+		if (JsonValue->Type != EJson::String)
+			return false;
+
+		softObjectProperty->SetPropertyValue(ValuePtr, FSoftObjectPtr(FSoftObjectPath(JsonValue->AsString())));
+		return true;
+	}
+
+	if (FObjectPropertyBase* objectProperty = CastField<FObjectPropertyBase>(Property))
+	{
+		UObject* objectValue = nullptr;
+		bool bAllowNullObject = false;
+		if (JsonValue->Type == EJson::Object && objectProperty->PropertyClass->IsChildOf(UMounteaJsonObject::StaticClass()))
+		{
+			UMounteaJsonObject* jsonObjectValue = NewObject<UMounteaJsonObject>(ResolveJsonObjectOuter(Outer));
+			jsonObjectValue->SetSharedJsonObject(JsonValue->AsObject());
+			objectValue = jsonObjectValue;
+		}
+		else if (JsonValue->Type == EJson::String)
+		{
+			const FString path = JsonValue->AsString();
+			bAllowNullObject = path.IsEmpty();
+			objectValue = bAllowNullObject ? nullptr : StaticLoadObject(objectProperty->PropertyClass, nullptr, *path);
+		}
+		else
+		{
+			return false;
+		}
+
+		objectProperty->SetObjectPropertyValue(ValuePtr, objectValue);
+		return bAllowNullObject || IsValid(objectValue);
+	}
+
+	if (FStructProperty* structProperty = CastField<FStructProperty>(Property))
+	{
+		if (JsonValue->Type != EJson::Object)
+			return false;
+
+		const TSharedPtr<FJsonObject> jsonObject = JsonValue->AsObject();
+		return jsonObject.IsValid() && FJsonObjectConverter::JsonObjectToUStruct(jsonObject.ToSharedRef(), structProperty->Struct, ValuePtr, 0, 0);
+	}
+
+	return false;
+}
+
 DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execSetStructJsonField)
 {
 	P_GET_OBJECT(UMounteaJsonObject, Target);
@@ -1064,6 +1267,84 @@ DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execSetStructJsonField)
 	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
 }
 
+DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execSetArrayJsonField)
+{
+	P_GET_OBJECT(UMounteaJsonObject, Target);
+	P_GET_PROPERTY(FNameProperty, FieldName);
+
+	Stack.StepCompiledIn<FArrayProperty>(nullptr);
+	void* arrayPtr = Stack.MostRecentPropertyAddress;
+	FArrayProperty* arrayProperty = CastField<FArrayProperty>(Stack.MostRecentProperty);
+
+	P_GET_OBJECT_REF(UMounteaJsonObject, JsonObject);
+
+	P_FINISH;
+
+	bool bSuccess = false;
+	JsonObject = Target;
+
+	[&]()
+	{
+		if (!IsValidJsonObject(Target) || !arrayPtr || !arrayProperty || !arrayProperty->Inner || FieldName.IsNone())
+			return;
+
+		FScriptArrayHelper arrayHelper(arrayProperty, arrayPtr);
+		TArray<TSharedPtr<FJsonValue>> jsonValues;
+		for (int32 index = 0; index < arrayHelper.Num(); ++index)
+		{
+			TSharedPtr<FJsonValue> jsonValue = PropertyValueToJsonValue(arrayProperty->Inner, arrayHelper.GetRawPtr(index));
+			if (!jsonValue.IsValid())
+				return;
+
+			jsonValues.Add(jsonValue);
+		}
+
+		Target->GetSharedJsonObject()->SetArrayField(FieldName.ToString(), jsonValues);
+		bSuccess = true;
+	}();
+
+	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
+}
+
+DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execSetSetJsonField)
+{
+	P_GET_OBJECT(UMounteaJsonObject, Target);
+	P_GET_PROPERTY(FNameProperty, FieldName);
+
+	Stack.StepCompiledIn<FSetProperty>(nullptr);
+	void* setPtr = Stack.MostRecentPropertyAddress;
+	FSetProperty* setProperty = CastField<FSetProperty>(Stack.MostRecentProperty);
+
+	P_GET_OBJECT_REF(UMounteaJsonObject, JsonObject);
+
+	P_FINISH;
+
+	bool bSuccess = false;
+	JsonObject = Target;
+
+	[&]()
+	{
+		if (!IsValidJsonObject(Target) || !setPtr || !setProperty || !setProperty->ElementProp || FieldName.IsNone())
+			return;
+
+		FScriptSetHelper setHelper(setProperty, setPtr);
+		TArray<TSharedPtr<FJsonValue>> jsonValues;
+		for (FScriptSetHelper::FIterator it(setHelper); it; ++it)
+		{
+			TSharedPtr<FJsonValue> jsonValue = PropertyValueToJsonValue(setProperty->ElementProp, setHelper.GetElementPtr(it));
+			if (!jsonValue.IsValid())
+				return;
+
+			jsonValues.Add(jsonValue);
+		}
+
+		Target->GetSharedJsonObject()->SetArrayField(FieldName.ToString(), jsonValues);
+		bSuccess = true;
+	}();
+
+	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
+}
+
 DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execGetStructJsonField)
 {
 	P_GET_OBJECT(UMounteaJsonObject, Target);
@@ -1087,6 +1368,89 @@ DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execGetStructJsonField)
 			return;
 
 		bSuccess = FJsonObjectConverter::JsonObjectToUStruct(jsonObject.ToSharedRef(), valueProperty->Struct, valuePtr, 0, 0);
+	}();
+
+	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
+}
+
+DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execGetArrayJsonField)
+{
+	P_GET_OBJECT(UMounteaJsonObject, Target);
+	P_GET_PROPERTY(FNameProperty, FieldName);
+
+	Stack.StepCompiledIn<FArrayProperty>(nullptr);
+	void* arrayPtr = Stack.MostRecentPropertyAddress;
+	FArrayProperty* arrayProperty = CastField<FArrayProperty>(Stack.MostRecentProperty);
+
+	P_FINISH;
+
+	bool bSuccess = false;
+
+	[&]()
+	{
+		if (!IsValidJsonObject(Target) || !arrayPtr || !arrayProperty || !arrayProperty->Inner || FieldName.IsNone())
+			return;
+
+		const TSharedPtr<FJsonValue> fieldValue = Target->GetSharedJsonObject()->TryGetField(FieldName.ToString());
+		if (!fieldValue.IsValid() || fieldValue->Type != EJson::Array)
+			return;
+
+		const TArray<TSharedPtr<FJsonValue>>& jsonValues = fieldValue->AsArray();
+		FScriptArrayHelper arrayHelper(arrayProperty, arrayPtr);
+		arrayHelper.EmptyValues();
+		for (const TSharedPtr<FJsonValue>& jsonValue : jsonValues)
+		{
+			const int32 newIndex = arrayHelper.AddValue();
+			if (!JsonValueToPropertyValue(jsonValue, arrayProperty->Inner, arrayHelper.GetRawPtr(newIndex), Target))
+			{
+				arrayHelper.EmptyValues();
+				return;
+			}
+		}
+
+		bSuccess = true;
+	}();
+
+	*static_cast<bool*>(RESULT_PARAM) = bSuccess;
+}
+
+DEFINE_FUNCTION(UMounteaAdvancedInventoryJsonStatics::execGetSetJsonField)
+{
+	P_GET_OBJECT(UMounteaJsonObject, Target);
+	P_GET_PROPERTY(FNameProperty, FieldName);
+
+	Stack.StepCompiledIn<FSetProperty>(nullptr);
+	void* setPtr = Stack.MostRecentPropertyAddress;
+	FSetProperty* setProperty = CastField<FSetProperty>(Stack.MostRecentProperty);
+
+	P_FINISH;
+
+	bool bSuccess = false;
+
+	[&]()
+	{
+		if (!IsValidJsonObject(Target) || !setPtr || !setProperty || !setProperty->ElementProp || FieldName.IsNone())
+			return;
+
+		const TSharedPtr<FJsonValue> fieldValue = Target->GetSharedJsonObject()->TryGetField(FieldName.ToString());
+		if (!fieldValue.IsValid() || fieldValue->Type != EJson::Array)
+			return;
+
+		const TArray<TSharedPtr<FJsonValue>>& jsonValues = fieldValue->AsArray();
+		FScriptSetHelper setHelper(setProperty, setPtr);
+		setHelper.EmptyElements(jsonValues.Num());
+		for (const TSharedPtr<FJsonValue>& jsonValue : jsonValues)
+		{
+			const int32 newIndex = setHelper.AddDefaultValue_Invalid_NeedsRehash();
+			if (!JsonValueToPropertyValue(jsonValue, setProperty->ElementProp, setHelper.GetElementPtr(newIndex), Target))
+			{
+				setHelper.EmptyElements();
+				return;
+			}
+		}
+
+		setHelper.Rehash();
+		bSuccess = true;
 	}();
 
 	*static_cast<bool*>(RESULT_PARAM) = bSuccess;

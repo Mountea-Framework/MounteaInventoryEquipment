@@ -172,6 +172,16 @@ public:
 		meta=(DefaultToSelf="Target"))
 	static bool SetStructJsonField(UMounteaJsonObject* Target, FName FieldName, const int32& Value, UMounteaJsonObject*& JsonObject);
 
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields", CustomThunk,
+		meta=(ArrayParm="Value"),
+		meta=(DefaultToSelf="Target"))
+	static bool SetArrayJsonField(UMounteaJsonObject* Target, FName FieldName, const TArray<int32>& Value, UMounteaJsonObject*& JsonObject);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields", CustomThunk,
+		meta=(SetParam="Value"),
+		meta=(DefaultToSelf="Target"))
+	static bool SetSetJsonField(UMounteaJsonObject* Target, FName FieldName, const TSet<int32>& Value, UMounteaJsonObject*& JsonObject);
+
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields",
 		meta=(DefaultToSelf="Target"))
 	static bool GetIntJsonField(UMounteaJsonObject* Target, FName FieldName, int32& Value);
@@ -225,8 +235,22 @@ public:
 		meta=(DefaultToSelf="Target"))
 	static bool GetStructJsonField(UMounteaJsonObject* Target, FName FieldName, int32& Value);
 
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields", CustomThunk,
+		meta=(ArrayParm="Value"),
+		meta=(DefaultToSelf="Target"))
+	static bool GetArrayJsonField(UMounteaJsonObject* Target, FName FieldName, TArray<int32>& Value);
+
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly, Category="Mountea|Inventory & Equipment|JSON|Fields", CustomThunk,
+		meta=(SetParam="Value"),
+		meta=(DefaultToSelf="Target"))
+	static bool GetSetJsonField(UMounteaJsonObject* Target, FName FieldName, TSet<int32>& Value);
+
 	DECLARE_FUNCTION(execSetStructJsonField);
+	DECLARE_FUNCTION(execSetArrayJsonField);
+	DECLARE_FUNCTION(execSetSetJsonField);
 	DECLARE_FUNCTION(execGetStructJsonField);
+	DECLARE_FUNCTION(execGetArrayJsonField);
+	DECLARE_FUNCTION(execGetSetJsonField);
 
 #pragma endregion
 };
