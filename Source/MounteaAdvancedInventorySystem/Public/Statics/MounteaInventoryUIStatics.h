@@ -68,34 +68,6 @@ public:
 	static APlayerController* FindPlayerController(AActor* Actor, int SearchDepth);
 	static void SetOwningInventoryUIInternal(UWidget* Target, const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& NewOwningInventoryUI);
 
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
-		meta=(MounteaBinding),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Category Selected")
-	static bool BindToOnCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
-		meta=(MounteaBinding),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From On Category Selected")
-	static bool UnbindFromOnCategorySelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryCategorySelectedBinding& Binding);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
-		meta=(MounteaBinding),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Item Selected")
-	static bool BindToOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
-
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Bindings",
-		meta=(MounteaBinding),
-		meta=(DefaultToSelf="Target"),
-		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From On Item Selected")
-	static bool UnbindFromOnItemSelected(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryUIManagerInterface")) UObject* Target, const FMounteaInventoryItemSelectedBinding& Binding);
-	
 	// --- UI Subsystem
 #pragma region UISubsystem
 	
