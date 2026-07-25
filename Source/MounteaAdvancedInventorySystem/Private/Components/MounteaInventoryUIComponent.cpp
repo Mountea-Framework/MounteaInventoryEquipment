@@ -263,7 +263,7 @@ void UMounteaInventoryUIComponent::SetActiveItemWidget_Implementation(UWidget* N
 		ActiveItemWidget = NewActiveItemWidget;
 	
 	if (UIConfig && UIConfig->bAllowAutoFocus && ActiveItemWidget)
-		ActiveItemWidget->SetFocus();	
+		ActiveItemWidget->SetFocus();
 }
 
 void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FMounteaInventoryItem& AddedItem)
@@ -360,6 +360,7 @@ bool UMounteaInventoryUIComponent::UnbindItemWidgetSelected_Implementation(UObje
 bool UMounteaInventoryUIComponent::TriggerItemWidgetSelected_Implementation(UObject* ItemWidget, const FGuid& ItemId)
 {
 	const bool bDelivered = FMounteaItemWidgetEventHelpers::TriggerItemWidgetSelected(ItemWidgetSelectedRegistry, ItemWidget, ItemId);
+	Execute_SetActiveItemWidget(this, Cast<UWidget>(ItemWidget));
 	Execute_ItemSelected(this, ItemId);
 	return bDelivered;
 }
