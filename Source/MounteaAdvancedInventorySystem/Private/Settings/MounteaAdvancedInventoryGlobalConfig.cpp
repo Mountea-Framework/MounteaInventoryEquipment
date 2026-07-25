@@ -200,14 +200,16 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 	JsonObjectDefinitions.Add(TEXT("ItemSelectedRequest"), MakeJsonObjectDefinition(
 		{
 			MakeJsonUObjectDefinitionField(TEXT("ItemWidget")),
-			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get())
+			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get()),
+			MakeJsonStringDefinitionField(TEXT("ParentCategory"))
 		}
 	));
 
 	// ItemSelectedResponse
 	JsonObjectDefinitions.Add(TEXT("ItemSelectedResponse"), MakeJsonObjectDefinition(
 		{
-			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get())
+			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get()),
+			MakeJsonStringDefinitionField(TEXT("ParentCategory"))
 		}
 	));
 }
