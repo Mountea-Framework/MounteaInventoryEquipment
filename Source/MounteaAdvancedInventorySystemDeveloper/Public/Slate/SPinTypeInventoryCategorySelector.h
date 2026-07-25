@@ -14,7 +14,6 @@
 #if WITH_EDITOR
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
 #include "SGraphPin.h"
 
 class SPinTypeInventoryCategorySelector : public SGraphPin
@@ -33,13 +32,13 @@ protected:
 
 private:
 
-	void OnCategorySelected(TSharedPtr<FGameplayTag> Selection, ESelectInfo::Type SelectInfo);
+	void OnCategorySelected(TSharedPtr<FString> Selection, ESelectInfo::Type SelectInfo);
 	FText GetSelectedCategoryText() const;
-	TSharedRef<SWidget> GenerateCategoryWidget(TSharedPtr<FGameplayTag> Item);
+	TSharedRef<SWidget> GenerateCategoryWidget(TSharedPtr<FString> Item);
 
-	static void GetCategoriesFromSettings(TArray<FGameplayTag>& OutCategories);
+	void GetCategoriesFromSettings(TArray<FString>& OutCategories) const;
 
-	TArray<TSharedPtr<FGameplayTag>> CategoryOptions;
+	TArray<TSharedPtr<FString>> CategoryOptions;
 };
 
 #endif
