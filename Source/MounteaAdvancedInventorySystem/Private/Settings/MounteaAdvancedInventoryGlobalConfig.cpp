@@ -182,27 +182,17 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 		{
 			MakeJsonDefinitionField(TEXT("ItemWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass()),
 			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject")),
-			MakeJsonStringDefinitionField(TEXT("categoryId"))
-		}
-	));
-
-	// InventoryItemsCreateRequest
-	JsonObjectDefinitions.Add(TEXT("InventoryItemsCreateRequest"), MakeJsonObjectDefinition(
-		{
+			MakeJsonStringDefinitionField(TEXT("categoryId")),
 			MakeJsonArrayDefinitionField(TEXT("itemGuids"), TEXT("struct"), TBaseStructure<FGuid>::Get())
-		},
-		{
-			MakeJsonDefinitionInclude(TEXT("ItemsCreateRequest"))
 		}
 	));
 
-	// CraftingRecipesCreateRequest
-	JsonObjectDefinitions.Add(TEXT("CraftingRecipesCreateRequest"), MakeJsonObjectDefinition(
+	// ItemCreateRequest
+	JsonObjectDefinitions.Add(TEXT("ItemCreateRequest"), MakeJsonObjectDefinition(
 		{
-			MakeJsonArrayDefinitionField(TEXT("recipesGuids"), TEXT("struct"), TBaseStructure<FGuid>::Get())
-		},
-		{
-			MakeJsonDefinitionInclude(TEXT("ItemsCreateRequest"))
+			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject")),
+			MakeJsonStringDefinitionField(TEXT("categoryId")),
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
 		}
 	));
 
