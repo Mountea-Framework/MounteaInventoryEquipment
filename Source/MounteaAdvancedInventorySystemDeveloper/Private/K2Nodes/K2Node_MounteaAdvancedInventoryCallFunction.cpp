@@ -155,10 +155,11 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseInventoryCategorySel
 	if (Pin->Direction != EGPD_Input)
 		return false;
 
-	if (Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_Struct)
-		return false;
-
-	if (Pin->PinType.PinSubCategoryObject != FGameplayTag::StaticStruct())
+	const bool bIsGameplayTagPin =
+		Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct &&
+		Pin->PinType.PinSubCategoryObject == FGameplayTag::StaticStruct();
+	const bool bIsStringPin = Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_String;
+	if (!bIsGameplayTagPin && !bIsStringPin)
 		return false;
 
 	const UFunction* targetFunction = GetTargetFunction();
