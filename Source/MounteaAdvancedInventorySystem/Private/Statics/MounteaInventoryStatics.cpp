@@ -467,25 +467,33 @@ TArray<FGuid> UMounteaInventoryStatics::GetInventoryItemGuids(const TArray<FMoun
 	TArray<FGuid> returnValue;
 	returnValue.Reserve(Items.Num());
 
-	for (int32 itemIndex = 0; itemIndex < Items.Num(); ++itemIndex)
-	{
-		const FMounteaInventoryItem& item = Items[itemIndex];
-		const FGuid itemGuid = item.GetGuid();
-
-		if (!itemGuid.IsValid())
+	Algo::TransformIf(
+		Items,
+		returnValue,
+		[&Errors, itemIndex = -1](const FMounteaInventoryItem& Item) mutable
 		{
-			Errors.Add(FString::Printf(TEXT("Item at index %d has invalid GUID."), itemIndex));
-			continue;
-		}
+			++itemIndex;
 
-		if (!item.IsItemValid())
+			const FGuid itemGuid = Item.GetGuid();
+			if (!itemGuid.IsValid())
+			{
+				Errors.Add(FString::Printf(TEXT("Item at index %d has invalid GUID."), itemIndex));
+				return false;
+			}
+
+			if (!Item.IsItemValid())
+			{
+				Errors.Add(FString::Printf(TEXT("Item at index %d is invalid. GUID: %s."), itemIndex, *itemGuid.ToString()));
+				return false;
+			}
+
+			return true;
+		},
+		[](const FMounteaInventoryItem& Item)
 		{
-			Errors.Add(FString::Printf(TEXT("Item at index %d is invalid. GUID: %s."), itemIndex, *itemGuid.ToString()));
-			continue;
+			return Item.GetGuid();
 		}
-
-		returnValue.Add(itemGuid);
-	}
+	);
 
 	return returnValue;
 }
