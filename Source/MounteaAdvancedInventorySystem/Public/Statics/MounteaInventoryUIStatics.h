@@ -1266,6 +1266,17 @@ public:
 	static FString GetInventoryCategoryKey(UWidget* Target);
 
 	/**
+	 * Returns the selected inventory category key from the configured category list.
+	 *
+	 * @param CategoryId Category key selected from the inventory settings.
+	 * @return The selected category key.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
+		meta=(MounteaGetter, MounteaInventoryCategoryPin="CategoryId"),
+		DisplayName="Select Inventory Category")
+	static FString SelectInventoryCategory(const FString& CategoryId);
+
+	/**
 	 * Associates a UWidget with its owning inventory UI interface.
 	 *
 	 * @param Target The widget to associate with the owning inventory UI.

@@ -813,6 +813,11 @@ FString UMounteaInventoryUIStatics::GetInventoryCategoryKey(UWidget* Target)
 		) ? IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_GetInventoryCategoryKey(Target) : TEXT("none");
 }
 
+FString UMounteaInventoryUIStatics::SelectInventoryCategory(const FString& CategoryId)
+{
+	return CategoryId;
+}
+
 void UMounteaInventoryUIStatics::SetCategoryOwningInventoryUI(UWidget* Target,
 	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& OwningInventoryUI)
 {
