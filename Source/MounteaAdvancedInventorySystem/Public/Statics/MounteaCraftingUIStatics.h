@@ -71,7 +71,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
 		meta=(MounteaGetter),
 		meta=(DefaultToSelf="Target"),
-		DisplayName="Get Parent Crafting Participant")
+		DisplayName="Get Parent Crafting Participant (Interface)")
 	static TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant(const UObject* Target);
 	
 	/**

@@ -674,3 +674,23 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetRecipesByCategory(UO
 {
 	return GetFilteredRecipesByCategory(Target, CategoryTag);
 }
+
+TArray<FGuid> UMounteaCraftingStatics::GetRecipeGuids(const TArray<UMounteaRecipeTemplate*>& Recipes)
+{
+	TArray<FGuid> returnValue;
+	returnValue.Reserve(Recipes.Num());
+
+	Algo::TransformIf(
+		Recipes,
+		returnValue,
+		[](const UMounteaRecipeTemplate* Recipe)
+		{
+			return IsValid(Recipe);
+		},
+		[](const UMounteaRecipeTemplate* Recipe)
+		{
+			return Recipe->RecipeGuid;
+		});
+
+	return returnValue;
+}

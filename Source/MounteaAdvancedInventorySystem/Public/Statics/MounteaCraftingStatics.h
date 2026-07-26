@@ -332,6 +332,16 @@ public:
 
 public:
 	
+	/**
+	 * Converts recipe templates to their recipe GUIDs.
+	 * @param Recipes Recipes to read GUIDs from.
+	 * @return GUIDs from valid recipe templates.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
+		meta=(MounteaGetter),
+		DisplayName="Get Recipe Guids")
+	static TArray<FGuid> GetRecipeGuids(const TArray<UMounteaRecipeTemplate*>& Recipes);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Helpers",
 		meta=(MounteaGetter, MounteaInventoryCategoryPin="CategoryTag"),
 		meta=(DefaultToSelf="Target"),
