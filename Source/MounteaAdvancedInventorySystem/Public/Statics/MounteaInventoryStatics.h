@@ -187,7 +187,9 @@ public:
 	 * @return Category data structure.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Config", 
-		meta=(MounteaGetter))
+		meta=(MounteaGetter),
+		meta=(MounteaInventoryCategoryPin="CategoryName", MounteaInventoryParentCategoryPin="ParentCategory"),
+		DisplayName="Get Category Data")
 	static FInventoryCategoryData GetInventoryCategoryData(const FString& CategoryName, const FString ParentCategory, 
 		UPARAM(DisplayName="Success") bool& bResult);
 	
