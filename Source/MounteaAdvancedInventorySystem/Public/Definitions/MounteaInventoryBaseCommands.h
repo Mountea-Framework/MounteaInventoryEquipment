@@ -195,3 +195,14 @@ namespace InventoryUICommands
 		return AllCommands.Array();
 	}
 }
+
+// JSON Object Definition keys (UMounteaAdvancedInventoryGlobalConfig::JsonObjectDefinitions) for widget command payloads
+namespace InventoryUIPayloadDefinitions
+{
+	// Item-level events/actions payloads
+	namespace Items
+	{
+		inline const FString ItemChange(TEXT("InventoryItemChangePayload"));
+		inline const FString ItemQuantityChange(TEXT("InventoryItemQuantityChangePayload"));
+	}
+}
