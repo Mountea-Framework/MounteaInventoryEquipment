@@ -19,9 +19,9 @@
 
 #include "Definitions/MounteaInventoryBaseCommands.h"
 
-#include "Helpers/MounteaAdvancedInventoryWidgetPayload.h"
 #include "Helpers/MounteaCategoryWidgetEventHelpers.h"
 #include "Helpers/MounteaItemWidgetEventHelpers.h"
+#include "Helpers/MounteaJsonObject.h"
 
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
@@ -36,6 +36,7 @@
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 
+#include "Statics/MounteaAdvancedInventoryJsonStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 #include "Statics/MounteaInventoryUIStatics.h"
 #include "Subsystems/MounteaAdvancedInventoryUISubsystem.h"
@@ -275,8 +276,15 @@ void UMounteaInventoryUIComponent::ProcessItemAdded_Implementation(const FMounte
 
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
-		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
-		newPayload->PayloadData.Add(AddedItem.Guid);
+		UMounteaJsonObject* newPayload = UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinitionKey(this, InventoryUIPayloadDefinitions::Items::ItemChange);
+		if (IsValid(newPayload))
+		{
+			UMounteaJsonObject* chainedObject = nullptr;
+			newPayload->SetGuidField(TEXT("itemGuid"), AddedItem.Guid, chainedObject);
+		}
+		else
+			LOG_WARNING(TEXT("[ProcessItemAdded] Failed to create InventoryItemChangePayload — check Global Config JSON definitions."))
+
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Added, newPayload);
 	}
 }
@@ -291,10 +299,17 @@ void UMounteaInventoryUIComponent::ProcessItemModified_Implementation(const FMou
 
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
-		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
-		newPayload->PayloadData.Add(ModifiedItem.Guid);
-		newPayload->PayloadQuantities.Add(ModifiedItem.Quantity);
-		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Modified, newPayload);
+		UMounteaJsonObject* newPayload = UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinitionKey(this, InventoryUIPayloadDefinitions::Items::ItemQuantityChange);
+		if (IsValid(newPayload))
+		{
+			UMounteaJsonObject* chainedObject = nullptr;
+			newPayload->SetGuidField(TEXT("itemGuid"), ModifiedItem.Guid, chainedObject);
+			newPayload->SetIntField(TEXT("quantity"), ModifiedItem.Quantity, chainedObject);
+		}
+		else
+			LOG_WARNING(TEXT("[ProcessItemModified] Failed to create InventoryItemQuantityChangePayload — check Global Config JSON definitions."))
+		
+			IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Modified, newPayload);
 	}
 }
 
@@ -308,8 +323,15 @@ void UMounteaInventoryUIComponent::ProcessItemRemoved_Implementation(const FMoun
 
 	if (InventoryWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
 	{
-		UMounteaAdvancedInventoryWidgetPayload* newPayload = NewObject<UMounteaAdvancedInventoryWidgetPayload>();
-		newPayload->PayloadData.Add(RemovedItem.Guid);
+		UMounteaJsonObject* newPayload = UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinitionKey(this, InventoryUIPayloadDefinitions::Items::ItemChange);
+		if (IsValid(newPayload))
+		{
+			UMounteaJsonObject* chainedObject = nullptr;
+			newPayload->SetGuidField(TEXT("itemGuid"), RemovedItem.Guid, chainedObject);
+		}
+		else
+			LOG_WARNING(TEXT("[ProcessItemRemoved] Failed to create InventoryItemChangePayload — check Global Config JSON definitions."))
+
 		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(InventoryWidget, InventoryUICommands::Items::Removed, newPayload);
 	}
 }
