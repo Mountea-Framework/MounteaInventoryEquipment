@@ -36,7 +36,11 @@ private:
 	FText GetSelectedCategoryText() const;
 	TSharedRef<SWidget> GenerateCategoryWidget(TSharedPtr<FString> Item);
 
+	void RefreshCategoryOptions();
 	void GetCategoriesFromSettings(TArray<FString>& OutCategories) const;
+	bool IsParentCategoryPin() const;
+	bool IsChildCategoryPin() const;
+	FString GetParentCategoryPinValue() const;
 
 	TArray<TSharedPtr<FString>> CategoryOptions;
 };

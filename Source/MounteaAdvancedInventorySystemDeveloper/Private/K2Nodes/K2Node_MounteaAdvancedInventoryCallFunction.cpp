@@ -166,11 +166,24 @@ bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseInventoryCategorySel
 	if (!targetFunction)
 		return false;
 
-	if (!targetFunction->HasMetaData(TEXT("MounteaInventoryCategoryPin")))
+	if (!targetFunction->HasMetaData(TEXT("MounteaInventoryCategoryPin")) && !targetFunction->HasMetaData(TEXT("MounteaInventoryParentCategoryPin")))
 		return false;
 
-	const FString categoryPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryCategoryPin"));
-	return Pin->PinName == FName(*categoryPinName);
+	if (targetFunction->HasMetaData(TEXT("MounteaInventoryCategoryPin")))
+	{
+		const FString categoryPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryCategoryPin"));
+		if (Pin->PinName == FName(*categoryPinName))
+			return true;
+	}
+
+	if (targetFunction->HasMetaData(TEXT("MounteaInventoryParentCategoryPin")))
+	{
+		const FString parentPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryParentCategoryPin"));
+		if (Pin->PinName == FName(*parentPinName))
+			return true;
+	}
+
+	return false;
 }
 
 bool UK2Node_MounteaAdvancedInventoryCallFunction::ShouldUseJsonDefinitionSelector(UEdGraphPin* Pin) const

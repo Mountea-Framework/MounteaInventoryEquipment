@@ -14,6 +14,7 @@
 #include "Slate/SPinTypeInventoryCategorySelector.h"
 
 #include "Algo/Transform.h"
+#include "EdGraph/EdGraphNode.h"
 #include "EdGraph/EdGraphPin.h"
 #include "EdGraph/EdGraphSchema.h"
 #include "EdGraphSchema_K2.h"
@@ -22,6 +23,7 @@
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaCraftingStatics.h"
 #include "Styling/AppStyle.h"
+#include "K2Nodes/K2Node_MounteaAdvancedInventoryCallFunction.h"
 #include "Widgets/Input/SComboBox.h"
 #include "Widgets/Text/STextBlock.h"
 
@@ -29,16 +31,9 @@ void SPinTypeInventoryCategorySelector::Construct(const FArguments& InArgs, UEdG
 {
 	SGraphPin::Construct(SGraphPin::FArguments(), InGraphPinObj);
 
-	TArray<FString> categories;
-	GetCategoriesFromSettings(categories);
+	RefreshCategoryOptions();
 
-	CategoryOptions.Empty(categories.Num());
-	for (const FString& category : categories)
-	{
-		CategoryOptions.Add(MakeShared<FString>(category));
-	}
-
-	if (CategoryOptions.Num() > 0 && GraphPinObj && GraphPinObj->GetDefaultAsString().IsEmpty() && GraphPinObj->LinkedTo.Num() == 0)
+	if (!IsParentCategoryPin() && CategoryOptions.Num() > 0 && GraphPinObj && GraphPinObj->GetDefaultAsString().IsEmpty() && GraphPinObj->LinkedTo.Num() == 0)
 		GraphPinObj->GetSchema()->TrySetDefaultValue(*GraphPinObj, *CategoryOptions[0]);
 }
 
@@ -50,6 +45,7 @@ TSharedRef<SWidget> SPinTypeInventoryCategorySelector::GetDefaultValueWidget()
 			SNew(SComboBox<TSharedPtr<FString>>)
 			.ContentPadding(FMargin(2.0f, 2.0f))
 			.OptionsSource(&CategoryOptions)
+			.OnComboBoxOpening(this, &SPinTypeInventoryCategorySelector::RefreshCategoryOptions)
 			.OnGenerateWidget(this, &SPinTypeInventoryCategorySelector::GenerateCategoryWidget)
 			.OnSelectionChanged(this, &SPinTypeInventoryCategorySelector::OnCategorySelected)
 			[
@@ -101,6 +97,19 @@ TSharedRef<SWidget> SPinTypeInventoryCategorySelector::GenerateCategoryWidget(TS
 		.Font(FAppStyle::GetFontStyle(TEXT("PropertyWindow.NormalFont")));
 }
 
+void SPinTypeInventoryCategorySelector::RefreshCategoryOptions()
+{
+	TArray<FString> categories;
+	GetCategoriesFromSettings(categories);
+	categories.Sort();
+
+	CategoryOptions.Empty(categories.Num());
+	for (const FString& category : categories)
+	{
+		CategoryOptions.Add(MakeShared<FString>(category));
+	}
+}
+
 void SPinTypeInventoryCategorySelector::GetCategoriesFromSettings(TArray<FString>& OutCategories) const
 {
 	OutCategories.Reset();
@@ -114,7 +123,30 @@ void SPinTypeInventoryCategorySelector::GetCategoriesFromSettings(TArray<FString
 			return;
 		}
 
-		inventorySettings->GetAllowedCategories().GetKeys(OutCategories);
+		const TMap<FString, FInventoryCategory> allowedCategories = inventorySettings->GetAllowedCategories();
+
+		if (IsParentCategoryPin())
+		{
+			for (const TPair<FString, FInventoryCategory>& category : allowedCategories)
+			{
+				if (category.Value.SubCategories.Num() > 0)
+					OutCategories.Add(category.Key);
+			}
+			return;
+		}
+
+		if (IsChildCategoryPin())
+		{
+			const FString parentCategoryName = GetParentCategoryPinValue();
+			if (!parentCategoryName.IsEmpty())
+			{
+				if (const FInventoryCategory* parentCategory = allowedCategories.Find(parentCategoryName))
+					parentCategory->SubCategories.GetKeys(OutCategories);
+				return;
+			}
+		}
+
+		allowedCategories.GetKeys(OutCategories);
 		return;
 	}
 
@@ -127,6 +159,51 @@ void SPinTypeInventoryCategorySelector::GetCategoriesFromSettings(TArray<FString
 		{
 			return CategoryTag.ToString();
 		});
+}
+
+bool SPinTypeInventoryCategorySelector::IsParentCategoryPin() const
+{
+	if (!GraphPinObj)
+		return false;
+
+	const UK2Node_MounteaAdvancedInventoryCallFunction* functionNode = Cast<UK2Node_MounteaAdvancedInventoryCallFunction>(GraphPinObj->GetOwningNode());
+	const UFunction* targetFunction = functionNode ? functionNode->GetTargetFunction() : nullptr;
+	if (!targetFunction || !targetFunction->HasMetaData(TEXT("MounteaInventoryParentCategoryPin")))
+		return false;
+
+	const FString parentPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryParentCategoryPin"));
+	return GraphPinObj->PinName == FName(*parentPinName);
+}
+
+bool SPinTypeInventoryCategorySelector::IsChildCategoryPin() const
+{
+	if (!GraphPinObj)
+		return false;
+
+	const UK2Node_MounteaAdvancedInventoryCallFunction* functionNode = Cast<UK2Node_MounteaAdvancedInventoryCallFunction>(GraphPinObj->GetOwningNode());
+	const UFunction* targetFunction = functionNode ? functionNode->GetTargetFunction() : nullptr;
+	if (!targetFunction || !targetFunction->HasMetaData(TEXT("MounteaInventoryCategoryPin")))
+		return false;
+
+	const FString categoryPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryCategoryPin"));
+	return GraphPinObj->PinName == FName(*categoryPinName);
+}
+
+FString SPinTypeInventoryCategorySelector::GetParentCategoryPinValue() const
+{
+	if (!GraphPinObj)
+		return FString();
+
+	const UK2Node_MounteaAdvancedInventoryCallFunction* functionNode = Cast<UK2Node_MounteaAdvancedInventoryCallFunction>(GraphPinObj->GetOwningNode());
+	const UFunction* targetFunction = functionNode ? functionNode->GetTargetFunction() : nullptr;
+	if (!targetFunction || !targetFunction->HasMetaData(TEXT("MounteaInventoryParentCategoryPin")))
+		return FString();
+
+	const FString parentPinName = targetFunction->GetMetaData(TEXT("MounteaInventoryParentCategoryPin"));
+	if (const UEdGraphPin* parentPin = GraphPinObj->GetOwningNode()->FindPin(*parentPinName, EGPD_Input))
+		return parentPin->GetDefaultAsString().TrimQuotes();
+
+	return FString();
 }
 
 #endif
