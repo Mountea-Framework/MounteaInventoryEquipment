@@ -54,6 +54,9 @@ public:
 	bool SetBoolField(FName FieldName, bool Value, UMounteaJsonObject*& JsonObject);
 	bool GetBoolField(FName FieldName, bool& Value) const;
 
+	bool SetGuidField(FName FieldName, const FGuid& Value, UMounteaJsonObject*& JsonObject);
+	bool GetGuidField(FName FieldName, FGuid& Value) const;
+
 	bool SetObjectField(FName FieldName, UMounteaJsonObject* Value, UMounteaJsonObject*& JsonObject);
 	bool GetObjectField(FName FieldName, UMounteaJsonObject*& Value) const;
 

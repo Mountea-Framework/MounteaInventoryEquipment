@@ -13,6 +13,8 @@
 
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
+#include "Engine/EngineTypes.h"
+#include "JsonObjectConverter.h"
 
 static UObject* ResolveJsonObjectOuter(UObject* Target)
 {
@@ -210,6 +212,31 @@ bool UMounteaJsonObject::GetBoolField(const FName FieldName, bool& Value) const
 
 	Value = fieldValue->AsBool();
 	return true;
+}
+
+bool UMounteaJsonObject::SetGuidField(const FName FieldName, const FGuid& Value, UMounteaJsonObject*& OutJsonObject)
+{
+	OutJsonObject = this;
+
+	if (!JsonObject.IsValid() || FieldName.IsNone())
+		return false;
+
+	TSharedRef<FJsonObject> guidObject = MakeShared<FJsonObject>();
+	if (!FJsonObjectConverter::UStructToJsonObject(TBaseStructure<FGuid>::Get(), &Value, guidObject, 0, 0))
+		return false;
+
+	return SetObjectFieldRaw(FieldName, guidObject);
+}
+
+bool UMounteaJsonObject::GetGuidField(const FName FieldName, FGuid& Value) const
+{
+	Value.Invalidate();
+
+	TSharedPtr<FJsonObject> guidObject;
+	if (!GetObjectFieldRaw(FieldName, guidObject))
+		return false;
+
+	return FJsonObjectConverter::JsonObjectToUStruct(guidObject.ToSharedRef(), TBaseStructure<FGuid>::Get(), &Value, 0, 0);
 }
 
 bool UMounteaJsonObject::SetObjectField(const FName FieldName, UMounteaJsonObject* Value, UMounteaJsonObject*& OutJsonObject)
