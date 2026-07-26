@@ -246,6 +246,7 @@ bool UMounteaCraftingParticipantUIComponent::CraftingCategorySelected_Implementa
 	if (SelectedCategory.Equals(SelectedCategoryId, ESearchCase::IgnoreCase))
 		return false;
 	SelectedCategory = SelectedCategoryId;
+	OnCraftingCategorySelected.Broadcast(SelectedCategoryId);
 	return true;
 }
 
@@ -289,6 +290,7 @@ bool UMounteaCraftingParticipantUIComponent::CraftableItemSelected_Implementatio
 		return false;
 
 	SelectedItem = NewSelectedItem;
+	OnCraftableItemSelected.Broadcast(NewSelectedItem);
 	return true;
 }
 

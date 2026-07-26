@@ -19,6 +19,8 @@ class IMounteaAdvancedCraftingParticipantInterface;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCraftingUIScreenOpened);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCraftingUIScreenClosed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCraftingCategorySelected, const FString&, SelectedCategoryId);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCraftableItemSelected, const FGuid&, SelectedItemId);
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedCraftingParticipantUIInterface : public UInterface
@@ -113,4 +115,6 @@ public:
 
 	virtual FCraftingUIScreenOpened& GetOnUIScreenOpenedHandle() = 0;
 	virtual FCraftingUIScreenClosed& GetOnUIScreenClosedHandle() = 0;
+	virtual FCraftingCategorySelected& GetOnCraftingCategorySelectedHandle() = 0;
+	virtual FCraftableItemSelected& GetOnCraftableItemSelectedHandle() = 0;
 };

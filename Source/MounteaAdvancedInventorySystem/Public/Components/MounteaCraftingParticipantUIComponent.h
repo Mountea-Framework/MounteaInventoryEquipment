@@ -84,6 +84,10 @@ public:
 	{ return OnUIScreenOpened; };
 	virtual FCraftingUIScreenClosed& GetOnUIScreenClosedHandle() override
 	{ return OnUIScreenClosed; };
+	virtual FCraftingCategorySelected& GetOnCraftingCategorySelectedHandle() override
+	{ return OnCraftingCategorySelected; };
+	virtual FCraftableItemSelected& GetOnCraftableItemSelectedHandle() override
+	{ return OnCraftableItemSelected; };
 
 protected:
 
@@ -130,4 +134,18 @@ protected:
 	UPROPERTY(BlueprintAssignable, Category="Mountea|Crafting",
 		meta=(DisplayName="Crafting UI - On UI Screen Closed"))
 	FCraftingUIScreenClosed OnUIScreenClosed;
+
+	/**
+	 * Delegate triggered when a Crafting category is selected in the Crafting UI.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Crafting",
+		meta=(DisplayName="Crafting UI - On Category Selected"))
+	FCraftingCategorySelected OnCraftingCategorySelected;
+
+	/**
+	 * Delegate triggered when a Craftable item is selected in the Crafting UI.
+	 */
+	UPROPERTY(BlueprintAssignable, Category="Mountea|Crafting",
+		meta=(DisplayName="Crafting UI - On Craftable Item Selected"))
+	FCraftableItemSelected OnCraftableItemSelected;
 };
