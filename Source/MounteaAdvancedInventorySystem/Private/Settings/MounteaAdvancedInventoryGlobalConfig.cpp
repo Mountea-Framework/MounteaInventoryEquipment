@@ -212,6 +212,23 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 			MakeJsonStringDefinitionField(TEXT("ParentCategory"))
 		}
 	));
+
+	// InventoryItemChangePayload
+	JsonObjectDefinitions.Add(TEXT("InventoryItemChangePayload"), MakeJsonObjectDefinition(
+		{
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
+		}
+	));
+
+	// InventoryItemQuantityChangePayload
+	JsonObjectDefinitions.Add(TEXT("InventoryItemQuantityChangePayload"), MakeJsonObjectDefinition(
+		{
+			MakeJsonIntDefinitionField(TEXT("quantity"))
+		},
+		{
+			MakeJsonDefinitionInclude(TEXT("InventoryItemChangePayload"))
+		}
+	));
 }
 
 #endif
