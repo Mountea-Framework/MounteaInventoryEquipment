@@ -246,6 +246,11 @@ bool UMounteaCraftingParticipantUIComponent::CraftingCategorySelected_Implementa
 	if (SelectedCategory.Equals(SelectedCategoryId, ESearchCase::IgnoreCase))
 		return false;
 	SelectedCategory = SelectedCategoryId;
+	SelectedItem = FGuid();
+
+	if (IsValid(CraftingWidget) && CraftingWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(CraftingWidget, InventoryUICommands::Categories::Selected, nullptr);
+
 	OnCraftingCategorySelected.Broadcast(SelectedCategoryId);
 	return true;
 }
@@ -290,6 +295,10 @@ bool UMounteaCraftingParticipantUIComponent::CraftableItemSelected_Implementatio
 		return false;
 
 	SelectedItem = NewSelectedItem;
+
+	if (IsValid(CraftingWidget) && CraftingWidget->Implements<UMounteaInventoryGenericWidgetInterface>())
+		IMounteaInventoryGenericWidgetInterface::Execute_ProcessInventoryWidgetCommand(CraftingWidget, InventoryUICommands::Items::Selected, nullptr);
+
 	OnCraftableItemSelected.Broadcast(NewSelectedItem);
 	return true;
 }
