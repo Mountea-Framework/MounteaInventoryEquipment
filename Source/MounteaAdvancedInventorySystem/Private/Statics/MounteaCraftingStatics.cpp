@@ -14,6 +14,8 @@
 
 #include "Algo/Copy.h"
 #include "Algo/ForEach.h"
+#include "Algo/MaxElement.h"
+#include "Algo/MinElement.h"
 #include "Algo/Transform.h"
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaCraftingBaseEnums.h"
@@ -122,6 +124,89 @@ int32 UMounteaCraftingStatics::GetIngredientQuantityCached(
 
 	IngredientQuantityCache.Add(IngredientTemplate, totalQuantity);
 	return totalQuantity;
+}
+
+int32 UMounteaCraftingStatics::GetIngredientGroupCraftableCreations(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const UMounteaRecipeIngredientsList* IngredientGroup,
+	TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache)
+{
+	if (!Inventory || !IsValid(IngredientGroup) || IngredientGroup->RecipeIngredients.Num() == 0)
+		return 0;
+
+	TMap<UMounteaInventoryItemTemplate*, int32> requiredQuantities;
+
+	const auto isValidIngredient = [](const UMounteaRecipeIngredient* Ingredient)
+	{
+		if (!IsValid(Ingredient) || Ingredient->RequiredQuantity <= 0)
+			return false;
+
+		return IsValid(Ingredient->IngredientSource.LoadSynchronous());
+	};
+
+	if (IngredientGroup->RecipeIngredients.ContainsByPredicate(
+		[&isValidIngredient](const UMounteaRecipeIngredient* Ingredient)
+		{
+			return !isValidIngredient(Ingredient);
+		}))
+	{
+		return 0;
+	}
+
+	Algo::ForEach(
+		IngredientGroup->RecipeIngredients,
+		[&requiredQuantities](const UMounteaRecipeIngredient* Ingredient)
+		{
+			UMounteaInventoryItemTemplate* ingredientTemplate = Ingredient->IngredientSource.LoadSynchronous();
+			int32& requiredQuantity = requiredQuantities.FindOrAdd(ingredientTemplate);
+			requiredQuantity += Ingredient->RequiredQuantity;
+		});
+
+	TArray<int32> craftableCreationOptions;
+	craftableCreationOptions.Reserve(requiredQuantities.Num());
+
+	Algo::TransformIf(
+		requiredQuantities,
+		craftableCreationOptions,
+		[](const TPair<UMounteaInventoryItemTemplate*, int32>& RequiredIngredient)
+		{
+			return IsValid(RequiredIngredient.Key) && RequiredIngredient.Value > 0;
+		},
+		[&Inventory, &IngredientQuantityCache](const TPair<UMounteaInventoryItemTemplate*, int32>& RequiredIngredient)
+		{
+			const int32 availableQuantity = GetIngredientQuantityCached(Inventory, RequiredIngredient.Key, IngredientQuantityCache);
+			return availableQuantity / RequiredIngredient.Value;
+		});
+
+	const int32* limitingCraftableCreations = Algo::MinElement(craftableCreationOptions);
+	return limitingCraftableCreations ? *limitingCraftableCreations : 0;
+}
+
+int32 UMounteaCraftingStatics::GetRecipeCraftableCreations(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const UMounteaRecipeTemplate* Recipe,
+	TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache)
+{
+	if (!Inventory || !IsValid(Recipe) || Recipe->RecipeIngredientOptions.Num() == 0)
+		return 0;
+
+	TArray<int32> craftableCreationOptions;
+	craftableCreationOptions.Reserve(Recipe->RecipeIngredientOptions.Num());
+
+	Algo::TransformIf(
+		Recipe->RecipeIngredientOptions,
+		craftableCreationOptions,
+		[](const UMounteaRecipeIngredientsList* IngredientGroup)
+		{
+			return IsValid(IngredientGroup);
+		},
+		[&Inventory, &IngredientQuantityCache](const UMounteaRecipeIngredientsList* IngredientGroup)
+		{
+			return GetIngredientGroupCraftableCreations(Inventory, IngredientGroup, IngredientQuantityCache);
+		});
+
+	const int32* maxCraftableCreations = Algo::MaxElement(craftableCreationOptions);
+	return maxCraftableCreations ? *maxCraftableCreations : 0;
 }
 
 bool UMounteaCraftingStatics::IsIngredientSatisfied(
@@ -508,6 +593,21 @@ bool UMounteaCraftingStatics::ForgetRecipe(UObject* Target, UMounteaRecipeTempla
 bool UMounteaCraftingStatics::IsCraftingPossible(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft)
 {
 	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_IsCraftingPossible(Target, TemplateToCraft) : false;
+}
+
+int32 UMounteaCraftingStatics::GetMaximumCraftableUnits(UObject* CraftingParticipant, UMounteaRecipeTemplate* TemplateToCraft)
+{
+	if (!IsValidRecipeHandler(CraftingParticipant) || !IsValid(TemplateToCraft) || TemplateToCraft->QuantityPerCreation <= 0)
+		return 0;
+
+	const TScriptInterface<IMounteaAdvancedInventoryInterface> parentInventory = GetParentInventory(CraftingParticipant);
+	if (!parentInventory)
+		return 0;
+
+	TMap<UMounteaInventoryItemTemplate*, int32> ingredientQuantityCache;
+	const int32 maxCraftableCreations = GetRecipeCraftableCreations(parentInventory, TemplateToCraft, ingredientQuantityCache);
+
+	return maxCraftableCreations * TemplateToCraft->QuantityPerCreation;
 }
 
 FMounteaCraftingResult UMounteaCraftingStatics::StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)

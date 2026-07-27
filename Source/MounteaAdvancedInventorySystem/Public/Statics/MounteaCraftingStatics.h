@@ -169,6 +169,22 @@ public:
 		DisplayName="Is Crafting Possible")
 	static bool IsCraftingPossible(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft);
 
+	/**
+	 * Calculates how many result item units can be crafted from the participant's available ingredients.
+	 * If the recipe contains multiple ingredient options, the highest craftable option is returned.
+	 *
+	 * @param CraftingParticipant Crafting participant whose parent inventory provides the ingredients.
+	 * @param TemplateToCraft Recipe to evaluate.
+	 * @return Maximum number of result item units craftable from the available ingredients.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(MounteaGetter, DefaultToSelf="CraftingParticipant"),
+		meta=(Keywords="craft,craftable,amount,quantity,units,recipe,ingredients"),
+		DisplayName="Get Maximum Craftable Units")
+	static int32 GetMaximumCraftableUnits(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* CraftingParticipant,
+		UMounteaRecipeTemplate* TemplateToCraft);
+
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
@@ -228,6 +244,16 @@ public:
 	static int32 GetIngredientQuantityCached(
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
 		UMounteaInventoryItemTemplate* IngredientTemplate,
+		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+
+	static int32 GetIngredientGroupCraftableCreations(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const UMounteaRecipeIngredientsList* IngredientGroup,
+		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+
+	static int32 GetRecipeCraftableCreations(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const UMounteaRecipeTemplate* Recipe,
 		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
 
 	static bool IsIngredientSatisfied(
