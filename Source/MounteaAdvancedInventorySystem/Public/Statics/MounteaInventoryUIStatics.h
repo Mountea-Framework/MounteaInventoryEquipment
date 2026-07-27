@@ -1244,7 +1244,7 @@ public:
 	 * @return The selected category key.
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Inventory|Categories",
-		meta=(MounteaGetter, MounteaInventoryCategoryPin="CategoryId"),
+		meta=(MounteaGetter, MounteaInventoryCategoryPin="CategoryId", Keywords="category,key,id,get,select"),
 		DisplayName="Select Inventory Category")
 	static FString SelectInventoryCategory(const FString& CategoryId);
 
