@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "UObject/Interface.h"
 #include "MounteaAdvancedInventoryUIManagerInterface.generated.h"
 
@@ -185,69 +184,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Item")
 	FGuid GetActiveItemGuid() const;
 	virtual FGuid GetActiveItemGuid_Implementation() const = 0;
-	
-	// --- Items
-
-	/**
-	 * Retrieves local custom items map.
-	 * 
-	 * @return Custom items map if any entries are present.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
-	TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap() const;
-	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const = 0;
-	
-	/**
-	 * Adds (or replaces) a single entry in the custom items map.
-	 *
-	 * @param ItemTag   Gameplay tag representing the custom item key.
-	 * @param ItemId    Guid value associated with the item.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
-	void AddCustomItemToMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
-	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
-
-	/**
-	 * Appends entries from another map into the custom items map.
-	 * Existing keys will be overwritten with new values.
-	 *
-	 * @param OtherItems   Map of custom items to merge in.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
-	void AppendCustomItemsMap(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
-	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) = 0;
-
-	/**
-	 * Clears all entries from the custom items map.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
-	void ClearCustomItemsMap();
-	virtual void ClearCustomItemsMap_Implementation() = 0;
-
-	/**
-	 * Removes a single entry from the custom items map.
-	 *
-	 * @param ItemTag Key to remove the item from.
-	 * @param ItemId Guid representing the custom item key to remove.
-	 *
-	 * @return True if an entry was removed, false otherwise.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
-	bool RemoveCustomItemFromMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
-	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
-
-	/**
-	 * Validates whether the provided Item guid is stored in a map for specified tag.
-	 * Example:
-	 * - Is Item in Favorites
-	 * 
-	 * @param ItemTag Tag which defines the key, like "Favorite"
-	 * @param ItemId Item guid to search for
-	 * @return True if item is stored in such container, false otherwise
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Manager|Items")
-	bool IsItemStoredInCustomMap(const FGameplayTag& ItemTag, const FGuid& ItemId);
-	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) = 0;
 	
 	// --- Item Actions
 
