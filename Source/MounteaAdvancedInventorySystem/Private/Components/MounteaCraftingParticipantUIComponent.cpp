@@ -16,6 +16,7 @@
 #include "Definitions/MounteaInventoryBaseCommands.h"
 #include "Engine/LocalPlayer.h"
 #include "Helpers/MounteaCategoryWidgetEventHelpers.h"
+#include "Helpers/MounteaCustomItemsMapHelpers.h"
 #include "Helpers/MounteaItemWidgetEventHelpers.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
@@ -301,6 +302,31 @@ bool UMounteaCraftingParticipantUIComponent::CraftableItemSelected_Implementatio
 
 	OnCraftableItemSelected.Broadcast(NewSelectedItem);
 	return true;
+}
+
+void UMounteaCraftingParticipantUIComponent::AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	FMounteaCustomItemsMapHelpers::AddCustomItem(CustomItemsMap, ItemTag, ItemId);
+}
+
+void UMounteaCraftingParticipantUIComponent::AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
+{
+	FMounteaCustomItemsMapHelpers::AppendCustomItems(CustomItemsMap, OtherItems);
+}
+
+void UMounteaCraftingParticipantUIComponent::ClearCustomItemsMap_Implementation()
+{
+	FMounteaCustomItemsMapHelpers::ClearCustomItems(CustomItemsMap);
+}
+
+bool UMounteaCraftingParticipantUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	return FMounteaCustomItemsMapHelpers::RemoveCustomItem(CustomItemsMap, ItemTag, ItemId);
+}
+
+bool UMounteaCraftingParticipantUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	return FMounteaCustomItemsMapHelpers::IsItemStored(CustomItemsMap, ItemTag, ItemId);
 }
 
 UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaCraftingParticipantUIComponent::GetSharedHUDSubsystem() const
