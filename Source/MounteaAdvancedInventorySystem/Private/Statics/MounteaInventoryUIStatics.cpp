@@ -343,49 +343,6 @@ FMounteaInventoryItem UMounteaInventoryUIStatics::FindItem(const TScriptInterfac
 	return inventory->Execute_FindItem(inventory.GetObject(), SearchParams);
 }
 
-TMap<FGameplayTag, FInventoryUICustomData> UMounteaInventoryUIStatics::GetCustomItemsMap(
-	const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
-{
-	return Target.GetObject() ? 
-		IMounteaAdvancedInventoryUIManagerInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FInventoryUICustomData>();
-}
-
-void UMounteaInventoryUIStatics::AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-	const FGameplayTag& ItemTag, const FGuid& ItemId)
-{
-	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIManagerInterface::Execute_AddCustomItemToMap(Target.GetObject(), ItemTag, ItemId);
-}
-
-void UMounteaInventoryUIStatics::AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-	const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
-{
-	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIManagerInterface::Execute_AppendCustomItemsMap(Target.GetObject(), OtherItems);
-}
-
-void UMounteaInventoryUIStatics::ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
-{
-	if (Target.GetObject())
-		IMounteaAdvancedInventoryUIManagerInterface::Execute_ClearCustomItemsMap(Target.GetObject());
-}
-
-bool UMounteaInventoryUIStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-	const FGameplayTag& ItemTag, const FGuid& ItemId)
-{
-	if (Target.GetObject())
-		return IMounteaAdvancedInventoryUIManagerInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag, ItemId);
-	return false;
-}
-
-bool UMounteaInventoryUIStatics::IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, 
-	const FGameplayTag& ItemTag, const FGuid& ItemId)
-{
-	if (Target.GetObject())
-		return IMounteaAdvancedInventoryUIManagerInterface::Execute_IsItemStoredInCustomMap(Target.GetObject(), ItemTag, ItemId);
-	return false;
-}
-
 TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryUIStatics::GetItemActionsQueue(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target)
 {
 	return Target.GetObject() ? IMounteaAdvancedInventoryUIManagerInterface::Execute_GetItemActionsQueue(Target.GetObject()) : TArray<UMounteaSelectableInventoryItemAction*>();

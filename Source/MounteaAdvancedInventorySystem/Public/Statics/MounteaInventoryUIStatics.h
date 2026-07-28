@@ -24,7 +24,6 @@ struct FMounteaInventoryGridSlot;
 struct FInventoryItemSearchParams;
 struct FMounteaItemActionData;
 struct FGameplayTagContainer;
-struct FGameplayTag;
 
 class UMounteaAdvancedInventoryUISubsystem;
 
@@ -171,85 +170,6 @@ public:
 		meta=(MounteaGetter),
 		DisplayName="Inventory UI Manager - Find Item")
 	static FMounteaInventoryItem FindItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FInventoryItemSearchParams& SearchParams);
-	
-	/**
-	 * Retrieves local custom items map.
-	 * 
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @return Custom items map if any entries are present.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
-		meta=(MounteaGetter),
-		DisplayName="Inventory UI Manager - Get Custom Items")
-	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
-	
-	/**
-	 * Adds (or replaces) a custom item entry in the target UI component's custom items map.
-	 *
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @param ItemTag    Gameplay tag representing the custom item key.
-	 * @param ItemId     Guid value associated with the item.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
-		meta=(MounteaSetter),
-		DisplayName="Inventory UI Manager - Add Custom Item")
-	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target, const FGameplayTag& ItemTag,
-		const FGuid& ItemId);
-	
-	/**
-	 * Appends custom item entries to the target UI component's custom items map.
-	 * Existing keys will be overwritten.
-	 *
-	 * @param Target       UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @param OtherItems   Map of custom items to append.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
-		meta=(MounteaSetter),
-		DisplayName="Inventory UI Manager - Append Custom Items")
-	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-		const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
-
-	/**
-	 * Clears all custom items from the target UI component's custom items map.
-	 *
-	 * @param Target     UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 */
-	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
-		meta=(MounteaSetter),
-		DisplayName="Inventory UI Manager - Clear Custom Items")
-	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target);
-
-	/**
-	 * Removes a single custom item from the target UI component's custom items map.
-	 *
-	 * @param Target    UI component implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @param ItemTag   Gameplay tag representing the custom item key to remove.
-	 * @param ItemId	Guid of the item to be removed.
-	 *
-	 * @return True if an entry was removed, false otherwise.
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
-		meta=(MounteaSetter),
-		meta=(ExpandBoolAsExecs="ReturnValue"),		
-		DisplayName="Inventory UI Manager - Remove Custom Item")
-	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-		const FGameplayTag& ItemTag, const FGuid& ItemId);
-	
-	/**
-	 * Validates whether the provided Item guid is stored in a map for specified tag.
-	 * Example:
-	 * - Is Item in Favorites
-	 * 
-	 * @param Target UI manager implementing MounteaAdvancedInventoryUIManagerInterface.
-	 * @param ItemTag Tag which defines the key, like "Favorite"
-	 * @param ItemId Item guid to search for
-	 * @return True if item is stored in such container, false otherwise
-	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager|Custom Items Map",
-		meta=(MounteaValidate),
-		DisplayName="Inventory UI Manager - Is Item Stored In Custom Map")
-	static bool IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedInventoryUIManagerInterface>& Target,
-		const FGameplayTag& ItemTag, const FGuid& ItemId);
 	
 	/**
 	 * Returns a snapshot of the currently queued Item Actions waiting to be processed.
