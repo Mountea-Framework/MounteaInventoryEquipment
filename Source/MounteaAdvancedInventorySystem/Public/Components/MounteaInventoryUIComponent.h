@@ -17,6 +17,7 @@
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryUIManagerInterface.h"
+#include "Interfaces/UserInterface/MounteaAdvancedCustomItemsMapInterface.h"
 #include "Interfaces/Widgets/Category/MounteaCategoryWidgetEventRegistrarInterface.h"
 #include "Interfaces/Widgets/Items/MounteaItemWidgetEventRegistrarInterface.h"
 #include "MounteaInventoryUIComponent.generated.h"
@@ -36,7 +37,7 @@ class UMounteaAdvancedInventorySharedHUDSubsystem;
 UCLASS(ClassGroup=(Mountea), Blueprintable, AutoExpandCategories=("Mountea","Inventory","Mountea|Inventory"), HideCategories=("Cooking","Collision"), 
     meta=(BlueprintSpawnableComponent),
     meta=(DisplayName="Mountea Inventory UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface, public IMounteaCategoryWidgetEventRegistrarInterface, public IMounteaItemWidgetEventRegistrarInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryUIComponent : public UActorComponent, public IMounteaAdvancedInventoryUIManagerInterface, public IMounteaAdvancedCustomItemsMapInterface, public IMounteaCategoryWidgetEventRegistrarInterface, public IMounteaItemWidgetEventRegistrarInterface
 {
 	GENERATED_BODY()
 
@@ -87,14 +88,8 @@ public:
 		return CustomItemsMap;
 	};
 	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
-	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override
-	{
-		CustomItemsMap.Append(OtherItems);
-	};
-	virtual void ClearCustomItemsMap_Implementation() override
-	{
-		CustomItemsMap.Reset();
-	};
+	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override;
+	virtual void ClearCustomItemsMap_Implementation() override;
 	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
 	

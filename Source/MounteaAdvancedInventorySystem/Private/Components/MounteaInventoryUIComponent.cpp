@@ -12,7 +12,6 @@
 
 #include "Components/MounteaInventoryUIComponent.h"
 
-#include "Algo/AnyOf.h"
 #include "Blueprint/UserWidget.h"
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
 #include "Engine/LocalPlayer.h"
@@ -20,6 +19,7 @@
 #include "Definitions/MounteaInventoryBaseCommands.h"
 
 #include "Helpers/MounteaCategoryWidgetEventHelpers.h"
+#include "Helpers/MounteaCustomItemsMapHelpers.h"
 #include "Helpers/MounteaItemWidgetEventHelpers.h"
 #include "Helpers/MounteaJsonObject.h"
 
@@ -403,18 +403,17 @@ void UMounteaInventoryUIComponent::ItemSelected_Implementation(const FGuid& Sele
 
 void UMounteaInventoryUIComponent::AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
-	if (FInventoryUICustomData* customData = CustomItemsMap.Find(ItemTag))
-	{
-		if (!customData->StoredIds.Contains(ItemId))
-			customData->StoredIds.Add(ItemId);
-	}
-	else
-	{
-		FInventoryUICustomData newData;
-		newData.StoredIds.Add(ItemId);
+	FMounteaCustomItemsMapHelpers::AddCustomItem(CustomItemsMap, ItemTag, ItemId);
+}
 
-		CustomItemsMap.Add(ItemTag, MoveTemp(newData));
-	}	
+void UMounteaInventoryUIComponent::AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
+{
+	FMounteaCustomItemsMapHelpers::AppendCustomItems(CustomItemsMap, OtherItems);
+}
+
+void UMounteaInventoryUIComponent::ClearCustomItemsMap_Implementation()
+{
+	FMounteaCustomItemsMapHelpers::ClearCustomItems(CustomItemsMap);
 }
 
 void UMounteaInventoryUIComponent::ProcessItemDurabilityChanged(const FMounteaInventoryItem& Item, const float OldDurability, const float NewDurability)
@@ -441,31 +440,12 @@ void UMounteaInventoryUIComponent::ProcessItemQuantityChanged(const FMounteaInve
 
 bool UMounteaInventoryUIComponent::RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
-	FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
-	if (!foundData || foundData->StoredIds.IsEmpty())
-		return false;
-
-	const int32 removedCount = foundData->StoredIds.RemoveAll([&ItemId](const FGuid& storedId)
-	{
-		return storedId == ItemId;
-	});
-
-	if (removedCount > 0 && foundData->StoredIds.Num() == 0)
-		CustomItemsMap.Remove(ItemTag);
-
-	return removedCount > 0;
+	return FMounteaCustomItemsMapHelpers::RemoveCustomItem(CustomItemsMap, ItemTag, ItemId);
 }
 
 bool UMounteaInventoryUIComponent::IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
-	const FInventoryUICustomData* foundData = CustomItemsMap.Find(ItemTag);
-	if (!foundData)
-		return false;
-	
-	return Algo::AnyOf(foundData->StoredIds, [&ItemId](const FGuid& storedId)
-	{
-		return storedId == ItemId;
-	});
+	return FMounteaCustomItemsMapHelpers::IsItemStored(CustomItemsMap, ItemTag, ItemId);
 }
 
 bool UMounteaInventoryUIComponent::EnqueueItemAction_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, UObject* Payload)
