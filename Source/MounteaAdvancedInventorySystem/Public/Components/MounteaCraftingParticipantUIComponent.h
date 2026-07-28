@@ -14,6 +14,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
+#include "Interfaces/UserInterface/MounteaAdvancedCustomItemsMapInterface.h"
 #include "Interfaces/Widgets/Category/MounteaCategoryWidgetEventRegistrarInterface.h"
 #include "Interfaces/Widgets/Items/MounteaItemWidgetEventRegistrarInterface.h"
 #include "MounteaCraftingParticipantUIComponent.generated.h"
@@ -34,7 +35,7 @@ UCLASS(ClassGroup=(Mountea), Blueprintable,
 	AutoCollapseCategories=("Variable,Sockets,Tags,Component Tick,Component Replication,Activation,Events,Replication,Asset User Data,Navigation"),
 	HideCategories=("Cooking","Collision"),
 	meta=(BlueprintSpawnableComponent, DisplayName="Mountea Crafting Participant UI Component"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingParticipantUIComponent : public UActorComponent, public IMounteaAdvancedCraftingParticipantUIInterface, public IMounteaCategoryWidgetEventRegistrarInterface, public IMounteaItemWidgetEventRegistrarInterface
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaCraftingParticipantUIComponent : public UActorComponent, public IMounteaAdvancedCraftingParticipantUIInterface, public IMounteaAdvancedCustomItemsMapInterface, public IMounteaCategoryWidgetEventRegistrarInterface, public IMounteaItemWidgetEventRegistrarInterface
 {
 	GENERATED_BODY()
 
@@ -72,6 +73,16 @@ public:
 		return SelectedItem;
 	}
 
+	virtual TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap_Implementation() const override
+	{
+		return CustomItemsMap;
+	}
+	virtual void AddCustomItemToMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
+	virtual void AppendCustomItemsMap_Implementation(const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems) override;
+	virtual void ClearCustomItemsMap_Implementation() override;
+	virtual bool RemoveCustomItemFromMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
+	virtual bool IsItemStoredInCustomMap_Implementation(const FGameplayTag& ItemTag, const FGuid& ItemId) override;
+
 	virtual bool BindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool UnbindCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FMounteaCategoryWidgetSelectedBinding& Binding) override;
 	virtual bool TriggerCategoryWidgetSelected_Implementation(UObject* CategoryWidget, const FString& CategoryId) override;
@@ -102,7 +113,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
 	FGuid SelectedItem;
-		
+
+	// Custom stored map, can be used to store unique Craftable items, like Favourites etc.
+	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
+		meta=(NoResetToDefault))
+	TMap<FGameplayTag, FInventoryUICustomData> CustomItemsMap;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
 	TObjectPtr<UUserWidget> CraftingWidget;
