@@ -14,6 +14,12 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantUIInterface.h"
+#include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingRecipeDetailsPanelWidgetInterface.h"
+#include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingRecipeIngredientWidgetInterface.h"
+#include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingRecipeIngredientsWrapperWidgetInterface.h"
+#include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingRecipeInfoboxWidgetInterface.h"
+#include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingRecipeResultWidgetInterface.h"
+#include "Interfaces/Widgets/Crafting/MounteaAdvancedInventoryCraftingRecipeSliderWidgetInterface.h"
 #include "Settings/MounteaAdvancedCraftingUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Statics/MounteaInventoryUIStatics.h"
@@ -22,6 +28,15 @@
 bool UMounteaCraftingUIStatics::IsValidCraftingUIHandler(const UObject* Target)
 {
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedCraftingParticipantUIInterface>();
+}
+
+TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::ResolveCraftingWidgetClass(const TSoftClassPtr<UUserWidget>& WidgetClassPtr, const UClass* RequiredInterface)
+{
+	UClass* widgetClass = WidgetClassPtr.LoadSynchronous();
+	if (!IsValid(widgetClass) || !IsValid(RequiredInterface) || !widgetClass->ImplementsInterface(RequiredInterface))
+		return nullptr;
+
+	return widgetClass;
 }
 
 UMounteaAdvancedCraftingUISubsystem* UMounteaCraftingUIStatics::GetCraftingUISubsystem(UObject* Context)
@@ -56,6 +71,54 @@ UMounteaAdvancedCraftingUIConfig* UMounteaCraftingUIStatics::GetCraftingUISettin
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!settings) return nullptr;
 	return settings->AdvancedCraftingUISettingsConfig.LoadSynchronous();
+}
+
+TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::GetCraftingRecipeDetailsPanelWidgetClass()
+{
+	const UMounteaAdvancedCraftingUIConfig* config = GetCraftingUISettingsConfig();
+	return config
+		? ResolveCraftingWidgetClass(config->CraftingRecipeDetailsPanelUserInterfaceClass, UMounteaAdvancedInventoryCraftingRecipeDetailsPanelWidgetInterface::StaticClass())
+		: nullptr;
+}
+
+TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::GetCraftingRecipeIngredientsWrapperWidgetClass()
+{
+	const UMounteaAdvancedCraftingUIConfig* config = GetCraftingUISettingsConfig();
+	return config
+		? ResolveCraftingWidgetClass(config->CraftingRecipeIngredientsWrapperUserInterfaceClass, UMounteaAdvancedInventoryCraftingRecipeIngredientsWrapperWidgetInterface::StaticClass())
+		: nullptr;
+}
+
+TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::GetCraftingRecipeIngredientWidgetClass()
+{
+	const UMounteaAdvancedCraftingUIConfig* config = GetCraftingUISettingsConfig();
+	return config
+		? ResolveCraftingWidgetClass(config->CraftingRecipeIngredientUserInterfaceClass, UMounteaAdvancedInventoryCraftingRecipeIngredientWidgetInterface::StaticClass())
+		: nullptr;
+}
+
+TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::GetCraftingRecipeResultWidgetClass()
+{
+	const UMounteaAdvancedCraftingUIConfig* config = GetCraftingUISettingsConfig();
+	return config
+		? ResolveCraftingWidgetClass(config->CraftingRecipeResultUserInterfaceClass, UMounteaAdvancedInventoryCraftingRecipeResultWidgetInterface::StaticClass())
+		: nullptr;
+}
+
+TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::GetCraftingRecipeInfoboxWidgetClass()
+{
+	const UMounteaAdvancedCraftingUIConfig* config = GetCraftingUISettingsConfig();
+	return config
+		? ResolveCraftingWidgetClass(config->CraftingRecipeInfoboxUserInterfaceClass, UMounteaAdvancedInventoryCraftingRecipeInfoboxWidgetInterface::StaticClass())
+		: nullptr;
+}
+
+TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::GetCraftingRecipeSliderWidgetClass()
+{
+	const UMounteaAdvancedCraftingUIConfig* config = GetCraftingUISettingsConfig();
+	return config
+		? ResolveCraftingWidgetClass(config->CraftingRecipeSliderUserInterfaceClass, UMounteaAdvancedInventoryCraftingRecipeSliderWidgetInterface::StaticClass())
+		: nullptr;
 }
 
 TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> UMounteaCraftingUIStatics::GetParentCraftingParticipant(const UObject* Target)

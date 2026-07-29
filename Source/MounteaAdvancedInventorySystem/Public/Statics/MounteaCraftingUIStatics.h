@@ -59,6 +59,66 @@ public:
 		meta=(MounteaGetter),
 		meta=(DisplayName="Crafting UI - Get Crafting UI Config"))
 	static UMounteaAdvancedCraftingUIConfig* GetCraftingUISettingsConfig();
+
+	/**
+	 * Returns the configured recipe details panel widget class after validating its marker interface.
+	 *
+	 * @return Widget class implementing UMounteaAdvancedInventoryCraftingRecipeDetailsPanelWidgetInterface, or nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config",
+		meta=(MounteaGetter),
+		meta=(DisplayName="Crafting UI - Get Recipe Details Panel Widget Class"))
+	static TSubclassOf<UUserWidget> GetCraftingRecipeDetailsPanelWidgetClass();
+
+	/**
+	 * Returns the configured recipe ingredients wrapper widget class after validating its marker interface.
+	 *
+	 * @return Widget class implementing UMounteaAdvancedInventoryCraftingRecipeIngredientsWrapperWidgetInterface, or nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config",
+		meta=(MounteaGetter),
+		meta=(DisplayName="Crafting UI - Get Recipe Ingredients Wrapper Widget Class"))
+	static TSubclassOf<UUserWidget> GetCraftingRecipeIngredientsWrapperWidgetClass();
+
+	/**
+	 * Returns the configured recipe ingredient widget class after validating its marker interface.
+	 *
+	 * @return Widget class implementing UMounteaAdvancedInventoryCraftingRecipeIngredientWidgetInterface, or nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config",
+		meta=(MounteaGetter),
+		meta=(DisplayName="Crafting UI - Get Recipe Ingredient Widget Class"))
+	static TSubclassOf<UUserWidget> GetCraftingRecipeIngredientWidgetClass();
+
+	/**
+	 * Returns the configured recipe result widget class after validating its marker interface.
+	 *
+	 * @return Widget class implementing UMounteaAdvancedInventoryCraftingRecipeResultWidgetInterface, or nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config",
+		meta=(MounteaGetter),
+		meta=(DisplayName="Crafting UI - Get Recipe Result Widget Class"))
+	static TSubclassOf<UUserWidget> GetCraftingRecipeResultWidgetClass();
+
+	/**
+	 * Returns the configured recipe infobox widget class after validating its marker interface.
+	 *
+	 * @return Widget class implementing UMounteaAdvancedInventoryCraftingRecipeInfoboxWidgetInterface, or nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config",
+		meta=(MounteaGetter),
+		meta=(DisplayName="Crafting UI - Get Recipe Infobox Widget Class"))
+	static TSubclassOf<UUserWidget> GetCraftingRecipeInfoboxWidgetClass();
+
+	/**
+	 * Returns the configured recipe slider wrapper widget class after validating its marker interface.
+	 *
+	 * @return Widget class implementing UMounteaAdvancedInventoryCraftingRecipeSliderWidgetInterface, or nullptr.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config",
+		meta=(MounteaGetter),
+		meta=(DisplayName="Crafting UI - Get Recipe Slider Widget Class"))
+	static TSubclassOf<UUserWidget> GetCraftingRecipeSliderWidgetClass();
 	
 	// --- Crafting Participant
 
@@ -198,4 +258,8 @@ public:
 		meta=(MounteaSetter),
 		meta=(DisplayName="Crafting Participant UI - Select Craftable Item"))
 	static bool CraftableItemSelected(UObject* Target, const FGuid& SelectedItem);
+
+private:
+
+	static TSubclassOf<UUserWidget> ResolveCraftingWidgetClass(const TSoftClassPtr<UUserWidget>& WidgetClassPtr, const UClass* RequiredInterface);
 };
