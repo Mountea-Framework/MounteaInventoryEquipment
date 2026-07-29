@@ -11,45 +11,69 @@
 
 #include "Statics/MounteaCustomItemsMapStatics.h"
 
-TMap<FGameplayTag, FInventoryUICustomData> UMounteaCustomItemsMapStatics::GetCustomItemsMap(
-	const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target)
+#include "Logs/MounteaAdvancedInventoryLog.h"
+
+bool UMounteaCustomItemsMapStatics::ValidateTarget(const UObject* Target, const TCHAR* CallingFunction)
 {
-	return Target.GetObject() ?
-		IMounteaAdvancedCustomItemsMapInterface::Execute_GetCustomItemsMap(Target.GetObject()) : TMap<FGameplayTag, FInventoryUICustomData>();
+	if (!IsValid(Target))
+	{
+		LOG_WARNING(TEXT("[%s] Target is invalid."), CallingFunction)
+		return false;
+	}
+
+	if (!Target->Implements<UMounteaAdvancedCustomItemsMapInterface>())
+	{
+		LOG_WARNING(TEXT("[%s] Target '%s' does not implement IMounteaAdvancedCustomItemsMapInterface."), CallingFunction, *Target->GetName())
+		return false;
+	}
+
+	return true;
 }
 
-void UMounteaCustomItemsMapStatics::AddCustomItem(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target,
-	const FGameplayTag& ItemTag, const FGuid& ItemId)
+TMap<FGameplayTag, FInventoryUICustomData> UMounteaCustomItemsMapStatics::GetCustomItemsMap(UObject* Target)
 {
-	if (Target.GetObject())
-		IMounteaAdvancedCustomItemsMapInterface::Execute_AddCustomItemToMap(Target.GetObject(), ItemTag, ItemId);
+	if (!ValidateTarget(Target, TEXT("Custom Items Map - Get Custom Items")))
+		return TMap<FGameplayTag, FInventoryUICustomData>();
+
+	return IMounteaAdvancedCustomItemsMapInterface::Execute_GetCustomItemsMap(Target);
 }
 
-void UMounteaCustomItemsMapStatics::AppendCustomItems(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target,
-	const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
+void UMounteaCustomItemsMapStatics::AddCustomItem(UObject* Target, const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
-	if (Target.GetObject())
-		IMounteaAdvancedCustomItemsMapInterface::Execute_AppendCustomItemsMap(Target.GetObject(), OtherItems);
+	if (!ValidateTarget(Target, TEXT("Custom Items Map - Add Custom Item")))
+		return;
+
+	IMounteaAdvancedCustomItemsMapInterface::Execute_AddCustomItemToMap(Target, ItemTag, ItemId);
 }
 
-void UMounteaCustomItemsMapStatics::ClearCustomItems(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target)
+void UMounteaCustomItemsMapStatics::AppendCustomItems(UObject* Target, const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems)
 {
-	if (Target.GetObject())
-		IMounteaAdvancedCustomItemsMapInterface::Execute_ClearCustomItemsMap(Target.GetObject());
+	if (!ValidateTarget(Target, TEXT("Custom Items Map - Append Custom Items")))
+		return;
+
+	IMounteaAdvancedCustomItemsMapInterface::Execute_AppendCustomItemsMap(Target, OtherItems);
 }
 
-bool UMounteaCustomItemsMapStatics::RemoveCustomItem(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target,
-	const FGameplayTag& ItemTag, const FGuid& ItemId)
+void UMounteaCustomItemsMapStatics::ClearCustomItems(UObject* Target)
 {
-	if (Target.GetObject())
-		return IMounteaAdvancedCustomItemsMapInterface::Execute_RemoveCustomItemFromMap(Target.GetObject(), ItemTag, ItemId);
-	return false;
+	if (!ValidateTarget(Target, TEXT("Custom Items Map - Clear Custom Items")))
+		return;
+
+	IMounteaAdvancedCustomItemsMapInterface::Execute_ClearCustomItemsMap(Target);
 }
 
-bool UMounteaCustomItemsMapStatics::IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target,
-	const FGameplayTag& ItemTag, const FGuid& ItemId)
+bool UMounteaCustomItemsMapStatics::RemoveCustomItem(UObject* Target, const FGameplayTag& ItemTag, const FGuid& ItemId)
 {
-	if (Target.GetObject())
-		return IMounteaAdvancedCustomItemsMapInterface::Execute_IsItemStoredInCustomMap(Target.GetObject(), ItemTag, ItemId);
-	return false;
+	if (!ValidateTarget(Target, TEXT("Custom Items Map - Remove Custom Item")))
+		return false;
+
+	return IMounteaAdvancedCustomItemsMapInterface::Execute_RemoveCustomItemFromMap(Target, ItemTag, ItemId);
+}
+
+bool UMounteaCustomItemsMapStatics::IsItemStoredInCustomMap(UObject* Target, const FGameplayTag& ItemTag, const FGuid& ItemId)
+{
+	if (!ValidateTarget(Target, TEXT("Custom Items Map - Is Item Stored In Custom Map")))
+		return false;
+
+	return IMounteaAdvancedCustomItemsMapInterface::Execute_IsItemStoredInCustomMap(Target, ItemTag, ItemId);
 }

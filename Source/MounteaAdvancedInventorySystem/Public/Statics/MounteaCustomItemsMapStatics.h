@@ -41,8 +41,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Custom Items Map",
 		meta=(MounteaGetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Custom Items Map - Get Custom Items")
-	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target);
+	static TMap<FGameplayTag,FInventoryUICustomData> GetCustomItemsMap(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCustomItemsMapInterface")) UObject* Target);
 
 	/**
 	 * Adds (or replaces) a custom item entry in the target UI Manager's custom items map.
@@ -53,9 +55,11 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Custom Items Map",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Custom Items Map - Add Custom Item")
-	static void AddCustomItem(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target, const FGameplayTag& ItemTag,
-		const FGuid& ItemId);
+	static void AddCustomItem(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCustomItemsMapInterface")) UObject* Target,
+		const FGameplayTag& ItemTag, const FGuid& ItemId);
 
 	/**
 	 * Appends custom item entries to the target UI Manager's custom items map.
@@ -66,8 +70,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Custom Items Map",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Custom Items Map - Append Custom Items")
-	static void AppendCustomItems(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target,
+	static void AppendCustomItems(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCustomItemsMapInterface")) UObject* Target,
 		const TMap<FGameplayTag, FInventoryUICustomData>& OtherItems);
 
 	/**
@@ -77,8 +83,10 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Custom Items Map",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Custom Items Map - Clear Custom Items")
-	static void ClearCustomItems(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target);
+	static void ClearCustomItems(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCustomItemsMapInterface")) UObject* Target);
 
 	/**
 	 * Removes a single custom item from the target UI Manager's custom items map.
@@ -92,8 +100,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Custom Items Map",
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Custom Items Map - Remove Custom Item")
-	static bool RemoveCustomItem(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target,
+	static bool RemoveCustomItem(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCustomItemsMapInterface")) UObject* Target,
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
 
 	/**
@@ -108,7 +118,14 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Custom Items Map",
 		meta=(MounteaValidate),
+		meta=(DefaultToSelf="Target"),
 		DisplayName="Custom Items Map - Is Item Stored In Custom Map")
-	static bool IsItemStoredInCustomMap(const TScriptInterface<IMounteaAdvancedCustomItemsMapInterface>& Target,
+	static bool IsItemStoredInCustomMap(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCustomItemsMapInterface")) UObject* Target,
 		const FGameplayTag& ItemTag, const FGuid& ItemId);
+
+private:
+
+	/** Validates that Target is non-null and implements IMounteaAdvancedCustomItemsMapInterface, logging a warning naming the calling node otherwise. */
+	static bool ValidateTarget(const UObject* Target, const TCHAR* CallingFunction);
 };
