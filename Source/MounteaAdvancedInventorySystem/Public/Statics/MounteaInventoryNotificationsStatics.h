@@ -63,32 +63,79 @@ public:
 	/*************************************************************/
 	/******************* BLUEPRINTABLE *******************/
 	/*************************************************************/
+	/**
+	 * Adds a notification widget to a notification container.
+	 *
+	 * @param Container Notification container to update.
+	 * @param NewNotification Notification widget to add.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification",
-		meta=(MounteaSetter))
+		meta=(MounteaSetter),
+		meta=(DisplayName="Notification Container - Add Notification"))
 	static void AddNotification(UObject* Container, UUserWidget* NewNotification);
 
+	/**
+	 * Removes a notification widget from a notification container.
+	 *
+	 * @param Container Notification container to update.
+	 * @param Notification Notification widget to remove.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification",
-		meta=(MounteaSetter))
+		meta=(MounteaSetter),
+		meta=(DisplayName="Notification Container - Remove Notification"))
 	static void RemoveNotification(UObject* Container, UUserWidget* Notification);
 
+	/**
+	 * Clears all notifications from a notification container.
+	 *
+	 * @param Container Notification container to clear.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification",
-		meta=(MounteaSetter))
+		meta=(MounteaSetter),
+		meta=(DisplayName="Notification Container - Clear Notifications"))
 	static void ClearNotifications(UObject* Container);
 
+	/**
+	 * Updates notification container visibility.
+	 *
+	 * @param Container Notification container to update.
+	 * @param bShowContainer Whether the container should be visible.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification",
-		meta=(MounteaSetter))
+		meta=(MounteaSetter),
+		meta=(DisplayName="Notification Container - Set Visibility"))
 	static void SetNotificationsContainerVisibility(UObject* Container, const bool bShowContainer);
 
+	/**
+	 * Initializes a notification widget from notification data.
+	 *
+	 * @param Notification Notification widget to initialize.
+	 * @param NotificationData Data used to initialize the notification.
+	 * @param Container Container that owns the notification.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification",
-		meta=(MounteaSetter))
+		meta=(MounteaSetter),
+		meta=(DisplayName="Notification - Create Notification"))
 	static void CreateNotification(UObject* Notification, const FInventoryNotificationData& NotificationData, const TScriptInterface<IMounteaInventoryNotificationContainerWidgetInterface>& Container);
 	
+	/**
+	 * Expires a notification widget.
+	 *
+	 * @param Notification Notification widget to expire.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification",
-		meta=(MounteaSetter))
+		meta=(MounteaSetter),
+		meta=(DisplayName="Notification - Expire Notification"))
 	static void ExpireNotification(UObject* Notification);
 
+	/**
+	 * Deletes a notification widget.
+	 *
+	 * @param Notification Notification widget to delete.
+	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Notification",
-		meta=(MounteaSetter))
+		meta=(MounteaSetter),
+		meta=(DisplayName="Notification - Delete Notification"))
 	static void DeleteNotification(UObject* Notification);
 
 	
