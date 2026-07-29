@@ -40,74 +40,144 @@ public:
 
 #pragma region Bindings
 
+	/**
+	 * Binds a dynamic delegate to the attachment container's attachment changed event.
+	 *
+	 * @param Target Attachment container to bind to.
+	 * @param Binding Delegate to add to the attachment changed event.
+	 * @return True if the binding was added successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Attachment Changed")
+		meta=(DisplayName="Attachment Container - Bind On Attachment Changed"))
 	static bool BindToOnAttachmentChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaAttachmentChangedBinding& Binding);
 
+	/**
+	 * Removes a dynamic delegate from the attachment container's attachment changed event.
+	 *
+	 * @param Target Attachment container to unbind from.
+	 * @param Binding Delegate to remove from the attachment changed event.
+	 * @return True if the binding was removed successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From On Attachment Changed")
+		meta=(DisplayName="Attachment Container - Unbind From On Attachment Changed"))
 	static bool UnbindFromOnAttachmentChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaAttachmentChangedBinding& Binding);
 
+	/**
+	 * Binds a dynamic delegate to the attachment container's slot state changed event.
+	 *
+	 * @param Target Attachment container to bind to.
+	 * @param Binding Delegate to add to the slot state changed event.
+	 * @return True if the binding was added successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Slot State Changed")
+		meta=(DisplayName="Attachment Container - Bind On Slot State Changed"))
 	static bool BindToOnSlotStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaSlotStateChangedBinding& Binding);
 
+	/**
+	 * Removes a dynamic delegate from the attachment container's slot state changed event.
+	 *
+	 * @param Target Attachment container to unbind from.
+	 * @param Binding Delegate to remove from the slot state changed event.
+	 * @return True if the binding was removed successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From On Slot State Changed")
+		meta=(DisplayName="Attachment Container - Unbind From On Slot State Changed"))
 	static bool UnbindFromOnSlotStateChanged(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaSlotStateChangedBinding& Binding);
 
+	/**
+	 * Binds a dynamic delegate to the attachment container's cleared event.
+	 *
+	 * @param Target Attachment container to bind to.
+	 * @param Binding Delegate to add to the container cleared event.
+	 * @return True if the binding was added successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Container Cleared")
+		meta=(DisplayName="Attachment Container - Bind On Container Cleared"))
 	static bool BindToOnContainerCleared(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaContainerClearedBinding& Binding);
 
+	/**
+	 * Removes a dynamic delegate from the attachment container's cleared event.
+	 *
+	 * @param Target Attachment container to unbind from.
+	 * @param Binding Delegate to remove from the container cleared event.
+	 * @return True if the binding was removed successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From On Container Cleared")
+		meta=(DisplayName="Attachment Container - Unbind From On Container Cleared"))
 	static bool UnbindFromOnContainerCleared(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentContainerInterface")) UObject* Target, const FMounteaContainerClearedBinding& Binding);
 
+	/**
+	 * Binds a dynamic delegate to the attachable's attached event.
+	 *
+	 * @param Target Attachable object to bind to.
+	 * @param Binding Delegate to add to the attachable attached event.
+	 * @return True if the binding was added successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Attachable Attached")
+		meta=(DisplayName="Attachable - Bind On Attachable Attached"))
 	static bool BindToOnAttachableAttached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableAttachedBinding& Binding);
 
+	/**
+	 * Removes a dynamic delegate from the attachable's attached event.
+	 *
+	 * @param Target Attachable object to unbind from.
+	 * @param Binding Delegate to remove from the attachable attached event.
+	 * @return True if the binding was removed successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From On Attachable Attached")
+		meta=(DisplayName="Attachable - Unbind From On Attachable Attached"))
 	static bool UnbindFromOnAttachableAttached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableAttachedBinding& Binding);
 
+	/**
+	 * Binds a dynamic delegate to the attachable's detached event.
+	 *
+	 * @param Target Attachable object to bind to.
+	 * @param Binding Delegate to add to the attachable detached event.
+	 * @return True if the binding was added successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Bind On Attachable Detached")
+		meta=(DisplayName="Attachable - Bind On Attachable Detached"))
 	static bool BindToOnAttachableDetached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableDetachedBinding& Binding);
 
+	/**
+	 * Removes a dynamic delegate from the attachable's detached event.
+	 *
+	 * @param Target Attachable object to unbind from.
+	 * @param Binding Delegate to remove from the attachable detached event.
+	 * @return True if the binding was removed successfully.
+	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Bindings",
 		meta=(MounteaBinding),
 		meta=(DefaultToSelf="Target"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Unbind From On Attachable Detached")
+		meta=(DisplayName="Attachable - Unbind From On Attachable Detached"))
 	static bool UnbindFromOnAttachableDetached(UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedAttachmentAttachableInterface")) UObject* Target, const FMounteaAttachableDetachedBinding& Binding);
 
 #pragma endregion
@@ -122,7 +192,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
 		meta=(MounteaGetter),
-		DisplayName="Get Available Components")
+		meta=(DisplayName="Attachments - Get Available Components"))
 	static TArray<USceneComponent*> GetAvailableComponents(const AActor* Target);
 
 	/**
@@ -133,7 +203,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
 		meta=(MounteaGetter),
-		DisplayName="Get Available Components Names")
+		meta=(DisplayName="Attachments - Get Available Components Names"))
 	static TArray<FName> GetAvailableComponentNames(const AActor* Target);
 
 	/**
@@ -146,7 +216,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
 		meta=(MounteaGetter),
 		meta=(AutoCreateRefTerm="ComponentName"),
-		DisplayName="Get Available Component By Name")
+		meta=(DisplayName="Attachments - Get Available Component By Name"))
 	static USceneComponent* GetAvailableComponentByName(const AActor* Target, const FName& ComponentName);
 	
 	/**
@@ -159,7 +229,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Helpers",
 		meta=(MounteaGetter),
 		meta=(AutoCreateRefTerm="ComponentName"),
-		DisplayName="Get Available Socket Names")
+		meta=(DisplayName="Attachments - Get Available Socket Names"))
 	static TArray<FName> GetAvailableSocketNames(const AActor* Target, const FName& ComponentName);
 
 	/**
@@ -171,7 +241,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Is Valid Attachable Class")
+		meta=(DisplayName="Attachable - Is Valid Attachable Class"))
 	static bool IsTargetClassValid(const UClass* TargetClass);
 	
 #pragma endregion 
@@ -186,7 +256,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|AttachmentContainer",
 		meta=(MounteaGetter),
-		DisplayName="Get Owning Actor")
+		meta=(DisplayName="Attachment Container - Get Owning Actor"))
 	static AActor* GetOwningActor(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 	/**
@@ -197,7 +267,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaGetter),
-		DisplayName="Get Default Attachment Target")
+		meta=(DisplayName="Attachment Container - Get Default Attachment Target"))
 	static FName GetDefaultAttachmentTarget(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 	/**
@@ -210,7 +280,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaValidate),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Is Valid Slot")
+		meta=(DisplayName="Attachment Container - Is Valid Slot"))
 	static bool IsValidSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
@@ -223,7 +293,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaGetter),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Get Slot")
+		meta=(DisplayName="Attachment Container - Get Slot"))
 	static UMounteaAdvancedAttachmentSlot* GetSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
@@ -236,7 +306,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaValidate),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Is Slot Occupied")
+		meta=(DisplayName="Attachment Container - Is Slot Occupied"))
 	static bool IsSlotOccupied(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
@@ -250,7 +320,7 @@ public:
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Disable Slot")
+		meta=(DisplayName="Attachment Container - Disable Slot"))
 	static bool DisableSlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
@@ -265,7 +335,7 @@ public:
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Try Attach")
+		meta=(DisplayName="Attachment Container - Try Attach"))
 	static bool TryAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment);
 
 	/**
@@ -279,7 +349,7 @@ public:
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Try Detach")
+		meta=(DisplayName="Attachment Container - Try Detach"))
 	static bool TryDetach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
@@ -294,7 +364,7 @@ public:
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Force Attach")
+		meta=(DisplayName="Attachment Container - Force Attach"))
 	static bool ForceAttach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId, UObject* Attachment);
 
 	/**
@@ -308,7 +378,7 @@ public:
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="SlotId"),
-		DisplayName="Force Detach")
+		meta=(DisplayName="Attachment Container - Force Detach"))
 	static bool ForceDetach(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const FName& SlotId);
 
 	/**
@@ -321,7 +391,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaGetter),
 		meta=(AutoCreateRefTerm="RequiredTags"),
-		DisplayName="Find First Free Slot By Tags")
+		meta=(DisplayName="Attachment Container - Find First Free Slot By Tags"))
 	static FName FindFirstFreeSlotWithTags(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, 
 		UPARAM(meta=(Categories="Mountea_Inventory.AttachmentSlots,Mountea_Inventory.Category,Mountea_Inventory.Equipment")) const FGameplayTagContainer& RequiredTags);
 
@@ -334,7 +404,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaGetter),
-		DisplayName="Find Slot Id For Attachable")
+		meta=(DisplayName="Attachment Container - Find Slot Id For Attachable"))
 	static FName GetSlotIdForAttachable(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target, const UMounteaAttachableComponent* Attachable);
 
 	/**
@@ -344,7 +414,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaSetter),
-		DisplayName="Clear All")
+		meta=(DisplayName="Attachment Container - Clear All"))
 	static void ClearAll(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 	/**
@@ -355,7 +425,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaGetter),
-		DisplayName="Find First Empty Slot")
+		meta=(DisplayName="Attachment Container - Find First Empty Slot"))
 	static FName GetFirstEmptySlot(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 	/**
@@ -366,7 +436,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|AttachmentContainer",
 		meta=(MounteaGetter),
-		DisplayName="Get All Attachment Slots")
+		meta=(DisplayName="Attachment Container - Get All Attachment Slots"))
 	static TArray<UMounteaAdvancedAttachmentSlot*> GetAttachmentSlots(const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Target);
 
 #pragma endregion
@@ -381,7 +451,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaGetter),
-		DisplayName="Get Attached To")
+		meta=(DisplayName="Attachable - Get Attached To"))
 	static TScriptInterface<IMounteaAdvancedAttachmentContainerInterface> GetAttachedTo(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -392,7 +462,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaGetter),
-		DisplayName="Get Attachable Id")
+		meta=(DisplayName="Attachable - Get Attachable Id"))
 	static FName GetId(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -404,7 +474,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaSetter),
 		meta=(AutoCreateRefTerm="NewId"),
-		DisplayName="Set Attachable Id")
+		meta=(DisplayName="Attachable - Set Attachable Id"))
 	static void SetId(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FName& NewId);
 
 	/**
@@ -415,7 +485,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaGetter),
-		DisplayName="Get Attachable Display Name")
+		meta=(DisplayName="Attachable - Get Attachable Display Name"))
 	static FText GetDisplayName(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -427,7 +497,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaSetter),
 		meta=(AutoCreateRefTerm="NewDisplayName"),
-		DisplayName="Set Attachable Display Name")
+		meta=(DisplayName="Attachable - Set Attachable Display Name"))
 	static void SetDisplayName(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const FText& NewDisplayName);
 
 	/**
@@ -438,7 +508,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaGetter),
-		DisplayName="Get Attachable Tags")
+		meta=(DisplayName="Attachable - Get Attachable Tags"))
 	static FGameplayTagContainer GetTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -450,7 +520,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaSetter),
 		meta=(AutoCreateRefTerm="NewTags"),
-		DisplayName="Set Attachable Tags")
+		meta=(DisplayName="Attachable - Set Attachable Tags"))
 	static void SetTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, 
 		UPARAM(meta=(Categories="Mountea_Inventory.AttachmentSlots,Mountea_Inventory.Category,Mountea_Inventory.Equipment")) const FGameplayTagContainer& NewTags);
 
@@ -462,7 +532,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaGetter),
-		DisplayName="Get Attachable State")
+		meta=(DisplayName="Attachable - Get Attachable State"))
 	static EAttachmentState GetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -474,7 +544,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaSetter),
 		meta=(AutoCreateRefTerm="NewState"),
-		DisplayName="Set Slot State")
+		meta=(DisplayName="Attachable - Set Slot State"))
 	static void SetState(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const EAttachmentState NewState);
 
 	/**
@@ -486,7 +556,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Is Valid Attachable")
+		meta=(DisplayName="Attachable - Is Valid Attachable"))
 	static bool IsValidAttachable(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -498,7 +568,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Can Attachable Be Attached")
+		meta=(DisplayName="Attachable - Can Attachable Be Attached"))
 	static bool CanAttach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -512,7 +582,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Attach to Slot")
+		meta=(DisplayName="Attachable - Attach To Slot"))
 	static bool AttachToSlot(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Container, const FName& SlotId);
 
 	/**
@@ -525,7 +595,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Attach to Container")
+		meta=(DisplayName="Attachable - Attach To Container"))
 	static bool AttachToContainer(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, const TScriptInterface<IMounteaAdvancedAttachmentContainerInterface>& Container);
 
 	/**
@@ -537,7 +607,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Attachments|Attachable",
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Detach")
+		meta=(DisplayName="Attachable - Detach"))
 	static bool Detach(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target);
 
 	/**
@@ -551,7 +621,7 @@ public:
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="Tag"),
-		DisplayName="Has Attachable Tag")
+		meta=(DisplayName="Attachable - Has Attachable Tag"))
 	static bool HasTag(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, 
 		UPARAM(meta=(Categories="Mountea_Inventory.AttachmentSlots,Mountea_Inventory.Category,Mountea_Inventory.Equipment")) const FGameplayTag& Tag);
 
@@ -567,7 +637,7 @@ public:
 		meta=(MounteaValidate),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		meta=(AutoCreateRefTerm="OtherTags"),
-		DisplayName="Has Attachable Tags")
+		meta=(DisplayName="Attachable - Has Attachable Tags"))
 	static bool MatchesTags(const TScriptInterface<IMounteaAdvancedAttachmentAttachableInterface>& Target, 
 		UPARAM(meta=(Categories="Mountea_Inventory.AttachmentSlots,Mountea_Inventory.Category,Mountea_Inventory.Equipment")) const FGameplayTagContainer& OtherTags, bool bRequireAll);
 	
