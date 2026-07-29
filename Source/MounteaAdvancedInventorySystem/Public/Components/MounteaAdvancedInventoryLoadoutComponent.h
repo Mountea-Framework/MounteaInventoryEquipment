@@ -46,16 +46,20 @@ public:
 	
 	virtual bool LoadLoadout_Implementation() override;
 	
-	virtual UMounteaAdvancedInventoryLoadoutConfig* GetLoadout_Implementation() const override
-	{ return LoadoutConfiguration.LoadSynchronous(); };
+	virtual UMounteaAdvancedInventoryLoadoutConfig* GetLoadout_Implementation() const override;
 	
 	virtual TArray<UMounteaAdvancedInventoryLoadoutItem*> GetLoadoutItems_Implementation() const override;
 	
 	virtual bool ShouldLoadAutomatically_Implementation() const override
-	{ return bAutoLoad; };
+	{
+		return bAutoLoad;
+	};
 	
 	virtual void SetAutomaticLoad_Implementation(const bool bNewValue) override
-	{ if (bNewValue != bAutoLoad) bAutoLoad = bNewValue; }
+	{
+		if (bNewValue != bAutoLoad) 
+			bAutoLoad = bNewValue;
+	}
 	
 protected:
 	

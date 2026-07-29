@@ -205,6 +205,11 @@ bool UMounteaAdvancedInventoryLoadoutComponent::LoadLoadout_Implementation()
 	return true;
 }
 
+UMounteaAdvancedInventoryLoadoutConfig* UMounteaAdvancedInventoryLoadoutComponent::GetLoadout_Implementation() const
+{
+	return LoadoutConfiguration.LoadSynchronous();
+};
+
 TArray<UMounteaAdvancedInventoryLoadoutItem*> UMounteaAdvancedInventoryLoadoutComponent::GetLoadoutItems_Implementation() const
 {
 	if (!IsValid(LoadoutConfiguration.LoadSynchronous()))
