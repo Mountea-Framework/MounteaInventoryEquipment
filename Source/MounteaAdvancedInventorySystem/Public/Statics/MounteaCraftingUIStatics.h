@@ -47,12 +47,17 @@ public:
 		meta=(MounteaGetter),
 		meta=(DefaultToSelf="Context"),
 		meta=(CompactNodeTitle="Crafting UI Subsystem"),
-		DisplayName="Get Crafting UI Subsystem")
+		meta=(DisplayName="Crafting UI - Get Crafting UI Subsystem"))
 	static UMounteaAdvancedCraftingUISubsystem* GetCraftingUISubsystem(UObject* Context);
 		
+	/**
+	 * Returns the crafting UI settings configuration.
+	 *
+	 * @return Crafting UI configuration asset, or nullptr when unavailable.
+	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Config", 
 		meta=(MounteaGetter),
-		DisplayName="Get Crafting UI Config")
+		meta=(DisplayName="Crafting UI - Get Crafting UI Config"))
 	static UMounteaAdvancedCraftingUIConfig* GetCraftingUISettingsConfig();
 	
 	// --- Crafting Participant
@@ -71,7 +76,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
 		meta=(MounteaGetter),
 		meta=(DefaultToSelf="Target"),
-		DisplayName="Get Parent Crafting Participant (Interface)")
+		meta=(DisplayName="Crafting Participant UI - Get Parent Crafting Participant Interface"))
 	static TScriptInterface<IMounteaAdvancedCraftingParticipantInterface> GetParentCraftingParticipant(const UObject* Target);
 	
 	/**
@@ -88,7 +93,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Manager", 
 		meta=(MounteaGetter),
 		meta=(DefaultToSelf="Target"),
-		DisplayName="Get Parent Crafting Participant")
+		meta=(DisplayName="Crafting Participant UI - Get Parent Crafting Participant"))
 	static UObject* GetParentCraftingParticipantObject(const UObject* Target);
 
 	/**
@@ -104,7 +109,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
-		DisplayName="Set Parent Crafting Participant")
+		meta=(DisplayName="Crafting Participant UI - Set Parent Crafting Participant"))
 	static bool SetParentCraftingParticipant(UObject* Target, const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Participant);
 	
 /**
@@ -119,7 +124,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Create Crafting Widget")
+		meta=(DisplayName="Crafting Participant UI - Create Crafting Widget"))
 	static bool CreateCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
 	
 	/**
@@ -129,7 +134,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaGetter),
-		DisplayName="Get Crafting Widget")
+		meta=(DisplayName="Crafting Participant UI - Get Crafting Widget"))
 	static UUserWidget* GetCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
 
 	/**
@@ -139,7 +144,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
-		DisplayName="Set Crafting Widget")
+		meta=(DisplayName="Crafting Participant UI - Set Crafting Widget"))
 	static bool SetCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target, UUserWidget* NewCraftingWidget);
 
 	/**
@@ -147,7 +152,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaSetter),
-		DisplayName="Remove Crafting Widget")
+		meta=(DisplayName="Crafting Participant UI - Remove Crafting Widget"))
 	static void RemoveCraftingWidget(const TScriptInterface<IMounteaAdvancedCraftingParticipantUIInterface>& Target);
 
 	/**
@@ -158,7 +163,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaGetter),
-		DisplayName="Get Selected Crafting Category")
+		meta=(DisplayName="Crafting Participant UI - Get Selected Crafting Category"))
 	static FString GetCraftingSelectedCategoryId(UObject* Target);
 	
 	/**
@@ -169,7 +174,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaSetter),
-		DisplayName="Select Crafting Category")
+		meta=(DisplayName="Crafting Participant UI - Select Crafting Category"))
 	static bool CraftingCategorySelected(UObject* Target, const FString& SelectedCategoryId);
 
 	/**
@@ -180,7 +185,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaGetter),
-		DisplayName="Get Active Craftable Item Guid")
+		meta=(DisplayName="Crafting Participant UI - Get Active Craftable Item Guid"))
 	static FGuid GetActiveCraftableItemGuid_Implementation(UObject* Target);
 	
 	/**
@@ -191,6 +196,6 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaSetter),
-		DisplayName="Select Craftable Item")
+		meta=(DisplayName="Crafting Participant UI - Select Craftable Item"))
 	static bool CraftableItemSelected(UObject* Target, const FGuid& SelectedItem);
 };
