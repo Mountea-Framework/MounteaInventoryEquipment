@@ -118,6 +118,9 @@ bool UMounteaCraftingParticipantComponent::IsRecipeKnown_Implementation(UMountea
 
 bool UMounteaCraftingParticipantComponent::LearnRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate)
 {
+	if (!IsValid(RecipeTemplate))
+		return false;
+	
 	if (Execute_IsRecipeKnown(this, RecipeTemplate))
 		return false;
 
