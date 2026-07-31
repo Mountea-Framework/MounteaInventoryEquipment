@@ -35,6 +35,7 @@
 
 #include "Customizations/MounteaJsonObjectDefinitionCustomization.h"
 #include "DetailsCustomizations/MounteaSourceFilePathDetailsCustomization.h"
+#include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaRecipeTemplate.h"
 #include "Interfaces/IMainFrameModule.h"
@@ -213,6 +214,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		{
 			UMounteaInventoryItemTemplate::StaticClass()->GetFName(),
 			UMounteaRecipeTemplate::StaticClass()->GetFName(),
+			UMounteaAdvancedInventoryLoadoutConfig::StaticClass()->GetFName(),
 		};
 		for (const FName& className : RegisteredCustomClassLayouts)
 		{
