@@ -12,6 +12,7 @@
 #include "MounteaAdvancedInventoryLoadoutConfig_Factory.h"
 
 #include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
+#include "Helpers/MounteaEditorNotificationHelpers.h"
 #include "Statics/MounteaAdvancedInventoryLoadoutEditorStatics.h"
 #include "Utilities/MounteaAdvancedInventoryEditorUtilities.h"
 
@@ -66,9 +67,14 @@ UObject* UMounteaAdvancedInventoryLoadoutConfigs_Factory::FactoryCreateFile(
 	{
 		if (Warn)
 			Warn->Logf(ELogVerbosity::Error, TEXT("%s"), *errorMessage);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMessage, EMounteaEditorNotificationType::Error);
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
+
+	FMounteaEditorNotificationHelpers::ShowNotification(
+		FString::Printf(TEXT("Successfully imported %d loadout(s)"), importedLoadouts.Num()),
+		EMounteaEditorNotificationType::Success);
 
 	return importedLoadouts.Num() > 0 ? importedLoadouts[0] : nullptr;
 }

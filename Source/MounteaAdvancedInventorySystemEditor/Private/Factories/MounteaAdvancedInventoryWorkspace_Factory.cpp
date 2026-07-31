@@ -14,6 +14,7 @@
 #include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaRecipeTemplate.h"
+#include "Helpers/MounteaEditorNotificationHelpers.h"
 #include "Statics/MounteaAdvancedInventoryWorkspaceEditorStatics.h"
 
 UMounteaAdvancedInventoryWorkspace_Factory::UMounteaAdvancedInventoryWorkspace_Factory()
@@ -49,9 +50,15 @@ UObject* UMounteaAdvancedInventoryWorkspace_Factory::FactoryCreateFile(
 	{
 		if (Warn)
 			Warn->Logf(ELogVerbosity::Error, TEXT("%s"), *errorMessage);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMessage, EMounteaEditorNotificationType::Error);
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
+
+	FMounteaEditorNotificationHelpers::ShowNotification(
+		FString::Printf(TEXT("Workspace import complete: %d items, %d recipes, %d loadouts"),
+			importedItems.Num(), importedRecipes.Num(), importedLoadouts.Num()),
+		EMounteaEditorNotificationType::Success);
 
 	if (importedItems.Num() > 0)
 		return importedItems[0];

@@ -13,6 +13,7 @@
 #include "MounteaAdvancedInventoryItemTemplate_Factory.h"
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Helpers/MounteaEditorNotificationHelpers.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 #include "Subsystems/MounteaInventoryTemplateEditorSubsystem.h"
 #include "Utilities/MounteaAdvancedInventoryEditorUtilities.h"
@@ -92,6 +93,7 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass
 	{
 		if (Warn)
 			Warn->Logf(ELogVerbosity::Error, TEXT("%s"), *errorMessage);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMessage, EMounteaEditorNotificationType::Error);
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
@@ -104,6 +106,10 @@ UObject* UMounteaAdvancedInventoryItemTemplate_Factory::FactoryCreateFile(UClass
 
 	if (UMounteaInventoryTemplateEditorSubsystem* editorTemplateSubsystem = GEditor->GetEditorSubsystem<UMounteaInventoryTemplateEditorSubsystem>())
 		editorTemplateSubsystem->NotifyTemplatesChanged();
+
+	FMounteaEditorNotificationHelpers::ShowNotification(
+		FString::Printf(TEXT("Successfully imported %d item template(s)"), importedTemplates.Num()),
+		EMounteaEditorNotificationType::Success);
 
 	return importedTemplates[0];
 }
