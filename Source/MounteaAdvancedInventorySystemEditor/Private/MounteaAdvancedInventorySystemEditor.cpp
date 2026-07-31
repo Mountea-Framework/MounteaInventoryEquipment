@@ -34,7 +34,9 @@
 #include "Commands/FMAISCommands.h"
 
 #include "Customizations/MounteaJsonObjectDefinitionCustomization.h"
+#include "DetailsCustomizations/MounteaSourceFilePathDetailsCustomization.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Definitions/MounteaRecipeTemplate.h"
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "PropertyEditorModule.h"
@@ -206,6 +208,20 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 			RegisteredCustomPropertyTypeLayouts[0],
 			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaJsonObjectDefinitionCustomization::MakeInstance)
 		);
+
+		RegisteredCustomClassLayouts =
+		{
+			UMounteaInventoryItemTemplate::StaticClass()->GetFName(),
+			UMounteaRecipeTemplate::StaticClass()->GetFName(),
+		};
+		for (const FName& className : RegisteredCustomClassLayouts)
+		{
+			PropertyModule.RegisterCustomClassLayout(
+				className,
+				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaSourceFilePathDetailsCustomization::MakeInstance)
+			);
+		}
+
 		PropertyModule.NotifyCustomizationModuleChanged();
 	}
 
@@ -359,6 +375,9 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 			FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
 			for (const FName& layoutName : RegisteredCustomPropertyTypeLayouts)
 				PropertyModule.UnregisterCustomPropertyTypeLayout(layoutName);
+
+			for (const FName& className : RegisteredCustomClassLayouts)
+				PropertyModule.UnregisterCustomClassLayout(className);
 
 			PropertyModule.NotifyCustomizationModuleChanged();
 		}
