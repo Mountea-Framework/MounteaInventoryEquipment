@@ -50,6 +50,7 @@
 #include "ObjectTools.h"
 #include "Algo/ForEach.h"
 #include "Editor/STemplateTreeItemRow.h"
+#include "Helpers/MounteaEditorNotificationHelpers.h"
 #include "Search/MounteaInventoryTemplateSearchFilter.h"
 #include "Settings/EditorStyleSettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsEditor.h"
@@ -474,14 +475,14 @@ FReply SMounteaInventoryTemplateEditor::SaveTemplate()
 {
 	if (!CurrentTemplate.IsValid())
 	{
-		ShowTemplateEditorNotification(TEXT("Cannot save: No template is being edited."), false);
+		FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Cannot save: No template is being edited."), EMounteaEditorNotificationType::Error);
 		return FReply::Unhandled();
 	}
 
 	FString validationError;
 	if (!ValidateTemplateData(validationError))
 	{
-		ShowTemplateEditorNotification(FString::Printf(TEXT("Cannot save: %s."), *validationError), false);
+		FMounteaEditorNotificationHelpers::ShowNotification(FString::Printf(TEXT("Cannot save: %s."), *validationError), EMounteaEditorNotificationType::Error);
 		return FReply::Unhandled();
 	}
 
@@ -536,12 +537,12 @@ FReply SMounteaInventoryTemplateEditor::SaveAllDirtyTemplates()
 	{
 		const FString errorMsg = FString::Printf(TEXT("Failed to save %d assets: %s"),
 			failedAssets.Num(), *FString::Join(failedAssets, TEXT(", ")));
-		ShowTemplateEditorNotification(errorMsg, false);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMsg, EMounteaEditorNotificationType::Error);
 	}
 	else if (savedCount > 0)
-		ShowTemplateEditorNotification(FString::Printf(TEXT("Successfully saved %d templates."), savedCount), true);
+		FMounteaEditorNotificationHelpers::ShowNotification(FString::Printf(TEXT("Successfully saved %d templates."), savedCount), EMounteaEditorNotificationType::Success);
 	else
-		ShowTemplateEditorNotification(TEXT("No templates to save."), true);
+		FMounteaEditorNotificationHelpers::ShowNotification(TEXT("No templates to save."), EMounteaEditorNotificationType::Success);
 
 	return FReply::Handled();
 }
@@ -575,12 +576,12 @@ FReply SMounteaInventoryTemplateEditor::SaveExistingTemplate()
 		if (UPackage::SavePackage(package, itemTemplate, *fileName, saveArgs))
 		{
 			UntrackDirtyAsset(itemTemplate);
-			ShowTemplateEditorNotification(TEXT("Template saved successfully!"), true);
+			FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Template saved successfully!"), EMounteaEditorNotificationType::Success);
 			return FReply::Handled();
 		}
 	}
 	
-	ShowTemplateEditorNotification(TEXT("Failed to save template."), false);
+	FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Failed to save template."), EMounteaEditorNotificationType::Error);
 	return FReply::Unhandled();
 }
 
@@ -756,13 +757,13 @@ FReply SMounteaInventoryTemplateEditor::SaveNewTemplate()
 					TemplateTreeView->SetSelection(foundItem, ESelectInfo::Direct);
 				}
 				
-				ShowTemplateEditorNotification(TEXT("New template created successfully!"), true);
+				FMounteaEditorNotificationHelpers::ShowNotification(TEXT("New template created successfully!"), EMounteaEditorNotificationType::Success);
 				return FReply::Handled();
 			}
 		}
 	}
 	
-	ShowTemplateEditorNotification(TEXT("Failed to create new template."), false);
+	FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Failed to create new template."), EMounteaEditorNotificationType::Error);
 	return FReply::Unhandled();
 }
 
@@ -1080,7 +1081,7 @@ FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMou
 
 	if (itemTemplate->HasAnyFlags(RF_Transient))
 	{
-		ShowTemplateEditorNotification(TEXT("Cannot delete unsaved template."), false);
+		FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Cannot delete unsaved template."), EMounteaEditorNotificationType::Error);
 		return FReply::Handled();
 	}
 
@@ -1105,10 +1106,10 @@ FReply SMounteaInventoryTemplateEditor::DeleteTemplate(const TWeakObjectPtr<UMou
 	if (numDeleted > 0)
 	{
 		RefreshTemplateList();
-		ShowTemplateEditorNotification(TEXT("Template deleted successfully."), true);
+		FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Template deleted successfully."), EMounteaEditorNotificationType::Success);
 	}
 	else
-		ShowTemplateEditorNotification(TEXT("Failed to delete template."), false);
+		FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Failed to delete template."), EMounteaEditorNotificationType::Error);
 
 	return FReply::Handled();
 }
@@ -1150,10 +1151,10 @@ FReply SMounteaInventoryTemplateEditor::DuplicateTemplate(const TWeakObjectPtr<U
 			TemplateTreeView->SetSelection(foundItem, ESelectInfo::Direct);
 		}
 		
-		ShowTemplateEditorNotification(TEXT("Template duplicated successfully."), true);
+		FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Template duplicated successfully."), EMounteaEditorNotificationType::Success);
 	}
 	else
-		ShowTemplateEditorNotification(TEXT("Failed to duplicate template."), false);
+		FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Failed to duplicate template."), EMounteaEditorNotificationType::Error);
 	
 	return FReply::Handled();
 }
@@ -1165,12 +1166,12 @@ void SMounteaInventoryTemplateEditor::ImportTemplate()
     
 	if (UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile(importedTemplates, errorMessage))
 	{
-		ShowTemplateEditorNotification(errorMessage, true);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMessage, EMounteaEditorNotificationType::Success);
 		RefreshTemplateList();
 	}
 	else
 	{
-		ShowTemplateEditorNotification(errorMessage, false);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMessage, EMounteaEditorNotificationType::Error);
 	}
 }
 
@@ -1193,10 +1194,10 @@ void SMounteaInventoryTemplateEditor::ExportTemplate()
 			templatesToExport.Num(),
 			templatesToExport.Num() > 1 ? TEXT("s") : TEXT("")
 		);
-		ShowTemplateEditorNotification(tempMessage, true);
+		FMounteaEditorNotificationHelpers::ShowNotification(tempMessage, EMounteaEditorNotificationType::Success);
 	}
 	else
-		ShowTemplateEditorNotification(errorMessage, false);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMessage, EMounteaEditorNotificationType::Error);
 }
 
 TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
@@ -1907,21 +1908,6 @@ bool SMounteaInventoryTemplateEditor::ValidateTemplateData(FString& ErrorMessage
 	}
 	
 	return true;
-}
-
-void SMounteaInventoryTemplateEditor::ShowTemplateEditorNotification(const FString& Message, const bool bSuccess)
-{
-	FNotificationInfo notifInfo(FText::FromString(Message));
-	notifInfo.bFireAndForget = true;
-	notifInfo.ExpireDuration = 4.0f;
-	notifInfo.bUseThrobber = false;
-	notifInfo.bUseSuccessFailIcons = true;
-	notifInfo.bUseLargeFont = false;
-	notifInfo.WidthOverride = FOptionalSize();
-
-	TSharedPtr<SNotificationItem> notificationItem = FSlateNotificationManager::Get().AddNotification(notifInfo);
-	if (notificationItem.IsValid())
-		notificationItem->SetCompletionState(bSuccess ? SNotificationItem::CS_Success : SNotificationItem::CS_Fail);
 }
 
 void SMounteaInventoryTemplateEditor::TrackDirtyAsset(UMounteaInventoryItemTemplate* Template)
