@@ -118,8 +118,7 @@ private:
 	void CreateTransientTemplate();
 	void CleanupTransientTemplate();
 	bool ValidateTemplateData(FString& ErrorMessage) const;
-	static void ShowTemplateEditorNotification(const FString& Message, const bool bSuccess = true);
-	
+
 	void TrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
 	void UntrackDirtyAsset(UMounteaInventoryItemTemplate* Template);
 	bool HasUnsavedChanges() const;
