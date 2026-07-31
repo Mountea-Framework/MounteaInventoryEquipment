@@ -108,6 +108,7 @@ TSet<FGuid> FMounteaInventoryImportHelpers::ParseBundledGuids(const TArray<FStri
 
 void FMounteaInventoryImportHelpers::ImportBundledItems(const TArray<FString>& BundledItemJsons,
 	const FString& TargetFolder,
+	const FString& SourceFilePath,
 	TMap<FGuid, UMounteaInventoryItemTemplate*>& InOutItemsByGuid)
 {
 	const TArray<UMounteaInventoryItemTemplate*> existingTemplates =
@@ -127,8 +128,7 @@ void FMounteaInventoryImportHelpers::ImportBundledItems(const TArray<FString>& B
 		}
 
 		const FString nameStr = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(itemJson);
-		const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"),
-			nameStr.IsEmpty() ? *g.ToString(EGuidFormats::Short) : *nameStr);
+		const FString assetName = nameStr.IsEmpty() ? g.ToString(EGuidFormats::Short) : nameStr;
 
 		FString createError;
 		UMounteaInventoryItemTemplate* newTemplate =
@@ -142,6 +142,7 @@ void FMounteaInventoryImportHelpers::ImportBundledItems(const TArray<FString>& B
 				itemJson, newTemplate, parseErr);
 			newTemplate->ReloadItemActions();
 			newTemplate->CalculateJson();
+			newTemplate->SetSourceFilePath(SourceFilePath);
 			UMounteaAdvancedInventoryItemTemplateEditorStatics::SaveTemplateAsset(
 				newTemplate, FPaths::Combine(TargetFolder, assetName));
 			InOutItemsByGuid.Add(g, newTemplate);

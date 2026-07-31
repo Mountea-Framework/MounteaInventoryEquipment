@@ -51,6 +51,7 @@ struct FMounteaInventoryImportHelpers
 	 */
 	static void ImportBundledItems(const TArray<FString>& BundledItemJsons,
 		const FString& TargetFolder,
+		const FString& SourceFilePath,
 		TMap<FGuid, UMounteaInventoryItemTemplate*>& InOutItemsByGuid);
 
 	// ── Generic save operations ────────────────────────────────────────────────
