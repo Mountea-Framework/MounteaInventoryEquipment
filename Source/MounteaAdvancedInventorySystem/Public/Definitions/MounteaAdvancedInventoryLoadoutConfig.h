@@ -57,7 +57,21 @@ public:
 		meta=(FullyExpand=true))
 	TArray<TObjectPtr<UMounteaAdvancedInventoryLoadoutItem>> Items;
 
+protected:
+
+#if WITH_EDITORONLY_DATA
+	// Absolute path to the file this loadout was imported from (set automatically by the import pipeline).
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data", AdvancedDisplay,
+		meta=(NoResetToDefault))
+	FString SourceFilePath;
+#endif
+
+public:
+
 #if WITH_EDITOR
+	FString GetSourceFilePath() const;
+	void SetSourceFilePath(const FString& InPath);
+
 	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 #endif
 };

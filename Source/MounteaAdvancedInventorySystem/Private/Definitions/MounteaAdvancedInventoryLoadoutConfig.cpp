@@ -15,6 +15,17 @@
 #include "UObject/UnrealType.h"
 
 #if WITH_EDITOR
+
+FString UMounteaAdvancedInventoryLoadoutConfig::GetSourceFilePath() const
+{
+	return SourceFilePath;
+}
+
+void UMounteaAdvancedInventoryLoadoutConfig::SetSourceFilePath(const FString& InPath)
+{
+	SourceFilePath = InPath;
+}
+
 void UMounteaAdvancedInventoryLoadoutConfig::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeChainProperty(PropertyChangedEvent);
