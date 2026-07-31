@@ -43,12 +43,16 @@ public:
 public:
 	// ── ZIP parsing ──────────────────────────────────────────────────────────
 
-	/** Extract recipe.json and all items/*.json from a single .mntearecipe ZIP blob. */
+	/** Extract recipe.json, all items/*.json, and taxonomy/crafting-stations.json from a single .mntearecipe ZIP blob. */
 	static bool ParseRecipeFromZip(
 		const TArray<uint8>& ZipBytes,
 		FString& OutRecipeJson,
 		TArray<FString>& OutBundledItemJsons,
+		FString& OutStationTaxonomyJson,
 		FString& OutErrorMessage);
+
+	/** Parse a taxonomy/crafting-stations.json array ([{ id, name, icon, tag }]) into a display-name -> gameplay tag lookup. */
+	static TMap<FString, FString> ParseStationTagMap(const FString& TaxonomyJson);
 
 	// ── Validation (read-only, no writes) ────────────────────────────────────
 
@@ -79,6 +83,7 @@ public:
 		const TSharedPtr<FJsonObject>& JsonObject,
 		UMounteaRecipeTemplate* Recipe,
 		const TMap<FGuid, UMounteaInventoryItemTemplate*>& ItemsByGuid,
+		const TMap<FString, FString>& StationTagByName,
 		FString& OutErrorMessage);
 
 	/** Save a recipe template package to disk and register it with the asset registry. */
@@ -100,5 +105,6 @@ public:
 		UMounteaRecipeTemplate* Recipe,
 		const TSharedPtr<FJsonObject>& JsonObject,
 		const TMap<FGuid, UMounteaInventoryItemTemplate*>& ItemsByGuid,
+		const TMap<FString, FString>& StationTagByName,
 		FString& OutErrorMessage);
 };
