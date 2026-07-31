@@ -16,6 +16,16 @@
 
 #if WITH_EDITOR
 
+FString UMounteaRecipeTemplate::GetSourceFilePath() const
+{
+	return SourceFilePath;
+}
+
+void UMounteaRecipeTemplate::SetSourceFilePath(const FString& InPath)
+{
+	SourceFilePath = InPath;
+}
+
 void UMounteaRecipeTemplate::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeChainProperty(PropertyChangedEvent);

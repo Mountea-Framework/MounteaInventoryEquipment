@@ -269,17 +269,24 @@ protected:
 		meta=(DisplayPriority=29))
 	FString JsonManifest;
 	
-	// Asset path which defines source location where the item is located.
+#if WITH_EDITORONLY_DATA
+	// Absolute path to the file this item template was imported from (set automatically by the import pipeline).
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data", AdvancedDisplay,
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=30))
-	FFilePath ImportFilePath;
-	
+	FString SourceFilePath;
+#endif
+
 public:
-	
+
 	FString GetJson() const;
 	void SetJson(const FString& Json);
 	bool CalculateJson();
+
+#if WITH_EDITOR
+	FString GetSourceFilePath() const;
+	void SetSourceFilePath(const FString& InPath);
+#endif
 	
 protected:
 

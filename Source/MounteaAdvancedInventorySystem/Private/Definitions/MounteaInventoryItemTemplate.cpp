@@ -149,6 +149,16 @@ namespace
 	}
 }
 
+FString UMounteaInventoryItemTemplate::GetSourceFilePath() const
+{
+	return SourceFilePath;
+}
+
+void UMounteaInventoryItemTemplate::SetSourceFilePath(const FString& InPath)
+{
+	SourceFilePath = InPath;
+}
+
 void UMounteaInventoryItemTemplate::ReloadItemActions()
 {
 	const auto inventorySettings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
