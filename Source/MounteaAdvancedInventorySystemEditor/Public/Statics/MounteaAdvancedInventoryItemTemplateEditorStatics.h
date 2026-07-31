@@ -37,7 +37,7 @@ public:
 public:
 	static TArray<UMounteaInventoryItemTemplate*> LoadAllExistingTemplates();
 	static UMounteaInventoryItemTemplate* FindTemplateByGuid(const TArray<UMounteaInventoryItemTemplate*>& Templates, const FGuid& Guid);
-	static bool UpdateExistingTemplate(UMounteaInventoryItemTemplate* Template, const FString& JsonString, FString& OutErrorMessage);
+	static bool UpdateExistingTemplate(UMounteaInventoryItemTemplate* Template, const FString& JsonString, const FString& SourceFilePath, FString& OutErrorMessage);
 	static FGuid ExtractGuidFromJson(const FString& JsonString);
 	static FString ExtractNameFromJson(const FString& JsonString);
 	
@@ -46,7 +46,7 @@ public:
 
 	// ZIP-format import (web companion export)
 	static bool ParseItemJsonFromZip(const TArray<uint8>& ZipBytes, FString& OutItemJson, FString& OutErrorMessage);
-	static bool ImportTemplatesFromZipBytes(const TArray<uint8>& ZipBytes, const FString& TargetFolder, TArray<UMounteaInventoryItemTemplate*>& OutTemplates, FString& OutErrorMessage);
+	static bool ImportTemplatesFromZipBytes(const TArray<uint8>& ZipBytes, const FString& TargetFolder, const FString& SourceFilePath, TArray<UMounteaInventoryItemTemplate*>& OutTemplates, FString& OutErrorMessage);
     
 	static UMounteaInventoryItemTemplate* CreateTemplateAsset(const FString& TargetFolder, const FString& AssetName, FString& OutErrorMessage);
 	static bool SaveTemplateAsset(UMounteaInventoryItemTemplate* Template, const FString& PackagePath);

@@ -67,14 +67,14 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
             for (const TArray<uint8>& inner : innerZips)
             {
                 FString innerError;
-                ImportTemplatesFromZipBytes(inner, TargetFolder, OutTemplates, innerError);
+                ImportTemplatesFromZipBytes(inner, TargetFolder, FilePath, OutTemplates, innerError);
                 if (!innerError.IsEmpty())
                     OutErrorMessage += innerError + TEXT("\n");
             }
         }
         else
         {
-            if (!ImportTemplatesFromZipBytes(fileBytes, TargetFolder, OutTemplates, OutErrorMessage))
+            if (!ImportTemplatesFromZipBytes(fileBytes, TargetFolder, FilePath, OutTemplates, OutErrorMessage))
                 return false;
         }
 
@@ -110,7 +110,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
 
         if (UMounteaInventoryItemTemplate* TargetTemplate = FindTemplateByGuid(existingTemplates, itemGuid))
         {
-            if (UpdateExistingTemplate(TargetTemplate, itemJson, OutErrorMessage))
+            if (UpdateExistingTemplate(TargetTemplate, itemJson, FilePath, OutErrorMessage))
             {
                 OutTemplates.Add(TargetTemplate);
                 updatedCount++;
@@ -122,7 +122,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
             if (folderToUse.IsEmpty())
             {
                 folderToUse = ShowContentBrowserPathPicker(
-                    NSLOCTEXT("UMounteaAdvancedInventoryItemTemplateEditorStatics", "Import_TargetFolder", 
+                    NSLOCTEXT("UMounteaAdvancedInventoryItemTemplateEditorStatics", "Import_TargetFolder",
                         "Select Target Folder for New Template").ToString(),
                     TEXT("/Game/")
                 );
@@ -135,10 +135,10 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
             }
 
             const FString itemDisplayName = ExtractNameFromJson(itemJson);
-            const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"),  itemDisplayName.IsEmpty() ?
-                *itemGuid.ToString(EGuidFormats::Short) : *itemDisplayName);
+            const FString assetName = itemDisplayName.IsEmpty() ?
+                itemGuid.ToString(EGuidFormats::Short) : itemDisplayName;
             UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(folderToUse, assetName, OutErrorMessage);
-            
+
             if (!newTemplate)
                 continue;
 
@@ -146,7 +146,8 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromFile
             {
                 newTemplate->ReloadItemActions();
                 newTemplate->CalculateJson();
-                
+                newTemplate->SetSourceFilePath(FilePath);
+
                 const FString packagePath = FPaths::Combine(folderToUse, assetName);
                 if (SaveTemplateAsset(newTemplate, packagePath))
                 {
@@ -296,8 +297,9 @@ UMounteaInventoryItemTemplate* UMounteaAdvancedInventoryItemTemplateEditorStatic
 }
 
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::UpdateExistingTemplate(
-    UMounteaInventoryItemTemplate* Template, 
-    const FString& JsonString, 
+    UMounteaInventoryItemTemplate* Template,
+    const FString& JsonString,
+    const FString& SourceFilePath,
     FString& OutErrorMessage)
 {
     if (!IsValid(Template))
@@ -310,6 +312,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::UpdateExistingTemplate(
         return false;
 
     Template->CalculateJson();
+    Template->SetSourceFilePath(SourceFilePath);
     
     UPackage* templatePackage = Template->GetOutermost();
     if (!templatePackage)
@@ -812,6 +815,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseItemJsonFromZip(
 bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromZipBytes(
     const TArray<uint8>& ZipBytes,
     const FString& TargetFolder,
+    const FString& SourceFilePath,
     TArray<UMounteaInventoryItemTemplate*>& OutTemplates,
     FString& OutErrorMessage)
 {
@@ -824,7 +828,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromZipB
 
     if (UMounteaInventoryItemTemplate* existing = FindTemplateByGuid(existingTemplates, itemGuid))
     {
-        if (UpdateExistingTemplate(existing, itemJson, OutErrorMessage))
+        if (UpdateExistingTemplate(existing, itemJson, SourceFilePath, OutErrorMessage))
             OutTemplates.Add(existing);
         return OutTemplates.Num() > 0;
     }
@@ -845,8 +849,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromZipB
     }
 
     const FString displayName = ExtractNameFromJson(itemJson);
-    const FString assetName = FString::Printf(TEXT("ImportedTemplate_%s"),
-        displayName.IsEmpty() ? *itemGuid.ToString(EGuidFormats::Short) : *displayName);
+    const FString assetName = displayName.IsEmpty() ? itemGuid.ToString(EGuidFormats::Short) : displayName;
 
     UMounteaInventoryItemTemplate* newTemplate = CreateTemplateAsset(folderToUse, assetName, OutErrorMessage);
     if (!newTemplate)
@@ -856,6 +859,7 @@ bool UMounteaAdvancedInventoryItemTemplateEditorStatics::ImportTemplatesFromZipB
     {
         newTemplate->ReloadItemActions();
         newTemplate->CalculateJson();
+        newTemplate->SetSourceFilePath(SourceFilePath);
 
         const FString packagePath = FPaths::Combine(folderToUse, assetName);
         if (SaveTemplateAsset(newTemplate, packagePath))
