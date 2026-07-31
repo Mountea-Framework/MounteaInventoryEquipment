@@ -12,6 +12,7 @@
 #include "MounteaRecipeTemplate_Factory.h"
 
 #include "Definitions/MounteaRecipeTemplate.h"
+#include "Helpers/MounteaEditorNotificationHelpers.h"
 #include "Statics/MounteaAdvancedInventoryRecipeEditorStatics.h"
 #include "Utilities/MounteaAdvancedInventoryEditorUtilities.h"
 
@@ -68,9 +69,14 @@ UObject* UMounteaRecipeTemplate_Factory::FactoryCreateFile(
 	{
 		if (Warn)
 			Warn->Logf(ELogVerbosity::Error, TEXT("%s"), *errorMessage);
+		FMounteaEditorNotificationHelpers::ShowNotification(errorMessage, EMounteaEditorNotificationType::Error);
 		bOutOperationCanceled = true;
 		return nullptr;
 	}
+
+	FMounteaEditorNotificationHelpers::ShowNotification(
+		FString::Printf(TEXT("Successfully imported %d recipe(s)"), importedRecipes.Num()),
+		EMounteaEditorNotificationType::Success);
 
 	return importedRecipes.Num() > 0 ? importedRecipes[0] : nullptr;
 }
