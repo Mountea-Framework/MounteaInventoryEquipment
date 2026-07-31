@@ -54,6 +54,9 @@ public:
 	/** Parse a taxonomy/crafting-stations.json array ([{ id, name, icon, tag }]) into a display-name -> gameplay tag lookup. */
 	static TMap<FString, FString> ParseStationTagMap(const FString& TaxonomyJson);
 
+	/** Same as above, but from an already-parsed JSON array (e.g. the "craftingStations" field of a workspace's taxonomy.json). */
+	static TMap<FString, FString> ParseStationTagMap(const TArray<TSharedPtr<FJsonValue>>& Entries);
+
 	// ── Validation (read-only, no writes) ────────────────────────────────────
 
 	/**

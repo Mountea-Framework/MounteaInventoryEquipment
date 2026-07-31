@@ -242,19 +242,25 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ParseRecipeFromZip(
 
 TMap<FString, FString> UMounteaAdvancedInventoryRecipeEditorStatics::ParseStationTagMap(const FString& TaxonomyJson)
 {
-	TMap<FString, FString> map;
 	if (TaxonomyJson.IsEmpty())
-		return map;
+		return TMap<FString, FString>();
 
 	TArray<TSharedPtr<FJsonValue>> entries;
 	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(TaxonomyJson);
 	if (!FJsonSerializer::Deserialize(reader, entries))
 	{
 		LOG_WARNING(TEXT("[Recipe Import] Failed to parse taxonomy/crafting-stations.json"));
-		return map;
+		return TMap<FString, FString>();
 	}
 
-	for (const TSharedPtr<FJsonValue>& entryVal : entries)
+	return ParseStationTagMap(entries);
+}
+
+TMap<FString, FString> UMounteaAdvancedInventoryRecipeEditorStatics::ParseStationTagMap(const TArray<TSharedPtr<FJsonValue>>& Entries)
+{
+	TMap<FString, FString> map;
+
+	for (const TSharedPtr<FJsonValue>& entryVal : Entries)
 	{
 		const TSharedPtr<FJsonObject>* entryObj;
 		if (!entryVal->TryGetObject(entryObj))
