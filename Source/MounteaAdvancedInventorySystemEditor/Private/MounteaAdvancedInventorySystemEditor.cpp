@@ -35,6 +35,7 @@
 
 #include "Customizations/MounteaJsonObjectDefinitionCustomization.h"
 #include "DetailsCustomizations/MounteaSourceFilePathDetailsCustomization.h"
+#include "Helpers/MounteaEditorNotificationHelpers.h"
 #include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaRecipeTemplate.h"
@@ -561,13 +562,10 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 									FEditorFileUtils::LoadMap(mapPath, false, true);
 								else
 								{
-									FNotificationInfo notifInfo(LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Notification", "Unable to open example level!"));
-									notifInfo.bUseSuccessFailIcons = true;
-									notifInfo.SubText = LOCTEXT("MounteaSystemEditor_OpenExampleLevel_Notification_SubText",
-										"The example level is missing. Please, verify that the Mountea Advanced Inventory & Equipment plugin is installed correctly!");
-									TSharedPtr<SNotificationItem> notificationItem = FSlateNotificationManager::Get().AddNotification(notifInfo);
-									if (notificationItem.IsValid())
-										notificationItem->SetCompletionState(SNotificationItem::CS_Fail);
+									FMounteaEditorNotificationHelpers::ShowNotification(
+										TEXT("Unable to open example level!"),
+										EMounteaEditorNotificationType::Error,
+										TEXT("The example level is missing. Please, verify that the Mountea Advanced Inventory & Equipment plugin is installed correctly!"));
 								}
 							})
 						));
