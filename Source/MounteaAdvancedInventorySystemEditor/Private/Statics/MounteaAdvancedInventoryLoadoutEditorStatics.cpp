@@ -17,7 +17,10 @@
 
 #include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Definitions/MounteaAdvancedInventoryLoadoutItem.h"
+#include "Definitions/MounteaInventoryBaseEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
+#include "Statics/MounteaInventorySystemStatics.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Dom/JsonObject.h"
@@ -40,12 +43,14 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 	if (!FMounteaInventoryZipHelper::LoadFileToBytes(FilePath, fileBytes))
 	{
 		OutErrorMessage = FString::Printf(TEXT("Failed to read file: %s"), *FilePath);
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 		return false;
 	}
 
 	if (!FMounteaInventoryZipHelper::IsZipFile(fileBytes))
 	{
 		OutErrorMessage = TEXT("File is not a valid ZIP archive");
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 		return false;
 	}
 
@@ -56,6 +61,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		if (!FMounteaInventoryZipHelper::ExpandBundle(fileBytes, TEXT("mntealoadout"), singleZips))
 		{
 			OutErrorMessage = TEXT("Failed to expand .mntealoadouts bundle");
+			LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 			return false;
 		}
 	}
@@ -86,6 +92,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		if (!ParseLoadoutFromZip(zipBlob, entry.LoadoutJson, entry.BundledItemJsons, parseError))
 		{
 			OutErrorMessage += parseError + TEXT("\n");
+			LOG_ERROR(TEXT("[Loadout Import] %s"), *parseError);
 			return false;
 		}
 
@@ -93,6 +100,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		if (!FJsonSerializer::Deserialize(reader, entry.ParsedJson) || !entry.ParsedJson.IsValid())
 		{
 			OutErrorMessage += TEXT("Failed to parse loadout JSON\n");
+			LOG_ERROR(TEXT("[Loadout Import] Failed to parse loadout JSON"));
 			return false;
 		}
 
@@ -107,6 +115,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		if (!ValidateLoadout(entry.ParsedJson, knownGuids, validationError))
 		{
 			OutErrorMessage += validationError + TEXT("\n");
+			LOG_ERROR(TEXT("[Loadout Import] %s"), *validationError);
 			return false;
 		}
 
@@ -131,40 +140,53 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		if (loadout)
 		{
 			FString updateError;
-			if (UpdateExistingLoadout(loadout, entry.ParsedJson, itemsByGuid, updateError))
+			if (UpdateExistingLoadout(loadout, entry.ParsedJson, itemsByGuid, FilePath, updateError))
 				OutLoadouts.Add(loadout);
 			else
+			{
 				OutErrorMessage += updateError + TEXT("\n");
+				LOG_ERROR(TEXT("[Loadout Import] %s"), *updateError);
+			}
 		}
 		else
 		{
 			const FString name = ExtractNameFromLoadoutJson(entry.LoadoutJson);
-			const FString assetName = FString::Printf(TEXT("ImportedLoadout_%s"),
-				name.IsEmpty() ? *loadoutGuid.ToString(EGuidFormats::Short) : *name);
+			const FString assetName = name.IsEmpty() ? loadoutGuid.ToString(EGuidFormats::Short) : name;
 
 			FString createError;
 			loadout = CreateLoadoutAsset(folderToUse, assetName, createError);
 			if (!loadout)
 			{
 				OutErrorMessage += createError + TEXT("\n");
+				LOG_ERROR(TEXT("[Loadout Import] %s"), *createError);
 				continue;
 			}
 
 			FString deserError;
 			if (DeserializeLoadoutFromJson(entry.ParsedJson, loadout, itemsByGuid, deserError))
 			{
+				loadout->SetSourceFilePath(FilePath);
 				const FString pkgPath = FPaths::Combine(folderToUse, assetName);
 				if (SaveLoadoutAsset(loadout, pkgPath))
 					OutLoadouts.Add(loadout);
+				else
+				{
+					OutErrorMessage += FString::Printf(TEXT("Failed to save loadout asset '%s'\n"), *assetName);
+					LOG_ERROR(TEXT("[Loadout Import] Failed to save loadout asset '%s'"), *assetName);
+				}
 			}
 			else
+			{
 				OutErrorMessage += deserError + TEXT("\n");
+				LOG_ERROR(TEXT("[Loadout Import] %s"), *deserError);
+			}
 		}
 	}
 
 	if (OutLoadouts.Num() == 0)
 	{
 		OutErrorMessage = TEXT("No loadouts were successfully imported");
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 		return false;
 	}
 
@@ -222,6 +244,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(
 	if (!LoadoutJson->TryGetStringField(TEXT("guid"), guidStr) || guidStr.IsEmpty())
 	{
 		OutErrorMessage = TEXT("Loadout JSON missing 'guid' field");
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 		return false;
 	}
 
@@ -246,6 +269,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(
 						refGuid, TEXT("items[]"), KnownGuids, checkError))
 					{
 						OutErrorMessage = checkError;
+						LOG_ERROR(TEXT("[Loadout Import] %s"), *checkError);
 						return false;
 					}
 				}
@@ -270,6 +294,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(
 				if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
 					slotGuid, FString::Printf(TEXT("slots[%s]"), *slotKv.Key), KnownGuids, checkError))
 				{
+					LOG_ERROR(TEXT("[Loadout Import] %s"), *checkError);
 					OutErrorMessage = checkError;
 					return false;
 				}
@@ -295,6 +320,7 @@ UMounteaAdvancedInventoryLoadoutConfig* UMounteaAdvancedInventoryLoadoutEditorSt
 	if (!newPackage)
 	{
 		OutErrorMessage = FString::Printf(TEXT("Failed to create package: %s"), *packageName);
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 		return nullptr;
 	}
 
@@ -306,7 +332,10 @@ UMounteaAdvancedInventoryLoadoutConfig* UMounteaAdvancedInventoryLoadoutEditorSt
 	);
 
 	if (!loadout)
+	{
 		OutErrorMessage = TEXT("Failed to create loadout config object");
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
+	}
 
 	return loadout;
 }
@@ -320,8 +349,13 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::DeserializeLoadoutFromJson(
 	if (!JsonObject.IsValid() || !IsValid(Loadout))
 	{
 		OutErrorMessage = TEXT("Invalid JSON or loadout object");
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 		return false;
 	}
+
+	FString loadoutGuidStr;
+	if (JsonObject->TryGetStringField(TEXT("guid"), loadoutGuidStr))
+		FGuid::Parse(loadoutGuidStr, Loadout->Guid);
 
 	Loadout->Items.Empty();
 
@@ -350,7 +384,10 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::DeserializeLoadoutFromJson(
 
 			UMounteaInventoryItemTemplate* const* templatePtr = ItemsByGuid.Find(itemGuid);
 			if (!templatePtr || !IsValid(*templatePtr))
+			{
+				LOG_WARNING(TEXT("[Loadout Import] Item GUID %s not found among imported/known items"), *refGuidStr);
 				continue;
+			}
 
 			UMounteaAdvancedInventoryLoadoutItem* loadoutItem =
 				NewObject<UMounteaAdvancedInventoryLoadoutItem>(Loadout,
@@ -362,8 +399,29 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::DeserializeLoadoutFromJson(
 			loadoutItem->ItemTemplate = *templatePtr;
 
 			int32 qty = 1;
-			if ((*itemObj)->TryGetNumberField(TEXT("quantity"), qty))
+			if ((*itemObj)->TryGetNumberField(TEXT("qty"), qty))
 				loadoutItem->BaseQuantity = FMath::Max(1, qty);
+
+			// "durability" is a 0.0-1.0 fraction of the item template's MaxDurability; convert to
+			// the absolute value BaseQuantity expects, matching the same formula used when a user
+			// manually assigns an ItemTemplate in the editor (see PostEditChangeProperty).
+			double durabilityFraction = 1.0;
+			if ((*itemObj)->TryGetNumberField(TEXT("durability"), durabilityFraction) &&
+				(*templatePtr)->bHasDurability &&
+				UMounteaInventorySystemStatics::HasFlag((*templatePtr)->ItemFlags, EInventoryItemFlags::EIIF_Durable))
+			{
+				loadoutItem->BaseDurability = FMath::RoundToInt(durabilityFraction * (*templatePtr)->MaxDurability);
+			}
+
+			bool bAutoEquip = false;
+			if ((*itemObj)->TryGetBoolField(TEXT("autoEquip"), bAutoEquip) && bAutoEquip)
+			{
+				loadoutItem->bAutomaticallyEquip = true;
+
+				FString slotName;
+				if ((*itemObj)->TryGetStringField(TEXT("slot"), slotName) && !slotName.IsEmpty())
+					loadoutItem->EquipmentSlot = FName(*slotName);
+			}
 
 #if WITH_EDITORONLY_DATA
 			FString displayName;
@@ -440,16 +498,20 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::UpdateExistingLoadout(
 	UMounteaAdvancedInventoryLoadoutConfig* Loadout,
 	const TSharedPtr<FJsonObject>& JsonObject,
 	const TMap<FGuid, UMounteaInventoryItemTemplate*>& ItemsByGuid,
+	const FString& SourceFilePath,
 	FString& OutErrorMessage)
 {
 	if (!IsValid(Loadout))
 	{
 		OutErrorMessage = TEXT("Invalid loadout object");
+		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
 		return false;
 	}
 
 	if (!DeserializeLoadoutFromJson(JsonObject, Loadout, ItemsByGuid, OutErrorMessage))
 		return false;
+
+	Loadout->SetSourceFilePath(SourceFilePath);
 
 	return FMounteaInventoryImportHelpers::SaveExistingAssetPackage(Loadout, OutErrorMessage);
 }
@@ -471,7 +533,7 @@ FString UMounteaAdvancedInventoryLoadoutEditorStatics::ExtractNameFromLoadoutJso
 		return TEXT("");
 
 	FString name;
-	if (obj->TryGetStringField(TEXT("displayName"), name))
+	if (obj->TryGetStringField(TEXT("name"), name))
 		return FMounteaInventoryImportHelpers::SanitizeAssetName(name);
 
 	return TEXT("");
@@ -500,7 +562,11 @@ UMounteaAdvancedInventoryLoadoutConfig* UMounteaAdvancedInventoryLoadoutEditorSt
 	if (!Guid.IsValid())
 		return nullptr;
 
-	// UMounteaAdvancedInventoryLoadoutConfig has no stored Guid — we cannot match by GUID.
-	// Return nullptr so imports always create a new asset (idempotency requires a Guid field on the asset).
-	return nullptr;
+	UMounteaAdvancedInventoryLoadoutConfig* const* found = Loadouts.FindByPredicate(
+		[&Guid](const UMounteaAdvancedInventoryLoadoutConfig* l)
+		{
+			return IsValid(l) && l->Guid == Guid;
+		});
+
+	return found ? *found : nullptr;
 }
