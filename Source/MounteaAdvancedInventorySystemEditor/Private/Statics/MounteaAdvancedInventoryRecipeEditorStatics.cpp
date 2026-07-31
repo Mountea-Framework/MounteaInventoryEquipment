@@ -132,7 +132,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 		const FString folderToUse = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
 
 		TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
-		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, itemsByGuid);
+		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, FilePath, itemsByGuid);
 
 		// Find or create recipe asset
 		const FGuid recipeGuid = ExtractGuidFromRecipeJson(entry.RecipeJson);
@@ -141,7 +141,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 		if (recipe)
 		{
 			FString updateError;
-			if (UpdateExistingRecipe(recipe, entry.ParsedJson, itemsByGuid, entry.StationTagByName, updateError))
+			if (UpdateExistingRecipe(recipe, entry.ParsedJson, itemsByGuid, entry.StationTagByName, FilePath, updateError))
 				OutRecipes.Add(recipe);
 			else
 			{
@@ -152,8 +152,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 		else
 		{
 			const FString name = ExtractNameFromRecipeJson(entry.RecipeJson);
-			const FString assetName = FString::Printf(TEXT("ImportedRecipe_%s"),
-				name.IsEmpty() ? *recipeGuid.ToString(EGuidFormats::Short) : *name);
+			const FString assetName = name.IsEmpty() ? recipeGuid.ToString(EGuidFormats::Short) : name;
 
 			FString createError;
 			recipe = CreateRecipeAsset(folderToUse, assetName, createError);
@@ -167,6 +166,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 			FString deserError;
 			if (DeserializeRecipeFromJson(entry.ParsedJson, recipe, itemsByGuid, entry.StationTagByName, deserError))
 			{
+				recipe->SetSourceFilePath(FilePath);
 				if (SaveRecipeAsset(recipe, FPaths::Combine(folderToUse, assetName)))
 					OutRecipes.Add(recipe);
 				else
@@ -624,6 +624,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::UpdateExistingRecipe(
 	const TSharedPtr<FJsonObject>& JsonObject,
 	const TMap<FGuid, UMounteaInventoryItemTemplate*>& ItemsByGuid,
 	const TMap<FString, FString>& StationTagByName,
+	const FString& SourceFilePath,
 	FString& OutErrorMessage)
 {
 	if (!IsValid(Recipe))
@@ -635,6 +636,8 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::UpdateExistingRecipe(
 
 	if (!DeserializeRecipeFromJson(JsonObject, Recipe, ItemsByGuid, StationTagByName, OutErrorMessage))
 		return false;
+
+	Recipe->SetSourceFilePath(SourceFilePath);
 
 	return FMounteaInventoryImportHelpers::SaveExistingAssetPackage(Recipe, OutErrorMessage);
 }

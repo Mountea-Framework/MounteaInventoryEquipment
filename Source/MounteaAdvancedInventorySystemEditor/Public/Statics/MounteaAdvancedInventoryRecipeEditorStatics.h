@@ -106,5 +106,6 @@ public:
 		const TSharedPtr<FJsonObject>& JsonObject,
 		const TMap<FGuid, UMounteaInventoryItemTemplate*>& ItemsByGuid,
 		const TMap<FString, FString>& StationTagByName,
+		const FString& SourceFilePath,
 		FString& OutErrorMessage);
 };

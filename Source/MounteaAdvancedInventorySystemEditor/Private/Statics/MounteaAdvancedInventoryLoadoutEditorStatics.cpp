@@ -122,7 +122,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		const FString folderToUse = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
 
 		TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
-		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, itemsByGuid);
+		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, FilePath, itemsByGuid);
 
 		// Find or create loadout asset
 		const FGuid loadoutGuid = ExtractGuidFromLoadoutJson(entry.LoadoutJson);
