@@ -56,7 +56,8 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 
 	StyleSet->Set("MAISStyleSet.Level", new SVG_BRUSH_TINT(TEXT("WebIcons/mountain-snow"), Icon40x40, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Folder", new SVG_BRUSH_TINT(TEXT("WebIcons/folder-open"), Icon40x40, FLinearColor::White));
-	
+	StyleSet->Set("MAISStyleSet.FolderOpen", new SVG_BRUSH_TINT(TEXT("WebIcons/folder-open"), Icon16x16, FLinearColor::White));
+
 	StyleSet->Set("MAISStyleSet.Import", new SVG_BRUSH_TINT(TEXT("WebIcons/import"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Export", new SVG_BRUSH_TINT(TEXT("WebIcons/export"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Close", new SVG_BRUSH_TINT(TEXT("WebIcons/x"), Icon16x16, FLinearColor::White));
