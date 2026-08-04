@@ -249,27 +249,11 @@ TArray<UMounteaRecipeTemplate*> UMounteaCraftingParticipantComponent::ResolveKno
 	if (KnownRecipeGuids.Num() == 0)
 		return TArray<UMounteaRecipeTemplate*>();
 
-	const TArray<UMounteaRecipeTemplate*> allRecipes = UMounteaCraftingStatics::GetAllRecipeTemplates().Array();
+	const TArray<UMounteaRecipeTemplate*> allRecipes = UMounteaCraftingStatics::GetAllRecipeTemplates();
 	if (allRecipes.Num() == 0)
 		return TArray<UMounteaRecipeTemplate*>();
 
-	TArray<UMounteaRecipeTemplate*> result;
-	result.Reserve(KnownRecipeGuids.Num());
-
-	const auto allRecipesArray = allRecipes;
-	for (const FGuid& knownRecipeGuid : KnownRecipeGuids)
-	{
-		UMounteaRecipeTemplate* const* foundRecipe = allRecipesArray.FindByPredicate(
-			[&knownRecipeGuid](const UMounteaRecipeTemplate* recipe)
-			{
-				return IsValid(recipe) && recipe->RecipeGuid == knownRecipeGuid;
-			});
-
-		if (foundRecipe != nullptr && IsValid(*foundRecipe))
-			result.Add(*foundRecipe);
-	}
-
-	return result;
+	return allRecipes;
 }
 
 void UMounteaCraftingParticipantComponent::Server_StopCrafting_Implementation()
