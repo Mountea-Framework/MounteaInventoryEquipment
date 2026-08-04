@@ -640,22 +640,22 @@ TScriptInterface<IMounteaAdvancedCraftingStationInterface> UMounteaCraftingStati
 	return IsValidRecipeHandler(Target) ? IMounteaAdvancedCraftingParticipantInterface::Execute_GetCraftingStation(Target) : TScriptInterface<IMounteaAdvancedCraftingStationInterface>();
 }
 
-TSet<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetAllRecipeTemplates()
+TArray<UMounteaRecipeTemplate*> UMounteaCraftingStatics::GetAllRecipeTemplates()
 {
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
 	if (!IsValid(settings))
-		return TSet<UMounteaRecipeTemplate*>();
+		return TArray<UMounteaRecipeTemplate*>();
 	const auto craftingConfig = settings->AdvancedCraftingSettingsConfig.LoadSynchronous();
 	if (!IsValid(craftingConfig))
-		return TSet<UMounteaRecipeTemplate*>();
+		return TArray<UMounteaRecipeTemplate*>();
 	const auto& allowedRecipes = craftingConfig->AllowedRecipes;
 
-	TSet<UMounteaRecipeTemplate*> returnValue;
+	TArray<UMounteaRecipeTemplate*> returnValue;
 	returnValue.Reserve(allowedRecipes.Num());
 
 	for(const auto& recipe : allowedRecipes)
 	{
-		returnValue.Add(recipe.Get());
+		returnValue.Add(recipe.LoadSynchronous());
 	}
 
 	return returnValue;

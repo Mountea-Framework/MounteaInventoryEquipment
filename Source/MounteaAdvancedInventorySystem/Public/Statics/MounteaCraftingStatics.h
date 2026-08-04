@@ -382,7 +382,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaGetter),
 		meta=(DisplayName="Crafting - Get All Recipe Templates"))
-	static TSet<UMounteaRecipeTemplate*> GetAllRecipeTemplates();
+	static TArray<UMounteaRecipeTemplate*> GetAllRecipeTemplates();
 
 	static FMounteaCraftingResult CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
 	
