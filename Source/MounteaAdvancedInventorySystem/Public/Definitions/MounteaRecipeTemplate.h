@@ -71,8 +71,9 @@ public:
 	 * Some Items grant only temporary knowledge, and if the related item is NOT in the inventory (grimoire, for example),
 	 * then we must not allow this recipe to be visible.
 	 */
-	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
-		meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault),
+		meta=(ForceShowEngineContent, ForceShowPluginContent))
 	TSoftObjectPtr<UMounteaInventoryItemTemplate_Recipe> RecipeSource;
 
 protected:
