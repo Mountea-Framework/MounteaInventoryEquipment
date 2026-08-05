@@ -124,6 +124,11 @@ public:
 		meta=(DisplayName="Select Category"))
 	static bool SelectCategory(
 		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryCategoryWidgetInterface")) UObject* CategoryWidget);
+	
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Category",
+		meta=(MounteaGetter),
+		meta=(DisplayName="Calculate New Active Category"))
+	static FString CalculateNewSelectedCategory(const int32 Offset, const TArray<FString>& Categories, const FString& ActiveCategory, const bool Overscroll = false);
 
 private:
 

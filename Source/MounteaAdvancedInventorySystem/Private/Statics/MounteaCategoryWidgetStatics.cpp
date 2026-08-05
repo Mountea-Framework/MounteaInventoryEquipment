@@ -64,3 +64,20 @@ bool UMounteaCategoryWidgetStatics::SelectCategory(UObject* CategoryWidget)
 		CategoryWidget->Implements<UMounteaAdvancedInventoryCategoryWidgetInterface>() && 
 			IMounteaAdvancedInventoryCategoryWidgetInterface::Execute_SelectCategory(CategoryWidget);
 }
+
+FString UMounteaCategoryWidgetStatics::CalculateNewSelectedCategory(const int32 Offset, const TArray<FString>& Categories,
+	const FString& ActiveCategory, const bool Overscroll)
+{
+	const int32 count = Categories.Num();
+	const int32 activeIndex = Categories.Find(ActiveCategory);
+	if (activeIndex == INDEX_NONE)
+		return ActiveCategory;
+
+	const int32 targetIndex = activeIndex + Offset;
+	if (targetIndex >= count)
+		return Overscroll ? Categories[0] : ActiveCategory;
+	if (targetIndex < 0)
+		return Overscroll ? Categories[count - 1] : ActiveCategory;
+
+	return Categories[targetIndex];
+}
