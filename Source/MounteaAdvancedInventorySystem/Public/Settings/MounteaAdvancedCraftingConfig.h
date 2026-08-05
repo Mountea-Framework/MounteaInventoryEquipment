@@ -26,6 +26,18 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedCraftingConfig : public
 {
 	GENERATED_BODY()
 	
+#if WITH_EDITOR
+public:
+	
+	/**
+	 * Loads all recipes from the system.
+	 */
+	UFUNCTION(CallInEditor,
+		DisplayName="Load All Recipes")
+	virtual void LoadAllRecipes();
+#endif
+	
+	
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Crafting",

@@ -11,3 +11,28 @@
 
 
 #include "Settings/MounteaAdvancedCraftingConfig.h"
+
+#include "Definitions/MounteaRecipeTemplate.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
+
+#if WITH_EDITOR
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/IAssetRegistry.h"
+
+void UMounteaAdvancedCraftingConfig::LoadAllRecipes()
+{
+	const IAssetRegistry& assetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+
+	TArray<FAssetData> recipeAssets;
+	assetRegistry.GetAssetsByClass(UMounteaRecipeTemplate::StaticClass()->GetClassPathName(), recipeAssets, true);
+
+	AllowedRecipes.Empty();
+	for (const FAssetData& recipeAsset : recipeAssets)
+	{
+		if (UMounteaRecipeTemplate* recipe = Cast<UMounteaRecipeTemplate>(recipeAsset.GetAsset()))
+			AllowedRecipes.Add(recipe);
+	}
+
+	MarkPackageDirty();
+}
+#endif
