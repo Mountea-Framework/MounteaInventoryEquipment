@@ -58,6 +58,12 @@ public class MounteaAdvancedInventorySystem : ModuleRules
 			);
 		
 		
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.Add("AssetRegistry");
+		}
+
+
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
