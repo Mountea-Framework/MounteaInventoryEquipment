@@ -296,9 +296,11 @@ TMap<int32, FMounteaTransformedWidgetPositionData> UMounteaInventoryBaseUIStatic
 		FMounteaTransformedWidgetPositionData data;
 		data.Widget = widget;
 		data.Position = ellipseCenter + FVector2D(localX, localY);
-		// Rotate to face outward from the ellipse's center (like spokes on a wheel): 0 at the apex,
-		// tilting further as items approach the two corners, ±90 exactly at the corners themselves.
-		data.RotationAngle = FMath::RadiansToDegrees(FMath::Atan2(localX, -localY));
+		// Rotate to match the ellipse's true tangent at this point (the derivative of the position
+		// formula above, not the position vector itself) — the two only coincide when radiusX == radiusY,
+		// i.e. a circle. Using the position-vector angle here instead visibly misaligns everything
+		// between the apex and the two corners on a non-square canvas.
+		data.RotationAngle = FMath::RadiansToDegrees(FMath::Atan2(radiusY * FMath::Cos(phi), radiusX * FMath::Sin(phi)));
 
 		result.Add(sortedKeys[rank], data);
 	}
