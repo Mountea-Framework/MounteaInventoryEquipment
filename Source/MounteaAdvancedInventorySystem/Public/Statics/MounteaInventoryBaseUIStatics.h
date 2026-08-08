@@ -201,12 +201,13 @@ public:
 	 * Do not feed Position into a Render Transform Translation — that stacks on top of whatever position
 	 * the slot already has.
 	 *
-	 * Children are placed at the interior boundaries of (CurrentChildren.Num() + 1) equal angular gaps along
-	 * the arc, so the margin before the first child and after the last child always matches the spacing
-	 * between children — nobody sits exactly on the arc's own two corner endpoints, even at low counts. A
-	 * single child naturally lands at the arc's apex (top-center of the Canvas), upright. The whole current
-	 * CurrentChildren count always stretches to fill the full arc; it does not reserve fixed-width slots for
-	 * some larger capacity.
+	 * Children are placed at the interior boundaries of (CurrentChildren.Num() + 1) equal HORIZONTAL gaps
+	 * across the Canvas width (not equal steps in angle — cos()/sin() aren't linear, so equal-angle steps
+	 * would bunch children toward the apex on a wide/short canvas instead of spreading them evenly), so the
+	 * margin before the first child, the margin after the last child, and the gaps between children are all
+	 * equal horizontal distances, even at low counts. A single child naturally lands dead-center at the arc's
+	 * apex, upright. The whole current CurrentChildren count always stretches to fill the full Canvas width;
+	 * it does not reserve fixed-width slots for some larger capacity.
 	 *
 	 * @param ParentCanvas Canvas Panel the children are laid out in; also the source of the arc's own geometry.
 	 * @param CurrentChildren Currently present children, keyed by their slot index.
@@ -239,6 +240,11 @@ public:
 	 * @param SizeOverride Optional explicit Canvas size to use instead of reading ParentCanvas's live geometry.
 	 * Use this when ParentCanvas's arranged size can't be trusted (e.g. it's inside an auto-sized ancestor
 	 * and its own reported size is driven by its still-unpositioned children). Leave as (0,0) to auto-read.
+	 * @param bSizeToContent When true (default), also sets each child's Canvas Panel Slot "Size To Content"
+	 * (AutoSize) to true, so the slot always matches that widget's own desired size. A Canvas Panel Slot does
+	 * not size itself to its content unless told to — without this, a slot left at its default/unset size can
+	 * end up effectively zero-sized and invisible even though it's correctly positioned. Set false if you're
+	 * managing each child's slot size yourself elsewhere.
 	 * @return True if the layout was applied to at least one child, false otherwise.
 	 *
 	 * @note ParentCanvas's cached geometry must be valid (call after first frame/tick) unless SizeOverride is used.
@@ -251,7 +257,8 @@ public:
 	static bool ApplyArcWidgetLayout(
 		UCanvasPanel* ParentCanvas,
 		const TMap<int32, UUserWidget*>& CurrentChildren,
-		FVector2D SizeOverride = FVector2D::ZeroVector);
+		FVector2D SizeOverride = FVector2D::ZeroVector,
+		bool bSizeToContent = true);
 
 private:
 

@@ -222,7 +222,8 @@ TMap<int32, FMounteaTransformedWidgetPositionData> UMounteaInventoryBaseUIStatic
 }
 
 bool UMounteaInventoryBaseUIStatics::ApplyArcWidgetLayout(
-	UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren, const FVector2D SizeOverride)
+	UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren, const FVector2D SizeOverride,
+	const bool bSizeToContent)
 {
 	if (!IsValid(ParentCanvas))
 		return false;
@@ -248,6 +249,9 @@ bool UMounteaInventoryBaseUIStatics::ApplyArcWidgetLayout(
 		// swings the widget off the curve it was just placed on.
 		canvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
 		widget->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+
+		if (bSizeToContent)
+			canvasSlot->SetAutoSize(true);
 
 		canvasSlot->SetPosition(pair.Value.Position);
 		widget->SetRenderTransformAngle(pair.Value.RotationAngle);
@@ -285,12 +289,15 @@ TMap<int32, FMounteaTransformedWidgetPositionData> UMounteaInventoryBaseUIStatic
 		if (!IsValid(widget))
 			continue;
 
-		// Divide the arc into (count + 1) equal gaps and place each child at an interior boundary, so the
-		// margin before the first child and after the last child matches the spacing between children —
-		// nobody sits exactly on the arc's own two endpoints. A single child naturally lands at the apex.
-		const float phi = UE_PI - (rank + 1) * (UE_PI / static_cast<float>(count + 1));
+		// Divide the CANVAS WIDTH (not the arc's angle) into (count + 1) equal linear gaps, and place each
+		// child at an interior boundary — so the margin before the first child, the margin after the last
+		// child, and the gaps between children are all equal HORIZONTAL distances. A single child lands
+		// dead-center. Equal steps in angle would NOT give this: cos()/sin() aren't linear, so equal-angle
+		// spacing bunches items toward the apex on a wide/short canvas instead of spreading them evenly.
+		const float localX = ((rank + 1) * CanvasSize.X / static_cast<float>(count + 1)) - radiusX;
+		const float cosPhi = FMath::Clamp(localX / radiusX, -1.f, 1.f);
+		const float phi = FMath::Acos(cosPhi);
 
-		const float localX = radiusX * FMath::Cos(phi);
 		const float localY = -radiusY * FMath::Sin(phi);
 
 		FMounteaTransformedWidgetPositionData data;
