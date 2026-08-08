@@ -14,6 +14,8 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/ActorComponent.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/Widget.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/Actor.h"
@@ -207,4 +209,99 @@ bool UMounteaInventoryBaseUIStatics::AddModalWindow(UObject* Target, UUserWidget
 bool UMounteaInventoryBaseUIStatics::CleanupModalWindow(UObject* Target)
 {
 	return IsValidBaseUIHandler(Target) ? IMounteaInventorySystemWrapperWidgetInterface::Execute_CleanupModalWindow(Target) : false;
+}
+
+TMap<int32, FMounteaTransformedWidgetPositionData> UMounteaInventoryBaseUIStatics::CalculateArcWidgetLayout(
+	UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren, const FVector2D SizeOverride)
+{
+	if (!IsValid(ParentCanvas))
+		return {};
+
+	const FVector2D canvasSize = SizeOverride.IsZero() ? ParentCanvas->GetCachedGeometry().GetLocalSize() : SizeOverride;
+	return CalculateArcWidgetLayoutInternal(canvasSize, CurrentChildren);
+}
+
+bool UMounteaInventoryBaseUIStatics::ApplyArcWidgetLayout(
+	UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren, const FVector2D SizeOverride)
+{
+	if (!IsValid(ParentCanvas))
+		return false;
+
+	const FVector2D canvasSize = SizeOverride.IsZero() ? ParentCanvas->GetCachedGeometry().GetLocalSize() : SizeOverride;
+	const TMap<int32, FMounteaTransformedWidgetPositionData> layout =
+		CalculateArcWidgetLayoutInternal(canvasSize, CurrentChildren);
+
+	bool bAppliedAny = false;
+	for (const TPair<int32, FMounteaTransformedWidgetPositionData>& pair : layout)
+	{
+		UUserWidget* widget = pair.Value.Widget;
+		if (!IsValid(widget))
+			continue;
+
+		UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(widget->Slot);
+		if (!canvasSlot)
+			continue;
+
+		// Position/rotation are computed as the widget's center on the curve. Force both the slot's
+		// anchor and the render pivot to center so they agree — otherwise Position lands the widget's
+		// top-left corner on the curve instead, and rotating around the (different) visual center
+		// swings the widget off the curve it was just placed on.
+		canvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+		widget->SetRenderTransformPivot(FVector2D(0.5f, 0.5f));
+
+		canvasSlot->SetPosition(pair.Value.Position);
+		widget->SetRenderTransformAngle(pair.Value.RotationAngle);
+
+		bAppliedAny = true;
+	}
+
+	return bAppliedAny;
+}
+
+TMap<int32, FMounteaTransformedWidgetPositionData> UMounteaInventoryBaseUIStatics::CalculateArcWidgetLayoutInternal(
+	const FVector2D& CanvasSize, const TMap<int32, UUserWidget*>& CurrentChildren)
+{
+	TMap<int32, FMounteaTransformedWidgetPositionData> result;
+
+	if (CurrentChildren.IsEmpty() || CanvasSize.X <= 0.f || CanvasSize.Y <= 0.f)
+		return result;
+
+	// Semi-ellipse spanning the whole Canvas: center at bottom-middle, horizontal radius reaching the
+	// left/right edges, vertical radius reaching the top edge. Its two ends sit exactly on the Canvas's
+	// own bottom-left/bottom-right corners, and its apex sits exactly on the top-center of the Canvas.
+	const float radiusX = CanvasSize.X * 0.5f;
+	const float radiusY = CanvasSize.Y;
+	const FVector2D ellipseCenter(radiusX, CanvasSize.Y);
+
+	TArray<int32> sortedKeys;
+	CurrentChildren.GetKeys(sortedKeys);
+	sortedKeys.Sort();
+
+	const int32 count = sortedKeys.Num();
+
+	for (int32 rank = 0; rank < count; ++rank)
+	{
+		UUserWidget* widget = CurrentChildren.FindRef(sortedKeys[rank]);
+		if (!IsValid(widget))
+			continue;
+
+		// Divide the arc into (count + 1) equal gaps and place each child at an interior boundary, so the
+		// margin before the first child and after the last child matches the spacing between children —
+		// nobody sits exactly on the arc's own two endpoints. A single child naturally lands at the apex.
+		const float phi = UE_PI - (rank + 1) * (UE_PI / static_cast<float>(count + 1));
+
+		const float localX = radiusX * FMath::Cos(phi);
+		const float localY = -radiusY * FMath::Sin(phi);
+
+		FMounteaTransformedWidgetPositionData data;
+		data.Widget = widget;
+		data.Position = ellipseCenter + FVector2D(localX, localY);
+		// Rotate to face outward from the ellipse's center (like spokes on a wheel): 0 at the apex,
+		// tilting further as items approach the two corners, ±90 exactly at the corners themselves.
+		data.RotationAngle = FMath::RadiansToDegrees(FMath::Atan2(localX, -localY));
+
+		result.Add(sortedKeys[rank], data);
+	}
+
+	return result;
 }
