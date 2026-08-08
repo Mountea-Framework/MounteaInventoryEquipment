@@ -14,6 +14,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
 #include "Definitions/MounteaAdvancedInventoryGlobalUIDataTypes.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
 
 static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UObject* SubCategoryObject = nullptr)
 {
@@ -227,6 +228,14 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 		},
 		{
 			MakeJsonDefinitionInclude(TEXT("InventoryItemChangePayload"))
+		}
+	));
+
+	// CraftingIngredientPayload
+	JsonObjectDefinitions.Add(TEXT("CraftingIngredientPayload"), MakeJsonObjectDefinition(
+		{
+			MakeJsonUObjectDefinitionField(TEXT("ingredientTemplate"), UMounteaInventoryItemTemplate::StaticClass()),
+			MakeJsonStructDefinitionField(TEXT("quantities"), TBaseStructure<FIntPoint>::Get())
 		}
 	));
 }
