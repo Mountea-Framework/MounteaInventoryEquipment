@@ -209,6 +209,34 @@ int32 UMounteaCraftingStatics::GetRecipeCraftableCreations(
 	return maxCraftableCreations ? *maxCraftableCreations : 0;
 }
 
+TMap<UMounteaInventoryItemTemplate*, FIntPoint> UMounteaCraftingStatics::GetIngredientGroupQuantities(
+	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+	const UMounteaRecipeIngredientsList* IngredientGroup,
+	TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache)
+{
+	TMap<UMounteaInventoryItemTemplate*, FIntPoint> result;
+
+	if (!Inventory || !IsValid(IngredientGroup))
+		return result;
+
+	for (const UMounteaRecipeIngredient* ingredient : IngredientGroup->RecipeIngredients)
+	{
+		if (!IsValid(ingredient) || ingredient->RequiredQuantity <= 0)
+			continue;
+
+		UMounteaInventoryItemTemplate* ingredientTemplate = ingredient->IngredientSource.LoadSynchronous();
+		if (!IsValid(ingredientTemplate))
+			continue;
+
+		const int32 ownedQuantity = GetIngredientQuantityCached(Inventory, ingredientTemplate, IngredientQuantityCache);
+
+		FIntPoint& quantities = result.FindOrAdd(ingredientTemplate, FIntPoint(ownedQuantity, 0));
+		quantities.Y += ingredient->RequiredQuantity;
+	}
+
+	return result;
+}
+
 bool UMounteaCraftingStatics::IsIngredientSatisfied(
 	const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
 	const UMounteaRecipeIngredient* Ingredient,
@@ -608,6 +636,41 @@ int32 UMounteaCraftingStatics::GetMaximumCraftableUnits(UObject* CraftingPartici
 	const int32 maxCraftableCreations = GetRecipeCraftableCreations(parentInventory, TemplateToCraft, ingredientQuantityCache);
 
 	return maxCraftableCreations * TemplateToCraft->QuantityPerCreation;
+}
+
+TMap<UMounteaInventoryItemTemplate*, FIntPoint> UMounteaCraftingStatics::GetRecipeIngredientQuantities(UObject* CraftingParticipant, UMounteaRecipeTemplate* TemplateToCraft)
+{
+	TMap<UMounteaInventoryItemTemplate*, FIntPoint> result;
+
+	if (!IsValidRecipeHandler(CraftingParticipant) || !IsValid(TemplateToCraft) || TemplateToCraft->RecipeIngredientOptions.Num() == 0)
+		return result;
+
+	const TScriptInterface<IMounteaAdvancedInventoryInterface> parentInventory = GetParentInventory(CraftingParticipant);
+	if (!parentInventory)
+		return result;
+
+	TMap<UMounteaInventoryItemTemplate*, int32> ingredientQuantityCache;
+
+	const UMounteaRecipeIngredientsList* bestIngredientGroup = nullptr;
+	int32 bestCraftableCreations = -1;
+
+	for (const UMounteaRecipeIngredientsList* ingredientGroup : TemplateToCraft->RecipeIngredientOptions)
+	{
+		if (!IsValid(ingredientGroup))
+			continue;
+
+		const int32 craftableCreations = GetIngredientGroupCraftableCreations(parentInventory, ingredientGroup, ingredientQuantityCache);
+		if (!bestIngredientGroup || craftableCreations > bestCraftableCreations)
+		{
+			bestIngredientGroup = ingredientGroup;
+			bestCraftableCreations = craftableCreations;
+		}
+	}
+
+	if (!bestIngredientGroup)
+		return result;
+
+	return GetIngredientGroupQuantities(parentInventory, bestIngredientGroup, ingredientQuantityCache);
 }
 
 FMounteaCraftingResult UMounteaCraftingStatics::StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)

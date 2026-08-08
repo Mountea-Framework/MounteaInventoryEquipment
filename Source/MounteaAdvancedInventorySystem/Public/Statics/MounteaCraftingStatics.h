@@ -295,6 +295,22 @@ public:
 		UMounteaRecipeTemplate* TemplateToCraft);
 
 	/**
+	 * Returns, for each ingredient of the recipe's most craftable ingredient option, how many the crafting
+	 * participant currently owns and how many are required to craft a single batch (RequiredQuantity) of the recipe.
+	 *
+	 * @param CraftingParticipant Crafting participant whose parent inventory provides the owned ingredient counts.
+	 * @param TemplateToCraft Recipe to evaluate.
+	 * @return Map from ingredient item template to FIntPoint(X=Owned, Y=Required), or empty map when unavailable.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
+		meta=(MounteaGetter, DefaultToSelf="CraftingParticipant"),
+		meta=(Keywords="craft,ingredient,quantity,owned,required,recipe"),
+		meta=(DisplayName="Crafting Participant - Get Recipe Ingredient Quantities"))
+	static TMap<UMounteaInventoryItemTemplate*, FIntPoint> GetRecipeIngredientQuantities(
+		UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedCraftingParticipantInterface")) UObject* CraftingParticipant,
+		UMounteaRecipeTemplate* TemplateToCraft);
+
+	/**
 	 * Starts crafting the specified recipe with the selected ingredient list.
 	 *
 	 * @param Target Crafting participant that performs crafting.
@@ -408,6 +424,11 @@ public:
 	static int32 GetRecipeCraftableCreations(
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
 		const UMounteaRecipeTemplate* Recipe,
+		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+
+	static TMap<UMounteaInventoryItemTemplate*, FIntPoint> GetIngredientGroupQuantities(
+		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
+		const UMounteaRecipeIngredientsList* IngredientGroup,
 		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
 
 	static bool IsIngredientSatisfied(
