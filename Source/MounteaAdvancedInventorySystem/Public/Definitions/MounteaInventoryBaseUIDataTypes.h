@@ -267,6 +267,35 @@ public:
 };
 
 /**
+ * Result of an arc widget layout calculation for a single child widget: the widget itself
+ * plus its computed local position and rotation within the parent Canvas Panel.
+ *
+ * @see UMounteaInventoryBaseUIStatics::CalculateArcWidgetLayout
+ */
+USTRUCT(BlueprintType)
+struct FMounteaTransformedWidgetPositionData
+{
+	GENERATED_BODY()
+
+public:
+
+	// Child widget this transform applies to.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI",
+		meta=(DisplayPriority=0))
+	TObjectPtr<UUserWidget> Widget = nullptr;
+
+	/** Local position within the parent Canvas Panel. Apply via UCanvasPanelSlot::SetPosition. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI",
+		meta=(DisplayPriority=1))
+	FVector2D Position = FVector2D::ZeroVector;
+
+	/** Rotation, in degrees. Apply via UWidget::SetRenderTransformAngle. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI",
+		meta=(DisplayPriority=2))
+	float RotationAngle = 0.f;
+};
+
+/**
  * FInventoryUICustomData stores UI-specific metadata associated with inventory elements.
  *
  * UI systems may read these values to reconstruct state, while gameplay systems should
