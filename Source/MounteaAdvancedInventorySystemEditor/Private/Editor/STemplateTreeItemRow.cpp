@@ -11,13 +11,15 @@
 
 #include "Editor/STemplateTreeItemRow.h"
 
+#include "Styling/MounteaAdvancedInventoryEditorStyle.h"
+
 void STemplateTreeItemRow::Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTableView)
 {
 	STableRow<TSharedPtr<FTemplateTreeItem>>::Construct(
 		STableRow<TSharedPtr<FTemplateTreeItem>>::FArguments()
 		.Padding(InArgs._Padding)
 		//.Style(FAppStyle::Get(), "TableView.NoHoverTableRow")
-		.Style(FAppStyle::Get(), "MAISStyleSet.CustomTableRow")
+		.Style(FMounteaAdvancedInventoryEditorStyle::Get(), "MAISStyleSet.CustomTableRow")
 		.ShowSelection(false)
 		.Content()
 		[

@@ -648,7 +648,7 @@ FReply SMounteaInventoryTemplateEditor::ShowHelpModal()
 							.OnClicked(this, &SMounteaInventoryTemplateEditor::OnCloseHelp)
 							[
 								SNew(SImage)
-								.Image(FAppStyle::GetBrush("MAISStyleSet.Close"))
+								.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Close"))
 								.ColorAndOpacity(FSlateColor::UseForeground())
 								.DesiredSizeOverride(FVector2D(16, 16))
 							]
@@ -1282,7 +1282,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("MAISStyleSet.Save"))
+					.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Save"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			
@@ -1324,7 +1324,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("MAISStyleSet.SaveMultiple"))
+					.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.SaveMultiple"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			
@@ -1379,7 +1379,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("MAISStyleSet.Import"))
+					.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Import"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			
@@ -1424,7 +1424,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("MAISStyleSet.Export"))
+					.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Export"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			
@@ -1479,7 +1479,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("MAISStyleSet.Close"))
+					.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Close"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			
@@ -1534,7 +1534,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 				.Padding(4, 0)
 				[
 					SNew(SImage)
-					.Image(FAppStyle::GetBrush("MAISStyleSet.Tutorial"))
+					.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Tutorial"))
 					.ColorAndOpacity(FSlateColor::UseForeground())
 				]
 			

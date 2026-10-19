@@ -71,6 +71,8 @@
 #include "AssetActions/MounteaAdvancedInventoryRecipeIngredient_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeTemplate_AssetAction.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
+#include "WebBrowserModule.h"
 
 #define LOCTEXT_NAMESPACE "FMounteaAdvancedInventorySystemEditor"
 
@@ -80,6 +82,13 @@ TSharedPtr<SMounteaInventoryTemplateEditor> CurrentEditor;
 
 void FMounteaAdvancedInventorySystemEditor::StartupModule()
 {
+	// Load WebBrowser module - SWebBrowserView only creates a browser if the module is already loaded
+	// (normally done by the WebBrowserWidget plugin, which we do not want to require)
+	{
+		if (!IWebBrowserModule::Get().IsWebModuleAvailable())
+			UE_LOG(LogMounteaAdvancedInventorySystem, Warning, TEXT("[MounteaAdvancedInventorySystemEditor] Web browser module is not available, HTML pages will not render."));
+	}
+
 	// Register Style
 	{
 		FMounteaAdvancedInventoryEditorStyle::Initialize();
@@ -293,71 +302,14 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 			compVisualizer->OnRegister();
 		}
 	}
-	
-	// Validate WebBrowserWidget
-	{
-		if (!FModuleManager::Get().IsModuleLoaded("WebBrowserWidget"))
-		{
-			FText errorTitle = NSLOCTEXT("MounteaInventory", "WebBrowserMissing", "⚠ Missing Plugin ⚠");
-			FText errorMessage = NSLOCTEXT("MounteaInventory", "WebBrowserMissingMessage", 
-				"The 'Web Browser Widget' plugin is required for the Item Template Editor system.\n\n"
-				"We need to enable the plugin and restart the Editor. Sorry for the inconvenience.");
-		
-			FMessageDialog::Open(EAppMsgType::Ok, errorMessage, errorTitle);
-		
-			FString projectFilePath = FPaths::ProjectDir() / FApp::GetProjectName() + TEXT(".uproject");			
-			FString jsonString;
-			if (FFileHelper::LoadFileToString(jsonString, *projectFilePath))
-			{
-				TSharedPtr<FJsonObject> jsonObject;
-				TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(jsonString);
-				
-				if (FJsonSerializer::Deserialize(reader, jsonObject) && jsonObject.IsValid())
-				{
-					TArray<TSharedPtr<FJsonValue>> pluginsArray;
-					if (jsonObject->HasField(TEXT("Plugins")))
-						pluginsArray = jsonObject->GetArrayField(TEXT("Plugins"));
-					
-					bool bExists = false;
-					for (const TSharedPtr<FJsonValue>& plugin : pluginsArray)
-					{
-						TSharedPtr<FJsonObject> pluginObj = plugin->AsObject();
-						if (pluginObj.IsValid() && pluginObj->GetStringField(TEXT("Name")) == TEXT("WebBrowserWidget"))
-						{
-							pluginObj->SetBoolField(TEXT("Enabled"), true);
-							bExists = true;
-							break;
-						}
-					}
-					
-					if (!bExists)
-					{
-						TSharedPtr<FJsonObject> newPlugin = MakeShareable(new FJsonObject());
-						newPlugin->SetStringField(TEXT("Name"), TEXT("WebBrowserWidget"));
-						newPlugin->SetBoolField(TEXT("Enabled"), true);
-						pluginsArray.Add(MakeShareable(new FJsonValueObject(newPlugin)));
-					}
-					
-					jsonObject->SetArrayField(TEXT("Plugins"), pluginsArray);
-					
-					FString outputString;
-					TSharedRef<TJsonWriter<>> writer = TJsonWriterFactory<>::Create(&outputString);
-					if (FJsonSerializer::Serialize(jsonObject.ToSharedRef(), writer))
-					{
-						if (FFileHelper::SaveStringToFile(outputString, *projectFilePath))
-							FUnrealEdMisc::Get().RestartEditor(false);
-					}
-				}
-			}
-		}
-	}
 }
 
 void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 {
 	// Thumbnails and Icons
 	{
-		FSlateStyleRegistry::UnRegisterSlateStyle(AdvancedInventorySet->GetStyleSetName());
+		if (AdvancedInventorySet.IsValid())
+			FSlateStyleRegistry::UnRegisterSlateStyle(AdvancedInventorySet->GetStyleSetName());
 	}
 
 	// Asset Types Cleanup
@@ -457,7 +409,7 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 			newEditor
 		];
 	
-	newTab->SetTabIcon(FAppStyle::GetBrush("MAISStyleSet.TemplatesEditor"));
+	newTab->SetTabIcon(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.TemplatesEditor"));
 
 	return newTab;
 }

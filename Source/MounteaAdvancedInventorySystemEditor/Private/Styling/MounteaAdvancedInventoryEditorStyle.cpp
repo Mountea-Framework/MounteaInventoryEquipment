@@ -178,12 +178,14 @@ void FMounteaAdvancedInventoryEditorStyle::Initialize()
 		FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());
 
 		StyleSet->SetParentStyleName(FAppStyle::GetAppStyleSetName());
-		FAppStyle::SetAppStyleSet(*StyleSet);
 	}
 }
 
 void FMounteaAdvancedInventoryEditorStyle::Shutdown()
 {
+	if (!StyleSet.IsValid())
+		return;
+
 	FSlateStyleRegistry::UnRegisterSlateStyle(*StyleSet.Get());
 	ensure(StyleSet.IsUnique());
 	StyleSet.Reset();
