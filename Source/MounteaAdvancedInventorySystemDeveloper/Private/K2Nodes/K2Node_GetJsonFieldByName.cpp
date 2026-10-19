@@ -17,6 +17,7 @@
 #include "K2Node_CallFunction.h"
 #include "KismetCompiler.h"
 #include "Statics/MounteaAdvancedInventoryJsonStatics.h"
+#include "K2Nodes/MounteaAdvancedInventoryK2NodeWidget.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "K2Node_GetJsonFieldByName"
@@ -262,6 +263,11 @@ FSlateIcon UK2Node_GetJsonFieldByName::GetIconAndTint(FLinearColor& OutColor) co
 {
 	OutColor = FLinearColor(.823f, .823f, .823f);
 	return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_SetPropertyByName.Small");
+}
+
+TSharedPtr<SGraphNode> UK2Node_GetJsonFieldByName::CreateVisualWidget()
+{
+	return MounteaAdvancedInventoryK2NodeWidget::Create(this);
 }
 
 FName UK2Node_GetJsonFieldByName::GetCornerIcon() const

@@ -46,6 +46,7 @@ public:
 	virtual FText GetTooltipText() const override;
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FName GetCornerIcon() const override;
+	virtual TSharedPtr<SGraphNode> CreateVisualWidget() override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& outColor) const override;
 	virtual FText GetFunctionContextString() const override;
 

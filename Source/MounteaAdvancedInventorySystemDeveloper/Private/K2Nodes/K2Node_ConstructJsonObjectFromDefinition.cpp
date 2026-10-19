@@ -20,6 +20,7 @@
 #include "KismetCompiler.h"
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
 #include "Statics/MounteaAdvancedInventoryJsonStatics.h"
+#include "K2Nodes/MounteaAdvancedInventoryK2NodeWidget.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "K2Node_ConstructJsonObjectFromDefinition"
@@ -577,6 +578,11 @@ FSlateIcon UK2Node_ConstructJsonObjectFromDefinition::GetIconAndTint(FLinearColo
 {
 	OutColor = FLinearColor(.823f, .823f, .823f);
 	return FSlateIcon(FMounteaAdvancedInventoryDeveloperStyle::GetAppStyleSetName(), "MAISStyleSet.K2Node_SetPropertyByName.Small");
+}
+
+TSharedPtr<SGraphNode> UK2Node_ConstructJsonObjectFromDefinition::CreateVisualWidget()
+{
+	return MounteaAdvancedInventoryK2NodeWidget::Create(this);
 }
 
 FName UK2Node_ConstructJsonObjectFromDefinition::GetCornerIcon() const

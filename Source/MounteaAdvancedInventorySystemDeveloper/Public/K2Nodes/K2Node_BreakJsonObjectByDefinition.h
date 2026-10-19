@@ -42,6 +42,7 @@ public:
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
 	virtual FName GetCornerIcon() const override;
+	virtual TSharedPtr<SGraphNode> CreateVisualWidget() override;
 	virtual bool ShowVisualWarning() const override;
 	virtual FText GetMenuCategory() const override;
 	virtual FString GetDocumentationLink() const override { return TEXT("https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/K2Nodes/"); };

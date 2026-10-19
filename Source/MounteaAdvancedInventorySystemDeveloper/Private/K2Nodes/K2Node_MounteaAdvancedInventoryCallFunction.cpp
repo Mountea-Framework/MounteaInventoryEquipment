@@ -14,6 +14,7 @@
 #include "BlueprintNodeSpawner.h"
 #include "EdGraphSchema_K2.h"
 #include "GameplayTagContainer.h"
+#include "K2Nodes/MounteaAdvancedInventoryK2NodeWidget.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryCallFunction"
@@ -342,6 +343,11 @@ FLinearColor UK2Node_MounteaAdvancedInventoryCallFunction::GetNodeTitleColor() c
 		default:
 			return Super::GetNodeTitleColor();
 	}
+}
+
+TSharedPtr<SGraphNode> UK2Node_MounteaAdvancedInventoryCallFunction::CreateVisualWidget()
+{
+	return MounteaAdvancedInventoryK2NodeWidget::Create(this);
 }
 
 FName UK2Node_MounteaAdvancedInventoryCallFunction::GetCornerIcon() const

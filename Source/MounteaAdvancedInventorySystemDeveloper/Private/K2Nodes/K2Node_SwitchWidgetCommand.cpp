@@ -17,6 +17,7 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "K2Nodes/MounteaAdvancedInventoryK2NodeWidget.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "K2Node_SwitchWidgetCommand"
@@ -261,6 +262,11 @@ void UK2Node_SwitchWidgetCommand::GetMenuActions(FBlueprintActionDatabaseRegistr
 FLinearColor UK2Node_SwitchWidgetCommand::GetNodeTitleColor() const
 {
 	return FLinearColor::White;
+}
+
+TSharedPtr<SGraphNode> UK2Node_SwitchWidgetCommand::CreateVisualWidget()
+{
+	return MounteaAdvancedInventoryK2NodeWidget::Create(this);
 }
 
 FName UK2Node_SwitchWidgetCommand::GetCornerIcon() const

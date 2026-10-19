@@ -52,6 +52,7 @@ public:
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
 	virtual FLinearColor GetNodeTitleColor() const override;
 	virtual FName GetCornerIcon() const override;
+	virtual TSharedPtr<SGraphNode> CreateVisualWidget() override;
 	virtual FSlateIcon GetIconAndTint(FLinearColor& OutColor) const override;
 	virtual bool SupportsAddPinButton() const override { return false; };
 	virtual bool CanEverRemoveExecutionPin() const override { return false; };

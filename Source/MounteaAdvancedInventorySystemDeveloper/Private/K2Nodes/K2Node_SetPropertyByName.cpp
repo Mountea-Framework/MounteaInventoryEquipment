@@ -16,6 +16,7 @@
 #include "K2Node_CallFunction.h"
 #include "KismetCompiler.h"
 #include "Statics/MounteaInventorySystemStatics.h"
+#include "K2Nodes/MounteaAdvancedInventoryK2NodeWidget.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #define LOCTEXT_NAMESPACE "K2Node_SetPropertyByName"
@@ -284,6 +285,11 @@ FText UK2Node_SetPropertyByName::GetVisualWarningTooltipText() const
 FText UK2Node_SetPropertyByName::GetToolTipHeading() const
 {
 	return LOCTEXT("SetPropertyByName_ToolTipHeading", "Mountea Advanced Inventory System");
+}
+
+TSharedPtr<SGraphNode> UK2Node_SetPropertyByName::CreateVisualWidget()
+{
+	return MounteaAdvancedInventoryK2NodeWidget::Create(this);
 }
 
 FName UK2Node_SetPropertyByName::GetCornerIcon() const

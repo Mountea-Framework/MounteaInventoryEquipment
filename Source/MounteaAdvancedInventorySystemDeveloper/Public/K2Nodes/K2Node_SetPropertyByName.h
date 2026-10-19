@@ -41,6 +41,7 @@ public:
 	virtual FText GetVisualWarningTooltipText() const override;
 	virtual FText GetToolTipHeading() const override;
 	virtual FName GetCornerIcon() const override;
+	virtual TSharedPtr<SGraphNode> CreateVisualWidget() override;
 	virtual bool ShowVisualWarning() const override { return true; };
 	virtual FText GetMenuCategory() const override;
 	virtual FString GetDocumentationLink() const override { return TEXT("https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/K2Nodes/"); };

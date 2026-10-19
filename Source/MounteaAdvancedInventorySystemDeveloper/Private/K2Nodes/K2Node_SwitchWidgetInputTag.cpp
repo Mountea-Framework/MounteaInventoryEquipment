@@ -17,6 +17,7 @@
 #include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
+#include "K2Nodes/MounteaAdvancedInventoryK2NodeWidget.h"
 #include "Styling/MounteaAdvancedInventoryDeveloperStyle.h"
 
 #if WITH_EDITOR
@@ -246,6 +247,11 @@ void UK2Node_SwitchWidgetInputTag::GetMenuActions(FBlueprintActionDatabaseRegist
 FLinearColor UK2Node_SwitchWidgetInputTag::GetNodeTitleColor() const
 {
 	return FLinearColor::White;
+}
+
+TSharedPtr<SGraphNode> UK2Node_SwitchWidgetInputTag::CreateVisualWidget()
+{
+	return MounteaAdvancedInventoryK2NodeWidget::Create(this);
 }
 
 FName UK2Node_SwitchWidgetInputTag::GetCornerIcon() const
