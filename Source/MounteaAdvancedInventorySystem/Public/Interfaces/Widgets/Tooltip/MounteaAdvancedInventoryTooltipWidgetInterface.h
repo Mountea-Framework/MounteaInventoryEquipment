@@ -39,4 +39,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Tooltip")
 	void SetTooltipItem(const FInventorySlot& SlotId);
 	virtual void SetTooltipItem_Implementation(const FInventorySlot& SlotId) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Tooltip")
+	void SetTooltipHeader(const FText& HeaderText);
+	virtual void SetTooltipHeader_Implementation(const FText& HeaderText) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Tooltip")
+	void SetTooltipBody(const FText& BodyText);
+	virtual void SetTooltipBody_Implementation(const FText& BodyText) = 0;
 };

@@ -978,6 +978,18 @@ void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipItem(UWidget* Target, con
 		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipItem(Target, SourceSlot);
 }
 
+void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipHeader(UWidget* Target, const FText& TooltipHeader)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryTooltipWidgetInterface>())
+		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipHeader(Target, TooltipHeader);
+}
+
+void UMounteaInventoryUIStatics::ItemTooltip_SetTooltipBody(UWidget* Target, const FText& TooltipBody)
+{
+	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryTooltipWidgetInterface>())
+		IMounteaAdvancedInventoryTooltipWidgetInterface::Execute_SetTooltipBody(Target, TooltipBody);
+}
+
 FInventorySlot UMounteaInventoryUIStatics::MakeInventoryGridSlotData(const FInventorySlot& SlotData)
 {
 	return FMounteaInventoryGridSlot(SlotData);

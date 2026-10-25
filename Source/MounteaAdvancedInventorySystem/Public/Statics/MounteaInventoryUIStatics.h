@@ -16,6 +16,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryUIStatics.generated.h"
 
+struct FInventorySlot;
 class IMounteaAdvancedCraftingParticipantInterface;
 enum class EMounteaWidgetInputPhase : uint8;
 enum class ECommonInputType : uint8;
@@ -1339,6 +1340,35 @@ public:
 		meta=(MounteaSetter),
 		DisplayName="Item Tooltip - Set Tooltip Item")
 	static void ItemTooltip_SetTooltipItem(UWidget* Target, const FInventorySlot& SourceSlot);
+
+	/**
+	 * Sets the tooltip header for the specified widget if it implements the Mountea Advanced Inventory Tooltip Widget Interface.
+	 *
+	 * This function verifies that the provided widget is valid and implements the required interface
+	 * before executing the SetTooltipHeader method on the interface.
+	 *
+	 * @param Target The widget that will have its tooltip header set.
+	 * @param TooltipHeader The text to set as the tooltip header of the target widget.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemTooltip",
+		meta=(MounteaSetter),
+		DisplayName="Item Tooltip - Set Tooltip Header")
+	static void ItemTooltip_SetTooltipHeader(UWidget* Target, const FText& TooltipHeader);
+
+	/**
+	 * Updates the tooltip body of a target widget implementing the tooltip interface.
+	 *
+	 * This function checks if the provided widget is valid and implements the
+	 * UMounteaAdvancedInventoryTooltipWidgetInterface before invoking the corresponding
+	 * interface function to set the tooltip body text.
+	 *
+	 * @param Target The widget to which the tooltip body will be applied. Must be valid and implement the required interface.
+	 * @param TooltipBody The text to be displayed as the body of the tooltip.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|ItemTooltip",
+		meta=(MounteaSetter),
+		DisplayName="Item Tooltip - Set Tooltip Body")
+	static void ItemTooltip_SetTooltipBody(UWidget* Target, const FText& TooltipBody);
 	
 #pragma endregion
 	
