@@ -350,7 +350,7 @@ FGuid UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(co
         return FGuid();
 
     FString guidString;
-    if (jsonObject->TryGetStringField(TEXT("Guid"), guidString))
+    if (jsonObject->TryGetStringField(TEXT("guid"), guidString))
     {
         FGuid guid;
         if (FGuid::Parse(guidString, guid))
