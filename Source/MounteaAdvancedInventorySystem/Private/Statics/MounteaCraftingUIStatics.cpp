@@ -173,7 +173,7 @@ bool UMounteaCraftingUIStatics::CraftingCategorySelected(UObject* Target,const F
 	return IsValidCraftingUIHandler(Target) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_CraftingCategorySelected(Target, SelectedCategoryId) : false;
 }
 
-FGuid UMounteaCraftingUIStatics::GetActiveCraftableItemGuid_Implementation(UObject* Target)
+FGuid UMounteaCraftingUIStatics::GetActiveCraftableItemGuid(UObject* Target)
 {
 	return IsValidCraftingUIHandler(Target) ? IMounteaAdvancedCraftingParticipantUIInterface::Execute_GetActiveCraftableItemGuid(Target) : FGuid();
 }

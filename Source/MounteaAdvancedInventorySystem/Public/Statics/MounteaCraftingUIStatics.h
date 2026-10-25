@@ -245,8 +245,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|UI",
 		meta=(MounteaGetter),
-		meta=(DisplayName="Crafting Participant UI - Get Active Craftable Item Guid"))
-	static FGuid GetActiveCraftableItemGuid_Implementation(UObject* Target);
+		meta=(DisplayName="Crafting Participant UI - Get Active Craftable Item Guid"),
+		meta=(Keywords="active,selected,recipe"))
+	static FGuid GetActiveCraftableItemGuid(UObject* Target);
 	
 	/**
 	 * Handles the selection of a Craftable item in the Crafting UI.
