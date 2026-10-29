@@ -42,7 +42,6 @@ public:
 	static FString ExtractNameFromJson(const FString& JsonString);
 	
 	static bool ParseSingleTemplateJson(const FString& JsonString, UMounteaInventoryItemTemplate* Template, FString& OutErrorMessage);
-	static bool ParseMultipleTemplatesJson(const FString& JsonString, TArray<FString>& OutItemJsons, FString& OutErrorMessage);
 
 	// ZIP-format import (web companion export)
 	static bool ParseItemJsonFromZip(const TArray<uint8>& ZipBytes, FString& OutItemJson, FString& OutErrorMessage);

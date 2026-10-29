@@ -24,6 +24,7 @@
 #include "ObjectTools.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
+#include "Helpers/MounteaInventoryZipHelper.h"
 
 namespace
 {
@@ -86,8 +87,8 @@ bool FMounteaImportE2EItemsTest::RunTest(const FString& Parameters)
 	const FGuid itemGuid = FGuid::NewGuid();
 	const FString itemName = FString::Printf(TEXT("TestItem%s"), *itemGuid.ToString(EGuidFormats::Digits));
 	const FString dir = FPaths::ProjectSavedDir() / TEXT("Tests") / TEXT("MounteaInventoryTests") / itemGuid.ToString(EGuidFormats::Digits);
-	// Non-zip, non-.mnteaitems file takes the importer's single-item raw-JSON path.
-	const FString path = dir / TEXT("item.json");
+	// A single item uses the same ZIP transport as recipes and loadouts.
+	const FString path = dir / TEXT("item.mnteaitem");
 
 	if (UMounteaAdvancedInventoryItemTemplateEditorStatics::FindTemplateByGuid(
 			UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates(), itemGuid))
@@ -96,9 +97,13 @@ bool FMounteaImportE2EItemsTest::RunTest(const FString& Parameters)
 		return true;
 	}
 
-	FFileHelper::SaveStringToFile(
-		FString::Printf(TEXT("{\"guid\":\"%s\",\"displayName\":\"%s\"}"), *itemGuid.ToString(EGuidFormats::DigitsWithHyphens), *itemName),
-		*path);
+	const FString json = FString::Printf(TEXT("{\"guid\":\"%s\",\"displayName\":\"%s\"}"), *itemGuid.ToString(EGuidFormats::DigitsWithHyphens), *itemName);
+	TArray<uint8> archive;
+	FString archiveError;
+	if (!TestTrue(TEXT("Build canonical item ZIP"), FMounteaInventoryZipHelper::BuildEntityArchive(TEXT("item.json"), json, {}, archive, archiveError))) return false;
+	IFileManager::Get().MakeDirectory(*dir, true);
+	if (!TestTrue(TEXT("Save canonical item ZIP"), FFileHelper::SaveArrayToFile(archive, *path))) return false;
+
 
 	const FString folder = MakeTestFolder();
 
@@ -123,7 +128,7 @@ bool FMounteaImportE2EItemsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-// Non-zip content falls to the legacy JSON path, where ParseMultipleTemplatesJson fails -> returns false, nothing written.
+// Non-ZIP content is rejected without creating assets.
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaImportE2ECorruptTest,
 	"Mountea.InventorySystemEditor.ImportEndToEnd.CorruptFile",
 	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
@@ -144,6 +149,62 @@ bool FMounteaImportE2ECorruptTest::RunTest(const FString& Parameters)
 	IFileManager::Get().DeleteDirectory(*FPaths::GetPath(badFile), false, true);
 	CleanupFolder(*this, folder);
 	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaItemExportRoundTripTest,
+    "Mountea.InventorySystemEditor.ImportEndToEnd.ItemsExportRoundTrip",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+bool FMounteaItemExportRoundTripTest::RunTest(const FString& Parameters)
+{
+    using FItems = UMounteaAdvancedInventoryItemTemplateEditorStatics;
+    auto* first = NewObject<UMounteaInventoryItemTemplate>();
+    auto* second = NewObject<UMounteaInventoryItemTemplate>();
+    first->Guid = FGuid::NewGuid(); second->Guid = FGuid::NewGuid();
+    first->DisplayName = second->DisplayName = FText::FromString(TEXT("Shared item export label"));
+    const auto existing = FItems::LoadAllExistingTemplates();
+    if (FItems::FindTemplateByGuid(existing, first->Guid) || FItems::FindTemplateByGuid(existing, second->Guid))
+    { AddError(TEXT("Fresh test GUID collides with an existing item")); return false; }
+    const FString folder = MakeTestFolder();
+    const FString directory = FPaths::ProjectSavedDir() / TEXT("Automation/ItemExport") / FGuid::NewGuid().ToString(EGuidFormats::Digits);
+    IFileManager::Get().MakeDirectory(*directory, true);
+    const FString single = directory / TEXT("single.mnteaitem");
+    const FString bundle = directory / TEXT("bundle.mnteaitems");
+    FString error;
+    TArray<TArray<uint8>> archives;
+    if (TestTrue(TEXT("Export canonical single item"), FItems::ExportTemplatesToFilePath({first}, single, error)) &&
+        TestTrue(TEXT("Read canonical single item"), FMounteaInventoryZipHelper::ReadEntityArchives(single, TEXT("mnteaitem"), TEXT("mnteaitems"), archives, error)))
+    {
+        TestEqual(TEXT("One item archive"), archives.Num(), 1);
+        FString json;
+        if (archives.Num() == 1 && TestTrue(TEXT("Extract item JSON"), FItems::ParseItemJsonFromZip(archives[0], json, error)))
+        {
+            auto* restored = NewObject<UMounteaInventoryItemTemplate>();
+            TestTrue(TEXT("Deserialize exported item"), FItems::ParseSingleTemplateJson(json, restored, error));
+            TestEqual(TEXT("Item identity retained"), restored->Guid, first->Guid);
+            TestEqual(TEXT("Item display name retained"), restored->DisplayName.ToString(), first->DisplayName.ToString());
+        }
+    }
+    if (TestTrue(TEXT("Export canonical item bundle"), FItems::ExportTemplatesToFilePath({first, second}, bundle, error)))
+    {
+        TestFalse(TEXT("Duplicate primary item GUID selection rejected"), FItems::ExportTemplatesToFilePath({first, first}, bundle, error));
+        TestTrue(TEXT("Failed export leaves bundle readable"), FMounteaInventoryZipHelper::ReadEntityArchives(bundle, TEXT("mnteaitem"), TEXT("mnteaitems"), archives, error));
+        TestEqual(TEXT("Both original item archives preserved"), archives.Num(), 2);
+        TArray<UMounteaInventoryItemTemplate*> imported {first};
+        if (TestTrue(TEXT("Import exported items"), FItems::ImportTemplatesFromFilePath(bundle, folder, imported, error)))
+        {
+            TestEqual(TEXT("Import outputs contain only this operation"), imported.Num(), 2);
+            TestEqual(TEXT("Same display names create two assets"), GetAssetsUnder(folder).Num(), 2);
+            if (imported.Num() == 2) TestTrue(TEXT("Unique packages prevent display-name overwrite"), imported[0]->GetOutermost() != imported[1]->GetOutermost());
+            TArray<UMounteaInventoryItemTemplate*> reimported;
+            TestTrue(TEXT("Reimport exported item bundle"), FItems::ImportTemplatesFromFilePath(bundle, folder, reimported, error));
+            TestEqual(TEXT("Reimport creates no duplicates"), GetAssetsUnder(folder).Num(), 2);
+            for (const auto* item : reimported) TestTrue(TEXT("Reimport reuses the existing object"), imported.Contains(item));
+        }
+    }
+    CleanupFolder(*this, folder);
+    IFileManager::Get().Delete(*single); IFileManager::Get().Delete(*bundle);
+    IFileManager::Get().DeleteDirectory(*directory);
+    return true;
 }
 
 #endif
