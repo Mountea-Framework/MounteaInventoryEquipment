@@ -16,6 +16,7 @@
 #include "Definitions/MounteaCraftingBaseDataTypes.h"
 #include "Definitions/MounteaCraftingBaseEnums.h"
 #include "Definitions/MounteaRecipeTemplate.h"
+#include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Interfaces/Crafting/MounteaAdvancedCraftingStationInterface.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
@@ -113,7 +114,7 @@ UMounteaRecipeTemplate* UMounteaCraftingParticipantComponent::GetRecipe_Implemen
 
 bool UMounteaCraftingParticipantComponent::IsRecipeKnown_Implementation(UMounteaRecipeTemplate* RecipeTemplate) const
 {
-	return KnownRecipes.Contains(RecipeTemplate->RecipeGuid);
+	return IsValid(RecipeTemplate) && KnownRecipes.Contains(RecipeTemplate->RecipeGuid);
 }
 
 bool UMounteaCraftingParticipantComponent::LearnRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate)
@@ -155,20 +156,31 @@ bool UMounteaCraftingParticipantComponent::ForgetRecipe_Implementation(UMounteaR
 
 bool UMounteaCraftingParticipantComponent::IsCraftingPossible_Implementation(UMounteaRecipeTemplate* TemplateToCraft) const
 {
-	return Execute_IsRecipeKnown(this, TemplateToCraft);
+	if (!IsValid(TemplateToCraft) || TemplateToCraft->QuantityPerCreation <= 0
+		|| !IsValid(TemplateToCraft->ResultItem.LoadSynchronous())
+		|| !Execute_IsRecipeKnown(this, TemplateToCraft) || !RelatedInventory)
+		return false;
+
+	if (TemplateToCraft->RequiredCraftingPlace.IsValid()
+		&& (!UMounteaCraftingStatics::IsValidCraftingPlace(CraftingStation.GetObject())
+			|| TemplateToCraft->RequiredCraftingPlace != UMounteaCraftingStatics::GetCraftingPlaceType(CraftingStation.GetObject())))
+		return false;
+
+	TMap<UMounteaInventoryItemTemplate*, int32> ingredientQuantityCache;
+	return UMounteaCraftingStatics::IsRecipeSatisfiedByIngredients(RelatedInventory, TemplateToCraft, ingredientQuantityCache);
 }
 
-FMounteaCraftingResult UMounteaCraftingParticipantComponent::StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)
+FMounteaCraftingResult UMounteaCraftingParticipantComponent::StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft)
 {
 	if (!GetOwner()->HasAuthority())
 	{
-		Server_StartCrafting(TemplateToCraft, Ingredients);
+		Server_StartCrafting(TemplateToCraft);
 		return FMounteaCraftingResult{};
 	}
 
 	OnCraftingStarted.Broadcast(CraftingStation);
 	PostCraftingStarted_Client(CraftingStation);
-	FMounteaCraftingResult result = UMounteaCraftingStatics::CraftItem(this, TemplateToCraft, Ingredients);
+	FMounteaCraftingResult result = UMounteaCraftingStatics::CraftItem(this, TemplateToCraft);
 	
 	// TODO: Add possible delay IF crafting recipe takes time
 	
@@ -281,9 +293,9 @@ void UMounteaCraftingParticipantComponent::Server_ForgetRecipe_Implementation(UM
 	Execute_ForgetRecipe(this, RecipeTemplate);
 }
 
-void UMounteaCraftingParticipantComponent::Server_StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients)
+void UMounteaCraftingParticipantComponent::Server_StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft)
 {
-	Execute_StartCrafting(this, TemplateToCraft, Ingredients);
+	Execute_StartCrafting(this, TemplateToCraft);
 }
 
 void UMounteaCraftingParticipantComponent::Server_StartUsingCraftingStation_Implementation(const TScriptInterface<IMounteaAdvancedCraftingStationInterface>& Station)

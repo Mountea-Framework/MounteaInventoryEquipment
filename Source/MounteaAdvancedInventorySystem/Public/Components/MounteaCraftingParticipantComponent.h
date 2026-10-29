@@ -62,7 +62,7 @@ public:
 	virtual bool LearnRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate) override;
 	virtual bool ForgetRecipe_Implementation(UMounteaRecipeTemplate* RecipeTemplate) override;
 	virtual bool IsCraftingPossible_Implementation(UMounteaRecipeTemplate* TemplateToCraft) const override;
-	virtual FMounteaCraftingResult StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients) override;
+	virtual FMounteaCraftingResult StartCrafting_Implementation(UMounteaRecipeTemplate* TemplateToCraft) override;
 	virtual void StopCrafting_Implementation() override;
 	virtual TScriptInterface<IMounteaAdvancedInventoryInterface> GetParentInventory_Implementation() const override
 	{
@@ -138,7 +138,7 @@ protected:
 	void Server_ForgetRecipe(UMounteaRecipeTemplate* RecipeTemplate);
 
 	UFUNCTION(Server, Reliable)
-	void Server_StartCrafting(UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	void Server_StartCrafting(UMounteaRecipeTemplate* TemplateToCraft);
 	
 	UFUNCTION(Server, Reliable)
 	void Server_StopCrafting();

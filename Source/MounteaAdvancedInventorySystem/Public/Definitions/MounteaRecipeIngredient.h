@@ -20,7 +20,7 @@ class UMounteaInventoryItemTemplate;
 /**
  * 
  */
-UCLASS(ClassGroup=(Mountea), BlueprintType, DefaultToInstanced, EditInlineNew,
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DefaultToInstanced, EditInlineNew,
 	AutoExpandCategories=("Mountea"),
 	HideCategories=("Cooking","Collision","Private"),
 	meta=(DisplayName="Mountea Inventory Recipe Ingredient"))
@@ -30,11 +30,11 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaRecipeIngredient : public UPrim
 	
 public:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
 	TSoftObjectPtr<UMounteaInventoryItemTemplate> IngredientSource = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration",
-		meta=(NoResetToDefault))
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
+		meta=(NoResetToDefault, ClampMin="1", UIMin="1"))
 	int32 RequiredQuantity = 1;
 };

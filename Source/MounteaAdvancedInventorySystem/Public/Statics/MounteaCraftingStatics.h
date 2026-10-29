@@ -19,8 +19,6 @@
 #include "MounteaCraftingStatics.generated.h"
 
 class UMounteaRecipeTemplate;
-class UMounteaRecipeIngredientsList;
-class UMounteaRecipeIngredient;
 class UMounteaInventoryItemTemplate;
 class UMounteaInventoryItemTemplate_Recipe;
 class IMounteaAdvancedCraftingParticipantInterface;
@@ -280,7 +278,6 @@ public:
 
 	/**
 	 * Calculates how many result item units can be crafted from the participant's available ingredients.
-	 * If the recipe contains multiple ingredient options, the highest craftable option is returned.
 	 *
 	 * @param CraftingParticipant Crafting participant whose parent inventory provides the ingredients.
 	 * @param TemplateToCraft Recipe to evaluate.
@@ -295,7 +292,7 @@ public:
 		UMounteaRecipeTemplate* TemplateToCraft);
 
 	/**
-	 * Returns, for each ingredient of the recipe's most craftable ingredient option, how many the crafting
+	 * Returns, for each ingredient required by the recipe, how many the crafting
 	 * participant currently owns and how many are required to craft a single batch (RequiredQuantity) of the recipe.
 	 *
 	 * @param CraftingParticipant Crafting participant whose parent inventory provides the owned ingredient counts.
@@ -311,18 +308,17 @@ public:
 		UMounteaRecipeTemplate* TemplateToCraft);
 
 	/**
-	 * Starts crafting the specified recipe with the selected ingredient list.
+	 * Starts crafting the specified recipe using its ingredient requirements.
 	 *
 	 * @param Target Crafting participant that performs crafting.
 	 * @param TemplateToCraft Recipe to craft.
-	 * @param Ingredients Ingredient option to consume.
 	 * @return Crafting result describing whether the operation succeeded.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Mountea|Inventory & Equipment|Crafting|Participant",
 		meta=(MounteaSetter),
 		meta=(DefaultToSelf="Target"),
 		meta=(DisplayName="Crafting Participant - Start Crafting"))
-	static FMounteaCraftingResult StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	static FMounteaCraftingResult StartCrafting(UObject* Target, UMounteaRecipeTemplate* TemplateToCraft);
 
 	/**
 	 * Returns the inventory used by the crafting participant.
@@ -400,7 +396,7 @@ public:
 		meta=(DisplayName="Crafting - Get All Recipe Templates"))
 	static TArray<UMounteaRecipeTemplate*> GetAllRecipeTemplates();
 
-	static FMounteaCraftingResult CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, const UMounteaRecipeTemplate* TemplateToCraft, UMounteaRecipeIngredientsList* Ingredients);
+	static FMounteaCraftingResult CraftItem(const TScriptInterface<IMounteaAdvancedCraftingParticipantInterface>& Target, UMounteaRecipeTemplate* TemplateToCraft);
 	
 	static bool HasInventoryItemForRecipeSourceCached(
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
@@ -416,29 +412,14 @@ public:
 		UMounteaInventoryItemTemplate* IngredientTemplate,
 		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
 
-	static int32 GetIngredientGroupCraftableCreations(
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
-		const UMounteaRecipeIngredientsList* IngredientGroup,
-		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
+	/** Aggregates duplicate rows; empty, invalid, nonpositive or overflowing requirements fail. */
+	static bool GetRecipeRequiredQuantities(
+		const UMounteaRecipeTemplate* Recipe,
+		TMap<UMounteaInventoryItemTemplate*, int32>& OutRequiredQuantities);
 
 	static int32 GetRecipeCraftableCreations(
 		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
 		const UMounteaRecipeTemplate* Recipe,
-		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
-
-	static TMap<UMounteaInventoryItemTemplate*, FIntPoint> GetIngredientGroupQuantities(
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
-		const UMounteaRecipeIngredientsList* IngredientGroup,
-		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
-
-	static bool IsIngredientSatisfied(
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
-		const UMounteaRecipeIngredient* Ingredient,
-		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
-
-	static bool IsIngredientGroupSatisfied(
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& Inventory,
-		const UMounteaRecipeIngredientsList* IngredientGroup,
 		TMap<UMounteaInventoryItemTemplate*, int32>& IngredientQuantityCache);
 
 	static bool IsRecipeSatisfiedByIngredients(

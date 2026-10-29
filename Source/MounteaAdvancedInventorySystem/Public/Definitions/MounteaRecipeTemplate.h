@@ -14,9 +14,9 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
+#include "Definitions/MounteaRecipeIngredient.h"
 #include "MounteaRecipeTemplate.generated.h"
 
-class UMounteaRecipeIngredientsList;
 class UMounteaInventoryItemTemplate;
 class UMounteaInventoryItemTemplate_Recipe;
 
@@ -55,12 +55,14 @@ public:
 		meta=(Units="seconds"))
 	float CraftingTime = 0.f;
 	
-	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Category = "Configuration",
-		Instanced,
-		meta=(NoResetToDefault),
-		meta=(ShowInnerProperties, ShowOnlyInnerProperties),
-		meta=(FullyExpand=true))
-	TArray<TObjectPtr<UMounteaRecipeIngredientsList>> RecipeIngredientOptions;
+	/** Class used for newly added ingredient rows; existing rows keep their chosen subclass. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Configuration", meta=(AllowAbstract="false"))
+	TSubclassOf<UMounteaRecipeIngredient> DefaultIngredientClass = UMounteaRecipeIngredient::StaticClass();
+
+	/** One flat list of ingredient instances, owned by this recipe. */
+	UPROPERTY(SaveGame, EditAnywhere, BlueprintReadOnly, Instanced, Category = "Configuration",
+		meta=(NoResetToDefault, ShowInnerProperties, FullyExpand=true))
+	TArray<TObjectPtr<UMounteaRecipeIngredient>> RecipeIngredients;
 	
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
@@ -87,10 +89,13 @@ protected:
 
 public:
 
+	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
+
 #if WITH_EDITOR
+	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
+
 	FString GetSourceFilePath() const;
 	void SetSourceFilePath(const FString& InPath);
 
-	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 #endif
 };

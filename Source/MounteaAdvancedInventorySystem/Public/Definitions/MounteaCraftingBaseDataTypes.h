@@ -17,6 +17,7 @@
 #include "MounteaCraftingBaseDataTypes.generated.h"
 
 class UMounteaRecipeTemplate;
+class UMounteaInventoryItemTemplate;
 
 /**
  * 

@@ -23,7 +23,7 @@ class UMounteaAdvancedInventoryCraftingRecipeIngredientWidgetInterface : public 
 
 /**
  * Marker interface for crafting recipe ingredient widgets.
- * Ingredient widgets represent a single UMounteaRecipeIngredient entry from a recipe ingredient list.
+ * Ingredient widgets represent a single UMounteaRecipeIngredient instance from a recipe.
  */
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryCraftingRecipeIngredientWidgetInterface
 {

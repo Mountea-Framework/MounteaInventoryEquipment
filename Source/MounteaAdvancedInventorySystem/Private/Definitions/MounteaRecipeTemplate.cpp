@@ -11,10 +11,45 @@
 
 
 #include "Definitions/MounteaRecipeTemplate.h"
+#include "UObject/UnrealType.h"
 
-#include "Definitions/MounteaRecipeIngredientsList.h"
+
+void UMounteaRecipeTemplate::PostDuplicate(EDuplicateMode::Type DuplicateMode)
+{
+	Super::PostDuplicate(DuplicateMode);
+	if (DuplicateMode == EDuplicateMode::Normal)
+		RecipeGuid = FGuid::NewGuid();
+}
 
 #if WITH_EDITOR
+
+void UMounteaRecipeTemplate::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeChainProperty(PropertyChangedEvent);
+
+	const FName propertyName = PropertyChangedEvent.GetMemberPropertyName();
+	if (propertyName != GET_MEMBER_NAME_CHECKED(UMounteaRecipeTemplate, RecipeIngredients)
+		|| !(PropertyChangedEvent.ChangeType & (EPropertyChangeType::ArrayAdd | EPropertyChangeType::Duplicate)))
+		return;
+
+	int32 ingredientIndex = PropertyChangedEvent.GetArrayIndex(GET_MEMBER_NAME_STRING_CHECKED(UMounteaRecipeTemplate, RecipeIngredients));
+	if (!RecipeIngredients.IsValidIndex(ingredientIndex))
+	{
+		ingredientIndex = RecipeIngredients.IndexOfByPredicate([](const TObjectPtr<UMounteaRecipeIngredient>& Ingredient)
+		{
+			return Ingredient == nullptr;
+		});
+	}
+	if (!RecipeIngredients.IsValidIndex(ingredientIndex) || RecipeIngredients[ingredientIndex] != nullptr)
+		return;
+
+	UClass* ingredientClass = DefaultIngredientClass.Get();
+	if (!IsValid(ingredientClass) || ingredientClass->HasAnyClassFlags(CLASS_Abstract | CLASS_Deprecated | CLASS_NewerVersionExists))
+		ingredientClass = UMounteaRecipeIngredient::StaticClass();
+
+	Modify();
+	RecipeIngredients[ingredientIndex] = NewObject<UMounteaRecipeIngredient>(this, ingredientClass, NAME_None, RF_Transactional);
+}
 
 FString UMounteaRecipeTemplate::GetSourceFilePath() const
 {
@@ -24,34 +59,6 @@ FString UMounteaRecipeTemplate::GetSourceFilePath() const
 void UMounteaRecipeTemplate::SetSourceFilePath(const FString& InPath)
 {
 	SourceFilePath = InPath;
-}
-
-void UMounteaRecipeTemplate::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeChainProperty(PropertyChangedEvent);
-
-	const FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-	if (PropertyName == GET_MEMBER_NAME_CHECKED(UMounteaRecipeTemplate, RecipeIngredientOptions))
-	{
-		if (!(PropertyChangedEvent.ChangeType & (EPropertyChangeType::ArrayAdd | EPropertyChangeType::Duplicate)))
-			return;
-
-		const int32 itemIndex = PropertyChangedEvent.GetArrayIndex(GET_MEMBER_NAME_STRING_CHECKED(UMounteaRecipeTemplate, RecipeIngredientOptions));
-		int32 resolvedItemIndex = itemIndex;
-		if (!RecipeIngredientOptions.IsValidIndex(resolvedItemIndex))
-		{
-			resolvedItemIndex = RecipeIngredientOptions.IndexOfByPredicate([](const TObjectPtr<UMounteaRecipeIngredientsList>& Item)
-			{
-				return Item == nullptr;
-			});
-		}
-
-		if (!RecipeIngredientOptions.IsValidIndex(resolvedItemIndex) || RecipeIngredientOptions[resolvedItemIndex] != nullptr)
-			return;
-
-		RecipeIngredientOptions[resolvedItemIndex] = NewObject<UMounteaRecipeIngredientsList>(this, UMounteaRecipeIngredientsList::StaticClass(), NAME_None, RF_Transactional);
-		Modify();
-	}
 }
 
 #endif
