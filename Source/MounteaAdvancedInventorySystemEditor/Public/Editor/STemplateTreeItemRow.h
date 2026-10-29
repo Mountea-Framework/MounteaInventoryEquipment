@@ -45,27 +45,41 @@ namespace MounteaInventoryTreeRows
 	template<typename ItemType>
 	FReply SelectItem(const TSharedPtr<STreeView<ItemType>>& Tree, ItemType Item, const TArray<ItemType>& Roots)
 	{
-		if (!Tree.IsValid() || !Item.IsValid()) return FReply::Handled();
-		const FModifierKeysState Keys = FSlateApplication::Get().GetModifierKeys();
-		if (Keys.IsControlDown())
+		if (!Tree.IsValid() || !Item.IsValid())
+			return FReply::Handled();
+
+		const FModifierKeysState keys = FSlateApplication::Get().GetModifierKeys();
+
+		if (keys.IsControlDown())
 			Tree->SetItemSelection(Item, !Tree->IsItemSelected(Item), ESelectInfo::OnMouseClick);
-		else if (Keys.IsShiftDown())
+		else if (keys.IsShiftDown())
 		{
-			const TArray<ItemType> Selected = Tree->GetSelectedItems();
-			if (Selected.IsEmpty()) Tree->SetSelection(Item, ESelectInfo::OnMouseClick);
+			const TArray<ItemType> selected = Tree->GetSelectedItems();
+
+			if (selected.IsEmpty())
+				Tree->SetSelection(Item, ESelectInfo::OnMouseClick);
 			else
-				for (const ItemType& Root : Roots)
+			{
+				for (const ItemType& root : Roots)
 				{
-					const int32 LastIndex = Root->Children.Find(Selected.Last());
-					const int32 CurrentIndex = Root->Children.Find(Item);
-					if (LastIndex == INDEX_NONE || CurrentIndex == INDEX_NONE) continue;
+					const int32 lastIndex = root->Children.Find(selected.Last());
+					const int32 currentIndex = root->Children.Find(Item);
+
+					if (lastIndex == INDEX_NONE || currentIndex == INDEX_NONE)
+						continue;
+
 					Tree->ClearSelection();
-					for (int32 Index = FMath::Min(LastIndex, CurrentIndex); Index <= FMath::Max(LastIndex, CurrentIndex); ++Index)
-						Tree->SetItemSelection(Root->Children[Index], true, ESelectInfo::OnMouseClick);
+
+					for (int32 index = FMath::Min(lastIndex, currentIndex); index <= FMath::Max(lastIndex, currentIndex); ++index)
+						Tree->SetItemSelection(root->Children[index], true, ESelectInfo::OnMouseClick);
+
 					break;
 				}
+			}
 		}
-		else Tree->SetSelection(Item, ESelectInfo::OnMouseClick);
+		else
+			Tree->SetSelection(Item, ESelectInfo::OnMouseClick);
+
 		return FReply::Handled();
 	}
 }
@@ -76,31 +90,42 @@ class SMounteaInventoryTreeItemRow : public STableRow<ItemType>
 public:
 	SLATE_BEGIN_ARGS(SMounteaInventoryTreeItemRow)
 		: _Padding(FMargin(0.0f))
-		{}    
-	SLATE_ARGUMENT(FMargin, Padding)
-	SLATE_DEFAULT_SLOT(FArguments, Content)
+		{
+		}
+		SLATE_ARGUMENT(FMargin, Padding)
+		SLATE_DEFAULT_SLOT(FArguments, Content)
+	SLATE_END_ARGS()
 
-SLATE_END_ARGS()
+	void Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTableView)
+	{
+		STableRow<ItemType>::Construct(typename STableRow<ItemType>::FArguments()
+			.Padding(InArgs._Padding)
+			.Style(MounteaInventoryTreeRows::GetRowStyle())
+			.ShowSelection(false)
+			[InArgs._Content.Widget], InOwnerTableView);
 
-
-void Construct(const FArguments& InArgs, const TSharedRef<STableViewBase>& InOwnerTableView)
-{
-	STableRow<ItemType>::Construct(typename STableRow<ItemType>::FArguments()
-		.Padding(InArgs._Padding)
-		.Style(MounteaInventoryTreeRows::GetRowStyle())
-		.ShowSelection(false)
-		[InArgs._Content.Widget], InOwnerTableView);
-	this->SetCanTick(false);
-	this->SetVisibility(EVisibility::SelfHitTestInvisible);
-}
+		this->SetCanTick(false);
+		this->SetVisibility(EVisibility::SelfHitTestInvisible);
+	}
 
 protected:
 	virtual FReply OnFocusReceived(const FGeometry&, const FFocusEvent&) override
-	{ return FReply::Handled().SetUserFocus(this->AsShared(), EFocusCause::Cleared); }
-	virtual void OnFocusLost(const FFocusEvent&) override {}
-	virtual bool SupportsKeyboardFocus() const override { return false; }
+	{
+		return FReply::Handled().SetUserFocus(this->AsShared(), EFocusCause::Cleared);
+	}
+
+	virtual void OnFocusLost(const FFocusEvent&) override
+	{
+	}
+	virtual bool SupportsKeyboardFocus() const override
+	{
+		return false;
+	}
+
 	virtual FCursorReply OnCursorQuery(const FGeometry&, const FPointerEvent&) const override
-	{ return FCursorReply::Cursor(EMouseCursor::Default); }
+	{
+		return FCursorReply::Cursor(EMouseCursor::Default);
+	}
 };
 
 using STemplateTreeItemRow = SMounteaInventoryTreeItemRow<TSharedPtr<FTemplateTreeItem>>;
