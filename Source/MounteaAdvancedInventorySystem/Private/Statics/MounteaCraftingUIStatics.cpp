@@ -33,6 +33,7 @@ bool UMounteaCraftingUIStatics::IsValidCraftingUIHandler(const UObject* Target)
 TSubclassOf<UUserWidget> UMounteaCraftingUIStatics::ResolveCraftingWidgetClass(const TSoftClassPtr<UUserWidget>& WidgetClassPtr, const UClass* RequiredInterface)
 {
 	UClass* widgetClass = WidgetClassPtr.LoadSynchronous();
+
 	if (!IsValid(widgetClass) || !IsValid(RequiredInterface) || !widgetClass->ImplementsInterface(RequiredInterface))
 		return nullptr;
 
@@ -69,7 +70,10 @@ UMounteaAdvancedCraftingUISubsystem* UMounteaCraftingUIStatics::GetCraftingUISub
 UMounteaAdvancedCraftingUIConfig* UMounteaCraftingUIStatics::GetCraftingUISettingsConfig()
 {
 	const auto settings = GetDefault<UMounteaAdvancedInventorySettings>();
-	if (!settings) return nullptr;
+
+	if (!settings)
+		return nullptr;
+
 	return settings->AdvancedCraftingUISettingsConfig.LoadSynchronous();
 }
 

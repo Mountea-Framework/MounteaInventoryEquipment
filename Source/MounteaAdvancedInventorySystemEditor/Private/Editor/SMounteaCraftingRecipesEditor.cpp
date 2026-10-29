@@ -3,7 +3,7 @@
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
 //
-// - You may use this solution in commercial products, provided the product is not 
+// - You may use this solution in commercial products, provided the product is not
 //   this solution itself (or unless significant modifications have been made to the solution).
 // - You may not resell or redistribute the original, unmodified solution.
 //
@@ -47,74 +47,97 @@
 
 namespace
 {
-	FText RecipeName(const UMounteaRecipeTemplate* Recipe)
-	{
-		if (!Recipe) return LOCTEXT("Invalid", "Invalid recipe");
-		const auto* Result = Recipe->ResultItem.LoadSynchronous();
-		if (!Result || Result->DisplayName.IsEmpty()) return FText::FromString(Recipe->GetName());
-		return Result->DisplayName;
-	}
-	FString RecipeGroup(const UMounteaRecipeTemplate* Recipe)
-	{
-		const auto* Result = Recipe->ResultItem.LoadSynchronous();
-		return Result ? Result->ItemCategory : FString();
-	}
-	void ShowError(const FString& Error)
-	{
-		FMounteaEditorNotificationHelpers::ShowNotification(Error, EMounteaEditorNotificationType::Error);
-	}
+FText RecipeName(const UMounteaRecipeTemplate* Recipe)
+{
+	if (!Recipe)
+		return LOCTEXT("Invalid", "Invalid recipe");
+
+	const auto* result = Recipe->ResultItem.LoadSynchronous();
+
+	if (!result || result->DisplayName.IsEmpty())
+		return FText::FromString(Recipe->GetName());
+
+	return result->DisplayName;
+}
+
+FString RecipeGroup(const UMounteaRecipeTemplate* Recipe)
+{
+	const auto* result = Recipe->ResultItem.LoadSynchronous();
+	return result ? result->ItemCategory : FString();
+}
+
+void ShowError(const FString& Error)
+{
+	FMounteaEditorNotificationHelpers::ShowNotification(Error, EMounteaEditorNotificationType::Error);
+}
 }
 
 void SMounteaCraftingRecipesEditor::Construct(const FArguments& InArgs)
 {
-	FDetailsViewArgs Args;
-	Args.bUpdatesFromSelection = false;
-	Args.bLockable = false;
-	Args.bAllowSearch = true;
-	Args.bShowOptions = false;
-	Args.bShowPropertyMatrixButton = false;
-	Args.bHideSelectionTip = true;
-	Args.NotifyHook = this;
-	Details = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor").CreateDetailView(Args);
-	TSharedRef<SWidget> Browser = SAssignNew(Tree, STreeView<FTreeItem>)
-		.TreeItemsSource(&Roots).SelectionMode(ESelectionMode::Multi)
-		.OnGenerateRow(this, &SMounteaCraftingRecipesEditor::GenerateRow)
-		.OnGetChildren(this, &SMounteaCraftingRecipesEditor::GetRecipeChildren)
-		.OnSelectionChanged(this, &SMounteaCraftingRecipesEditor::SelectionChanged)
-		.OnExpansionChanged_Lambda([this](FTreeItem Item, bool Expanded)
+	FDetailsViewArgs args;
+	args.bUpdatesFromSelection = false;
+	args.bLockable = false;
+	args.bAllowSearch = true;
+	args.bShowOptions = false;
+	args.bShowPropertyMatrixButton = false;
+	args.bHideSelectionTip = true;
+	args.NotifyHook = this;
+	Details = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor").CreateDetailView(args);
+	TSharedRef<SWidget> browser = SAssignNew(Tree, STreeView<FTreeItem>)
+	                                  .TreeItemsSource(&Roots)
+	                                  .SelectionMode(ESelectionMode::Multi)
+	                                  .OnGenerateRow(this, &SMounteaCraftingRecipesEditor::GenerateRow)
+	                                  .OnGetChildren(this, &SMounteaCraftingRecipesEditor::GetRecipeChildren)
+	                                  .OnSelectionChanged(this, &SMounteaCraftingRecipesEditor::SelectionChanged)
+	                                  .OnExpansionChanged_Lambda([this](FTreeItem Item, bool Expanded)
+	{
+		if (!bRefreshing && Item.IsValid() && !Item->Recipe.IsValid())
 		{
-			if (!bRefreshing && Item.IsValid() && !Item->Recipe.IsValid())
-			{
-				if (Expanded) CollapsedGroups.Remove(Item->Group); else CollapsedGroups.Add(Item->Group);
-			}
-		});
-	ChildSlot[MounteaInventoryEditorLayout::MakeLayout(CreateToolbar(),
-		MounteaInventoryEditorLayout::MakeBrowserDetails(Browser, Details.ToSharedRef(),
-			TAttribute<float>::CreateLambda([this]() { return GetCachedGeometry().GetLocalSize().X * 0.20f; }),
-			TAttribute<float>::CreateLambda([this]() { return GetCachedGeometry().GetLocalSize().X * 0.50f; })))];
-	auto& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
-	AddedHandle = Registry.OnAssetAdded().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
-	RemovedHandle = Registry.OnAssetRemoved().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
-	UpdatedHandle = Registry.OnAssetUpdated().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
-	RenamedHandle = Registry.OnAssetRenamed().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetRenamed);
-	ChangedHandle = FCoreUObjectDelegates::OnObjectPropertyChanged.AddSP(this, &SMounteaCraftingRecipesEditor::OnObjectChanged);
+			if (Expanded)
+				CollapsedGroups.Remove(Item->Group);
+			else
+				CollapsedGroups.Add(Item->Group);
+		}
+	});
+	ChildSlot[MounteaInventoryEditorLayout::MakeLayout(
+	    CreateToolbar(), MounteaInventoryEditorLayout::MakeBrowserDetails(browser, Details.ToSharedRef(),
+	                         TAttribute<float>::CreateLambda(
+	                             [this]()
+	{
+		return GetCachedGeometry().GetLocalSize().X * 0.20f;
+	}),
+	                         TAttribute<float>::CreateLambda([this]()
+	{
+		return GetCachedGeometry().GetLocalSize().X * 0.50f;
+	})))];
+	auto& registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+	AddedHandle = registry.OnAssetAdded().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
+	RemovedHandle = registry.OnAssetRemoved().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
+	UpdatedHandle = registry.OnAssetUpdated().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
+	RenamedHandle = registry.OnAssetRenamed().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetRenamed);
+	ChangedHandle =
+	    FCoreUObjectDelegates::OnObjectPropertyChanged.AddSP(this, &SMounteaCraftingRecipesEditor::OnObjectChanged);
 	GEditor->RegisterForUndo(this);
 	RefreshRecipes();
 }
 
 SMounteaCraftingRecipesEditor::~SMounteaCraftingRecipesEditor()
 {
-	if (auto* Module = FModuleManager::GetModulePtr<FAssetRegistryModule>("AssetRegistry"))
+	if (auto* module = FModuleManager::GetModulePtr<FAssetRegistryModule>("AssetRegistry"))
 	{
-		auto& Registry = Module->Get();
-		Registry.OnAssetAdded().Remove(AddedHandle);
-		Registry.OnAssetRemoved().Remove(RemovedHandle);
-		Registry.OnAssetUpdated().Remove(UpdatedHandle);
-		Registry.OnAssetRenamed().Remove(RenamedHandle);
+		auto& registry = module->Get();
+		registry.OnAssetAdded().Remove(AddedHandle);
+		registry.OnAssetRemoved().Remove(RemovedHandle);
+		registry.OnAssetUpdated().Remove(UpdatedHandle);
+		registry.OnAssetRenamed().Remove(RenamedHandle);
 	}
+
 	FCoreUObjectDelegates::OnObjectPropertyChanged.Remove(ChangedHandle);
-	if (GEditor) GEditor->UnregisterForUndo(this);
-	if (Details) Details->SetObject(nullptr);
+
+	if (GEditor)
+		GEditor->UnregisterForUndo(this);
+	if (Details)
+		Details->SetObject(nullptr);
 }
 
 void SMounteaCraftingRecipesEditor::AddReferencedObjects(FReferenceCollector& Collector)
@@ -125,379 +148,656 @@ void SMounteaCraftingRecipesEditor::AddReferencedObjects(FReferenceCollector& Co
 
 TSharedRef<SWidget> SMounteaCraftingRecipesEditor::CreateToolbar()
 {
-	FMounteaInventoryEditorToolbarActions Actions;
-	Actions.Create = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::CreateRecipe);
-	Actions.Save = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::SaveCurrent);
-	Actions.SaveAll = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::SaveAll);
-	Actions.Import = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ImportRecipes);
-	Actions.Export = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ExportRecipes);
-	Actions.Close = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::CloseRecipe);
-	Actions.Help = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ShowHelp);
-	Actions.CanSave = TAttribute<bool>::CreateLambda([this]()
-	{ return Current.IsValid() && (Current.Get() == Draft || Current->GetPackage()->IsDirty()); });
-	Actions.CanSaveAll = TAttribute<bool>::CreateLambda([this]() { return HasDirtyRecipes(); });
-	return MounteaInventoryEditorLayout::MakeToolbar(Actions,
-		SAssignNew(Search, SSearchBox).HintText(LOCTEXT("Search", "Search recipes, stations, categories..."))
-		.OnTextChanged_Lambda([this](const FText& Text) { SearchText = Text.ToString(); RefreshRecipes(); }));
+	FMounteaInventoryEditorToolbarActions actions;
+	actions.Create = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::CreateRecipe);
+	actions.Save = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::SaveCurrent);
+	actions.SaveAll = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::SaveAll);
+	actions.Import = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ImportRecipes);
+	actions.Export = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ExportRecipes);
+	actions.Close = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::CloseRecipe);
+	actions.Help = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ShowHelp);
+	actions.CanSave = TAttribute<bool>::CreateLambda([this]()
+	{
+		return Current.IsValid() && (Current.Get() == Draft || Current->GetPackage()->IsDirty());
+	});
+	actions.CanSaveAll = TAttribute<bool>::CreateLambda([this]()
+	{
+		return HasDirtyRecipes();
+	});
+	return MounteaInventoryEditorLayout::MakeToolbar(
+	    actions, SAssignNew(Search, SSearchBox)
+	                 .HintText(LOCTEXT("Search", "Search recipes, stations, categories..."))
+	                 .OnTextChanged_Lambda([this](const FText& Text)
+	{
+		SearchText = Text.ToString();
+		RefreshRecipes();
+	}));
 }
 
 void SMounteaCraftingRecipesEditor::RefreshRecipes()
 {
-	TGuardValue<bool> Guard(bRefreshing, true);
-	const TWeakObjectPtr<UMounteaRecipeTemplate> Selected = Current;
-	TArray<TWeakObjectPtr<UMounteaRecipeTemplate>> SelectedRecipes;
-	for (const auto& SelectedItem : Tree->GetSelectedItems())
-		if (SelectedItem->Recipe.IsValid()) SelectedRecipes.Add(SelectedItem->Recipe);
-	TArray<FAssetData> Assets;
-	auto& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
-	Registry.GetAssetsByClass(UMounteaRecipeTemplate::StaticClass()->GetClassPathName(), Assets, true);
+	TGuardValue<bool> guard(bRefreshing, true);
+	const TWeakObjectPtr<UMounteaRecipeTemplate> selected = Current;
+	TArray<TWeakObjectPtr<UMounteaRecipeTemplate>> selectedRecipes;
+
+	for (const auto& selectedItem : Tree->GetSelectedItems())
+		if (selectedItem->Recipe.IsValid())
+			selectedRecipes.Add(selectedItem->Recipe);
+	TArray<FAssetData> assets;
+	auto& registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
+	registry.GetAssetsByClass(UMounteaRecipeTemplate::StaticClass()->GetClassPathName(), assets, true);
 	Recipes.Reset();
-	for (const FAssetData& Asset : Assets)
-		if (auto* Recipe = Cast<UMounteaRecipeTemplate>(Asset.GetAsset()))
+
+	for (const FAssetData& asset : assets)
+		if (auto* recipe = Cast<UMounteaRecipeTemplate>(asset.GetAsset()))
 		{
-			Recipe->SetFlags(RF_Transactional);
-			Recipes.Add(Recipe);
+			recipe->SetFlags(RF_Transactional);
+			Recipes.Add(recipe);
 		}
-	if (Draft) Recipes.Add(Draft);
+	if (Draft)
+		Recipes.Add(Draft);
 	Recipes.Sort([](const UMounteaRecipeTemplate& A, const UMounteaRecipeTemplate& B)
-	{ return RecipeName(&A).ToString() < RecipeName(&B).ToString(); });
+	{
+		return RecipeName(&A).ToString() < RecipeName(&B).ToString();
+	});
 	Roots.Reset();
-	TMap<FString, FTreeItem> Groups;
-	for (UMounteaRecipeTemplate* Recipe : Recipes)
+	TMap<FString, FTreeItem> groups;
+
+	for (UMounteaRecipeTemplate* recipe : Recipes)
 	{
-		const FString Group = RecipeGroup(Recipe);
-		const FString Searchable = RecipeName(Recipe).ToString() + TEXT(" ") + Group + TEXT(" ") + Recipe->RequiredCraftingPlace.ToString() + TEXT(" ") + Recipe->GetPathName() + TEXT(" ") + Recipe->RecipeGuid.ToString();
-		if (!SearchText.IsEmpty() && !Searchable.Contains(SearchText)) continue;
-		FTreeItem* Existing = Groups.Find(Group);
-		if (!Existing)
+		const FString group = RecipeGroup(recipe);
+		const FString searchable = RecipeName(recipe).ToString() + TEXT(" ") + group + TEXT(" ") +
+		                           recipe->RequiredCraftingPlace.ToString() + TEXT(" ") + recipe->GetPathName() +
+		                           TEXT(" ") + recipe->RecipeGuid.ToString();
+
+		if (!SearchText.IsEmpty() && !searchable.Contains(SearchText))
+			continue;
+
+		FTreeItem* existing = groups.Find(group);
+
+		if (!existing)
 		{
-			FTreeItem NewGroup = MakeShared<FMounteaRecipeTreeItem>(); NewGroup->Group = Group;
-			Roots.Add(NewGroup); Groups.Add(Group, NewGroup); Existing = Groups.Find(Group);
+			FTreeItem newGroup = MakeShared<FMounteaRecipeTreeItem>();
+			newGroup->Group = group;
+			Roots.Add(newGroup);
+			groups.Add(group, newGroup);
+			existing = groups.Find(group);
 		}
-		FTreeItem Row = MakeShared<FMounteaRecipeTreeItem>(); Row->Recipe = Recipe;
-		(*Existing)->Children.Add(Row);
+
+		FTreeItem row = MakeShared<FMounteaRecipeTreeItem>();
+		row->Recipe = recipe;
+		(*existing)->Children.Add(row);
 	}
-	Roots.Sort([](const FTreeItem& A, const FTreeItem& B) { return A->Group < B->Group; });
-	Tree->RequestTreeRefresh();
-	for (const FTreeItem& Root : Roots) Tree->SetItemExpansion(Root, !CollapsedGroups.Contains(Root->Group));
-	if (SelectedRecipes.Num() > 1)
+
+	Roots.Sort([](const FTreeItem& A, const FTreeItem& B)
 	{
-		TArray<UObject*> Objects;
+		return A->Group < B->Group;
+	});
+	Tree->RequestTreeRefresh();
+
+	for (const FTreeItem& root : Roots)
+		Tree->SetItemExpansion(root, !CollapsedGroups.Contains(root->Group));
+	if (selectedRecipes.Num() > 1)
+	{
+		TArray<UObject*> objects;
 		Tree->ClearSelection();
-		for (const auto& Root : Roots)
-			for (const auto& Child : Root->Children)
-				if (Child->Recipe.IsValid() && SelectedRecipes.Contains(Child->Recipe))
+
+		for (const auto& root : Roots)
+			for (const auto& child : root->Children)
+				if (child->Recipe.IsValid() && selectedRecipes.Contains(child->Recipe))
 				{
-					Tree->SetItemSelection(Child, true, ESelectInfo::Direct);
-					Objects.Add(Child->Recipe.Get());
+					Tree->SetItemSelection(child, true, ESelectInfo::Direct);
+					objects.Add(child->Recipe.Get());
 				}
-		Current = Objects.Num() == 1 ? Cast<UMounteaRecipeTemplate>(Objects[0]) : nullptr;
-		Details->SetObjects(Objects);
+		Current = objects.Num() == 1 ? Cast<UMounteaRecipeTemplate>(objects[0]) : nullptr;
+		Details->SetObjects(objects);
 	}
-	else if (Selected.IsValid() && Recipes.Contains(Selected.Get())) SelectRecipe(Selected.Get());
-	else if (!Current.IsValid() || !Recipes.Contains(Current.Get())) { Current.Reset(); Details->SetObject(nullptr); }
+	else if (selected.IsValid() && Recipes.Contains(selected.Get()))
+		SelectRecipe(selected.Get());
+	else if (!Current.IsValid() || !Recipes.Contains(Current.Get()))
+	{
+		Current.Reset();
+		Details->SetObject(nullptr);
+	}
 }
 
 void SMounteaCraftingRecipesEditor::SelectRecipe(UMounteaRecipeTemplate* Recipe)
 {
-	TGuardValue<bool> Guard(bRefreshing, true);
+	TGuardValue<bool> guard(bRefreshing, true);
 	Current = Recipe;
 	Details->SetObject(Recipe);
 	Tree->ClearSelection();
-	for (const FTreeItem& Root : Roots)
-		for (const FTreeItem& Child : Root->Children)
-			if (Child->Recipe.Get() == Recipe)
+
+	for (const FTreeItem& root : Roots)
+		for (const FTreeItem& child : root->Children)
+			if (child->Recipe.Get() == Recipe)
 			{
-				Tree->SetItemExpansion(Root, true);
-				Tree->SetSelection(Child, ESelectInfo::Direct);
+				Tree->SetItemExpansion(root, true);
+				Tree->SetSelection(child, ESelectInfo::Direct);
 				return;
 			}
 }
 
 void SMounteaCraftingRecipesEditor::GetRecipeChildren(FTreeItem Item, TArray<FTreeItem>& Children) const
-{ if (Item) Children = Item->Children; }
+{
+	if (Item)
+		Children = Item->Children;
+}
 
 void SMounteaCraftingRecipesEditor::SelectionChanged(FTreeItem Item, ESelectInfo::Type Type)
 {
-	if (bRefreshing) return;
-	TArray<UObject*> Selection;
-	for (const auto& Selected : Tree->GetSelectedItems())
-		if (Selected->Recipe.IsValid()) Selection.Add(Selected->Recipe.Get());
-	Current = Selection.Num() == 1 ? Cast<UMounteaRecipeTemplate>(Selection[0]) : nullptr;
-	Details->SetObjects(Selection);
+	if (bRefreshing)
+		return;
+
+	TArray<UObject*> selection;
+
+	for (const auto& selected : Tree->GetSelectedItems())
+		if (selected->Recipe.IsValid())
+			selection.Add(selected->Recipe.Get());
+	Current = selection.Num() == 1 ? Cast<UMounteaRecipeTemplate>(selection[0]) : nullptr;
+	Details->SetObjects(selection);
 }
 
-TSharedRef<ITableRow> SMounteaCraftingRecipesEditor::GenerateRow(FTreeItem Item, const TSharedRef<STableViewBase>& Owner)
+TSharedRef<ITableRow> SMounteaCraftingRecipesEditor::GenerateRow(
+    FTreeItem Item, const TSharedRef<STableViewBase>& Owner)
 {
 	using SRecipeTreeItemRow = SMounteaInventoryTreeItemRow<FTreeItem>;
-	if (!Item.IsValid()) return SNew(SRecipeTreeItemRow, Owner)[SNullWidget::NullWidget];
-	if (!Item->Recipe.IsValid())
-		return SNew(SRecipeTreeItemRow, Owner).Padding(FMargin(0, 4, 0, 2))
-		[MounteaInventoryTreeRows::MakeCategoryContent(Item->Group,
-			TAttribute<int32>::CreateLambda([Item]() { return Item->Children.Num(); }))];
 
-	const TWeakObjectPtr<UMounteaRecipeTemplate> Recipe = Item->Recipe;
-	FMounteaInventoryAssetRowPresentation Presentation;
-	Presentation.Name = TAttribute<FText>::CreateLambda([this, Recipe]()
-	{
-		if (!Recipe.IsValid()) return FText::GetEmpty();
-		return MounteaInventoryTreeRows::DisplayName(RecipeName(Recipe.Get()), Recipe.Get() == Draft || Recipe->GetPackage()->IsDirty());
-	});
-	Presentation.Tooltip = TAttribute<FText>::CreateLambda([Recipe]()
-	{ return Recipe.IsValid() ? FText::FromString(Recipe->GetPathName()) : FText::GetEmpty(); });
-	Presentation.AssetPath = MounteaInventoryTreeRows::AssetPath(Recipe.Get());
-	Presentation.NameColor = TAttribute<FSlateColor>::CreateLambda([this, Recipe]()
-	{
-		if (Recipe.IsValid())
+	if (!Item.IsValid())
+		return SNew(SRecipeTreeItemRow, Owner)[SNullWidget::NullWidget];
+
+	if (!Item->Recipe.IsValid())
+		return SNew(SRecipeTreeItemRow, Owner)
+		    .Padding(FMargin(0, 4, 0,
+		        2))[MounteaInventoryTreeRows::MakeCategoryContent(Item->Group, TAttribute<int32>::CreateLambda([Item]()
 		{
-			if (Recipe.Get() == Draft) return FSlateColor(FLinearColor(1.f, 1.f, 0.5f));
-			if (Recipe->GetPackage()->IsDirty()) return FSlateColor(FLinearColor(1.f, 0.7f, 0.7f));
+			return Item->Children.Num();
+		}))];
+
+	const TWeakObjectPtr<UMounteaRecipeTemplate> recipe = Item->Recipe;
+	FMounteaInventoryAssetRowPresentation presentation;
+	presentation.Name = TAttribute<FText>::CreateLambda([this, recipe]()
+	{
+		if (!recipe.IsValid())
+			return FText::GetEmpty();
+
+		return MounteaInventoryTreeRows::DisplayName(
+		    RecipeName(recipe.Get()), recipe.Get() == Draft || recipe->GetPackage()->IsDirty());
+	});
+	presentation.Tooltip = TAttribute<FText>::CreateLambda([recipe]()
+	{
+		return recipe.IsValid() ? FText::FromString(recipe->GetPathName()) : FText::GetEmpty();
+	});
+	presentation.AssetPath = MounteaInventoryTreeRows::AssetPath(recipe.Get());
+	presentation.NameColor = TAttribute<FSlateColor>::CreateLambda([this, recipe]()
+	{
+		if (recipe.IsValid())
+		{
+			if (recipe.Get() == Draft)
+				return FSlateColor(FLinearColor(1.f, 1.f, 0.5f));
+
+			if (recipe->GetPackage()->IsDirty())
+				return FSlateColor(FLinearColor(1.f, 0.7f, 0.7f));
 		}
+
 		return FSlateColor::UseForeground();
 	});
-	Presentation.IsSelected = TAttribute<bool>::CreateLambda([this, Item]()
-	{ return Tree.IsValid() && Tree->IsItemSelected(Item); });
-	Presentation.ActionsVisibility = Recipe.Get() == Draft ? EVisibility::Collapsed : EVisibility::Visible;
-	Presentation.Select = FOnClicked::CreateLambda([this, Item]()
-	{ return MounteaInventoryTreeRows::SelectItem(Tree, Item, Roots); });
-	Presentation.Locate = FOnClicked::CreateLambda([Recipe]()
-	{ return MounteaInventoryTreeRows::LocateAsset(Recipe.Get()); });
-	Presentation.Duplicate = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::DuplicateRecipe, Recipe);
-	Presentation.Delete = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::DeleteRecipe, Recipe);
-	return SNew(SRecipeTreeItemRow, Owner).Padding(FMargin(4, 2))
-		[MounteaInventoryTreeRows::MakeAssetContent(Presentation)];
+	presentation.IsSelected = TAttribute<bool>::CreateLambda([this, Item]()
+	{
+		return Tree.IsValid() && Tree->IsItemSelected(Item);
+	});
+	presentation.ActionsVisibility = recipe.Get() == Draft ? EVisibility::Collapsed : EVisibility::Visible;
+	presentation.Select = FOnClicked::CreateLambda([this, Item]()
+	{
+		return MounteaInventoryTreeRows::SelectItem(Tree, Item, Roots);
+	});
+	presentation.Locate = FOnClicked::CreateLambda([recipe]()
+	{
+		return MounteaInventoryTreeRows::LocateAsset(recipe.Get());
+	});
+	presentation.Duplicate = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::DuplicateRecipe, recipe);
+	presentation.Delete = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::DeleteRecipe, recipe);
+	return SNew(SRecipeTreeItemRow, Owner)
+	    .Padding(FMargin(4, 2))[MounteaInventoryTreeRows::MakeAssetContent(presentation)];
 }
 
 void SMounteaCraftingRecipesEditor::OnAssetChanged(const FAssetData& Asset)
 {
-	if (Asset.AssetClassPath != UMounteaRecipeTemplate::StaticClass()->GetClassPathName()) return;
+	if (Asset.AssetClassPath != UMounteaRecipeTemplate::StaticClass()->GetClassPathName())
+		return;
+
 	if (!bRefreshPending)
 	{
 		bRefreshPending = true;
-		RegisterActiveTimer(0.f, FWidgetActiveTimerDelegate::CreateSP(this, &SMounteaCraftingRecipesEditor::DeferredRefresh));
+		RegisterActiveTimer(
+		    0.f, FWidgetActiveTimerDelegate::CreateSP(this, &SMounteaCraftingRecipesEditor::DeferredRefresh));
 	}
 }
-void SMounteaCraftingRecipesEditor::OnAssetRenamed(const FAssetData& Asset, const FString& OldPath) { OnAssetChanged(Asset); }
+
+void SMounteaCraftingRecipesEditor::OnAssetRenamed(const FAssetData& Asset, const FString& OldPath)
+{
+	OnAssetChanged(Asset);
+}
+
 EActiveTimerReturnType SMounteaCraftingRecipesEditor::DeferredRefresh(double Time, float Delta)
-{ bRefreshPending = false; RefreshRecipes(); return EActiveTimerReturnType::Stop; }
+{
+	bRefreshPending = false;
+	RefreshRecipes();
+	return EActiveTimerReturnType::Stop;
+}
 
 void SMounteaCraftingRecipesEditor::OnObjectChanged(UObject* Object, FPropertyChangedEvent& Event)
 {
-	auto* Recipe = Cast<UMounteaRecipeTemplate>(Object);
-	if (!Recipe) return;
-	if (Recipe == Draft) bDraftDirty = true;
-	if (Recipes.Contains(Recipe) && Event.ChangeType != EPropertyChangeType::Interactive)
+	auto* recipe = Cast<UMounteaRecipeTemplate>(Object);
+
+	if (!recipe)
+		return;
+
+	if (recipe == Draft)
+		bDraftDirty = true;
+	if (Recipes.Contains(recipe) && Event.ChangeType != EPropertyChangeType::Interactive)
 	{
 		if (!bRefreshPending)
 		{
 			bRefreshPending = true;
-			RegisterActiveTimer(0.f, FWidgetActiveTimerDelegate::CreateSP(this, &SMounteaCraftingRecipesEditor::DeferredRefresh));
+			RegisterActiveTimer(
+			    0.f, FWidgetActiveTimerDelegate::CreateSP(this, &SMounteaCraftingRecipesEditor::DeferredRefresh));
 		}
 	}
 }
+
 void SMounteaCraftingRecipesEditor::NotifyPostChange(const FPropertyChangedEvent& Event, FProperty* Property)
 {
-	if (Current.Get() == Draft && Draft) bDraftDirty = true;
+	if (Current.Get() == Draft && Draft)
+		bDraftDirty = true;
 	Tree->RequestTreeRefresh();
 }
+
 void SMounteaCraftingRecipesEditor::PostUndo(bool bSuccess)
 {
-	if (!bSuccess) return;
-	if (Draft) bDraftDirty = true;
-	RefreshRecipes(); Details->ForceRefresh();
+	if (!bSuccess)
+		return;
+
+	if (Draft)
+		bDraftDirty = true;
+	RefreshRecipes();
+	Details->ForceRefresh();
 }
 
 bool SMounteaCraftingRecipesEditor::HasDirtyRecipes() const
 {
-	if (Draft && bDraftDirty) return true;
-	for (UMounteaRecipeTemplate* Recipe : Recipes) if (Recipe != Draft && IsValid(Recipe) && Recipe->GetPackage()->IsDirty()) return true;
+	if (Draft && bDraftDirty)
+		return true;
+
+	for (UMounteaRecipeTemplate* recipe : Recipes)
+		if (recipe != Draft && IsValid(recipe) && recipe->GetPackage()->IsDirty())
+			return true;
+
 	return false;
 }
 
 bool SMounteaCraftingRecipesEditor::ConfirmDiscardDraft()
 {
-	if (!Draft || !bDraftDirty) return true;
-	const auto Answer = FMessageDialog::Open(EAppMsgType::YesNoCancel,
-		LOCTEXT("DraftPrompt", "Save the unsaved recipe before closing it?"));
-	if (Answer == EAppReturnType::Yes) return SaveRecipe(Draft);
-	return Answer == EAppReturnType::No;
+	if (!Draft || !bDraftDirty)
+		return true;
+
+	const auto answer = FMessageDialog::Open(
+	    EAppMsgType::YesNoCancel, LOCTEXT("DraftPrompt", "Save the unsaved recipe before closing it?"));
+	if (answer == EAppReturnType::Yes)
+		return SaveRecipe(Draft);
+
+	return answer == EAppReturnType::No;
 }
 
 bool SMounteaCraftingRecipesEditor::CanCloseEditor()
 {
-	if (!HasDirtyRecipes()) return true;
-	const auto Answer = FMessageDialog::Open(EAppMsgType::YesNoCancel,
-		LOCTEXT("ClosePrompt", "Save modified recipes before closing the editor? Unsaved draft data will be lost if you choose No. Existing assets remain dirty in the project."));
-	if (Answer == EAppReturnType::No) return true;
-	if (Answer != EAppReturnType::Yes) return false;
-	SaveAll(); return !HasDirtyRecipes();
+	if (!HasDirtyRecipes())
+		return true;
+
+	const auto answer = FMessageDialog::Open(EAppMsgType::YesNoCancel,
+	    LOCTEXT("ClosePrompt", "Save modified recipes before closing the editor? Unsaved draft data will be lost if you choose No. Existing assets remain dirty in the project."));
+	if (answer == EAppReturnType::No)
+		return true;
+
+	if (answer != EAppReturnType::Yes)
+		return false;
+
+	SaveAll();
+	return !HasDirtyRecipes();
 }
 
 FReply SMounteaCraftingRecipesEditor::CreateRecipe()
 {
-	if (!ConfirmDiscardDraft()) return FReply::Handled();
-	const FScopedTransaction Transaction(LOCTEXT("NewRecipeTransaction", "Create crafting recipe"));
+	if (!ConfirmDiscardDraft())
+		return FReply::Handled();
+
+	const FScopedTransaction transaction(LOCTEXT("NewRecipeTransaction", "Create crafting recipe"));
 	Draft = NewObject<UMounteaRecipeTemplate>(GetTransientPackage(), NAME_None, RF_Transient | RF_Transactional);
 	Draft->Modify();
 	bDraftDirty = false;
 	Search->SetText(FText::GetEmpty());
-	RefreshRecipes(); SelectRecipe(Draft);
+	RefreshRecipes();
+	SelectRecipe(Draft);
 	return FReply::Handled();
 }
 
 bool SMounteaCraftingRecipesEditor::SaveRecipe(UMounteaRecipeTemplate* Recipe)
 {
-	FString Error;
-	if (!UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipeTemplate(Recipe, Error)) { ShowError(Error); return false; }
+	FString error;
+
+	if (!UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipeTemplate(Recipe, error))
+	{
+		ShowError(error);
+		return false;
+	}
+
 	if (Recipe == Draft)
 	{
-		FSaveAssetDialogConfig Config;
-		Config.DialogTitleOverride = LOCTEXT("SaveTitle", "Save Crafting Recipe");
-		Config.DefaultPath = TEXT("/Game"); Config.DefaultAssetName = TEXT("NewCraftingRecipe");
-		Config.AssetClassNames.Add(UMounteaRecipeTemplate::StaticClass()->GetClassPathName());
-		Config.ExistingAssetPolicy = ESaveAssetDialogExistingAssetPolicy::Disallow;
-		const FString ObjectPath = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser").Get().CreateModalSaveAssetDialog(Config);
-		if (ObjectPath.IsEmpty()) return false;
-		const FString PackageName = FPackageName::ObjectPathToPackageName(ObjectPath);
-		UPackage* Package = CreatePackage(*PackageName);
-		const FScopedTransaction Transaction(LOCTEXT("SaveNewTransaction", "Create recipe asset"));
-		auto* Asset = DuplicateObject<UMounteaRecipeTemplate>(Recipe, Package, *FPackageName::GetLongPackageAssetName(PackageName));
-		Asset->ClearFlags(RF_Transient); Asset->SetFlags(RF_Public | RF_Standalone | RF_Transactional);
+		FSaveAssetDialogConfig config;
+		config.DialogTitleOverride = LOCTEXT("SaveTitle", "Save Crafting Recipe");
+		config.DefaultPath = TEXT("/Game");
+		config.DefaultAssetName = TEXT("NewCraftingRecipe");
+		config.AssetClassNames.Add(UMounteaRecipeTemplate::StaticClass()->GetClassPathName());
+		config.ExistingAssetPolicy = ESaveAssetDialogExistingAssetPolicy::Disallow;
+		const FString objectPath = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser")
+		                               .Get()
+		                               .CreateModalSaveAssetDialog(config);
+
+		if (objectPath.IsEmpty())
+			return false;
+
+		const FString packageName = FPackageName::ObjectPathToPackageName(objectPath);
+		UPackage* package = CreatePackage(*packageName);
+		const FScopedTransaction transaction(LOCTEXT("SaveNewTransaction", "Create recipe asset"));
+		auto* asset = DuplicateObject<UMounteaRecipeTemplate>(
+		    Recipe, package, *FPackageName::GetLongPackageAssetName(packageName));
+		asset->ClearFlags(RF_Transient);
+		asset->SetFlags(RF_Public | RF_Standalone | RF_Transactional);
 		// Saving a draft preserves its identity. Only DuplicateRecipe assigns a fresh GUID.
-		Asset->RecipeGuid = Recipe->RecipeGuid;
-		Asset->MarkPackageDirty(); FAssetRegistryModule::AssetCreated(Asset);
-		Recipes.AddUnique(Asset); Draft = nullptr; bDraftDirty = false;
-		Recipe = Asset; Current = Asset; Details->SetObject(Asset);
+		asset->RecipeGuid = Recipe->RecipeGuid;
+		asset->MarkPackageDirty();
+		FAssetRegistryModule::AssetCreated(asset);
+		Recipes.AddUnique(asset);
+		Draft = nullptr;
+		bDraftDirty = false;
+		Recipe = asset;
+		Current = asset;
+		Details->SetObject(asset);
 	}
-	TArray<UPackage*> Packages; Packages.Add(Recipe->GetPackage());
-	const bool Saved = FEditorFileUtils::PromptForCheckoutAndSave(Packages, false, false) == FEditorFileUtils::PR_Success;
-	if (!Saved) ShowError(TEXT("Recipe could not be saved. Its changes remain available in the editor."));
-	RefreshRecipes(); SelectRecipe(Recipe);
-	return Saved;
+
+	TArray<UPackage*> packages;
+	packages.Add(Recipe->GetPackage());
+	const bool saved =
+	    FEditorFileUtils::PromptForCheckoutAndSave(packages, false, false) == FEditorFileUtils::PR_Success;
+
+	if (!saved)
+		ShowError(TEXT("Recipe could not be saved. Its changes remain available in the editor."));
+	RefreshRecipes();
+	SelectRecipe(Recipe);
+	return saved;
 }
+
 FReply SMounteaCraftingRecipesEditor::SaveCurrent()
-{ if (Current.IsValid()) SaveRecipe(Current.Get()); return FReply::Handled(); }
+{
+	if (Current.IsValid())
+		SaveRecipe(Current.Get());
+	return FReply::Handled();
+}
+
 FReply SMounteaCraftingRecipesEditor::SaveAll()
 {
-	TArray<TWeakObjectPtr<UMounteaRecipeTemplate>> Dirty;
-	for (UMounteaRecipeTemplate* Recipe : Recipes)
-		if (Recipe && ((Recipe == Draft && bDraftDirty) || (Recipe != Draft && Recipe->GetPackage()->IsDirty()))) Dirty.Add(Recipe);
+	TArray<TWeakObjectPtr<UMounteaRecipeTemplate>> dirty;
+
+	for (UMounteaRecipeTemplate* recipe : Recipes)
+		if (recipe && ((recipe == Draft && bDraftDirty) || (recipe != Draft && recipe->GetPackage()->IsDirty())))
+			dirty.Add(recipe);
 	// Validate every selected asset before the first package is written.
-	for (const auto& Recipe : Dirty)
+	for (const auto& recipe : dirty)
 	{
-		FString Error;
-		if (Recipe.IsValid() && !UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipeTemplate(Recipe.Get(), Error))
-		{ ShowError(Error); return FReply::Handled(); }
+		FString error;
+
+		if (recipe.IsValid() &&
+		    !UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipeTemplate(recipe.Get(), error))
+		{
+			ShowError(error);
+			return FReply::Handled();
+		}
 	}
-	for (const auto& Recipe : Dirty) if (Recipe.IsValid() && !SaveRecipe(Recipe.Get())) break;
+
+	for (const auto& recipe : dirty)
+		if (recipe.IsValid() && !SaveRecipe(recipe.Get()))
+			break;
+
 	return FReply::Handled();
 }
+
 FReply SMounteaCraftingRecipesEditor::CloseRecipe()
 {
-	if (Current.Get() == Draft && !ConfirmDiscardDraft()) return FReply::Handled();
-	if (Current.Get() == Draft) { Draft = nullptr; bDraftDirty = false; }
-	Current.Reset(); Tree->ClearSelection(); Details->SetObject(nullptr); RefreshRecipes();
+	if (Current.Get() == Draft && !ConfirmDiscardDraft())
+		return FReply::Handled();
+
+	if (Current.Get() == Draft)
+	{
+		Draft = nullptr;
+		bDraftDirty = false;
+	}
+
+	Current.Reset();
+	Tree->ClearSelection();
+	Details->SetObject(nullptr);
+	RefreshRecipes();
 	return FReply::Handled();
 }
+
 FReply SMounteaCraftingRecipesEditor::DuplicateRecipe(TWeakObjectPtr<UMounteaRecipeTemplate> Recipe)
 {
-	if (!Recipe.IsValid() || !ConfirmDiscardDraft()) return FReply::Handled();
-	const FScopedTransaction Transaction(LOCTEXT("DuplicateTransaction", "Duplicate crafting recipe"));
+	if (!Recipe.IsValid() || !ConfirmDiscardDraft())
+		return FReply::Handled();
+
+	const FScopedTransaction transaction(LOCTEXT("DuplicateTransaction", "Duplicate crafting recipe"));
 	Draft = DuplicateObject<UMounteaRecipeTemplate>(Recipe.Get(), GetTransientPackage(),
-		MakeUniqueObjectName(GetTransientPackage(), Recipe->GetClass(), TEXT("CraftingRecipeCopy")));
-	Draft->ClearFlags(RF_Public | RF_Standalone); Draft->SetFlags(RF_Transient | RF_Transactional);
-	Draft->Modify(); Draft->RecipeGuid = FGuid::NewGuid(); Draft->SetSourceFilePath(FString());
-	bDraftDirty = true; Search->SetText(FText::GetEmpty()); RefreshRecipes(); SelectRecipe(Draft);
+	    MakeUniqueObjectName(GetTransientPackage(), Recipe->GetClass(), TEXT("CraftingRecipeCopy")));
+	Draft->ClearFlags(RF_Public | RF_Standalone);
+	Draft->SetFlags(RF_Transient | RF_Transactional);
+	Draft->Modify();
+	Draft->RecipeGuid = FGuid::NewGuid();
+	Draft->SetSourceFilePath(FString());
+	bDraftDirty = true;
+	Search->SetText(FText::GetEmpty());
+	RefreshRecipes();
+	SelectRecipe(Draft);
 	return FReply::Handled();
 }
+
 FReply SMounteaCraftingRecipesEditor::DeleteRecipe(TWeakObjectPtr<UMounteaRecipeTemplate> Recipe)
 {
-	if (!Recipe.IsValid()) return FReply::Handled();
+	if (!Recipe.IsValid())
+		return FReply::Handled();
+
 	if (Recipe.Get() == Draft)
 	{
-		if (!ConfirmDiscardDraft()) return FReply::Handled();
-		Draft = nullptr; bDraftDirty = false; Current.Reset(); Details->SetObject(nullptr);
+		if (!ConfirmDiscardDraft())
+			return FReply::Handled();
+
+		Draft = nullptr;
+		bDraftDirty = false;
+		Current.Reset();
+		Details->SetObject(nullptr);
 	}
 	else
 	{
 		// Release editor references so the normal asset deletion dialog can detect real referencers.
-		auto* Asset = Recipe.Get(); Details->SetObject(nullptr); Current.Reset(); Recipes.Remove(Asset);
-		TArray<UObject*> ToDelete; ToDelete.Add(Asset); ObjectTools::DeleteObjects(ToDelete, true);
+		auto* asset = Recipe.Get();
+		Details->SetObject(nullptr);
+		Current.Reset();
+		Recipes.Remove(asset);
+		TArray<UObject*> toDelete;
+		toDelete.Add(asset);
+		ObjectTools::DeleteObjects(toDelete, true);
 	}
-	RefreshRecipes(); return FReply::Handled();
+
+	RefreshRecipes();
+	return FReply::Handled();
 }
 
 FReply SMounteaCraftingRecipesEditor::ImportRecipes()
 {
-	IDesktopPlatform* Desktop = FDesktopPlatformModule::Get();
-	if (!Desktop) { ShowError(TEXT("File dialogs are unavailable.")); return FReply::Handled(); }
-	const void* Parent = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(AsShared());
-	TArray<FString> Files;
-	if (!Desktop->OpenFileDialog(Parent, TEXT("Import Crafting Recipes"), FString(), FString(),
-		TEXT("Mountea Recipes (*.mntearecipe;*.mntearecipes)|*.mntearecipe;*.mntearecipes"), EFileDialogFlags::None, Files) || Files.IsEmpty()) return FReply::Handled();
+	IDesktopPlatform* desktop = FDesktopPlatformModule::Get();
+
+	if (!desktop)
+	{
+		ShowError(TEXT("File dialogs are unavailable."));
+		return FReply::Handled();
+	}
+
+	const void* parent = FSlateApplication::Get().FindBestParentWindowHandleForDialogs(AsShared());
+	TArray<FString> files;
+
+	if (!desktop->OpenFileDialog(parent, TEXT("Import Crafting Recipes"), FString(), FString(),
+	        TEXT("Mountea Recipes (*.mntearecipe;*.mntearecipes)|*.mntearecipe;*.mntearecipes"), EFileDialogFlags::None,
+	        files) ||
+	    files.IsEmpty())
+		return FReply::Handled();
 	if (HasDirtyRecipes())
 	{
 		if (FMessageDialog::Open(EAppMsgType::OkCancel,
-			LOCTEXT("ImportDirtyPrompt", "Import may update existing recipes. Save all modified recipes before importing?")) != EAppReturnType::Ok)
+		        LOCTEXT("ImportDirtyPrompt",
+		            "Import may update existing recipes. Save all modified recipes before importing?")) !=
+		    EAppReturnType::Ok)
 			return FReply::Handled();
+
 		SaveAll();
-		if (HasDirtyRecipes()) return FReply::Handled();
+
+		if (HasDirtyRecipes())
+			return FReply::Handled();
 	}
-	FString Folder = TEXT("/Game"); bool Accepted = false;
-	TSharedRef<SWindow> Window = SNew(SWindow).Title(LOCTEXT("ImportFolder", "Choose Recipe Import Folder"))
-		.ClientSize(FVector2D(500, 450)).SupportsMinimize(false).SupportsMaximize(false);
-	TWeakPtr<SWindow> WeakWindow = Window;
-	FPathPickerConfig Config; Config.DefaultPath = Folder; Config.bAllowReadOnlyFolders = false;
-	Config.OnPathSelected = FOnPathSelected::CreateLambda([&Folder](const FString& Path) { Folder = Path; });
-	Window->SetContent(SNew(SVerticalBox)
-		+ SVerticalBox::Slot().FillHeight(1.f)[FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser").Get().CreatePathPicker(Config)]
-		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Right).Padding(8.f)
-		[SNew(SButton).Text(LOCTEXT("ImportHere", "Import Here")).OnClicked_Lambda([&Accepted, WeakWindow]() { Accepted = true; if (auto Pinned = WeakWindow.Pin()) Pinned->RequestDestroyWindow(); return FReply::Handled(); })]);
-	FSlateApplication::Get().AddModalWindow(Window, FSlateApplication::Get().FindWidgetWindow(AsShared()));
-	if (!Accepted) return FReply::Handled();
-	TArray<UMounteaRecipeTemplate*> Imported; FString Error;
-	if (!UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(Files[0], Folder, Imported, Error)) ShowError(Error);
+
+	FString folder = TEXT("/Game");
+	bool accepted = false;
+	TSharedRef<SWindow> window = SNew(SWindow)
+	                                 .Title(LOCTEXT("ImportFolder", "Choose Recipe Import Folder"))
+	                                 .ClientSize(FVector2D(500, 450))
+	                                 .SupportsMinimize(false)
+	                                 .SupportsMaximize(false);
+	TWeakPtr<SWindow> weakWindow = window;
+	FPathPickerConfig config;
+	config.DefaultPath = folder;
+	config.bAllowReadOnlyFolders = false;
+	config.OnPathSelected = FOnPathSelected::CreateLambda([&folder](const FString& Path)
+	{
+		folder = Path;
+	});
+	window->SetContent(
+	    SNew(SVerticalBox) +
+	    SVerticalBox::Slot().FillHeight(1.f)[FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser")
+	            .Get()
+	            .CreatePathPicker(config)] +
+	    SVerticalBox::Slot()
+	        .AutoHeight()
+	        .HAlign(HAlign_Right)
+	        .Padding(8.f)[SNew(SButton)
+	                .Text(LOCTEXT("ImportHere", "Import Here"))
+	                .OnClicked_Lambda([&accepted, weakWindow]()
+	{
+		accepted = true;
+
+		if (auto pinned = weakWindow.Pin())
+			pinned->RequestDestroyWindow();
+		return FReply::Handled();
+	})]);
+	FSlateApplication::Get().AddModalWindow(window, FSlateApplication::Get().FindWidgetWindow(AsShared()));
+
+	if (!accepted)
+		return FReply::Handled();
+
+	TArray<UMounteaRecipeTemplate*> imported;
+	FString error;
+
+	if (!UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(files[0], folder, imported, error))
+		ShowError(error);
 	else
 	{
-		RefreshRecipes(); if (!Imported.IsEmpty()) SelectRecipe(Imported[0]);
-		FMounteaEditorNotificationHelpers::ShowNotification(FString::Printf(TEXT("Imported %d recipes."), Imported.Num()), EMounteaEditorNotificationType::Success);
+		RefreshRecipes();
+
+		if (!imported.IsEmpty())
+			SelectRecipe(imported[0]);
+		FMounteaEditorNotificationHelpers::ShowNotification(
+		    FString::Printf(TEXT("Imported %d recipes."), imported.Num()), EMounteaEditorNotificationType::Success);
 	}
+
 	return FReply::Handled();
 }
 
 FReply SMounteaCraftingRecipesEditor::ExportRecipes()
 {
-	TArray<UMounteaRecipeTemplate*> Selected;
-	for (const auto& Item : Tree->GetSelectedItems()) if (Item->Recipe.IsValid()) Selected.Add(Item->Recipe.Get());
-	if (Selected.IsEmpty()) { ShowError(TEXT("Select at least one recipe to export.")); return FReply::Handled(); }
-	IDesktopPlatform* Desktop = FDesktopPlatformModule::Get();
-	if (!Desktop) { ShowError(TEXT("File dialogs are unavailable.")); return FReply::Handled(); }
-	TArray<FString> Files;
-	const bool Single = Selected.Num() == 1;
-	const FString Extension = Single ? TEXT("mntearecipe") : TEXT("mntearecipes");
-	if (Desktop->SaveFileDialog(FSlateApplication::Get().FindBestParentWindowHandleForDialogs(AsShared()), TEXT("Export Crafting Recipes"), FString(),
-		TEXT("recipes.") + Extension, Single ? TEXT("Mountea Recipe (*.mntearecipe)|*.mntearecipe") : TEXT("Mountea Recipes (*.mntearecipes)|*.mntearecipes"), EFileDialogFlags::None, Files) && !Files.IsEmpty())
+	TArray<UMounteaRecipeTemplate*> selected;
+
+	for (const auto& item : Tree->GetSelectedItems())
+		if (item->Recipe.IsValid())
+			selected.Add(item->Recipe.Get());
+	if (selected.IsEmpty())
 	{
-		FString Error;
-		const FString File = FPaths::ChangeExtension(Files[0], Extension);
-		if (!UMounteaAdvancedInventoryRecipeEditorStatics::ExportRecipesToFilePath(Selected, File, Error)) ShowError(Error);
-		else FMounteaEditorNotificationHelpers::ShowNotification(TEXT("Recipes exported successfully."), EMounteaEditorNotificationType::Success);
+		ShowError(TEXT("Select at least one recipe to export."));
+		return FReply::Handled();
 	}
+
+	IDesktopPlatform* desktop = FDesktopPlatformModule::Get();
+
+	if (!desktop)
+	{
+		ShowError(TEXT("File dialogs are unavailable."));
+		return FReply::Handled();
+	}
+
+	TArray<FString> files;
+	const bool single = selected.Num() == 1;
+	const FString extension = single ? TEXT("mntearecipe") : TEXT("mntearecipes");
+
+	if (desktop->SaveFileDialog(FSlateApplication::Get().FindBestParentWindowHandleForDialogs(AsShared()),
+	        TEXT("Export Crafting Recipes"), FString(), TEXT("recipes.") + extension,
+	        single ? TEXT("Mountea Recipe (*.mntearecipe)|*.mntearecipe")
+	               : TEXT("Mountea Recipes (*.mntearecipes)|*.mntearecipes"),
+	        EFileDialogFlags::None, files) &&
+	    !files.IsEmpty())
+	{
+		FString error;
+		const FString file = FPaths::ChangeExtension(files[0], extension);
+
+		if (!UMounteaAdvancedInventoryRecipeEditorStatics::ExportRecipesToFilePath(selected, file, error))
+			ShowError(error);
+		else
+			FMounteaEditorNotificationHelpers::ShowNotification(
+			    TEXT("Recipes exported successfully."), EMounteaEditorNotificationType::Success);
+	}
+
 	return FReply::Handled();
 }
 
 FReply SMounteaCraftingRecipesEditor::ShowHelp()
 {
-	TSharedRef<SWindow> Window = SNew(SWindow).Title(LOCTEXT("HelpTitle", "Crafting Recipes Editor Tutorial"))
-		.ClientSize(FVector2D(660, 380)).SupportsMinimize(false).SupportsMaximize(false);
-	Window->SetContent(SNew(SVerticalBox)
-		+ SVerticalBox::Slot().FillHeight(1.f).Padding(20.f)
-		[SNew(STextBlock).AutoWrapText(true).Text(LOCTEXT("HelpText",
-			"Use New Template to create a recipe, select its result item, quantity, crafting time and optional station tag. Add ingredients directly in Recipe Ingredients: each entry has an Ingredient Source and Required Quantity. Every ingredient is required.\n\nRecipes are grouped by their result item category. Search matches result names, station tags, categories, asset paths and recipe GUIDs. Select several recipes to edit common properties or export a bundle.\n\nSave Template saves the current recipe; Save All Templates saves modified recipes. Duplicate creates a draft with a new GUID. Saving preserves the GUID. Delete uses the standard asset deletion dialog. Existing asset edits support Undo and Redo.\n\nThe Allowed Recipes list in your crafting configuration controls which recipes are available at runtime. Import and export use .mntearecipe and .mntearecipes files."))]
-		+ SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Right).Padding(12.f)
-		[SNew(SButton).Text(LOCTEXT("Website", "Open Mountea Website")).OnClicked_Lambda([]()
-			{ FPlatformProcess::LaunchURL(TEXT("https://mountea.tools"), nullptr, nullptr); return FReply::Handled(); })]);
-	FSlateApplication::Get().AddModalWindow(Window, FSlateApplication::Get().FindWidgetWindow(AsShared()));
+	TSharedRef<SWindow> window = SNew(SWindow)
+	                                 .Title(LOCTEXT("HelpTitle", "Crafting Recipes Editor Tutorial"))
+	                                 .ClientSize(FVector2D(660, 380))
+	                                 .SupportsMinimize(false)
+	                                 .SupportsMaximize(false);
+	window->SetContent(
+	    SNew(SVerticalBox) +
+	    SVerticalBox::Slot().FillHeight(1.f).Padding(20.f)[SNew(STextBlock)
+	            .AutoWrapText(true)
+	            .Text(LOCTEXT("HelpText",
+	                "Use New Template to create a recipe, select its result item, quantity, crafting time and optional station tag. Add ingredients directly in Recipe Ingredients: each entry has an Ingredient Source and Required Quantity. Every ingredient is required.\n\nRecipes are grouped by their result item category. Search matches result names, station tags, categories, asset paths and recipe GUIDs. Select several recipes to edit common properties or export a bundle.\n\nSave Template saves the current recipe; Save All Templates saves modified recipes. Duplicate creates a draft with a new GUID. Saving preserves the GUID. Delete uses the standard asset deletion dialog. Existing asset edits support Undo and Redo.\n\nThe Allowed Recipes list in your crafting configuration controls which recipes are available at runtime. Import and export use .mntearecipe and .mntearecipes files."))] +
+	    SVerticalBox::Slot()
+	        .AutoHeight()
+	        .HAlign(HAlign_Right)
+	        .Padding(12.f)[SNew(SButton)
+	                .Text(LOCTEXT("Website", "Open Mountea Website"))
+	                .OnClicked_Lambda([]()
+	{
+		FPlatformProcess::LaunchURL(TEXT("https://mountea.tools"), nullptr, nullptr);
+		return FReply::Handled();
+	})]);
+	FSlateApplication::Get().AddModalWindow(window, FSlateApplication::Get().FindWidgetWindow(AsShared()));
 	return FReply::Handled();
 }
+
 #undef LOCTEXT_NAMESPACE

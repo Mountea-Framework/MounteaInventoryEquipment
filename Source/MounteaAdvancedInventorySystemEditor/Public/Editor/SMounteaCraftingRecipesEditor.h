@@ -34,15 +34,25 @@ struct FMounteaRecipeTreeItem
 class SMounteaCraftingRecipesEditor : public SCompoundWidget, public FNotifyHook, public FEditorUndoClient, public FGCObject
 {
 public:
-	SLATE_BEGIN_ARGS(SMounteaCraftingRecipesEditor) {} SLATE_END_ARGS()
+	SLATE_BEGIN_ARGS(SMounteaCraftingRecipesEditor)
+	{
+	}
+	SLATE_END_ARGS()
 	void Construct(const FArguments& InArgs);
 	virtual ~SMounteaCraftingRecipesEditor() override;
 	bool CanCloseEditor();
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
-	virtual FString GetReferencerName() const override { return TEXT("SMounteaCraftingRecipesEditor"); }
+	virtual FString GetReferencerName() const override
+	{
+		return TEXT("SMounteaCraftingRecipesEditor");
+	}
+
 	virtual void NotifyPostChange(const FPropertyChangedEvent& Event, FProperty* Property) override;
 	virtual void PostUndo(bool bSuccess) override;
-	virtual void PostRedo(bool bSuccess) override { PostUndo(bSuccess); }
+	virtual void PostRedo(bool bSuccess) override
+	{
+		PostUndo(bSuccess);
+	}
 
 private:
 	friend class FMounteaCraftingRecipesEditorLifecycleTest;
