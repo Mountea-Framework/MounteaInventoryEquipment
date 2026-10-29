@@ -21,6 +21,16 @@
  */
 struct FMounteaInventoryZipHelper
 {
+	/** Strict shared ZIP transport. Extensions are supplied without a leading dot. */
+	static bool ReadEntityArchives(const FString& FilePath, const FString& SingleExtension, const FString& BundleExtension,
+		TArray<TArray<uint8>>& OutArchives, FString& OutError);
+	static bool ExtractEntityArchive(const TArray<uint8>& Bytes, const FString& RootJsonFile, FString& OutJson,
+		TArray<FString>& OutBundledItems, FString& OutStationTaxonomy, FString& OutError);
+	static bool BuildEntityArchive(const FString& RootJsonFile, const FString& EntityJson, const TArray<FString>& BundledItemJsons,
+		TArray<uint8>& OutBytes, FString& OutError);
+	static bool WriteEntityArchives(const TMap<FGuid, TArray<uint8>>& Archives, const FString& FilePath,
+		const FString& SingleExtension, const FString& BundleExtension, FString& OutError);
+
 	/**
 	 * Returns true if Data starts with a recognised ZIP magic signature.
 	 * Checks PK local-file (0x04034b50), spanned (0x08074b50),
