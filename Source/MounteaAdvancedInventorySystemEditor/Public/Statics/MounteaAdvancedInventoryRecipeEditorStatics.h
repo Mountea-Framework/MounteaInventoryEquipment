@@ -19,7 +19,7 @@ class UMounteaRecipeTemplate;
 class UMounteaInventoryItemTemplate;
 
 /**
- * Editor-only static helpers for importing .mntearecipe / .mntearecipes files.
+ * Editor-only static helpers for importing and exporting .mntearecipe / .mntearecipes files.
  *
  * Import is atomic: all ZIP reading and validation finishes before any UAsset is created.
  * If validation fails, nothing is written.
@@ -39,6 +39,12 @@ public:
 		const FString& TargetFolder,
 		TArray<UMounteaRecipeTemplate*>& OutRecipes,
 		FString& OutErrorMessage);
+
+public:
+	/** Export one recipe archive or a ZIP bundle; ingredient data is always flat. */
+	static bool ExportRecipesToFilePath(const TArray<UMounteaRecipeTemplate*>& Recipes, const FString& FilePath, FString& OutErrorMessage);
+	/** Validate the editable recipe before saving or exporting. */
+	static bool ValidateRecipeTemplate(const UMounteaRecipeTemplate* Recipe, FString& OutErrorMessage);
 
 public:
 	// ── ZIP parsing ──────────────────────────────────────────────────────────
@@ -80,7 +86,7 @@ public:
 	/**
 	 * Populate a recipe template from its JSON object.
 	 * ItemsByGuid maps item GUIDs → already-imported UMounteaInventoryItemTemplate objects.
-	 * Sub-objects (ingredient lists and individual ingredients) are created inline.
+	 * Mandatory ingredients are instanced subclassable objects owned directly by the recipe.
 	 */
 	static bool DeserializeRecipeFromJson(
 		const TSharedPtr<FJsonObject>& JsonObject,

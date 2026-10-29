@@ -199,7 +199,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 			if (UMounteaAdvancedInventoryRecipeEditorStatics::DeserializeRecipeFromJson(recipeJson, recipe, itemsByGuid, stationTagByName, deserError))
 			{
 				recipe->SetSourceFilePath(FilePath);
-				if (UMounteaAdvancedInventoryRecipeEditorStatics::SaveRecipeAsset(recipe, FPaths::Combine(recipesFolder, assetName)))
+				if (UMounteaAdvancedInventoryRecipeEditorStatics::SaveRecipeAsset(recipe, recipe->GetOutermost()->GetName()))
 					OutRecipes.Add(recipe);
 				else
 					OutErrorMessage += FString::Printf(TEXT("Failed to save recipe asset '%s'\n"), *assetName);

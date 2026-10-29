@@ -16,12 +16,12 @@
 #include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 
 #include "Definitions/MounteaRecipeTemplate.h"
-#include "Definitions/MounteaRecipeIngredientsList.h"
 #include "Definitions/MounteaRecipeIngredient.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
 #include "Dom/JsonObject.h"
 #include "GameplayTagsManager.h"
 #include "Misc/Paths.h"
@@ -167,8 +167,11 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 			if (DeserializeRecipeFromJson(entry.ParsedJson, recipe, itemsByGuid, entry.StationTagByName, deserError))
 			{
 				recipe->SetSourceFilePath(FilePath);
-				if (SaveRecipeAsset(recipe, FPaths::Combine(folderToUse, assetName)))
+				if (SaveRecipeAsset(recipe, recipe->GetOutermost()->GetName()))
+				{
 					OutRecipes.Add(recipe);
+					existingRecipes.Add(recipe);
+				}
 				else
 				{
 					OutErrorMessage += FString::Printf(TEXT("Failed to save recipe asset '%s'\n"), *assetName);
@@ -280,78 +283,85 @@ TMap<FString, FString> UMounteaAdvancedInventoryRecipeEditorStatics::ParseStatio
 // Validation
 // ---------------------------------------------------------------------------
 
-bool UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipe(
-	const TSharedPtr<FJsonObject>& RecipeJson,
-	const TSet<FGuid>& KnownGuids,
-	FString& OutErrorMessage)
+namespace
 {
-	FString guidStr;
-	if (!RecipeJson->TryGetStringField(TEXT("guid"), guidStr) || guidStr.IsEmpty())
+	// Transitional reader for Inventour's current format. No alternatives enter the runtime model.
+	bool ReadFlatIngredients(const TSharedPtr<FJsonObject>& Json, TArray<TSharedPtr<FJsonValue>>& Out, FString& Error)
 	{
-		OutErrorMessage = TEXT("Recipe JSON missing 'guid' field");
-		LOG_ERROR(TEXT("[Recipe Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
-	// Validate result item
-	const TSharedPtr<FJsonObject>* resultObj;
-	if (RecipeJson->TryGetObjectField(TEXT("result"), resultObj))
-	{
-		FString itemRef;
-		if ((*resultObj)->TryGetStringField(TEXT("itemRef"), itemRef) && !itemRef.IsEmpty())
+		if (!Json.IsValid()) { Error = TEXT("Invalid recipe JSON"); return false; }
+		const TArray<TSharedPtr<FJsonValue>>* ingredients = nullptr;
+		if (Json->HasField(TEXT("ingredients")))
 		{
-			FString checkError;
-			if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
-				itemRef, TEXT("result.itemRef"), KnownGuids, checkError))
+			if (Json->HasField(TEXT("groups"))) { Error = TEXT("Recipe cannot contain both ingredients and legacy groups"); return false; }
+			if (!Json->TryGetArrayField(TEXT("ingredients"), ingredients)) { Error = TEXT("ingredients must be an array"); return false; }
+			Out = *ingredients;
+		}
+		else
+		{
+			const TArray<TSharedPtr<FJsonValue>>* groups = nullptr;
+			if (!Json->TryGetArrayField(TEXT("groups"), groups)) { Error = TEXT("Recipe is missing its ingredients array"); return false; }
+			for (const auto& value : *groups)
 			{
-				OutErrorMessage = checkError;
-				LOG_ERROR(TEXT("[Recipe Import] %s"), *checkError);
-				return false;
+				const TSharedPtr<FJsonObject>* group = nullptr;
+				if (!value.IsValid() || !value->TryGetObject(group)) { Error = TEXT("Invalid legacy ingredient group"); return false; }
+				bool required = true, oneOf = false;
+				if (((*group)->HasField(TEXT("required")) && !(*group)->TryGetBoolField(TEXT("required"), required)) ||
+					((*group)->HasField(TEXT("oneOf")) && !(*group)->TryGetBoolField(TEXT("oneOf"), oneOf)))
+				{ Error = TEXT("Legacy group flags must be booleans"); return false; }
+				if (!required || oneOf)
+				{ Error = TEXT("Alternative or optional ingredients are no longer supported. Convert each crafting method to a separate recipe before importing."); return false; }
+				if (!(*group)->TryGetArrayField(TEXT("ingredients"), ingredients)) { Error = TEXT("Legacy group is missing ingredients"); return false; }
+				Out.Append(*ingredients);
 			}
 		}
+		if (Out.IsEmpty()) { Error = TEXT("A recipe must have at least one mandatory ingredient"); return false; }
+		return true;
 	}
+}
 
-	// Validate ingredient groups
-	const TArray<TSharedPtr<FJsonValue>>* groupsArray;
-	if (RecipeJson->TryGetArrayField(TEXT("groups"), groupsArray))
+bool UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipe(
+	const TSharedPtr<FJsonObject>& RecipeJson, const TSet<FGuid>& KnownGuids, FString& OutErrorMessage)
+{
+	OutErrorMessage.Reset();
+	FString guidString;
+	FGuid guid;
+	if (!RecipeJson.IsValid() || !RecipeJson->TryGetStringField(TEXT("guid"), guidString) || !FGuid::Parse(guidString, guid) || !guid.IsValid())
+	{ OutErrorMessage = TEXT("Recipe requires a valid nonzero guid"); return false; }
+	const TSharedPtr<FJsonObject>* result = nullptr;
+	FString resultGuid;
+	if (!RecipeJson->TryGetObjectField(TEXT("result"), result) || !(*result)->TryGetStringField(TEXT("itemRef"), resultGuid))
+	{ OutErrorMessage = TEXT("Recipe requires result.itemRef"); return false; }
+	if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(resultGuid, TEXT("result.itemRef"), KnownGuids, OutErrorMessage)) return false;
+	double yield = 1;
+	if (RecipeJson->HasField(TEXT("qtyMax")) &&
+		(!RecipeJson->TryGetNumberField(TEXT("qtyMax"), yield) || !FMath::IsFinite(yield) || yield < 1 || yield > MAX_int32 || yield != FMath::FloorToDouble(yield)))
+	{ OutErrorMessage = TEXT("qtyMax must be a positive integer"); return false; }
+	const TSharedPtr<FJsonObject>* reqs = nullptr;
+	if (RecipeJson->TryGetObjectField(TEXT("reqs"), reqs) && (*reqs)->HasField(TEXT("duration")))
 	{
-		for (int32 gi = 0; gi < groupsArray->Num(); ++gi)
-		{
-			const TSharedPtr<FJsonObject>* groupObj;
-			if (!(*groupsArray)[gi]->TryGetObject(groupObj))
-				continue;
-
-			const TArray<TSharedPtr<FJsonValue>>* ingredientsArray;
-			if (!(*groupObj)->TryGetArrayField(TEXT("ingredients"), ingredientsArray))
-				continue;
-
-			for (int32 ii = 0; ii < ingredientsArray->Num(); ++ii)
-			{
-				const TSharedPtr<FJsonObject>* ingObj;
-				if (!(*ingredientsArray)[ii]->TryGetObject(ingObj))
-					continue;
-
-				const TSharedPtr<FJsonObject>* refObj;
-				FString refGuid;
-				if ((*ingObj)->TryGetObjectField(TEXT("ref"), refObj) &&
-					(*refObj)->TryGetStringField(TEXT("guid"), refGuid))
-				{
-					FString checkError;
-					if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
-						refGuid,
-						FString::Printf(TEXT("groups[%d].ingredients[%d]"), gi, ii),
-						KnownGuids,
-						checkError))
-					{
-						OutErrorMessage = checkError;
-						LOG_ERROR(TEXT("[Recipe Import] %s"), *checkError);
-						return false;
-					}
-				}
-			}
-		}
+		double duration = 0;
+		if (!(*reqs)->TryGetNumberField(TEXT("duration"), duration) || !FMath::IsFinite(duration) || duration < 0 || duration > MAX_flt)
+		{ OutErrorMessage = TEXT("Crafting duration must be a finite nonnegative number"); return false; }
 	}
-
+	TArray<TSharedPtr<FJsonValue>> ingredients;
+	if (!ReadFlatIngredients(RecipeJson, ingredients, OutErrorMessage)) return false;
+	TMap<FGuid, int64> totals;
+	for (int32 index = 0; index < ingredients.Num(); ++index)
+	{
+		const TSharedPtr<FJsonObject>* ingredient = nullptr;
+		const TSharedPtr<FJsonObject>* ref = nullptr;
+		FString itemGuid;
+		double quantity = 0;
+		if (!ingredients[index].IsValid() || !ingredients[index]->TryGetObject(ingredient) ||
+			!(*ingredient)->TryGetObjectField(TEXT("ref"), ref) || !(*ref)->TryGetStringField(TEXT("guid"), itemGuid) ||
+			!(*ingredient)->TryGetNumberField(TEXT("qty"), quantity) || !FMath::IsFinite(quantity) || quantity <= 0 || quantity > MAX_int32 || quantity != FMath::FloorToDouble(quantity))
+		{ OutErrorMessage = FString::Printf(TEXT("ingredients[%d] requires ref.guid and a positive integer qty"), index); return false; }
+		if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(itemGuid, FString::Printf(TEXT("ingredients[%d].ref.guid"), index), KnownGuids, OutErrorMessage)) return false;
+		FGuid parsed; FGuid::Parse(itemGuid, parsed);
+		int64& total = totals.FindOrAdd(parsed);
+		total += static_cast<int64>(quantity);
+		if (total > MAX_int32) { OutErrorMessage = TEXT("Combined ingredient quantity exceeds int32 capacity"); return false; }
+	}
 	return true;
 }
 
@@ -364,7 +374,9 @@ UMounteaRecipeTemplate* UMounteaAdvancedInventoryRecipeEditorStatics::CreateReci
 	const FString& AssetName,
 	FString& OutErrorMessage)
 {
-	const FString packageName = FPaths::Combine(TargetFolder, AssetName);
+	FString packageName, uniqueName;
+	FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get().CreateUniqueAssetName(
+		FPaths::Combine(TargetFolder, FMounteaInventoryImportHelpers::SanitizeAssetName(AssetName)), TEXT(""), packageName, uniqueName);
 	UPackage* newPackage = CreatePackage(*packageName);
 
 	if (!newPackage)
@@ -377,7 +389,7 @@ UMounteaRecipeTemplate* UMounteaAdvancedInventoryRecipeEditorStatics::CreateReci
 	UMounteaRecipeTemplate* recipe = NewObject<UMounteaRecipeTemplate>(
 		newPackage,
 		UMounteaRecipeTemplate::StaticClass(),
-		*AssetName,
+		*uniqueName,
 		RF_Public | RF_Standalone
 	);
 
@@ -390,231 +402,63 @@ UMounteaRecipeTemplate* UMounteaAdvancedInventoryRecipeEditorStatics::CreateReci
 	return recipe;
 }
 
-namespace MounteaRecipeImportPrivate
-{
-	struct FIngredientRef
-	{
-		FGuid Guid;
-		int32 Quantity = 1;
-	};
-
-	/** Safety cap on generated ingredient-option combinations (guards against pathological oneOf-group counts). */
-	constexpr int32 MaxIngredientOptionCombinations = 64;
-}
-
 bool UMounteaAdvancedInventoryRecipeEditorStatics::DeserializeRecipeFromJson(
-	const TSharedPtr<FJsonObject>& JsonObject,
-	UMounteaRecipeTemplate* Recipe,
+	const TSharedPtr<FJsonObject>& JsonObject, UMounteaRecipeTemplate* Recipe,
 	const TMap<FGuid, UMounteaInventoryItemTemplate*>& ItemsByGuid,
-	const TMap<FString, FString>& StationTagByName,
-	FString& OutErrorMessage)
+	const TMap<FString, FString>& StationTagByName, FString& OutErrorMessage)
 {
-	using namespace MounteaRecipeImportPrivate;
+	TSet<FGuid> knownGuids;
+	for (const auto& item : ItemsByGuid) if (IsValid(item.Value)) knownGuids.Add(item.Key);
+	if (!IsValid(Recipe) || !ValidateRecipe(JsonObject, knownGuids, OutErrorMessage)) return false;
 
-	if (!JsonObject.IsValid() || !IsValid(Recipe))
+	TArray<TSharedPtr<FJsonValue>> entries;
+	if (!ReadFlatIngredients(JsonObject, entries, OutErrorMessage)) return false;
+	TArray<TObjectPtr<UMounteaRecipeIngredient>> ingredients;
+	TMap<FGuid, int32> indexByGuid;
+	for (const auto& entry : entries)
 	{
-		OutErrorMessage = TEXT("Invalid JSON or recipe object");
-		LOG_ERROR(TEXT("[Recipe Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
-	Recipe->RecipeIngredientOptions.Empty();
-
-	// RecipeGuid
-	FString guidStr;
-	if (JsonObject->TryGetStringField(TEXT("guid"), guidStr))
-		FGuid::Parse(guidStr, Recipe->RecipeGuid);
-
-	// Result item
-	const TSharedPtr<FJsonObject>* resultObj;
-	if (JsonObject->TryGetObjectField(TEXT("result"), resultObj))
-	{
-		FString itemRef;
-		if ((*resultObj)->TryGetStringField(TEXT("itemRef"), itemRef))
+		const auto object = entry->AsObject();
+		FGuid guid; FGuid::Parse(object->GetObjectField(TEXT("ref"))->GetStringField(TEXT("guid")), guid);
+		const int32 quantity = static_cast<int32>(object->GetNumberField(TEXT("qty")));
+		if (const int32* index = indexByGuid.Find(guid)) ingredients[*index]->RequiredQuantity += quantity;
+		else
 		{
-			FGuid itemGuid;
-			if (FGuid::Parse(itemRef, itemGuid))
-			{
-				if (UMounteaInventoryItemTemplate* const* t = ItemsByGuid.Find(itemGuid))
-					Recipe->ResultItem = TSoftObjectPtr<UMounteaInventoryItemTemplate>(*t);
-				else
-					LOG_WARNING(TEXT("[Recipe Import] result.itemRef %s not found among imported/known items"), *itemRef);
-			}
+			// Preserve a project's chosen subclass and its additional fields on reimport.
+			UMounteaRecipeIngredient* previous = nullptr;
+			for (UMounteaRecipeIngredient* existing : Recipe->RecipeIngredients)
+				if (IsValid(existing) && existing->IngredientSource.LoadSynchronous() == ItemsByGuid.FindChecked(guid))
+				{ previous = existing; break; }
+			UClass* ingredientClass = Recipe->DefaultIngredientClass.Get();
+			if (!ingredientClass || ingredientClass->HasAnyClassFlags(CLASS_Abstract)) ingredientClass = UMounteaRecipeIngredient::StaticClass();
+			UMounteaRecipeIngredient* ingredient = previous
+				? DuplicateObject<UMounteaRecipeIngredient>(previous, Recipe)
+				: NewObject<UMounteaRecipeIngredient>(Recipe, ingredientClass, NAME_None, RF_Transactional);
+			ingredient->IngredientSource = ItemsByGuid.FindChecked(guid);
+			ingredient->RequiredQuantity = quantity;
+			indexByGuid.Add(guid, ingredients.Add(ingredient));
 		}
 	}
-
-	// Result quantity: qtyMin/qtyMax live at the recipe root, not nested under "result".
-	// The current data model only stores a single deterministic yield, so qtyMax is used.
-	int32 qtyMax = 1;
-	JsonObject->TryGetNumberField(TEXT("qtyMax"), qtyMax);
-	Recipe->QuantityPerCreation = FMath::Max(1, qtyMax);
-
-	// Crafting requirements
-	const TSharedPtr<FJsonObject>* reqsObj;
-	if (JsonObject->TryGetObjectField(TEXT("reqs"), reqsObj))
+	// Apply only after all parsing/validation has succeeded, so failed reimports preserve the old data.
+	FGuid::Parse(JsonObject->GetStringField(TEXT("guid")), Recipe->RecipeGuid);
+	FGuid resultGuid; FGuid::Parse(JsonObject->GetObjectField(TEXT("result"))->GetStringField(TEXT("itemRef")), resultGuid);
+	Recipe->ResultItem = ItemsByGuid.FindChecked(resultGuid);
+	int32 yield = 1; JsonObject->TryGetNumberField(TEXT("qtyMax"), yield);
+	Recipe->QuantityPerCreation = yield;
+	Recipe->CraftingTime = 0.f;
+	Recipe->RequiredCraftingPlace = FGameplayTag();
+	const TSharedPtr<FJsonObject>* reqs = nullptr;
+	if (JsonObject->TryGetObjectField(TEXT("reqs"), reqs))
 	{
-		double duration = 0.0;
-		if ((*reqsObj)->TryGetNumberField(TEXT("duration"), duration))
-			Recipe->CraftingTime = static_cast<float>(duration);
-
-		FString stationName;
-		if ((*reqsObj)->TryGetStringField(TEXT("station"), stationName) &&
-			!stationName.IsEmpty() && !stationName.Equals(TEXT("None"), ESearchCase::IgnoreCase))
+		double duration = 0; (*reqs)->TryGetNumberField(TEXT("duration"), duration);
+		Recipe->CraftingTime = static_cast<float>(duration);
+		FString station;
+		if ((*reqs)->TryGetStringField(TEXT("station"), station) && !station.IsEmpty() && !station.Equals(TEXT("None"), ESearchCase::IgnoreCase))
 		{
-			// `station` is a display name (e.g. "Forge"); resolve through the bundled taxonomy to the real tag.
-			const FString* mappedTag = StationTagByName.Find(stationName);
-			const FString tagName = mappedTag ? *mappedTag : stationName;
-
-			const FGameplayTag tag = FGameplayTag::RequestGameplayTag(FName(*tagName), false);
-			if (tag.IsValid())
-				Recipe->RequiredCraftingPlace = tag;
-			else
-				LOG_WARNING(TEXT("[Recipe Import] Crafting station '%s' has no taxonomy mapping and is not a valid registered gameplay tag; RequiredCraftingPlace left unset"), *stationName);
+			const FString* mapped = StationTagByName.Find(station);
+			Recipe->RequiredCraftingPlace = FGameplayTag::RequestGameplayTag(FName(mapped ? **mapped : *station), false);
 		}
 	}
-
-	// Ingredient groups → RecipeIngredientOptions.
-	// Real recipes use groups[] with `required`/`oneOf` flags, which the current runtime model
-	// (RecipeIngredientOptions = OR-alternatives, each internally AND-only) can't represent directly.
-	// So: merge all required, non-oneOf groups into one shared base AND-set, and cartesian-expand
-	// one option per combination of choices across all required, oneOf groups.
-	TArray<FIngredientRef> baseIngredients;
-	TArray<TArray<FIngredientRef>> choiceGroups;
-
-	const TArray<TSharedPtr<FJsonValue>>* groupsArray;
-	if (JsonObject->TryGetArrayField(TEXT("groups"), groupsArray))
-	{
-		for (int32 gi = 0; gi < groupsArray->Num(); ++gi)
-		{
-			const TSharedPtr<FJsonObject>* groupObj;
-			if (!(*groupsArray)[gi]->TryGetObject(groupObj))
-				continue;
-
-			bool bRequired = true;
-			(*groupObj)->TryGetBoolField(TEXT("required"), bRequired);
-			if (!bRequired)
-			{
-				FString groupTitle;
-				(*groupObj)->TryGetStringField(TEXT("title"), groupTitle);
-				LOG_WARNING(TEXT("[Recipe Import] Skipping optional ingredient group '%s' (required=false) - not supported by the current recipe data model"), *groupTitle);
-				continue;
-			}
-
-			bool bOneOf = false;
-			(*groupObj)->TryGetBoolField(TEXT("oneOf"), bOneOf);
-
-			const TArray<TSharedPtr<FJsonValue>>* ingredientsArray;
-			if (!(*groupObj)->TryGetArrayField(TEXT("ingredients"), ingredientsArray))
-				continue;
-
-			TArray<FIngredientRef> groupIngredients;
-			for (int32 ii = 0; ii < ingredientsArray->Num(); ++ii)
-			{
-				const TSharedPtr<FJsonObject>* ingObj;
-				if (!(*ingredientsArray)[ii]->TryGetObject(ingObj))
-					continue;
-
-				const TSharedPtr<FJsonObject>* refObj;
-				FString refGuidStr;
-				if (!(*ingObj)->TryGetObjectField(TEXT("ref"), refObj) ||
-					!(*refObj)->TryGetStringField(TEXT("guid"), refGuidStr))
-					continue;
-
-				FIngredientRef ingredientRef;
-				if (!FGuid::Parse(refGuidStr, ingredientRef.Guid) || !ingredientRef.Guid.IsValid())
-					continue;
-
-				int32 qty = 1;
-				(*ingObj)->TryGetNumberField(TEXT("qty"), qty);
-				ingredientRef.Quantity = FMath::Max(1, qty);
-
-				groupIngredients.Add(ingredientRef);
-			}
-
-			if (bOneOf)
-			{
-				if (groupIngredients.Num() > 0)
-					choiceGroups.Add(MoveTemp(groupIngredients));
-			}
-			else
-				baseIngredients.Append(groupIngredients);
-		}
-	}
-
-	if (baseIngredients.Num() > 0 || choiceGroups.Num() > 0)
-	{
-		// Cartesian product across oneOf choice groups (empty choiceGroups -> single base-only combination).
-		TArray<TArray<FIngredientRef>> combinations;
-		combinations.Add(TArray<FIngredientRef>());
-
-		bool bTruncated = false;
-		for (const TArray<FIngredientRef>& choices : choiceGroups)
-		{
-			TArray<TArray<FIngredientRef>> expanded;
-			expanded.Reserve(combinations.Num() * choices.Num());
-
-			for (const TArray<FIngredientRef>& existing : combinations)
-			{
-				for (const FIngredientRef& choice : choices)
-				{
-					if (expanded.Num() >= MaxIngredientOptionCombinations)
-					{
-						bTruncated = true;
-						break;
-					}
-					TArray<FIngredientRef> combo = existing;
-					combo.Add(choice);
-					expanded.Add(MoveTemp(combo));
-				}
-				if (bTruncated)
-					break;
-			}
-
-			combinations = MoveTemp(expanded);
-			if (bTruncated)
-				break;
-		}
-
-		if (bTruncated)
-			LOG_WARNING(TEXT("[Recipe Import] Recipe '%s' generates more than %d ingredient option combinations; truncating"), *guidStr, MaxIngredientOptionCombinations);
-
-		for (const TArray<FIngredientRef>& combo : combinations)
-		{
-			UMounteaRecipeIngredientsList* ingredientsList =
-				NewObject<UMounteaRecipeIngredientsList>(Recipe,
-					UMounteaRecipeIngredientsList::StaticClass(),
-					NAME_None,
-					RF_NoFlags);
-
-			auto addIngredient = [&](const FIngredientRef& Ref)
-			{
-				UMounteaInventoryItemTemplate* const* ingTemplate = ItemsByGuid.Find(Ref.Guid);
-				if (!ingTemplate || !IsValid(*ingTemplate))
-				{
-					LOG_WARNING(TEXT("[Recipe Import] Ingredient GUID %s not found among imported/known items"), *Ref.Guid.ToString());
-					return;
-				}
-
-				UMounteaRecipeIngredient* ingredient =
-					NewObject<UMounteaRecipeIngredient>(ingredientsList,
-						UMounteaRecipeIngredient::StaticClass(),
-						NAME_None,
-						RF_NoFlags);
-
-				ingredient->IngredientSource = TSoftObjectPtr<UMounteaInventoryItemTemplate>(*ingTemplate);
-				ingredient->RequiredQuantity = Ref.Quantity;
-				ingredientsList->RecipeIngredients.Add(ingredient);
-			};
-
-			for (const FIngredientRef& ref : baseIngredients)
-				addIngredient(ref);
-			for (const FIngredientRef& ref : combo)
-				addIngredient(ref);
-
-			Recipe->RecipeIngredientOptions.Add(ingredientsList);
-		}
-	}
-
+	Recipe->RecipeIngredients = MoveTemp(ingredients);
 	return true;
 }
 
