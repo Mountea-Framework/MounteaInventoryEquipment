@@ -53,6 +53,9 @@ struct FMounteaInventoryZipHelper
 		const FString& InnerExtension,
 		TArray<TArray<uint8>>& OutInnerZips);
 
+	/** Build a ZIP from archive-relative entry names and bytes. Does not modify OutBytes on failure. */
+	static bool BuildArchive(const TMap<FString, TArray<uint8>>& Entries, TArray<uint8>& OutBytes);
+
 	/** Convert a raw UTF-8 byte span to FString, skipping a leading BOM if present. */
 	static FString BytesToString(const uint8* Bytes, int32 Count);
 };

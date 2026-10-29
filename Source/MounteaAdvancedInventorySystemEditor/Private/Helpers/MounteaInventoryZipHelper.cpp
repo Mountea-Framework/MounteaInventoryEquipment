@@ -152,3 +152,32 @@ bool FMounteaInventoryZipHelper::ExpandBundle(
 
 	return OutInnerZips.Num() > 0;
 }
+
+
+bool FMounteaInventoryZipHelper::BuildArchive(const TMap<FString, TArray<uint8>>& Entries, TArray<uint8>& OutBytes)
+{
+	if (Entries.IsEmpty()) return false;
+	const FString tempPath = FPaths::CreateTempFilename(FPlatformProcess::UserTempDir(), TEXT("MounteaRecipe"), TEXT(".zip"));
+	zip_t* archive = zip_open(TCHAR_TO_UTF8(*tempPath), 6, 'w');
+	if (!archive) return false;
+	bool success = true;
+	TArray<FString> names;
+	Entries.GetKeys(names);
+	names.Sort();
+	for (const FString& name : names)
+	{
+		if (name.IsEmpty() || name.StartsWith(TEXT("/")) || name.Contains(TEXT("..")) || name.Contains(TEXT("\\")) ||
+			zip_entry_open(archive, TCHAR_TO_UTF8(*name)) < 0)
+		{ success = false; break; }
+		const auto& bytes = Entries.FindChecked(name);
+		const int writeResult = zip_entry_write(archive, bytes.GetData(), bytes.Num());
+		const int closeResult = zip_entry_close(archive);
+		if (writeResult < 0 || closeResult < 0) { success = false; break; }
+	}
+	zip_close(archive);
+	TArray<uint8> result;
+	success = success && FFileHelper::LoadFileToArray(result, *tempPath);
+	IFileManager::Get().Delete(*tempPath);
+	if (success) OutBytes = MoveTemp(result);
+	return success;
+}
