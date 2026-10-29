@@ -14,6 +14,7 @@
 #include "Modules/ModuleManager.h"
 
 class SMounteaInventoryTemplateEditor;
+class SMounteaCraftingRecipesEditor;
 
 class FMounteaAdvancedInventorySystemEditor : public IModuleInterface
 {
@@ -31,10 +32,13 @@ private:
 	void UnregisterTabSpawners();
 
 	void OpenInventoryTemplateEditor();
+	void OpenCraftingRecipesEditor();
+	TSharedRef<SDockTab> SpawnCraftingRecipesEditorTab(const FSpawnTabArgs& Args);
 	void SetupDefaultsButtonClicked();
 	TSharedRef<SDockTab> SpawnInventoryTemplateEditorTab(const FSpawnTabArgs& Args);
 
 	static const FName InventoryTemplateEditorTabId;
+	static const FName CraftingRecipesEditorTabId;
 	
 	void RegisterMenus();
 
@@ -46,4 +50,5 @@ private:
 	TArray<FName> RegisteredCustomPropertyTypeLayouts;
 	TSharedPtr<class FUICommandList> PluginCommands;
 	TWeakPtr<SMounteaInventoryTemplateEditor> CurrentTemplateEditor;
+	TWeakPtr<SMounteaCraftingRecipesEditor> CurrentRecipesEditor;
 };

@@ -20,6 +20,7 @@ UMounteaRecipeIngredient_Factory::UMounteaRecipeIngredient_Factory()
 	bEditAfterNew = true;
 
 	SupportedClass = UMounteaRecipeIngredient::StaticClass();
+	ParentClass = UMounteaRecipeIngredient::StaticClass();
 }
 
 UObject* UMounteaRecipeIngredient_Factory::FactoryCreateNew(UClass* Class, UObject* InParent, FName Name,

@@ -44,6 +44,7 @@
 #include "PropertyEditorModule.h"
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
+#include "Editor/SMounteaCraftingRecipesEditor.h"
 #include "Popups/MAISSetupDefaultsPopup.h"
 #include "Setup/MounteaInventorySetupUtilities.h"
 
@@ -67,9 +68,8 @@
 #include "AssetActions/MounteaAdvancedInventoryLoadoutConfigs_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryLoadoutItem_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryModalsDataTable_AssetAction.h"
-#include "AssetActions/MounteaAdvancedInventoryRecipeIngredientsList_AssetAction.h"
-#include "AssetActions/MounteaAdvancedInventoryRecipeIngredient_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryRecipeTemplate_AssetAction.h"
+#include "AssetActions/MounteaAdvancedInventoryRecipeIngredient_AssetAction.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
 #include "WebBrowserModule.h"
@@ -78,6 +78,7 @@
 
 static const FName MenuName("LevelEditor.LevelEditorToolBar.PlayToolBar");
 const FName FMounteaAdvancedInventorySystemEditor::InventoryTemplateEditorTabId = TEXT("MounteaInventoryTemplateEditor");
+const FName FMounteaAdvancedInventorySystemEditor::CraftingRecipesEditorTabId = TEXT("MounteaCraftingRecipesEditor");
 TSharedPtr<SMounteaInventoryTemplateEditor> CurrentEditor;
 
 void FMounteaAdvancedInventorySystemEditor::StartupModule()
@@ -137,7 +138,6 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaAdvancedInventoryLoadoutComponent"), TEXT("LoadoutComponent") },
 					{ TEXT("MounteaAdvancedInventoryLoadoutItem"), TEXT("LoadoutItem") },
 					{ TEXT("MounteaRecipeTemplate"), TEXT("RecipeBook") },
-					{ TEXT("MounteaRecipeIngredientsList"), TEXT("RecipeIngredientsList") },
 					{ TEXT("MounteaRecipeIngredient"), TEXT("MounteaRecipeIngredients") },
 					{ TEXT("MounteaCraftingParticipantComponent"), TEXT("CraftingParticipantIcon") },
 					{ TEXT("MounteaCraftingParticipantUIComponent"), TEXT("CraftingParticipantUIIcon") },
@@ -194,7 +194,6 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryModalsDataTable_AssetAction>());
 		
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeTemplate_AssetAction>());
-		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredientsList_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryRecipeIngredient_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryCraftingUIConfig_AssetAction>());
@@ -373,12 +372,21 @@ void FMounteaAdvancedInventorySystemEditor::RegisterTabSpawners()
 	.SetDisplayName(LOCTEXT("InventoryTemplateEditorTabTitle", "Mountea Inventory Template Editor"))
 	.SetTooltipText(LOCTEXT("InventoryTemplateEditorTooltipText", "Open the Mountea Inventory Template Editor"))
 	.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor")); 
+	FGlobalTabmanager::Get()->RegisterTabSpawner(CraftingRecipesEditorTabId,
+		FOnSpawnTab::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::SpawnCraftingRecipesEditorTab))
+		.SetDisplayName(LOCTEXT("CraftingRecipesTitle", "Mountea Crafting Recipes Editor"))
+		.SetTooltipText(LOCTEXT("CraftingRecipesTip", "Create and edit crafting recipes"))
+		.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor"));
+
 }
 
 void FMounteaAdvancedInventorySystemEditor::UnregisterTabSpawners()
 {
 	if (FSlateApplication::IsInitialized())
+	{
 		FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(InventoryTemplateEditorTabId);
+		FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(CraftingRecipesEditorTabId);
+	}
 }
 
 void FMounteaAdvancedInventorySystemEditor::OpenInventoryTemplateEditor()
@@ -412,6 +420,25 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnInventoryTempla
 	newTab->SetTabIcon(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.TemplatesEditor"));
 
 	return newTab;
+}
+
+void FMounteaAdvancedInventorySystemEditor::OpenCraftingRecipesEditor()
+{
+	FGlobalTabmanager::Get()->TryInvokeTab(CraftingRecipesEditorTabId);
+}
+
+TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnCraftingRecipesEditorTab(const FSpawnTabArgs& Args)
+{
+	TSharedRef<SMounteaCraftingRecipesEditor> Editor = SNew(SMounteaCraftingRecipesEditor);
+	CurrentRecipesEditor = Editor;
+	TWeakPtr<SMounteaCraftingRecipesEditor> WeakEditor = Editor;
+	TSharedRef<SDockTab> Tab = SNew(SDockTab).TabRole(ETabRole::NomadTab)
+		.Label(LOCTEXT("CraftingRecipesLabel", "Crafting Recipes Editor"))
+		.ToolTipText(LOCTEXT("CraftingRecipesTooltip", "Create and edit Mountea crafting recipes"))[Editor];
+	Tab->SetTabIcon(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.TemplatesEditor"));
+	Tab->SetCanCloseTab(SDockTab::FCanCloseTab::CreateLambda([WeakEditor]()
+	{ auto Pinned = WeakEditor.Pin(); return !Pinned || Pinned->CanCloseEditor(); }));
+	return Tab;
 }
 
 void FMounteaAdvancedInventorySystemEditor::SetupDefaultsButtonClicked()
@@ -497,6 +524,14 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor"),
 							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { OpenInventoryTemplateEditor(); })
 						));
+						toolsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+							"MounteaInventory_CraftingRecipesEditor",
+							LOCTEXT("CraftingRecipesMenu", "Mountea Crafting Recipes Editor"),
+							LOCTEXT("CraftingRecipesMenuTooltip", "Create, edit, duplicate, import and export crafting recipes."),
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor"),
+							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { OpenCraftingRecipesEditor(); })
+						));
+
 					}
 
 					{
