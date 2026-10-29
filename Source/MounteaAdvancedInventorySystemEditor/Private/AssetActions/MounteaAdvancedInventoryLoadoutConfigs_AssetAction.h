@@ -19,6 +19,7 @@ class  FMounteaAdvancedInventoryLoadoutConfigs_AssetAction : public FAssetTypeAc
 public:
 	FMounteaAdvancedInventoryLoadoutConfigs_AssetAction();
 
+	virtual void GetActions(const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder) override;
 	virtual FText GetName() const override;
 	virtual FColor GetTypeColor() const override;
 	virtual UClass* GetSupportedClass() const override;

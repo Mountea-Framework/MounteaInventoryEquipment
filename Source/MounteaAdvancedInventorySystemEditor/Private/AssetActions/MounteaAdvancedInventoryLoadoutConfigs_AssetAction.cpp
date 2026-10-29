@@ -14,12 +14,54 @@
 #include "MounteaAdvancedInventoryThemeConfig_AssetAction.h"
 #include "Definitions/MounteaAdvancedInventoryEditorBaseTypes.h"
 #include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
+#include "Helpers/MounteaEditorNotificationHelpers.h"
+#include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
+#include "Statics/MounteaAdvancedInventoryLoadoutEditorStatics.h"
+#include "Styling/MounteaAdvancedInventoryEditorStyle.h"
 
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventoryLoadoutConfigs_AssetAction"
 
 FMounteaAdvancedInventoryLoadoutConfigs_AssetAction::FMounteaAdvancedInventoryLoadoutConfigs_AssetAction()
 {
+}
+
+void FMounteaAdvancedInventoryLoadoutConfigs_AssetAction::GetActions(
+    const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder)
+{
+	const auto selection = GetTypedWeakObjectPtrs<UMounteaAdvancedInventoryLoadoutConfig>(InObjects);
+	MenuBuilder.AddMenuEntry(LOCTEXT("ExportLoadouts", "Export Loadout(s)..."),
+	    LOCTEXT("ExportLoadoutsTip", "Export selected loadouts using the shared Mountea ZIP format."),
+	    FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Export"),
+	    FUIAction(FExecuteAction::CreateLambda([selection]()
+	{
+		TArray<UMounteaAdvancedInventoryLoadoutConfig*> loadouts;
+
+		for (const auto& loadout : selection)
+		{
+			if (loadout.IsValid())
+				loadouts.Add(loadout.Get());
+		}
+
+		if (loadouts.IsEmpty())
+			return;
+
+		const bool bundle = loadouts.Num() > 1;
+		const FString path = UMounteaAdvancedInventoryItemTemplateEditorStatics::ShowSaveFileDialog(
+		    TEXT("Export Loadouts"), bundle ? TEXT("Loadouts") : loadouts[0]->GetName(),
+		    bundle ? TEXT("Mountea Loadouts (*.mntealoadouts)|*.mntealoadouts")
+		           : TEXT("Mountea Loadout (*.mntealoadout)|*.mntealoadout"));
+
+		if (path.IsEmpty())
+			return;
+
+		FString error;
+		const bool success =
+		    UMounteaAdvancedInventoryLoadoutEditorStatics::ExportLoadoutsToFilePath(loadouts, path, error);
+		FMounteaEditorNotificationHelpers::ShowNotification(success ? TEXT("Loadouts exported successfully.") : error,
+		    success ? EMounteaEditorNotificationType::Success : EMounteaEditorNotificationType::Error);
+	})));
 }
 
 FText FMounteaAdvancedInventoryLoadoutConfigs_AssetAction::GetName() const

@@ -19,10 +19,10 @@ class UMounteaAdvancedInventoryLoadoutConfig;
 class UMounteaInventoryItemTemplate;
 
 /**
- * Editor-only static helpers for importing .mntealoadout / .mntealoadouts files.
+ * Editor-only static helpers for importing and exporting .mntealoadout / .mntealoadouts ZIP files.
  *
- * Import is atomic: all ZIP reading and validation finishes before any UAsset is created.
- * If validation fails, nothing is written.
+ * All ZIP reading and validation finishes before any UAsset is created.
+ * If validation fails, nothing is written. Save errors are reported and may leave earlier assets saved.
  */
 UCLASS()
 class MOUNTEAADVANCEDINVENTORYSYSTEMEDITOR_API UMounteaAdvancedInventoryLoadoutEditorStatics : public UBlueprintFunctionLibrary
@@ -41,6 +41,12 @@ public:
 		FString& OutErrorMessage);
 
 public:
+	/** Export native loadout assets with their item dependencies using the common ZIP contract. */
+	static bool ExportLoadoutsToFilePath(
+		const TArray<UMounteaAdvancedInventoryLoadoutConfig*>& Loadouts,
+		const FString& FilePath,
+		FString& OutErrorMessage);
+
 	// ── ZIP parsing ──────────────────────────────────────────────────────────
 
 	/** Extract loadout.json and all items/*.json from a single .mntealoadout ZIP blob. */

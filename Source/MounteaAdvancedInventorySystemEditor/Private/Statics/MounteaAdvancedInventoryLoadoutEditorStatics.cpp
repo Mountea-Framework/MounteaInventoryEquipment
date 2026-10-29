@@ -13,7 +13,6 @@
 
 #include "Helpers/MounteaInventoryImportHelpers.h"
 #include "Helpers/MounteaInventoryZipHelper.h"
-#include "Statics/MounteaAdvancedInventoryItemTemplateEditorStatics.h"
 
 #include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Definitions/MounteaAdvancedInventoryLoadoutItem.h"
@@ -23,11 +22,12 @@
 #include "Statics/MounteaInventorySystemStatics.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
+#include "IAssetTools.h"
 #include "Dom/JsonObject.h"
 #include "Misc/Paths.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
-#include "UObject/SavePackage.h"
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -39,34 +39,12 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 	TArray<UMounteaAdvancedInventoryLoadoutConfig*>& OutLoadouts,
 	FString& OutErrorMessage)
 {
-	TArray<uint8> fileBytes;
-	if (!FMounteaInventoryZipHelper::LoadFileToBytes(FilePath, fileBytes))
-	{
-		OutErrorMessage = FString::Printf(TEXT("Failed to read file: %s"), *FilePath);
-		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
-	if (!FMounteaInventoryZipHelper::IsZipFile(fileBytes))
-	{
-		OutErrorMessage = TEXT("File is not a valid ZIP archive");
-		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
-	// Expand bundle or treat as single
+	OutLoadouts.Reset();
+	OutErrorMessage.Reset();
 	TArray<TArray<uint8>> singleZips;
-	if (FilePath.EndsWith(TEXT(".mntealoadouts")))
-	{
-		if (!FMounteaInventoryZipHelper::ExpandBundle(fileBytes, TEXT("mntealoadout"), singleZips))
-		{
-			OutErrorMessage = TEXT("Failed to expand .mntealoadouts bundle");
-			LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
-			return false;
-		}
-	}
-	else
-		singleZips.Add(MoveTemp(fileBytes));
+
+	if (!FMounteaInventoryZipHelper::ReadEntityArchives(FilePath, TEXT("mntealoadout"), TEXT("mntealoadouts"), singleZips, OutErrorMessage))
+		return false;
 
 	// ── Phase 1 & 2: Read and validate all ZIPs before writing anything ──────
 
@@ -84,11 +62,14 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 	const TMap<FGuid, UMounteaInventoryItemTemplate*> projectItems =
 		FMounteaInventoryImportHelpers::BuildProjectItemGuidMap();
 
+	TSet<FGuid> loadoutGuids;
+
 	for (const TArray<uint8>& zipBlob : singleZips)
 	{
 		FParsedLoadout entry;
 
 		FString parseError;
+
 		if (!ParseLoadoutFromZip(zipBlob, entry.LoadoutJson, entry.BundledItemJsons, parseError))
 		{
 			OutErrorMessage += parseError + TEXT("\n");
@@ -97,6 +78,7 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		}
 
 		TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(entry.LoadoutJson);
+
 		if (!FJsonSerializer::Deserialize(reader, entry.ParsedJson) || !entry.ParsedJson.IsValid())
 		{
 			OutErrorMessage += TEXT("Failed to parse loadout JSON\n");
@@ -104,14 +86,25 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 			return false;
 		}
 
+		const FGuid parsedGuid = ExtractGuidFromLoadoutJson(entry.LoadoutJson);
+
+		if (!parsedGuid.IsValid() || loadoutGuids.Contains(parsedGuid))
+		{
+			OutErrorMessage = TEXT("Invalid or duplicate loadout GUID in archive");
+			return false;
+		}
+
+		loadoutGuids.Add(parsedGuid);
 		entry.BundledGuids = FMounteaInventoryImportHelpers::ParseBundledGuids(entry.BundledItemJsons);
 
 		// Build combined set: bundled + project
 		TSet<FGuid> knownGuids = entry.BundledGuids;
+
 		for (const auto& kv : projectItems)
 			knownGuids.Add(kv.Key);
 
 		FString validationError;
+
 		if (!ValidateLoadout(entry.ParsedJson, knownGuids, validationError))
 		{
 			OutErrorMessage += validationError + TEXT("\n");
@@ -122,75 +115,50 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ImportLoadoutsFromFilePath(
 		parsed.Add(MoveTemp(entry));
 	}
 
-	// ── Phase 3: Import bundled items, then persist loadouts ─────────────────
-
-	TArray<UMounteaAdvancedInventoryLoadoutConfig*> existingLoadouts = LoadAllExistingLoadouts();
+	// Persist validated dependencies and entities. Surface the first write failure.
+	TArray<UMounteaAdvancedInventoryLoadoutConfig*> existing = LoadAllExistingLoadouts();
+	TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
+	const FString folder = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
 
 	for (FParsedLoadout& entry : parsed)
 	{
-		const FString folderToUse = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
+		if (!FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folder, FilePath, itemsByGuid, OutErrorMessage))
+			return false;
 
-		TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
-		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, FilePath, itemsByGuid);
+		const FGuid guid = ExtractGuidFromLoadoutJson(entry.LoadoutJson);
+		UMounteaAdvancedInventoryLoadoutConfig* asset = FindLoadoutByGuid(existing, guid);
 
-		// Find or create loadout asset
-		const FGuid loadoutGuid = ExtractGuidFromLoadoutJson(entry.LoadoutJson);
-		UMounteaAdvancedInventoryLoadoutConfig* loadout = FindLoadoutByGuid(existingLoadouts, loadoutGuid);
-
-		if (loadout)
+		if (asset)
 		{
-			FString updateError;
-			if (UpdateExistingLoadout(loadout, entry.ParsedJson, itemsByGuid, FilePath, updateError))
-				OutLoadouts.Add(loadout);
-			else
-			{
-				OutErrorMessage += updateError + TEXT("\n");
-				LOG_ERROR(TEXT("[Loadout Import] %s"), *updateError);
-			}
+			if (!UpdateExistingLoadout(asset, entry.ParsedJson, itemsByGuid, FilePath, OutErrorMessage))
+				return false;
 		}
 		else
 		{
-			const FString name = ExtractNameFromLoadoutJson(entry.LoadoutJson);
-			const FString assetName = name.IsEmpty() ? loadoutGuid.ToString(EGuidFormats::Short) : name;
+			FString name = ExtractNameFromLoadoutJson(entry.LoadoutJson);
 
-			FString createError;
-			loadout = CreateLoadoutAsset(folderToUse, assetName, createError);
-			if (!loadout)
+			if (name.IsEmpty())
+				name = guid.ToString(EGuidFormats::DigitsWithHyphens);
+			asset = CreateLoadoutAsset(folder, name, OutErrorMessage);
+
+			if (!asset || !DeserializeLoadoutFromJson(entry.ParsedJson, asset, itemsByGuid, OutErrorMessage))
+				return false;
+
+			asset->SetSourceFilePath(FilePath);
+
+			if (!SaveLoadoutAsset(asset, asset->GetOutermost()->GetName()))
 			{
-				OutErrorMessage += createError + TEXT("\n");
-				LOG_ERROR(TEXT("[Loadout Import] %s"), *createError);
-				continue;
+				OutErrorMessage = TEXT("Failed to save imported loadout asset");
+				return false;
 			}
 
-			FString deserError;
-			if (DeserializeLoadoutFromJson(entry.ParsedJson, loadout, itemsByGuid, deserError))
-			{
-				loadout->SetSourceFilePath(FilePath);
-				const FString pkgPath = FPaths::Combine(folderToUse, assetName);
-				if (SaveLoadoutAsset(loadout, pkgPath))
-					OutLoadouts.Add(loadout);
-				else
-				{
-					OutErrorMessage += FString::Printf(TEXT("Failed to save loadout asset '%s'\n"), *assetName);
-					LOG_ERROR(TEXT("[Loadout Import] Failed to save loadout asset '%s'"), *assetName);
-				}
-			}
-			else
-			{
-				OutErrorMessage += deserError + TEXT("\n");
-				LOG_ERROR(TEXT("[Loadout Import] %s"), *deserError);
-			}
+			existing.Add(asset);
 		}
+
+		OutLoadouts.Add(asset);
 	}
 
-	if (OutLoadouts.Num() == 0)
-	{
-		OutErrorMessage = TEXT("No loadouts were successfully imported");
-		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
-	OutErrorMessage = FString::Printf(TEXT("Loadout import complete: %d imported"), OutLoadouts.Num());
+	OutErrorMessage.Reset();
 	return true;
 }
 
@@ -204,31 +172,9 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ParseLoadoutFromZip(
 	TArray<FString>& OutBundledItemJsons,
 	FString& OutErrorMessage)
 {
-	TMap<FString, FString> textFiles;
-	TMap<FString, TArray<uint8>> binaryFiles;
-
-	if (!FMounteaInventoryZipHelper::ExtractEntries(ZipBytes, textFiles, binaryFiles))
-	{
-		OutErrorMessage = TEXT("Failed to extract ZIP entries");
-		return false;
-	}
-
-	const FString* loadoutJson = textFiles.Find(TEXT("loadout.json"));
-	if (!loadoutJson)
-	{
-		OutErrorMessage = TEXT("loadout.json not found in ZIP");
-		return false;
-	}
-
-	OutLoadoutJson = *loadoutJson;
-
-	for (const auto& kv : textFiles)
-	{
-		if (kv.Key.StartsWith(TEXT("items/")) && kv.Key.EndsWith(TEXT(".json")))
-			OutBundledItemJsons.Add(kv.Value);
-	}
-
-	return true;
+	FString stationTaxonomy;
+	return FMounteaInventoryZipHelper::ExtractEntityArchive(ZipBytes, TEXT("loadout.json"), OutLoadoutJson,
+		OutBundledItemJsons, stationTaxonomy, OutErrorMessage);
 }
 
 // ---------------------------------------------------------------------------
@@ -240,67 +186,92 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(
 	const TSet<FGuid>& KnownGuids,
 	FString& OutErrorMessage)
 {
-	FString guidStr;
-	if (!LoadoutJson->TryGetStringField(TEXT("guid"), guidStr) || guidStr.IsEmpty())
+	OutErrorMessage.Reset();
+	auto fail = [&OutErrorMessage](const TCHAR* Message)
 	{
-		OutErrorMessage = TEXT("Loadout JSON missing 'guid' field");
-		LOG_ERROR(TEXT("[Loadout Import] %s"), *OutErrorMessage);
+		OutErrorMessage = Message;
 		return false;
-	}
+	};
+	FString guidText;
+	FGuid guid;
 
-	// Validate items[] array
-	const TArray<TSharedPtr<FJsonValue>>* itemsArray;
-	if (LoadoutJson->TryGetArrayField(TEXT("items"), itemsArray))
+	if (!LoadoutJson.IsValid() || !LoadoutJson->TryGetStringField(TEXT("guid"), guidText) ||
+		!FGuid::Parse(guidText, guid) || !guid.IsValid())
+		return fail(TEXT("Loadout requires a valid nonzero guid"));
+
+	const TArray<TSharedPtr<FJsonValue>>* items;
+
+	if (!LoadoutJson->TryGetArrayField(TEXT("items"), items))
+		return fail(TEXT("Loadout requires an items array (which may be empty)"));
+
+	TSet<FName> occupiedSlots;
+
+	for (const TSharedPtr<FJsonValue>& value : *items)
 	{
-		for (const TSharedPtr<FJsonValue>& itemVal : *itemsArray)
-		{
-			const TSharedPtr<FJsonObject>* itemObj;
-			if (!itemVal->TryGetObject(itemObj))
-				continue;
+		const TSharedPtr<FJsonObject>* row;
+		const TSharedPtr<FJsonObject>* ref;
+		FString refText;
+		FGuid itemGuid;
 
-			const TSharedPtr<FJsonObject>* refObj;
-			if ((*itemObj)->TryGetObjectField(TEXT("ref"), refObj))
-			{
-				FString refGuid;
-				if ((*refObj)->TryGetStringField(TEXT("guid"), refGuid))
-				{
-					FString checkError;
-					if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
-						refGuid, TEXT("items[]"), KnownGuids, checkError))
-					{
-						OutErrorMessage = checkError;
-						LOG_ERROR(TEXT("[Loadout Import] %s"), *checkError);
-						return false;
-					}
-				}
-			}
+		if (!value.IsValid() || !value->TryGetObject(row) || !(*row)->TryGetObjectField(TEXT("ref"), ref) ||
+			!(*ref)->TryGetStringField(TEXT("guid"), refText) || !FGuid::Parse(refText, itemGuid) ||
+			!itemGuid.IsValid() || !KnownGuids.Contains(itemGuid))
+			return fail(TEXT("Every loadout item requires a known ref.guid"));
+
+		double quantity;
+
+		if (!(*row)->TryGetNumberField(TEXT("qty"), quantity) || !FMath::IsFinite(quantity) ||
+			quantity < 1 || quantity > MAX_int32 || quantity != static_cast<int32>(quantity))
+			return fail(TEXT("Loadout qty must be a positive int32 integer"));
+
+		double durability = 1.0;
+
+		if ((*row)->HasField(TEXT("durability")) && (!(*row)->TryGetNumberField(TEXT("durability"), durability) ||
+			!FMath::IsFinite(durability) || durability < 0.0 || durability > 1.0))
+			return fail(TEXT("Loadout durability must be a finite fraction from zero to one"));
+
+		bool autoEquip = false;
+
+		if ((*row)->HasField(TEXT("autoEquip")) && !(*row)->TryGetBoolField(TEXT("autoEquip"), autoEquip))
+			return fail(TEXT("Loadout autoEquip must be boolean"));
+
+		FString slot;
+
+		if ((*row)->HasField(TEXT("slot")) && (!(*row)->TryGetStringField(TEXT("slot"), slot) || slot.Len() >= NAME_SIZE))
+			return fail(TEXT("Loadout slot must be a valid name string"));
+
+		if (autoEquip && !FName(*slot).IsNone())
+		{
+			const FName slotName(*slot);
+
+			if (occupiedSlots.Contains(slotName))
+				return fail(TEXT("Multiple loadout rows cannot automatically equip the same slot"));
+
+			occupiedSlots.Add(slotName);
 		}
+
+		bool random = false;
+
+		if ((*row)->HasField(TEXT("useRandomQuantity")) && !(*row)->TryGetBoolField(TEXT("useRandomQuantity"), random))
+			return fail(TEXT("useRandomQuantity must be boolean"));
+
+		if ((*row)->HasField(TEXT("randomRange")))
+		{
+			const TSharedPtr<FJsonObject>* range;
+			double minimum, maximum;
+
+			if (!(*row)->TryGetObjectField(TEXT("randomRange"), range) ||
+				!(*range)->TryGetNumberField(TEXT("min"), minimum) || !(*range)->TryGetNumberField(TEXT("max"), maximum) ||
+				!FMath::IsFinite(minimum) || !FMath::IsFinite(maximum) || minimum < 1 || maximum < minimum || maximum > MAX_int32 ||
+				minimum != static_cast<int32>(minimum) || maximum != static_cast<int32>(maximum))
+				return fail(TEXT("randomRange requires positive integer min and max, with min <= max"));
+		}
+		else if (random)
+			return fail(TEXT("Random quantity requires randomRange"));
 	}
 
-	// Validate slots{} map
-	const TSharedPtr<FJsonObject>* slotsObj;
-	if (LoadoutJson->TryGetObjectField(TEXT("slots"), slotsObj))
-	{
-		for (const auto& slotKv : (*slotsObj)->Values)
-		{
-			const TSharedPtr<FJsonObject>* slotVal;
-			if (!slotKv.Value->TryGetObject(slotVal))
-				continue;
-
-			FString slotGuid;
-			if ((*slotVal)->TryGetStringField(TEXT("guid"), slotGuid))
-			{
-				FString checkError;
-				if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(
-					slotGuid, FString::Printf(TEXT("slots[%s]"), *slotKv.Key), KnownGuids, checkError))
-				{
-					LOG_ERROR(TEXT("[Loadout Import] %s"), *checkError);
-					OutErrorMessage = checkError;
-					return false;
-				}
-			}
-		}
-	}
+	if (LoadoutJson->HasField(TEXT("slots")))
+		return fail(TEXT("Loadout slots map is unsupported; assign autoEquip and slot on each items row"));
 
 	return true;
 }
@@ -314,7 +285,9 @@ UMounteaAdvancedInventoryLoadoutConfig* UMounteaAdvancedInventoryLoadoutEditorSt
 	const FString& AssetName,
 	FString& OutErrorMessage)
 {
-	const FString packageName = FPaths::Combine(TargetFolder, AssetName);
+	FString packageName, uniqueName;
+	FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get().CreateUniqueAssetName(
+		FPaths::Combine(TargetFolder, FMounteaInventoryImportHelpers::SanitizeAssetName(AssetName)), TEXT(""), packageName, uniqueName);
 	UPackage* newPackage = CreatePackage(*packageName);
 
 	if (!newPackage)
@@ -327,7 +300,7 @@ UMounteaAdvancedInventoryLoadoutConfig* UMounteaAdvancedInventoryLoadoutEditorSt
 	UMounteaAdvancedInventoryLoadoutConfig* loadout = NewObject<UMounteaAdvancedInventoryLoadoutConfig>(
 		newPackage,
 		UMounteaAdvancedInventoryLoadoutConfig::StaticClass(),
-		*AssetName,
+		*uniqueName,
 		RF_Public | RF_Standalone
 	);
 
@@ -353,137 +326,59 @@ bool UMounteaAdvancedInventoryLoadoutEditorStatics::DeserializeLoadoutFromJson(
 		return false;
 	}
 
-	FString loadoutGuidStr;
-	if (JsonObject->TryGetStringField(TEXT("guid"), loadoutGuidStr))
-		FGuid::Parse(loadoutGuidStr, Loadout->Guid);
+	TSet<FGuid> knownGuids;
 
-	Loadout->Items.Empty();
-
-	// Build a map from item GUID → created LoadoutItem so slot assignments can find them
-	TMap<FGuid, UMounteaAdvancedInventoryLoadoutItem*> loadoutItemsByItemGuid;
-
-	// Process items[]
-	const TArray<TSharedPtr<FJsonValue>>* itemsArray;
-	if (JsonObject->TryGetArrayField(TEXT("items"), itemsArray))
+	for (const auto& pair : ItemsByGuid)
 	{
-		for (const TSharedPtr<FJsonValue>& itemVal : *itemsArray)
-		{
-			const TSharedPtr<FJsonObject>* itemObj;
-			if (!itemVal->TryGetObject(itemObj))
-				continue;
+		if (IsValid(pair.Value))
+			knownGuids.Add(pair.Key);
+	}
 
-			const TSharedPtr<FJsonObject>* refObj;
-			FString refGuidStr;
-			if (!(*itemObj)->TryGetObjectField(TEXT("ref"), refObj) ||
-				!(*refObj)->TryGetStringField(TEXT("guid"), refGuidStr))
-				continue;
+	if (!ValidateLoadout(JsonObject, knownGuids, OutErrorMessage))
+		return false;
 
-			FGuid itemGuid;
-			if (!FGuid::Parse(refGuidStr, itemGuid) || !itemGuid.IsValid())
-				continue;
+	// Validation completes before touching the existing asset. Each row owns a separate instance,
+	// even when multiple rows reference the same item template.
+	TArray<TObjectPtr<UMounteaAdvancedInventoryLoadoutItem>> newItems;
+	const TArray<TSharedPtr<FJsonValue>>* items;
+	JsonObject->TryGetArrayField(TEXT("items"), items);
 
-			UMounteaInventoryItemTemplate* const* templatePtr = ItemsByGuid.Find(itemGuid);
-			if (!templatePtr || !IsValid(*templatePtr))
-			{
-				LOG_WARNING(TEXT("[Loadout Import] Item GUID %s not found among imported/known items"), *refGuidStr);
-				continue;
-			}
+	for (const auto& value : *items)
+	{
+		const TSharedPtr<FJsonObject> row = value->AsObject();
+		const TSharedPtr<FJsonObject> ref = row->GetObjectField(TEXT("ref"));
+		FGuid itemGuid;
+		FGuid::Parse(ref->GetStringField(TEXT("guid")), itemGuid);
+		UMounteaInventoryItemTemplate* itemTemplate = ItemsByGuid.FindChecked(itemGuid);
+		auto* item = NewObject<UMounteaAdvancedInventoryLoadoutItem>(Loadout);
+		item->Guid = itemGuid;
+		item->ItemTemplate = itemTemplate;
+		item->BaseQuantity = static_cast<int32>(row->GetNumberField(TEXT("qty")));
+		double durability = 1.0;
+		row->TryGetNumberField(TEXT("durability"), durability);
+		const bool durable = itemTemplate->bHasDurability &&
+			UMounteaInventorySystemStatics::HasFlag(itemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Durable);
+		item->BaseDurability = durable ? FMath::RoundToInt(durability * itemTemplate->MaxDurability) : -1;
+		bool autoEquip = false, random = false;
+		row->TryGetBoolField(TEXT("autoEquip"), autoEquip);
+		row->TryGetBoolField(TEXT("useRandomQuantity"), random);
+		item->bAutomaticallyEquip = autoEquip;
+		item->bUseRandomQuantity = random;
+		FString slot;
+		row->TryGetStringField(TEXT("slot"), slot);
+		item->EquipmentSlot = FName(*slot);
+		const TSharedPtr<FJsonObject>* range;
 
-			UMounteaAdvancedInventoryLoadoutItem* loadoutItem =
-				NewObject<UMounteaAdvancedInventoryLoadoutItem>(Loadout,
-					UMounteaAdvancedInventoryLoadoutItem::StaticClass(),
-					NAME_None,
-					RF_NoFlags);
-
-			loadoutItem->Guid         = itemGuid;
-			loadoutItem->ItemTemplate = *templatePtr;
-
-			int32 qty = 1;
-			if ((*itemObj)->TryGetNumberField(TEXT("qty"), qty))
-				loadoutItem->BaseQuantity = FMath::Max(1, qty);
-
-			// "durability" is a 0.0-1.0 fraction of the item template's MaxDurability; convert to
-			// the absolute value BaseQuantity expects, matching the same formula used when a user
-			// manually assigns an ItemTemplate in the editor (see PostEditChangeProperty).
-			double durabilityFraction = 1.0;
-			if ((*itemObj)->TryGetNumberField(TEXT("durability"), durabilityFraction) &&
-				(*templatePtr)->bHasDurability &&
-				UMounteaInventorySystemStatics::HasFlag((*templatePtr)->ItemFlags, EInventoryItemFlags::EIIF_Durable))
-			{
-				loadoutItem->BaseDurability = FMath::RoundToInt(durabilityFraction * (*templatePtr)->MaxDurability);
-			}
-
-			bool bAutoEquip = false;
-			if ((*itemObj)->TryGetBoolField(TEXT("autoEquip"), bAutoEquip) && bAutoEquip)
-			{
-				loadoutItem->bAutomaticallyEquip = true;
-
-				FString slotName;
-				if ((*itemObj)->TryGetStringField(TEXT("slot"), slotName) && !slotName.IsEmpty())
-					loadoutItem->EquipmentSlot = FName(*slotName);
-			}
-
+		if (row->TryGetObjectField(TEXT("randomRange"), range))
+			item->RandomRange = FIntPoint(static_cast<int32>((*range)->GetNumberField(TEXT("min"))), static_cast<int32>((*range)->GetNumberField(TEXT("max"))));
 #if WITH_EDITORONLY_DATA
-			FString displayName;
-			if ((*refObj)->TryGetStringField(TEXT("displayName"), displayName))
-				loadoutItem->DisplayName = FName(*displayName);
+		item->DisplayName = FName(*itemTemplate->DisplayName.ToString());
 #endif
-
-			Loadout->Items.Add(loadoutItem);
-			loadoutItemsByItemGuid.Add(itemGuid, loadoutItem);
-		}
+		newItems.Add(item);
 	}
 
-	// Process slots{} — find matching LoadoutItem and set equipment slot
-	const TSharedPtr<FJsonObject>* slotsObj;
-	if (JsonObject->TryGetObjectField(TEXT("slots"), slotsObj))
-	{
-		for (const auto& slotKv : (*slotsObj)->Values)
-		{
-			const FString& slotName = slotKv.Key;
-
-			const TSharedPtr<FJsonObject>* slotVal;
-			if (!slotKv.Value->TryGetObject(slotVal))
-				continue;
-
-			FString slotGuidStr;
-			if (!(*slotVal)->TryGetStringField(TEXT("guid"), slotGuidStr))
-				continue;
-
-			FGuid slotItemGuid;
-			if (!FGuid::Parse(slotGuidStr, slotItemGuid) || !slotItemGuid.IsValid())
-				continue;
-
-			if (UMounteaAdvancedInventoryLoadoutItem** existingItem = loadoutItemsByItemGuid.Find(slotItemGuid))
-			{
-				(*existingItem)->EquipmentSlot       = FName(*slotName);
-				(*existingItem)->bAutomaticallyEquip = true;
-			}
-			else
-			{
-				// Item only mentioned in slots, not in items[] — create an entry for it
-				UMounteaInventoryItemTemplate* const* templatePtr = ItemsByGuid.Find(slotItemGuid);
-				if (!templatePtr || !IsValid(*templatePtr))
-					continue;
-
-				UMounteaAdvancedInventoryLoadoutItem* loadoutItem =
-					NewObject<UMounteaAdvancedInventoryLoadoutItem>(Loadout,
-						UMounteaAdvancedInventoryLoadoutItem::StaticClass(),
-						NAME_None,
-						RF_NoFlags);
-
-				loadoutItem->Guid                = slotItemGuid;
-				loadoutItem->ItemTemplate        = *templatePtr;
-				loadoutItem->BaseQuantity         = 1;
-				loadoutItem->EquipmentSlot        = FName(*slotName);
-				loadoutItem->bAutomaticallyEquip  = true;
-
-				Loadout->Items.Add(loadoutItem);
-				loadoutItemsByItemGuid.Add(slotItemGuid, loadoutItem);
-			}
-		}
-	}
-
+	FGuid::Parse(JsonObject->GetStringField(TEXT("guid")), Loadout->Guid);
+	Loadout->Items = MoveTemp(newItems);
 	return true;
 }
 
@@ -529,10 +424,12 @@ FString UMounteaAdvancedInventoryLoadoutEditorStatics::ExtractNameFromLoadoutJso
 {
 	TSharedPtr<FJsonObject> obj;
 	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(JsonString);
+
 	if (!FJsonSerializer::Deserialize(reader, obj) || !obj.IsValid())
 		return TEXT("");
 
 	FString name;
+
 	if (obj->TryGetStringField(TEXT("name"), name))
 		return FMounteaInventoryImportHelpers::SanitizeAssetName(name);
 
@@ -552,6 +449,7 @@ TArray<UMounteaAdvancedInventoryLoadoutConfig*> UMounteaAdvancedInventoryLoadout
 		if (UMounteaAdvancedInventoryLoadoutConfig* l = Cast<UMounteaAdvancedInventoryLoadoutConfig>(a.GetAsset()))
 			loadouts.Add(l);
 	}
+
 	return loadouts;
 }
 
@@ -563,10 +461,102 @@ UMounteaAdvancedInventoryLoadoutConfig* UMounteaAdvancedInventoryLoadoutEditorSt
 		return nullptr;
 
 	UMounteaAdvancedInventoryLoadoutConfig* const* found = Loadouts.FindByPredicate(
-		[&Guid](const UMounteaAdvancedInventoryLoadoutConfig* l)
+		[&Guid](const UMounteaAdvancedInventoryLoadoutConfig* Loadout)
 		{
-			return IsValid(l) && l->Guid == Guid;
+			return IsValid(Loadout) && Loadout->Guid == Guid;
 		});
 
 	return found ? *found : nullptr;
+}
+
+
+bool UMounteaAdvancedInventoryLoadoutEditorStatics::ExportLoadoutsToFilePath(
+	const TArray<UMounteaAdvancedInventoryLoadoutConfig*>& Loadouts,
+	const FString& FilePath,
+	FString& OutErrorMessage)
+{
+	OutErrorMessage.Reset();
+	TMap<FGuid, TArray<uint8>> archives;
+
+	for (const auto* loadout : Loadouts)
+	{
+		if (!IsValid(loadout) || !loadout->Guid.IsValid() || archives.Contains(loadout->Guid))
+		{
+			OutErrorMessage = TEXT("Loadout export requires valid assets with distinct valid GUIDs");
+			return false;
+		}
+
+		TSharedPtr<FJsonObject> root = MakeShared<FJsonObject>();
+		root->SetStringField(TEXT("guid"), loadout->Guid.ToString(EGuidFormats::DigitsWithHyphens));
+		root->SetStringField(TEXT("name"), loadout->GetName());
+		TArray<TSharedPtr<FJsonValue>> rows;
+		TArray<UMounteaInventoryItemTemplate*> templates;
+		TSet<FGuid> knownGuids;
+
+		for (const auto& item : loadout->Items)
+		{
+			if (!IsValid(item.Get()) || !IsValid(item->ItemTemplate.Get()) || !item->ItemTemplate->Guid.IsValid())
+			{
+				OutErrorMessage = TEXT("Cannot export a loadout with an invalid item template");
+				return false;
+			}
+
+			UMounteaInventoryItemTemplate* itemTemplate = item->ItemTemplate;
+
+			if (knownGuids.Contains(itemTemplate->Guid) && !templates.Contains(itemTemplate))
+			{
+				OutErrorMessage = TEXT("Distinct item templates cannot share a GUID");
+				return false;
+			}
+
+			templates.AddUnique(itemTemplate);
+			knownGuids.Add(itemTemplate->Guid);
+			TSharedPtr<FJsonObject> row = MakeShared<FJsonObject>();
+			TSharedPtr<FJsonObject> ref = MakeShared<FJsonObject>();
+			ref->SetStringField(TEXT("guid"), itemTemplate->Guid.ToString(EGuidFormats::DigitsWithHyphens));
+			row->SetObjectField(TEXT("ref"), ref);
+			row->SetNumberField(TEXT("qty"), item->BaseQuantity);
+			const bool durable = itemTemplate->bHasDurability &&
+				UMounteaInventorySystemStatics::HasFlag(itemTemplate->ItemFlags, EInventoryItemFlags::EIIF_Durable);
+			if (durable && itemTemplate->MaxDurability <= 0)
+			{
+				OutErrorMessage = TEXT("Durable template requires positive MaxDurability");
+				return false;
+			}
+
+			row->SetNumberField(TEXT("durability"), durable ? static_cast<double>(item->BaseDurability) / itemTemplate->MaxDurability : 1.0);
+			row->SetBoolField(TEXT("autoEquip"), item->bAutomaticallyEquip);
+			row->SetStringField(TEXT("slot"), item->EquipmentSlot.IsNone() ? TEXT("") : item->EquipmentSlot.ToString());
+			row->SetBoolField(TEXT("useRandomQuantity"), item->bUseRandomQuantity);
+			TSharedPtr<FJsonObject> range = MakeShared<FJsonObject>();
+			range->SetNumberField(TEXT("min"), item->RandomRange.X);
+			range->SetNumberField(TEXT("max"), item->RandomRange.Y);
+			row->SetObjectField(TEXT("randomRange"), range);
+			rows.Add(MakeShared<FJsonValueObject>(row));
+		}
+
+		root->SetArrayField(TEXT("items"), rows);
+
+		if (!ValidateLoadout(root, knownGuids, OutErrorMessage))
+			return false;
+
+		FString json;
+
+		if (!FJsonSerializer::Serialize(root.ToSharedRef(), TJsonWriterFactory<>::Create(&json)))
+		{
+			OutErrorMessage = TEXT("Could not serialize loadout JSON");
+			return false;
+		}
+
+		TArray<FString> bundledItems;
+		TArray<uint8> archive;
+
+		if (!FMounteaInventoryImportHelpers::SerializeBundledItems(templates, bundledItems, OutErrorMessage) ||
+			!FMounteaInventoryZipHelper::BuildEntityArchive(TEXT("loadout.json"), json, bundledItems, archive, OutErrorMessage))
+			return false;
+
+		archives.Add(loadout->Guid, MoveTemp(archive));
+	}
+
+	return FMounteaInventoryZipHelper::WriteEntityArchives(archives, FilePath, TEXT("mntealoadout"), TEXT("mntealoadouts"), OutErrorMessage);
 }
