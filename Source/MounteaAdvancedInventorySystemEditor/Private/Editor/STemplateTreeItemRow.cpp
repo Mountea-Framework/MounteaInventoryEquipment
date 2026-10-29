@@ -64,29 +64,38 @@ FReply MounteaInventoryTreeRows::LocateAsset(TWeakObjectPtr<UObject> Asset)
 TSharedRef<SWidget> MounteaInventoryTreeRows::MakeCategoryContent(const FString& Category, TAttribute<int32> Count)
 {
 	return SNew(SBorder)
-	    .BorderImage(FAppStyle::GetBrush("DetailsView.CategoryTop"))
-	    .BorderBackgroundColor(FLinearColor::Transparent)
-	    .Padding(FMargin(6, 4))[SNew(SHorizontalBox) +
-	                            SHorizontalBox::Slot().FillWidth(1.f).VAlign(VAlign_Center)[SNew(STextBlock)
-	                                    .Text(CategoryLabel(Category))
-	                                    .Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
-	                                    .ColorAndOpacity(FSlateColor::UseForeground())
-	                                    .TextStyle(FAppStyle::Get(), "DetailsView.CategoryTextStyle")] +
-	                            SHorizontalBox::Slot()
-	                                .AutoWidth()
-	                                .VAlign(VAlign_Center)
-	                                .Padding(6, 0, 0, 0)[SNew(STextBlock)
-	                                        .Text_Lambda(
-	                                            [Count]()
-	{
-		return FText::AsNumber(Count.Get());
-	})
-	                                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
-	                                        .ColorAndOpacity(FSlateColor::UseSubduedForeground())]];
+		.BorderImage(FAppStyle::GetBrush("DetailsView.CategoryTop"))
+		.BorderBackgroundColor(FLinearColor::Transparent)
+		.Padding(FMargin(6, 4))
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.FillWidth(1.f)
+			.VAlign(VAlign_Center)
+			[
+				SNew(STextBlock)
+				.Text(CategoryLabel(Category))
+				.Font(FCoreStyle::GetDefaultFontStyle("Bold", 12))
+				.ColorAndOpacity(FSlateColor::UseForeground())
+				.TextStyle(FAppStyle::Get(), "DetailsView.CategoryTextStyle")
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			.Padding(6, 0, 0, 0)
+			[
+				SNew(STextBlock)
+				.Text_Lambda([Count]()
+				{
+					return FText::AsNumber(Count.Get());
+				})
+				.Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
+				.ColorAndOpacity(FSlateColor::UseSubduedForeground())
+			]
+		];
 }
 
-TSharedRef<SWidget> MounteaInventoryTreeRows::MakeAssetContent(
-    const FMounteaInventoryAssetRowPresentation& Presentation)
+TSharedRef<SWidget> MounteaInventoryTreeRows::MakeAssetContent(const FMounteaInventoryAssetRowPresentation& Presentation)
 {
 	struct FButtonHolder
 	{
@@ -94,50 +103,102 @@ TSharedRef<SWidget> MounteaInventoryTreeRows::MakeAssetContent(
 	};
 	const auto holder = MakeShared<FButtonHolder>();
 	TSharedPtr<SButton> interactionButton;
-	auto actionButton = [&Presentation](
-	                        const FName Icon, const FText& Tooltip, const FOnClicked& Callback) -> TSharedRef<SWidget>
+	auto actionButton = [&Presentation](const FName Icon, const FText& Tooltip, const FOnClicked& Callback) -> TSharedRef<SWidget>
 	{
 		return SNew(SButton)
-		    .ButtonStyle(FAppStyle::Get(), "SimpleButton")
-		    .ContentPadding(FMargin(2))
-		    .ToolTipText(Tooltip)
-		    .Visibility(Presentation.ActionsVisibility)
-		    .OnClicked(Callback)[SNew(SImage)
-		            .Image(FAppStyle::GetBrush(Icon))
-		            .ColorAndOpacity(FSlateColor::UseForeground())
-		            .DesiredSizeOverride(FVector2D(16, 16))];
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ContentPadding(FMargin(2))
+			.ToolTipText(Tooltip)
+			.Visibility(Presentation.ActionsVisibility)
+			.OnClicked(Callback)
+			[
+				SNew(SImage)
+				.Image(FAppStyle::GetBrush(Icon))
+				.ColorAndOpacity(FSlateColor::UseForeground())
+				.DesiredSizeOverride(FVector2D(16, 16))
+			];
 	};
 	const TSharedRef<SWidget> content = SAssignNew(interactionButton, SButton)
-	                                        .ButtonStyle(FAppStyle::Get(), "NoBorder")
-	                                        .OnClicked(Presentation.Select)
-	                                        .ContentPadding(0)
-	                                        .IsFocusable(false)
-	                                            [SNew(SBorder)
-	                                                 .BorderImage_Lambda([selected = Presentation.IsSelected, holder]() -> const FSlateBrush*
-	                                                                     {
-		                                                                     const bool isSelected = selected.Get();
-		                                                                     const auto button = holder->Button.Pin();
-		                                                                     const bool isHovered = button.IsValid() && button->IsHovered();
-		                                                                     const auto& style = FMounteaAdvancedInventoryEditorStyle::Get();
+		.ButtonStyle(FAppStyle::Get(), "NoBorder")
+		.OnClicked(Presentation.Select)
+		.ContentPadding(0)
+		.IsFocusable(false)
+		[
+			SNew(SBorder)
+			.BorderImage_Lambda([selected = Presentation.IsSelected, holder]() -> const FSlateBrush*
+			{
+				const bool isSelected = selected.Get();
+				const auto button = holder->Button.Pin();
+				const bool isHovered = button.IsValid() && button->IsHovered();
+				const auto& style = FMounteaAdvancedInventoryEditorStyle::Get();
 
-		                                                                     if (isSelected && isHovered)
-			                                                                     return style.GetBrush("MAISStyleSet.TemplateItem.SelectedHovered");
+				if (isSelected && isHovered)
+					return style.GetBrush("MAISStyleSet.TemplateItem.SelectedHovered");
 
-		                                                                     if (isSelected)
-			                                                                     return style.GetBrush("MAISStyleSet.TemplateItem.Selected");
+				if (isSelected)
+					return style.GetBrush("MAISStyleSet.TemplateItem.Selected");
 
-		                                                                     if (isHovered)
-			                                                                     return style.GetBrush("MAISStyleSet.TemplateItem.Hovered");
+				if (isHovered)
+					return style.GetBrush("MAISStyleSet.TemplateItem.Hovered");
 
-		                                                                     return style.GetBrush("MAISStyleSet.TemplateItem.Normal");
-	                                                                     })
-	                                                 .Padding(FMargin(8, 6))[SNew(SHorizontalBox) + SHorizontalBox::Slot().FillWidth(1.f)[SNew(SVerticalBox) + SVerticalBox::Slot().AutoHeight()[SNew(STextBlock).Text(Presentation.Name).ToolTipText(Presentation.Tooltip).Font_Lambda([selected = Presentation.IsSelected]()
-	                                                                                                                                                                                                                                                                                    {
-		                                                                                                                                                                                                                                                                                    return FCoreStyle::GetDefaultFontStyle(selected.Get() ? "Bold" : "Regular", 10);
-	                                                                                                                                                                                                                                                                                    })
-	                                                                                                                                                                                                 .ColorAndOpacity(Presentation.NameColor)] +
-	                                                                                                                                      SVerticalBox::Slot().AutoHeight().Padding(0, 2, 0, 0)[SNew(STextBlock).Text(FText::FromString(Presentation.AssetPath)).Font(FCoreStyle::GetDefaultFontStyle("Regular", 8)).ColorAndOpacity(FSlateColor::UseSubduedForeground())]] +
-	                                                                         SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).Padding(8, 0, 0, 0)[SNew(SHorizontalBox) + SHorizontalBox::Slot().AutoWidth().Padding(2, 0)[actionButton("Icons.FolderOpen", LOCTEXT("Locate", "Navigate to folder in Content Browser"), Presentation.Locate)] + SHorizontalBox::Slot().AutoWidth().Padding(2, 0)[actionButton("Icons.Duplicate", LOCTEXT("Duplicate", "Duplicate this template"), Presentation.Duplicate)] + SHorizontalBox::Slot().AutoWidth().Padding(2, 0)[actionButton("Icons.Delete", LOCTEXT("Delete", "Delete this template"), Presentation.Delete)]]]];
+				return style.GetBrush("MAISStyleSet.TemplateItem.Normal");
+			})
+			.Padding(FMargin(8, 6))
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.FillWidth(1.f)
+				[
+					SNew(SVerticalBox)
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					[
+						SNew(STextBlock)
+						.Text(Presentation.Name)
+						.ToolTipText(Presentation.Tooltip)
+						.Font_Lambda([selected = Presentation.IsSelected]()
+						{
+							return FCoreStyle::GetDefaultFontStyle(selected.Get() ? "Bold" : "Regular", 10);
+						})
+						.ColorAndOpacity(Presentation.NameColor)
+					]
+					+ SVerticalBox::Slot()
+					.AutoHeight()
+					.Padding(0, 2, 0, 0)
+					[
+						SNew(STextBlock)
+						.Text(FText::FromString(Presentation.AssetPath))
+						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
+						.ColorAndOpacity(FSlateColor::UseSubduedForeground())
+					]
+				]
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(8, 0, 0, 0)
+				[
+					SNew(SHorizontalBox)
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.Padding(2, 0)
+					[
+						actionButton("Icons.FolderOpen", LOCTEXT("Locate", "Navigate to folder in Content Browser"), Presentation.Locate)
+					]
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.Padding(2, 0)
+					[
+						actionButton("Icons.Duplicate", LOCTEXT("Duplicate", "Duplicate this template"), Presentation.Duplicate)
+					]
+					+ SHorizontalBox::Slot()
+					.AutoWidth()
+					.Padding(2, 0)
+					[
+						actionButton("Icons.Delete", LOCTEXT("Delete", "Delete this template"), Presentation.Delete)
+					]
+				]
+			]
+		];
 	holder->Button = interactionButton;
 	return content;
 }
