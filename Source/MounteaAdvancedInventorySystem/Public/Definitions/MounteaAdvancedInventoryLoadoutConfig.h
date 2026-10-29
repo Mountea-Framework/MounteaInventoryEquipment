@@ -35,12 +35,12 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryLoadoutConfig 
 public:
 	
 	/**
-	 * Unique identifier for this Loadout Config entry, matching the referenced item template's GUID.
+	 * Unique identifier for this loadout asset, independent of the referenced item template GUIDs.
 	 * Used by the import pipeline to match and update existing entries without loading the template.
 	 */
 	UPROPERTY(SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "Configuration",
 		meta=(NoResetToDefault))
-	FGuid Guid;
+	FGuid Guid = FGuid::NewGuid();
 	
 	/**
 	 * Ordered list of item entries that make up this loadout configuration.
@@ -67,6 +67,8 @@ protected:
 #endif
 
 public:
+
+	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
 
 #if WITH_EDITOR
 	FString GetSourceFilePath() const;

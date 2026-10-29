@@ -14,6 +14,14 @@
 #include "Definitions/MounteaAdvancedInventoryLoadoutItem.h"
 #include "UObject/UnrealType.h"
 
+void UMounteaAdvancedInventoryLoadoutConfig::PostDuplicate(EDuplicateMode::Type DuplicateMode)
+{
+	Super::PostDuplicate(DuplicateMode);
+
+	if (DuplicateMode == EDuplicateMode::Normal)
+		Guid = FGuid::NewGuid();
+}
+
 #if WITH_EDITOR
 
 FString UMounteaAdvancedInventoryLoadoutConfig::GetSourceFilePath() const
