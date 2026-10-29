@@ -109,7 +109,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
 	FString SelectedCategory;
-	
+
+	/**
+	 * Selected Recipe in the list of recipes.
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cratfing",
 		meta=(NoResetToDefault))
 	FGuid SelectedItem;
