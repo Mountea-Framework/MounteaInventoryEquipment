@@ -166,7 +166,7 @@ private:
 	TWeakPtr<FActiveTimerHandle> PendingRefreshTimer;
 	bool bPendingRefresh = false;
 	
-	TSet<UMounteaInventoryItemTemplate*> PendingChanges;
+	TSet<TWeakObjectPtr<UMounteaInventoryItemTemplate>> PendingChanges;
 	FTimerHandle ProcessChangesTimer;
 	float ChangeDebounceDelay = 0.5f;
 	
