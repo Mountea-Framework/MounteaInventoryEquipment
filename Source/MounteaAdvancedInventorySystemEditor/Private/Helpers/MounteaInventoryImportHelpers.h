@@ -41,6 +41,9 @@ struct FMounteaInventoryImportHelpers
 	/** Builds a GUID→template map from all UMounteaInventoryItemTemplate assets in the project. */
 	static TMap<FGuid, UMounteaInventoryItemTemplate*> BuildProjectItemGuidMap();
 
+	/** Serialize current item state, deduplicating references and rejecting GUID collisions. */
+	static bool SerializeBundledItems(const TArray<UMounteaInventoryItemTemplate*>& Items, TArray<FString>& OutJsons, FString& OutError);
+
 	/** Extracts GUIDs from bundled item JSON strings (items/*.json entries from a single-entity ZIP). */
 	static TSet<FGuid> ParseBundledGuids(const TArray<FString>& BundledItemJsons);
 
@@ -49,10 +52,10 @@ struct FMounteaInventoryImportHelpers
 	 * or creates a new one from the JSON, then adds it to InOutItemsByGuid.
 	 * Entries whose GUID is already present in InOutItemsByGuid are skipped.
 	 */
-	static void ImportBundledItems(const TArray<FString>& BundledItemJsons,
+	static bool ImportBundledItems(const TArray<FString>& BundledItemJsons,
 		const FString& TargetFolder,
 		const FString& SourceFilePath,
-		TMap<FGuid, UMounteaInventoryItemTemplate*>& InOutItemsByGuid);
+		TMap<FGuid, UMounteaInventoryItemTemplate*>& InOutItemsByGuid, FString& OutError);
 
 	// ── Generic save operations ────────────────────────────────────────────────
 

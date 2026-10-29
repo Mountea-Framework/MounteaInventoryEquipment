@@ -67,6 +67,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 	FString& OutErrorMessage)
 {
 	TArray<uint8> fileBytes;
+
 	if (!FMounteaInventoryZipHelper::LoadFileToBytes(FilePath, fileBytes))
 	{
 		OutErrorMessage = FString::Printf(TEXT("Failed to read file: %s"), *FilePath);
@@ -83,6 +84,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 
 	TMap<FString, FString> textFiles;
 	TMap<FString, TArray<uint8>> binaryFiles;
+
 	if (!FMounteaInventoryZipHelper::ExtractEntries(fileBytes, textFiles, binaryFiles))
 	{
 		OutErrorMessage = TEXT("Failed to extract ZIP entries");
@@ -94,6 +96,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 	{
 		TSharedPtr<FJsonObject> manifestObj;
 		TSharedRef<TJsonReader<>> manifestReader = TJsonReaderFactory<>::Create(*manifestJson);
+
 		if (FJsonSerializer::Deserialize(manifestReader, manifestObj) && manifestObj.IsValid())
 		{
 			FString schemaVersion, exportedAt;
@@ -105,13 +108,16 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 
 	// taxonomy.json's "craftingStations" array is the workspace equivalent of a per-recipe taxonomy/crafting-stations.json.
 	TMap<FString, FString> stationTagByName;
+
 	if (const FString* taxonomyJson = textFiles.Find(TEXT("taxonomy.json")))
 	{
 		TSharedPtr<FJsonObject> taxonomyObj;
 		TSharedRef<TJsonReader<>> taxonomyReader = TJsonReaderFactory<>::Create(*taxonomyJson);
+
 		if (FJsonSerializer::Deserialize(taxonomyReader, taxonomyObj) && taxonomyObj.IsValid())
 		{
 			const TArray<TSharedPtr<FJsonValue>>* craftingStations;
+
 			if (taxonomyObj->TryGetArrayField(TEXT("craftingStations"), craftingStations))
 				stationTagByName = UMounteaAdvancedInventoryRecipeEditorStatics::ParseStationTagMap(*craftingStations);
 		}
@@ -126,16 +132,20 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 	// ── Phase 1: import every item first, building a workspace-wide GUID -> template map ──
 
 	TArray<FString> itemJsons;
+
 	for (const auto& kv : textFiles)
 		if (kv.Key.StartsWith(TEXT("items/")) && kv.Key.EndsWith(TEXT(".json")))
 			itemJsons.Add(kv.Value);
 
 	TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = FMounteaInventoryImportHelpers::BuildProjectItemGuidMap();
-	FMounteaInventoryImportHelpers::ImportBundledItems(itemJsons, itemsFolder, FilePath, itemsByGuid);
+
+	if (!FMounteaInventoryImportHelpers::ImportBundledItems(itemJsons, itemsFolder, FilePath, itemsByGuid, OutErrorMessage))
+		return false;
 
 	for (const FString& itemJson : itemJsons)
 	{
 		const FGuid itemGuid = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(itemJson);
+
 		if (UMounteaInventoryItemTemplate* const* found = itemsByGuid.Find(itemGuid))
 			OutItems.AddUnique(*found);
 		else
@@ -143,6 +153,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 	}
 
 	TSet<FGuid> knownGuids;
+
 	for (const auto& kv : itemsByGuid)
 		knownGuids.Add(kv.Key);
 
@@ -157,6 +168,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 
 		TSharedPtr<FJsonObject> recipeJson;
 		TSharedRef<TJsonReader<>> recipeReader = TJsonReaderFactory<>::Create(kv.Value);
+
 		if (!FJsonSerializer::Deserialize(recipeReader, recipeJson) || !recipeJson.IsValid())
 		{
 			OutErrorMessage += FString::Printf(TEXT("Failed to parse %s\n"), *kv.Key);
@@ -165,6 +177,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 		}
 
 		FString validationError;
+
 		if (!UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipe(recipeJson, knownGuids, validationError))
 		{
 			OutErrorMessage += validationError + TEXT("\n");
@@ -177,6 +190,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 		if (recipe)
 		{
 			FString updateError;
+
 			if (UMounteaAdvancedInventoryRecipeEditorStatics::UpdateExistingRecipe(recipe, recipeJson, itemsByGuid, stationTagByName, FilePath, updateError))
 				OutRecipes.Add(recipe);
 			else
@@ -189,6 +203,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 
 			FString createError;
 			recipe = UMounteaAdvancedInventoryRecipeEditorStatics::CreateRecipeAsset(recipesFolder, assetName, createError);
+
 			if (!recipe)
 			{
 				OutErrorMessage += createError + TEXT("\n");
@@ -196,9 +211,11 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 			}
 
 			FString deserError;
+
 			if (UMounteaAdvancedInventoryRecipeEditorStatics::DeserializeRecipeFromJson(recipeJson, recipe, itemsByGuid, stationTagByName, deserError))
 			{
 				recipe->SetSourceFilePath(FilePath);
+
 				if (UMounteaAdvancedInventoryRecipeEditorStatics::SaveRecipeAsset(recipe, recipe->GetOutermost()->GetName()))
 					OutRecipes.Add(recipe);
 				else
@@ -220,6 +237,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 
 		TSharedPtr<FJsonObject> loadoutJson;
 		TSharedRef<TJsonReader<>> loadoutReader = TJsonReaderFactory<>::Create(kv.Value);
+
 		if (!FJsonSerializer::Deserialize(loadoutReader, loadoutJson) || !loadoutJson.IsValid())
 		{
 			OutErrorMessage += FString::Printf(TEXT("Failed to parse %s\n"), *kv.Key);
@@ -228,6 +246,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 		}
 
 		FString validationError;
+
 		if (!UMounteaAdvancedInventoryLoadoutEditorStatics::ValidateLoadout(loadoutJson, knownGuids, validationError))
 		{
 			OutErrorMessage += validationError + TEXT("\n");
@@ -240,6 +259,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 		if (loadout)
 		{
 			FString updateError;
+
 			if (UMounteaAdvancedInventoryLoadoutEditorStatics::UpdateExistingLoadout(loadout, loadoutJson, itemsByGuid, FilePath, updateError))
 				OutLoadouts.Add(loadout);
 			else
@@ -252,6 +272,7 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 
 			FString createError;
 			loadout = UMounteaAdvancedInventoryLoadoutEditorStatics::CreateLoadoutAsset(loadoutsFolder, assetName, createError);
+
 			if (!loadout)
 			{
 				OutErrorMessage += createError + TEXT("\n");
@@ -259,10 +280,12 @@ bool UMounteaAdvancedInventoryWorkspaceEditorStatics::ImportWorkspaceFromFilePat
 			}
 
 			FString deserError;
+
 			if (UMounteaAdvancedInventoryLoadoutEditorStatics::DeserializeLoadoutFromJson(loadoutJson, loadout, itemsByGuid, deserError))
 			{
 				loadout->SetSourceFilePath(FilePath);
-				if (UMounteaAdvancedInventoryLoadoutEditorStatics::SaveLoadoutAsset(loadout, FPaths::Combine(loadoutsFolder, assetName)))
+
+				if (UMounteaAdvancedInventoryLoadoutEditorStatics::SaveLoadoutAsset(loadout, loadout->GetOutermost()->GetName()))
 					OutLoadouts.Add(loadout);
 				else
 					OutErrorMessage += FString::Printf(TEXT("Failed to save loadout asset '%s'\n"), *assetName);

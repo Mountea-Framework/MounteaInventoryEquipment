@@ -36,11 +36,13 @@ FString FMounteaInventoryImportHelpers::SanitizeAssetName(const FString& RawName
 	FString sanitized;
 	sanitized.Reserve(name.Len());
 	int32 last = 0;
+
 	while (matcher.FindNext())
 	{
 		sanitized += name.Mid(last, matcher.GetMatchBeginning() - last);
 		last = matcher.GetMatchEnding();
 	}
+
 	sanitized += name.Mid(last);
 	return sanitized;
 }
@@ -49,11 +51,13 @@ FGuid FMounteaInventoryImportHelpers::ExtractGuidFromJsonField(const FString& Js
 {
 	TSharedPtr<FJsonObject> obj;
 	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(JsonString);
+
 	if (!FJsonSerializer::Deserialize(reader, obj) || !obj.IsValid())
 		return FGuid();
 
 	FString guidStr;
 	FGuid guid;
+
 	if (obj->TryGetStringField(FieldName, guidStr) && FGuid::Parse(guidStr, guid))
 		return guid;
 
@@ -64,11 +68,13 @@ bool FMounteaInventoryImportHelpers::CheckGuidInKnownSet(const FString& GuidStri
 	const TSet<FGuid>& KnownGuids, FString& OutError)
 {
 	FGuid guid;
+
 	if (!FGuid::Parse(GuidString, guid) || !guid.IsValid())
 	{
 		OutError = FString::Printf(TEXT("Invalid GUID '%s' in %s"), *GuidString, *Context);
 		return false;
 	}
+
 	if (!KnownGuids.Contains(guid))
 	{
 		OutError = FString::Printf(
@@ -76,6 +82,7 @@ bool FMounteaInventoryImportHelpers::CheckGuidInKnownSet(const FString& GuidStri
 			*GuidString, *Context);
 		return false;
 	}
+
 	return true;
 }
 
@@ -86,68 +93,146 @@ bool FMounteaInventoryImportHelpers::CheckGuidInKnownSet(const FString& GuidStri
 TMap<FGuid, UMounteaInventoryItemTemplate*> FMounteaInventoryImportHelpers::BuildProjectItemGuidMap()
 {
 	TMap<FGuid, UMounteaInventoryItemTemplate*> map;
+
 	for (UMounteaInventoryItemTemplate* t : UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates())
 	{
 		if (IsValid(t))
 			map.Add(t->Guid, t);
 	}
+
 	return map;
 }
 
 TSet<FGuid> FMounteaInventoryImportHelpers::ParseBundledGuids(const TArray<FString>& BundledItemJsons)
 {
 	TSet<FGuid> guids;
+
 	for (const FString& json : BundledItemJsons)
 	{
 		const FGuid guid = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(json);
+
 		if (guid.IsValid())
 			guids.Add(guid);
 	}
+
 	return guids;
 }
 
-void FMounteaInventoryImportHelpers::ImportBundledItems(const TArray<FString>& BundledItemJsons,
-	const FString& TargetFolder,
-	const FString& SourceFilePath,
-	TMap<FGuid, UMounteaInventoryItemTemplate*>& InOutItemsByGuid)
+bool FMounteaInventoryImportHelpers::SerializeBundledItems(const TArray<UMounteaInventoryItemTemplate*>& Items,
+	TArray<FString>& OutJsons, FString& OutError)
 {
-	const TArray<UMounteaInventoryItemTemplate*> existingTemplates =
-		UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates();
+	OutError.Reset();
+	TMap<FGuid, UMounteaInventoryItemTemplate*> seen;
+	TArray<FString> jsons;
 
-	for (const FString& itemJson : BundledItemJsons)
+	for (UMounteaInventoryItemTemplate* item : Items)
 	{
-		const FGuid g = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractGuidFromJson(itemJson);
-		if (!g.IsValid() || InOutItemsByGuid.Contains(g))
-			continue;
-
-		if (UMounteaInventoryItemTemplate* found =
-			UMounteaAdvancedInventoryItemTemplateEditorStatics::FindTemplateByGuid(existingTemplates, g))
+		if (!IsValid(item) || !item->Guid.IsValid())
 		{
-			InOutItemsByGuid.Add(g, found);
+			OutError = TEXT("Invalid bundled item or GUID");
+			return false;
+		}
+
+		if (UMounteaInventoryItemTemplate** previous = seen.Find(item->Guid))
+		{
+			if (*previous != item)
+			{
+				OutError = TEXT("Different item assets share the same GUID");
+				return false;
+			}
+
 			continue;
 		}
 
-		const FString nameStr = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(itemJson);
-		const FString assetName = nameStr.IsEmpty() ? g.ToString(EGuidFormats::Short) : nameStr;
-
-		FString createError;
-		UMounteaInventoryItemTemplate* newTemplate =
-			UMounteaAdvancedInventoryItemTemplateEditorStatics::CreateTemplateAsset(
-				TargetFolder, assetName, createError);
-
-		if (newTemplate)
+		if (!item->CalculateJson())
 		{
-			FString parseErr;
-			UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(
-				itemJson, newTemplate, parseErr);
-			newTemplate->ReloadItemActions();
-			newTemplate->CalculateJson();
-			newTemplate->SetSourceFilePath(SourceFilePath);
-			UMounteaAdvancedInventoryItemTemplateEditorStatics::SaveTemplateAsset(
-				newTemplate, FPaths::Combine(TargetFolder, assetName));
-			InOutItemsByGuid.Add(g, newTemplate);
+			OutError = TEXT("Failed to serialize item");
+			return false;
 		}
+
+		const FString json = item->GetJson();
+
+		if (ExtractGuidFromJsonField(json, TEXT("guid")) != item->Guid)
+		{
+			OutError = TEXT("Serialized item JSON has an invalid GUID");
+			return false;
+		}
+
+		seen.Add(item->Guid, item);
+		jsons.Add(json);
 	}
+
+	OutJsons = MoveTemp(jsons);
+	return true;
+}
+
+bool FMounteaInventoryImportHelpers::ImportBundledItems(const TArray<FString>& BundledItemJsons,
+	const FString& TargetFolder, const FString& SourceFilePath,
+	TMap<FGuid, UMounteaInventoryItemTemplate*>& InOutItemsByGuid, FString& OutError)
+{
+	OutError.Reset();
+	// Validate every dependency before creating packages or saving assets.
+	TSet<FGuid> seen;
+
+	for (const FString& json : BundledItemJsons)
+	{
+		const FGuid guid = ExtractGuidFromJsonField(json, TEXT("guid"));
+
+		if (!guid.IsValid() || seen.Contains(guid))
+		{
+			OutError = TEXT("Invalid or duplicate bundled item GUID");
+			return false;
+		}
+
+		UMounteaInventoryItemTemplate* transient = NewObject<UMounteaInventoryItemTemplate>();
+
+		if (!UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(json, transient, OutError))
+			return false;
+
+		seen.Add(guid);
+	}
+
+	const TArray<UMounteaInventoryItemTemplate*> existingTemplates = UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates();
+
+	for (const FString& json : BundledItemJsons)
+	{
+		const FGuid guid = ExtractGuidFromJsonField(json, TEXT("guid"));
+
+		if (InOutItemsByGuid.Contains(guid))
+			continue;
+
+		if (UMounteaInventoryItemTemplate* found = UMounteaAdvancedInventoryItemTemplateEditorStatics::FindTemplateByGuid(existingTemplates, guid))
+		{
+			InOutItemsByGuid.Add(guid, found);
+			continue;
+		}
+
+		const FString displayName = UMounteaAdvancedInventoryItemTemplateEditorStatics::ExtractNameFromJson(json);
+		UMounteaInventoryItemTemplate* item = UMounteaAdvancedInventoryItemTemplateEditorStatics::CreateTemplateAsset(
+			TargetFolder, displayName.IsEmpty() ? guid.ToString(EGuidFormats::DigitsWithHyphens) : displayName, OutError);
+		if (!item || !UMounteaAdvancedInventoryItemTemplateEditorStatics::ParseSingleTemplateJson(json, item, OutError))
+			return false;
+
+		item->ReloadItemActions();
+
+		if (!item->CalculateJson())
+		{
+			OutError = TEXT("Failed to serialize imported dependency");
+			return false;
+		}
+
+		item->SetSourceFilePath(SourceFilePath);
+
+		if (!UMounteaAdvancedInventoryItemTemplateEditorStatics::SaveTemplateAsset(item, item->GetOutermost()->GetName()))
+		{
+			OutError = TEXT("Failed to save bundled item");
+			return false;
+		}
+
+		InOutItemsByGuid.Add(guid, item);
+	}
+
+	return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -186,6 +271,7 @@ bool FMounteaInventoryImportHelpers::SaveExistingAssetPackage(UObject* Asset, FS
 	}
 
 	UPackage* pkg = Asset->GetOutermost();
+
 	if (!pkg)
 	{
 		OutError = TEXT("Asset has no valid package");
