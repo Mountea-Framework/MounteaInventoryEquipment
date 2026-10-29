@@ -119,7 +119,7 @@ bool FMounteaImportContractRecipeTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("root guid"), obj->HasField(TEXT("guid")));
 	TestTrue(TEXT("root qtyMax"), obj->HasField(TEXT("qtyMax")));
 	TestTrue(TEXT("reqs object"), obj->HasTypedField<EJson::Object>(TEXT("reqs")));
-	TestTrue(TEXT("groups array"), obj->HasTypedField<EJson::Array>(TEXT("groups")));
+	TestTrue(TEXT("ingredients array"), obj->HasTypedField<EJson::Array>(TEXT("ingredients")));
 	return true;
 }
 

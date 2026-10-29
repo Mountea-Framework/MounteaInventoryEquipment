@@ -71,7 +71,6 @@ namespace MounteaRecipeFlatModelTest
             const auto json = MakeShared<FJsonObject>();
             json->SetStringField(TEXT("guid"), RecipeGuid.ToString(EGuidFormats::DigitsWithHyphens));
             json->SetStringField(TEXT("name"), TEXT("FlatModelTest"));
-            json->SetStringField(TEXT("ingredientModel"), TEXT("flat-v1"));
             json->SetNumberField(TEXT("qtyMax"), 3);
             const auto result = MakeShared<FJsonObject>();
             result->SetStringField(TEXT("itemRef"), Result->Guid.ToString(EGuidFormats::DigitsWithHyphens));
@@ -167,7 +166,7 @@ namespace MounteaRecipeFlatModelTest
         if (!Test.TestTrue(TEXT("Recipe is JSON"), FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(recipeText), json) && json.IsValid()))
             return false;
         Test.TestFalse(TEXT("Export contains no legacy groups"), json->HasField(TEXT("groups")));
-        Test.TestEqual(TEXT("Export declares flat ingredient model"), json->GetStringField(TEXT("ingredientModel")), FString(TEXT("flat-v1")));
+        Test.TestFalse(TEXT("Export needs no ingredient model discriminator"), json->HasField(TEXT("ingredientModel")));
         Test.TestEqual(TEXT("Export combines duplicate rows"), json->GetArrayField(TEXT("ingredients")).Num(), 1);
         if (!Test.TestTrue(TEXT("Exported JSON validates"), FRecipeStatics::ValidateRecipe(json, Fixture.KnownGuids(), error)))
         {
@@ -239,7 +238,7 @@ namespace MounteaRecipeFlatModelTest
 using namespace MounteaRecipeFlatModelTest;
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatDeserializeTest,
-    "Mountea.InventorySystemEditor.RecipeFlatModel.CanonicalAndLegacy",
+    "Mountea.InventorySystemEditor.RecipeFlatModel.CanonicalIngredientsOnly",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 
 bool FMounteaRecipeFlatDeserializeTest::RunTest(const FString& Parameters)
@@ -255,16 +254,17 @@ bool FMounteaRecipeFlatDeserializeTest::RunTest(const FString& Parameters)
     if (TestTrue(TEXT("Canonical flat recipe deserializes"), FRecipeStatics::DeserializeRecipeFromJson(json, restored, fixture.Items(), stations, error)))
         CheckRestored(*this, restored, expected, fixture.Ingredient);
 
-    const auto legacy = fixture.Json();
-    legacy->RemoveField(TEXT("ingredients"));
-    legacy->RemoveField(TEXT("ingredientModel"));
-    legacy->SetArrayField(TEXT("groups"), {
-        MakeShared<FJsonValueObject>(LegacyGroup({ MakeShared<FJsonValueObject>(fixture.IngredientJson(2)) })),
-        MakeShared<FJsonValueObject>(LegacyGroup({ MakeShared<FJsonValueObject>(fixture.IngredientJson(3)) })) });
-    TestTrue(TEXT("Mandatory non-oneOf legacy groups validate"), FRecipeStatics::ValidateRecipe(legacy, fixture.KnownGuids(), error));
-    restored = NewObject<UMounteaRecipeTemplate>(GetTransientPackage());
-    if (TestTrue(TEXT("Mandatory legacy groups flatten"), FRecipeStatics::DeserializeRecipeFromJson(legacy, restored, fixture.Items(), stations, error)))
-        CheckRestored(*this, restored, expected, fixture.Ingredient);
+    const auto unresolvedStation = fixture.Json();
+    unresolvedStation->GetObjectField(TEXT("reqs"))->SetStringField(TEXT("station"), TEXT("Mountea_Unregistered_Exchange_Test_Station"));
+    const FGuid previousGuid = restored->RecipeGuid;
+    TestFalse(TEXT("Unresolved station rejects before changing recipe"), FRecipeStatics::DeserializeRecipeFromJson(unresolvedStation, restored, fixture.Items(), {}, error));
+    TestEqual(TEXT("Unresolved station preserves recipe identity"), restored->RecipeGuid, previousGuid);
+
+    const auto obsolete = fixture.Json();
+    obsolete->RemoveField(TEXT("ingredients"));
+    obsolete->SetArrayField(TEXT("groups"), {
+        MakeShared<FJsonValueObject>(LegacyGroup({ MakeShared<FJsonValueObject>(fixture.IngredientJson(2)) })) });
+    TestFalse(TEXT("Group-based recipes are rejected"), FRecipeStatics::ValidateRecipe(obsolete, fixture.KnownGuids(), error));
     return true;
 }
 
@@ -435,7 +435,9 @@ bool FMounteaRecipeFlatZipParserTest::RunTest(const FString& Parameters)
     TMap<FString, TArray<uint8>> entries;
     entries.Add(TEXT("recipe.json"), JsonBytes(fixture.Json()));
     entries.Add(TEXT("taxonomy/crafting-stations.json"), taxonomyBytes);
-    entries.Add(TEXT("items/ingredient.json"), JsonBytes(MakeShared<FJsonObject>()));
+    const auto bundledItem = MakeShared<FJsonObject>();
+    bundledItem->SetStringField(TEXT("guid"), fixture.Ingredient->Guid.ToString(EGuidFormats::DigitsWithHyphens));
+    entries.Add(TEXT("items/") + fixture.Ingredient->Guid.ToString(EGuidFormats::DigitsWithHyphens) + TEXT(".json"), JsonBytes(bundledItem));
     TArray<uint8> archive;
     if (!TestTrue(TEXT("Build in-memory archive"), FMounteaInventoryZipHelper::BuildArchive(entries, archive))) return false;
     FString recipeText, stationText, error;

@@ -29,6 +29,49 @@
 #include "Serialization/JsonSerializer.h"
 #include "UObject/SavePackage.h"
 
+namespace
+{
+	bool ResolveRecipeStation(const TSharedPtr<FJsonObject>& Json, const TMap<FString, FString>& StationTags,
+		FGameplayTag& OutStation, FString& Error)
+	{
+		OutStation = FGameplayTag();
+		if (!Json->HasField(TEXT("reqs")))
+			return true;
+
+		const TSharedPtr<FJsonObject>* requirements = nullptr;
+
+		if (!Json->TryGetObjectField(TEXT("reqs"), requirements))
+		{
+			Error = TEXT("Recipe reqs must be an object");
+			return false;
+		}
+
+		if (!(*requirements)->HasField(TEXT("station")))
+			return true;
+
+		FString station;
+
+		if (!(*requirements)->TryGetStringField(TEXT("station"), station))
+		{
+			Error = TEXT("Recipe station must be a string");
+			return false;
+		}
+
+		if (station.IsEmpty() || station.Equals(TEXT("None"), ESearchCase::IgnoreCase))
+			return true;
+
+		const FString* mapped = StationTags.Find(station);
+		OutStation = FGameplayTag::RequestGameplayTag(FName(mapped ? **mapped : *station), false);
+		if (!OutStation.IsValid())
+		{
+			Error = TEXT("Recipe station must resolve to a registered Gameplay Tag");
+			return false;
+		}
+
+		return true;
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -39,33 +82,12 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 	TArray<UMounteaRecipeTemplate*>& OutRecipes,
 	FString& OutErrorMessage)
 {
-	TArray<uint8> fileBytes;
-	if (!FMounteaInventoryZipHelper::LoadFileToBytes(FilePath, fileBytes))
-	{
-		OutErrorMessage = FString::Printf(TEXT("Failed to read file: %s"), *FilePath);
-		LOG_ERROR(TEXT("[Recipe Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
-	if (!FMounteaInventoryZipHelper::IsZipFile(fileBytes))
-	{
-		OutErrorMessage = TEXT("File is not a valid ZIP archive");
-		LOG_ERROR(TEXT("[Recipe Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
+	OutRecipes.Reset();
+	OutErrorMessage.Reset();
 	TArray<TArray<uint8>> singleZips;
-	if (FilePath.EndsWith(TEXT(".mntearecipes")))
-	{
-		if (!FMounteaInventoryZipHelper::ExpandBundle(fileBytes, TEXT("mntearecipe"), singleZips))
-		{
-			OutErrorMessage = TEXT("Failed to expand .mntearecipes bundle");
-			LOG_ERROR(TEXT("[Recipe Import] %s"), *OutErrorMessage);
-			return false;
-		}
-	}
-	else
-		singleZips.Add(MoveTemp(fileBytes));
+
+	if (!FMounteaInventoryZipHelper::ReadEntityArchives(FilePath, TEXT("mntearecipe"), TEXT("mntearecipes"), singleZips, OutErrorMessage))
+		return false;
 
 	// ── Phase 1 & 2: Read and validate everything before writing ─────────────
 
@@ -81,6 +103,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 
 	TArray<FParsedRecipe> parsed;
 	parsed.Reserve(singleZips.Num());
+	TSet<FGuid> recipeGuids;
 
 	const TMap<FGuid, UMounteaInventoryItemTemplate*> projectItems =
 		FMounteaInventoryImportHelpers::BuildProjectItemGuidMap();
@@ -90,6 +113,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 		FParsedRecipe entry;
 
 		FString parseError;
+
 		if (!ParseRecipeFromZip(zipBlob, entry.RecipeJson, entry.BundledItemJsons, entry.StationTaxonomyJson, parseError))
 		{
 			OutErrorMessage += parseError + TEXT("\n");
@@ -98,6 +122,7 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 		}
 
 		TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(entry.RecipeJson);
+
 		if (!FJsonSerializer::Deserialize(reader, entry.ParsedJson) || !entry.ParsedJson.IsValid())
 		{
 			OutErrorMessage += TEXT("Failed to parse recipe JSON\n");
@@ -106,13 +131,20 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 		}
 
 		entry.StationTagByName = ParseStationTagMap(entry.StationTaxonomyJson);
+		FGameplayTag station;
+
+		if (!ResolveRecipeStation(entry.ParsedJson, entry.StationTagByName, station, OutErrorMessage))
+			return false;
+
 		entry.BundledGuids = FMounteaInventoryImportHelpers::ParseBundledGuids(entry.BundledItemJsons);
 
 		TSet<FGuid> knownGuids = entry.BundledGuids;
+
 		for (const auto& kv : projectItems)
 			knownGuids.Add(kv.Key);
 
 		FString validationError;
+
 		if (!ValidateRecipe(entry.ParsedJson, knownGuids, validationError))
 		{
 			OutErrorMessage += validationError + TEXT("\n");
@@ -120,80 +152,62 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ImportRecipesFromFilePath(
 			return false;
 		}
 
+		const FGuid recipeGuid = ExtractGuidFromRecipeJson(entry.RecipeJson);
+
+		if (recipeGuids.Contains(recipeGuid))
+		{
+			OutErrorMessage = TEXT("Duplicate recipe GUID in bundle");
+			return false;
+		}
+
+		recipeGuids.Add(recipeGuid);
 		parsed.Add(MoveTemp(entry));
 	}
 
-	// ── Phase 3: Import bundled items, then persist recipes ──────────────────
-
-	TArray<UMounteaRecipeTemplate*> existingRecipes = LoadAllExistingRecipes();
+	// Persist validated dependencies and entities. Surface the first write failure.
+	TArray<UMounteaRecipeTemplate*> existing = LoadAllExistingRecipes();
+	TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
+	const FString folder = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
 
 	for (FParsedRecipe& entry : parsed)
 	{
-		const FString folderToUse = TargetFolder.IsEmpty() ? TEXT("/Game/") : TargetFolder;
+		if (!FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folder, FilePath, itemsByGuid, OutErrorMessage))
+			return false;
 
-		TMap<FGuid, UMounteaInventoryItemTemplate*> itemsByGuid = projectItems;
-		FMounteaInventoryImportHelpers::ImportBundledItems(entry.BundledItemJsons, folderToUse, FilePath, itemsByGuid);
+		const FGuid guid = ExtractGuidFromRecipeJson(entry.RecipeJson);
+		UMounteaRecipeTemplate* asset = FindRecipeByGuid(existing, guid);
 
-		// Find or create recipe asset
-		const FGuid recipeGuid = ExtractGuidFromRecipeJson(entry.RecipeJson);
-		UMounteaRecipeTemplate* recipe = FindRecipeByGuid(existingRecipes, recipeGuid);
-
-		if (recipe)
+		if (asset)
 		{
-			FString updateError;
-			if (UpdateExistingRecipe(recipe, entry.ParsedJson, itemsByGuid, entry.StationTagByName, FilePath, updateError))
-				OutRecipes.Add(recipe);
-			else
-			{
-				OutErrorMessage += updateError + TEXT("\n");
-				LOG_ERROR(TEXT("[Recipe Import] %s"), *updateError);
-			}
+			if (!UpdateExistingRecipe(asset, entry.ParsedJson, itemsByGuid, entry.StationTagByName, FilePath, OutErrorMessage))
+				return false;
 		}
 		else
 		{
-			const FString name = ExtractNameFromRecipeJson(entry.RecipeJson);
-			const FString assetName = name.IsEmpty() ? recipeGuid.ToString(EGuidFormats::Short) : name;
+			FString name = ExtractNameFromRecipeJson(entry.RecipeJson);
 
-			FString createError;
-			recipe = CreateRecipeAsset(folderToUse, assetName, createError);
-			if (!recipe)
+			if (name.IsEmpty())
+				name = guid.ToString(EGuidFormats::DigitsWithHyphens);
+			asset = CreateRecipeAsset(folder, name, OutErrorMessage);
+
+			if (!asset || !DeserializeRecipeFromJson(entry.ParsedJson, asset, itemsByGuid, entry.StationTagByName, OutErrorMessage))
+				return false;
+
+			asset->SetSourceFilePath(FilePath);
+
+			if (!SaveRecipeAsset(asset, asset->GetOutermost()->GetName()))
 			{
-				OutErrorMessage += createError + TEXT("\n");
-				LOG_ERROR(TEXT("[Recipe Import] %s"), *createError);
-				continue;
+				OutErrorMessage = TEXT("Failed to save imported recipe asset");
+				return false;
 			}
 
-			FString deserError;
-			if (DeserializeRecipeFromJson(entry.ParsedJson, recipe, itemsByGuid, entry.StationTagByName, deserError))
-			{
-				recipe->SetSourceFilePath(FilePath);
-				if (SaveRecipeAsset(recipe, recipe->GetOutermost()->GetName()))
-				{
-					OutRecipes.Add(recipe);
-					existingRecipes.Add(recipe);
-				}
-				else
-				{
-					OutErrorMessage += FString::Printf(TEXT("Failed to save recipe asset '%s'\n"), *assetName);
-					LOG_ERROR(TEXT("[Recipe Import] Failed to save recipe asset '%s'"), *assetName);
-				}
-			}
-			else
-			{
-				OutErrorMessage += deserError + TEXT("\n");
-				LOG_ERROR(TEXT("[Recipe Import] %s"), *deserError);
-			}
+			existing.Add(asset);
 		}
+
+		OutRecipes.Add(asset);
 	}
 
-	if (OutRecipes.Num() == 0)
-	{
-		OutErrorMessage = TEXT("No recipes were successfully imported");
-		LOG_ERROR(TEXT("[Recipe Import] %s"), *OutErrorMessage);
-		return false;
-	}
-
-	OutErrorMessage = FString::Printf(TEXT("Recipe import complete: %d imported"), OutRecipes.Num());
+	OutErrorMessage.Reset();
 	return true;
 }
 
@@ -208,35 +222,8 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ParseRecipeFromZip(
 	FString& OutStationTaxonomyJson,
 	FString& OutErrorMessage)
 {
-	TMap<FString, FString> textFiles;
-	TMap<FString, TArray<uint8>> binaryFiles;
-
-	if (!FMounteaInventoryZipHelper::ExtractEntries(ZipBytes, textFiles, binaryFiles))
-	{
-		OutErrorMessage = TEXT("Failed to extract ZIP entries");
-		return false;
-	}
-
-	const FString* recipeJson = textFiles.Find(TEXT("recipe.json"));
-	if (!recipeJson)
-	{
-		OutErrorMessage = TEXT("recipe.json not found in ZIP");
-		return false;
-	}
-
-	OutRecipeJson = *recipeJson;
-
-	// Optional: display-name -> gameplay tag lookup for `reqs.station`. Absence is not an error.
-	if (const FString* taxonomyJson = textFiles.Find(TEXT("taxonomy/crafting-stations.json")))
-		OutStationTaxonomyJson = *taxonomyJson;
-
-	for (const auto& kv : textFiles)
-	{
-		if (kv.Key.StartsWith(TEXT("items/")) && kv.Key.EndsWith(TEXT(".json")))
-			OutBundledItemJsons.Add(kv.Value);
-	}
-
-	return true;
+	return FMounteaInventoryZipHelper::ExtractEntityArchive(ZipBytes, TEXT("recipe.json"),
+		OutRecipeJson, OutBundledItemJsons, OutStationTaxonomyJson, OutErrorMessage);
 }
 
 // ---------------------------------------------------------------------------
@@ -250,6 +237,7 @@ TMap<FString, FString> UMounteaAdvancedInventoryRecipeEditorStatics::ParseStatio
 
 	TArray<TSharedPtr<FJsonValue>> entries;
 	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(TaxonomyJson);
+
 	if (!FJsonSerializer::Deserialize(reader, entries))
 	{
 		LOG_WARNING(TEXT("[Recipe Import] Failed to parse taxonomy/crafting-stations.json"));
@@ -266,10 +254,12 @@ TMap<FString, FString> UMounteaAdvancedInventoryRecipeEditorStatics::ParseStatio
 	for (const TSharedPtr<FJsonValue>& entryVal : Entries)
 	{
 		const TSharedPtr<FJsonObject>* entryObj;
+
 		if (!entryVal->TryGetObject(entryObj))
 			continue;
 
 		FString name, tag;
+
 		if ((*entryObj)->TryGetStringField(TEXT("name"), name) &&
 			(*entryObj)->TryGetStringField(TEXT("tag"), tag) &&
 			!name.IsEmpty() && !tag.IsEmpty())
@@ -285,36 +275,29 @@ TMap<FString, FString> UMounteaAdvancedInventoryRecipeEditorStatics::ParseStatio
 
 namespace
 {
-	// Transitional reader for Inventour's current format. No alternatives enter the runtime model.
 	bool ReadFlatIngredients(const TSharedPtr<FJsonObject>& Json, TArray<TSharedPtr<FJsonValue>>& Out, FString& Error)
 	{
-		if (!Json.IsValid()) { Error = TEXT("Invalid recipe JSON"); return false; }
-		const TArray<TSharedPtr<FJsonValue>>* ingredients = nullptr;
-		if (Json->HasField(TEXT("ingredients")))
-		{
-			if (Json->HasField(TEXT("groups"))) { Error = TEXT("Recipe cannot contain both ingredients and legacy groups"); return false; }
-			if (!Json->TryGetArrayField(TEXT("ingredients"), ingredients)) { Error = TEXT("ingredients must be an array"); return false; }
-			Out = *ingredients;
-		}
-		else
-		{
-			const TArray<TSharedPtr<FJsonValue>>* groups = nullptr;
-			if (!Json->TryGetArrayField(TEXT("groups"), groups)) { Error = TEXT("Recipe is missing its ingredients array"); return false; }
-			for (const auto& value : *groups)
-			{
-				const TSharedPtr<FJsonObject>* group = nullptr;
-				if (!value.IsValid() || !value->TryGetObject(group)) { Error = TEXT("Invalid legacy ingredient group"); return false; }
-				bool required = true, oneOf = false;
-				if (((*group)->HasField(TEXT("required")) && !(*group)->TryGetBoolField(TEXT("required"), required)) ||
-					((*group)->HasField(TEXT("oneOf")) && !(*group)->TryGetBoolField(TEXT("oneOf"), oneOf)))
-				{ Error = TEXT("Legacy group flags must be booleans"); return false; }
-				if (!required || oneOf)
-				{ Error = TEXT("Alternative or optional ingredients are no longer supported. Convert each crafting method to a separate recipe before importing."); return false; }
-				if (!(*group)->TryGetArrayField(TEXT("ingredients"), ingredients)) { Error = TEXT("Legacy group is missing ingredients"); return false; }
-				Out.Append(*ingredients);
-			}
-		}
-		if (Out.IsEmpty()) { Error = TEXT("A recipe must have at least one mandatory ingredient"); return false; }
+	    if (!Json.IsValid())
+	    {
+		    Error = TEXT("Invalid recipe JSON");
+		    return false;
+	    }
+
+	    const TArray<TSharedPtr<FJsonValue>>* ingredients = nullptr;
+
+	    if (Json->HasField(TEXT("groups")))
+	    {
+		    Error = TEXT("Ingredient groups are not supported; use one ingredients array");
+		    return false;
+	    }
+
+	    if (!Json->TryGetArrayField(TEXT("ingredients"), ingredients) || ingredients->IsEmpty())
+	    {
+		    Error = TEXT("A recipe requires a nonempty ingredients array");
+		    return false;
+	    }
+
+	    Out = *ingredients;
 		return true;
 	}
 }
@@ -325,43 +308,84 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::ValidateRecipe(
 	OutErrorMessage.Reset();
 	FString guidString;
 	FGuid guid;
+
 	if (!RecipeJson.IsValid() || !RecipeJson->TryGetStringField(TEXT("guid"), guidString) || !FGuid::Parse(guidString, guid) || !guid.IsValid())
-	{ OutErrorMessage = TEXT("Recipe requires a valid nonzero guid"); return false; }
+	{
+		OutErrorMessage = TEXT("Recipe requires a valid nonzero guid");
+		return false;
+	}
+
 	const TSharedPtr<FJsonObject>* result = nullptr;
 	FString resultGuid;
+
 	if (!RecipeJson->TryGetObjectField(TEXT("result"), result) || !(*result)->TryGetStringField(TEXT("itemRef"), resultGuid))
-	{ OutErrorMessage = TEXT("Recipe requires result.itemRef"); return false; }
-	if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(resultGuid, TEXT("result.itemRef"), KnownGuids, OutErrorMessage)) return false;
+	{
+		OutErrorMessage = TEXT("Recipe requires result.itemRef");
+		return false;
+	}
+
+	if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(resultGuid, TEXT("result.itemRef"), KnownGuids, OutErrorMessage))
+		return false;
+
 	double yield = 1;
+
 	if (RecipeJson->HasField(TEXT("qtyMax")) &&
 		(!RecipeJson->TryGetNumberField(TEXT("qtyMax"), yield) || !FMath::IsFinite(yield) || yield < 1 || yield > MAX_int32 || yield != FMath::FloorToDouble(yield)))
-	{ OutErrorMessage = TEXT("qtyMax must be a positive integer"); return false; }
+	{
+		OutErrorMessage = TEXT("qtyMax must be a positive integer");
+		return false;
+	}
+
 	const TSharedPtr<FJsonObject>* reqs = nullptr;
+
 	if (RecipeJson->TryGetObjectField(TEXT("reqs"), reqs) && (*reqs)->HasField(TEXT("duration")))
 	{
 		double duration = 0;
+
 		if (!(*reqs)->TryGetNumberField(TEXT("duration"), duration) || !FMath::IsFinite(duration) || duration < 0 || duration > MAX_flt)
-		{ OutErrorMessage = TEXT("Crafting duration must be a finite nonnegative number"); return false; }
+		{
+			OutErrorMessage = TEXT("Crafting duration must be a finite nonnegative number");
+			return false;
+		}
 	}
+
 	TArray<TSharedPtr<FJsonValue>> ingredients;
-	if (!ReadFlatIngredients(RecipeJson, ingredients, OutErrorMessage)) return false;
+
+	if (!ReadFlatIngredients(RecipeJson, ingredients, OutErrorMessage))
+		return false;
+
 	TMap<FGuid, int64> totals;
+
 	for (int32 index = 0; index < ingredients.Num(); ++index)
 	{
 		const TSharedPtr<FJsonObject>* ingredient = nullptr;
 		const TSharedPtr<FJsonObject>* ref = nullptr;
 		FString itemGuid;
 		double quantity = 0;
+
 		if (!ingredients[index].IsValid() || !ingredients[index]->TryGetObject(ingredient) ||
 			!(*ingredient)->TryGetObjectField(TEXT("ref"), ref) || !(*ref)->TryGetStringField(TEXT("guid"), itemGuid) ||
 			!(*ingredient)->TryGetNumberField(TEXT("qty"), quantity) || !FMath::IsFinite(quantity) || quantity <= 0 || quantity > MAX_int32 || quantity != FMath::FloorToDouble(quantity))
-		{ OutErrorMessage = FString::Printf(TEXT("ingredients[%d] requires ref.guid and a positive integer qty"), index); return false; }
-		if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(itemGuid, FString::Printf(TEXT("ingredients[%d].ref.guid"), index), KnownGuids, OutErrorMessage)) return false;
-		FGuid parsed; FGuid::Parse(itemGuid, parsed);
+		{
+			OutErrorMessage = FString::Printf(TEXT("ingredients[%d] requires ref.guid and a positive integer qty"), index);
+			return false;
+		}
+
+		if (!FMounteaInventoryImportHelpers::CheckGuidInKnownSet(itemGuid, FString::Printf(TEXT("ingredients[%d].ref.guid"), index), KnownGuids, OutErrorMessage))
+			return false;
+
+		FGuid parsed;
+		FGuid::Parse(itemGuid, parsed);
 		int64& total = totals.FindOrAdd(parsed);
 		total += static_cast<int64>(quantity);
-		if (total > MAX_int32) { OutErrorMessage = TEXT("Combined ingredient quantity exceeds int32 capacity"); return false; }
+
+		if (total > MAX_int32)
+		{
+			OutErrorMessage = TEXT("Combined ingredient quantity exceeds int32 capacity");
+			return false;
+		}
 	}
+
 	return true;
 }
 
@@ -408,28 +432,56 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::DeserializeRecipeFromJson(
 	const TMap<FString, FString>& StationTagByName, FString& OutErrorMessage)
 {
 	TSet<FGuid> knownGuids;
-	for (const auto& item : ItemsByGuid) if (IsValid(item.Value)) knownGuids.Add(item.Key);
-	if (!IsValid(Recipe) || !ValidateRecipe(JsonObject, knownGuids, OutErrorMessage)) return false;
+
+	for (const auto& item : ItemsByGuid)
+	{
+		if (IsValid(item.Value))
+			knownGuids.Add(item.Key);
+	}
+
+	if (!IsValid(Recipe) || !ValidateRecipe(JsonObject, knownGuids, OutErrorMessage))
+		return false;
+
+	FGameplayTag station;
+
+	if (!ResolveRecipeStation(JsonObject, StationTagByName, station, OutErrorMessage))
+		return false;
 
 	TArray<TSharedPtr<FJsonValue>> entries;
-	if (!ReadFlatIngredients(JsonObject, entries, OutErrorMessage)) return false;
+
+	if (!ReadFlatIngredients(JsonObject, entries, OutErrorMessage))
+		return false;
+
 	TArray<TObjectPtr<UMounteaRecipeIngredient>> ingredients;
 	TMap<FGuid, int32> indexByGuid;
+
 	for (const auto& entry : entries)
 	{
 		const auto object = entry->AsObject();
-		FGuid guid; FGuid::Parse(object->GetObjectField(TEXT("ref"))->GetStringField(TEXT("guid")), guid);
+		FGuid guid;
+		FGuid::Parse(object->GetObjectField(TEXT("ref"))->GetStringField(TEXT("guid")), guid);
 		const int32 quantity = static_cast<int32>(object->GetNumberField(TEXT("qty")));
-		if (const int32* index = indexByGuid.Find(guid)) ingredients[*index]->RequiredQuantity += quantity;
+
+		if (const int32* index = indexByGuid.Find(guid))
+			ingredients[*index]->RequiredQuantity += quantity;
 		else
 		{
 			// Preserve a project's chosen subclass and its additional fields on reimport.
 			UMounteaRecipeIngredient* previous = nullptr;
+
 			for (UMounteaRecipeIngredient* existing : Recipe->RecipeIngredients)
+			{
 				if (IsValid(existing) && existing->IngredientSource.LoadSynchronous() == ItemsByGuid.FindChecked(guid))
-				{ previous = existing; break; }
+				{
+					previous = existing;
+					break;
+				}
+			}
+
 			UClass* ingredientClass = Recipe->DefaultIngredientClass.Get();
-			if (!ingredientClass || ingredientClass->HasAnyClassFlags(CLASS_Abstract)) ingredientClass = UMounteaRecipeIngredient::StaticClass();
+
+			if (!ingredientClass || ingredientClass->HasAnyClassFlags(CLASS_Abstract))
+				ingredientClass = UMounteaRecipeIngredient::StaticClass();
 			UMounteaRecipeIngredient* ingredient = previous
 				? DuplicateObject<UMounteaRecipeIngredient>(previous, Recipe)
 				: NewObject<UMounteaRecipeIngredient>(Recipe, ingredientClass, NAME_None, RF_Transactional);
@@ -440,24 +492,23 @@ bool UMounteaAdvancedInventoryRecipeEditorStatics::DeserializeRecipeFromJson(
 	}
 	// Apply only after all parsing/validation has succeeded, so failed reimports preserve the old data.
 	FGuid::Parse(JsonObject->GetStringField(TEXT("guid")), Recipe->RecipeGuid);
-	FGuid resultGuid; FGuid::Parse(JsonObject->GetObjectField(TEXT("result"))->GetStringField(TEXT("itemRef")), resultGuid);
+	FGuid resultGuid;
+	FGuid::Parse(JsonObject->GetObjectField(TEXT("result"))->GetStringField(TEXT("itemRef")), resultGuid);
 	Recipe->ResultItem = ItemsByGuid.FindChecked(resultGuid);
-	int32 yield = 1; JsonObject->TryGetNumberField(TEXT("qtyMax"), yield);
+	int32 yield = 1;
+	JsonObject->TryGetNumberField(TEXT("qtyMax"), yield);
 	Recipe->QuantityPerCreation = yield;
 	Recipe->CraftingTime = 0.f;
-	Recipe->RequiredCraftingPlace = FGameplayTag();
+	Recipe->RequiredCraftingPlace = station;
 	const TSharedPtr<FJsonObject>* reqs = nullptr;
+
 	if (JsonObject->TryGetObjectField(TEXT("reqs"), reqs))
 	{
-		double duration = 0; (*reqs)->TryGetNumberField(TEXT("duration"), duration);
+		double duration = 0;
+		(*reqs)->TryGetNumberField(TEXT("duration"), duration);
 		Recipe->CraftingTime = static_cast<float>(duration);
-		FString station;
-		if ((*reqs)->TryGetStringField(TEXT("station"), station) && !station.IsEmpty() && !station.Equals(TEXT("None"), ESearchCase::IgnoreCase))
-		{
-			const FString* mapped = StationTagByName.Find(station);
-			Recipe->RequiredCraftingPlace = FGameplayTag::RequestGameplayTag(FName(mapped ? **mapped : *station), false);
-		}
 	}
+
 	Recipe->RecipeIngredients = MoveTemp(ingredients);
 	return true;
 }
@@ -505,10 +556,12 @@ FString UMounteaAdvancedInventoryRecipeEditorStatics::ExtractNameFromRecipeJson(
 {
 	TSharedPtr<FJsonObject> obj;
 	TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(JsonString);
+
 	if (!FJsonSerializer::Deserialize(reader, obj) || !obj.IsValid())
 		return TEXT("");
 
 	FString name;
+
 	if (obj->TryGetStringField(TEXT("name"), name))
 		return FMounteaInventoryImportHelpers::SanitizeAssetName(name);
 
@@ -528,6 +581,7 @@ TArray<UMounteaRecipeTemplate*> UMounteaAdvancedInventoryRecipeEditorStatics::Lo
 		if (UMounteaRecipeTemplate* r = Cast<UMounteaRecipeTemplate>(a.GetAsset()))
 			recipes.Add(r);
 	}
+
 	return recipes;
 }
 
@@ -539,9 +593,9 @@ UMounteaRecipeTemplate* UMounteaAdvancedInventoryRecipeEditorStatics::FindRecipe
 		return nullptr;
 
 	UMounteaRecipeTemplate* const* found = Recipes.FindByPredicate(
-		[&Guid](const UMounteaRecipeTemplate* r)
+		[&Guid](const UMounteaRecipeTemplate* Recipe)
 		{
-			return IsValid(r) && r->RecipeGuid == Guid;
+			return IsValid(Recipe) && Recipe->RecipeGuid == Guid;
 		});
 
 	return found ? *found : nullptr;
