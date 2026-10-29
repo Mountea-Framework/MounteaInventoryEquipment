@@ -85,6 +85,7 @@ protected:
 	virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged) override;
 
 private:
+	friend class FMounteaInventoryTreeRowParityTest;
 	TSharedRef<SWidget> CreatePropertyMatrix();
 	TSharedRef<SWidget> CreateToolbar();
 	TSharedRef<ITableRow> GenerateTemplateTreeRow(TSharedPtr<FTemplateTreeItem> Item, const TSharedRef<STableViewBase>& OwnerTable);
@@ -112,6 +113,8 @@ private:
 	FReply ShowHelpModal();
 	FReply OnCloseHelp();
 
+	FReply ImportTemplateAction();
+	FReply ExportTemplateAction();
 	void ImportTemplate();
 	void ExportTemplate();
 	
