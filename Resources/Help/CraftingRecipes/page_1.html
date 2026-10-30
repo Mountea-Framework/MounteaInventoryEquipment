@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Crafting Recipes Editor — Recipe setup</title>
+</head>
+<body>
+	<main class="doc-page">
+		<header>
+			<div class="version">Learning guide · 2 of 3</div>
+			<h1>Recipe setup</h1>
+			<p>Build a recipe by choosing its output, adding each required ingredient, and setting any optional crafting requirements.</p>
+		</header>
+
+		<div>
+			<section>
+				<h2>Set the output and timing</h2>
+				<ol>
+					<li>Start a draft with <strong>New Template</strong>, or select an existing recipe in the browser.</li>
+					<li>Set <strong>Result Item</strong> to the item template produced by crafting, then set <strong>Quantity Per Creation</strong> to the output count.</li>
+					<li>Set <strong>Crafting Time</strong> to the duration used for the recipe.</li>
+					<li>Optionally set <strong>Required Crafting Place</strong> to the gameplay tag for a required station. Leave it unset when no station is required.</li>
+				</ol>
+			</section>
+
+			<section class="card">
+				<h2>Add ingredients</h2>
+				<p>In <strong>Recipe Ingredients</strong>, add one entry for each item template the recipe requires. Set each entry's <strong>Ingredient Source</strong> and <strong>Required Quantity</strong>.</p>
+				<p>Every ingredient row is required. Add separate rows for separate inputs; there are no optional or “one of” groups in the current flat recipe model.</p>
+			</section>
+
+			<section>
+				<h2>Review and save</h2>
+				<ul>
+					<li>Check that the result and every ingredient refer to the intended item templates.</li>
+					<li>Use <strong>Save Template</strong> for the current recipe or <strong>Save All Templates</strong> for all modified recipes.</li>
+					<li>Use <strong>Duplicate</strong> on a saved recipe to make a separate draft with a new GUID.</li>
+					<li>The crafting configuration's <strong>Allowed Recipes</strong> list controls which recipes are available to runtime crafting systems.</li>
+				</ul>
+			</section>
+		</div>
+
+		<footer>
+			<span class="tag">recipe fields</span>
+			<span class="tag">ingredients</span>
+			<span class="tag">crafting setup</span>
+			·
+			<a href="0" data-type="page">← Overview</a> · <a href="#top">Back to top</a> · <a href="2" data-type="page">Next: Import and export →</a>
+		</footer>
+	</main>
+</body>
+</html>
+
+

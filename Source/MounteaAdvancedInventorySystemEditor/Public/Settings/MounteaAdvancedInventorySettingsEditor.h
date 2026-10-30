@@ -66,6 +66,10 @@ public:
 		AdvancedDisplay)
 	TMap<int32, FItemTemplateEditorPageConfig> EditorTemplatePages;
 
+	/** Tutorial pages for the Crafting Recipes Editor, ordered by page ID. */
+	UPROPERTY(Config, EditAnywhere, Category = "Crafting Recipes Editor", AdvancedDisplay)
+	TMap<int32, FItemTemplateEditorPageConfig> EditorRecipePages;
+
 public:
 
 #if WITH_EDITOR

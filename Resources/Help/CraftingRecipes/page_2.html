@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Crafting Recipes Editor — Import and export</title>
+</head>
+<body>
+	<main class="doc-page">
+		<header>
+			<div class="version">Learning guide · 3 of 3</div>
+			<h1>Import and export</h1>
+			<p>Use the recipe toolbar actions to exchange individual recipes or bundles while keeping existing recipe identity intact.</p>
+		</header>
+
+		<div>
+			<section class="card">
+				<h2>Import recipes</h2>
+				<p>Choose <strong>Import Template</strong> and select a <code>.mntearecipe</code> file for one recipe or a <code>.mntearecipes</code> file for a bundle. Review the import result notification and inspect the imported recipes in the browser.</p>
+				<p>When an imported recipe matches an existing recipe GUID, the importer updates that record. A new GUID creates a new recipe asset. Bundle import can include referenced item templates as dependencies.</p>
+			</section>
+
+			<section>
+				<h2>Reimport from a recorded source</h2>
+				<p><strong>Reimport All</strong> refreshes existing recipes that have a recorded source file. It can include recipes hidden by the current search or browser filters. Unsaved recipe changes may prompt before source data replaces them.</p>
+				<p>Reimport uses each asset's recorded source; it does not create new recipes from unrelated files. Check the completion report for updated, skipped, or failed records.</p>
+			</section>
+
+			<section class="card">
+				<h2>Export recipes</h2>
+				<p>Select one or more recipes and choose <strong>Export Item</strong> to write a single-recipe file or a bundle. Export serializes recipe identity, output, station requirement, timing, and ingredient rows. Referenced item templates can be included as bundled dependencies.</p>
+				<p>After moving files between projects, verify that the referenced item templates and required gameplay tags exist in the destination project.</p>
+			</section>
+		</div>
+
+		<footer>
+			<span class="tag">import</span>
+			<span class="tag">reimport</span>
+			<span class="tag">export</span>
+			·
+			<a href="1" data-type="page">← Recipe setup</a> · <a href="#top">Back to top</a>
+		</footer>
+	</main>
+</body>
+</html>
+

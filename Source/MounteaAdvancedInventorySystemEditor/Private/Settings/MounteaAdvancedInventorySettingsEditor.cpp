@@ -69,4 +69,14 @@ UMounteaAdvancedInventorySettingsEditor::UMounteaAdvancedInventorySettingsEditor
 	EditorTemplatePages.Add(4, fifthPage);
 	EditorTemplatePages.Add(5, sixthPage);
 
+	this->EditorRecipePages.Add(0, FItemTemplateEditorPageConfig(
+		NSLOCTEXT("MounteaAdvancedInventorySettingsEditor", "EditorRecipePages_Overview", "Overview"),
+		ResolvePluginPath(TEXT("Resources/Help/CraftingRecipes/page_0.html"))));
+	this->EditorRecipePages.Add(1, FItemTemplateEditorPageConfig(
+		NSLOCTEXT("MounteaAdvancedInventorySettingsEditor", "EditorRecipePages_Setup", "Recipe setup"),
+		ResolvePluginPath(TEXT("Resources/Help/CraftingRecipes/page_1.html"))));
+	this->EditorRecipePages.Add(2, FItemTemplateEditorPageConfig(
+		NSLOCTEXT("MounteaAdvancedInventorySettingsEditor", "EditorRecipePages_ImportExport", "Import and export"),
+		ResolvePluginPath(TEXT("Resources/Help/CraftingRecipes/page_2.html"))));
+
 }
