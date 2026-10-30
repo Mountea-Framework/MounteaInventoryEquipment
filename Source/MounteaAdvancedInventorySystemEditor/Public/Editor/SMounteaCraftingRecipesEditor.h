@@ -72,6 +72,7 @@ private:
 	bool ConfirmDiscardDraft();
 	bool SaveRecipe(UMounteaRecipeTemplate* Recipe);
 	bool HasDirtyRecipes() const;
+	void InitializeDraft();
 	FReply CreateRecipe();
 	FReply SaveCurrent();
 	FReply SaveAll();

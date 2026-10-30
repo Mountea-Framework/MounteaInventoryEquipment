@@ -114,7 +114,9 @@ void SMounteaCraftingRecipesEditor::Construct(const FArguments& InArgs)
 	RenamedHandle = registry.OnAssetRenamed().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetRenamed);
 	ChangedHandle = FCoreUObjectDelegates::OnObjectPropertyChanged.AddSP(this, &SMounteaCraftingRecipesEditor::OnObjectChanged);
 	GEditor->RegisterForUndo(this);
-	RefreshRecipes();
+	this->InitializeDraft();
+	this->RefreshRecipes();
+	this->SelectRecipe(this->Draft);
 }
 
 SMounteaCraftingRecipesEditor::~SMounteaCraftingRecipesEditor()
@@ -189,13 +191,13 @@ void SMounteaCraftingRecipesEditor::RefreshRecipes()
 	{
 		if (auto* recipe = Cast<UMounteaRecipeTemplate>(asset.GetAsset()))
 		{
+			if (recipe->HasAnyFlags(RF_Transient))
+				continue;
+
 			recipe->SetFlags(RF_Transactional);
 			Recipes.Add(recipe);
 		}
 	}
-
-	if (Draft)
-		Recipes.Add(Draft);
 
 	Recipes.Sort([](const UMounteaRecipeTemplate& A, const UMounteaRecipeTemplate& B)
 	{
@@ -255,7 +257,7 @@ void SMounteaCraftingRecipesEditor::RefreshRecipes()
 		Current = objects.Num() == 1 ? Cast<UMounteaRecipeTemplate>(objects[0]) : nullptr;
 		Details->SetObjects(objects);
 	}
-	else if (selected.IsValid() && Recipes.Contains(selected.Get()))
+	else if (selected.IsValid() && (selected.Get() == this->Draft || this->Recipes.Contains(selected.Get())))
 		SelectRecipe(selected.Get());
 	else if (!Current.IsValid() || !Recipes.Contains(Current.Get()))
 	{
@@ -292,18 +294,52 @@ void SMounteaCraftingRecipesEditor::GetRecipeChildren(FTreeItem Item, TArray<FTr
 
 void SMounteaCraftingRecipesEditor::SelectionChanged(FTreeItem Item, ESelectInfo::Type Type)
 {
-	if (bRefreshing)
+	if (this->bRefreshing)
 		return;
 
 	TArray<UObject*> selection;
-	for (const auto& selected : Tree->GetSelectedItems())
+	for (const auto& selected : this->Tree->GetSelectedItems())
 	{
 		if (selected->Recipe.IsValid())
 			selection.Add(selected->Recipe.Get());
 	}
 
-	Current = selection.Num() == 1 ? Cast<UMounteaRecipeTemplate>(selection[0]) : nullptr;
-	Details->SetObjects(selection);
+	if (this->Current.Get() == this->Draft && this->Draft && this->bDraftDirty)
+	{
+		if (!this->ConfirmDiscardDraft())
+		{
+			this->SelectRecipe(this->Draft);
+			return;
+		}
+
+		this->bDraftDirty = false;
+	}
+
+	if (selection.IsEmpty())
+	{
+		this->SelectRecipe(this->Draft);
+		return;
+	}
+
+	if (selection.Num() == 1)
+	{
+		this->SelectRecipe(Cast<UMounteaRecipeTemplate>(selection[0]));
+		return;
+	}
+
+	TGuardValue<bool> guard(this->bRefreshing, true);
+	this->Tree->ClearSelection();
+	for (const FTreeItem& root : this->Roots)
+	{
+		for (const FTreeItem& child : root->Children)
+		{
+			if (selection.Contains(child->Recipe.Get()))
+				this->Tree->SetItemSelection(child, true, ESelectInfo::Direct);
+		}
+	}
+
+	this->Current.Reset();
+	this->Details->SetObjects(selection);
 }
 
 TSharedRef<ITableRow> SMounteaCraftingRecipesEditor::GenerateRow(FTreeItem Item, const TSharedRef<STableViewBase>& Owner)
@@ -482,15 +518,20 @@ bool SMounteaCraftingRecipesEditor::CanCloseEditor()
 	return !HasDirtyRecipes();
 }
 
+void SMounteaCraftingRecipesEditor::InitializeDraft()
+{
+	this->Draft = NewObject<UMounteaRecipeTemplate>(GetTransientPackage(), NAME_None, RF_Transient | RF_Transactional);
+	this->bDraftDirty = false;
+}
+
 FReply SMounteaCraftingRecipesEditor::CreateRecipe()
 {
 	if (!ConfirmDiscardDraft())
 		return FReply::Handled();
 
 	const FScopedTransaction transaction(LOCTEXT("NewRecipeTransaction", "Create crafting recipe"));
-	Draft = NewObject<UMounteaRecipeTemplate>(GetTransientPackage(), NAME_None, RF_Transient | RF_Transactional);
-	Draft->Modify();
-	bDraftDirty = false;
+	this->InitializeDraft();
+	this->Draft->Modify();
 	Search->SetText(FText::GetEmpty());
 	RefreshRecipes();
 	SelectRecipe(Draft);
@@ -559,9 +600,13 @@ FReply SMounteaCraftingRecipesEditor::SaveCurrent()
 FReply SMounteaCraftingRecipesEditor::SaveAll()
 {
 	TArray<TWeakObjectPtr<UMounteaRecipeTemplate>> dirty;
+
+	if (this->Draft && this->bDraftDirty)
+		dirty.Add(this->Draft);
+
 	for (UMounteaRecipeTemplate* recipe : Recipes)
 	{
-		if (recipe && ((recipe == Draft && bDraftDirty) || (recipe != Draft && recipe->GetPackage()->IsDirty())))
+		if (recipe && recipe->GetPackage()->IsDirty())
 			dirty.Add(recipe);
 	}
 
