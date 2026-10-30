@@ -14,6 +14,9 @@
 #if WITH_DEV_AUTOMATION_TESTS && WITH_EDITOR
 
 #include "Editor/SMounteaCraftingRecipesEditor.h"
+#include "IDetailsView.h"
+#include "Engine/TimerHandle.h"
+#include "Engine/StreamableRenderAsset.h"
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 #include "Editor/STemplateTreeItemRow.h"
 #include "Editor/MounteaInventoryEditorLayout.h"
@@ -109,10 +112,58 @@ bool FMounteaCraftingRecipesEditorLifecycleTest::RunTest(const FString& Paramete
 {
 	if (!GEditor || !FSlateApplication::IsInitialized()) { AddError(TEXT("An initialized editor and Slate are required.")); return false; }
 	TSharedPtr<SMounteaCraftingRecipesEditor> Editor = SNew(SMounteaCraftingRecipesEditor);
+	if (!TestNotNull(TEXT("Opening the recipe editor creates a default draft"), Editor->Draft.Get())) return false;
+	TWeakObjectPtr<UMounteaRecipeTemplate> StartupDraft = Editor->Draft.Get();
+	TestTrue(TEXT("Default draft is transient and supports undo"), StartupDraft->HasAllFlags(RF_Transient | RF_Transactional));
+	TestTrue(TEXT("Default draft is the current recipe"), Editor->Current.Get() == StartupDraft.Get());
+	TestFalse(TEXT("Default draft is excluded from saved browser recipes"), Editor->Recipes.Contains(StartupDraft.Get()));
+	TestEqual(TEXT("Default draft has no selected browser row"), Editor->Tree->GetSelectedItems().Num(), 0);
+	TestEqual(TEXT("Default draft appears in the details panel"), Editor->Details->GetSelectedObjects().Num(), 1);
+	if (Editor->Details->GetSelectedObjects().Num() == 1)
+		TestTrue(TEXT("Details show the default draft"), Editor->Details->GetSelectedObjects()[0].Get() == StartupDraft.Get());
+	TestFalse(TEXT("Default draft starts clean"), Editor->bDraftDirty);
+	Editor->RefreshRecipes();
+	TestTrue(TEXT("Refreshing preserves the hidden draft in details"), Editor->Current.Get() == StartupDraft.Get());
+	Editor->SelectionChanged(nullptr, ESelectInfo::Direct);
+	TestTrue(TEXT("Empty browser selection falls back to the hidden draft"), Editor->Current.Get() == StartupDraft.Get());
+	TestTrue(TEXT("Untouched default draft can be closed without prompting"), Editor->CanCloseEditor());
+	const auto SaveButton = FindButton(Editor.ToSharedRef(), TEXT("Save Template"));
+	if (TestTrue(TEXT("Recipe editor provides the shared Save Template button"), SaveButton.IsValid()))
+		TestTrue(TEXT("Default draft can be saved before its first edit"), SaveButton->IsEnabled());
+	CollectGarbage(RF_NoFlags);
+	TestTrue(TEXT("Default draft survives garbage collection while its editor is open"), StartupDraft.IsValid());
+	TSharedPtr<FMounteaRecipeTreeItem> AssetRow;
+	for (const auto& Root : Editor->Roots)
+	{
+		if (!Root->Children.IsEmpty())
+		{
+			AssetRow = Root->Children[0];
+			break;
+		}
+	}
+	if (TestTrue(TEXT("Saved recipes are available for browser selection"), AssetRow.IsValid()))
+	{
+		Editor->Tree->SetSelection(AssetRow, ESelectInfo::Direct);
+		TestTrue(TEXT("Selecting a saved recipe replaces draft details"), Editor->Current.Get() == AssetRow->Recipe.Get());
+		TestTrue(TEXT("Selecting a saved recipe retains the hidden draft"), Editor->Draft.Get() == StartupDraft.Get());
+		Editor->Tree->ClearSelection();
+		TestTrue(TEXT("Clearing asset selection restores the hidden draft"), Editor->Current.Get() == StartupDraft.Get());
+		Editor->Tree->SetSelection(AssetRow, ESelectInfo::Direct);
+		const int32 RecipeCount = Editor->Recipes.Num();
+		TestTrue(TEXT("Closing a saved recipe is handled"), Editor->CloseRecipe().IsEventHandled());
+		TestTrue(TEXT("Closing a saved recipe restores draft details"), Editor->Current.Get() == StartupDraft.Get());
+		TestTrue(TEXT("Closing a saved recipe retains the same draft"), Editor->Draft.Get() == StartupDraft.Get());
+		TestEqual(TEXT("Closing a saved recipe clears browser selection"), Editor->Tree->GetSelectedItems().Num(), 0);
+		TestEqual(TEXT("Closing a saved recipe preserves the saved browser list"), Editor->Recipes.Num(), RecipeCount);
+		Editor->Tree->SetSelection(AssetRow, ESelectInfo::Direct);
+	}
 	const auto NewButton = FindButton(Editor.ToSharedRef(), TEXT("New Template"));
 	if (!TestTrue(TEXT("Recipe editor provides the shared New Template button"), NewButton.IsValid())) return false;
 	NewButton->SimulateClick();
 	if (!TestNotNull(TEXT("New toolbar action creates a draft"), Editor->Draft.Get())) return false;
+	TestTrue(TEXT("New replaces the untouched default draft"), Editor->Draft.Get() != StartupDraft.Get());
+	TestEqual(TEXT("New clears saved asset selection"), Editor->Tree->GetSelectedItems().Num(), 0);
+	TestFalse(TEXT("New draft is excluded from saved browser recipes"), Editor->Recipes.Contains(Editor->Draft));
 	TWeakObjectPtr<UMounteaRecipeTemplate> Original = Editor->Draft.Get();
 	const FGuid OriginalGuid = Original->RecipeGuid;
 	CollectGarbage(RF_NoFlags);
@@ -133,15 +184,27 @@ bool FMounteaCraftingRecipesEditorLifecycleTest::RunTest(const FString& Paramete
 	TestTrue(TEXT("Duplicating creates a distinct recipe GUID"), Editor->Draft->RecipeGuid != OriginalGuid);
 	TestEqual(TEXT("Duplicating retains recipe data"), Editor->Draft->QuantityPerCreation, OriginalQuantity);
 	Editor->bDraftDirty = false;
+	TWeakObjectPtr<UMounteaRecipeTemplate> ClosedDraft = Editor->Draft.Get();
 	const auto CloseButton = FindButton(Editor.ToSharedRef(), TEXT("Close Template"));
 	if (TestTrue(TEXT("Recipe editor provides the shared Close Template button"), CloseButton.IsValid())) CloseButton->SimulateClick();
-	TestNull(TEXT("Close releases the unsaved draft"), Editor->Draft.Get());
+	TestTrue(TEXT("Close retains the unsaved draft like the item editor"), Editor->Draft.Get() == ClosedDraft.Get());
+	TestTrue(TEXT("Close keeps draft details visible"), Editor->Current.Get() == ClosedDraft.Get());
+	TestEqual(TEXT("Close leaves no saved browser selection"), Editor->Tree->GetSelectedItems().Num(), 0);
+	TestEqual(TEXT("Close retains draft data"), Editor->Draft->QuantityPerCreation, OriginalQuantity);
+	TestFalse(TEXT("Close leaves the retained draft clean"), Editor->bDraftDirty);
+	CollectGarbage(RF_NoFlags);
+	TestTrue(TEXT("Closed draft survives while its editor is open"), ClosedDraft.IsValid());
 	Editor.Reset();
 	// A fresh instance binds fresh registry/undo delegates after the first instance was destroyed.
 	Editor = SNew(SMounteaCraftingRecipesEditor);
-	TestNull(TEXT("Reopening starts with a blank details canvas"), Editor->Draft.Get());
-	TestFalse(TEXT("Reopened editor has no stale selection"), Editor->Current.IsValid());
+	if (!TestNotNull(TEXT("Reopening creates another default draft"), Editor->Draft.Get())) return false;
+	TestTrue(TEXT("Reopened editor selects its new draft"), Editor->Current.Get() == Editor->Draft.Get());
+	TestTrue(TEXT("Reopening creates a fresh recipe identity"), Editor->Draft->RecipeGuid != OriginalGuid);
+	TestFalse(TEXT("Reopened draft starts clean"), Editor->bDraftDirty);
+	TWeakObjectPtr<UMounteaRecipeTemplate> ReopenedDraft = Editor->Draft.Get();
 	Editor.Reset();
+	CollectGarbage(RF_NoFlags);
+	TestFalse(TEXT("Destroying the editor releases its untouched transient draft"), ReopenedDraft.IsValid());
 	return true;
 }
 
@@ -206,13 +269,16 @@ bool FMounteaInventoryTreeRowParityTest::RunTest(const FString& Parameters)
 	FGameplayTagContainer Tags; UGameplayTagsManager::Get().RequestAllGameplayTags(Tags, true);
 	RecipeEditor->Draft->RequiredCraftingPlace = Tags.First();
 	RecipeEditor->RefreshRecipes();
-	TSharedPtr<FMounteaRecipeTreeItem> Group;
+	bool HasDraftRow = false;
 	for (const auto& Root : RecipeEditor->Roots)
 		for (const auto& Child : Root->Children)
-			if (Child->Recipe.Get() == RecipeEditor->Draft) Group = Root;
-	if (TestTrue(TEXT("Draft remains in its result category even with a station tag"), Group.IsValid()))
+			if (Child->Recipe.Get() == RecipeEditor->Draft) HasDraftRow = true;
+	TestFalse(TEXT("Transient recipe is absent from every browser category"), HasDraftRow);
+	TestTrue(TEXT("Hidden draft remains the current recipe after refreshing"), RecipeEditor->Current.Get() == RecipeEditor->Draft);
+	const auto Group = MakeShared<FMounteaRecipeTreeItem>();
+	Group->Group = Result->ItemCategory;
+	Group->Children.Add(RecipeNode);
 	{
-		TestEqual(TEXT("Grouping uses only ResultItem.ItemCategory"), Group->Group, Result->ItemCategory);
 		TArray<TSharedRef<SWidget>> HeaderText;
 		FindWidgets(RecipeEditor->GenerateRow(Group, RecipeEditor->Tree.ToSharedRef())->AsWidget(), TEXT("STextBlock"), HeaderText);
 		if (TestEqual(TEXT("Category header includes its count"), HeaderText.Num(), 2))
