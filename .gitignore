@@ -211,3 +211,4 @@ crashinfo--*
 *.zip
 *.kra~
 *.webp~
+/Scripts
