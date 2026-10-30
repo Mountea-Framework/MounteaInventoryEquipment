@@ -506,7 +506,7 @@ bool SMounteaCraftingRecipesEditor::CanCloseEditor()
 		return true;
 
 	const auto answer = FMessageDialog::Open(EAppMsgType::YesNoCancel,
-		LOCTEXT("ClosePrompt", "Save modified recipes before closing the editor? Unsaved draft data will be lost if you choose No. Existing assets remain dirty in the project."));
+		LOCTEXT("ClosePrompt", "Save modified recipes before closing? Existing assets remain dirty in the project if you choose No."));
 
 	if (answer == EAppReturnType::No)
 		return true;
@@ -631,19 +631,15 @@ FReply SMounteaCraftingRecipesEditor::SaveAll()
 }
 FReply SMounteaCraftingRecipesEditor::CloseRecipe()
 {
-	if (Current.Get() == Draft && !ConfirmDiscardDraft())
-		return FReply::Handled();
+	if (!this->CanCloseEditor())
+		return FReply::Unhandled();
 
-	if (Current.Get() == Draft)
-	{
-		Draft = nullptr;
-		bDraftDirty = false;
-	}
+	this->bDraftDirty = false;
 
-	Current.Reset();
-	Tree->ClearSelection();
-	Details->SetObject(nullptr);
-	RefreshRecipes();
+	if (!this->Draft)
+		this->InitializeDraft();
+
+	this->SelectRecipe(this->Draft);
 
 	return FReply::Handled();
 }
