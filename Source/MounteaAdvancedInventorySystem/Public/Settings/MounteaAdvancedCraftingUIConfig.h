@@ -124,4 +124,22 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftClassPtr<UUserWidget> CraftingRecipeSliderUserInterfaceClass;
+	
+	// ---- Item (Recipe) Actions
+	
+	/** Widget class used display list of available Item Actions. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionsContainerWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> RecipeActionsContainerWidgetClass;
+
+	/** Widget class used to display individual Item Actions. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Action",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryItemActionWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> RecipeActionWidgetClass;
 };
