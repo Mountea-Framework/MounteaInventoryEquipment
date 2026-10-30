@@ -85,6 +85,7 @@ TSharedRef<SWidget> MounteaInventoryEditorLayout::MakeToolbar(const FMounteaInve
 	addButton(LOCTEXT("SaveAll", "Save All Templates"), LOCTEXT("SaveAllTip", "Save all unsaved templates."), FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.SaveMultiple"), Actions.SaveAll, Actions.CanSaveAll);
 	separator();
 	addButton(LOCTEXT("Import", "Import Template"), LOCTEXT("ImportTip", "Import single or multiple templates from source files."), FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Import"), Actions.Import, true);
+	addButton(LOCTEXT("ReimportAll", "Reimport All"), LOCTEXT("ReimportAllTip", "Update all existing templates from their recorded source files, including templates hidden by search or filters."), FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.ReimportAll"), Actions.ReimportAll, true);
 	addButton(LOCTEXT("Export", "Export Item"), LOCTEXT("ExportTip", "Export all selected templates to new source files."), FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Export"), Actions.Export, true);
 	separator();
 	addButton(LOCTEXT("Close", "Close Template"), LOCTEXT("CloseTip", "Close current template and return to blank canvas."), FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Close"), Actions.Close, true);

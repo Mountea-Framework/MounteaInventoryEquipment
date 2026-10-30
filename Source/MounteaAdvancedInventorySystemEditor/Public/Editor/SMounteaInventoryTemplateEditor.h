@@ -114,6 +114,7 @@ private:
 	FReply OnCloseHelp();
 
 	FReply ImportTemplateAction();
+	FReply ReimportAll();
 	FReply ExportTemplateAction();
 	void ImportTemplate();
 	void ExportTemplate();
@@ -159,6 +160,7 @@ private:
 	
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> CurrentTemplate;
 	TWeakObjectPtr<UMounteaInventoryItemTemplate> OriginalTemplate;
+	bool bReimporting = false;
 	bool bIsEditingExisting = false;
 	bool bIsShowingTransient = false;
 	

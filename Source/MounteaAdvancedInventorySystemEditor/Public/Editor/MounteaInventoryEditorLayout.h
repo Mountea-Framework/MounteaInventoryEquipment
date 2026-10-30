@@ -18,7 +18,7 @@
 /** Common presentation and actions for the item and crafting recipe editors. */
 struct FMounteaInventoryEditorToolbarActions
 {
-	FOnClicked Create, Save, SaveAll, Import, Export, Close, Help;
+	FOnClicked Create, Save, SaveAll, Import, ReimportAll, Export, Close, Help;
 	TAttribute<bool> CanSave = false;
 	TAttribute<bool> CanSaveAll = false;
 };

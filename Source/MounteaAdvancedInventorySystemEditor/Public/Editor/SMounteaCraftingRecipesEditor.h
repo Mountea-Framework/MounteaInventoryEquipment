@@ -78,6 +78,7 @@ private:
 	FReply SaveAll();
 	FReply CloseRecipe();
 	FReply ImportRecipes();
+	FReply ReimportAll();
 	FReply ExportRecipes();
 	FReply ShowHelp();
 	FReply DuplicateRecipe(TWeakObjectPtr<UMounteaRecipeTemplate> Recipe);

@@ -12,6 +12,7 @@
 // SMounteaInventoryTemplateEditor.cpp
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
+#include "Helpers/MounteaInventoryReimportHelpers.h"
 #include "Editor/MounteaInventoryEditorLayout.h"
 
 #include "Widgets/Layout/SScrollBox.h"
@@ -344,7 +345,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreatePropertyMatrix()
 
 void SMounteaInventoryTemplateEditor::OnTreeSelectionChanged(TSharedPtr<FTemplateTreeItem> SelectedItem, ESelectInfo::Type SelectInfo)
 {
-	if (!PropertyDetailsView.IsValid())
+	if (this->bReimporting || !PropertyDetailsView.IsValid())
 		return;
 
 	const bool bHasTransient = bIsShowingTransient && CurrentTemplate.IsValid() && CurrentTemplate->HasAnyFlags(RF_Transient);
@@ -1195,6 +1196,7 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 	actions.Close = FOnClicked::CreateSP(this, &SMounteaInventoryTemplateEditor::CloseTemplate);
 	actions.Help = FOnClicked::CreateSP(this, &SMounteaInventoryTemplateEditor::ShowHelpModal);
 	actions.Import = FOnClicked::CreateSP(this, &SMounteaInventoryTemplateEditor::ImportTemplateAction);
+	actions.ReimportAll = FOnClicked::CreateSP(this, &SMounteaInventoryTemplateEditor::ReimportAll);
 	actions.Export = FOnClicked::CreateSP(this, &SMounteaInventoryTemplateEditor::ExportTemplateAction);
 	actions.CanSave = TAttribute<bool>::CreateLambda([this]()
 	{
@@ -1221,6 +1223,51 @@ TSharedRef<SWidget> SMounteaInventoryTemplateEditor::CreateToolbar()
 FReply SMounteaInventoryTemplateEditor::ImportTemplateAction()
 {
 	ImportTemplate();
+	return FReply::Handled();
+}
+
+FReply SMounteaInventoryTemplateEditor::ReimportAll()
+{
+	TArray<UObject*> assets;
+
+	for (UMounteaInventoryItemTemplate* item : UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates())
+	{
+		assets.Add(item);
+	}
+
+	TArray<TWeakObjectPtr<UMounteaInventoryItemTemplate>> selected;
+
+	for (const auto& row : this->TemplateTreeView->GetSelectedItems())
+	{
+		if (row->Template.IsValid())
+			selected.Add(row->Template);
+	}
+
+	TGuardValue<bool> guard(this->bReimporting, true);
+	const FMounteaInventoryReimportResult result = FMounteaInventoryReimportHelpers::Reimport(assets);
+
+	if (!result.bCancelled)
+	{
+		for (UObject* asset : result.Updated)
+		{
+			auto* item = CastChecked<UMounteaInventoryItemTemplate>(asset);
+			this->DirtyTemplates.Remove(item);
+			this->PendingChanges.Remove(item);
+		}
+
+		this->RefreshTemplateList();
+		this->TemplateTreeView->ClearSelection();
+
+		for (const auto& item : selected)
+		{
+			if (const auto row = this->FindTreeItemForTemplate(item))
+				this->TemplateTreeView->SetItemSelection(row, true, ESelectInfo::Direct);
+		}
+
+		this->PropertyDetailsView->ForceRefresh();
+	}
+
+	FMounteaInventoryReimportHelpers::ShowResult(result);
 	return FReply::Handled();
 }
 

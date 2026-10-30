@@ -10,6 +10,7 @@
 // For more information, visit: https://mountea.tools
 
 #include "Editor/SMounteaCraftingRecipesEditor.h"
+#include "Helpers/MounteaInventoryReimportHelpers.h"
 #include "Editor/MounteaInventoryEditorLayout.h"
 #include "Editor/STemplateTreeItemRow.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -152,6 +153,7 @@ TSharedRef<SWidget> SMounteaCraftingRecipesEditor::CreateToolbar()
 	actions.Save = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::SaveCurrent);
 	actions.SaveAll = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::SaveAll);
 	actions.Import = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ImportRecipes);
+	actions.ReimportAll = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ReimportAll);
 	actions.Export = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ExportRecipes);
 	actions.Close = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::CloseRecipe);
 	actions.Help = FOnClicked::CreateSP(this, &SMounteaCraftingRecipesEditor::ShowHelp);
@@ -779,6 +781,27 @@ FReply SMounteaCraftingRecipesEditor::ImportRecipes()
 			SelectRecipe(imported[0]);
 		FMounteaEditorNotificationHelpers::ShowNotification(FString::Printf(TEXT("Imported %d recipes."), imported.Num()), EMounteaEditorNotificationType::Success);
 	}
+	return FReply::Handled();
+}
+
+FReply SMounteaCraftingRecipesEditor::ReimportAll()
+{
+	TArray<UObject*> assets;
+
+	for (UMounteaRecipeTemplate* recipe : UMounteaAdvancedInventoryRecipeEditorStatics::LoadAllExistingRecipes())
+	{
+		assets.Add(recipe);
+	}
+
+	const FMounteaInventoryReimportResult result = FMounteaInventoryReimportHelpers::Reimport(assets);
+
+	if (!result.bCancelled)
+	{
+		this->RefreshRecipes();
+		this->Details->ForceRefresh();
+	}
+
+	FMounteaInventoryReimportHelpers::ShowResult(result);
 	return FReply::Handled();
 }
 

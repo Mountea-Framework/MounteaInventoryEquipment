@@ -82,18 +82,18 @@ bool FMounteaInventorySharedToolbarTest::RunTest(const FString& Parameters)
 	auto Bind = [&Invocations](const TCHAR* Name)
 	{ return FOnClicked::CreateLambda([&Invocations, Name]() { Invocations.Add(Name); return FReply::Handled(); }); };
 	Actions.Create = Bind(TEXT("New")); Actions.Save = Bind(TEXT("Save")); Actions.SaveAll = Bind(TEXT("SaveAll"));
-	Actions.Import = Bind(TEXT("Import")); Actions.Export = Bind(TEXT("Export"));
+	Actions.Import = Bind(TEXT("Import")); Actions.ReimportAll = Bind(TEXT("ReimportAll")); Actions.Export = Bind(TEXT("Export"));
 	Actions.Close = Bind(TEXT("Close")); Actions.Help = Bind(TEXT("Help"));
 	Actions.CanSave = true; Actions.CanSaveAll = true;
 	const auto Toolbar = MounteaInventoryEditorLayout::MakeToolbar(Actions, SNullWidget::NullWidget);
 	const TArray<FString> Labels = {TEXT("New Template"), TEXT("Save Template"), TEXT("Save All Templates"),
-		TEXT("Import Template"), TEXT("Export Item"), TEXT("Close Template"), TEXT("Show Tutorial")};
+		TEXT("Import Template"), TEXT("Reimport All"), TEXT("Export Item"), TEXT("Close Template"), TEXT("Show Tutorial")};
 	for (const auto& Label : Labels)
 	{
 		const auto Button = FindButton(Toolbar, Label);
 		if (TestTrue(*FString::Printf(TEXT("Toolbar contains %s"), *Label), Button.IsValid())) Button->SimulateClick();
 	}
-	TestEqual(TEXT("Every shared toolbar route invokes its own callback"), FString::Join(Invocations, TEXT(",")), FString(TEXT("New,Save,SaveAll,Import,Export,Close,Help")));
+	TestEqual(TEXT("Every shared toolbar route invokes its own callback"), FString::Join(Invocations, TEXT(",")), FString(TEXT("New,Save,SaveAll,Import,ReimportAll,Export,Close,Help")));
 	Actions.CanSave = false; Actions.CanSaveAll = false;
 	const auto DisabledToolbar = MounteaInventoryEditorLayout::MakeToolbar(Actions, SNullWidget::NullWidget);
 	TestFalse(TEXT("Save follows its enabled attribute"), FindButton(DisabledToolbar, TEXT("Save Template"))->IsEnabled());
