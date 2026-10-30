@@ -19,6 +19,8 @@
 #include "Widgets/Views/STreeView.h"
 
 class IDetailsView;
+class SOverlay;
+class SMounteaItemTemplatesEditorHelp;
 class SSearchBox;
 class UMounteaRecipeTemplate;
 struct FAssetData;
@@ -56,6 +58,7 @@ public:
 
 private:
 	friend class FMounteaCraftingRecipesEditorLifecycleTest;
+	friend class FMounteaCraftingRecipesHelpTest;
 	friend class FMounteaInventoryTreeRowParityTest;
 	friend class FMounteaCraftingRecipesRegisteredTabTest;
 	using FTreeItem = TSharedPtr<FMounteaRecipeTreeItem>;
@@ -81,9 +84,13 @@ private:
 	FReply ReimportAll();
 	FReply ExportRecipes();
 	FReply ShowHelp();
+	FReply OnCloseHelp();
 	FReply DuplicateRecipe(TWeakObjectPtr<UMounteaRecipeTemplate> Recipe);
 	FReply DeleteRecipe(TWeakObjectPtr<UMounteaRecipeTemplate> Recipe);
 
+	TSharedPtr<SOverlay> RootOverlay;
+	TSharedPtr<SWidget> HelpModalContent;
+	TSharedPtr<SMounteaItemTemplatesEditorHelp> HelpWidget;
 	TSharedPtr<IDetailsView> Details;
 	TSharedPtr<SSearchBox> Search;
 	TSharedPtr<STreeView<FTreeItem>> Tree;

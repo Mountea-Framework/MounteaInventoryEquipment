@@ -13,6 +13,11 @@
 #include "Helpers/MounteaInventoryReimportHelpers.h"
 #include "Editor/MounteaInventoryEditorLayout.h"
 #include "Editor/STemplateTreeItemRow.h"
+#include "Editor/MounteaItemTemplatesEditorHelp.h"
+#include "Settings/MounteaAdvancedInventorySettingsEditor.h"
+#include "Styling/MounteaAdvancedInventoryEditorStyle.h"
+#include "Widgets/SOverlay.h"
+#include "Widgets/Images/SImage.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "ContentBrowserModule.h"
@@ -98,16 +103,26 @@ void SMounteaCraftingRecipesEditor::Construct(const FArguments& InArgs)
 					CollapsedGroups.Add(Item->Group);
 			}
 		});
-	ChildSlot[MounteaInventoryEditorLayout::MakeLayout(CreateToolbar(),
-		MounteaInventoryEditorLayout::MakeBrowserDetails(browser, Details.ToSharedRef(),
+	TSharedRef<SWidget> editorLayout = MounteaInventoryEditorLayout::MakeLayout(this->CreateToolbar(),
+		MounteaInventoryEditorLayout::MakeBrowserDetails(browser, this->Details.ToSharedRef(),
 			TAttribute<float>::CreateLambda([this]()
 			{
-				return GetCachedGeometry().GetLocalSize().X * 0.20f;
+				return this->GetCachedGeometry().GetLocalSize().X * 0.20f;
 			}),
 			TAttribute<float>::CreateLambda([this]()
 			{
-				return GetCachedGeometry().GetLocalSize().X * 0.50f;
-			})))];
+				return this->GetCachedGeometry().GetLocalSize().X * 0.50f;
+			})));
+
+	ChildSlot
+	[
+		SAssignNew(this->RootOverlay, SOverlay)
+		+ SOverlay::Slot()
+		[
+			editorLayout
+		]
+	];
+
 	auto& registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry").Get();
 	AddedHandle = registry.OnAssetAdded().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
 	RemovedHandle = registry.OnAssetRemoved().AddSP(this, &SMounteaCraftingRecipesEditor::OnAssetChanged);
@@ -850,37 +865,90 @@ FReply SMounteaCraftingRecipesEditor::ExportRecipes()
 
 FReply SMounteaCraftingRecipesEditor::ShowHelp()
 {
-	TSharedRef<SWindow> window = SNew(SWindow)
-		.Title(LOCTEXT("HelpTitle", "Crafting Recipes Editor Tutorial"))
-		.ClientSize(FVector2D(660, 380))
-		.SupportsMinimize(false)
-		.SupportsMaximize(false);
-	window->SetContent(
-		SNew(SVerticalBox)
-		+ SVerticalBox::Slot()
-		.FillHeight(1.f)
-		.Padding(20.f)
+	if (this->HelpWidget.IsValid())
+		return FReply::Handled();
+
+	this->RootOverlay->AddSlot()
+	.HAlign(HAlign_Fill)
+	.VAlign(VAlign_Fill)
+	[
+		SAssignNew(this->HelpModalContent, SBox)
 		[
-			SNew(STextBlock)
-			.AutoWrapText(true)
-			.Text(LOCTEXT("HelpText",
-			"Use New Template to create a recipe, select its result item, quantity, crafting time and optional station tag. Add ingredients directly in Recipe Ingredients: each entry has an Ingredient Source and Required Quantity. Every ingredient is required.\n\nRecipes are grouped by their result item category. Search matches result names, station tags, categories, asset paths and recipe GUIDs. Select several recipes to edit common properties or export a bundle.\n\nSave Template saves the current recipe; Save All Templates saves modified recipes. Duplicate creates a draft with a new GUID. Saving preserves the GUID. Delete uses the standard asset deletion dialog. Existing asset edits support Undo and Redo.\n\nThe Allowed Recipes list in your crafting configuration controls which recipes are available at runtime. Import and export use .mntearecipe and .mntearecipes files."))
+			SNew(SOverlay)
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Fill)
+			.VAlign(VAlign_Fill)
+			[
+				SNew(SBorder)
+				.BorderImage(FAppStyle::GetBrush("WhiteBrush"))
+				.BorderBackgroundColor(FLinearColor(0.0f, 0.0f, 0.0f, 0.75f))
+			]
+			+ SOverlay::Slot()
+			.HAlign(HAlign_Center)
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride_Lambda([this]()
+				{
+					const FVector2D parentSize = this->GetCachedGeometry().GetLocalSize();
+					return parentSize.X * 0.8f;
+				})
+				.HeightOverride_Lambda([this]()
+				{
+					const FVector2D parentSize = this->GetCachedGeometry().GetLocalSize();
+					return parentSize.Y * 0.8f;
+				})
+				[
+					SNew(SBorder)
+					.BorderImage(FAppStyle::GetBrush("ToolPanel.DarkGroupBorder"))
+					.BorderBackgroundColor(FAppStyle::GetSlateColor("DefaultForeground"))
+					.Padding(0)
+					[
+						SNew(SOverlay)
+						+ SOverlay::Slot()
+						[
+							SAssignNew(this->HelpWidget, SMounteaItemTemplatesEditorHelp)
+							.Pages(TOptional<TMap<int32, FItemTemplateEditorPageConfig>>(GetDefault<UMounteaAdvancedInventorySettingsEditor>()->EditorRecipePages))
+						]
+						+ SOverlay::Slot()
+						.HAlign(HAlign_Right)
+						.VAlign(VAlign_Top)
+						.Padding(0)
+						[
+							SNew(SButton)
+							.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+							.ContentPadding(FMargin(2))
+							.RenderTransformPivot(FVector2f(1.f, 1.f))
+							.RenderTransform(FSlateRenderTransform(FVector2f(25.f, 0.f)))
+							.OnClicked(this, &SMounteaCraftingRecipesEditor::OnCloseHelp)
+							[
+								SNew(SImage)
+								.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Close"))
+								.ColorAndOpacity(FSlateColor::UseForeground())
+								.DesiredSizeOverride(FVector2D(16, 16))
+							]
+						]
+					]
+				]
+			]
 		]
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.HAlign(HAlign_Right)
-		.Padding(12.f)
-		[
-			SNew(SButton)
-			.Text(LOCTEXT("Website", "Open Mountea Website"))
-			.OnClicked_Lambda([]()
-			{
-				FPlatformProcess::LaunchURL(TEXT("https://mountea.tools"), nullptr, nullptr);
-				return FReply::Handled();
-			})
-		]
-	);
-	FSlateApplication::Get().AddModalWindow(window, FSlateApplication::Get().FindWidgetWindow(AsShared()));
+	];
+
+	this->HelpWidget->Start();
 	return FReply::Handled();
 }
+
+FReply SMounteaCraftingRecipesEditor::OnCloseHelp()
+{
+	if (this->RootOverlay.IsValid() && this->HelpModalContent.IsValid())
+	{
+		this->HelpWidget->Reset();
+		this->HelpWidget.Reset();
+		this->RootOverlay->RemoveSlot(this->HelpModalContent.ToSharedRef());
+		this->HelpModalContent.Reset();
+	}
+
+	return FReply::Handled();
+}
+
 #undef LOCTEXT_NAMESPACE
