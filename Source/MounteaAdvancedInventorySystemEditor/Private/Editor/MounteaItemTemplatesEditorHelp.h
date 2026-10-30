@@ -16,6 +16,8 @@ enum class EWebBrowserConsoleLogSeverity;
 class SWebBrowser;
 
 #include "CoreMinimal.h"
+#include "Widgets/SCompoundWidget.h"
+#include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
 
 /**
  * 
@@ -23,21 +25,27 @@ class SWebBrowser;
 class SMounteaItemTemplatesEditorHelp : public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(SMounteaItemTemplatesEditorHelp) {}
+	using FPageMap = TMap<int32, FItemTemplateEditorPageConfig>;
+	SLATE_BEGIN_ARGS(SMounteaItemTemplatesEditorHelp)
+	{
+	}
+		SLATE_ARGUMENT(TOptional<FPageMap>, Pages)
 	SLATE_END_ARGS()
 
-	void Construct(const FArguments& InArgs);
+	void Construct(const FArguments& Args);
 	
 	void Reset();
 	void Start();
 
 private:
+	friend class FMounteaCraftingRecipesHelpTest;
 	TSharedRef<SWidget> CreateNavigationButton(const FText& Label, int32 PageId);
 	void SwitchToPage(int32 PageId);
-	static FString GetHtmlPath(int32 PageId);
+	FString GetHtmlPath(int32 PageId) const;
 	void HandleConsoleMessage(const FString& Message, const FString& Source, int32 Line, EWebBrowserConsoleLogSeverity Severity);
 
 
+	TMap<int32, FItemTemplateEditorPageConfig> Pages;
 	TSharedPtr<SMounteaInventoryWebBrowserWrapper> WebBrowser;
 	TSharedPtr<SWidget> InputBlockerOverlay;
 	bool bBlockInput = false;

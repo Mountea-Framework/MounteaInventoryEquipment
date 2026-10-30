@@ -12,7 +12,16 @@
 
 #include "MounteaItemTemplatesEditorHelp.h"
 
+#include "Blueprint/UserWidget.h"
 #include "ContentBrowserModule.h"
+#include "Misc/FileHelper.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Layout/SBorder.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/Layout/SScrollBox.h"
+#include "Widgets/SOverlay.h"
+#include "Widgets/SBoxPanel.h"
+#include "Widgets/Text/STextBlock.h"
 #include "IContentBrowserSingleton.h"
 #include "Definitions/MounteaAdvancedInventoryEditorTypes.h"
 #include "Runtime/WebBrowser/Public/SWebBrowser.h"
@@ -25,29 +34,29 @@
 
 #define LOCTEXT_NAMESPACE "MounteaAdvancedInventorySystemEditorHelp"
 
-void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
+void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& Args)
 {
+	if (Args._Pages.IsSet())
+		this->Pages = Args._Pages.GetValue();
+	else if (const auto* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>())
+		this->Pages = editorSettings->EditorTemplatePages;
+
 	TSharedRef<SVerticalBox> navigationBox = SNew(SVerticalBox);
 
-	if (const UMounteaAdvancedInventorySettingsEditor* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>())
+	TArray<int32> pageIds;
+	this->Pages.GetKeys(pageIds);
+	pageIds.Sort();
+
+	for (const int32 pageId : pageIds)
 	{
-		TArray<int32> pageIds;
-		editorSettings->EditorTemplatePages.GetKeys(pageIds);
-		pageIds.Sort();
-		
-		for (const int32 pageId : pageIds)
-		{
-			if (const FItemTemplateEditorPageConfig* pageConfig = editorSettings->EditorTemplatePages.Find(pageId))
-			{
-				navigationBox->AddSlot()
-				.AutoHeight()
-				[
-					CreateNavigationButton(pageConfig->PageTitle, pageId)
-				];
-			}
-		}
+		const FItemTemplateEditorPageConfig& pageConfig = this->Pages.FindChecked(pageId);
+		navigationBox->AddSlot()
+		.AutoHeight()
+		[
+			this->CreateNavigationButton(pageConfig.PageTitle, pageId)
+		];
 	}
-	
+
 	ChildSlot
 	[
 		SNew(SBorder)
@@ -135,14 +144,26 @@ void SMounteaItemTemplatesEditorHelp::Construct(const FArguments& InArgs)
 
 void SMounteaItemTemplatesEditorHelp::Reset()
 {
-	CurrentPageId = 0;
-	WebBrowser->LoadString(TEXT(""), TEXT("about:blank"));
+	this->CurrentPageId = 0;
+	this->bBlockInput = false;
+
+	if (this->WebBrowser.IsValid())
+		this->WebBrowser->LoadString(TEXT(""), TEXT("about:blank"));
 }
 
 void SMounteaItemTemplatesEditorHelp::Start()
 {
-	CurrentPageId = 0;
-	SwitchToPage(CurrentPageId);
+	TArray<int32> pageIds;
+	this->Pages.GetKeys(pageIds);
+	pageIds.Sort();
+
+	if (pageIds.IsEmpty())
+	{
+		this->Reset();
+		return;
+	}
+
+	this->SwitchToPage(pageIds[0]);
 }
 
 TSharedRef<SWidget> SMounteaItemTemplatesEditorHelp::CreateNavigationButton(const FText& Label, int32 PageId)
@@ -205,14 +226,16 @@ void SMounteaItemTemplatesEditorHelp::SwitchToPage(const int32 PageId)
 		WebBrowser->LoadString(htmlWithCss, *baseUrl);
 	}
 	else
+	{
 		UE_LOG(LogTemp, Error, TEXT("Failed to load: %s"), *filePath);
+		this->WebBrowser->LoadString(TEXT("<html><body><h1>Tutorial page unavailable</h1><p>Check the tutorial page path in Mountea Inventory System (Editor) settings.</p></body></html>"), TEXT("about:blank"));
+	}
 }
 
-FString SMounteaItemTemplatesEditorHelp::GetHtmlPath(const int32 PageId)
+FString SMounteaItemTemplatesEditorHelp::GetHtmlPath(const int32 PageId) const
 {
-	if (const UMounteaAdvancedInventorySettingsEditor* editorSettings = GetDefault<UMounteaAdvancedInventorySettingsEditor>())
-		if (const FItemTemplateEditorPageConfig* pageConfig = editorSettings->EditorTemplatePages.Find(PageId))
-			return FPaths::ConvertRelativePathToFull(pageConfig->PageFile.FilePath);
+	if (const FItemTemplateEditorPageConfig* pageConfig = this->Pages.Find(PageId))
+		return FPaths::ConvertRelativePathToFull(pageConfig->PageFile.FilePath);
 	
 	return FString();
 }
