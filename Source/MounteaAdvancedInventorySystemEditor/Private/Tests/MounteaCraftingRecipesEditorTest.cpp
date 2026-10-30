@@ -15,6 +15,9 @@
 
 #include "Editor/SMounteaCraftingRecipesEditor.h"
 #include "IDetailsView.h"
+#include "Editor/MounteaItemTemplatesEditorHelp.h"
+#include "Settings/MounteaAdvancedInventorySettingsEditor.h"
+#include "Widgets/SOverlay.h"
 #include "Engine/TimerHandle.h"
 #include "Engine/StreamableRenderAsset.h"
 #include "Editor/SMounteaInventoryTemplateEditor.h"
@@ -102,6 +105,61 @@ bool FMounteaInventorySharedToolbarTest::RunTest(const FString& Parameters)
 		MounteaInventoryEditorLayout::MakeBrowserDetails(SNullWidget::NullWidget, SNullWidget::NullWidget, 100.f, 200.f));
 	TArray<TSharedRef<SWidget>> Splitters; FindWidgets(Layout, TEXT("SSplitter"), Splitters);
 	TestEqual(TEXT("Shared layout uses one browser/details splitter"), Splitters.Num(), 1);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaCraftingRecipesHelpTest,
+	"Mountea.InventorySystemEditor.Recipes.HtmlTutorial",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+bool FMounteaCraftingRecipesHelpTest::RunTest(const FString& Parameters)
+{
+	if (!GEditor || !FSlateApplication::IsInitialized()) return false;
+	const auto* Settings = GetDefault<UMounteaAdvancedInventorySettingsEditor>();
+	TestEqual(TEXT("Three recipe tutorial defaults"), Settings->EditorRecipePages.Num(), 3);
+	for (int32 PageId = 0; PageId < 3; ++PageId)
+	{
+		const auto* Page = Settings->EditorRecipePages.Find(PageId);
+		if (!TestNotNull(TEXT("Recipe page is configured"), Page)) return false;
+		TestTrue(TEXT("Default recipe page exists"), FPaths::FileExists(Page->PageFile.FilePath));
+	}
+	const auto Editor = SNew(SMounteaCraftingRecipesEditor);
+	const auto Draft = Editor->Draft;
+	Draft->QuantityPerCreation = 7;
+	Editor->bDraftDirty = true;
+	const auto Selection = Editor->Tree->GetSelectedItems();
+	for (int32 Cycle = 0; Cycle < 2; ++Cycle)
+	{
+		TestTrue(TEXT("Help opens"), Editor->ShowHelp().IsEventHandled());
+		if (!TestTrue(TEXT("Uses shared HTML tutorial widget"), Editor->HelpWidget.IsValid())) return false;
+		TestEqual(TEXT("Overlay adds one modal"), Editor->RootOverlay->GetNumWidgets(), 2);
+		TestEqual(TEXT("Recipe navigation has only recipe pages"), Editor->HelpWidget->Pages.Num(), Settings->EditorRecipePages.Num());
+		TestEqual(TEXT("Recipe-specific HTML path"), Editor->HelpWidget->GetHtmlPath(0), Settings->EditorRecipePages[0].PageFile.FilePath);
+		const auto Help = Editor->HelpWidget;
+		Editor->ShowHelp();
+		TestTrue(TEXT("Repeated open retains current tutorial"), Editor->HelpWidget == Help);
+		TestEqual(TEXT("Repeated open adds no second modal"), Editor->RootOverlay->GetNumWidgets(), 2);
+		Editor->HelpWidget->SwitchToPage(2);
+		TestEqual(TEXT("Shared browser navigates recipe pages"), Help->CurrentPageId, 2);
+		Editor->OnCloseHelp();
+		TestFalse(TEXT("Close releases browser widget"), Editor->HelpWidget.IsValid());
+		TestFalse(TEXT("Close releases modal container"), Editor->HelpModalContent.IsValid());
+		TestEqual(TEXT("Close restores editor overlay"), Editor->RootOverlay->GetNumWidgets(), 1);
+		TestEqual(TEXT("Close resets page"), Help->CurrentPageId, 0);
+		TestTrue(TEXT("Tutorial preserves current draft"), Editor->Current.Get() == Draft.Get());
+		TestEqual(TEXT("Tutorial preserves unsaved quantity"), Draft->QuantityPerCreation, 7);
+		TestTrue(TEXT("Tutorial preserves dirty state"), Editor->bDraftDirty);
+		TestTrue(TEXT("Tutorial preserves selection"), Editor->Tree->GetSelectedItems() == Selection);
+	}
+	Editor->OnCloseHelp();
+	TMap<int32, FItemTemplateEditorPageConfig> CustomPages;
+	CustomPages.Add(7, Settings->EditorRecipePages[0]);
+	const auto CustomHelp = SNew(SMounteaItemTemplatesEditorHelp).Pages(TOptional<TMap<int32, FItemTemplateEditorPageConfig>>(CustomPages));
+	CustomHelp->Start();
+	TestEqual(TEXT("Custom navigation starts at its first page ID"), CustomHelp->CurrentPageId, 7);
+	CustomHelp->Reset();
+	const auto InventoryHelp = SNew(SMounteaItemTemplatesEditorHelp);
+	TestEqual(TEXT("Default shared widget retains inventory pages"), InventoryHelp->Pages.Num(), Settings->EditorTemplatePages.Num());
+	TestEqual(TEXT("Default shared widget retains inventory HTML"), InventoryHelp->GetHtmlPath(0), Settings->EditorTemplatePages[0].PageFile.FilePath);
 	return true;
 }
 
