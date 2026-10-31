@@ -23,6 +23,7 @@ class UMounteaAdvancedInventorySettingsConfig;
 class UMounteaSelectableInventoryItemAction;
 class UMounteaCallbackInventoryItemAction;
 class UMounteaInventoryItemAction;
+class UMounteaJsonObject;
 
 enum class EInventoryNotificationCategory : uint8;
 enum class EInventoryNotificationType : uint8;
@@ -37,22 +38,19 @@ public:
 #pragma region ItemActions
 	
 	/**
-	 * Initializes the action with the target item and owning inventory.
+	 * Initializes the action with the payload describing the target item and owning inventory.
 	 * This must be called before executing the action to establish the operating context.
-	 * 
+	 *
 	 * @param Target The Item Action.
-	 * @param TargetItem The inventory item this action will operate on.
-	 * @param OwningInventory The inventory interface that contains the target item.
-	 * @param ContextPayload Optional context object for additional data (e.g., player controller, UI context).
-	 * 
+	 * @param Payload "ItemAction" JSON payload (owningInventory, itemGuid).
+	 *
 	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Initialize Inventory Action")
-	static bool InitializeItemAction(UMounteaInventoryItemAction* Target, const FMounteaInventoryItem& TargetItem, 
-		const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory, UObject* ContextPayload = nullptr);
+	static bool InitializeInventoryAction(UMounteaInventoryItemAction* Target, const UMounteaJsonObject* Payload);
 	
 	/**
 	 * Executes the inventory action on the specified target item.
@@ -62,18 +60,21 @@ public:
 	 * - Callback actions: Execute logic directly and returns result
 	 * 
 	 * @param Target The Item Action.
-	 * @param TargetItem The inventory item to perform the action on.
-	 * 
+	 * @param Payload "ItemAction" JSON payload (owningInventory, itemGuid).
+	 *
 	 * @return True if the action was executed successfully, false if it failed.
 	 * 
-	 * @note Always call InitializeItemAction() before executing actions to ensure proper context.
+	 * @note Always call InitializeInventoryAction() before executing actions to ensure proper context.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(MounteaSetter),
 		meta=(Keywords="start"),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
 		DisplayName="Execute Inventory Action")
-	static bool ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FMounteaInventoryItem& TargetItem);
+	static bool ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const UMounteaJsonObject* Payload);
+
+	/** C++ only: builds an "ItemAction" payload for the given owner object and item GUID. Returns nullptr on failure. */
+	static UMounteaJsonObject* CreateItemActionPayload(UObject* Owner, const FGuid& ItemGuid);
 	
 	/**
 	 * Gets the inventory interface that owns the target item.
@@ -84,7 +85,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Inventory|Item Actions",
 		meta=(MounteaGetter),
 		DisplayName="Get Inventory Action Tags")
-	static FGameplayTagContainer GetItemActionTags(UMounteaInventoryItemAction* Target);
+	static FGameplayTagContainer GetInventoryActionTags(UMounteaInventoryItemAction* Target);
 
 	/**
 	 * Gets called once Action has finished/cancelled to restore resources.

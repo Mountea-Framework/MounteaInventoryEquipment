@@ -19,8 +19,10 @@
 #include "Definitions/MounteaInventoryBaseUIEnums.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaEquipmentBaseDataTypes.h"
+#include "Helpers/MounteaJsonObject.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventorySettingsConfig.h"
+#include "Statics/MounteaAdvancedInventoryJsonStatics.h"
 #include "Statics/MounteaInventorySystemStatics.h"
 
 #define MOUNTEA_BIND_INVENTORY_DELEGATE(Target, Binding, HandleGetter) \
@@ -43,21 +45,46 @@
 
 #pragma region ItemActions
 
-bool UMounteaInventoryStatics::InitializeItemAction(UMounteaInventoryItemAction* Target,
-	const FMounteaInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
-	UObject* ContextPayload)
+bool UMounteaInventoryStatics::InitializeInventoryAction(UMounteaInventoryItemAction* Target, const UMounteaJsonObject* Payload)
 {
-	return IsValid(Target) ? Target->InitializeItemAction(TargetItem, OwningInventory, ContextPayload) : false;
+	return IsValid(Target) ? Target->InitializeInventoryAction(Payload) : false;
 }
 
-bool UMounteaInventoryStatics::ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const FMounteaInventoryItem& TargetItem)
+bool UMounteaInventoryStatics::ExecuteInventoryAction(UMounteaInventoryItemAction* Target, const UMounteaJsonObject* Payload)
 {
-	return IsValid(Target) ? Target->ExecuteInventoryAction(TargetItem) : false;
+	return IsValid(Target) ? Target->ExecuteInventoryAction(Payload) : false;
 }
 
-FGameplayTagContainer UMounteaInventoryStatics::GetItemActionTags(UMounteaInventoryItemAction* Target)
+UMounteaJsonObject* UMounteaInventoryStatics::CreateItemActionPayload(UObject* Owner, const FGuid& ItemGuid)
 {
-	return IsValid(Target) ? Target->GetItemActionTags() : FGameplayTagContainer();
+	if (!IsValid(Owner))
+	{
+		return nullptr;
+	}
+
+	UMounteaJsonObject* payload = UMounteaAdvancedInventoryJsonStatics::CreateJsonObjectFromDefinitionKey(Owner, TEXT("ItemAction"));
+	if (!IsValid(payload))
+	{
+		return nullptr;
+	}
+
+	UMounteaJsonObject* result = nullptr;
+	if (!UMounteaAdvancedInventoryJsonStatics::SetObjectJsonField(payload, TEXT("owningInventory"), Owner, result))
+	{
+		return nullptr;
+	}
+
+	if (!payload->SetGuidField(TEXT("itemGuid"), ItemGuid, result))
+	{
+		return nullptr;
+	}
+
+	return payload;
+}
+
+FGameplayTagContainer UMounteaInventoryStatics::GetInventoryActionTags(UMounteaInventoryItemAction* Target)
+{
+	return IsValid(Target) ? Target->GetInventoryActionTags() : FGameplayTagContainer();
 }
 
 #pragma endregion 
@@ -375,12 +402,18 @@ TArray<UMounteaSelectableInventoryItemAction*> UMounteaInventoryStatics::GetDisp
 	const auto itemTemplate = Item.GetTemplate();
 	if (!itemTemplate) return {};
 	
+	const UMounteaJsonObject* payload = CreateItemActionPayload(Item.GetOwningInventory().GetObject(), Item.GetGuid());
+	if (!payload)
+	{
+		return {};
+	}
+
 	const TArray<UMounteaSelectableInventoryItemAction*> uniqueActions = itemTemplate->ItemActions;
 	TArray<UMounteaSelectableInventoryItemAction*> validActions = uniqueActions;
-	
-	validActions.RemoveAll([Item](const UMounteaSelectableInventoryItemAction* actionData)
+
+	validActions.RemoveAll([payload](const UMounteaSelectableInventoryItemAction* actionData)
 	{
-		return actionData && actionData->IsAllowed(Item) != true && actionData->IsActionVisible(Item) != true;
+		return actionData && actionData->IsAllowed(payload) != true && actionData->IsActionVisible(payload) != true;
 	});
 	
 	validActions.Sort([](const UMounteaSelectableInventoryItemAction& A, const UMounteaSelectableInventoryItemAction& B)
