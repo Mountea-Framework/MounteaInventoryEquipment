@@ -30,6 +30,7 @@ namespace MounteaJsonDefinitionPinTypes
 	static const FName Class(TEXT("class"));
 	static const FName Int(TEXT("int"));
 	static const FName Int64(TEXT("int64"));
+	static const FName Interface(TEXT("interface"));
 	static const FName Name(TEXT("name"));
 	static const FName Object(TEXT("object"));
 	static const FName Real(TEXT("real"));
@@ -57,6 +58,7 @@ bool UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType
 		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Text ||
 		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Byte ||
 		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Object ||
+		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Interface ||
 		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject ||
 		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Class ||
 		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftClass ||
@@ -121,6 +123,7 @@ static EJson GetJsonTypeForDefinitionField(const FMounteaJsonObjectDefinitionFie
 		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Name ||
 		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Text ||
 		pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject ||
+		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Interface ||
 		pinType.PinCategory == MounteaJsonDefinitionPinTypes::Class ||
 		pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftClass ||
 		(pinType.PinCategory == MounteaJsonDefinitionPinTypes::Object && !IsJsonObjectDefinitionField(pinType)))
@@ -251,7 +254,7 @@ static bool ValidateDefinitionObjectField(const FMounteaJsonObjectDefinitionFiel
 		return false;
 	}
 
-	if (loadedObject->IsA(baseClass))
+	if (loadedObject->IsA(baseClass) || (baseClass->HasAnyClassFlags(CLASS_Interface) && loadedObject->GetClass()->ImplementsInterface(baseClass)))
 		return true;
 
 	Errors.Add(FString::Printf(TEXT("JSON field '%s' expected object path of type '%s', but loaded '%s'."), *Field.FieldName.ToString(), *baseClass->GetName(), *loadedObject->GetClass()->GetName()));
@@ -302,7 +305,7 @@ static void ValidateDefinitionFieldMetadata(const FMounteaJsonObjectDefinitionFi
 		return;
 	}
 
-	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject)
+	if (pinType.PinCategory == MounteaJsonDefinitionPinTypes::SoftObject || pinType.PinCategory == MounteaJsonDefinitionPinTypes::Interface)
 	{
 		ValidateDefinitionObjectField(Field, FieldValue->AsString(), Errors);
 		return;
