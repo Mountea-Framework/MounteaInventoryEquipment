@@ -145,24 +145,27 @@ public:
 	virtual void ExecuteQueuedAction_Implementation(UObject* OptionalPayload);
 	
 	/**
-	 * Determines whether this action should be visible in the UI for the given item.
-	 * 
-	 * @param TargetItem The inventory item to check visibility for.
-	 * 
+	 * Determines whether this action should be visible in the UI for the given payload.
+	 *
+	 * @param Payload JSON object with the `ItemAction` definition.
+	 *
 	 * @return True if the action should be shown in the user interface, false otherwise.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool IsActionVisible(const FMounteaInventoryItem& TargetItem) const;
-	virtual bool IsActionVisible_Implementation(const FMounteaInventoryItem& TargetItem) const;
+	virtual bool IsActionVisible(const UMounteaJsonObject* Payload) const;
 	
-	int32 GetActionPriority() const { return ActionPriority; };
+	int32 GetActionPriority() const
+	{
+		return ActionPriority;
+	};
 	
 	UMounteaCallbackInventoryItemAction* GetCallbackItemAction() const
-	{ return CallbackAction; };
+	{
+		return CallbackAction;
+	};
 	
 public:
 	
-	virtual bool IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const override;
+	virtual bool IsAllowed_Implementation(const UMounteaJsonObject* Payload) const override;
 };
 
 #undef LOCTEXT_NAMESPACE

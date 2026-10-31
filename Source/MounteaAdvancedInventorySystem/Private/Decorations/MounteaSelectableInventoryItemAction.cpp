@@ -12,21 +12,24 @@
 
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
 
+#include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Statics/MounteaInventoryStatics.h"
 
-bool UMounteaSelectableInventoryItemAction::IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const
+
+bool UMounteaSelectableInventoryItemAction::IsAllowed_Implementation(const UMounteaJsonObject* Payload) const
 {
-	if (!Super::IsAllowed_Implementation(TargetItem) && IsActionVisible(TargetItem))
+	if (!IsActionVisible(Payload))
+		return false;
+
+	UObject* inventory = nullptr;
+	FMounteaInventoryItem item;
+	if (!ResolveItemFromPayload(Payload, inventory, item) || !IsValid(item.GetTemplate()))
 		return false;
 	
-	TArray<UMounteaSelectableInventoryItemAction*> allowedActions = UMounteaInventoryStatics::GetDisplayableItemActions(TargetItem);
-
-	const bool bFound = Algo::FindByPredicate(allowedActions, [this](const UMounteaSelectableInventoryItemAction* action)
+	return item.GetTemplate()->ItemActions.ContainsByPredicate([this](const UMounteaSelectableInventoryItemAction* action)
 	{
-		return action && action->GetClass() == GetClass();
-	}) != nullptr;
-
-	return bFound;
+		return IsValid(action) && action->GetClass() == GetClass();
+	});
 }
 
 void UMounteaSelectableInventoryItemAction::ExecuteQueuedAction_Implementation(UObject* OptionalPayload)
@@ -34,7 +37,10 @@ void UMounteaSelectableInventoryItemAction::ExecuteQueuedAction_Implementation(U
 	OnSelectableActionQueueExecuted.Broadcast(this, OptionalPayload);
 }
 
-bool UMounteaSelectableInventoryItemAction::IsActionVisible_Implementation(const FMounteaInventoryItem& TargetItem) const
+bool UMounteaSelectableInventoryItemAction::IsActionVisible(const UMounteaJsonObject* Payload) const
 {
 	return true;
 }
+
+
+

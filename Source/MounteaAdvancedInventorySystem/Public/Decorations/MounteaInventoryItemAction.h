@@ -14,6 +14,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 
+#include "Decorations/MounteaInventoryScriptableAction.h"
 #include "Definitions/MounteaInventoryBaseDataTypes.h"
 #include "Definitions/MounteaInventoryItem.h"
 
@@ -32,27 +33,20 @@ UCLASS(ClassGroup=(Mountea), Abstract, NotBlueprintable, BlueprintType, DefaultT
 	AutoExpandCategories=("Mountea","Inventory Action","Mountea|Inventory Action"),
 	HideCategories=("Cooking","Collision","Private"),
 	meta=(DisplayName="Mountea Inventory Action"))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UObject
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryItemAction : public UMounteaInventoryScriptableAction
 {
 	GENERATED_BODY()
 
 public:
 	
 	/**
-	 * Initializes the action with the target item and owning inventory.
-	 * This must be called before executing the action to establish the operating context.
-	 * 
-	 * @param TargetItem The inventory item this action will operate on.
-	 * @param OwningInventory The inventory interface that contains the target item.
-	 * @param ContextPayload Optional context object for additional data (e.g., player controller, UI context).
-	 * 
-	 * @return True if initialization was successful and action is ready to execute, false if setup failed.
+	 * Validates the payload. The owning inventory and the item it references must both resolve.
+	 *
+	 * @param Payload JSON object with the `ItemAction` definition: owningInventory and itemGuid.
+	 *
+	 * @return True if the action can be initialized from this payload.
 	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool InitializeItemAction(const FMounteaInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
-		UObject* ContextPayload = nullptr);
-	virtual bool InitializeItemAction_Implementation(const FMounteaInventoryItem& TargetItem, const TScriptInterface<IMounteaAdvancedInventoryInterface>& OwningInventory,
-		UObject* ContextPayload = nullptr);
+	virtual bool InitializeInventoryAction_Implementation(const UMounteaJsonObject* Payload) override;
 
 	/**
 	 * Gets the inventory interface that owns the target item.
@@ -71,76 +65,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
 	bool CanModifyTargetItem() const;
 	virtual bool CanModifyTargetItem_Implementation() const { return true; };
-
-	/**
-	 * Determines whether this action is currently allowed to be executed on the target item.
-	 * 
-	 * @param TargetItem The inventory item to check execution permissions for.
-	 * 
-	 * @return True if the action can be executed, false if it's currently blocked.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool IsAllowed(const FMounteaInventoryItem& TargetItem) const;
-	virtual bool IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const;
-
-	/**
-	 * Gets a user-friendly reason explaining why the action is not allowed.
-	 * 
-	 * @param TargetItem The inventory item that the action cannot be performed on.
-	 * 
-	 * @return Localized text explaining why the action is disabled or unavailable.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	FText GetDisallowedReason(const FMounteaInventoryItem& TargetItem) const;
-	virtual FText GetDisallowedReason_Implementation(const FMounteaInventoryItem& TargetItem) const;
-
-	/**
-	 * Executes the inventory action on the specified target item.
-	 * 
-	 * This is the main entry point for all inventory actions, regardless of implementation type:
-	 * - Selectable actions: Execute logic and does UI related stuff
-	 * - Callback actions: Execute logic directly and returns result
-	 * 
-	 * @param TargetItem The inventory item to perform the action on.
-	 * 
-	 * @return True if the action was executed successfully, false if it failed.
-	 * 
-	 * @note Always call InitializeItemAction() before executing actions to ensure proper context.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	bool ExecuteInventoryAction(const FMounteaInventoryItem& TargetItem);
-	virtual bool ExecuteInventoryAction_Implementation(const FMounteaInventoryItem& TargetItem);
-
-	/**
-	 * Cancels the Inventory Action. This should be called mostly from delayed Actions!
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	void CancelInventoryAction();
-	virtual void CancelInventoryAction_Implementation();
-
-	/**
-	 * Gets the gameplay tag that uniquely identifies this inventory action.
-	 * 
-	 * @return The gameplay tag used for filtering and identifying this action type.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	FGameplayTagContainer GetItemActionTags() const;
-	virtual FGameplayTagContainer GetItemActionTags_Implementation() const { return ItemActionTags; };
-
-	/**
-	 * Gets called once Action has finished/cancelled to restore resources.
-	 */
-	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|Inventory|Item Actions")
-	void CleanupInventoryAction();
-	virtual void CleanupInventoryAction_Implementation() {};
-
+	
 protected:
 	
-	/**
-	 * The tag used to identify this action in the gameplay ability system.
-	 * This tag is used for filtering and identifying actions in the UI and logic.
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Configuration",
-		meta=(Categories="Mountea_Inventory.ItemAction,Mountea_Inventory.ItemActions,ItemAction,Action"))
-	FGameplayTagContainer ItemActionTags;
+	static bool ResolveItemFromPayload(const UMounteaJsonObject* Payload, UObject*& OutInventory, FMounteaInventoryItem& OutItem);
+	
+public:
+	
+	virtual bool IsAllowed_Implementation(const UMounteaJsonObject* Payload) const override;
+	virtual FText GetDisallowedReason_Implementation(const UMounteaJsonObject* Payload) const override;
+	virtual bool ExecuteInventoryAction_Implementation(const UMounteaJsonObject* Payload) override;
 };

@@ -13,17 +13,53 @@
 #include "Decorations/MounteaInventoryItemAction.h"
 
 #include "Definitions/MounteaInventoryItemTemplate.h"
-#include "Interfaces/Widgets/Items/MounteaAdvancedInventoryItemWidgetInterface.h"
+#include "Helpers/MounteaJsonObject.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
+#include "Statics/MounteaAdvancedInventoryJsonStatics.h"
 #include "Logs/MounteaAdvancedInventoryLog.h"
-#include "Statics/MounteaInventoryStatics.h"
 
-bool UMounteaInventoryItemAction::InitializeItemAction_Implementation(const FMounteaInventoryItem& NewTargetItem,
- const TScriptInterface<IMounteaAdvancedInventoryInterface>& NewOwningInventory, UObject* ContextPayload)
+namespace MounteaItemActionPayload
 {
-	if (!NewTargetItem.IsItemValid() || NewTargetItem.OwningInventory != NewOwningInventory || !IsValid(NewOwningInventory.GetObject()))
+	const FName OwningInventoryField(TEXT("owningInventory"));
+	const FName ItemGuidField(TEXT("itemGuid"));
+}
+
+bool UMounteaInventoryItemAction::ResolveItemFromPayload(const UMounteaJsonObject* Payload, UObject*& OutInventory, FMounteaInventoryItem& OutItem)
+{
+	OutInventory = nullptr;
+	OutItem = FMounteaInventoryItem();
+
+	if (!IsValid(Payload))
 		return false;
+
+	FGuid itemGuid;
+	if (!Payload->GetGuidField(MounteaItemActionPayload::ItemGuidField, itemGuid) || !itemGuid.IsValid())
+		return false;
+
+	// Reading does not mutate the payload; the JSON statics take a non-const pointer
+	UMounteaJsonObject* mutablePayload = const_cast<UMounteaJsonObject*>(Payload);
+	if (!UMounteaAdvancedInventoryJsonStatics::GetObjectJsonField(mutablePayload, MounteaItemActionPayload::OwningInventoryField, OutInventory))
+		return false;
+
+	if (!IsValid(OutInventory) || !OutInventory->Implements<UMounteaAdvancedInventoryInterface>())
+		return false;
+
+	OutItem = IMounteaAdvancedInventoryInterface::Execute_FindItem(OutInventory, FInventoryItemSearchParams(itemGuid));
+	return OutItem.IsItemValid();
+}
+
+bool UMounteaInventoryItemAction::InitializeInventoryAction_Implementation(const UMounteaJsonObject* Payload)
+{
+	UObject* inventory = nullptr;
+	FMounteaInventoryItem item;
 	
-	return true;
+	if(ResolveItemFromPayload(Payload, inventory, item))
+	{
+		ContextPayload = const_cast<UMounteaJsonObject*>(Payload);
+		return true;
+	}
+	
+	return false;
 }
 
 TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction::GetOwningInventory_Implementation() const
@@ -31,38 +67,32 @@ TScriptInterface<IMounteaAdvancedInventoryInterface> UMounteaInventoryItemAction
 	return nullptr;
 }
 
-bool UMounteaInventoryItemAction::IsAllowed_Implementation(const FMounteaInventoryItem& TargetItem) const
+bool UMounteaInventoryItemAction::IsAllowed_Implementation(const UMounteaJsonObject* Payload) const
 {
-	if (!TargetItem.IsItemValid())
+	UObject* inventory = nullptr;
+	FMounteaInventoryItem item;
+	if (!ResolveItemFromPayload(Payload, inventory, item))
 		return false;
 
-	if (!IsValid(TargetItem.Template))
-		return false;
-
-	return false;
+	return IsValid(item.GetTemplate());
 }
 
-FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const FMounteaInventoryItem& TargetItem) const
+FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const UMounteaJsonObject* Payload) const
 {
-	if (!TargetItem.IsItemValid())
+	if (!IsValid(Payload))
 		return FText::FromString(TEXT("Invalid target item"));
 
-	return FText::FromString(TEXT("Action is not currently available"));
+	return Super::GetDisallowedReason(Payload);
 }
 
-bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const FMounteaInventoryItem& TargetItem)
+bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const UMounteaJsonObject* Payload)
 {
-	if (!IsAllowed(TargetItem))
+	if (!IsAllowed(Payload))
 	{
-		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *GetDisallowedReason(TargetItem).ToString())
+		LOG_WARNING(TEXT("[%s] Action not allowed: %s"), *GetName(), *GetDisallowedReason(Payload).ToString())
 		return false;
 	}
 	
 	return true;
-}
-
-void UMounteaInventoryItemAction::CancelInventoryAction_Implementation()
-{
-	CleanupInventoryAction();
 }
 
