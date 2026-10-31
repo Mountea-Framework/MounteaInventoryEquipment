@@ -338,7 +338,7 @@ UFunction* UK2Node_BreakJsonObjectByDefinition::GetGetterFunctionForPinType(cons
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetByteJsonField));
 	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Text)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetTextJsonField));
-	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Object)
+	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Object || PinType.PinCategory == UEdGraphSchema_K2::PC_Interface)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetObjectJsonField));
 	if (PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetSoftObjectJsonField));

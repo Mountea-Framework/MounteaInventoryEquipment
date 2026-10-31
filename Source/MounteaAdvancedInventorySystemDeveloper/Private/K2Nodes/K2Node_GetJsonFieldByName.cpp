@@ -144,7 +144,7 @@ UFunction* UK2Node_GetJsonFieldByName::GetTargetFunction(const UEdGraphPin* Valu
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetByteJsonField));
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Text)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetTextJsonField));
-	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Object)
+	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_Object || effectiveType.PinCategory == UEdGraphSchema_K2::PC_Interface)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetObjectJsonField));
 	if (effectiveType.PinCategory == UEdGraphSchema_K2::PC_SoftObject)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, GetSoftObjectJsonField));

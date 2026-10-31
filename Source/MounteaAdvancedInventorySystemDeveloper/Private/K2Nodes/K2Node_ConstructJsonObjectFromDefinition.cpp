@@ -244,6 +244,7 @@ void UK2Node_ConstructJsonObjectFromDefinition::PostReconstructNode()
 
 		const FName& pinCategory = pin->PinType.PinCategory;
 		if (pinCategory == UEdGraphSchema_K2::PC_Object ||
+			pinCategory == UEdGraphSchema_K2::PC_Interface ||
 			pinCategory == UEdGraphSchema_K2::PC_SoftObject ||
 			pinCategory == UEdGraphSchema_K2::PC_Class ||
 			pinCategory == UEdGraphSchema_K2::PC_SoftClass)
@@ -415,7 +416,7 @@ UFunction* UK2Node_ConstructJsonObjectFromDefinition::GetSetterFunctionForPinTyp
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetByteJsonField));
 	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Text)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetTextJsonField));
-	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Object)
+	if (PinType.PinCategory == UEdGraphSchema_K2::PC_Object || PinType.PinCategory == UEdGraphSchema_K2::PC_Interface)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetObjectJsonField));
 	if (PinType.PinCategory == UEdGraphSchema_K2::PC_SoftObject)
 		return staticsClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(UMounteaAdvancedInventoryJsonStatics, SetSoftObjectJsonField));
@@ -478,7 +479,7 @@ bool UK2Node_ConstructJsonObjectFromDefinition::IsRequiredInputPinEmpty(const UE
 		return false;
 
 	const FName& pinCategory = Pin->PinType.PinCategory;
-	if (pinCategory == UEdGraphSchema_K2::PC_Object)
+	if (pinCategory == UEdGraphSchema_K2::PC_Object || pinCategory == UEdGraphSchema_K2::PC_Interface)
 		return Pin->DefaultObject == nullptr;
 
 	if (pinCategory == UEdGraphSchema_K2::PC_Class)
@@ -503,7 +504,7 @@ bool UK2Node_ConstructJsonObjectFromDefinition::ShouldSkipUnconnectedFieldPin(co
 		return false;
 
 	const FName& pinCategory = Pin->PinType.PinCategory;
-	if (pinCategory == UEdGraphSchema_K2::PC_Object)
+	if (pinCategory == UEdGraphSchema_K2::PC_Object || pinCategory == UEdGraphSchema_K2::PC_Interface)
 		return Pin->DefaultObject == nullptr;
 
 	if (pinCategory == UEdGraphSchema_K2::PC_Class)
