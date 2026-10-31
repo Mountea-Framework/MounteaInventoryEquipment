@@ -802,7 +802,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Action",
 		meta=(MounteaSetter),
 		DisplayName="Item Action - Initialize")
-	static void ItemAction_InitializeItemAction(UWidget* Target,
+	static void ItemAction_InitializeInventoryAction(UWidget* Target,
 		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
 
 	/**

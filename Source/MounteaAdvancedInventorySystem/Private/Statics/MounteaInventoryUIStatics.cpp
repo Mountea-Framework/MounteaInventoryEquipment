@@ -825,14 +825,14 @@ void UMounteaInventoryUIStatics::Item_HighlightItem(UWidget* Target, const bool 
 		IMounteaAdvancedInventoryItemWidgetInterface::Execute_HighlightItem(Target, bIsSelected);
 }
 
-void UMounteaInventoryUIStatics::ItemAction_InitializeItemAction(UWidget* Target,
+void UMounteaInventoryUIStatics::ItemAction_InitializeInventoryAction(UWidget* Target,
                                                                  const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem)
 {
 	if (IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionWidgetInterface>())
-		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeItemAction(
+		IMounteaAdvancedInventoryItemActionWidgetInterface::Execute_InitializeInventoryAction(
 				Target, ItemAction, SelectedItem);
 	else
-		LOG_ERROR(TEXT("[InitializeItemAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
+		LOG_ERROR(TEXT("[InitializeInventoryAction] Target does not implement IMounteaAdvancedInventoryItemActionWidgetInterface!"));
 }
 
 bool UMounteaInventoryUIStatics::ItemAction_IsActionEnabled(UWidget* Target)

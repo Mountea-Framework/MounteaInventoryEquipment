@@ -50,9 +50,9 @@ public:
 	 * @param SelectedItem Inventory Item which this action affects.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions")
-	void InitializeItemAction(
+	void InitializeInventoryAction(
 		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
-	virtual void InitializeItemAction_Implementation(
+	virtual void InitializeInventoryAction_Implementation(
 		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem) = 0;
 
 	/**
