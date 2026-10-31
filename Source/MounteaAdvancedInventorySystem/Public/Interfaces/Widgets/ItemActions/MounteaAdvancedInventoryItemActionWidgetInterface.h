@@ -46,14 +46,11 @@ public:
 	/**
 	 * Initializes the item action widget with the Initiator UI and item action data.
 	 * 
-	 * @param ItemAction The item action associated with this widget.
-	 * @param SelectedItem Inventory Item which this action affects.
+	 * @param Payload Contextual payload holding information about the Item Action Widget context.
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions")
-	void InitializeInventoryAction(
-		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
-	virtual void InitializeInventoryAction_Implementation(
-		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem) = 0;
+	void InitializeInventoryAction(const UMounteaJsonObject* Payload);
+	virtual void InitializeInventoryAction_Implementation(const UMounteaJsonObject* Payload) = 0;
 
 	/**
 	 * Retrieves the item action associated with this widget.

@@ -797,14 +797,12 @@ public:
 	 * Initializes the item action widget with the Initiator UI and item action data.
 	 * 
 	 * @param Target Widget object which implements MounteaAdvancedInventoryItemActionWidgetInterface
-	 * @param ItemAction The item action associated with this widget.
-	 * @param SelectedItem Inventory Item which this action affects.
+	 * @param Payload Contextual payload holding information about the Item Action Widget context.
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Action",
 		meta=(MounteaSetter),
 		DisplayName="Item Action - Initialize")
-	static void ItemAction_InitializeInventoryAction(UWidget* Target,
-		const UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& SelectedItem);
+	static void ItemAction_InitializeInventoryAction(UWidget* Target, const UMounteaJsonObject* Payload);
 
 	/**
 	 * Checks if the item action associated with the specified target widget is enabled.
