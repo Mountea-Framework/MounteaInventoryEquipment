@@ -881,18 +881,17 @@ bool UMounteaInventoryUIStatics::IsValidActionsContainerWidget(const UObject* Ta
 	return IsValid(Target) && Target->Implements<UMounteaAdvancedInventoryItemActionsContainerWidgetInterface>();
 }
 
-void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UWidget* Target, 
-	const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList)
+void UMounteaInventoryUIStatics::ItemActionsContainer_ConstructFromActionsList(UWidget* Target,
+	const UMounteaJsonObject* Payload)
 {
 	if (IsValidActionsContainerWidget(Target))
-		IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, ItemActionsList);
+		IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_ConstructFromActionsList(Target, Payload);
 }
 
-UWidget* UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UWidget* Target, UMounteaSelectableInventoryItemAction* ItemAction, 
-	const FGuid& ItemId)
+UWidget* UMounteaInventoryUIStatics::ItemActionsContainer_AddItemActionToContainer(UWidget* Target, const UMounteaJsonObject* Payload)
 {
-	return IsValidActionsContainerWidget(Target) ? 
-		IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_AddItemActionToContainer(Target, ItemAction, ItemId) :
+	return IsValidActionsContainerWidget(Target) ?
+		IMounteaAdvancedInventoryItemActionsContainerWidgetInterface::Execute_AddItemActionToContainer(Target, Payload) :
 		nullptr;
 }
 

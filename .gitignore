@@ -211,4 +211,10 @@ crashinfo--*
 *.zip
 *.kra~
 *.webp~
+
+# ============================
+# Local only folders
+# ============================
 /Scripts
+/docs/investigations
+/docs/notes

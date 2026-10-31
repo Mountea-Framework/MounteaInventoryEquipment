@@ -16,9 +16,6 @@
 #include "Definitions/MounteaAdvancedInventoryGlobalUIDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaRecipeTemplate.h"
-#include "Helpers/MounteaJsonObject.h"
-#include "Interfaces/Crafting/MounteaAdvancedCraftingParticipantInterface.h"
-#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 
 static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UObject* SubCategoryObject = nullptr)
 {
@@ -121,7 +118,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 	// ModalItemQuantityDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalItemQuantityDefinition"), MakeJsonObjectDefinition(
 		{
-			MakeJsonSoftObjectPtrDefinitionField(TEXT("action"), UMounteaSelectableInventoryItemAction::StaticClass())
+			MakeJsonSoftObjectPtrDefinitionField(TEXT("inventoryAction"), UMounteaSelectableInventoryItemAction::StaticClass())
 		},
 		{
 			MakeJsonDefinitionInclude(TEXT("ModalBaseDefinition")),
@@ -251,34 +248,6 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 		}
 	));
 
-	// ItemActionBase
-	JsonObjectDefinitions.Add(TEXT("ItemActionBase"), MakeJsonObjectDefinition(
-		{
-			MakeJsonStructDefinitionField(TEXT("actionTags"), TBaseStructure<FGameplayTagContainer>::Get())
-		}
-	));
-
-	// ItemAction
-	JsonObjectDefinitions.Add(TEXT("ItemAction"), MakeJsonObjectDefinition(
-		{
-			MakeJsonUObjectDefinitionField(TEXT("owningInventory"), UMounteaAdvancedInventoryInterface::StaticClass()),
-			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
-		},
-		{
-			MakeJsonDefinitionInclude(TEXT("ItemActionBase"))
-		}
-	));
-
-	// CraftingAction
-	JsonObjectDefinitions.Add(TEXT("CraftingAction"), MakeJsonObjectDefinition(
-		{
-			MakeJsonUObjectDefinitionField(TEXT("owningCraftingSystem"), UMounteaAdvancedCraftingParticipantInterface::StaticClass()),
-			MakeJsonStructDefinitionField(TEXT("recipeGuid"), TBaseStructure<FGuid>::Get())
-		},
-		{
-			MakeJsonDefinitionInclude(TEXT("ItemActionBase"))
-		}
-	));
 }
 
 #endif

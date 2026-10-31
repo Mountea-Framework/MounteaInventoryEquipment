@@ -16,7 +16,7 @@
 #include "MounteaAdvancedInventoryItemActionsContainerWidgetInterface.generated.h"
 
 class UWidget;
-class UMounteaSelectableInventoryItemAction;
+class UMounteaJsonObject;
 
 UINTERFACE(MinimalAPI, BlueprintType, Blueprintable)
 class UMounteaAdvancedInventoryItemActionsContainerWidgetInterface : public UInterface
@@ -39,27 +39,24 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API IMounteaAdvancedInventoryItemActionsCon
 public:
 
 	/**
-	 * Constructs the item actions container from a list of item action classes.
-	 * 
-	 * @param ItemActionsList An array of TSoftClassPtr<UObject> representing the item actions to be added to the container.
-	 * 
-	 * Each class must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 * Constructs the item actions container from a Mountea JSON payload.
+	 *
+	 * @param Payload JSON payload conforming to the ActionsCreateRequest definition: "actions" (array of scriptable actions) and "context" (JSON object).
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container")
-	void ConstructFromActionsList(const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList);
-	virtual void ConstructFromActionsList_Implementation(const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList) = 0;
-	
+	void ConstructFromActionsList(const UMounteaJsonObject* Payload);
+	virtual void ConstructFromActionsList_Implementation(const UMounteaJsonObject* Payload) = 0;
+
 	/**
 	 * Adds an item action widget to the container.
-	 * 
-	 * @param ItemAction The Action that we need to generate widget for.
-	 * @param ItemId Item Guid which this Action is related to.
-	 * 
+	 *
+	 * @param Payload JSON payload conforming to the ActionCreateRequest definition: "action" (scriptable action) and "context" (JSON object).
+	 *
 	 * @return Returns create Widget if action is successful
 	 */
 	UFUNCTION(BlueprintNativeEvent, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container")
-	UWidget* AddItemActionToContainer(UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& ItemId);
-	virtual UWidget* AddItemActionToContainer_Implementation(UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& ItemId) = 0;
+	UWidget* AddItemActionToContainer(const UMounteaJsonObject* Payload);
+	virtual UWidget* AddItemActionToContainer_Implementation(const UMounteaJsonObject* Payload) = 0;
 
 	/**
 	 * Removes an item action widget from the container.

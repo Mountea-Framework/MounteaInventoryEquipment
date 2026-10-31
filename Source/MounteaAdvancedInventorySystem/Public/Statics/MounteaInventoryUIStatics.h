@@ -30,6 +30,7 @@ class UMounteaAdvancedInventoryUISubsystem;
 
 class UUserWidget;
 class UMounteaSelectableInventoryItemAction;
+class UMounteaJsonObject;
 class UMounteaInventoryScrollBox;
 class UVerticalBoxSlot;
 class UWidget;
@@ -867,31 +868,28 @@ public:
 	static bool IsValidActionsContainerWidget(const UObject* Target);
 
 	/**
-	 * Constructs the item actions container from a list of item action classes.
+	 * Constructs the item actions container from a Mountea JSON payload.
 	 *
 	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
-	 * @param ItemActionsList An array of TSoftClassPtr<UObject> representing the item actions to be added to the container.
-	 * 
-	 * Each class must implement IMounteaAdvancedInventoryItemActionWidgetInterface.
+	 * @param Payload JSON payload conforming to the ActionsCreateRequest definition: "actions" (array of scriptable actions) and "context" (JSON object).
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(MounteaSetter),
 		DisplayName="Construct From Actions List")
-	static void ItemActionsContainer_ConstructFromActionsList(UWidget* Target, const TArray<UMounteaSelectableInventoryItemAction*>& ItemActionsList);
+	static void ItemActionsContainer_ConstructFromActionsList(UWidget* Target, const UMounteaJsonObject* Payload);
 
 	/**
 	 * Adds an item action widget to the container.
-	 * 
+	 *
 	 * @param Target The target widget. Must implement the MounteaAdvancedInventoryItemActionsContainerWidgetInterface.
-	 * @param ItemAction The Action that we need to generate widget for.
-	 * @param ItemId Item Guid which this Action is related to.
-	 * 
+	 * @param Payload JSON payload conforming to the ActionCreateRequest definition: "action" (scriptable action) and "context" (JSON object).
+	 *
 	 * @return Returns create Widget if action is successful
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Inventory|Item Actions Container",
 		meta=(MounteaSetter),
 		DisplayName="Add Item Action To Container")
-	static UWidget* ItemActionsContainer_AddItemActionToContainer(UWidget* Target, UMounteaSelectableInventoryItemAction* ItemAction, const FGuid& ItemId);
+	static UWidget* ItemActionsContainer_AddItemActionToContainer(UWidget* Target, const UMounteaJsonObject* Payload);
 
 	/**
 	 * Removes the specified item action widget from the item actions container.
