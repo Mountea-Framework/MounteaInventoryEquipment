@@ -32,6 +32,9 @@
 #include "Widgets/Text/STextBlock.h"
 #include "Helpers/MounteaJsonDefinitionDependencyScanner.h"
 #include "Slate/SMounteaJsonDefinitionDependencyList.h"
+#include "Helpers/MounteaJsonDefinitionDeletionCheck.h"
+#include "Misc/MessageDialog.h"
+#include "Containers/Ticker.h"
 
 #define LOCTEXT_NAMESPACE "MounteaJsonObjectDefinitionCustomization"
 
@@ -252,6 +255,40 @@ namespace MounteaJsonObjectDefinitionCustomization
 		);
 	}
 
+	static void DeleteDefinition(const TSharedRef<IPropertyHandle>& StructHandle)
+	{
+		UMounteaAdvancedInventoryGlobalConfig* cfg = ResolveGlobalConfig(StructHandle);
+		const FString key = ResolveDefinitionKey(StructHandle);
+		
+		if (!cfg)
+			return;
+
+		const FMounteaJsonDefinitionDeletionReport report = FMounteaJsonDefinitionDeletionCheck::Check(*cfg, key, FMounteaJsonDefinitionDependencyScanner::GetUsages(key));
+		if (report.HasBlockers() && FMessageDialog::Open(EAppMsgType::YesNo, FMounteaJsonDefinitionDeletionCheck::Describe(key, report)) != EAppReturnType::Yes)
+			return;
+
+		// Walk up to the map handle; the child just below it carries the index inside the map.
+		TSharedPtr<IPropertyHandle> child = StructHandle;
+		TSharedPtr<IPropertyHandle> parent = StructHandle->GetParentHandle();
+		while (parent.IsValid() && !parent->AsMap().IsValid())
+		{
+			child = parent;
+			parent = parent->GetParentHandle();
+		}
+
+		if (parent.IsValid())
+		{
+			// Delete on the next tick, outside this click; the engine's own delete is deferred the same way.
+			const TSharedPtr<IPropertyHandleMap> map = parent->AsMap();
+			const int32 index = child->GetIndexInArray();
+			FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([map, index](float)
+			{
+				map->DeleteItem(index);
+				return false;
+			}));
+		}
+	}
+
 	static void RebuildDefinitionOptions(const TSharedRef<IPropertyHandle>& Handle, const TSharedRef<TArray<TSharedPtr<FString>>>& Options)
 	{
 		Options->Reset();
@@ -465,6 +502,25 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeHeader(
 			[
 				SNew(SImage)
 				.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Dependencies"))
+			]
+		]
+
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.VAlign(VAlign_Center)
+		.Padding(4.f, 0.f, 0.f, 0.f)
+		[
+			SNew(SButton)
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ToolTipText(LOCTEXT("DeleteDefinitionTip", "Delete this definition. Dependencies are checked first."))
+			.OnClicked_Lambda([StructPropertyHandle]()
+			{
+				MounteaJsonObjectDefinitionCustomization::DeleteDefinition(StructPropertyHandle);
+				return FReply::Handled();
+			})
+			[
+				SNew(SImage)
+				.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Delete"))
 			]
 		]
 	];

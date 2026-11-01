@@ -61,6 +61,7 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Import", new SVG_BRUSH_TINT(TEXT("WebIcons/import"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.ReimportAll", new SVG_BRUSH_TINT(TEXT("WebIcons/refresh-cw"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Dependencies", new SVG_BRUSH_TINT(TEXT("WebIcons/link-2"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.Delete", new SVG_BRUSH_TINT(TEXT("WebIcons/trash-2"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Export", new SVG_BRUSH_TINT(TEXT("WebIcons/export"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.Close", new SVG_BRUSH_TINT(TEXT("WebIcons/x"), Icon16x16, FLinearColor::White));
 	StyleSet->Set("MAISStyleSet.SaveMultiple", new SVG_BRUSH_TINT(TEXT("WebIcons/save-all"), Icon16x16, FLinearColor::White));
