@@ -106,28 +106,20 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 		for (const UEdGraph* graph : graphs)
 		{
 			if (!graph)
-			{
 				continue;
-			}
 
 			for (const UEdGraphNode* node : graph->Nodes)
 			{
 				if (!node)
-				{
 					continue;
-				}
 
 				for (const UEdGraphPin* pin : node->Pins)
 				{
 					if (!pin || pin->Direction != EGPD_Input || pin->PinName != DefinitionPinName)
-					{
 						continue;
-					}
 
 					if (Keys.Contains(pin->DefaultValue))
-					{
 						AddUsage(Results, pin->DefaultValue, TEXT("Blueprint"), path, 1);
-					}
 				}
 			}
 		}
@@ -151,19 +143,19 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 
 		for (const FString& file : files)
 		{
+			// shortcut: skips by file name only; the config's own defaults would count as a usage of every default key.
+			if (FPaths::GetCleanFilename(file) == TEXT("MounteaAdvancedInventoryGlobalConfig.cpp"))
+				continue;
+
 			FString content;
 			if (!FFileHelper::LoadFileToString(content, *file))
-			{
 				continue;
-			}
 
 			for (const FString& key : Keys)
 			{
 				const int32 count = FMounteaJsonDefinitionDependencyScanner::CountKeyLiterals(content, key);
 				if (count > 0)
-				{
 					AddUsage(results, key, TEXT("C++"), file, count);
-				}
 			}
 		}
 
@@ -204,49 +196,37 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 	static void EnsureCacheLoaded()
 	{
 		if (bCacheLoaded)
-		{
 			return;
-		}
 
 		bCacheLoaded = true;
 
 		FString json;
 		if (!FFileHelper::LoadFileToString(json, *GetStorePath()))
-		{
 			return;
-		}
 
 		TSharedPtr<FJsonObject> root;
 		const TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(json);
 		if (!FJsonSerializer::Deserialize(reader, root) || !root.IsValid())
-		{
 			return;
-		}
 
 		root->TryGetStringField(TEXT("generatedAt"), CachedScanTime);
 
 		const TSharedPtr<FJsonObject>* definitions = nullptr;
 		if (!root->TryGetObjectField(TEXT("definitions"), definitions))
-		{
 			return;
-		}
 
 		for (const TPair<FString, TSharedPtr<FJsonValue>>& pair : (*definitions)->Values)
 		{
 			const TArray<TSharedPtr<FJsonValue>>* entries = nullptr;
 			if (!pair.Value.IsValid() || !pair.Value->TryGetArray(entries))
-			{
 				continue;
-			}
 
 			TArray<FMounteaJsonDefinitionUsage>& usages = CachedUsages.Add(pair.Key);
 			for (const TSharedPtr<FJsonValue>& entryValue : *entries)
 			{
 				const TSharedPtr<FJsonObject>* entry = nullptr;
 				if (!entryValue.IsValid() || !entryValue->TryGetObject(entry))
-				{
 					continue;
-				}
 
 				FMounteaJsonDefinitionUsage usage;
 				double count = 0.0;
@@ -302,9 +282,7 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 			State->NextBlueprint++;
 
 			if (UBlueprint* blueprint = Cast<UBlueprint>(assetData.GetAsset()))
-			{
 				CountBlueprintUsages(blueprint, State->Keys, State->Results);
-			}
 		}
 
 		if (State->bCancelled)
@@ -314,9 +292,7 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 		}
 
 		if (State->NextBlueprint < State->Blueprints.Num() || !State->SourceScan.IsReady())
-		{
 			return true;
-		}
 
 		CompleteScan(State);
 		return false;
@@ -325,9 +301,7 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 	static void HandleRecalculateRequest(UMounteaAdvancedInventoryGlobalConfig* Config)
 	{
 		if (!Config)
-		{
 			return;
-		}
 
 		TArray<FString> keys;
 		Config->JsonObjectDefinitions.GetKeys(keys);
@@ -351,9 +325,7 @@ void FMounteaJsonDefinitionDependencyScanner::Unbind()
 void FMounteaJsonDefinitionDependencyScanner::StartScan(const TArray<FString>& DefinitionKeys)
 {
 	if (ActiveScan.IsValid())
-	{
 		return;
-	}
 
 	const TSharedPtr<FScanState> state = MakeShared<FScanState>();
 	state->Keys = TSet<FString>(DefinitionKeys);
@@ -364,9 +336,8 @@ void FMounteaJsonDefinitionDependencyScanner::StartScan(const TArray<FString>& D
 
 	TArray<FString> sourceDirs;
 	if (const TSharedPtr<IPlugin> plugin = IPluginManager::Get().FindPlugin(TEXT("MounteaAdvancedInventorySystem")))
-	{
 		sourceDirs.Add(FPaths::Combine(plugin->GetBaseDir(), TEXT("Source")));
-	}
+
 	sourceDirs.Add(FPaths::GameSourceDir());
 
 	const TArray<FString> keys = state->Keys.Array();
@@ -384,9 +355,7 @@ void FMounteaJsonDefinitionDependencyScanner::StartScan(const TArray<FString>& D
 		FSimpleDelegate::CreateLambda([weakState]()
 		{
 			if (const TSharedPtr<FScanState> pinned = weakState.Pin())
-			{
 				pinned->bCancelled = true;
-			}
 		})));
 
 	state->Notification = FSlateNotificationManager::Get().AddNotification(info);
@@ -404,9 +373,7 @@ TArray<FMounteaJsonDefinitionUsage> FMounteaJsonDefinitionDependencyScanner::Get
 	EnsureCacheLoaded();
 
 	if (const TArray<FMounteaJsonDefinitionUsage>* usages = CachedUsages.Find(DefinitionKey))
-	{
 		return *usages;
-	}
 
 	return {};
 }
@@ -420,9 +387,7 @@ FString FMounteaJsonDefinitionDependencyScanner::GetLastScanTime()
 int32 FMounteaJsonDefinitionDependencyScanner::CountKeyLiterals(const FString& Content, const FString& Key)
 {
 	if (Key.IsEmpty())
-	{
 		return 0;
-	}
 
 	const FString literal = FString::Printf(TEXT("\"%s\""), *Key);
 	int32 count = 0;
