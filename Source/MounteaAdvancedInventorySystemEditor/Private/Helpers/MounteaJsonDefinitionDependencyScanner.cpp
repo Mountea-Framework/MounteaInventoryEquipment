@@ -148,12 +148,14 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 				continue;
 
 			FString content;
+
 			if (!FFileHelper::LoadFileToString(content, *file))
 				continue;
 
 			for (const FString& key : Keys)
 			{
 				const int32 count = FMounteaJsonDefinitionDependencyScanner::CountKeyLiterals(content, key);
+
 				if (count > 0)
 					AddUsage(results, key, TEXT("C++"), file, count);
 			}
@@ -201,23 +203,27 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 		bCacheLoaded = true;
 
 		FString json;
+
 		if (!FFileHelper::LoadFileToString(json, *GetStorePath()))
 			return;
 
 		TSharedPtr<FJsonObject> root;
 		const TSharedRef<TJsonReader<>> reader = TJsonReaderFactory<>::Create(json);
+
 		if (!FJsonSerializer::Deserialize(reader, root) || !root.IsValid())
 			return;
 
 		root->TryGetStringField(TEXT("generatedAt"), CachedScanTime);
 
 		const TSharedPtr<FJsonObject>* definitions = nullptr;
+
 		if (!root->TryGetObjectField(TEXT("definitions"), definitions))
 			return;
 
 		for (const TPair<FString, TSharedPtr<FJsonValue>>& pair : (*definitions)->Values)
 		{
 			const TArray<TSharedPtr<FJsonValue>>* entries = nullptr;
+
 			if (!pair.Value.IsValid() || !pair.Value->TryGetArray(entries))
 				continue;
 
@@ -225,6 +231,7 @@ namespace MounteaJsonDefinitionDependencyScannerStatics
 			for (const TSharedPtr<FJsonValue>& entryValue : *entries)
 			{
 				const TSharedPtr<FJsonObject>* entry = nullptr;
+
 				if (!entryValue.IsValid() || !entryValue->TryGetObject(entry))
 					continue;
 
@@ -335,6 +342,7 @@ void FMounteaJsonDefinitionDependencyScanner::StartScan(const TArray<FString>& D
 	registryModule.Get().GetAssetsByClass(UBlueprint::StaticClass()->GetClassPathName(), state->Blueprints, true);
 
 	TArray<FString> sourceDirs;
+
 	if (const TSharedPtr<IPlugin> plugin = IPluginManager::Get().FindPlugin(TEXT("MounteaAdvancedInventorySystem")))
 		sourceDirs.Add(FPaths::Combine(plugin->GetBaseDir(), TEXT("Source")));
 

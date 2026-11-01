@@ -35,10 +35,9 @@ namespace
 	void OpenBlueprint(const FString& ObjectPath)
 	{
 		UObject* asset = FSoftObjectPath(ObjectPath).TryLoad();
+
 		if (asset && GEditor)
-		{
 			GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(asset);
-		}
 	}
 
 	TSharedRef<SWidget> MakeSectionLabel(const FText& Text, const FLinearColor& Color)
@@ -66,10 +65,10 @@ namespace
 		.OnClicked_Lambda([objectPath, OwnerWindow]()
 		{
 			OpenBlueprint(objectPath);
+
 			if (const TSharedPtr<SWindow> pinned = OwnerWindow.Pin())
-			{
 				pinned->RequestDestroyWindow();
-			}
+
 			return FReply::Handled();
 		})
 		[
@@ -292,9 +291,7 @@ TArray<FMounteaJsonDependencyGroup> SMounteaJsonDefinitionDependencyList::GroupB
 	for (const FMounteaJsonDefinitionUsage& usage : Usages)
 	{
 		if (usage.Source != TEXT("Blueprint"))
-		{
 			continue;
-		}
 
 		const FString folder = FPaths::GetPath(FPackageName::ObjectPathToPackageName(usage.Path));
 		FMounteaJsonDependencyGroup* group = groups.FindByPredicate([&folder](const FMounteaJsonDependencyGroup& candidate)

@@ -208,19 +208,16 @@ namespace MounteaJsonObjectDefinitionCustomization
 	{
 		TArray<void*> rawData;
 		StructHandle->AccessRawData(rawData);
+
 		if (rawData.Num() != 1 || !rawData[0])
-		{
 			return FString();
-		}
 
 		if (const UMounteaAdvancedInventoryGlobalConfig* cfg = ResolveGlobalConfig(StructHandle))
 		{
 			for (const TPair<FString, FMounteaJsonObjectDefinition>& pair : cfg->JsonObjectDefinitions)
 			{
 				if (&pair.Value == rawData[0])
-				{
 					return pair.Key;
-				}
 			}
 		}
 
@@ -236,9 +233,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 	static FText GetUsageTooltip(const TSharedRef<IPropertyHandle>& StructHandle)
 	{
 		if (FMounteaJsonDefinitionDependencyScanner::GetLastScanTime().IsEmpty())
-		{
 			return LOCTEXT("NotScanned", "Not scanned yet. Run Recalculate Dependencies on the Global Config.");
-		}
 
 		const TArray<FMounteaJsonDefinitionUsage> usages = FMounteaJsonDefinitionDependencyScanner::GetUsages(ResolveDefinitionKey(StructHandle));
 		int32 total = 0;
@@ -264,6 +259,7 @@ namespace MounteaJsonObjectDefinitionCustomization
 			return;
 
 		const FMounteaJsonDefinitionDeletionReport report = FMounteaJsonDefinitionDeletionCheck::Check(*cfg, key, FMounteaJsonDefinitionDependencyScanner::GetUsages(key));
+
 		if (report.HasBlockers() && FMessageDialog::Open(EAppMsgType::YesNo, FMounteaJsonDefinitionDeletionCheck::Describe(key, report)) != EAppReturnType::Yes)
 			return;
 
@@ -536,9 +532,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 	const TSharedPtr<IPropertyUtilities> utils = StructCustomizationUtils.GetPropertyUtilities();
 
 	if (const TSharedPtr<IPropertyHandle> descriptionHandle = StructPropertyHandle->GetChildHandle(TEXT("Description")))
-	{
 		StructBuilder.AddProperty(descriptionHandle.ToSharedRef());
-	}
 
 	if (!NewFieldPinType.IsValid())
 	{
