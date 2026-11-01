@@ -30,14 +30,8 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
-#include "Framework/Application/SlateApplication.h"
 #include "Helpers/MounteaJsonDefinitionDependencyScanner.h"
-#include "Subsystems/AssetEditorSubsystem.h"
-#include "Editor.h"
-#include "SourceCodeNavigation.h"
-#include "Widgets/Layout/SScrollBox.h"
-#include "Widgets/SWindow.h"
-#include "Widgets/Input/SHyperlink.h"
+#include "Slate/SMounteaJsonDefinitionDependencyList.h"
 
 #define LOCTEXT_NAMESPACE "MounteaJsonObjectDefinitionCustomization"
 
@@ -258,87 +252,6 @@ namespace MounteaJsonObjectDefinitionCustomization
 		);
 	}
 
-	static void OpenUsage(const FString& Path, const bool bBlueprint)
-	{
-		if (!bBlueprint)
-		{
-			FSourceCodeNavigation::OpenSourceFile(Path);
-			return;
-		}
-
-		UObject* asset = FSoftObjectPath(Path).TryLoad();
-		if (asset && GEditor)
-		{
-			GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(asset);
-		}
-	}
-
-	static void OpenDependencyWindow(const FString& DefinitionKey)
-	{
-		const TSharedRef<SVerticalBox> rows = SNew(SVerticalBox);
-		const TArray<FMounteaJsonDefinitionUsage> usages = FMounteaJsonDefinitionDependencyScanner::GetUsages(DefinitionKey);
-
-		if (usages.IsEmpty())
-		{
-			rows->AddSlot()
-			.AutoHeight()
-			.Padding(8.f)
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("NoUsages", "No usages recorded. Run Recalculate Dependencies on the Global Config."))
-			];
-		}
-
-		for (const FMounteaJsonDefinitionUsage& usage : usages)
-		{
-			const FString path = usage.Path;
-			const bool bBlueprint = usage.Source == TEXT("Blueprint");
-
-			rows->AddSlot()
-			.AutoHeight()
-			.Padding(8.f, 2.f)
-			[
-				SNew(SHorizontalBox)
-
-				+ SHorizontalBox::Slot()
-				.FillWidth(1.f)
-				.VAlign(VAlign_Center)
-				[
-					SNew(SHyperlink)
-					.Text(FText::FromString(path))
-					.OnNavigate_Lambda([path, bBlueprint]()
-					{
-						OpenUsage(path, bBlueprint);
-					})
-				]
-
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-				.VAlign(VAlign_Center)
-				.Padding(8.f, 0.f, 0.f, 0.f)
-				[
-					SNew(STextBlock)
-					.Text(FText::Format(LOCTEXT("UsageCount", "x{0}"), FText::AsNumber(usage.Count)))
-				]
-			];
-		}
-
-		const TSharedRef<SWindow> window = SNew(SWindow)
-		.Title(FText::Format(LOCTEXT("DependencyWindowTitle", "Dependencies: {0}"), FText::FromString(DefinitionKey)))
-		.ClientSize(FVector2D(520.f, 360.f))
-		.SizingRule(ESizingRule::UserSized)
-		[
-			SNew(SScrollBox)
-
-			+ SScrollBox::Slot()
-			[
-				rows
-			]
-		];
-
-		FSlateApplication::Get().AddWindow(window);
-	}
-
 	static void RebuildDefinitionOptions(const TSharedRef<IPropertyHandle>& Handle, const TSharedRef<TArray<TSharedPtr<FString>>>& Options)
 	{
 		Options->Reset();
@@ -546,7 +459,7 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeHeader(
 			})
 			.OnClicked_Lambda([StructPropertyHandle]()
 			{
-				MounteaJsonObjectDefinitionCustomization::OpenDependencyWindow(MounteaJsonObjectDefinitionCustomization::ResolveDefinitionKey(StructPropertyHandle));
+				SMounteaJsonDefinitionDependencyList::ShowModal(MounteaJsonObjectDefinitionCustomization::ResolveDefinitionKey(StructPropertyHandle), MounteaJsonObjectDefinitionCustomization::GetDescriptionText(StructPropertyHandle));
 				return FReply::Handled();
 			})
 			[

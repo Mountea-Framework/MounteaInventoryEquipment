@@ -117,7 +117,7 @@ public:
 	/**
 	 * Populates this global config asset with the default JSON object definitions.
 	 */
-	UFUNCTION(CallInEditor, Category="Defaults",
+	UFUNCTION(CallInEditor, Category="Setup",
 		DisplayName="Setup Defaults")
 	void SetupDefaults();
 
@@ -128,7 +128,7 @@ public:
 	 * Starts a scan of where each JSON object definition key is used by Blueprints and C++.
 	 * Results are stored in the editor-only dependency cache, not in this asset.
 	 */
-	UFUNCTION(CallInEditor, Category="Dependencies",
+	UFUNCTION(CallInEditor, Category="Setup",
 		meta=(MounteaSetter),
 		DisplayName="Recalculate Dependencies")
 	void RecalculateDependencies()

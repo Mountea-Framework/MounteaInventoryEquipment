@@ -15,6 +15,7 @@
 
 #include "Helpers/MounteaJsonDefinitionDependencyScanner.h"
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
+#include "Slate/SMounteaJsonDefinitionDependencyList.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaJsonDefinitionKeyLiteralCountTest,
 	"Mountea.InventorySystemEditor.JsonDefinition.KeyLiteralCount",
@@ -46,6 +47,33 @@ bool FMounteaJsonDefinitionSetupDefaultsTest::RunTest(const FString& Parameters)
 	{
 		TestFalse(*FString::Printf(TEXT("%s has a description"), *pair.Key), pair.Value.Description.IsEmpty());
 	}
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaJsonDefinitionGroupBlueprintUsagesTest,
+	"Mountea.InventorySystemEditor.JsonDefinition.GroupBlueprintUsages",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
+
+bool FMounteaJsonDefinitionGroupBlueprintUsagesTest::RunTest(const FString& Parameters)
+{
+	TArray<FMounteaJsonDefinitionUsage> usages;
+	usages.Add({ TEXT("Blueprint"), TEXT("/Game/B/Zed.Zed"), 1 });
+	usages.Add({ TEXT("Blueprint"), TEXT("/Game/A/Yak.Yak"), 2 });
+	usages.Add({ TEXT("Blueprint"), TEXT("/Game/A/Ant.Ant"), 1 });
+	usages.Add({ TEXT("C++"), TEXT("C:/Src/Foo.cpp"), 3 });
+
+	const TArray<FMounteaJsonDependencyGroup> groups = SMounteaJsonDefinitionDependencyList::GroupBlueprintUsages(usages);
+	TestEqual(TEXT("C++ excluded, two folders"), groups.Num(), 2);
+	if (groups.Num() != 2)
+	{
+		return true;
+	}
+
+	TestEqual(TEXT("Folders sorted"), groups[0].FolderPath, FString(TEXT("/Game/A")));
+	TestEqual(TEXT("Usages in folder"), groups[0].Usages.Num(), 2);
+	TestEqual(TEXT("Usages sorted by path"), groups[0].Usages[0].Path, FString(TEXT("/Game/A/Ant.Ant")));
+	TestEqual(TEXT("Count kept"), groups[0].Usages[1].Count, 2);
+	TestEqual(TEXT("Second folder"), groups[1].FolderPath, FString(TEXT("/Game/B")));
 	return true;
 }
 
