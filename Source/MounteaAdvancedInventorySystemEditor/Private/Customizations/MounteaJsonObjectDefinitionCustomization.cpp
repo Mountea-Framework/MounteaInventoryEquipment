@@ -30,6 +30,14 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Helpers/MounteaJsonDefinitionDependencyScanner.h"
+#include "Subsystems/AssetEditorSubsystem.h"
+#include "Editor.h"
+#include "SourceCodeNavigation.h"
+#include "Widgets/Layout/SScrollBox.h"
+#include "Widgets/SWindow.h"
+#include "Widgets/Input/SHyperlink.h"
 
 #define LOCTEXT_NAMESPACE "MounteaJsonObjectDefinitionCustomization"
 
@@ -197,6 +205,138 @@ namespace MounteaJsonObjectDefinitionCustomization
 				return cfg;
 		}
 		return nullptr;
+	}
+
+	static FString ResolveDefinitionKey(const TSharedRef<IPropertyHandle>& StructHandle)
+	{
+		TArray<void*> rawData;
+		StructHandle->AccessRawData(rawData);
+		if (rawData.Num() != 1 || !rawData[0])
+		{
+			return FString();
+		}
+
+		if (const UMounteaAdvancedInventoryGlobalConfig* cfg = ResolveGlobalConfig(StructHandle))
+		{
+			for (const TPair<FString, FMounteaJsonObjectDefinition>& pair : cfg->JsonObjectDefinitions)
+			{
+				if (&pair.Value == rawData[0])
+				{
+					return pair.Key;
+				}
+			}
+		}
+
+		return FString();
+	}
+
+	static FText GetDescriptionText(const TSharedRef<IPropertyHandle>& StructHandle)
+	{
+		const FMounteaJsonObjectDefinition* def = GetDefinition(StructHandle);
+		return def ? def->Description : FText::GetEmpty();
+	}
+
+	static FText GetUsageTooltip(const TSharedRef<IPropertyHandle>& StructHandle)
+	{
+		if (FMounteaJsonDefinitionDependencyScanner::GetLastScanTime().IsEmpty())
+		{
+			return LOCTEXT("NotScanned", "Not scanned yet. Run Recalculate Dependencies on the Global Config.");
+		}
+
+		const TArray<FMounteaJsonDefinitionUsage> usages = FMounteaJsonDefinitionDependencyScanner::GetUsages(ResolveDefinitionKey(StructHandle));
+		int32 total = 0;
+		for (const FMounteaJsonDefinitionUsage& usage : usages)
+		{
+			total += usage.Count;
+		}
+
+		return FText::Format(
+			LOCTEXT("UsageTooltip", "{0} use(s) in {1} location(s). Last scan: {2}"),
+			FText::AsNumber(total),
+			FText::AsNumber(usages.Num()),
+			FText::FromString(FMounteaJsonDefinitionDependencyScanner::GetLastScanTime())
+		);
+	}
+
+	static void OpenUsage(const FString& Path, const bool bBlueprint)
+	{
+		if (!bBlueprint)
+		{
+			FSourceCodeNavigation::OpenSourceFile(Path);
+			return;
+		}
+
+		UObject* asset = FSoftObjectPath(Path).TryLoad();
+		if (asset && GEditor)
+		{
+			GEditor->GetEditorSubsystem<UAssetEditorSubsystem>()->OpenEditorForAsset(asset);
+		}
+	}
+
+	static void OpenDependencyWindow(const FString& DefinitionKey)
+	{
+		const TSharedRef<SVerticalBox> rows = SNew(SVerticalBox);
+		const TArray<FMounteaJsonDefinitionUsage> usages = FMounteaJsonDefinitionDependencyScanner::GetUsages(DefinitionKey);
+
+		if (usages.IsEmpty())
+		{
+			rows->AddSlot()
+			.AutoHeight()
+			.Padding(8.f)
+			[
+				SNew(STextBlock)
+				.Text(LOCTEXT("NoUsages", "No usages recorded. Run Recalculate Dependencies on the Global Config."))
+			];
+		}
+
+		for (const FMounteaJsonDefinitionUsage& usage : usages)
+		{
+			const FString path = usage.Path;
+			const bool bBlueprint = usage.Source == TEXT("Blueprint");
+
+			rows->AddSlot()
+			.AutoHeight()
+			.Padding(8.f, 2.f)
+			[
+				SNew(SHorizontalBox)
+
+				+ SHorizontalBox::Slot()
+				.FillWidth(1.f)
+				.VAlign(VAlign_Center)
+				[
+					SNew(SHyperlink)
+					.Text(FText::FromString(path))
+					.OnNavigate_Lambda([path, bBlueprint]()
+					{
+						OpenUsage(path, bBlueprint);
+					})
+				]
+
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				.Padding(8.f, 0.f, 0.f, 0.f)
+				[
+					SNew(STextBlock)
+					.Text(FText::Format(LOCTEXT("UsageCount", "x{0}"), FText::AsNumber(usage.Count)))
+				]
+			];
+		}
+
+		const TSharedRef<SWindow> window = SNew(SWindow)
+		.Title(FText::Format(LOCTEXT("DependencyWindowTitle", "Dependencies: {0}"), FText::FromString(DefinitionKey)))
+		.ClientSize(FVector2D(520.f, 360.f))
+		.SizingRule(ESizingRule::UserSized)
+		[
+			SNew(SScrollBox)
+
+			+ SScrollBox::Slot()
+			[
+				rows
+			]
+		];
+
+		FSlateApplication::Get().AddWindow(window);
 	}
 
 	static void RebuildDefinitionOptions(const TSharedRef<IPropertyHandle>& Handle, const TSharedRef<TArray<TSharedPtr<FString>>>& Options)
@@ -387,6 +527,32 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeHeader(
 			{
 				return MounteaJsonObjectDefinitionCustomization::GetSummaryText(StructPropertyHandle);
 			})
+			.ToolTipText_Lambda([StructPropertyHandle]()
+			{
+				return MounteaJsonObjectDefinitionCustomization::GetDescriptionText(StructPropertyHandle);
+			})
+		]
+
+		+ SHorizontalBox::Slot()
+		.AutoWidth()
+		.VAlign(VAlign_Center)
+		.Padding(6.f, 0.f, 0.f, 0.f)
+		[
+			SNew(SButton)
+			.ButtonStyle(FAppStyle::Get(), "SimpleButton")
+			.ToolTipText_Lambda([StructPropertyHandle]()
+			{
+				return MounteaJsonObjectDefinitionCustomization::GetUsageTooltip(StructPropertyHandle);
+			})
+			.OnClicked_Lambda([StructPropertyHandle]()
+			{
+				MounteaJsonObjectDefinitionCustomization::OpenDependencyWindow(MounteaJsonObjectDefinitionCustomization::ResolveDefinitionKey(StructPropertyHandle));
+				return FReply::Handled();
+			})
+			[
+				SNew(SImage)
+				.Image(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.Dependencies"))
+			]
 		]
 	];
 }
@@ -399,6 +565,11 @@ void FMounteaJsonObjectDefinitionCustomization::CustomizeChildren(
 	IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
 	const TSharedPtr<IPropertyUtilities> utils = StructCustomizationUtils.GetPropertyUtilities();
+
+	if (const TSharedPtr<IPropertyHandle> descriptionHandle = StructPropertyHandle->GetChildHandle(TEXT("Description")))
+	{
+		StructBuilder.AddProperty(descriptionHandle.ToSharedRef());
+	}
 
 	if (!NewFieldPinType.IsValid())
 	{

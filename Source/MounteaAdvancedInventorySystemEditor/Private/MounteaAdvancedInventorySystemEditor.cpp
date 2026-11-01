@@ -13,6 +13,7 @@
 
 #include "AssetToolsModule.h"
 #include "ContentBrowserModule.h"
+#include "Helpers/MounteaJsonDefinitionDependencyScanner.h"
 #include "FileHelpers.h"
 #include "IContentBrowserSingleton.h"
 
@@ -94,6 +95,11 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	// Register Style
 	{
 		FMounteaAdvancedInventoryEditorStyle::Initialize();
+	}
+
+	// JSON definition dependency scan
+	{
+		FMounteaJsonDefinitionDependencyScanner::Bind();
 	}
 	
 	// Register new Category
@@ -342,6 +348,11 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 	// Style Shutdown
 	{
 		FMounteaAdvancedInventoryEditorStyle::Shutdown();
+	}
+
+	// JSON definition dependency scan
+	{
+		FMounteaJsonDefinitionDependencyScanner::Unbind();
 	}
 
 	// Help Button Cleanup
