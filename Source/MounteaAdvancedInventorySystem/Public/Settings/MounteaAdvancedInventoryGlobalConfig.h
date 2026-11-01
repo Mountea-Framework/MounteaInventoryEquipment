@@ -77,6 +77,10 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaJsonObjectDefinition
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
+		meta=(MultiLine=true, NoResetToDefault))
+	FText Description;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="JSON Definition",
 		meta=(NoResetToDefault),
 		meta=(TitleProperty="{DefinitionKey}"))
 	TArray<FMounteaJsonObjectDefinitionInclude> IncludedDefinitions;
@@ -94,6 +98,12 @@ public:
 	}
 };
 
+#if WITH_EDITOR
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FMounteaOnRecalculateJsonDefinitionDependencies, class UMounteaAdvancedInventoryGlobalConfig*);
+
+#endif
+
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Global Config",
 	meta=(ShortTooltip="Global configuration asset for Mountea Inventory & Equipment shared definitions."))
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryGlobalConfig : public UPrimaryDataAsset
@@ -110,6 +120,21 @@ public:
 	UFUNCTION(CallInEditor, Category="Defaults",
 		DisplayName="Setup Defaults")
 	void SetupDefaults();
+
+	/** Broadcast by RecalculateDependencies; the editor module listens and runs the dependency scan. */
+	static inline FMounteaOnRecalculateJsonDefinitionDependencies OnRecalculateDependencies;
+
+	/**
+	 * Starts a scan of where each JSON object definition key is used by Blueprints and C++.
+	 * Results are stored in the editor-only dependency cache, not in this asset.
+	 */
+	UFUNCTION(CallInEditor, Category="Dependencies",
+		meta=(MounteaSetter),
+		DisplayName="Recalculate Dependencies")
+	void RecalculateDependencies()
+	{
+		OnRecalculateDependencies.Broadcast(this);
+	}
 	
 #endif
 	

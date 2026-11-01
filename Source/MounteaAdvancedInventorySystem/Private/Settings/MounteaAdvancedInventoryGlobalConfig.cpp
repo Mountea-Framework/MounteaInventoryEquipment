@@ -16,6 +16,7 @@
 #include "Definitions/MounteaAdvancedInventoryGlobalUIDataTypes.h"
 #include "Definitions/MounteaInventoryItemTemplate.h"
 #include "Definitions/MounteaRecipeTemplate.h"
+#include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 
 static FMounteaJsonObjectDefinitionField MakeJsonDefinitionField(const FName FieldName, const FName PinCategory, UObject* SubCategoryObject = nullptr)
 {
@@ -79,10 +80,12 @@ static FMounteaJsonObjectDefinitionInclude MakeJsonDefinitionInclude(const FStri
 }
 
 static FMounteaJsonObjectDefinition MakeJsonObjectDefinition(
+	const TCHAR* Description,
 	TArray<FMounteaJsonObjectDefinitionField> Fields,
 	TArray<FMounteaJsonObjectDefinitionInclude> IncludedDefinitions = {})
 {
 	FMounteaJsonObjectDefinition definition;
+	definition.Description = FText::FromString(Description);
 	definition.Fields = MoveTemp(Fields);
 	definition.IncludedDefinitions = MoveTemp(IncludedDefinitions);
 
@@ -95,21 +98,24 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 {
 	// ModalBaseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalBaseDefinition"), MakeJsonObjectDefinition(
+		TEXT("Shared base for modal requests: the modal data and the modal type."),
 		{
 			MakeJsonStructDefinitionField(TEXT("modalData"), TBaseStructure<FMounteaModalsConfig>::Get()),
 			MakeJsonStringDefinitionField(TEXT("modalType"))
 		}
 	));
-	
+
 	// ModalItemDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalItemDefinition"), MakeJsonObjectDefinition(
+		TEXT("Adds the item GUID that a modal refers to."),
 		{
-			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get()),
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
 		}
 	));
 
 	// ModalSliderDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalSliderDefinition"), MakeJsonObjectDefinition(
+		TEXT("Adds the integer range used by a quantity slider modal."),
 		{
 			MakeJsonStructDefinitionField(TEXT("sliderRange"), TBaseStructure<FIntPoint>::Get())
 		}
@@ -117,8 +123,9 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// ModalItemQuantityDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalItemQuantityDefinition"), MakeJsonObjectDefinition(
+		TEXT("Request to choose an item quantity. Combines base, item and slider data with the selectable item action."),
 		{
-			MakeJsonSoftObjectPtrDefinitionField(TEXT("inventoryAction"), UMounteaSelectableInventoryItemAction::StaticClass())
+			MakeJsonSoftObjectPtrDefinitionField(TEXT("action"), UMounteaSelectableInventoryItemAction::StaticClass())
 		},
 		{
 			MakeJsonDefinitionInclude(TEXT("ModalBaseDefinition")),
@@ -127,9 +134,9 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 		}
 	));
 
-	
 	// ModalResponseBaseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalResponseBaseDefinition"), MakeJsonObjectDefinition(
+		TEXT("Shared base for modal responses: the answering modal type and whether it was confirmed."),
 		{
 			MakeJsonStringDefinitionField(TEXT("modalType")),
 			MakeJsonBooleanDefinitionField(TEXT("confirmed"))
@@ -138,6 +145,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// ModalItemResponseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalItemResponseDefinition"), MakeJsonObjectDefinition(
+		TEXT("Modal response for an item: adds the item GUID to the base response."),
 		{
 			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
 		},
@@ -148,6 +156,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// ModalQuantityResponseDefinition
 	JsonObjectDefinitions.Add(TEXT("ModalQuantityResponseDefinition"), MakeJsonObjectDefinition(
+		TEXT("Modal response for an item quantity: adds the chosen quantity."),
 		{
 			MakeJsonIntDefinitionField(TEXT("quantity"))
 		},
@@ -158,14 +167,16 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// CategorySelectedRequest
 	JsonObjectDefinitions.Add(TEXT("CategorySelectedRequest"), MakeJsonObjectDefinition(
+		TEXT("Request sent when a category is selected: the category widget and its ID."),
 		{
-			MakeJsonUObjectDefinitionField(TEXT("CategoryWidget")),
+			MakeJsonUObjectDefinitionField(TEXT("CategoryWidget"), UObject::StaticClass()),
 			MakeJsonStringDefinitionField(TEXT("CategoryId"))
 		}
 	));
 
 	// CategorySelectedResponse
 	JsonObjectDefinitions.Add(TEXT("CategorySelectedResponse"), MakeJsonObjectDefinition(
+		TEXT("Response to a category selection: the selected category ID."),
 		{
 			MakeJsonStringDefinitionField(TEXT("CategoryId"))
 		}
@@ -173,6 +184,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// CategoriesCreateRequest
 	JsonObjectDefinitions.Add(TEXT("CategoriesCreateRequest"), MakeJsonObjectDefinition(
+		TEXT("Request to create category widgets: the widget class and the registrar object."),
 		{
 			MakeJsonDefinitionField(TEXT("CategoryWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass()),
 			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject"))
@@ -181,6 +193,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// ItemsCreateRequest
 	JsonObjectDefinitions.Add(TEXT("ItemsCreateRequest"), MakeJsonObjectDefinition(
+		TEXT("Request to create item widgets for a category: widget class, registrar, category ID and item GUIDs."),
 		{
 			MakeJsonDefinitionField(TEXT("ItemWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass()),
 			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject")),
@@ -191,6 +204,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// ItemCreateRequest
 	JsonObjectDefinitions.Add(TEXT("ItemCreateRequest"), MakeJsonObjectDefinition(
+		TEXT("Request to create a single item widget: registrar, category ID and item GUID."),
 		{
 			MakeJsonUObjectDefinitionField(TEXT("RegistrarObject")),
 			MakeJsonStringDefinitionField(TEXT("categoryId")),
@@ -200,8 +214,9 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// ItemSelectedRequest
 	JsonObjectDefinitions.Add(TEXT("ItemSelectedRequest"), MakeJsonObjectDefinition(
+		TEXT("Request sent when an item is selected: the item widget, its GUID and parent category."),
 		{
-			MakeJsonUObjectDefinitionField(TEXT("ItemWidget")),
+			MakeJsonUObjectDefinitionField(TEXT("ItemWidget"), UObject::StaticClass()),
 			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get()),
 			MakeJsonStringDefinitionField(TEXT("ParentCategory"))
 		}
@@ -209,6 +224,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// ItemSelectedResponse
 	JsonObjectDefinitions.Add(TEXT("ItemSelectedResponse"), MakeJsonObjectDefinition(
+		TEXT("Response to an item selection: the item GUID and parent category."),
 		{
 			MakeJsonStructDefinitionField(TEXT("ItemId"), TBaseStructure<FGuid>::Get()),
 			MakeJsonStringDefinitionField(TEXT("ParentCategory"))
@@ -217,6 +233,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// InventoryItemChangePayload
 	JsonObjectDefinitions.Add(TEXT("InventoryItemChangePayload"), MakeJsonObjectDefinition(
+		TEXT("Payload for an inventory item change: the item GUID."),
 		{
 			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
 		}
@@ -224,6 +241,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// InventoryItemQuantityChangePayload
 	JsonObjectDefinitions.Add(TEXT("InventoryItemQuantityChangePayload"), MakeJsonObjectDefinition(
+		TEXT("Payload for an inventory item quantity change: adds the new quantity."),
 		{
 			MakeJsonIntDefinitionField(TEXT("quantity"))
 		},
@@ -234,6 +252,7 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// CraftingIngredientPayload
 	JsonObjectDefinitions.Add(TEXT("CraftingIngredientPayload"), MakeJsonObjectDefinition(
+		TEXT("Crafting ingredient payload: the ingredient template and its required quantities."),
 		{
 			MakeJsonUObjectDefinitionField(TEXT("ingredientTemplate"), UMounteaInventoryItemTemplate::StaticClass()),
 			MakeJsonStructDefinitionField(TEXT("quantities"), TBaseStructure<FIntPoint>::Get())
@@ -242,12 +261,43 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 
 	// CraftingRecipePayload
 	JsonObjectDefinitions.Add(TEXT("CraftingRecipePayload"), MakeJsonObjectDefinition(
+		TEXT("Crafting recipe payload: the recipe template and whether the ingredients are sufficient."),
 		{
 			MakeJsonUObjectDefinitionField(TEXT("recipeTemplate"), UMounteaRecipeTemplate::StaticClass()),
 			MakeJsonBooleanDefinitionField(TEXT("hasEnoughIngredients"))
 		}
 	));
 
+	// ItemAction
+	JsonObjectDefinitions.Add(TEXT("ItemAction"), MakeJsonObjectDefinition(
+		TEXT("Payload for an item action: the owning inventory and the item GUID."),
+		{
+			MakeJsonUObjectDefinitionField(TEXT("owningInventory"), UMounteaAdvancedInventoryInterface::StaticClass()),
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get())
+		}
+	));
+
+	// ItemSelected_ItemActions
+	JsonObjectDefinitions.Add(TEXT("ItemSelected_ItemActions"), MakeJsonObjectDefinition(
+		TEXT("Payload for showing the actions of a selected item: inventory, item GUID, item actions and action widget class."),
+		{
+			MakeJsonDefinitionField(TEXT("inventory"), TEXT("interface"), UMounteaAdvancedInventoryInterface::StaticClass()),
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get()),
+			MakeJsonArrayDefinitionField(TEXT("itemActions"), TEXT("object"), UMounteaSelectableInventoryItemAction::StaticClass()),
+			MakeJsonDefinitionField(TEXT("itemActionWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass())
+		}
+	));
+
+	// ItemSelected_ItemAction
+	JsonObjectDefinitions.Add(TEXT("ItemSelected_ItemAction"), MakeJsonObjectDefinition(
+		TEXT("Payload for a single selected item action: inventory, item GUID, action widget class and action."),
+		{
+			MakeJsonDefinitionField(TEXT("inventory"), TEXT("interface"), UMounteaAdvancedInventoryInterface::StaticClass()),
+			MakeJsonStructDefinitionField(TEXT("itemGuid"), TBaseStructure<FGuid>::Get()),
+			MakeJsonDefinitionField(TEXT("itemActionWidgetClass"), TEXT("softclass"), UUserWidget::StaticClass()),
+			MakeJsonUObjectDefinitionField(TEXT("itemAction"), UMounteaSelectableInventoryItemAction::StaticClass())
+		}
+	));
 }
 
 #endif
