@@ -114,21 +114,21 @@ public:
 	
 #if WITH_EDITOR
 	
+	/** Broadcast by RecalculateDependencies; the editor module listens and runs the dependency scan. */
+	static inline FMounteaOnRecalculateJsonDefinitionDependencies OnRecalculateDependencies;
+	
 	/**
 	 * Populates this global config asset with the default JSON object definitions.
 	 */
-	UFUNCTION(CallInEditor, Category="Setup",
+	UFUNCTION(CallInEditor, Category="Defaults",
 		DisplayName="Setup Defaults")
 	void SetupDefaults();
-
-	/** Broadcast by RecalculateDependencies; the editor module listens and runs the dependency scan. */
-	static inline FMounteaOnRecalculateJsonDefinitionDependencies OnRecalculateDependencies;
-
+	
 	/**
 	 * Starts a scan of where each JSON object definition key is used by Blueprints and C++.
 	 * Results are stored in the editor-only dependency cache, not in this asset.
 	 */
-	UFUNCTION(CallInEditor, Category="Setup",
+	UFUNCTION(CallInEditor, Category="Defaults",
 		meta=(MounteaSetter),
 		DisplayName="Recalculate Dependencies")
 	void RecalculateDependencies()
