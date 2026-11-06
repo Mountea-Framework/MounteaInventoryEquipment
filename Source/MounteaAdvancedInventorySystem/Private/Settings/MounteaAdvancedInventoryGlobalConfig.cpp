@@ -101,7 +101,8 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 		TEXT("Shared base for modal requests: the modal data and the modal type."),
 		{
 			MakeJsonStructDefinitionField(TEXT("modalData"), TBaseStructure<FMounteaModalsConfig>::Get()),
-			MakeJsonStringDefinitionField(TEXT("modalType"))
+			MakeJsonStringDefinitionField(TEXT("modalType")),
+			MakeJsonUObjectDefinitionField(TEXT("modalInitiator"), UInterface::StaticClass())
 		}
 	));
 
@@ -139,7 +140,8 @@ void UMounteaAdvancedInventoryGlobalConfig::SetupDefaults()
 		TEXT("Shared base for modal responses: the answering modal type and whether it was confirmed."),
 		{
 			MakeJsonStringDefinitionField(TEXT("modalType")),
-			MakeJsonBooleanDefinitionField(TEXT("confirmed"))
+			MakeJsonBooleanDefinitionField(TEXT("confirmed")),
+			MakeJsonUObjectDefinitionField(TEXT("responseInitiator"), UInterface::StaticClass())
 		}
 	));
 
