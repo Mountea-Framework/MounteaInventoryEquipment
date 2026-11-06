@@ -238,6 +238,17 @@ static bool ValidateDefinitionStructField(const FMounteaJsonObjectDefinitionFiel
 	return false;
 }
 
+static bool ClassImplementsAnyInterface(const UClass* Class)
+{
+	for (const UClass* current = Class; current; current = current->GetSuperClass())
+	{
+		if (current->Interfaces.Num() > 0)
+			return true;
+	}
+
+	return false;
+}
+
 static bool ValidateDefinitionObjectField(const FMounteaJsonObjectDefinitionField& Field, const FString& Path, TArray<FString>& Errors)
 {
 	if (IsDefinitionFieldRequiredAndEmptyString(Field, Path, Errors))
@@ -255,6 +266,10 @@ static bool ValidateDefinitionObjectField(const FMounteaJsonObjectDefinitionFiel
 	}
 
 	if (loadedObject->IsA(baseClass) || (baseClass->HasAnyClassFlags(CLASS_Interface) && loadedObject->GetClass()->ImplementsInterface(baseClass)))
+		return true;
+
+	// Generic "any interface" field (UInterface base): accept any object implementing at least one interface.
+	if (baseClass == UInterface::StaticClass() && ClassImplementsAnyInterface(loadedObject->GetClass()))
 		return true;
 
 	Errors.Add(FString::Printf(TEXT("JSON field '%s' expected object path of type '%s', but loaded '%s'."), *Field.FieldName.ToString(), *baseClass->GetName(), *loadedObject->GetClass()->GetName()));
