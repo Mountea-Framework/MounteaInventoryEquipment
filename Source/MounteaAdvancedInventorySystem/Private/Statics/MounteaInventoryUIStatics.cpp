@@ -64,6 +64,9 @@ APlayerController* UMounteaInventoryUIStatics::FindPlayerController(AActor* Acto
 	if (SearchDepth >= 8)
 		return nullptr;
 	
+	if (!IsValid(Actor))
+		return nullptr;
+	
 	if (APlayerController* playerController = Cast<APlayerController>(Actor))
 		return playerController;
 
