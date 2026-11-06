@@ -15,6 +15,7 @@
 
 #include "Components/MounteaInventoryComponent.h"
 #include "Components/SceneComponent.h"
+#include "Definitions/MounteaAdvancedInventoryLoadoutConfig.h"
 #include "Helpers/MounteaJsonObject.h"
 #include "Interfaces/Inventory/MounteaAdvancedInventoryInterface.h"
 #include "Settings/MounteaAdvancedInventoryGlobalConfig.h"
@@ -86,6 +87,36 @@ bool FMounteaJsonObjectInterfaceFieldTest::RunTest(const FString& Parameters)
 	UObject* nonImplementer = NewObject<USceneComponent>(GetTransientPackage());
 	TestTrue(TEXT("Store non-implementer"), UMounteaAdvancedInventoryJsonStatics::SetObjectJsonField(json, TEXT("Owner"), nonImplementer, out));
 	TestFalse(TEXT("Non-implementer rejected"), UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinition(json, definition, errors));
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaJsonObjectGenericInterfaceFieldTest, "Mountea.InventorySystem.JsonObject.GenericInterfaceField",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext | EAutomationTestFlags::ProductFilter)
+
+bool FMounteaJsonObjectGenericInterfaceFieldTest::RunTest(const FString& Parameters)
+{
+	FEdGraphPinType anyInterfacePin;
+	anyInterfacePin.PinCategory = FName(TEXT("interface"));
+	anyInterfacePin.PinSubCategoryObject = UInterface::StaticClass();
+
+	FMounteaJsonObjectDefinitionField field;
+	field.FieldName = TEXT("Initiator");
+	field.FieldValueType = anyInterfacePin;
+	FMounteaJsonObjectDefinition definition;
+	definition.Fields.Add(field);
+
+	UMounteaJsonObject* json = NewObject<UMounteaJsonObject>(GetTransientPackage());
+	UMounteaJsonObject* out = nullptr;
+	TArray<FString> errors;
+
+	UObject* implementer = NewObject<UMounteaInventoryComponent>(GetTransientPackage());
+	TestTrue(TEXT("Store implementer"), UMounteaAdvancedInventoryJsonStatics::SetObjectJsonField(json, TEXT("Initiator"), implementer, out));
+	TestTrue(TEXT("Any-interface field accepts implementer"), UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinition(json, definition, errors));
+
+	// USceneComponent implements engine interfaces, so use a concrete asset class that implements none.
+	UObject* nonImplementer = NewObject<UMounteaAdvancedInventoryLoadoutConfig>(GetTransientPackage());
+	TestTrue(TEXT("Store non-implementer"), UMounteaAdvancedInventoryJsonStatics::SetObjectJsonField(json, TEXT("Initiator"), nonImplementer, out));
+	TestFalse(TEXT("Any-interface field rejects non-implementer"), UMounteaAdvancedInventoryJsonStatics::ValidateJsonObjectAgainstDefinition(json, definition, errors));
 	return true;
 }
 
