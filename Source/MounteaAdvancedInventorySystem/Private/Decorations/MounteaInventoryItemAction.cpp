@@ -82,7 +82,7 @@ FText UMounteaInventoryItemAction::GetDisallowedReason_Implementation(const UMou
 	if (!IsValid(Payload))
 		return FText::FromString(TEXT("Invalid target item"));
 
-	return Super::GetDisallowedReason(Payload);
+	return Super::GetDisallowedReason_Implementation(Payload);
 }
 
 bool UMounteaInventoryItemAction::ExecuteInventoryAction_Implementation(const UMounteaJsonObject* Payload)
