@@ -389,7 +389,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterTabSpawners()
 		FOnSpawnTab::CreateRaw(this, &FMounteaAdvancedInventorySystemEditor::SpawnCraftingRecipesEditorTab))
 		.SetDisplayName(LOCTEXT("CraftingRecipesTitle", "Mountea Crafting Recipes Editor"))
 		.SetTooltipText(LOCTEXT("CraftingRecipesTip", "Create and edit crafting recipes"))
-		.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor"));
+		.SetIcon(FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.CraftingRecipesEditor"));
 
 }
 
@@ -448,7 +448,7 @@ TSharedRef<SDockTab> FMounteaAdvancedInventorySystemEditor::SpawnCraftingRecipes
 	TSharedRef<SDockTab> Tab = SNew(SDockTab).TabRole(ETabRole::NomadTab)
 		.Label(LOCTEXT("CraftingRecipesLabel", "Crafting Recipes Editor"))
 		.ToolTipText(LOCTEXT("CraftingRecipesTooltip", "Create and edit Mountea crafting recipes"))[Editor];
-	Tab->SetTabIcon(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.TemplatesEditor"));
+	Tab->SetTabIcon(FMounteaAdvancedInventoryEditorStyle::GetBrush("MAISStyleSet.CraftingRecipesEditor"));
 	Tab->SetCanCloseTab(SDockTab::FCanCloseTab::CreateLambda([WeakEditor]()
 	{ auto Pinned = WeakEditor.Pin(); return !Pinned || Pinned->CanCloseEditor(); }));
 	return Tab;
@@ -541,7 +541,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							"MounteaInventory_CraftingRecipesEditor",
 							LOCTEXT("CraftingRecipesMenu", "Mountea Crafting Recipes Editor"),
 							LOCTEXT("CraftingRecipesMenuTooltip", "Create, edit, duplicate, import and export crafting recipes."),
-							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.TemplatesEditor"),
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.CraftingRecipesEditor"),
 							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&) { OpenCraftingRecipesEditor(); })
 						));
 

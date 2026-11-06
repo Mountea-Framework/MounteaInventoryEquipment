@@ -77,6 +77,7 @@ void FMounteaAdvancedInventoryEditorStyle::Create()
 	StyleSet->Set("MAISStyleSet.Error.Filled", new SVG_BRUSH_TINT(TEXT("WebIcons/exclamation-circle_filled"), Icon16x16, FLinearColor::FromSRGBColor(FColor::FromHex("#F92C30"))));
 	
 	StyleSet->Set("MAISStyleSet.TemplatesEditor",  new SVG_BRUSH_TINT(TEXT("WebIcons/template"), Icon16x16, FLinearColor::White));
+	StyleSet->Set("MAISStyleSet.CraftingRecipesEditor", new SVG_BRUSH_TINT(TEXT("WebIcons/hammer"), Icon16x16, FLinearColor::White));
 
 	StyleSet->Set("MAISStyleSet.InventorySystemIcon", new IMAGE_BRUSH(TEXT("InventorySystem_Icon"), Icon16x16));
 
