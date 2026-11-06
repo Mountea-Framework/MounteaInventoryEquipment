@@ -79,6 +79,10 @@ public:
 		meta=(NoResetToDefault),
 		meta=(Categories="Mountea_Inventory.WidgetState.Modal,State"))
 	FGameplayTag WidgetTag;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Primary Data",
+		meta=(NoResetToDefault))
+	TScriptInterface<UInterface> InitiatorInterface;
 
 protected:
 
