@@ -17,6 +17,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryBaseUIStatics.generated.h"
 
+struct FInventoryNotificationData;
 class AActor;
 class APlayerController;
 class IMounteaAdvancedInventorySharedHUDInterface;
@@ -50,6 +51,21 @@ public:
 		DisplayName="Get Global UI Config")
 	static UMounteaAdvancedInventoryGlobalUIConfig* GetGlobalUIConfig();
 
+	/**
+	 * Resolves the widget command type filter from the supplied command string.
+	 *
+	 * Returns "All" when Command is empty, allowing an empty command value to represent every available widget
+	 * command type. Otherwise, returns Command unchanged.
+	 *
+	 * @param Command Command type string to resolve.
+	 * @return "All" if Command is empty; otherwise the original Command value.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Commands",
+		meta=(MounteaGetter),
+		meta=(MounteaCommand),
+		DisplayName="Get Widget Commands Types")
+	static FString GetWidgetCommandsTypes(const FString& Command);
+
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),
@@ -68,7 +84,7 @@ public:
 		meta=(Keywords="container,viewport,destroy"),
 		DisplayName="Remove Wrapper Widget")
 	static void RemoveWrapperWidget(const TScriptInterface<IMounteaAdvancedInventorySharedHUDInterface>& Target);
-
+	
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Commands",
 		meta=(MounteaSetter),
 		meta=(MounteaCommand),

@@ -53,6 +53,11 @@ bool UMounteaInventoryBaseUIStatics::IsValidBaseUIHandler(const UObject* Target)
 	return IsValid(Target) && Target->Implements<UMounteaInventorySystemWrapperWidgetInterface>();
 }
 
+FString UMounteaInventoryBaseUIStatics::GetWidgetCommandsTypes(const FString& Command)
+{
+	return Command.IsEmpty() ? TEXT("All") : Command;
+}
+
 UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryBaseUIStatics::GetSharedHUDSubsystem(UObject* Context)
 {
 	if (!IsValid(Context))
