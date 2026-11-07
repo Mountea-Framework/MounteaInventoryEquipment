@@ -30,6 +30,26 @@ public:
 	static bool CanExecuteCosmeticEvents(const UWorld* WorldContext);
 	
 public:
+	
+	/**
+	 * Retrieves the provided interface if its underlying object implements the specified interface type.
+	 *
+	 * This function checks whether the object referenced by Interface is valid and implements InterfaceFilter.
+	 * If the object implements the requested interface, a script interface bound to that object and interface address is returned,
+	 * and bResult is set to true. If the object is invalid or does not implement the requested interface, an empty interface is returned,
+	 * and bResult is set to false.
+	 *
+	 * @param Interface			The script interface whose underlying object will be checked.
+	 * @param InterfaceFilter	The interface type that the underlying object must implement.
+	 * @param bResult			(Out) true if the requested interface was found and returned; false otherwise.
+	 * @return					A script interface bound to the requested interface type if available; otherwise, an empty interface.
+	 */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Helpers",
+		meta=(ClassFilter="Interface"),
+		meta=(DeterminesOutputType = "InterfaceFilter"),
+		meta=(MounteaGetter),
+		DisplayName="Get Interface By Type")
+	static TScriptInterface<IInterface> GetInterfaceByType(const TScriptInterface<IInterface>& Interface, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult);
 
 	/**
 	 * Retrieves the given object if it is of the specified class type.

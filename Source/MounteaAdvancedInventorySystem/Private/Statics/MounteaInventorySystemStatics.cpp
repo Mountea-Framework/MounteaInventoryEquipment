@@ -23,13 +23,33 @@ bool UMounteaInventorySystemStatics::CanExecuteCosmeticEvents(const UWorld* Worl
 	return !UKismetSystemLibrary::IsDedicatedServer(WorldContext);
 }
 
+TScriptInterface<IInterface> UMounteaInventorySystemStatics::GetInterfaceByType(const TScriptInterface<IInterface>& Interface, const TSubclassOf<UInterface> InterfaceFilter, bool& bResult)
+{
+	TScriptInterface<IInterface> result = nullptr;
+	bResult = false;
+	if (Interface.GetObject() == nullptr) 
+		return result;
+	
+	if (!Interface.GetObject()->GetClass()->ImplementsInterface(InterfaceFilter)) 
+		return result;
+	
+	UObject* interfaceObject = Interface.GetObject();
+	result.SetObject(interfaceObject);
+	result.SetInterface(static_cast<IInterface*>(interfaceObject->GetInterfaceAddress(InterfaceFilter)));
+	bResult = true;
+	return result;
+}
+
 UObject* UMounteaInventorySystemStatics::GetObjectByClass(UObject* Object, const TSubclassOf<UObject> ClassFilter, bool& bResult)
 {
 	bResult = false;
 
-	if (ClassFilter == nullptr) return nullptr;
-	if (Object == nullptr) return nullptr;
-	if (!Object->IsA(ClassFilter)) return nullptr;
+	if (ClassFilter == nullptr) 
+		return nullptr;
+	if (Object == nullptr) 
+		return nullptr;
+	if (!Object->IsA(ClassFilter)) 
+		return nullptr;
 
 	bResult = true;
 	return Object;
