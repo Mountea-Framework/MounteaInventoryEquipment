@@ -65,7 +65,7 @@ bool UMounteaAdvancedInventoryJsonStatics::IsSupportedJsonDefinitionFieldPinType
 		valuePinType.PinCategory == MounteaJsonDefinitionPinTypes::Struct;
 }
 
-static UObject* ResolveJsonObjectOuter(UObject* Target)
+static UObject* ResolveStaticsJsonObjectOuter(UObject* Target)
 {
 	return IsValid(Target) ? Target : GetTransientPackage();
 }
@@ -528,7 +528,7 @@ static bool ResolveJsonObjectDefinition(const FString& DefinitionKey, const FMou
 
 UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::CreateJsonObject(UObject* Target)
 {
-	return NewObject<UMounteaJsonObject>(ResolveJsonObjectOuter(Target));
+	return NewObject<UMounteaJsonObject>(ResolveStaticsJsonObjectOuter(Target));
 }
 
 UMounteaJsonObject* UMounteaAdvancedInventoryJsonStatics::ParseJsonObjectFromString(UObject* Target, const FString& JsonString)
@@ -1223,7 +1223,7 @@ static bool JsonValueToPropertyValue(const TSharedPtr<FJsonValue>& JsonValue, FP
 		bool bAllowNullObject = false;
 		if (JsonValue->Type == EJson::Object && objectProperty->PropertyClass->IsChildOf(UMounteaJsonObject::StaticClass()))
 		{
-			UMounteaJsonObject* jsonObjectValue = NewObject<UMounteaJsonObject>(ResolveJsonObjectOuter(Outer));
+			UMounteaJsonObject* jsonObjectValue = NewObject<UMounteaJsonObject>(ResolveStaticsJsonObjectOuter(Outer));
 			jsonObjectValue->SetSharedJsonObject(JsonValue->AsObject());
 			objectValue = jsonObjectValue;
 		}

@@ -36,13 +36,13 @@ namespace MounteaRecipeFlatModelTest
 {
     using FRecipeStatics = UMounteaAdvancedInventoryRecipeEditorStatics;
 
-    struct FFixture
+    struct FRecipeFlatFixture
     {
         UMounteaInventoryItemTemplate* Ingredient = NewObject<UMounteaInventoryItemTemplate>(GetTransientPackage());
         UMounteaInventoryItemTemplate* Result = NewObject<UMounteaInventoryItemTemplate>(GetTransientPackage());
         FGuid RecipeGuid = FGuid::NewGuid();
 
-        FFixture()
+        FRecipeFlatFixture()
         {
             Ingredient->Guid = FGuid::NewGuid();
             Ingredient->DisplayName = FText::FromString(TEXT("Flat model test ingredient"));
@@ -140,7 +140,7 @@ namespace MounteaRecipeFlatModelTest
     }
 
     bool CheckArchiveRoundTrip(FAutomationTestBase& Test, const TArray<uint8>& Bytes,
-        const FFixture& Fixture, const UMounteaRecipeTemplate* Original)
+        const FRecipeFlatFixture& Fixture, const UMounteaRecipeTemplate* Original)
     {
         FString recipeText, stationText, error;
         TArray<FString> bundledItems;
@@ -243,7 +243,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatDeserializeTest,
 
 bool FMounteaRecipeFlatDeserializeTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture;
+    FRecipeFlatFixture fixture;
     FString error;
     const auto json = fixture.Json();
     auto* expected = fixture.Recipe();
@@ -274,7 +274,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatRejectTest,
 
 bool FMounteaRecipeFlatRejectTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture;
+    FRecipeFlatFixture fixture;
     auto* unchanged = fixture.Recipe();
     // Distinct sentinel values detect partial mutation before a later validation failure.
     unchanged->RecipeGuid = FGuid::NewGuid();
@@ -390,7 +390,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatTemplateValidationTest,
 
 bool FMounteaRecipeFlatTemplateValidationTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture;
+    FRecipeFlatFixture fixture;
     FString error;
     auto* recipe = fixture.Recipe();
     TestTrue(TEXT("Valid duplicate requirements are editable"), FRecipeStatics::ValidateRecipeTemplate(recipe, error));
@@ -425,7 +425,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatZipParserTest,
 
 bool FMounteaRecipeFlatZipParserTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture;
+    FRecipeFlatFixture fixture;
     auto* expected = fixture.Recipe();
     if (!TestTrue(TEXT("Registered test station exists"), expected->RequiredCraftingPlace.IsValid())) return false;
     const FString taxonomy = FString::Printf(TEXT("[{\"name\":\"Test Forge\",\"tag\":\"%s\"}]"), *expected->RequiredCraftingPlace.ToString());
@@ -467,7 +467,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatExportRoundTripTest,
 bool FMounteaRecipeFlatExportRoundTripTest::RunTest(const FString& Parameters)
 {
     // All recipes/items remain transient. Only export archives are written to this unique Saved directory.
-    FFixture fixture;
+    FRecipeFlatFixture fixture;
     auto* first = fixture.Recipe();
     auto* second = fixture.Recipe();
     second->RecipeGuid = FGuid::NewGuid();
@@ -515,7 +515,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatDuplicateIdentityTest,
 
 bool FMounteaRecipeFlatDuplicateIdentityTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture;
+    FRecipeFlatFixture fixture;
     auto* source = fixture.Recipe();
     auto* normal = DuplicateObject<UMounteaRecipeTemplate>(source, GetTransientPackage(), FName(*FGuid::NewGuid().ToString(EGuidFormats::Digits)));
     if (TestNotNull(TEXT("Normal duplication creates a recipe"), normal))
@@ -539,7 +539,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaRecipeFlatAssetReimportTest,
 
 bool FMounteaRecipeFlatAssetReimportTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture; // Every item and recipe identity is freshly generated for this run.
+    FRecipeFlatFixture fixture; // Every item and recipe identity is freshly generated for this run.
     auto* source = fixture.Recipe();
     auto* first = DuplicateObject<UMounteaRecipeTemplate>(source, NewObject<UMounteaRecipeTemplate>(GetTransientPackage()), TEXT("SameNamedRecipe"));
     auto* second = DuplicateObject<UMounteaRecipeTemplate>(source, NewObject<UMounteaRecipeTemplate>(GetTransientPackage()), TEXT("SameNamedRecipe"));
