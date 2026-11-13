@@ -66,6 +66,26 @@ public:
 		DisplayName="Get Widget Commands Types")
 	static FString GetWidgetCommandsTypes(const FString& Command);
 
+	/**
+	 * Forwards UI input to a child widget when the input tag, target widget, shared HUD subsystem, and widget state are valid.
+	 *
+	 * Validates the input tag, target widget, and shared HUD subsystem before dispatching the input. If validation fails,
+	 * adds a descriptive message to OutErrors and returns false. If the target widget is not in a state that should consume
+	 * input, returns false without adding an error. When all checks pass, calls the target widget input consumption handler.
+	 *
+	 * @param InputTag Gameplay tag identifying the input action to forward.
+	 * @param InputPayload Payload data associated with the input action.
+	 * @param DeltaTime Time elapsed since the previous frame.
+	 * @param Target Widget intended to receive and consume the input.
+	 * @param OutErrors Collection populated with validation errors encountered while attempting to forward the input.
+	 * @return true if the input was successfully passed to the target widget; false if validation failed or the widget should not consume input.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager|Commands",
+		meta=(MounteaSetter),
+		meta=(MounteaCommand),
+		DisplayName="Pass Input To Child Widget")
+	static bool PassInputToChildWidget(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& InputPayload, const float DeltaTime, UPARAM(meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaInventoryGenericWidgetInterface")) UWidget* Target, TArray<FString>& OutErrors);
+
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Manager",
 		meta=(MounteaSetter),
 		meta=(ExpandBoolAsExecs="ReturnValue"),

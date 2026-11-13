@@ -22,7 +22,9 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 #include "Interfaces/UserInterface/MounteaAdvancedInventorySharedHUDInterface.h"
+#include "Interfaces/Widgets/MounteaInventoryGenericWidgetInterface.h"
 #include "Interfaces/Widgets/MounteaInventorySystemWrapperWidgetInterface.h"
+#include "Logs/MounteaAdvancedInventoryLog.h"
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Subsystems/MounteaAdvancedInventorySharedHUDSubsystem.h"
@@ -56,6 +58,48 @@ bool UMounteaInventoryBaseUIStatics::IsValidBaseUIHandler(const UObject* Target)
 FString UMounteaInventoryBaseUIStatics::GetWidgetCommandsTypes(const FString& Command)
 {
 	return Command.IsEmpty() ? TEXT("All") : Command;
+}
+
+bool UMounteaInventoryBaseUIStatics::PassInputToChildWidget(const FGameplayTag& InputTag, const FMounteaWidgetInputPayload& InputPayload, const float DeltaTime, UWidget* Target, TArray<FString>& OutErrors)
+{
+	if (!InputTag.IsValid())
+	{
+		LOG_WARNING(TEXT("Invalid input tag"))
+		OutErrors.Add(TEXT("Invalid input tag"));
+		return false;
+	}
+	
+	if (!IsValid(Target))
+	{
+		LOG_WARNING(TEXT("Invalid Target Widget"))
+		OutErrors.Add(TEXT("Invalid Target Widget"));
+		return false;
+	}
+	
+	if (!Target->Implements<UMounteaInventoryGenericWidgetInterface>())
+	{
+		LOG_WARNING(TEXT("Target widget does not implement IMounteaInventoryGenericWidgetInterface"))
+		OutErrors.Add(TEXT("Target widget does not implement IMounteaInventoryGenericWidgetInterface"));
+		return false;
+	}
+	
+	const auto subsystem = GetSharedHUDSubsystem(Target);
+	if (!IsValid(subsystem))
+	{
+		LOG_WARNING(TEXT("Invalid SharedHUDSubsystem"))
+		OutErrors.Add(TEXT("Invalid SharedHUDSubsystem"));
+		return false;
+	}
+	
+	const auto widgetTag = IMounteaInventoryGenericWidgetInterface::Execute_GetWidgetTag(Target);
+	if (!subsystem->Execute_HasWidgetStateTag(subsystem, widgetTag, true))
+	{
+		LOG_INFO(TEXT("%s should not consume input, this is OK"), *Target->GetName());
+		return false;
+	}
+	
+	IMounteaInventoryGenericWidgetInterface::Execute_ConsumeUIInput(Target, InputTag, InputPayload, DeltaTime);
+	return true;
 }
 
 UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryBaseUIStatics::GetSharedHUDSubsystem(UObject* Context)
