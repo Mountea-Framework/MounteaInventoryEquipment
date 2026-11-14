@@ -259,10 +259,12 @@ public:
 		meta=(NoResetToDefault),
 		meta=(DisplayPriority=28))
 	TSet<TSoftClassPtr<UObject>> ItemSpecialAffects;
-	
+		
 protected:
 	
-	// JSON manifest of the Inventory Item.
+	/**
+	 * JSON Manifest of the Inventory Item Template.
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Technical Data", AdvancedDisplay,
 		meta=(Multiline), 
 		meta=(NoResetToDefault),

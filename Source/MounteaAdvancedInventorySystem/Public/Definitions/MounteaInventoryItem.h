@@ -76,10 +76,9 @@ public:
 public:
 	
 	FMounteaInventoryItem();
-	FMounteaInventoryItem(const FGuid& ItemGuid) : Guid(ItemGuid) {};
-	explicit FMounteaInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity = 1,
-							const float InDurability = 1.f,
-							TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory = nullptr);
+	FMounteaInventoryItem(const FGuid& ItemGuid) : Guid(ItemGuid)
+	{};
+	explicit FMounteaInventoryItem(UMounteaInventoryItemTemplate* InTemplate, const int32 InQuantity = 1, const float InDurability = 1.f, TScriptInterface<IMounteaAdvancedInventoryInterface> InOwningInventory = nullptr);
 	
 	/*************************************************************/
 	/*************** CORE FUNCTIONALITY ******************/
@@ -144,7 +143,10 @@ public:
 	 *
 	 * @return Owning Inventory of this Item. Could be null!
 	 */
-	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const { return OwningInventory; }
+	TScriptInterface<IMounteaAdvancedInventoryInterface> GetOwningInventory() const
+	{
+		return OwningInventory;
+	}
 
 	/**
 	 * Retrieves the short description of the inventory item.
