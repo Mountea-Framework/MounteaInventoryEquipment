@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .cls-1{fill:none;stroke:#d94a4a;stroke-width:2;stroke-miterlimit:10}
+    </style>
+  </defs>
+  <title>V3_Wireframe</title>
+  <g id="Wrapper">
+    <rect id="header_slot" x="0" y="0" width="1920" height="80" class="cls-1"/>
+    <rect id="footer_slot" x="0" y="1017.362" width="1920" height="62.638" class="cls-1"/>
+    <rect id="notifications_slot" x="1470" y="0" width="450" height="1080" class="cls-1"/>
+    <rect id="inventory_slot" x="0" y="0" width="1920" height="1080" class="cls-1"/>
+    <rect id="crafting_slot" x="0" y="0" width="1920" height="1080" class="cls-1"/>
+    <rect id="merchant_slot" x="0" y="0" width="1920" height="1080" class="cls-1"/>
+    <rect id="modals_slot" x="690" y="370" width="540" height="340" class="cls-1"/>
+  </g>
+  <g id="Inventory">
+    <rect id="categories_slot" x="0" y="80" width="238.73" height="937.362" class="cls-1"/>
+    <rect id="items_slot" x="238.73" y="80" width="548.228" height="937.362" class="cls-1"/>
+    <rect id="item_panel_slot" x="922.066" y="80" width="814.114" height="937.362" class="cls-1"/>
+  </g>
+  <g id="Crafting">
+    <rect id="categories_slot-2" data-name="categories_slot" x="0" y="80" width="238.73" height="937.362" class="cls-1"/>
+    <rect id="recipes_slot" x="238.73" y="80" width="548.228" height="937.362" class="cls-1"/>
+    <rect id="item_panel_slot-2" data-name="item_panel_slot" x="922.066" y="80" width="814.114" height="937.362" class="cls-1"/>
+  </g>
+  <g id="Merchant">
+    <rect id="player_categories_slot" x="0" y="80" width="238.73" height="937.362" class="cls-1"/>
+    <rect id="merchant_categories_slot" x="1681.27" y="80" width="238.73" height="937.362" class="cls-1"/>
+    <rect id="player_items_slot" x="238.73" y="80" width="548.228" height="937.362" class="cls-1"/>
+    <rect id="merchant_items_slot" x="1133.042" y="80" width="548.228" height="937.362" class="cls-1"/>
+  </g>
+</svg>
