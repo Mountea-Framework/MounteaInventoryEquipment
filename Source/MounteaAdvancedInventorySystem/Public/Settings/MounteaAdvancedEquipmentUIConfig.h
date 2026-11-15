@@ -32,6 +32,7 @@ public:
 
 	/** Optional standalone equipment screen. Leave unset when equipment is embedded in the inventory screen. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Equipment",
+		meta=(MustImplement="/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryEquipmentWidgetInterface"),
 		meta=(NoResetToDefault),
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
