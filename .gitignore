@@ -218,3 +218,6 @@ crashinfo--*
 /Scripts
 /docs/investigations
 /docs/notes
+/.playwright-cli
+/Mocaps
+/output
