@@ -1,0 +1,1455 @@
+{
+  "renderer": {
+    "name": "resvg-py",
+    "version": "0.5.0",
+    "ai_generation": false
+  },
+  "entries": [
+    {
+      "output": "textures/mountea/amulet.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\amulet.png",
+      "sha256": "ba0f6b016cb04c6f2d0662a622afd969d2bc98ea5d523ce2b6b7ac2e3e4aa213",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 158,
+      "height": 158,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        12,
+        10,
+        145,
+        148
+      ]
+    },
+    {
+      "output": "textures/mountea/armor.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\armor.png",
+      "sha256": "eec0181aee5f95a6dd5e6e26afae7092462f0a0a444bd49a5387e163d2ce931e",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 151,
+      "height": 151,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        10,
+        10,
+        141,
+        140
+      ]
+    },
+    {
+      "output": "textures/mountea/book.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\book.png",
+      "sha256": "bd8e1badd5b8884441a262f5647c51acd9991636b18ca8579fa20aee75358192",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 159,
+      "height": 159,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        14,
+        10,
+        145,
+        149
+      ]
+    },
+    {
+      "output": "textures/mountea/boots.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\boots.png",
+      "sha256": "438c52e34639bd76dd87d515ae061594477aabd15a0b775f6aeedfe0d892a7ad",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 148,
+      "height": 148,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        10,
+        12,
+        138,
+        135
+      ]
+    },
+    {
+      "output": "textures/mountea/gloves.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\gloves.png",
+      "sha256": "cadd312ecd0ecf4d86e52b3f4fb08fc3dae554edd8446db9a6d3a39027bbcd1b",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 132,
+      "height": 132,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        10,
+        10,
+        122,
+        122
+      ]
+    },
+    {
+      "output": "textures/mountea/helm.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\helm.png",
+      "sha256": "3aad7ac6a007dc8f36bbc641d43059e28ec96401ca34961d956077d67e3333e1",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 165,
+      "height": 165,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        27,
+        10,
+        137,
+        155
+      ]
+    },
+    {
+      "output": "textures/mountea/herb.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\herb.png",
+      "sha256": "bd7f80685e8b7184b2697b395038d1aa39548f3e6f7e1fb0a604c27c139d0484",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 168,
+      "height": 168,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        10,
+        138,
+        158
+      ]
+    },
+    {
+      "output": "textures/mountea/ingot.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\ingot.png",
+      "sha256": "af3f4c0f2f0234b83de63987d253bd17ec3a66f05f2fc8959b0d517d4ca3a54b",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 163,
+      "height": 163,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        10,
+        38,
+        153,
+        124
+      ]
+    },
+    {
+      "output": "textures/mountea/key.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\key.png",
+      "sha256": "a8e7b1cf55ac9b5d6b7a663e749704f8e069880070c8760662c5b352687e41f8",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 169,
+      "height": 169,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        10,
+        18,
+        159,
+        151
+      ]
+    },
+    {
+      "output": "textures/mountea/map.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\map.png",
+      "sha256": "fc2720bb6d54c3e0a147d3b8a2b3966882c029bac0fb3f5d01c072819f1129ce",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 192,
+      "height": 192,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        35,
+        10,
+        156,
+        182
+      ]
+    },
+    {
+      "output": "textures/mountea/material.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\material.png",
+      "sha256": "50f8088c7e33335fa8ffaedabf8d6a0ee1a4421fa797e206b033d711cae8218a",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 171,
+      "height": 171,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        10,
+        15,
+        161,
+        155
+      ]
+    },
+    {
+      "output": "textures/mountea/oil.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\oil.png",
+      "sha256": "2bd63fb1038198bbfb4eb12de7dd0fa814abb2f855c3d9c6a652002b66d30870",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 146,
+      "height": 146,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        24,
+        10,
+        121,
+        136
+      ]
+    },
+    {
+      "output": "textures/mountea/pants.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\pants.png",
+      "sha256": "dd9a6f5f60582790113863d20c85c27cb5325550e31f7abdf61b36ddf7212d60",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 170,
+      "height": 170,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        44,
+        10,
+        125,
+        160
+      ]
+    },
+    {
+      "output": "textures/mountea/potion.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\potion.png",
+      "sha256": "5554e298c4fe0067a516d08e5d97578703f3deadd6d81f3e1390e307ed26474e",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 158,
+      "height": 158,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        35,
+        10,
+        123,
+        148
+      ]
+    },
+    {
+      "output": "textures/mountea/quest.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\quest.png",
+      "sha256": "5d43794d82e5de700091dd917fc10223db2c0ae725a3439066e29ed3332f7371",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 136,
+      "height": 136,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        24,
+        10,
+        112,
+        126
+      ]
+    },
+    {
+      "output": "textures/mountea/ring.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\ring.png",
+      "sha256": "87228c3db34bb74f6d6d574d5a56bf2670a5a00a0214fa08574e9303cc235433",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 145,
+      "height": 145,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        12,
+        10,
+        133,
+        135
+      ]
+    },
+    {
+      "output": "textures/mountea/scroll.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\scroll.png",
+      "sha256": "1ac7d87868c26de1eb418539de12c729888e912d8bc30e4359d936bd6b182b42",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 171,
+      "height": 171,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        23,
+        10,
+        148,
+        161
+      ]
+    },
+    {
+      "output": "textures/mountea/shield.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\shield.png",
+      "sha256": "cfce77708ba418be79daa25e7ddc58268790f1158b459276b10d1d1517753ab3",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 189,
+      "height": 189,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        10,
+        160,
+        179
+      ]
+    },
+    {
+      "output": "textures/mountea/staff.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\staff.png",
+      "sha256": "f052f42c41f3df0f4bcc0cfbfa1f34db686ad55a3096efc27d28af462d7f37a6",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 160,
+      "height": 160,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        24,
+        10,
+        136,
+        150
+      ]
+    },
+    {
+      "output": "textures/mountea/weapon.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\mountea\\weapon.png",
+      "sha256": "b2ba17b195d59a2fe50377fe5655617fdefffb64eb18baf2485c5cb7e63cd51e",
+      "license": {
+        "status": "user-created",
+        "evidence": "D:\\Repos\\InventoryDemo\\ui\\data\\v3-list-icons.js:1",
+        "description": "Source states silhouettes are from user-created MounteaIconsSheet.psd; no separate license file supplied."
+      },
+      "conversion": "Byte-for-byte copy; original dimensions preserved",
+      "width": 161,
+      "height": 161,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        11,
+        10,
+        150,
+        151
+      ]
+    },
+    {
+      "output": "textures/skyrim/misc_gem.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\skyrim\\misc_gem.svg",
+      "sha256": "d7123351040c3493335e397349f11faa4aa933c1a89457f4ab405612fe2551b3",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "resvg-py vector rasterization, 512px width; aspect ratio retained; centered on 512x512 transparent canvas",
+      "saved_vector_source": "sources/svg/misc_gem.svg",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        0,
+        35,
+        511,
+        476
+      ]
+    },
+    {
+      "output": "textures/skyrim/misc_leather.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\assets\\v3\\skyrim\\misc_leather.svg",
+      "sha256": "b2e0023033d339efb9a545adb82c77e77e91d13282e3b9d6d2677c79ac2e2189",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "resvg-py vector rasterization, 512px width; aspect ratio retained; centered on 512x512 transparent canvas",
+      "saved_vector_source": "sources/svg/misc_leather.svg",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        9,
+        66,
+        502,
+        445
+      ]
+    },
+    {
+      "output": "textures/inline/sword.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.sword",
+      "sha256": "72da0c4b0cf2b5562c223c5593375f0c3627f1f98856c562d2bbbd57c755ccf4",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_sword.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        50,
+        50,
+        462,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/axe.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.axe",
+      "sha256": "3282df3d52aa967f2cc0560e56d25ab0397afa9377c5e5dab6df72dc83f68873",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_axe.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        26,
+        50,
+        483,
+        464
+      ]
+    },
+    {
+      "output": "textures/inline/shield.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.shield",
+      "sha256": "bc8dacb3fbb3ad3253c30dd38b38f47d1da4b26946d7eb1cda676d4601799372",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_shield.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        72,
+        29,
+        440,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/shirt.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.shirt",
+      "sha256": "111240ceedd16203240a75cf33dcf9991948c57b85e1bad9f8fd57abb74221a0",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_shirt.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        34,
+        29,
+        478,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/helm.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.helm",
+      "sha256": "95cb81be2bdf63aab6ce2d8943e3debecbce30b432cf0083d6197e815b19b181",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_helm.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        72,
+        483,
+        419
+      ]
+    },
+    {
+      "output": "textures/inline/boots.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.boots",
+      "sha256": "7d34d02b5ad68ebf88871edc9df3f8b05c605bc10a4c76770c7dcebaa7d39c58",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_boots.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        50,
+        29,
+        462,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/ring.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.ring",
+      "sha256": "294e67401001a628af3d6c59514ee1a869a27b962e96a68a1f5214b74b0649ac",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_ring.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        114,
+        50,
+        398,
+        419
+      ]
+    },
+    {
+      "output": "textures/inline/flask.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.flask",
+      "sha256": "077743610496ed3d2b5647f391bddaacfd13308e1f111a3389c05666c2748455",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_flask.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        85,
+        29,
+        427,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/beaker.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.beaker",
+      "sha256": "1269f03d4eec227d4a9c7d8c59a062cae1d8ef5f357bd2bc487166afdee61d25",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_beaker.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        93,
+        29,
+        419,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/gem.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.gem",
+      "sha256": "dd6cff9e21a386378dab5255328c3187a8a8a8c5b7259a9fed7d43f918c7b711",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_gem.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        50,
+        483,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/box.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.box",
+      "sha256": "96986ed76fbdff1e277cc737b751c0ffbdd7ce121b6cb530c501bfe720fd3913",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_box.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        50,
+        29,
+        462,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/layers.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.layers",
+      "sha256": "b8421db7922eee8119754a7c9a74d4732cac113125ba99f2b74c4364b6eb4b43",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_layers.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        29,
+        483,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/leaf.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.leaf",
+      "sha256": "502aa529a7d5763111f6d6632bbf358fb9b4ef33345b0fbf200bc0f25783aaeb",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_leaf.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        29,
+        462,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/scroll.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.scroll",
+      "sha256": "b24170185631c1eb0418a9ab41e468612f9b85e216fd9ac3cb5447ec68d2bf95",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_scroll.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        50,
+        483,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/key.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.key",
+      "sha256": "b4b1629c5ad3a5b4e5e6e2de22c0cc0ca85133672c83c0a594195a438285f4f7",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_key.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        29,
+        474,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/hammer.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.hammer",
+      "sha256": "eab3f32628baf2a5867ba99c557247d3bbcf10332aee5872b4c431bef7b5f0f2",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_hammer.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        48,
+        49,
+        483,
+        464
+      ]
+    },
+    {
+      "output": "textures/inline/wand.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.wand",
+      "sha256": "f55624e15d9474c2c9b2a0cbedd22cf176e099d993d6d4f31bad1448e0fd0490",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_wand.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        50,
+        29,
+        483,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/hand.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.hand",
+      "sha256": "f3454f5b499b8e33721f04d2684fab0c175084801f91fbb9de4bca2af7f8abc2",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_hand.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        27,
+        29,
+        483,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/crown.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.crown",
+      "sha256": "be9c84c1bca4acfa3cf778cf3a65d0fb4bb82a56eb09ba7672afe716a5315c13",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_crown.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        50,
+        483,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/amulet.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.amulet",
+      "sha256": "edfad0df5d054e55359344013bdd34f1668d4e8f6c45f9886a8e59ed02b94388",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_amulet.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        93,
+        50,
+        419,
+        440
+      ]
+    },
+    {
+      "output": "textures/inline/legs.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.legs",
+      "sha256": "cb5aa8dd0983c414c2f33638b75160972857da66b99a01ff2bfcf233c0c5464f",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_legs.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        114,
+        50,
+        398,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/backpack.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.backpack",
+      "sha256": "9d59e759d281a3dec8090b5ad71fbbd9bf5ce5e570c51e19546b2637e97ae460",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_backpack.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        72,
+        29,
+        440,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/anvil.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.anvil",
+      "sha256": "2232bb2c11a9c720f1157a40b65a342bbe6d8fa2b6ac9e3273bdf187a58bff24",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_anvil.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        72,
+        483,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/store.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.store",
+      "sha256": "d644c06d373a831c43488974e9cb44bd171efcac75433a0ea79a35713e361f69",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_store.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        50,
+        72,
+        462,
+        440
+      ]
+    },
+    {
+      "output": "textures/inline/user.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.user",
+      "sha256": "0c6e3a304d022f3b4a020c8eb91a7a976cdf35e306f84f10af43874cefc5c22b",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_user.svg",
+      "stroke_width": 1.5,
+      "used_directly_in_v3": true,
+      "role": "Equipped row marker",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        90,
+        48,
+        422,
+        464
+      ]
+    },
+    {
+      "output": "textures/inline/coins.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.coins",
+      "sha256": "dd4028be0f5e38a7e528e2c0b8d2cbe0d518df29070d0e795954b069fce4ca2b",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_coins.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        29,
+        483,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/weight.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.weight",
+      "sha256": "d64ae8dd203bfdb573e173e1fcd17258555c9f1fefe7f7f02e521dd3992751d1",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_weight.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        30,
+        29,
+        483,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/book.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.book",
+      "sha256": "c1fc847e2149a99040e0d9619f4661ec4c6094675844a5e869b540bce2bf2596",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_book.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        29,
+        50,
+        483,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/flame.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.flame",
+      "sha256": "eebd0c60720fad76487aa23666fcfc1585ee846d37c8547bba85830760836955",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_flame.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        93,
+        50,
+        419,
+        483
+      ]
+    },
+    {
+      "output": "textures/inline/down.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.down",
+      "sha256": "8f44165ed4c727000ade8612c64795d9f3e23f4f56eebae0c39c9e81d4c7483f",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_down.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        93,
+        93,
+        419,
+        419
+      ]
+    },
+    {
+      "output": "textures/inline/star.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.star",
+      "sha256": "3cad2f3020b7b79cae5184a047fff91495cbd867e343636cc4102790f58e3640",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_star.svg",
+      "stroke_width": 1.5,
+      "used_directly_in_v3": true,
+      "role": "Favourite row marker",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        26,
+        26,
+        486,
+        466
+      ]
+    },
+    {
+      "output": "textures/inline/lock.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.lock",
+      "sha256": "119b88eda8f2d9c5bab432bc8316b77cd02a41342924aee51c92eb65191e92fa",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_lock.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        93,
+        29,
+        419,
+        462
+      ]
+    },
+    {
+      "output": "textures/inline/x.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.x",
+      "sha256": "61033d949624ba8ca7e603f24352b07803c1e2eb81a1be6040731e14d273cf64",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_x.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        114,
+        114,
+        398,
+        398
+      ]
+    },
+    {
+      "output": "textures/inline/sort.png",
+      "source": "D:\\Repos\\InventoryDemo\\ui\\data\\icons.js IC.sort",
+      "sha256": "872ccd884cc67ebd8d103a0d201d6f8c697e0b5f6ab89cfb76a5e116a7206175",
+      "license": {
+        "status": "not supplied in local source",
+        "description": "Preserved user-provided design source; redistribution license not independently established."
+      },
+      "conversion": "Exact local SVG paths; currentColor resolved to white for UMG tinting; resvg-py vector rasterization at 512x512 transparent RGBA",
+      "saved_vector_source": "sources/svg/inline_sort.svg",
+      "stroke_width": 1.25,
+      "used_directly_in_v3": false,
+      "role": "Reusable shared icon; preview art excluded",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "content_bounds": [
+        50,
+        72,
+        462,
+        440
+      ]
+    }
+  ]
+}
