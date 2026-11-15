@@ -112,7 +112,6 @@ namespace MounteaLoadoutExchangeTest
         return true;
     }
 }
-using namespace MounteaLoadoutExchangeTest;
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaLoadoutExportRoundTripTest,
     "Mountea.InventorySystemEditor.LoadoutExchange.SingleAndBundleRoundTrip",
@@ -123,17 +122,17 @@ bool FMounteaLoadoutExportRoundTripTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("New native loadouts have an exportable GUID"), native->Guid.IsValid());
     auto* duplicated = DuplicateObject<UMounteaAdvancedInventoryLoadoutConfig>(native, GetTransientPackage());
     TestTrue(TEXT("Duplicated native loadouts receive a distinct GUID"), duplicated->Guid.IsValid() && duplicated->Guid != native->Guid);
-    FFixture fixture;
+    MounteaLoadoutExchangeTest::FFixture fixture;
     auto* first = fixture.Loadout(); auto* second = fixture.Loadout();
     second->Items[1]->BaseQuantity = 8;
-    FFiles files;
+    MounteaLoadoutExchangeTest::FFiles files;
     if (!TestTrue(TEXT("Create isolated Saved directory"), IFileManager::Get().MakeDirectory(*files.Directory, true))) return false;
     for (const bool bundle : { false, true })
     {
         const FString path = files.Path(bundle ? TEXT("bundle.mntealoadouts") : TEXT("single.mntealoadout"));
         const TArray<UMounteaAdvancedInventoryLoadoutConfig*> selection = bundle ? TArray<UMounteaAdvancedInventoryLoadoutConfig*> { first, second } : TArray<UMounteaAdvancedInventoryLoadoutConfig*> { first };
         FString error;
-        if (!TestTrue(TEXT("Export loadout selection"), FStatics::ExportLoadoutsToFilePath(selection, path, error))) { AddError(error); return false; }
+        if (!TestTrue(TEXT("Export loadout selection"), MounteaLoadoutExchangeTest::FStatics::ExportLoadoutsToFilePath(selection, path, error))) { AddError(error); return false; }
         TArray<TArray<uint8>> archives;
         if (!TestTrue(TEXT("Read common exchange contract"), FMounteaInventoryZipHelper::ReadEntityArchives(path, TEXT("mntealoadout"), TEXT("mntealoadouts"), archives, error))) return false;
         TestEqual(TEXT("Archive selection count"), archives.Num(), selection.Num());
@@ -141,18 +140,18 @@ bool FMounteaLoadoutExportRoundTripTest::RunTest(const FString& Parameters)
         for (const auto& archive : archives)
         {
             FString jsonText; TArray<FString> items;
-            if (!TestTrue(TEXT("Parse loadout archive"), FStatics::ParseLoadoutFromZip(archive, jsonText, items, error))) return false;
+            if (!TestTrue(TEXT("Parse loadout archive"), MounteaLoadoutExchangeTest::FStatics::ParseLoadoutFromZip(archive, jsonText, items, error))) return false;
             TestEqual(TEXT("Shared template bundled once"), items.Num(), 1);
             TSharedPtr<FJsonObject> json;
             if (!TestTrue(TEXT("Loadout JSON parses"), FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(jsonText), json))) return false;
             TestFalse(TEXT("Export has no root slots representation"), json->HasField(TEXT("slots")));
             TestEqual(TEXT("Export stores durability as fraction"), json->GetArrayField(TEXT("items"))[0]->AsObject()->GetNumberField(TEXT("durability")), 0.25);
             auto* restored = NewObject<UMounteaAdvancedInventoryLoadoutConfig>();
-            if (!TestTrue(TEXT("Deserialize native loadout"), FStatics::DeserializeLoadoutFromJson(json, restored, { { fixture.Template->Guid, fixture.Template } }, error))) return false;
+            if (!TestTrue(TEXT("Deserialize native loadout"), MounteaLoadoutExchangeTest::FStatics::DeserializeLoadoutFromJson(json, restored, { { fixture.Template->Guid, fixture.Template } }, error))) return false;
             auto* expected = restored->Guid == first->Guid ? first : second;
             TestTrue(TEXT("Archive identity belongs to selection"), selection.Contains(expected) && restored->Guid == expected->Guid);
             seen.Add(restored->Guid);
-            Check(*this, restored, expected);
+            MounteaLoadoutExchangeTest::Check(*this, restored, expected);
             TestTrue(TEXT("Template pointer resolved from GUID map"), restored->Items[0]->ItemTemplate.Get() == fixture.Template);
         }
         TestEqual(TEXT("Every selection has distinct identity"), seen.Num(), selection.Num());
@@ -165,14 +164,14 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaLoadoutValidationTest,
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FMounteaLoadoutValidationTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture; auto* unchanged = fixture.Loadout();
+    MounteaLoadoutExchangeTest::FFixture fixture; auto* unchanged = fixture.Loadout();
     const FGuid originalGuid = unchanged->Guid; auto* originalRow = unchanged->Items[0].Get();
     const auto reject = [&](const TSharedPtr<FJsonObject>& json)
     {
         FString error;
-        TestFalse(TEXT("Invalid JSON rejects"), FStatics::ValidateLoadout(json, { fixture.Template->Guid }, error));
+        TestFalse(TEXT("Invalid JSON rejects"), MounteaLoadoutExchangeTest::FStatics::ValidateLoadout(json, { fixture.Template->Guid }, error));
         TestFalse(TEXT("Invalid JSON has an explanation"), error.IsEmpty());
-        TestFalse(TEXT("Invalid deserialize rejects"), FStatics::DeserializeLoadoutFromJson(json, unchanged, { { fixture.Template->Guid, fixture.Template } }, error));
+        TestFalse(TEXT("Invalid deserialize rejects"), MounteaLoadoutExchangeTest::FStatics::DeserializeLoadoutFromJson(json, unchanged, { { fixture.Template->Guid, fixture.Template } }, error));
         TestEqual(TEXT("Failure preserves GUID"), unchanged->Guid, originalGuid);
         TestEqual(TEXT("Failure preserves rows"), unchanged->Items.Num(), 2);
         TestTrue(TEXT("Failure preserves row instance"), unchanged->Items[0].Get() == originalRow);
@@ -188,7 +187,7 @@ bool FMounteaLoadoutValidationTest::RunTest(const FString& Parameters)
     { auto json = fixture.Json(); json->GetArrayField(TEXT("items"))[1]->AsObject()->GetObjectField(TEXT("ref"))->SetStringField(TEXT("guid"), FGuid::NewGuid().ToString()); reject(json); }
     { auto json = fixture.Json(); json->RemoveField(TEXT("items")); reject(json); }
     FString error; auto empty = fixture.Json(); empty->SetArrayField(TEXT("items"), {});
-    TestTrue(TEXT("Explicit empty loadout is valid"), FStatics::DeserializeLoadoutFromJson(empty, unchanged, {}, error));
+    TestTrue(TEXT("Explicit empty loadout is valid"), MounteaLoadoutExchangeTest::FStatics::DeserializeLoadoutFromJson(empty, unchanged, {}, error));
     TestTrue(TEXT("Empty loadout clears old rows"), unchanged->Items.IsEmpty());
     return true;
 }
@@ -197,10 +196,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaLoadoutAssetReimportTest,
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter)
 bool FMounteaLoadoutAssetReimportTest::RunTest(const FString& Parameters)
 {
-    FFixture fixture; auto* source = fixture.Loadout();
+    MounteaLoadoutExchangeTest::FFixture fixture; auto* source = fixture.Loadout();
     const auto existingItems = UMounteaAdvancedInventoryItemTemplateEditorStatics::LoadAllExistingTemplates();
     if (UMounteaAdvancedInventoryItemTemplateEditorStatics::FindTemplateByGuid(existingItems, fixture.Template->Guid) ||
-        FStatics::FindLoadoutByGuid(FStatics::LoadAllExistingLoadouts(), source->Guid))
+        MounteaLoadoutExchangeTest::FStatics::FindLoadoutByGuid(MounteaLoadoutExchangeTest::FStatics::LoadAllExistingLoadouts(), source->Guid))
     { AddError(TEXT("Fresh GUID already exists; refusing asset import")); return false; }
     struct FImportedAssets
     {
@@ -228,15 +227,15 @@ bool FMounteaLoadoutAssetReimportTest::RunTest(const FString& Parameters)
             if (!Assets().IsEmpty()) Test.AddError(TEXT("Could not remove isolated loadout assets"));
         }
     } importedAssets { *this };
-    FFiles files;
+    MounteaLoadoutExchangeTest::FFiles files;
     if (!TestTrue(TEXT("Create isolated export folder"), IFileManager::Get().MakeDirectory(*files.Directory, true))) return false;
     const FString path = files.Path(TEXT("import.mntealoadout"));
     FString error;
-    if (!TestTrue(TEXT("Export fresh native loadout"), FStatics::ExportLoadoutsToFilePath({ source }, path, error))) { AddError(error); return false; }
+    if (!TestTrue(TEXT("Export fresh native loadout"), MounteaLoadoutExchangeTest::FStatics::ExportLoadoutsToFilePath({ source }, path, error))) { AddError(error); return false; }
     TArray<UMounteaAdvancedInventoryLoadoutConfig*> imported;
-    if (!TestTrue(TEXT("Import as real assets"), FStatics::ImportLoadoutsFromFilePath(path, importedAssets.Folder, imported, error))) { AddError(error); return false; }
+    if (!TestTrue(TEXT("Import as real assets"), MounteaLoadoutExchangeTest::FStatics::ImportLoadoutsFromFilePath(path, importedAssets.Folder, imported, error))) { AddError(error); return false; }
     if (!TestEqual(TEXT("One loadout imported"), imported.Num(), 1)) return false;
-    Check(*this, imported[0], source);
+    MounteaLoadoutExchangeTest::Check(*this, imported[0], source);
     TestEqual(TEXT("Loadout and shared dependency created once"), importedAssets.Assets().Num(), 2);
     for (const auto& asset : importedAssets.Assets())
         TestTrue(TEXT("Imported package saved"), FPaths::FileExists(FPackageName::LongPackageNameToFilename(asset.PackageName.ToString(), FPackageName::GetAssetPackageExtension())));
@@ -245,13 +244,13 @@ bool FMounteaLoadoutAssetReimportTest::RunTest(const FString& Parameters)
     TestTrue(TEXT("Dependency resolves to imported asset"), imported[0]->Items[0]->ItemTemplate->GetOutermost()->GetName().StartsWith(importedAssets.Folder + TEXT("/")));
     source->Items[0]->BaseQuantity = 11;
     source->Items[0]->BaseDurability = 50;
-    if (!TestTrue(TEXT("Export changed same identity"), FStatics::ExportLoadoutsToFilePath({ source }, path, error))) { AddError(error); return false; }
+    if (!TestTrue(TEXT("Export changed same identity"), MounteaLoadoutExchangeTest::FStatics::ExportLoadoutsToFilePath({ source }, path, error))) { AddError(error); return false; }
     TArray<UMounteaAdvancedInventoryLoadoutConfig*> reimported;
-    if (!TestTrue(TEXT("Reimport existing identity"), FStatics::ImportLoadoutsFromFilePath(path, importedAssets.Folder, reimported, error))) { AddError(error); return false; }
+    if (!TestTrue(TEXT("Reimport existing identity"), MounteaLoadoutExchangeTest::FStatics::ImportLoadoutsFromFilePath(path, importedAssets.Folder, reimported, error))) { AddError(error); return false; }
     if (!TestEqual(TEXT("One loadout reimported"), reimported.Num(), 1)) return false;
     TestTrue(TEXT("Reimport updates same object"), reimported[0] == imported[0]);
     TestEqual(TEXT("Reimport retains package"), reimported[0]->GetOutermost()->GetName(), package);
-    Check(*this, reimported[0], source);
+    MounteaLoadoutExchangeTest::Check(*this, reimported[0], source);
     TestEqual(TEXT("Reimport creates no duplicate assets"), importedAssets.Assets().Num(), 2);
     return true;
 }
