@@ -21,6 +21,7 @@ class UMounteaAdvancedInventoryGlobalUIConfig;
 class UMounteaAdvancedInventoryGlobalConfig;
 class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedEquipmentSettingsConfig;
+class UMounteaAdvancedEquipmentUIConfig;
 class UInputMappingContext;
 class UMounteaAdvancedInventorySettingsConfig;
 class UMounteaAdvancedCraftingConfig;
@@ -92,6 +93,13 @@ public:
 		meta=(ForceShowPluginContent),
 		meta=(ForceShowEngineContent))
 	TSoftObjectPtr<UMounteaAdvancedEquipmentSettingsConfig> AdvancedEquipmentSettingsConfig;
+
+	/** References equipment presentation widget classes independently of the gameplay equipment configuration. */
+	UPROPERTY(Config, EditAnywhere, Category="Config",
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent),
+		DisplayName="Advanced Equipment UI Settings Config")
+	TSoftObjectPtr<UMounteaAdvancedEquipmentUIConfig> AdvancedEquipmentUISettingsConfig;
 	
 	/**
 	 * Holds a reference to the configuration settings for Mountea Advanced Inventory UI.

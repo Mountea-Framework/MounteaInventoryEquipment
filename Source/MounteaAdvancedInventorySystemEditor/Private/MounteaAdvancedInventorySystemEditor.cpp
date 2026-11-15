@@ -19,6 +19,7 @@
 
 #include "AssetActions/MounteaAdvancedEquipmentComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedEquipmentSettingsConfig_AssetAction.h"
+#include "AssetActions/MounteaAdvancedEquipmentUIConfig_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryCallbackInventoryItemAction_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryComponent_AssetAction.h"
 #include "AssetActions/MounteaAdvancedInventoryGlobalConfig_AssetAction.h"
@@ -129,6 +130,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 					{ TEXT("MounteaInventoryItemTemplate"), TEXT("MounteaInventoryItemTemplate") },
 					{ TEXT("MounteaAdvancedInventorySettingsConfig"), TEXT("MounteaAdvancedInventorySettingsConfig") },
 					{ TEXT("MounteaAdvancedEquipmentSettingsConfig"), TEXT("MounteaAdvancedEquipmentSettingsConfig") },
+					{ TEXT("MounteaAdvancedEquipmentUIConfig"), TEXT("MounteaAdvancedEquipmentSettingsConfig") },
 					{ TEXT("MounteaAdvancedInventoryThemeConfig"), TEXT("ThemeConfigClassIcon") },
 					{ TEXT("MounteaAdvancedInventoryInteractiveWidgetConfig"), TEXT("InteractiveWidgetConfigIcon") },
 					{ TEXT("MounteaAttachmentContainerComponent"), TEXT("AttachmentContainerIcon") },
@@ -187,6 +189,7 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryThemeConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryInteractiveWidgetConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentSettingsConfig_AssetAction>());
+		this->AssetActions.Add(MakeShared<FMounteaAdvancedEquipmentUIConfig_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryItemTemplate_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryComponent_AssetAction>());
 		AssetActions.Add(MakeShared<FMounteaAdvancedInventoryUIComponent_AssetAction>());
@@ -698,6 +701,21 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 											settings ? settings->AdvancedEquipmentSettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
 											errorMessage,
 											LOCTEXT("MounteaSystemEditor_EquipmentConfigButton_Error", "Unable to locate the Mountea Equipment Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
+									})
+								));
+								equipmentConfigSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+									"MounteaInventory_EquipmentUIConfig",
+									LOCTEXT("MounteaSystemEditor_EquipmentUIConfigButton_Label", "Mountea Advanced Equipment UI Config"),
+									LOCTEXT("MounteaSystemEditor_EquipmentUIConfigButton_ToolTip", "Open Mountea Equipment UI Configuration"),
+									FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config"),
+									FToolMenuExecuteAction::CreateLambda([](const FToolMenuContext&)
+									{
+										FText errorMessage;
+										const UMounteaAdvancedInventorySettings* settings = GetDefault<UMounteaAdvancedInventorySettings>();
+										UMounteaAdvancedInventorySystemEditorStatics::OpenConfig(
+											settings ? settings->AdvancedEquipmentUISettingsConfig.ToSoftObjectPath() : FSoftObjectPath(),
+											errorMessage,
+											LOCTEXT("MounteaSystemEditor_EquipmentUIConfigButton_Error", "Unable to locate the Mountea Equipment UI Config asset.\nPlease, open Inventory & Equipment Settings and select proper Config!"));
 									})
 								));
 							}),
