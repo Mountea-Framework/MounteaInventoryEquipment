@@ -1,0 +1,1804 @@
+{
+  "version": 1,
+  "source_root": "InventoryDemo/ui",
+  "pipeline": "SVG rasterization with resvg2.6.2; PNG normalization with Pillow; Tools/UIArtwork/prepare.py + import_unreal.py; native art imported separately",
+  "maximum_icon_dimension": 512,
+  "source_notes": "Sources are read-only. Raw byte hashes retain checkout line endings. Baseline comparisons normalize CRLF. Original HTML artwork paths below are relative to source_root; font source URLs pin Google Fonts revisions. PSD source is a portable library locator. Staging paths are intentionally omitted.",
+  "entries": [
+    {
+      "source": "assets/v4/interface/categories/inv_all.svg",
+      "source_sha256": "2e0f1b99da04cafc55fcc3d3c4e81f5da540effaca827d9614ae858121fec571",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_All",
+      "output_sha256": "765e9e7373d9e006cce2589b0b7488162c92c1fc9408b16caabf533dcc4f4864",
+      "output_size": [
+        185,
+        185
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          185,
+          185
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        307.711,
+        287.23,
+        184.578,
+        184.578
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/categories/inv_weapons.svg",
+      "source_sha256": "44157d79bba9951d3cce2cbcd3742d72985ed83c24d8bf482b4facb22b9e85aa",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Weapon",
+      "output_sha256": "e0217efcc80414d9c1b23ac13303f3388f92d338862c3a8651978649c9811423",
+      "output_size": [
+        114,
+        117
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          114,
+          117
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        114.0,
+        117.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/categories/inv_armor.svg",
+      "source_sha256": "1dd10965b19d461dad2d7ac9a3d00463661aec4864537be43387353daa0ab49e",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Armor",
+      "output_sha256": "22d1471f64316549007b26f59a24214a305ebbbde1b5bc72cc02811ec94e0e0a",
+      "output_size": [
+        512,
+        512
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          512,
+          512
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        126.158,
+        138.708,
+        1000.58,
+        1000.58
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/categories/jewelry.svg",
+      "source_sha256": "5df0b434862bed5af41376b9ca897ca3840c2df75fa5977ce679a08ab5bfb655",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Jewellery",
+      "output_sha256": "4f14ca8d664ba754b8e75ec3895a2cf44ea9d59e87a91d62280bfaa16ca02e33",
+      "output_size": [
+        54,
+        54
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          54,
+          54
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        391.602,
+        373.519,
+        53.5099,
+        53.5099
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/categories/inv_potions.svg",
+      "source_sha256": "eec7092703484dc9318f4d6d32ab4b9f08a31707a1fa5b351f86b8aa886475c9",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Consumable",
+      "output_sha256": "d760c4a87660ac7166ae1dc78bf6ce00097d09efa20b539990be10cdfee932c7",
+      "output_size": [
+        359,
+        359
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          359,
+          359
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        593.394,
+        462.007,
+        359.381,
+        359.381
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/categories/inv_ingredients.svg",
+      "source_sha256": "f84a19cd0dc5066ea59707c381634cb72ebef6f3a9e73572b7e777dc607a6471",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Material",
+      "output_sha256": "e322e9f9d5cdb9f05ce5202cb8b3199ff7334a7b0184ddf36b648f9aa51c9652",
+      "output_size": [
+        227,
+        227
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          227,
+          227
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        227.0,
+        227.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/categories/inv_books.svg",
+      "source_sha256": "5a62c31bb752e4522b28b900aadf09609e2d5e47b6e714f749ddbd61d38b0e7a",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Recipe",
+      "output_sha256": "07d9ab7af4e26e40553c142b0ec46485facbc88e81dba08a6cbc7e03bc3e8778",
+      "output_size": [
+        208,
+        208
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          208,
+          208
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        296.0,
+        296.0,
+        208.0,
+        208.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/status/quest_item.svg",
+      "source_sha256": "e1fffdb0f06976d382f9ec5e8e218ab9b45a221a346b7420bf2c0800abcd8cea",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Quest",
+      "output_sha256": "43426d131e4a3066f46d6592528085e3e020416742905a13a1dd5a8b3820825e",
+      "output_size": [
+        129,
+        129
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          129,
+          129
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        -0.40166,
+        -1.43716,
+        128.916,
+        128.916
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/effects/damage.svg",
+      "source_sha256": "2a710eef75c09291ee625bee25178fefffcbd80ad13423c2394316d97773f565",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Status/T_V4_Status_Damage",
+      "output_sha256": "6fbbe7ed330becc8fd542e3a4c6b1fcdda1e6a2d2bf4216310d1cb2f83c980d6",
+      "output_size": [
+        128,
+        128
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          128,
+          128
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        128.0,
+        128.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/effects/armor.svg",
+      "source_sha256": "1dd10965b19d461dad2d7ac9a3d00463661aec4864537be43387353daa0ab49e",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Status/T_V4_Status_Armor",
+      "output_sha256": "22d1471f64316549007b26f59a24214a305ebbbde1b5bc72cc02811ec94e0e0a",
+      "output_size": [
+        512,
+        512
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          512,
+          512
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        126.158,
+        138.708,
+        1000.58,
+        1000.58
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/status/best_in_class.svg",
+      "source_sha256": "c591ae9008ade9e518b0c532dfd314a348a091da5c000d5de0004c43fc7aec3b",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Status/T_V4_Status_Crit",
+      "output_sha256": "abfd4d242661530bf8b95a39d89700290f1c5f825b40628baae13dd2e02881aa",
+      "output_size": [
+        93,
+        93
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          93,
+          93
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        348.673,
+        185.511,
+        92.793,
+        92.793
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/effects/stamina_regen.svg",
+      "source_sha256": "f534b1987d8e7f04c1ee2a818ef5a3047e9f9c68b360b163118bdd135d590f36",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Status/T_V4_Status_Stamina",
+      "output_sha256": "3613bfbf31f6850b3d4455cd3134ddfa9347ab931648f7f891d3b08f918fd1e5",
+      "output_size": [
+        128,
+        128
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          128,
+          128
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        128.0,
+        128.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/effects/carryweight.svg",
+      "source_sha256": "5ddaf08c94a1c565bddb4c74e68fe279fb0d82070cfdfd4da759f9c2365e0045",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Status/T_V4_Status_Weight",
+      "output_sha256": "0ce3b471cc0f19b3757df5c47cb0b318b5cd0537744525e488c205cd6a18247f",
+      "output_size": [
+        113,
+        113
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          113,
+          113
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        8.74965,
+        9.3591,
+        113.301,
+        113.301
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/misc_gold.svg",
+      "source_sha256": "69bbfa379299bb3d041c85b883a38971fd13bdeb9e27532e7a8ba1b1a7e751ff",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Status/T_V4_Status_Coins",
+      "output_sha256": "449f943559cdb578ce7f097e7335c254fb9c91499ba969cf1bf5cd11f4445527",
+      "output_size": [
+        192,
+        192
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          192,
+          192
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        304.315,
+        308.964,
+        192.435,
+        192.435
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/armor_head.svg",
+      "source_sha256": "2fadafab08e919a583d553e300e12093d356eeb78e1c558b5708794ed0a3c157",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Head",
+      "output_sha256": "804a930ce0ec3b8332425ef4ea46dc7300cc21a8c01f313ca8949e2dce13d94f",
+      "output_size": [
+        79,
+        114
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          79,
+          114
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        79.0,
+        114.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/armor_amulet.svg",
+      "source_sha256": "2dcc27fef912311e59130d86e10d9c34d76e7ae83e73ca01273008b311b28c1e",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Amulet",
+      "output_sha256": "8d2d64acaa9054e462eb15953d5813701e551330676c970b27e4323433ba4c7f",
+      "output_size": [
+        136,
+        138
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          136,
+          138
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        136.0,
+        138.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/weapon_sword.svg",
+      "source_sha256": "c0ecb41628fb1c61515d8fff8aa6003972157fbec8b7f40588eb79543b6a0b54",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Main",
+      "output_sha256": "0e82349d5e5deaf1adbcea2c9b00e44c1fa2583f6a0a715fdcadc613ed37a13a",
+      "output_size": [
+        113,
+        117
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          113,
+          117
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        113.0,
+        117.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/armor_shield.svg",
+      "source_sha256": "6d4535d990499a1cfcdb2dde4047ea4d37b731ac74ac184332b29f588995150b",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Off",
+      "output_sha256": "0b880e2a5a436dd61f7d7ef48dd07a434e0966303a4e71cc37ad7854a9c5daa9",
+      "output_size": [
+        254,
+        254
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          254,
+          254
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        4.23528,
+        17.0957,
+        253.675,
+        253.675
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/armor_ring.svg",
+      "source_sha256": "e09766f003f87a7ef6e9b6d52ed7e2a76594e557fdccc530096c4aad566da9d7",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Ring",
+      "output_sha256": "b77a8b8ceda1550d7e43780975607417a119efbf501f59b06b4acd39ba106c93",
+      "output_size": [
+        54,
+        54
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          54,
+          54
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        391.602,
+        373.519,
+        53.5099,
+        53.5099
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/default_potion.svg",
+      "source_sha256": "eec7092703484dc9318f4d6d32ab4b9f08a31707a1fa5b351f86b8aa886475c9",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Potion",
+      "output_sha256": "d760c4a87660ac7166ae1dc78bf6ce00097d09efa20b539990be10cdfee932c7",
+      "output_size": [
+        359,
+        359
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          359,
+          359
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        593.394,
+        462.007,
+        359.381,
+        359.381
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/potion_fire.svg",
+      "source_sha256": "1bf17f83132ec9ccef088d3fac12c031e9214fc75c1fc671eb427ab16482d1db",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Oil",
+      "output_sha256": "f0415bfec08cb9144bdf35380bbcedae2a8b09568e7c1fd3ae7cfef74c7a8a9a",
+      "output_size": [
+        360,
+        360
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          360,
+          360
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        600.852,
+        463.55,
+        359.765,
+        359.765
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/armor_body.svg",
+      "source_sha256": "1dd10965b19d461dad2d7ac9a3d00463661aec4864537be43387353daa0ab49e",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Chest",
+      "output_sha256": "22d1471f64316549007b26f59a24214a305ebbbde1b5bc72cc02811ec94e0e0a",
+      "output_size": [
+        512,
+        512
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          512,
+          512
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        126.158,
+        138.708,
+        1000.58,
+        1000.58
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/armor_hands.svg",
+      "source_sha256": "2efb14c05a41f9613f6c59319f02dcc2ff11c640d26ad41aff5ef230b761f5a5",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Hands",
+      "output_sha256": "2e742b0c6e138857928e788d18a8a729de1927639a1a18ec499716b30e9fbef2",
+      "output_size": [
+        135,
+        136
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          135,
+          136
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        135.0,
+        136.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/clothing_pants.svg",
+      "source_sha256": "9f861420ae248fd9de4cc866485498acb6d92d6aaead8ae423b280f451150c58",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Legs",
+      "output_sha256": "ffaf357204913d47ce353efb64e67e37ffd5f18a80e366bdcbedd8c975f89a0f",
+      "output_size": [
+        294,
+        294
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          294,
+          294
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        629.213,
+        639.079,
+        293.865,
+        293.865
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "assets/v4/interface/base/armor_feet.svg",
+      "source_sha256": "fcb597bb02fcb5d373b778919a20f6771ab959f8122bf772de76cad40bc16e2d",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Equipment/T_V4_Equipment_Feet",
+      "output_sha256": "ee3578c020b49645f7bfd557a72cc6c0df412769b57e760dfcd582f0a70d332c",
+      "output_size": [
+        120,
+        120
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          120,
+          120
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        668.681,
+        483.62,
+        119.602,
+        119.602
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "designs/v4/icons/craft.png",
+      "source_sha256": "68ce84ed50b2d2e64f2c311faf578bb7daede81cb6af20b78d5a192835d698ec",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Actions/T_V4_Action_Craft",
+      "output_sha256": "d4487cd70484182b44cf8e7860fad7179412486c0cd60685aa79a230d8eb74ab",
+      "output_size": [
+        128,
+        161
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          128,
+          161
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "source_size": [
+        128,
+        161
+      ],
+      "conversion": "Approved transparent PNG export; RGB replaced with white while preserving alpha",
+      "psd_source": "MounteaFramework/InventoryEquipment/Icons/Icons_Source.psd",
+      "psd_sha256": "8a8da125249719b7f8057e9634a41cc979062afea8e07f8212130238964aed33",
+      "psd_layer": "Crafting"
+    },
+    {
+      "source": "designs/v4/icons/trade.png",
+      "source_sha256": "8929dba4d29ca9649ebd675c96352b987bb49d3f32f43f372e416be9737fd1c5",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Actions/T_V4_Action_Trade",
+      "output_sha256": "c22c9ac9ad60fd73f3820dec2cad362af7a1b61640979fc2ee187a94f6908bdb",
+      "output_size": [
+        145,
+        131
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          145,
+          131
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "source_size": [
+        145,
+        131
+      ],
+      "conversion": "Approved transparent PNG export; RGB replaced with white while preserving alpha",
+      "psd_source": "MounteaFramework/InventoryEquipment/Icons/Icons_Source.psd",
+      "psd_sha256": "8a8da125249719b7f8057e9634a41cc979062afea8e07f8212130238964aed33",
+      "psd_layer": "MiscItems02"
+    },
+    {
+      "source": "designs/v4/action-medallion.svg",
+      "source_sha256": "cd81456fe4b2a0b918f0ef902b2e83bd14b2416bac25ae4445b74e5014ba05ea",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Frames/T_V4_ActionMedallion",
+      "output_sha256": "f6844921dbaaa297cf37007803a1ed17cf9c2e2b9d3f1546e0706a05296eb0bc",
+      "output_size": [
+        80,
+        80
+      ],
+      "tintable": true,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          80,
+          80
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        80.0,
+        80.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512; tintable output RGB replaced with white while preserving alpha"
+    },
+    {
+      "source": "designs/v4/merchant-scales.svg",
+      "source_sha256": "a6e495f6643fefbac85b79bd3edaf91eaaec226090ad61b7c6090c6f7ce45807",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Decorations/T_V4_MerchantScales",
+      "output_sha256": "e9888debaf5df06936911a0daf89623f0032dff0b486925e04b6443e9efb10af",
+      "output_size": [
+        512,
+        375
+      ],
+      "tintable": false,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          512,
+          375
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        600.0,
+        440.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512"
+    },
+    {
+      "source": "designs/v4/background-geometry.svg",
+      "source_sha256": "d9577eea7f9595e7ce27c55daed7a4e38281d9f69a4bf50f2b6489f8433ea5a3",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Decorations/T_V4_BackgroundGeometry",
+      "output_sha256": "16968ece0d4c819c0c642a89a902b9d3bd7dd174af42dc4efd574c53ea5c619c",
+      "output_size": [
+        512,
+        461
+      ],
+      "tintable": false,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          512,
+          461
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        1000.0,
+        900.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512"
+    },
+    {
+      "source": "designs/v4/crafting-geometry.svg",
+      "source_sha256": "8a6521688e4b9ba7b12648af235469cec632015591b0f7610fed2236b20198db",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Decorations/T_V4_CraftingGeometry",
+      "output_sha256": "3a1bd5eb9665e270f58d84d0c50933db72aedf28d2ae0ebb0f72cb0b4ba269ff",
+      "output_size": [
+        439,
+        512
+      ],
+      "tintable": false,
+      "alpha": "straight RGBA",
+      "crop": "none",
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 512,
+        "lod_bias": 0,
+        "srgb": true,
+        "never_stream": true,
+        "compression_no_alpha": false,
+        "address_x": "TA_CLAMP",
+        "address_y": "TA_CLAMP"
+      },
+      "validation": {
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          439,
+          512
+        ]
+      },
+      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
+      "approved_baseline_match_ignoring_crlf": true,
+      "svg_viewbox": [
+        0.0,
+        0.0,
+        600.0,
+        700.0
+      ],
+      "renderer": "@resvg/resvg-js 2.6.2",
+      "animation": "static initial SVG state",
+      "conversion": "Rasterized SVG at original size, bounded to512"
+    },
+    {
+      "source": "assets/character.png",
+      "source_sha256": "da1c03f36d5b0382f087f1d30a1a5ad094f04e9776b1bcdd7454067f8bb55328",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Character/T_V4_Character",
+      "output_sha256": "da1c03f36d5b0382f087f1d30a1a5ad094f04e9776b1bcdd7454067f8bb55328",
+      "output_size": [
+        1024,
+        1535
+      ],
+      "tintable": false,
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 0
+      },
+      "validation": {
+        "note": "Imported through native-art path; separate live dimensions/settings verification required"
+      },
+      "source_size": [
+        1024,
+        1535
+      ],
+      "conversion": "Unmodified original PNG at native resolution",
+      "alpha": "original PNG alpha preserved"
+    },
+    {
+      "source": "designs/v4/layout.css",
+      "source_sha256": "78eb86774f6b180a39169b552bad617bf66138471cc7d03edbb3a1b6e8cbf54d",
+      "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Backgrounds/T_V4_Background",
+      "output_sha256": "8a0efec3455dea2bbb21212eac35f54ee3f25e07e115d02e745d127a9ede691c",
+      "output_size": [
+        1920,
+        1080
+      ],
+      "tintable": false,
+      "draw_mode": "Image",
+      "slice_margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "texture_settings": {
+        "lod_group": "TEXTUREGROUP_UI",
+        "compression_settings": "TC_EDITOR_ICON",
+        "mip_gen_settings": "TMGS_NO_MIPMAPS",
+        "max_texture_size": 0
+      },
+      "validation": {
+        "note": "Imported through native-art path; separate live dimensions/settings verification required"
+      },
+      "generator": {
+        "reference_size": [
+          1920,
+          1080
+        ],
+        "ellipse_radii_fraction": [
+          0.55,
+          0.62
+        ],
+        "center_fraction": [
+          0.6,
+          0.46
+        ],
+        "stops": [
+          [
+            0,
+            "#25424f"
+          ],
+          [
+            0.36,
+            "#142631"
+          ],
+          [
+            0.68,
+            "#0a1318"
+          ],
+          [
+            1,
+            "#04070a"
+          ]
+        ],
+        "sample": "Pixel centers; Euclidean normalized elliptical distance; clamped at1; linear sRGB-channel interpolation; round to nearest integer"
+      },
+      "alpha": "opaque RGBA"
+    }
+  ],
+  "fonts": [
+    {
+      "family": "Marcellus",
+      "face": "Regular",
+      "weight": 400,
+      "source": "https://raw.githubusercontent.com/google/fonts/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/marcellus/Marcellus-Regular.ttf",
+      "source_revision": "7af0d90b4d532ffa4b041937b560c6df4e7b1e95",
+      "source_sha256": "1cf0cd10b17d35e852729962cc1ffaffed94514895972458345e2df34abb2f81",
+      "output_sha256": "1cf0cd10b17d35e852729962cc1ffaffed94514895972458345e2df34abb2f81",
+      "license_sha256": "b6c7a12bf278193304c4d576daca8bafccff26e1a6392700a49b3f8816dcf7eb",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_Marcellus_Regular",
+      "license": "Fonts/Licenses/Marcellus-OFL.txt",
+      "output_file": "Marcellus-Regular.ttf",
+      "conversion": "Original static font"
+    },
+    {
+      "family": "RobotoCondensed",
+      "face": "Light",
+      "weight": 300,
+      "source": "https://raw.githubusercontent.com/google/fonts/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/robotocondensed/RobotoCondensed%5Bwght%5D.ttf",
+      "source_revision": "7af0d90b4d532ffa4b041937b560c6df4e7b1e95",
+      "source_sha256": "dace262afcee68a5276f200d8026c57221735c0118ab5fda8c2c0d3dc409a8d0",
+      "output_sha256": "7063ba1c1542fd062d7a93d2ef4caf33d1a4567cd72f40ef46b62c3617f36ab9",
+      "license_sha256": "0b3098464626138c0e2b29b95239e9f27ffbe322c6256305852018d8a9587ede",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_Light",
+      "license": "Fonts/Licenses/RobotoCondensed-OFL.txt",
+      "output_file": "RobotoCondensed-Light.ttf",
+      "conversion": "Static fontTools.varLib.instancer export at specified wght; original timestamps preserved"
+    },
+    {
+      "family": "RobotoCondensed",
+      "face": "Regular",
+      "weight": 400,
+      "source": "https://raw.githubusercontent.com/google/fonts/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/robotocondensed/RobotoCondensed%5Bwght%5D.ttf",
+      "source_revision": "7af0d90b4d532ffa4b041937b560c6df4e7b1e95",
+      "source_sha256": "dace262afcee68a5276f200d8026c57221735c0118ab5fda8c2c0d3dc409a8d0",
+      "output_sha256": "d23931c335b8d54a1ac454648099c9a36c40311b24d31b8716bc58bb6175640a",
+      "license_sha256": "0b3098464626138c0e2b29b95239e9f27ffbe322c6256305852018d8a9587ede",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_Regular",
+      "license": "Fonts/Licenses/RobotoCondensed-OFL.txt",
+      "output_file": "RobotoCondensed-Regular.ttf",
+      "conversion": "Static fontTools.varLib.instancer export at specified wght; original timestamps preserved"
+    },
+    {
+      "family": "RobotoCondensed",
+      "face": "Medium",
+      "weight": 500,
+      "source": "https://raw.githubusercontent.com/google/fonts/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/robotocondensed/RobotoCondensed%5Bwght%5D.ttf",
+      "source_revision": "7af0d90b4d532ffa4b041937b560c6df4e7b1e95",
+      "source_sha256": "dace262afcee68a5276f200d8026c57221735c0118ab5fda8c2c0d3dc409a8d0",
+      "output_sha256": "922118dc05fa6e14ada23ad38728d1c46c4ad53ecbd0a992320ae3402551e6d4",
+      "license_sha256": "0b3098464626138c0e2b29b95239e9f27ffbe322c6256305852018d8a9587ede",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_Medium",
+      "license": "Fonts/Licenses/RobotoCondensed-OFL.txt",
+      "output_file": "RobotoCondensed-Medium.ttf",
+      "conversion": "Static fontTools.varLib.instancer export at specified wght; original timestamps preserved"
+    },
+    {
+      "family": "RobotoCondensed",
+      "face": "SemiBold",
+      "weight": 600,
+      "source": "https://raw.githubusercontent.com/google/fonts/7af0d90b4d532ffa4b041937b560c6df4e7b1e95/ofl/robotocondensed/RobotoCondensed%5Bwght%5D.ttf",
+      "source_revision": "7af0d90b4d532ffa4b041937b560c6df4e7b1e95",
+      "source_sha256": "dace262afcee68a5276f200d8026c57221735c0118ab5fda8c2c0d3dc409a8d0",
+      "output_sha256": "9836221c8910d1763ba5a75b52c813cb54164730efc55c4bc8dd9de1ae8beb8f",
+      "license_sha256": "0b3098464626138c0e2b29b95239e9f27ffbe322c6256305852018d8a9587ede",
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_SemiBold",
+      "license": "Fonts/Licenses/RobotoCondensed-OFL.txt",
+      "output_file": "RobotoCondensed-SemiBold.ttf",
+      "conversion": "Static fontTools.varLib.instancer export at specified wght; original timestamps preserved"
+    }
+  ],
+  "composite_fonts": [
+    {
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/F_Marcellus",
+      "font_cache_type": "RUNTIME",
+      "default_typeface": [
+        {
+          "name": "Regular",
+          "font_face": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_Marcellus_Regular"
+        }
+      ]
+    },
+    {
+      "target": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/F_RobotoCondensed",
+      "font_cache_type": "RUNTIME",
+      "default_typeface": [
+        {
+          "name": "Light",
+          "font_face": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_Light"
+        },
+        {
+          "name": "Regular",
+          "font_face": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_Regular"
+        },
+        {
+          "name": "Medium",
+          "font_face": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_Medium"
+        },
+        {
+          "name": "SemiBold",
+          "font_face": "/MounteaAdvancedInventorySystem/UI/V4/Fonts/FF_RobotoCondensed_SemiBold"
+        }
+      ]
+    }
+  ],
+  "shared_artwork_manifest": "../Shared/SourceManifest.json",
+  "shared_item_aliases": {
+    "bellsteel": "ashen",
+    "ironboots": "boots"
+  },
+  "equipment_slot_aliases": {
+    "ring1": "Ring",
+    "ring2": "Ring",
+    "quick1": "Potion",
+    "quick2": "Potion",
+    "quick3": "Potion",
+    "quick4": "Oil",
+    "quick5": "Potion"
+  }
+}
