@@ -221,3 +221,6 @@ crashinfo--*
 /.playwright-cli
 /Mocaps
 /output
+
+# Local artwork source manifests
+/Content/UI/**/SourceManifest.json
