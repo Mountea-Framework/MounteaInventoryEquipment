@@ -42,7 +42,8 @@
         "observed_size": [
           185,
           185
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -93,7 +94,8 @@
         "observed_size": [
           114,
           117
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -144,7 +146,8 @@
         "observed_size": [
           512,
           512
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -195,7 +198,8 @@
         "observed_size": [
           54,
           54
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -246,7 +250,8 @@
         "observed_size": [
           359,
           359
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -297,7 +302,8 @@
         "observed_size": [
           227,
           227
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -348,7 +354,8 @@
         "observed_size": [
           208,
           208
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -399,7 +406,8 @@
         "observed_size": [
           129,
           129
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -450,7 +458,8 @@
         "observed_size": [
           128,
           128
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -501,7 +510,8 @@
         "observed_size": [
           512,
           512
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -552,7 +562,8 @@
         "observed_size": [
           93,
           93
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -603,7 +614,8 @@
         "observed_size": [
           128,
           128
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -654,7 +666,8 @@
         "observed_size": [
           113,
           113
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -705,7 +718,8 @@
         "observed_size": [
           192,
           192
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -756,7 +770,8 @@
         "observed_size": [
           79,
           114
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -807,7 +822,8 @@
         "observed_size": [
           136,
           138
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -858,7 +874,8 @@
         "observed_size": [
           113,
           117
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -909,7 +926,8 @@
         "observed_size": [
           254,
           254
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -960,7 +978,8 @@
         "observed_size": [
           54,
           54
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1011,7 +1030,8 @@
         "observed_size": [
           359,
           359
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1062,7 +1082,8 @@
         "observed_size": [
           360,
           360
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1113,7 +1134,8 @@
         "observed_size": [
           512,
           512
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1164,7 +1186,8 @@
         "observed_size": [
           135,
           136
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1215,7 +1238,8 @@
         "observed_size": [
           294,
           294
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1266,7 +1290,8 @@
         "observed_size": [
           120,
           120
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1317,7 +1342,8 @@
         "observed_size": [
           128,
           161
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1367,7 +1393,8 @@
         "observed_size": [
           145,
           131
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1417,7 +1444,8 @@
         "observed_size": [
           80,
           80
-        ]
+        ],
+        "max_texture_size": 512
       },
       "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
       "approved_baseline_match_ignoring_crlf": true,
@@ -1436,14 +1464,12 @@
       "source_sha256": "a6e495f6643fefbac85b79bd3edaf91eaaec226090ad61b7c6090c6f7ce45807",
       "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
       "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Decorations/T_V4_MerchantScales",
-      "output_sha256": "e9888debaf5df06936911a0daf89623f0032dff0b486925e04b6443e9efb10af",
+      "output_sha256": "2fd239f6d4080524f86e84b9c9b48ed1f69bd58bbd5fd8dbed4b4dde275576f0",
       "output_size": [
-        512,
-        375
+        2048,
+        1502
       ],
       "tintable": false,
-      "alpha": "straight RGBA",
-      "crop": "none",
       "draw_mode": "Image",
       "slice_margins": [
         0,
@@ -1455,23 +1481,18 @@
         "lod_group": "TEXTUREGROUP_UI",
         "compression_settings": "TC_EDITOR_ICON",
         "mip_gen_settings": "TMGS_NO_MIPMAPS",
-        "max_texture_size": 512,
-        "lod_bias": 0,
-        "srgb": true,
-        "never_stream": true,
-        "compression_no_alpha": false,
-        "address_x": "TA_CLAMP",
-        "address_y": "TA_CLAMP"
+        "max_texture_size": 2048
       },
       "validation": {
         "dimensions_and_ui_settings_verified": true,
         "observed_size": [
-          512,
-          375
-        ]
+          2048,
+          1502
+        ],
+        "max_texture_size": 2048
       },
-      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
-      "approved_baseline_match_ignoring_crlf": true,
+      "artwork_class": "large_decorative_diagram",
+      "resolution_exception": "2048px decorative artwork;512px full-stage proof blurred fine spokes. Icon/frame cap remains512.",
       "svg_viewbox": [
         0.0,
         0.0,
@@ -1480,21 +1501,20 @@
       ],
       "renderer": "@resvg/resvg-js 2.6.2",
       "animation": "static initial SVG state",
-      "conversion": "Rasterized SVG at original size, bounded to512"
+      "conversion": "Original SVG rasterized proportionally at2048px maximum dimension; no crop or nine-slice",
+      "alpha": "straight RGBA"
     },
     {
       "source": "designs/v4/background-geometry.svg",
       "source_sha256": "d9577eea7f9595e7ce27c55daed7a4e38281d9f69a4bf50f2b6489f8433ea5a3",
       "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
       "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Decorations/T_V4_BackgroundGeometry",
-      "output_sha256": "16968ece0d4c819c0c642a89a902b9d3bd7dd174af42dc4efd574c53ea5c619c",
+      "output_sha256": "0b160a3caaed89257686885a2f856d4cf6b7976ecf2bcf62958459aa5701b1b8",
       "output_size": [
-        512,
-        461
+        2048,
+        1843
       ],
       "tintable": false,
-      "alpha": "straight RGBA",
-      "crop": "none",
       "draw_mode": "Image",
       "slice_margins": [
         0,
@@ -1506,23 +1526,18 @@
         "lod_group": "TEXTUREGROUP_UI",
         "compression_settings": "TC_EDITOR_ICON",
         "mip_gen_settings": "TMGS_NO_MIPMAPS",
-        "max_texture_size": 512,
-        "lod_bias": 0,
-        "srgb": true,
-        "never_stream": true,
-        "compression_no_alpha": false,
-        "address_x": "TA_CLAMP",
-        "address_y": "TA_CLAMP"
+        "max_texture_size": 2048
       },
       "validation": {
         "dimensions_and_ui_settings_verified": true,
         "observed_size": [
-          512,
-          461
-        ]
+          2048,
+          1843
+        ],
+        "max_texture_size": 2048
       },
-      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
-      "approved_baseline_match_ignoring_crlf": true,
+      "artwork_class": "large_decorative_diagram",
+      "resolution_exception": "2048px decorative artwork;512px full-stage proof blurred fine spokes. Icon/frame cap remains512.",
       "svg_viewbox": [
         0.0,
         0.0,
@@ -1531,21 +1546,20 @@
       ],
       "renderer": "@resvg/resvg-js 2.6.2",
       "animation": "static initial SVG state",
-      "conversion": "Rasterized SVG at original size, bounded to512"
+      "conversion": "Original SVG rasterized proportionally at2048px maximum dimension; no crop or nine-slice",
+      "alpha": "straight RGBA"
     },
     {
       "source": "designs/v4/crafting-geometry.svg",
       "source_sha256": "8a6521688e4b9ba7b12648af235469cec632015591b0f7610fed2236b20198db",
       "source_revision": "7d2d0c9e325850955af84f2af3ed0bf766a6bc7f",
       "target": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Decorations/T_V4_CraftingGeometry",
-      "output_sha256": "3a1bd5eb9665e270f58d84d0c50933db72aedf28d2ae0ebb0f72cb0b4ba269ff",
+      "output_sha256": "bd45440a6f6414105694485d00d7a6aa1f3cbd9de5d24833f8aac410f3b4b09d",
       "output_size": [
-        439,
-        512
+        1755,
+        2048
       ],
       "tintable": false,
-      "alpha": "straight RGBA",
-      "crop": "none",
       "draw_mode": "Image",
       "slice_margins": [
         0,
@@ -1557,23 +1571,18 @@
         "lod_group": "TEXTUREGROUP_UI",
         "compression_settings": "TC_EDITOR_ICON",
         "mip_gen_settings": "TMGS_NO_MIPMAPS",
-        "max_texture_size": 512,
-        "lod_bias": 0,
-        "srgb": true,
-        "never_stream": true,
-        "compression_no_alpha": false,
-        "address_x": "TA_CLAMP",
-        "address_y": "TA_CLAMP"
+        "max_texture_size": 2048
       },
       "validation": {
         "dimensions_and_ui_settings_verified": true,
         "observed_size": [
-          439,
-          512
-        ]
+          1755,
+          2048
+        ],
+        "max_texture_size": 2048
       },
-      "approved_baseline_revision": "778c10a53dd873fc67dba17d5fddc2e44becc06a",
-      "approved_baseline_match_ignoring_crlf": true,
+      "artwork_class": "large_decorative_diagram",
+      "resolution_exception": "2048px decorative artwork;512px full-stage proof blurred fine spokes. Icon/frame cap remains512.",
       "svg_viewbox": [
         0.0,
         0.0,
@@ -1582,7 +1591,8 @@
       ],
       "renderer": "@resvg/resvg-js 2.6.2",
       "animation": "static initial SVG state",
-      "conversion": "Rasterized SVG at original size, bounded to512"
+      "conversion": "Original SVG rasterized proportionally at2048px maximum dimension; no crop or nine-slice",
+      "alpha": "straight RGBA"
     },
     {
       "source": "assets/character.png",
@@ -1609,7 +1619,12 @@
         "max_texture_size": 0
       },
       "validation": {
-        "note": "Imported through native-art path; separate live dimensions/settings verification required"
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          1024,
+          1535
+        ],
+        "max_texture_size": 0
       },
       "source_size": [
         1024,
@@ -1643,7 +1658,12 @@
         "max_texture_size": 0
       },
       "validation": {
-        "note": "Imported through native-art path; separate live dimensions/settings verification required"
+        "dimensions_and_ui_settings_verified": true,
+        "observed_size": [
+          1920,
+          1080
+        ],
+        "max_texture_size": 0
       },
       "generator": {
         "reference_size": [
