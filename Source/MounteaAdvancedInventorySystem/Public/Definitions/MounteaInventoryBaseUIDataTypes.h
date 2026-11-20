@@ -269,8 +269,18 @@ public:
 	}
 };
 
+/** Direction from the Canvas center to the midpoint of a radial widget arc. */
+UENUM(BlueprintType)
+enum class EMounteaRadialArcDirection : uint8
+{
+	Below,
+	Above,
+	Left,
+	Right
+};
+
 /**
- * Result of an arc widget layout calculation for a single child widget: the widget itself
+ * Result of a widget layout calculation for a single child widget: the widget itself
  * plus its computed local position and rotation within the parent Canvas Panel.
  *
  * @see UMounteaInventoryBaseUIStatics::CalculateArcWidgetLayout
@@ -287,7 +297,7 @@ public:
 		meta=(DisplayPriority=0))
 	TObjectPtr<UUserWidget> Widget = nullptr;
 
-	/** Local position within the parent Canvas Panel. Apply via UCanvasPanelSlot::SetPosition. */
+	/** Slot position in Canvas units. Arc layouts use the top-left origin, radial layouts use a center anchor. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI",
 		meta=(DisplayPriority=1))
 	FVector2D Position = FVector2D::ZeroVector;

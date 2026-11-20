@@ -649,3 +649,114 @@ TMap<int32, FMounteaTransformedWidgetPositionData> UMounteaInventoryBaseUIStatic
 
 	return result;
 }
+
+TMap<int32, FMounteaTransformedWidgetPositionData> UMounteaInventoryBaseUIStatics::CalculateRadialWidgetLayout(
+	UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren, float Radius,
+	EMounteaRadialArcDirection ArcDirection)
+{
+	TMap<int32, FMounteaTransformedWidgetPositionData> result;
+
+	if (!IsValid(ParentCanvas) || !FMath::IsFinite(Radius) || Radius <= 0.f)
+		return result;
+
+	double directionAngle;
+	switch (ArcDirection)
+	{
+		case EMounteaRadialArcDirection::Below:
+			directionAngle = 90.0;
+			break;
+		case EMounteaRadialArcDirection::Above:
+			directionAngle = 270.0;
+			break;
+		case EMounteaRadialArcDirection::Left:
+			directionAngle = 180.0;
+			break;
+		case EMounteaRadialArcDirection::Right:
+			directionAngle = 0.0;
+			break;
+		default:
+			return result;
+	}
+
+	TArray<int32> sortedKeys;
+	CurrentChildren.GetKeys(sortedKeys);
+	sortedKeys.Sort();
+
+	TSet<UUserWidget*> seen;
+	for (int32 key : sortedKeys)
+	{
+		UUserWidget* widget = CurrentChildren.FindChecked(key);
+
+		if (!IsValid(widget) || widget->GetParent() != ParentCanvas || seen.Contains(widget))
+			continue;
+
+		seen.Add(widget);
+		result.Add(key).Widget = widget;
+	}
+
+	if (result.IsEmpty())
+		return result;
+
+	const double step = FMath::Min(45.0, 360.0 / result.Num());
+	const double firstAngle = directionAngle - (result.Num() - 1) * step * 0.5;
+	int32 rank = 0;
+	for (int32 key : sortedKeys)
+	{
+		FMounteaTransformedWidgetPositionData* data = result.Find(key);
+
+		if (!data)
+			continue;
+
+		const double angle = FMath::DegreesToRadians(firstAngle + rank * step);
+		data->Position = FVector2D(FMath::Cos(angle), FMath::Sin(angle)) * Radius;
+		++rank;
+	}
+
+	return result;
+}
+
+bool UMounteaInventoryBaseUIStatics::ApplyRadialWidgetLayout(
+	UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren, float Radius,
+	EMounteaRadialArcDirection ArcDirection, bool bSizeToContent)
+{
+	const auto layout = CalculateRadialWidgetLayout(ParentCanvas, CurrentChildren, Radius, ArcDirection);
+	bool appliedAny = false;
+	for (const auto& pair : layout)
+	{
+		UUserWidget* widget = pair.Value.Widget;
+		UCanvasPanelSlot* slot = CastChecked<UCanvasPanelSlot>(widget->Slot);
+		FAnchorData slotLayout = slot->GetLayout();
+		const FAnchors& anchors = slotLayout.Anchors;
+		FMargin& offsets = slotLayout.Offsets;
+
+		// On a stretched axis the trailing offset is a margin. Convert it to the
+		// arranged length before switching to a fixed anchor.
+		if (!bSizeToContent && !slot->GetAutoSize() && (anchors.IsStretchedHorizontal() || anchors.IsStretchedVertical()))
+		{
+			const FVector2D extent = ParentCanvas->GetCachedGeometry().GetLocalSize();
+
+			if ((anchors.IsStretchedHorizontal() && extent.X <= 0.) || (anchors.IsStretchedVertical() && extent.Y <= 0.))
+				continue;
+
+			if (anchors.IsStretchedHorizontal())
+				offsets.Right = FMath::Max(0., extent.X * (anchors.Maximum.X - anchors.Minimum.X) - offsets.Left - offsets.Right);
+
+			if (anchors.IsStretchedVertical())
+				offsets.Bottom = FMath::Max(0., extent.Y * (anchors.Maximum.Y - anchors.Minimum.Y) - offsets.Top - offsets.Bottom);
+		}
+
+		slotLayout.Anchors = FAnchors(0.5f, 0.5f);
+		slotLayout.Alignment = FVector2D(0.5, 0.5);
+		offsets.Left = pair.Value.Position.X;
+		offsets.Top = pair.Value.Position.Y;
+		slot->SetLayout(slotLayout);
+
+		if (bSizeToContent)
+			slot->SetAutoSize(true);
+
+		widget->SetRenderTransformAngle(pair.Value.RotationAngle);
+		appliedAny = true;
+	}
+
+	return appliedAny;
+}
