@@ -12,6 +12,11 @@
 #include "MounteaThemePickerCustomization.h"
 
 #include "DetailWidgetRow.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
+#include "Widgets/Colors/SColorBlock.h"
+#include "Widgets/Input/SComboButton.h"
+#include "Widgets/SBoxPanel.h"
+#include "Widgets/Text/STextBlock.h"
 #include "PropertyCustomizationHelpers.h"
 #include "PropertyHandle.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
@@ -46,8 +51,7 @@ namespace
 			Theme.Typography.GenerateKeyArray(Keys);
 	}
 
-	void GetPickerOptions(TArray<TSharedPtr<FString>>& Options, TArray<TSharedPtr<SToolTip>>& Tooltips,
-		TArray<bool>& RestrictedItems, TSharedRef<IPropertyHandle> PropertyHandle)
+	TArray<FName> GetPickerKeys(const TSharedRef<IPropertyHandle>& PropertyHandle)
 	{
 		TArray<UObject*> owners;
 		PropertyHandle->GetOuterObjects(owners);
@@ -80,13 +84,110 @@ namespace
 
 		keys.Remove(NAME_None);
 		keys.Sort(FNameLexicalLess());
-		Options.Add(MakeShared<FString>(FName(NAME_None).ToString()));
+		keys.Insert(NAME_None, 0);
+		return keys;
+	}
 
-		for (const FName key : keys)
+	void GetPickerOptions(TArray<TSharedPtr<FString>>& Options, TArray<TSharedPtr<SToolTip>>& Tooltips,
+		TArray<bool>& RestrictedItems, TSharedRef<IPropertyHandle> PropertyHandle)
+	{
+		for (const FName key : GetPickerKeys(PropertyHandle))
 		{
 			Options.Add(MakeShared<FString>(key.ToString()));
 		}
 	}
+
+	TSharedRef<SWidget> MakeInkLabel(const TSharedRef<IPropertyHandle>& PropertyHandle, TOptional<FName> MenuKey)
+	{
+		auto label = SNew(SHorizontalBox);
+		TArray<UObject*> owners;
+		PropertyHandle->GetOuterObjects(owners);
+
+		for (UObject* owner : owners)
+		{
+			const TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> theme = Cast<UMounteaAdvancedInventoryThemeConfig>(owner);
+			const auto findColour = [theme, PropertyHandle, MenuKey]() -> const FLinearColor*
+			{
+				if (!theme.IsValid())
+					return nullptr;
+
+				FName key;
+
+				if (MenuKey.IsSet())
+					key = MenuKey.GetValue();
+				else if (PropertyHandle->GetValue(key) != FPropertyAccess::Success)
+					return nullptr;
+
+				return key.IsNone() ? nullptr : theme->Palette.Find(key);
+			};
+
+			label->AddSlot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(SColorBlock)
+				.Size(FVector2D(20.f, 12.f))
+				.CornerRadius(FVector4(3.f))
+				.AlphaDisplayMode(EColorBlockAlphaDisplayMode::Ignore)
+				.Visibility_Lambda([findColour]()
+				{
+					return findColour() ? EVisibility::HitTestInvisible : EVisibility::Collapsed;
+				})
+				.Color_Lambda([findColour]()
+				{
+					const FLinearColor* colour = findColour();
+					return colour ? *colour : FLinearColor::Transparent;
+				})
+			];
+		}
+
+		label->AddSlot()
+		.AutoWidth()
+		.VAlign(VAlign_Center)
+		.Padding(4.f, 0.f)
+		[
+			SNew(STextBlock)
+			.Font(FAppStyle::GetFontStyle("PropertyWindow.NormalFont"))
+			.Text_Lambda([PropertyHandle, MenuKey]()
+			{
+				if (MenuKey.IsSet())
+					return FText::FromName(MenuKey.GetValue());
+
+				FText value;
+				PropertyHandle->GetValueAsDisplayText(value);
+				return value;
+			})
+		];
+
+		return label;
+	}
+
+	TSharedRef<SWidget> MakePalettePicker(const TSharedRef<IPropertyHandle>& PropertyHandle)
+	{
+		return SNew(SComboButton)
+			.ContentPadding(FMargin(4.f, 2.f))
+			.OnGetMenuContent_Lambda([PropertyHandle]()
+			{
+				FMenuBuilder menu(true, nullptr);
+
+				for (const FName key : GetPickerKeys(PropertyHandle))
+				{
+					const FUIAction select(FExecuteAction::CreateLambda([PropertyHandle, key]()
+					{
+						PropertyHandle->SetValue(key);
+					}));
+
+					menu.AddMenuEntry(select, MakeInkLabel(PropertyHandle, key));
+				}
+
+				return menu.MakeWidget(nullptr, 400);
+			})
+			.ButtonContent()
+			[
+				MakeInkLabel(PropertyHandle, {})
+			];
+	}
+
 }
 
 bool FMounteaThemePickerIdentifier::IsPropertyTypeCustomized(const IPropertyHandle& PropertyHandle) const
@@ -121,7 +222,8 @@ void FMounteaThemePickerCustomization::CustomizeHeader(TSharedRef<IPropertyHandl
 	.ValueContent()
 	.MinDesiredWidth(160.f)
 	[
-		PropertyCustomizationHelpers::MakePropertyComboBox(PropertyHandle,
+		PropertyHandle->HasMetaData(PalettePicker) ? MakePalettePicker(PropertyHandle) :
+			PropertyCustomizationHelpers::MakePropertyComboBox(PropertyHandle,
 			FOnGetPropertyComboBoxStrings::CreateStatic(&GetPickerOptions, PropertyHandle))
 	];
 }
