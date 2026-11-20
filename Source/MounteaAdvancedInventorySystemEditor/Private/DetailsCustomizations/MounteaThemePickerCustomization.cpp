@@ -17,7 +17,10 @@
 #include "Widgets/Input/SComboButton.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
-#include "PropertyCustomizationHelpers.h"
+#include "Brushes/SlateRoundedBoxBrush.h"
+#include "Widgets/Images/SImage.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/SOverlay.h"
 #include "PropertyHandle.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
 
@@ -88,18 +91,73 @@ namespace
 		return keys;
 	}
 
-	void GetPickerOptions(TArray<TSharedPtr<FString>>& Options, TArray<TSharedPtr<SToolTip>>& Tooltips,
-		TArray<bool>& RestrictedItems, TSharedRef<IPropertyHandle> PropertyHandle)
+	TSharedRef<SWidget> MakeBrushPreview(TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> Theme, TAttribute<FName> Key)
 	{
-		for (const FName key : GetPickerKeys(PropertyHandle))
-		{
-			Options.Add(MakeShared<FString>(key.ToString()));
-		}
+		const auto preview = MakeShared<FSlateBrush>();
+
+		return SNew(SBox)
+			.WidthOverride(26.f)
+			.HeightOverride(14.f)
+			.Visibility_Lambda([Theme, Key]()
+			{
+				return Theme.IsValid() && !Key.Get().IsNone() && Theme->Brushes.Contains(Key.Get())
+					? EVisibility::HitTestInvisible : EVisibility::Collapsed;
+			})
+			[
+				SNew(SOverlay)
+				+ SOverlay::Slot()
+				[
+					SNew(SColorBlock)
+					.Color(FLinearColor::Transparent)
+					.ShowBackgroundForAlpha(true)
+				]
+				+ SOverlay::Slot()
+				[
+					SNew(SImage)
+					.Image_Lambda([Theme, Key, preview]() -> const FSlateBrush*
+					{
+						if (!Theme.IsValid())
+							return nullptr;
+
+						// Tint-only roles acquire their geometry from the widget at runtime.
+						*preview = FSlateRoundedBoxBrush(FLinearColor::Transparent, 3.f, FLinearColor::Transparent, 1.5f);
+						Theme->PatchBrush(Key.Get(), *preview);
+						return &preview.Get();
+					})
+				]
+			];
 	}
 
-	TSharedRef<SWidget> MakeColourLabel(const TSharedRef<IPropertyHandle>& PropertyHandle, TOptional<FName> MenuKey)
+	TSharedRef<SWidget> MakeTypePreview(TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> Theme, TAttribute<FName> Key)
 	{
-		const bool isPaint = PropertyHandle->HasMetaData(PaintPicker);
+		return SNew(STextBlock)
+			.Text(INVTEXT("Aa"))
+			.Visibility_Lambda([Theme, Key]()
+			{
+				return Theme.IsValid() && !Key.Get().IsNone() && Theme->Typography.Contains(Key.Get())
+					? EVisibility::HitTestInvisible : EVisibility::Collapsed;
+			})
+			.Font_Lambda([Theme, Key]()
+			{
+				const auto* type = Theme.IsValid() ? Theme->Typography.Find(Key.Get()) : nullptr;
+				FSlateFontInfo font = type ? type->Font : FAppStyle::GetFontStyle("PropertyWindow.NormalFont");
+				font.Size = 11.f;
+				return font;
+			});
+	}
+
+	TSharedRef<SWidget> MakePickerLabel(const TSharedRef<IPropertyHandle>& PropertyHandle, TOptional<FName> MenuKey)
+	{
+		const FName picker = GetPicker(*PropertyHandle);
+		const auto key = TAttribute<FName>::CreateLambda([PropertyHandle, MenuKey]()
+		{
+			if (MenuKey.IsSet())
+				return MenuKey.GetValue();
+
+			FName selected;
+			return PropertyHandle->GetValue(selected) == FPropertyAccess::Success ? selected : FName(NAME_None);
+		});
+
 		auto label = SNew(SHorizontalBox);
 		TArray<UObject*> owners;
 		PropertyHandle->GetOuterObjects(owners);
@@ -107,29 +165,34 @@ namespace
 		for (UObject* owner : owners)
 		{
 			const TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> theme = Cast<UMounteaAdvancedInventoryThemeConfig>(owner);
-			const auto findColour = [theme, PropertyHandle, MenuKey, isPaint]() -> TOptional<FLinearColor>
+
+			if (picker == BrushPicker || picker == TypographyPicker)
 			{
-				if (!theme.IsValid())
-					return {};
+				label->AddSlot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				[
+					picker == BrushPicker ? MakeBrushPreview(theme, key) : MakeTypePreview(theme, key)
+				];
+				continue;
+			}
 
-				FName key;
+			const bool isPaint = picker == PaintPicker;
+			const auto findColour = [theme, key, isPaint]() -> TOptional<FLinearColor>
+			{
+				const FName role = key.Get();
 
-				if (MenuKey.IsSet())
-					key = MenuKey.GetValue();
-				else if (PropertyHandle->GetValue(key) != FPropertyAccess::Success)
-					return {};
-
-				if (key.IsNone())
+				if (!theme.IsValid() || role.IsNone())
 					return {};
 
 				if (isPaint)
 				{
 					FLinearColor colour;
 
-					if (theme->ResolvePaint(key, colour))
+					if (theme->ResolvePaint(role, colour))
 						return colour;
 				}
-				else if (const FLinearColor* ink = theme->Palette.Find(key))
+				else if (const FLinearColor* ink = theme->Palette.Find(role))
 					return *ink;
 
 				return {};
@@ -176,7 +239,7 @@ namespace
 		return label;
 	}
 
-	TSharedRef<SWidget> MakeColourPicker(const TSharedRef<IPropertyHandle>& PropertyHandle)
+	TSharedRef<SWidget> MakeThemePicker(const TSharedRef<IPropertyHandle>& PropertyHandle)
 	{
 		return SNew(SComboButton)
 			.ContentPadding(FMargin(4.f, 2.f))
@@ -191,14 +254,14 @@ namespace
 						PropertyHandle->SetValue(key);
 					}));
 
-					menu.AddMenuEntry(select, MakeColourLabel(PropertyHandle, key));
+					menu.AddMenuEntry(select, MakePickerLabel(PropertyHandle, key));
 				}
 
 				return menu.MakeWidget(nullptr, 400);
 			})
 			.ButtonContent()
 			[
-				MakeColourLabel(PropertyHandle, {})
+				MakePickerLabel(PropertyHandle, {})
 			];
 	}
 
@@ -229,8 +292,6 @@ TSharedRef<IPropertyTypeCustomization> FMounteaThemePickerCustomization::MakeIns
 void FMounteaThemePickerCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> PropertyHandle,
 	FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& CustomizationUtils)
 {
-	const bool showSwatch = PropertyHandle->HasMetaData(PalettePicker) || PropertyHandle->HasMetaData(PaintPicker);
-
 	HeaderRow.NameContent()
 	[
 		PropertyHandle->CreatePropertyNameWidget()
@@ -238,9 +299,7 @@ void FMounteaThemePickerCustomization::CustomizeHeader(TSharedRef<IPropertyHandl
 	.ValueContent()
 	.MinDesiredWidth(160.f)
 	[
-		showSwatch ? MakeColourPicker(PropertyHandle) :
-			PropertyCustomizationHelpers::MakePropertyComboBox(PropertyHandle,
-			FOnGetPropertyComboBoxStrings::CreateStatic(&GetPickerOptions, PropertyHandle))
+		MakeThemePicker(PropertyHandle)
 	];
 }
 

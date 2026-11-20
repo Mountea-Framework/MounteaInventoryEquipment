@@ -72,6 +72,9 @@ public:
 	/** Resolves a named paint to its palette RGB and paint opacity. Returns false for missing references. */
 	bool ResolvePaint(FName Role, FLinearColor& OutColour) const;
 
+	/** Applies the named brush replacement and resolved fill and outline paints to the supplied brush. */
+	void PatchBrush(FName Role, FSlateBrush& Brush) const;
+
 #if WITH_EDITOR
 public:
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;

@@ -68,25 +68,6 @@ namespace MounteaWidgetTheme
 		return true;
 	}
 
-	void PatchBrush(const UMounteaAdvancedInventoryThemeConfig* Theme, const FName Role, FSlateBrush& Brush)
-	{
-		const FMounteaThemeBrushStyle* definition = Theme->Brushes.Find(Role);
-
-		if (!definition)
-			return;
-
-		if (definition->bOverrideBrush)
-			Brush = definition->Brush;
-
-		FLinearColor colour;
-
-		if (Theme->ResolvePaint(definition->Tint, colour))
-			Brush.TintColor = FSlateColor(colour);
-
-		if (Theme->ResolvePaint(definition->OutlineTint, colour))
-			Brush.OutlineSettings.Color = FSlateColor(colour);
-	}
-
 	bool Supports(UClass* WidgetClass, const EMounteaWidgetThemeStyleType StyleType)
 	{
 		switch (StyleType)
@@ -157,7 +138,7 @@ namespace MounteaWidgetTheme
 
 		if (normal)
 		{
-			PatchBrush(Theme, normal->Background, Brush);
+			Theme->PatchBrush(normal->Background, Brush);
 			FLinearColor colour;
 
 			if (Theme->ResolvePaint(normal->Foreground, colour))
@@ -166,7 +147,7 @@ namespace MounteaWidgetTheme
 
 		if (state && state != normal)
 		{
-			PatchBrush(Theme, state->Background, Brush);
+			Theme->PatchBrush(state->Background, Brush);
 			FLinearColor colour;
 
 			if (Theme->ResolvePaint(state->Foreground, colour))
@@ -214,7 +195,7 @@ namespace MounteaWidgetTheme
 			if (UBorder* border = Cast<UBorder>(Widget))
 			{
 				FSlateBrush brush = border->Background;
-				PatchBrush(Theme, Assignment.BrushRole, brush);
+				Theme->PatchBrush(Assignment.BrushRole, brush);
 				border->SetBrush(brush);
 
 				if (Theme->ResolvePaint(Assignment.TintPaint, colour))
@@ -223,7 +204,7 @@ namespace MounteaWidgetTheme
 			else if (UImage* image = Cast<UImage>(Widget))
 			{
 				FSlateBrush brush = image->GetBrush();
-				PatchBrush(Theme, Assignment.BrushRole, brush);
+				Theme->PatchBrush(Assignment.BrushRole, brush);
 				image->SetBrush(brush);
 
 				if (Theme->ResolvePaint(Assignment.TintPaint, colour))
@@ -249,20 +230,20 @@ namespace MounteaWidgetTheme
 			else if (USlider* slider = Cast<USlider>(Widget))
 			{
 				FSliderStyle style = slider->GetWidgetStyle();
-				PatchBrush(Theme, control->Slider.NormalBar, style.NormalBarImage);
-				PatchBrush(Theme, control->Slider.HoveredBar, style.HoveredBarImage);
-				PatchBrush(Theme, control->Slider.DisabledBar, style.DisabledBarImage);
-				PatchBrush(Theme, control->Slider.NormalThumb, style.NormalThumbImage);
-				PatchBrush(Theme, control->Slider.HoveredThumb, style.HoveredThumbImage);
-				PatchBrush(Theme, control->Slider.DisabledThumb, style.DisabledThumbImage);
+				Theme->PatchBrush(control->Slider.NormalBar, style.NormalBarImage);
+				Theme->PatchBrush(control->Slider.HoveredBar, style.HoveredBarImage);
+				Theme->PatchBrush(control->Slider.DisabledBar, style.DisabledBarImage);
+				Theme->PatchBrush(control->Slider.NormalThumb, style.NormalThumbImage);
+				Theme->PatchBrush(control->Slider.HoveredThumb, style.HoveredThumbImage);
+				Theme->PatchBrush(control->Slider.DisabledThumb, style.DisabledThumbImage);
 				slider->SetWidgetStyle(style);
 			}
 			else if (UProgressBar* progress = Cast<UProgressBar>(Widget))
 			{
 				FProgressBarStyle style = progress->GetWidgetStyle();
-				PatchBrush(Theme, control->Progress.Background, style.BackgroundImage);
-				PatchBrush(Theme, control->Progress.Fill, style.FillImage);
-				PatchBrush(Theme, control->Progress.Marquee, style.MarqueeImage);
+				Theme->PatchBrush(control->Progress.Background, style.BackgroundImage);
+				Theme->PatchBrush(control->Progress.Fill, style.FillImage);
+				Theme->PatchBrush(control->Progress.Marquee, style.MarqueeImage);
 				progress->SetWidgetStyle(style);
 
 				if (Theme->ResolvePaint(Assignment.TintPaint, colour))
@@ -280,10 +261,10 @@ namespace MounteaWidgetTheme
 				if (ResolveTextForeground(Theme, type, parts.ForegroundPaint, colour))
 					style.ForegroundColor = FSlateColor(colour);
 
-				PatchBrush(Theme, parts.Background, style.BackgroundImageNormal);
-				PatchBrush(Theme, parts.HoveredBackground, style.BackgroundImageHovered);
-				PatchBrush(Theme, parts.FocusedBackground, style.BackgroundImageFocused);
-				PatchBrush(Theme, parts.ReadOnlyBackground, style.BackgroundImageReadOnly);
+				Theme->PatchBrush(parts.Background, style.BackgroundImageNormal);
+				Theme->PatchBrush(parts.HoveredBackground, style.BackgroundImageHovered);
+				Theme->PatchBrush(parts.FocusedBackground, style.BackgroundImageFocused);
+				Theme->PatchBrush(parts.ReadOnlyBackground, style.BackgroundImageReadOnly);
 				input->WidgetStyle = style;
 				input->SynchronizeProperties();
 			}

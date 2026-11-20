@@ -155,3 +155,22 @@ bool UMounteaAdvancedInventoryThemeConfig::ResolvePaint(const FName Role, FLinea
 	OutColour = FLinearColor(ink->R, ink->G, ink->B, FMath::Clamp(paint->Opacity, 0.f, 1.f));
 	return true;
 }
+
+void UMounteaAdvancedInventoryThemeConfig::PatchBrush(const FName Role, FSlateBrush& Brush) const
+{
+	const FMounteaThemeBrushStyle* definition = this->Brushes.Find(Role);
+
+	if (!definition)
+		return;
+
+	if (definition->bOverrideBrush)
+		Brush = definition->Brush;
+
+	FLinearColor colour;
+
+	if (this->ResolvePaint(definition->Tint, colour))
+		Brush.TintColor = FSlateColor(colour);
+
+	if (this->ResolvePaint(definition->OutlineTint, colour))
+		Brush.OutlineSettings.Color = FSlateColor(colour);
+}
