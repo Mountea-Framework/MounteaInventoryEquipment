@@ -693,7 +693,7 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemePaint
 
 	/** Required opaque palette entry. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaletteOptions"),
+		meta=(PalettePicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Ink = NAME_None;
 
@@ -717,13 +717,13 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeTextStyle
 
 	/** Foreground paint. None uses the theme default ink unless the widget rule supplies a paint. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaintOptions"),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Foreground = NAME_None;
 
 	/** ShadowColour role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaintOptions"),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName ShadowColour = NAME_None;
 
@@ -751,13 +751,13 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeBrushStyle
 
 	/** Tint role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaintOptions"),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Tint = NAME_None;
 
 	/** OutlineTint role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaintOptions"),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName OutlineTint = NAME_None;
 };
@@ -770,13 +770,13 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeControlStateStyle
 
 	/** Foreground role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaintOptions"),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Foreground = NAME_None;
 
 	/** IconTint role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaintOptions"),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName IconTint = NAME_None;
 
@@ -863,7 +863,7 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeEditableTextStyle
 
 	/** Optional foreground paint override. None uses the typography foreground. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(GetOptions="GetPaintOptions"),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName ForegroundPaint = NAME_None;
 

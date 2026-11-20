@@ -45,6 +45,7 @@
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "PropertyEditorModule.h"
+#include "DetailsCustomizations/MounteaThemePickerCustomization.h"
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 #include "Editor/SMounteaCraftingRecipesEditor.h"
@@ -220,6 +221,11 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	// Detail Customizations
 	{
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		this->ThemePickerIdentifier = MakeShared<FMounteaThemePickerIdentifier>();
+		PropertyModule.RegisterCustomPropertyTypeLayout(FNameProperty::StaticClass()->GetFName(),
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaThemePickerCustomization::MakeInstance),
+			this->ThemePickerIdentifier);
+
 		RegisteredCustomPropertyTypeLayouts =
 		{
 			TEXT("MounteaJsonObjectDefinition")
@@ -338,6 +344,9 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 		if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
 		{
 			FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+			PropertyModule.UnregisterCustomPropertyTypeLayout(FNameProperty::StaticClass()->GetFName(), this->ThemePickerIdentifier);
+			this->ThemePickerIdentifier.Reset();
+
 			for (const FName& layoutName : RegisteredCustomPropertyTypeLayouts)
 				PropertyModule.UnregisterCustomPropertyTypeLayout(layoutName);
 

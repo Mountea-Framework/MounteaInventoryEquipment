@@ -38,7 +38,7 @@ public:
 
 	/** Palette ink for typography without a foreground paint. None keeps the widget foreground. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Typography",
-		meta=(GetOptions="GetPaletteOptions"))
+		meta=(PalettePicker))
 	FName DefaultInk = TEXT("Foreground");
 
 	/** Complete typography by semantic role. */
@@ -70,25 +70,6 @@ public:
 	TSoftObjectPtr<USoundBase> ButtonHoveredSound;
 
 #if WITH_EDITOR
-private:
-	/**
-	 * Lists the palette inks available in this theme for the Details panel.
-	 * @return None followed by the named palette entries in alphabetical order.
-	 */
-	UFUNCTION(Category="Theme|Palette",
-		meta=(MounteaGetter),
-		DisplayName="Get Palette Options")
-	TArray<FName> GetPaletteOptions() const;
-
-	/**
-	 * Lists the paints available in this theme for the Details panel.
-	 * @return None followed by the named paint entries in alphabetical order.
-	 */
-	UFUNCTION(Category="Theme|Paints",
-		meta=(MounteaGetter),
-		DisplayName="Get Paint Options")
-	TArray<FName> GetPaintOptions() const;
-
 public:
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
 #endif
