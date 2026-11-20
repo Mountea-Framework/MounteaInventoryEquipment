@@ -41,3 +41,25 @@ enum class EMounteaWidgetInputKey : uint8
 	Wheel 				UMETA(DisplayName = "Wheel"),
 	Touch 				UMETA(DisplayName = "Touch"),
 };
+/** Visual states supplied by existing control state owners. */
+UENUM(BlueprintType)
+enum class EMounteaThemeControlState : uint8
+{
+	Normal,
+	Hovered,
+	Pressed,
+	Focused,
+	Selected,
+	Disabled
+};
+
+/** Supported, typed appearance operations for Designer prefix rules. */
+UENUM(BlueprintType)
+enum class EMounteaWidgetThemeStyleType : uint8
+{
+	Text,
+	Brush,
+	ImageTint,
+	Control,
+	GroupOpacity
+};

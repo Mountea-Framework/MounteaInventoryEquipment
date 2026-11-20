@@ -14,12 +14,15 @@
 #include "CoreMinimal.h"
 #include "MounteaInventoryBaseUIEnums.h"
 #include "MounteaInventoryItem.h"
+#include "Fonts/SlateFontInfo.h"
+#include "Styling/SlateBrush.h"
 #include "MounteaInventoryBaseUIDataTypes.generated.h"
 
 enum class ECommonInputType : uint8;
 enum class EMounteaWidgetInputMethod : uint8;
 enum class EMounteaWidgetInputKey : uint8;
 class UUserWidget;
+class UWidget;
 class UTextureCube;
 class UMounteaSelectableInventoryItemAction;
 
@@ -682,3 +685,306 @@ FORCEINLINE bool operator==(const FInventorySlot& LHS, const FMounteaInventoryGr
 {
 	return LHS.SlotGuid == RHS.SlotGuid;
 }
+/** Palette ink with independent semantic opacity. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemePaint
+{
+	GENERATED_BODY()
+
+	/** Required opaque palette entry. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Ink = NAME_None;
+
+	/** Local alpha in the inclusive range zero to one; palette alpha is ignored. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(ClampMin="0.0", ClampMax="1.0"),
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	float Opacity = 1.f;
+};
+
+/** Complete typography with optional shadow paint. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeTextStyle
+{
+	GENERATED_BODY()
+
+	/** Font family, face, fractional size, tracking, outline and material. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FSlateFontInfo Font;
+
+	/** Foreground role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Foreground = NAME_None;
+
+	/** ShadowColour role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName ShadowColour = NAME_None;
+
+	/** Shadow offset applied when a shadow paint is assigned. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FVector2D ShadowOffset = FVector2D::ZeroVector;
+};
+
+/** Paint overrides for an authored brush, with explicit resource replacement. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeBrushStyle
+{
+	GENERATED_BODY()
+
+	/** Replacement brush used only when bOverrideBrush is enabled. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FSlateBrush Brush;
+
+	/** Explicitly replace geometry and resource; otherwise patch the existing brush. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	bool bOverrideBrush = false;
+
+	/** Tint role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Tint = NAME_None;
+
+	/** OutlineTint role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName OutlineTint = NAME_None;
+};
+
+/** Optional control state fields; Normal supplies missing state defaults. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeControlStateStyle
+{
+	GENERATED_BODY()
+
+	/** Foreground role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Foreground = NAME_None;
+
+	/** IconTint role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName IconTint = NAME_None;
+
+	/** Background role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Background = NAME_None;
+
+	/** FocusDecoration role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName FocusDecoration = NAME_None;
+};
+
+/** Independent slider bar and thumb brush roles. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeSliderStyle
+{
+	GENERATED_BODY()
+
+	/** NormalBar role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName NormalBar = NAME_None;
+
+	/** HoveredBar role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName HoveredBar = NAME_None;
+
+	/** DisabledBar role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName DisabledBar = NAME_None;
+
+	/** NormalThumb role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName NormalThumb = NAME_None;
+
+	/** HoveredThumb role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName HoveredThumb = NAME_None;
+
+	/** DisabledThumb role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName DisabledThumb = NAME_None;
+};
+
+/** Independent progress bar brush roles. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeProgressStyle
+{
+	GENERATED_BODY()
+
+	/** Background role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Background = NAME_None;
+
+	/** Fill role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Fill = NAME_None;
+
+	/** Marquee role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Marquee = NAME_None;
+};
+
+/** Editable text typography and background roles. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeEditableTextStyle
+{
+	GENERATED_BODY()
+
+	/** TypeRole role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName TypeRole = NAME_None;
+
+	/** ForegroundPaint role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName ForegroundPaint = NAME_None;
+
+	/** Background role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName Background = NAME_None;
+
+	/** HoveredBackground role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName HoveredBackground = NAME_None;
+
+	/** FocusedBackground role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName FocusedBackground = NAME_None;
+
+	/** ReadOnlyBackground role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName ReadOnlyBackground = NAME_None;
+};
+
+/** Native control style fields patched onto the existing widget style. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeControlStyle
+{
+	GENERATED_BODY()
+
+	/** Per-state role overrides; Normal is the fallback. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<EMounteaThemeControlState, FMounteaThemeControlStateStyle> States;
+
+	/** Slider part assignments. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FMounteaThemeSliderStyle Slider;
+
+	/** Progress bar part assignments. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FMounteaThemeProgressStyle Progress;
+
+	/** Editable text part assignments. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FMounteaThemeEditableTextStyle EditableText;
+};
+
+/** Typed appearance assignment; only fields relevant to StyleType are consumed. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaWidgetThemeStyleAssignment
+{
+	GENERATED_BODY()
+
+	/** Operation supported by the configured widget class. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	EMounteaWidgetThemeStyleType StyleType = EMounteaWidgetThemeStyleType::Text;
+
+	/** TypeRole role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Text", EditConditionHides),
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName TypeRole = NAME_None;
+
+	/** ForegroundPaint role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Text", EditConditionHides),
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName ForegroundPaint = NAME_None;
+
+	/** BrushRole role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Brush", EditConditionHides),
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName BrushRole = NAME_None;
+
+	/** Image tint, border brush-colour multiplier or progress fill-colour multiplier; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::ImageTint", EditConditionHides),
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName TintPaint = NAME_None;
+
+	/** ControlRole role; None preserves the authored value. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Control", EditConditionHides),
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName ControlRole = NAME_None;
+
+	/** Intentional whole-subtree opacity role, used only by GroupOpacity assignments. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties),
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FName GroupOpacityRole = NAME_None;
+};
+
+/** Exact case-insensitive prefixes including their trailing underscore. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaWidgetPrefixRule
+{
+	GENERATED_BODY()
+
+	/** Aliases sharing one assignment; the widget name must also contain a suffix. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TArray<FName> Prefixes;
+
+	/** Typed role assignment for compatible controls. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	FMounteaWidgetThemeStyleAssignment Style;
+};
+
+/** Prefix rules for one compatible widget class. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaWidgetPrefixGroup
+{
+	GENERATED_BODY()
+
+	/** Most-specific compatible class takes precedence over its ancestors. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TSubclassOf<UWidget> WidgetClass;
+
+	/** Unique prefix aliases within this class. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TArray<FMounteaWidgetPrefixRule> Rules;
+};
