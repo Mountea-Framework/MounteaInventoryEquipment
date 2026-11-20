@@ -16,6 +16,30 @@
 #include "Misc/DataValidation.h"
 #include "Fonts/CompositeFont.h"
 
+namespace
+{
+	template <typename ValueType>
+	TArray<FName> GetThemeOptions(const TMap<FName, ValueType>& Entries)
+	{
+		TArray<FName> options;
+		Entries.GenerateKeyArray(options);
+		options.Remove(NAME_None);
+		options.Sort(FNameLexicalLess());
+		options.Insert(NAME_None, 0);
+		return options;
+	}
+}
+
+TArray<FName> UMounteaAdvancedInventoryThemeConfig::GetPaletteOptions() const
+{
+	return GetThemeOptions(this->Palette);
+}
+
+TArray<FName> UMounteaAdvancedInventoryThemeConfig::GetPaintOptions() const
+{
+	return GetThemeOptions(this->Paints);
+}
+
 EDataValidationResult UMounteaAdvancedInventoryThemeConfig::IsDataValid(FDataValidationContext& Context) const
 {
 	Super::IsDataValid(Context);
