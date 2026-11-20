@@ -47,6 +47,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Theme",
 		meta=(MounteaSetter),
+		meta=(DefaultToSelf="OwnerWidget"),
 		DisplayName="Apply Widget Theme By Prefix")
 	static bool ApplyWidgetThemeByPrefix(UUserWidget* OwnerWidget, UMounteaAdvancedInventoryThemeConfig* Theme);
 

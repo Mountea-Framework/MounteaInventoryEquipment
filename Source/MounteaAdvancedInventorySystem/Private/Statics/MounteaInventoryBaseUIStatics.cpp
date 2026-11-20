@@ -328,9 +328,7 @@ bool UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(UUserWidget* Owner
 	OwnerWidget->WidgetTree->ForEachWidget([&](UWidget* widget)
 	{
 		if (UUserWidget* child = Cast<UUserWidget>(widget))
-		{
 			children.Add(child);
-		}
 
 		const FString name = widget->GetName();
 		int32 underscore;
