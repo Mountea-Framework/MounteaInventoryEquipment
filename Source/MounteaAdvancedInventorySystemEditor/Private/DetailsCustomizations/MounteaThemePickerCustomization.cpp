@@ -97,8 +97,9 @@ namespace
 		}
 	}
 
-	TSharedRef<SWidget> MakeInkLabel(const TSharedRef<IPropertyHandle>& PropertyHandle, TOptional<FName> MenuKey)
+	TSharedRef<SWidget> MakeColourLabel(const TSharedRef<IPropertyHandle>& PropertyHandle, TOptional<FName> MenuKey)
 	{
+		const bool isPaint = PropertyHandle->HasMetaData(PaintPicker);
 		auto label = SNew(SHorizontalBox);
 		TArray<UObject*> owners;
 		PropertyHandle->GetOuterObjects(owners);
@@ -106,19 +107,32 @@ namespace
 		for (UObject* owner : owners)
 		{
 			const TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> theme = Cast<UMounteaAdvancedInventoryThemeConfig>(owner);
-			const auto findColour = [theme, PropertyHandle, MenuKey]() -> const FLinearColor*
+			const auto findColour = [theme, PropertyHandle, MenuKey, isPaint]() -> TOptional<FLinearColor>
 			{
 				if (!theme.IsValid())
-					return nullptr;
+					return {};
 
 				FName key;
 
 				if (MenuKey.IsSet())
 					key = MenuKey.GetValue();
 				else if (PropertyHandle->GetValue(key) != FPropertyAccess::Success)
-					return nullptr;
+					return {};
 
-				return key.IsNone() ? nullptr : theme->Palette.Find(key);
+				if (key.IsNone())
+					return {};
+
+				if (isPaint)
+				{
+					FLinearColor colour;
+
+					if (theme->ResolvePaint(key, colour))
+						return colour;
+				}
+				else if (const FLinearColor* ink = theme->Palette.Find(key))
+					return *ink;
+
+				return {};
 			};
 
 			label->AddSlot()
@@ -128,15 +142,15 @@ namespace
 				SNew(SColorBlock)
 				.Size(FVector2D(20.f, 12.f))
 				.CornerRadius(FVector4(3.f))
-				.AlphaDisplayMode(EColorBlockAlphaDisplayMode::Ignore)
+				.AlphaDisplayMode(isPaint ? EColorBlockAlphaDisplayMode::Combined : EColorBlockAlphaDisplayMode::Ignore)
+				.ShowBackgroundForAlpha(isPaint)
 				.Visibility_Lambda([findColour]()
 				{
-					return findColour() ? EVisibility::HitTestInvisible : EVisibility::Collapsed;
+					return findColour().IsSet() ? EVisibility::HitTestInvisible : EVisibility::Collapsed;
 				})
 				.Color_Lambda([findColour]()
 				{
-					const FLinearColor* colour = findColour();
-					return colour ? *colour : FLinearColor::Transparent;
+					return findColour().Get(FLinearColor::Transparent);
 				})
 			];
 		}
@@ -162,7 +176,7 @@ namespace
 		return label;
 	}
 
-	TSharedRef<SWidget> MakePalettePicker(const TSharedRef<IPropertyHandle>& PropertyHandle)
+	TSharedRef<SWidget> MakeColourPicker(const TSharedRef<IPropertyHandle>& PropertyHandle)
 	{
 		return SNew(SComboButton)
 			.ContentPadding(FMargin(4.f, 2.f))
@@ -177,14 +191,14 @@ namespace
 						PropertyHandle->SetValue(key);
 					}));
 
-					menu.AddMenuEntry(select, MakeInkLabel(PropertyHandle, key));
+					menu.AddMenuEntry(select, MakeColourLabel(PropertyHandle, key));
 				}
 
 				return menu.MakeWidget(nullptr, 400);
 			})
 			.ButtonContent()
 			[
-				MakeInkLabel(PropertyHandle, {})
+				MakeColourLabel(PropertyHandle, {})
 			];
 	}
 
@@ -215,6 +229,8 @@ TSharedRef<IPropertyTypeCustomization> FMounteaThemePickerCustomization::MakeIns
 void FMounteaThemePickerCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> PropertyHandle,
 	FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& CustomizationUtils)
 {
+	const bool showSwatch = PropertyHandle->HasMetaData(PalettePicker) || PropertyHandle->HasMetaData(PaintPicker);
+
 	HeaderRow.NameContent()
 	[
 		PropertyHandle->CreatePropertyNameWidget()
@@ -222,7 +238,7 @@ void FMounteaThemePickerCustomization::CustomizeHeader(TSharedRef<IPropertyHandl
 	.ValueContent()
 	.MinDesiredWidth(160.f)
 	[
-		PropertyHandle->HasMetaData(PalettePicker) ? MakePalettePicker(PropertyHandle) :
+		showSwatch ? MakeColourPicker(PropertyHandle) :
 			PropertyCustomizationHelpers::MakePropertyComboBox(PropertyHandle,
 			FOnGetPropertyComboBoxStrings::CreateStatic(&GetPickerOptions, PropertyHandle))
 	];

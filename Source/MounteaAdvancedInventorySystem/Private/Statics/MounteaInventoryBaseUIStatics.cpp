@@ -44,33 +44,17 @@ namespace MounteaWidgetTheme
 	using FClassRules = TMap<TWeakObjectPtr<UClass>, TMap<FName, FMounteaWidgetThemeStyleAssignment>>;
 	static TMap<TWeakObjectPtr<const UMounteaAdvancedInventoryGlobalUIConfig>, FClassRules> PrefixCache;
 
-	bool ResolvePaint(const UMounteaAdvancedInventoryThemeConfig* Theme, const FName Role, FLinearColor& OutColour)
-	{
-		const FMounteaThemePaint* paint = Theme->Paints.Find(Role);
-
-		if (!paint)
-			return false;
-
-		const FLinearColor* ink = Theme->Palette.Find(paint->Ink);
-
-		if (!ink)
-			return false;
-
-		OutColour = FLinearColor(ink->R, ink->G, ink->B, FMath::Clamp(paint->Opacity, 0.f, 1.f));
-		return true;
-	}
-
 	bool ResolveTextForeground(const UMounteaAdvancedInventoryThemeConfig* Theme, const FMounteaThemeTextStyle* Type,
 		const FName OverridePaint, FLinearColor& OutColour)
 	{
 		if (!OverridePaint.IsNone())
-			return ResolvePaint(Theme, OverridePaint, OutColour);
+			return Theme->ResolvePaint(OverridePaint, OutColour);
 
 		if (!Type)
 			return false;
 
 		if (!Type->Foreground.IsNone())
-			return ResolvePaint(Theme, Type->Foreground, OutColour);
+			return Theme->ResolvePaint(Type->Foreground, OutColour);
 
 		if (Theme->DefaultInk.IsNone())
 			return false;
@@ -96,10 +80,10 @@ namespace MounteaWidgetTheme
 
 		FLinearColor colour;
 
-		if (ResolvePaint(Theme, definition->Tint, colour))
+		if (Theme->ResolvePaint(definition->Tint, colour))
 			Brush.TintColor = FSlateColor(colour);
 
-		if (ResolvePaint(Theme, definition->OutlineTint, colour))
+		if (Theme->ResolvePaint(definition->OutlineTint, colour))
 			Brush.OutlineSettings.Color = FSlateColor(colour);
 	}
 
@@ -176,7 +160,7 @@ namespace MounteaWidgetTheme
 			PatchBrush(Theme, normal->Background, Brush);
 			FLinearColor colour;
 
-			if (ResolvePaint(Theme, normal->Foreground, colour))
+			if (Theme->ResolvePaint(normal->Foreground, colour))
 				Foreground = FSlateColor(colour);
 		}
 
@@ -185,7 +169,7 @@ namespace MounteaWidgetTheme
 			PatchBrush(Theme, state->Background, Brush);
 			FLinearColor colour;
 
-			if (ResolvePaint(Theme, state->Foreground, colour))
+			if (Theme->ResolvePaint(state->Foreground, colour))
 				Foreground = FSlateColor(colour);
 		}
 	}
@@ -212,7 +196,7 @@ namespace MounteaWidgetTheme
 			if (ResolveTextForeground(Theme, type, Assignment.ForegroundPaint, colour))
 				text->SetColorAndOpacity(FSlateColor(colour));
 
-			if (ResolvePaint(Theme, type->ShadowColour, colour))
+			if (Theme->ResolvePaint(type->ShadowColour, colour))
 			{
 				text->SetShadowColorAndOpacity(colour);
 				text->SetShadowOffset(type->ShadowOffset);
@@ -222,7 +206,7 @@ namespace MounteaWidgetTheme
 		{
 			UImage* image = Cast<UImage>(Widget);
 
-			if (image && ResolvePaint(Theme, Assignment.TintPaint, colour))
+			if (image && Theme->ResolvePaint(Assignment.TintPaint, colour))
 				image->SetColorAndOpacity(colour);
 		}
 		else if (Assignment.StyleType == EMounteaWidgetThemeStyleType::Brush)
@@ -233,7 +217,7 @@ namespace MounteaWidgetTheme
 				PatchBrush(Theme, Assignment.BrushRole, brush);
 				border->SetBrush(brush);
 
-				if (ResolvePaint(Theme, Assignment.TintPaint, colour))
+				if (Theme->ResolvePaint(Assignment.TintPaint, colour))
 					border->SetBrushColor(colour);
 			}
 			else if (UImage* image = Cast<UImage>(Widget))
@@ -242,7 +226,7 @@ namespace MounteaWidgetTheme
 				PatchBrush(Theme, Assignment.BrushRole, brush);
 				image->SetBrush(brush);
 
-				if (ResolvePaint(Theme, Assignment.TintPaint, colour))
+				if (Theme->ResolvePaint(Assignment.TintPaint, colour))
 					image->SetColorAndOpacity(colour);
 			}
 		}
@@ -281,7 +265,7 @@ namespace MounteaWidgetTheme
 				PatchBrush(Theme, control->Progress.Marquee, style.MarqueeImage);
 				progress->SetWidgetStyle(style);
 
-				if (ResolvePaint(Theme, Assignment.TintPaint, colour))
+				if (Theme->ResolvePaint(Assignment.TintPaint, colour))
 					progress->SetFillColorAndOpacity(colour);
 			}
 			else if (UEditableTextBox* input = Cast<UEditableTextBox>(Widget))

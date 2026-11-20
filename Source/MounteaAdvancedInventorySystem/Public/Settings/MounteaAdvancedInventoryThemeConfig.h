@@ -69,6 +69,9 @@ public:
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	TSoftObjectPtr<USoundBase> ButtonHoveredSound;
 
+	/** Resolves a named paint to its palette RGB and paint opacity. Returns false for missing references. */
+	bool ResolvePaint(FName Role, FLinearColor& OutColour) const;
+
 #if WITH_EDITOR
 public:
 	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;

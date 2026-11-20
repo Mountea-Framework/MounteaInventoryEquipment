@@ -139,3 +139,19 @@ EDataValidationResult UMounteaAdvancedInventoryThemeConfig::IsDataValid(FDataVal
 	return Context.GetNumErrors() > 0 ? EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 #endif
+
+bool UMounteaAdvancedInventoryThemeConfig::ResolvePaint(const FName Role, FLinearColor& OutColour) const
+{
+	const FMounteaThemePaint* paint = this->Paints.Find(Role);
+
+	if (!paint)
+		return false;
+
+	const FLinearColor* ink = this->Palette.Find(paint->Ink);
+
+	if (!ink)
+		return false;
+
+	OutColour = FLinearColor(ink->R, ink->G, ink->B, FMath::Clamp(paint->Opacity, 0.f, 1.f));
+	return true;
+}
