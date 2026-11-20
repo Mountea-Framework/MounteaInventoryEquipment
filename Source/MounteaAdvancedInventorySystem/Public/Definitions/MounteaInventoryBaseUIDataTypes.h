@@ -945,36 +945,42 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaWidgetThemeStyleAssignment
 	/** TypeRole role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
 		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Text", EditConditionHides),
+		meta=(TypographyPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName TypeRole = NAME_None;
 
 	/** Optional foreground paint override. None uses the typography foreground. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
 		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Text", EditConditionHides),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName ForegroundPaint = NAME_None;
 
 	/** BrushRole role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
 		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Brush", EditConditionHides),
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName BrushRole = NAME_None;
 
 	/** Image tint, border brush-colour multiplier or progress fill-colour multiplier; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
-		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::ImageTint", EditConditionHides),
+		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::ImageTint || StyleType == EMounteaWidgetThemeStyleType::Brush || StyleType == EMounteaWidgetThemeStyleType::Control", EditConditionHides),
+		meta=(PaintPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName TintPaint = NAME_None;
 
 	/** ControlRole role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
 		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Control", EditConditionHides),
+		meta=(ControlPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName ControlRole = NAME_None;
 
 	/** Intentional whole-subtree opacity role, used only by GroupOpacity assignments. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
-		meta=(NoResetToDefault, ShowOnlyInnerProperties),
+		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::GroupOpacity", EditConditionHides),
+		meta=(GroupOpacityPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName GroupOpacityRole = NAME_None;
 };

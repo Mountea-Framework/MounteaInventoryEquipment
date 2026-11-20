@@ -42,7 +42,8 @@ public:
 public:
 
 	/** Default theme shared by wrapper chrome and screens without an override. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(ForceRebuildProperty="WidgetPrefixGroups"))
 	TSoftObjectPtr<UMounteaAdvancedInventoryThemeConfig> BaseTheme;
 
 	/** Designer prefix rules shared by runtime application and editor auditing. */

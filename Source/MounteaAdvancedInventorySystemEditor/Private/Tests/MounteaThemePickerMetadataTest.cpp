@@ -42,7 +42,11 @@ namespace
 			{TEXT("HoveredBackground"), TEXT("BrushPicker")},
 			{TEXT("FocusedBackground"), TEXT("BrushPicker")},
 			{TEXT("ReadOnlyBackground"), TEXT("BrushPicker")},
-			{TEXT("TypeRole"), TEXT("TypographyPicker")}
+			{TEXT("TypeRole"), TEXT("TypographyPicker")},
+			{TEXT("BrushRole"), TEXT("BrushPicker")},
+			{TEXT("TintPaint"), TEXT("PaintPicker")},
+			{TEXT("ControlRole"), TEXT("ControlPicker")},
+			{TEXT("GroupOpacityRole"), TEXT("GroupOpacityPicker")}
 		};
 
 		if (const FName* picker = pickerByProperty.Find(PropertyName))
@@ -100,6 +104,11 @@ bool FMounteaThemePickerMetadataTest::RunTest(const FString& Parameters)
 	for (TFieldIterator<FProperty> iterator(UMounteaAdvancedInventoryThemeConfig::StaticClass(), EFieldIteratorFlags::ExcludeSuper); iterator; ++iterator)
 	{
 		CheckPickerMetadata(*this, *iterator, iterator->GetName());
+	}
+
+	for (TFieldIterator<FProperty> iterator(FMounteaWidgetThemeStyleAssignment::StaticStruct()); iterator; ++iterator)
+	{
+		CheckPickerMetadata(*this, *iterator, TEXT("PrefixStyle.") + iterator->GetName());
 	}
 
 	return true;

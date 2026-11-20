@@ -54,6 +54,7 @@ public class MounteaAdvancedInventorySystemEditor : ModuleRules
 
 				"Slate",
 				"SlateCore",
+				"UMG",
 				"EditorStyle",
 
 				"BlueprintGraph",

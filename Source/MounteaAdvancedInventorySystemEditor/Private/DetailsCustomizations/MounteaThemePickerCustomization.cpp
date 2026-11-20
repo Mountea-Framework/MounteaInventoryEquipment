@@ -22,6 +22,8 @@
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SOverlay.h"
 #include "PropertyHandle.h"
+#include "Components/ProgressBar.h"
+#include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
 
 namespace
@@ -31,9 +33,20 @@ namespace
 	const FName BrushPicker(TEXT("BrushPicker"));
 	const FName TypographyPicker(TEXT("TypographyPicker"));
 
+	const FName ControlPicker(TEXT("ControlPicker"));
+	const FName GroupOpacityPicker(TEXT("GroupOpacityPicker"));
+
+	UMounteaAdvancedInventoryThemeConfig* GetPickerTheme(UObject* Owner)
+	{
+		if (const auto* config = Cast<UMounteaAdvancedInventoryGlobalUIConfig>(Owner))
+			return config->BaseTheme.LoadSynchronous();
+
+		return Cast<UMounteaAdvancedInventoryThemeConfig>(Owner);
+	}
+
 	FName GetPicker(const IPropertyHandle& PropertyHandle)
 	{
-		for (const FName picker : { PalettePicker, PaintPicker, BrushPicker, TypographyPicker })
+		for (const FName picker : { PalettePicker, PaintPicker, BrushPicker, TypographyPicker, ControlPicker, GroupOpacityPicker })
 		{
 			if (PropertyHandle.HasMetaData(picker))
 				return picker;
@@ -52,6 +65,10 @@ namespace
 			Theme.Brushes.GenerateKeyArray(Keys);
 		else if (Picker == TypographyPicker)
 			Theme.Typography.GenerateKeyArray(Keys);
+		else if (Picker == ControlPicker)
+			Theme.Controls.GenerateKeyArray(Keys);
+		else if (Picker == GroupOpacityPicker)
+			Theme.GroupOpacity.GenerateKeyArray(Keys);
 	}
 
 	TArray<FName> GetPickerKeys(const TSharedRef<IPropertyHandle>& PropertyHandle)
@@ -63,7 +80,7 @@ namespace
 
 		for (int32 index = 0; index < owners.Num(); ++index)
 		{
-			const auto* theme = Cast<UMounteaAdvancedInventoryThemeConfig>(owners[index]);
+			const auto* theme = GetPickerTheme(owners[index]);
 
 			if (!theme)
 			{
@@ -91,7 +108,7 @@ namespace
 		return keys;
 	}
 
-	TSharedRef<SWidget> MakeBrushPreview(TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> Theme, TAttribute<FName> Key)
+	TSharedRef<SWidget> MakeBrushPreview(TStrongObjectPtr<UMounteaAdvancedInventoryThemeConfig> Theme, TAttribute<FName> Key)
 	{
 		const auto preview = MakeShared<FSlateBrush>();
 
@@ -128,7 +145,7 @@ namespace
 			];
 	}
 
-	TSharedRef<SWidget> MakeTypePreview(TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> Theme, TAttribute<FName> Key)
+	TSharedRef<SWidget> MakeTypePreview(TStrongObjectPtr<UMounteaAdvancedInventoryThemeConfig> Theme, TAttribute<FName> Key)
 	{
 		return SNew(STextBlock)
 			.Text(INVTEXT("Aa"))
@@ -164,7 +181,27 @@ namespace
 
 		for (UObject* owner : owners)
 		{
-			const TWeakObjectPtr<UMounteaAdvancedInventoryThemeConfig> theme = Cast<UMounteaAdvancedInventoryThemeConfig>(owner);
+			if (picker == ControlPicker)
+				break;
+
+			const TStrongObjectPtr<UMounteaAdvancedInventoryThemeConfig> theme(GetPickerTheme(owner));
+
+			if (picker == GroupOpacityPicker)
+			{
+				label->AddSlot()
+				.AutoWidth()
+				.VAlign(VAlign_Center)
+				[
+					SNew(STextBlock)
+					.Font(FAppStyle::GetFontStyle("PropertyWindow.NormalFont"))
+					.Text_Lambda([theme, key]()
+					{
+						const float* opacity = theme.IsValid() ? theme->GroupOpacity.Find(key.Get()) : nullptr;
+						return opacity ? FText::AsPercent(*opacity) : FText::GetEmpty();
+					})
+				];
+				continue;
+			}
 
 			if (picker == BrushPicker || picker == TypographyPicker)
 			{
@@ -277,7 +314,7 @@ bool FMounteaThemePickerIdentifier::IsPropertyTypeCustomized(const IPropertyHand
 
 	for (const UObject* owner : owners)
 	{
-		if (!IsValid(owner) || !owner->IsA<UMounteaAdvancedInventoryThemeConfig>())
+		if (!IsValid(owner) || (!owner->IsA<UMounteaAdvancedInventoryThemeConfig>() && !owner->IsA<UMounteaAdvancedInventoryGlobalUIConfig>()))
 			return false;
 	}
 
@@ -292,6 +329,37 @@ TSharedRef<IPropertyTypeCustomization> FMounteaThemePickerCustomization::MakeIns
 void FMounteaThemePickerCustomization::CustomizeHeader(TSharedRef<IPropertyHandle> PropertyHandle,
 	FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& CustomizationUtils)
 {
+	if (PropertyHandle->GetProperty()->GetFName() == GET_MEMBER_NAME_CHECKED(FMounteaWidgetThemeStyleAssignment, TintPaint))
+	{
+		const auto assignment = PropertyHandle->GetParentHandle();
+		const auto styleType = assignment->GetChildHandle(GET_MEMBER_NAME_CHECKED(FMounteaWidgetThemeStyleAssignment, StyleType));
+		auto group = assignment->GetParentHandle();
+
+		while (group.IsValid() && !group->GetChildHandle(GET_MEMBER_NAME_CHECKED(FMounteaWidgetPrefixGroup, WidgetClass)).IsValid())
+		{
+			group = group->GetParentHandle();
+		}
+
+		if (group.IsValid() && styleType.IsValid())
+		{
+			const auto widgetClass = group->GetChildHandle(GET_MEMBER_NAME_CHECKED(FMounteaWidgetPrefixGroup, WidgetClass));
+			HeaderRow.Visibility(TAttribute<EVisibility>::CreateLambda([widgetClass, styleType]()
+			{
+				uint8 type = 0;
+				UObject* value = nullptr;
+
+				if (styleType->GetValue(type) == FPropertyAccess::Success && type == static_cast<uint8>(EMounteaWidgetThemeStyleType::Control))
+				{
+					widgetClass->GetValue(value);
+					const auto* widgetType = Cast<UClass>(value);
+					return widgetType && widgetType->IsChildOf(UProgressBar::StaticClass()) ? EVisibility::Visible : EVisibility::Collapsed;
+				}
+
+				return EVisibility::Visible;
+			}));
+		}
+	}
+
 	HeaderRow.NameContent()
 	[
 		PropertyHandle->CreatePropertyNameWidget()
