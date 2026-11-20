@@ -782,11 +782,13 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeControlStateStyle
 
 	/** Background role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Background = NAME_None;
 
 	/** FocusDecoration role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName FocusDecoration = NAME_None;
 };
@@ -799,31 +801,37 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeSliderStyle
 
 	/** NormalBar role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName NormalBar = NAME_None;
 
 	/** HoveredBar role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName HoveredBar = NAME_None;
 
 	/** DisabledBar role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName DisabledBar = NAME_None;
 
 	/** NormalThumb role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName NormalThumb = NAME_None;
 
 	/** HoveredThumb role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName HoveredThumb = NAME_None;
 
 	/** DisabledThumb role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName DisabledThumb = NAME_None;
 };
@@ -836,16 +844,19 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeProgressStyle
 
 	/** Background role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Background = NAME_None;
 
 	/** Fill role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Fill = NAME_None;
 
 	/** Marquee role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Marquee = NAME_None;
 };
@@ -858,6 +869,7 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeEditableTextStyle
 
 	/** TypeRole role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(TypographyPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName TypeRole = NAME_None;
 
@@ -869,21 +881,25 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeEditableTextStyle
 
 	/** Background role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Background = NAME_None;
 
 	/** HoveredBackground role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName HoveredBackground = NAME_None;
 
 	/** FocusedBackground role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName FocusedBackground = NAME_None;
 
 	/** ReadOnlyBackground role; None preserves the authored value. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
+		meta=(BrushPicker),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName ReadOnlyBackground = NAME_None;
 };

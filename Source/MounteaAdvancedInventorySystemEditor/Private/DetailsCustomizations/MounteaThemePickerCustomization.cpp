@@ -20,13 +20,38 @@ namespace
 {
 	const FName PalettePicker(TEXT("PalettePicker"));
 	const FName PaintPicker(TEXT("PaintPicker"));
+	const FName BrushPicker(TEXT("BrushPicker"));
+	const FName TypographyPicker(TEXT("TypographyPicker"));
+
+	FName GetPicker(const IPropertyHandle& PropertyHandle)
+	{
+		for (const FName picker : { PalettePicker, PaintPicker, BrushPicker, TypographyPicker })
+		{
+			if (PropertyHandle.HasMetaData(picker))
+				return picker;
+		}
+
+		return NAME_None;
+	}
+
+	void GetThemeKeys(const UMounteaAdvancedInventoryThemeConfig& Theme, const FName Picker, TArray<FName>& Keys)
+	{
+		if (Picker == PalettePicker)
+			Theme.Palette.GenerateKeyArray(Keys);
+		else if (Picker == PaintPicker)
+			Theme.Paints.GenerateKeyArray(Keys);
+		else if (Picker == BrushPicker)
+			Theme.Brushes.GenerateKeyArray(Keys);
+		else if (Picker == TypographyPicker)
+			Theme.Typography.GenerateKeyArray(Keys);
+	}
 
 	void GetPickerOptions(TArray<TSharedPtr<FString>>& Options, TArray<TSharedPtr<SToolTip>>& Tooltips,
 		TArray<bool>& RestrictedItems, TSharedRef<IPropertyHandle> PropertyHandle)
 	{
 		TArray<UObject*> owners;
 		PropertyHandle->GetOuterObjects(owners);
-		const bool usePalette = PropertyHandle->HasMetaData(PalettePicker);
+		const FName picker = GetPicker(*PropertyHandle);
 		TArray<FName> keys;
 
 		for (int32 index = 0; index < owners.Num(); ++index)
@@ -40,17 +65,15 @@ namespace
 			}
 
 			if (index == 0)
-			{
-				if (usePalette)
-					theme->Palette.GenerateKeyArray(keys);
-				else
-					theme->Paints.GenerateKeyArray(keys);
-			}
+				GetThemeKeys(*theme, picker, keys);
 			else
 			{
-				keys.RemoveAll([theme, usePalette](const FName Key)
+				TArray<FName> otherKeys;
+				GetThemeKeys(*theme, picker, otherKeys);
+				const TSet<FName> sharedCandidates(otherKeys);
+				keys.RemoveAll([&sharedCandidates](const FName Key)
 				{
-					return usePalette ? !theme->Palette.Contains(Key) : !theme->Paints.Contains(Key);
+					return !sharedCandidates.Contains(Key);
 				});
 			}
 		}
@@ -68,7 +91,7 @@ namespace
 
 bool FMounteaThemePickerIdentifier::IsPropertyTypeCustomized(const IPropertyHandle& PropertyHandle) const
 {
-	if (!PropertyHandle.HasMetaData(PalettePicker) && !PropertyHandle.HasMetaData(PaintPicker))
+	if (GetPicker(PropertyHandle).IsNone())
 		return false;
 
 	TArray<UObject*> owners;
