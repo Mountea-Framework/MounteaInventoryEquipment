@@ -93,6 +93,34 @@ public:
 	/** Default size (in Slate units) of the notification card widget when rendered on screen. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
 	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
+	
+	// ---- Chrome
+
+	/**
+	 * Widget class used to display the header toolbar.
+	 *
+	 * The assigned widget must implement the MounteaAdvancedInventoryHeaderToolbarWidgetInterface
+	 * to provide header-level controls and toolbar behavior for the UI.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryHeaderToolbarWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> HeaderWidgetClass;
+	
+	/**
+	 * Widget class used to display the footer toolbar.
+	 *
+	 * The assigned widget must implement the MounteaAdvancedInventoryFooterToolbarWidgetInterface
+	 * to provide footer-level controls and toolbar behavior for the UI.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryFooterToolbarWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget>FooterWidgetClass;
 
 	// ---- Fonts
 
