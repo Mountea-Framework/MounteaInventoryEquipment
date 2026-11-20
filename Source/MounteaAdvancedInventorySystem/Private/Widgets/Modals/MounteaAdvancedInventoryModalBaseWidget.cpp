@@ -12,6 +12,7 @@
 #include "Widgets/Modals/MounteaAdvancedInventoryModalBaseWidget.h"
 
 #include "Components/PanelWidget.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 #include "Interfaces/Widgets/Modal/MounteaAdvancedInventoryModalContentWidgetInterface.h"
 
 void UMounteaAdvancedInventoryModalBaseWidget::AddModalContentToModalWindow_Implementation(UUserWidget* ModalContentWidget, UMounteaJsonObject* Payload)
@@ -24,6 +25,9 @@ void UMounteaAdvancedInventoryModalBaseWidget::AddModalContentToModalWindow_Impl
 		previousContent->GetOnModalContentConfirmedHandle().RemoveDynamic(this, &UMounteaAdvancedInventoryModalBaseWidget::HandleModalContentConfirmed);
 		previousContent->GetOnModalContentCancelledHandle().RemoveDynamic(this, &UMounteaAdvancedInventoryModalBaseWidget::HandleModalContentCancelled);
 	}
+
+	if (auto* theme = UMounteaInventoryBaseUIStatics::GetWidgetTheme(this))
+		UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(ModalContentWidget, theme);
 
 	CurrentModalContentWidget = ModalContentWidget;
 

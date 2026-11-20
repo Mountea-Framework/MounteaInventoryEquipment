@@ -13,6 +13,7 @@
 #include "Components/MounteaInventoryUIComponent.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 #include "Decorations/MounteaSelectableInventoryItemAction.h"
 #include "Engine/LocalPlayer.h"
 
@@ -155,7 +156,7 @@ UMounteaAdvancedInventorySharedHUDSubsystem* UMounteaInventoryUIComponent::GetSh
 
 bool UMounteaInventoryUIComponent::CreateInventoryWidget_Implementation()
 {
-	const UMounteaAdvancedInventoryUIConfig* inventoryUIConfig = UMounteaInventoryUIStatics::GetInventoryUISettingsConfig();
+	UMounteaAdvancedInventoryUIConfig* inventoryUIConfig = UMounteaInventoryUIStatics::GetInventoryUISettingsConfig();
 	if (!inventoryUIConfig)
 	{
 		LOG_ERROR(TEXT("[CreateInventoryWidget] Unable to load Inventory Config!"))
@@ -207,6 +208,8 @@ bool UMounteaInventoryUIComponent::CreateInventoryWidget_Implementation()
 		LOG_ERROR(TEXT("[CreateInventoryWidget] Inventory UI must implement `MounteaAdvancedInventoryWidgetInterface`!"))
 		return false;
 	}
+
+	UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(newWidget, UMounteaInventoryUIStatics::GetThemeConfig(inventoryUIConfig));
 
 	InventoryWidget = newWidget;
 	

@@ -60,6 +60,9 @@ public:
 	};
 
 protected:
+
+	/** Legacy theme event is initialization work, not a reattachment state reset. */
+	bool ThemeEventInitialized = false;
 	
 	/** Reference to the owning inventory UI interface.*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Mountea|Primary Data",

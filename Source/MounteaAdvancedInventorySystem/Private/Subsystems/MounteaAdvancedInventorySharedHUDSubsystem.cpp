@@ -106,6 +106,8 @@ bool UMounteaAdvancedInventorySharedHUDSubsystem::CreateWrapperWidget_Implementa
 		return false;
 	}
 
+	UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(newWidget, UMounteaInventoryUIStatics::GetThemeConfig());
+
 	SharedUserInterface = newWidget;
 	ensure(SharedUserInterface != nullptr);
 	
@@ -174,6 +176,8 @@ void UMounteaAdvancedInventorySharedHUDSubsystem::CreateInventoryNotification_Im
 		LOG_ERROR(TEXT("[CreateInventoryNotification] Failed to Create Inventory Notification!"))
 		return;
 	}
+
+	UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(notificationWidget, UMounteaInventoryUIStatics::GetThemeConfig());
 
 	IMounteaInventoryNotificationWidgetInterface::Execute_CreateNotification(notificationWidget, NotificationData, InventoryNotificationContainerWidget);
 

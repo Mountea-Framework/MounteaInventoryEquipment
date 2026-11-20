@@ -11,10 +11,15 @@
 
 
 #include "Widgets/MounteaAdvancedInventoryBaseWidget.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 
 void UMounteaAdvancedInventoryBaseWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Execute_ApplyTheme(this);
+	if (!this->ThemeEventInitialized)
+		Execute_ApplyTheme(this);
+
+	if (auto* theme = UMounteaInventoryBaseUIStatics::GetWidgetTheme(this))
+		this->ThemeEventInitialized = UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(this, theme);
 }
