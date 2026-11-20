@@ -37,6 +37,7 @@ class UWidget;
 class UTextBlock;
 class UMounteaAdvancedInventoryInterface;
 class UMounteaAdvancedInventoryThemeConfig;
+class UMounteaAdvancedInventoryScreenUIConfig;
 class UMounteaAdvancedInventoryUIConfig;
 class UMounteaAdvancedInventoryInteractableObjectWidget;
 class IMounteaAdvancedInventoryCategoryWidgetInterface;
@@ -951,18 +952,16 @@ public:
 #pragma region Theme	
 
 	/**
-	 * Retrieves the theme configuration for the Mountea Advanced Inventory system.
+	 * Resolves a screen override, falling back to the active global UI theme.
+	 * An unresolved override emits a diagnostic and still allows the global fallback.
 	 *
-	 * This method fetches the theme configuration by accessing the global settings
-	 * for the Mountea Advanced Inventory system, resolving any configured BaseTheme.
-	 *
-	 * @return Pointer to UMounteaAdvancedInventoryThemeConfig if the configuration
-	 *         is valid and successfully resolved. Returns nullptr if the configuration
-	 *         is invalid or unavailable.
+	 * @param OptionalUIConfig Actual config used to open the screen; nullptr selects the global theme.
+	 * @return Resolved screen or global theme, or nullptr when no theme can be loaded.
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Theme", 
-		meta=(MounteaGetter))
-	static UMounteaAdvancedInventoryThemeConfig* GetThemeConfig();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Mountea|Inventory & Equipment|Theme",
+		meta=(MounteaGetter),
+		DisplayName="Get Theme Config")
+	static UMounteaAdvancedInventoryThemeConfig* GetThemeConfig(UMounteaAdvancedInventoryScreenUIConfig* OptionalUIConfig = nullptr);
 
 #pragma endregion
 

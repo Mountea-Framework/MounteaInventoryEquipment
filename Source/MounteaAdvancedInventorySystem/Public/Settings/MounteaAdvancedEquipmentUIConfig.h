@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataAsset.h"
+#include "Settings/MounteaAdvancedInventoryScreenUIConfig.h"
 #include "MounteaAdvancedEquipmentUIConfig.generated.h"
 
 class UUserWidget;
@@ -23,7 +23,7 @@ class UUserWidget;
  */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Equipment UI Settings Config",
 	meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining equipment UI."))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedEquipmentUIConfig : public UPrimaryDataAsset
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedEquipmentUIConfig : public UMounteaAdvancedInventoryScreenUIConfig
 {
 	GENERATED_BODY()
 

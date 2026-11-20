@@ -50,6 +50,7 @@
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryUIConfig.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+#include "Settings/MounteaAdvancedInventoryScreenUIConfig.h"
 #include "Statics/MounteaInventoryBaseUIStatics.h"
 
 #include "Slate/MounteaInventoryScrollBox.h"
@@ -386,21 +387,33 @@ void UMounteaInventoryUIStatics::RemoveQueuedAction(const TScriptInterface<IMoun
 
 #pragma endregion
 
-UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig()
+UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryUIStatics::GetThemeConfig(UMounteaAdvancedInventoryScreenUIConfig* OptionalUIConfig)
 {
-	const auto settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
-	if (!IsValid(settings))
+	if (IsValid(OptionalUIConfig) && !OptionalUIConfig->ThemeOverride.IsNull())
 	{
-		LOG_ERROR(TEXT("[GetThemeConfig] Settings not found!"))
-		return nullptr;
+		UMounteaAdvancedInventoryThemeConfig* theme = OptionalUIConfig->ThemeOverride.LoadSynchronous();
+
+		if (IsValid(theme))
+			return theme;
+
+		LOG_WARNING(TEXT("[GetThemeConfig] Screen config '%s' could not load theme override '%s'; using the global theme."),
+			*OptionalUIConfig->GetPathName(), *OptionalUIConfig->ThemeOverride.ToSoftObjectPath().ToString());
 	}
-	const auto config = settings->AdvancedInventorySettingsConfig.LoadSynchronous();
-	if (!IsValid(config))
+
+	const UMounteaAdvancedInventoryGlobalUIConfig* globalConfig = UMounteaInventoryBaseUIStatics::GetGlobalUIConfig();
+
+	if (!IsValid(globalConfig) || globalConfig->BaseTheme.IsNull())
+		return nullptr;
+
+	UMounteaAdvancedInventoryThemeConfig* theme = globalConfig->BaseTheme.LoadSynchronous();
+
+	if (!IsValid(theme))
 	{
-		LOG_ERROR(TEXT("[GetThemeConfig] Config not found!"))
-		return nullptr;
+		LOG_WARNING(TEXT("[GetThemeConfig] Global UI config '%s' could not load base theme '%s'."),
+			*globalConfig->GetPathName(), *globalConfig->BaseTheme.ToSoftObjectPath().ToString());
 	}
-	return config->BaseTheme.LoadSynchronous();
+
+	return theme;
 }
 
 void UMounteaInventoryUIStatics::SetGridSlotData(FMounteaInventoryGridSlot& SourceData, 

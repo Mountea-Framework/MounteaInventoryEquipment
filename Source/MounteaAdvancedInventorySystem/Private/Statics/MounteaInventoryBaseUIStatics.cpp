@@ -1,4 +1,4 @@
-﻿// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
+// Copyright (C) 2025 Dominik (Pavlicek) Morse. All rights reserved.
 //
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
@@ -13,6 +13,17 @@
 #include "Statics/MounteaInventoryBaseUIStatics.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetTree.h"
+#include "Components/Border.h"
+#include "Components/Button.h"
+#include "Components/EditableTextBox.h"
+#include "Components/Image.h"
+#include "Components/ProgressBar.h"
+#include "Components/Slider.h"
+#include "Components/TextBlock.h"
+#include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+#include "Widgets/MounteaInventoryWidgetThemeExtension.h"
+
 #include "Components/ActorComponent.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -26,6 +37,346 @@
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Subsystems/MounteaAdvancedInventorySharedHUDSubsystem.h"
+
+
+namespace MounteaWidgetTheme
+{
+	using FClassRules = TMap<TWeakObjectPtr<UClass>, TMap<FName, FMounteaWidgetThemeStyleAssignment>>;
+	static TMap<TWeakObjectPtr<const UMounteaAdvancedInventoryGlobalUIConfig>, FClassRules> PrefixCache;
+
+	bool ResolvePaint(const UMounteaAdvancedInventoryThemeConfig* Theme, const FName Role, FLinearColor& OutColour)
+	{
+		const FMounteaThemePaint* paint = Theme->Paints.Find(Role);
+
+		if (!paint)
+			return false;
+
+		const FLinearColor* ink = Theme->Palette.Find(paint->Ink);
+
+		if (!ink)
+			return false;
+
+		OutColour = FLinearColor(ink->R, ink->G, ink->B, FMath::Clamp(paint->Opacity, 0.f, 1.f));
+		return true;
+	}
+
+	void PatchBrush(const UMounteaAdvancedInventoryThemeConfig* Theme, const FName Role, FSlateBrush& Brush)
+	{
+		const FMounteaThemeBrushStyle* definition = Theme->Brushes.Find(Role);
+
+		if (!definition)
+			return;
+
+		if (definition->bOverrideBrush)
+			Brush = definition->Brush;
+
+		FLinearColor colour;
+
+		if (ResolvePaint(Theme, definition->Tint, colour))
+			Brush.TintColor = FSlateColor(colour);
+
+		if (ResolvePaint(Theme, definition->OutlineTint, colour))
+			Brush.OutlineSettings.Color = FSlateColor(colour);
+	}
+
+	bool Supports(UClass* WidgetClass, const EMounteaWidgetThemeStyleType StyleType)
+	{
+		switch (StyleType)
+		{
+			case EMounteaWidgetThemeStyleType::Text:
+				return WidgetClass->IsChildOf(UTextBlock::StaticClass());
+			case EMounteaWidgetThemeStyleType::Brush:
+				return WidgetClass->IsChildOf(UBorder::StaticClass()) || WidgetClass->IsChildOf(UImage::StaticClass());
+			case EMounteaWidgetThemeStyleType::ImageTint:
+				return WidgetClass->IsChildOf(UImage::StaticClass());
+			case EMounteaWidgetThemeStyleType::Control:
+				return WidgetClass->IsChildOf(UButton::StaticClass()) || WidgetClass->IsChildOf(USlider::StaticClass()) ||
+					WidgetClass->IsChildOf(UProgressBar::StaticClass()) || WidgetClass->IsChildOf(UEditableTextBox::StaticClass());
+			case EMounteaWidgetThemeStyleType::GroupOpacity:
+				return WidgetClass->IsChildOf(UWidget::StaticClass());
+			default:
+				return false;
+		}
+	}
+
+	const FClassRules& GetRules(const UMounteaAdvancedInventoryGlobalUIConfig* Config)
+	{
+		if (const FClassRules* cached = PrefixCache.Find(Config))
+			return *cached;
+
+		for (auto iterator = PrefixCache.CreateIterator(); iterator; ++iterator)
+		{
+			if (!iterator.Key().IsValid())
+				iterator.RemoveCurrent();
+		}
+
+		FClassRules& index = PrefixCache.Add(Config);
+
+		for (const FMounteaWidgetPrefixGroup& group : Config->WidgetPrefixGroups)
+		{
+			if (!group.WidgetClass)
+				continue;
+
+			auto& classRules = index.FindOrAdd(group.WidgetClass.Get());
+
+			for (const FMounteaWidgetPrefixRule& rule : group.Rules)
+			{
+				if (!Supports(group.WidgetClass.Get(), rule.Style.StyleType))
+					continue;
+
+				for (const FName alias : rule.Prefixes)
+				{
+					const FString prefix = alias.ToString();
+					int32 underscore;
+
+					if (!prefix.FindChar(TEXT('_'), underscore) || underscore != prefix.Len() - 1)
+						continue;
+
+					if (!classRules.Contains(alias))
+						classRules.Add(alias, rule.Style);
+				}
+			}
+		}
+
+		return index;
+	}
+
+	void PatchButtonState(const UMounteaAdvancedInventoryThemeConfig* Theme, const FMounteaThemeControlStyle& Control,
+		const EMounteaThemeControlState State, FSlateBrush& Brush, FSlateColor& Foreground)
+	{
+		const FMounteaThemeControlStateStyle* normal = Control.States.Find(EMounteaThemeControlState::Normal);
+		const FMounteaThemeControlStateStyle* state = Control.States.Find(State);
+
+		if (normal)
+		{
+			PatchBrush(Theme, normal->Background, Brush);
+			FLinearColor colour;
+
+			if (ResolvePaint(Theme, normal->Foreground, colour))
+				Foreground = FSlateColor(colour);
+		}
+
+		if (state && state != normal)
+		{
+			PatchBrush(Theme, state->Background, Brush);
+			FLinearColor colour;
+
+			if (ResolvePaint(Theme, state->Foreground, colour))
+				Foreground = FSlateColor(colour);
+		}
+	}
+
+	void Apply(UWidget* Widget, const UMounteaAdvancedInventoryThemeConfig* Theme, const FMounteaWidgetThemeStyleAssignment& Assignment)
+	{
+		FLinearColor colour;
+
+		if (Assignment.StyleType == EMounteaWidgetThemeStyleType::GroupOpacity)
+		{
+			if (const float* opacity = Theme->GroupOpacity.Find(Assignment.GroupOpacityRole))
+				Widget->SetRenderOpacity(FMath::Clamp(*opacity, 0.f, 1.f));
+		}
+		else if (Assignment.StyleType == EMounteaWidgetThemeStyleType::Text)
+		{
+			UTextBlock* text = Cast<UTextBlock>(Widget);
+			const FMounteaThemeTextStyle* type = Theme->Typography.Find(Assignment.TypeRole);
+
+			if (!text || !type)
+				return;
+
+			text->SetFont(type->Font);
+			const FName foreground = Assignment.ForegroundPaint.IsNone() ? type->Foreground : Assignment.ForegroundPaint;
+
+			if (ResolvePaint(Theme, foreground, colour))
+				text->SetColorAndOpacity(FSlateColor(colour));
+
+			if (ResolvePaint(Theme, type->ShadowColour, colour))
+			{
+				text->SetShadowColorAndOpacity(colour);
+				text->SetShadowOffset(type->ShadowOffset);
+			}
+		}
+		else if (Assignment.StyleType == EMounteaWidgetThemeStyleType::ImageTint)
+		{
+			UImage* image = Cast<UImage>(Widget);
+
+			if (image && ResolvePaint(Theme, Assignment.TintPaint, colour))
+				image->SetColorAndOpacity(colour);
+		}
+		else if (Assignment.StyleType == EMounteaWidgetThemeStyleType::Brush)
+		{
+			if (UBorder* border = Cast<UBorder>(Widget))
+			{
+				FSlateBrush brush = border->Background;
+				PatchBrush(Theme, Assignment.BrushRole, brush);
+				border->SetBrush(brush);
+
+				if (ResolvePaint(Theme, Assignment.TintPaint, colour))
+					border->SetBrushColor(colour);
+			}
+			else if (UImage* image = Cast<UImage>(Widget))
+			{
+				FSlateBrush brush = image->GetBrush();
+				PatchBrush(Theme, Assignment.BrushRole, brush);
+				image->SetBrush(brush);
+
+				if (ResolvePaint(Theme, Assignment.TintPaint, colour))
+					image->SetColorAndOpacity(colour);
+			}
+		}
+		else if (Assignment.StyleType == EMounteaWidgetThemeStyleType::Control)
+		{
+			const FMounteaThemeControlStyle* control = Theme->Controls.Find(Assignment.ControlRole);
+
+			if (!control)
+				return;
+
+			if (UButton* button = Cast<UButton>(Widget))
+			{
+				FButtonStyle style = button->GetStyle();
+				PatchButtonState(Theme, *control, EMounteaThemeControlState::Normal, style.Normal, style.NormalForeground);
+				PatchButtonState(Theme, *control, EMounteaThemeControlState::Hovered, style.Hovered, style.HoveredForeground);
+				PatchButtonState(Theme, *control, EMounteaThemeControlState::Pressed, style.Pressed, style.PressedForeground);
+				PatchButtonState(Theme, *control, EMounteaThemeControlState::Disabled, style.Disabled, style.DisabledForeground);
+				button->SetStyle(style);
+			}
+			else if (USlider* slider = Cast<USlider>(Widget))
+			{
+				FSliderStyle style = slider->GetWidgetStyle();
+				PatchBrush(Theme, control->Slider.NormalBar, style.NormalBarImage);
+				PatchBrush(Theme, control->Slider.HoveredBar, style.HoveredBarImage);
+				PatchBrush(Theme, control->Slider.DisabledBar, style.DisabledBarImage);
+				PatchBrush(Theme, control->Slider.NormalThumb, style.NormalThumbImage);
+				PatchBrush(Theme, control->Slider.HoveredThumb, style.HoveredThumbImage);
+				PatchBrush(Theme, control->Slider.DisabledThumb, style.DisabledThumbImage);
+				slider->SetWidgetStyle(style);
+			}
+			else if (UProgressBar* progress = Cast<UProgressBar>(Widget))
+			{
+				FProgressBarStyle style = progress->GetWidgetStyle();
+				PatchBrush(Theme, control->Progress.Background, style.BackgroundImage);
+				PatchBrush(Theme, control->Progress.Fill, style.FillImage);
+				PatchBrush(Theme, control->Progress.Marquee, style.MarqueeImage);
+				progress->SetWidgetStyle(style);
+
+				if (ResolvePaint(Theme, Assignment.TintPaint, colour))
+					progress->SetFillColorAndOpacity(colour);
+			}
+			else if (UEditableTextBox* input = Cast<UEditableTextBox>(Widget))
+			{
+				FEditableTextBoxStyle style = input->WidgetStyle;
+				const auto& parts = control->EditableText;
+				const FMounteaThemeTextStyle* type = Theme->Typography.Find(parts.TypeRole);
+
+				if (type)
+					style.SetFont(type->Font);
+
+				const FName foreground = parts.ForegroundPaint.IsNone() && type ? type->Foreground : parts.ForegroundPaint;
+
+				if (ResolvePaint(Theme, foreground, colour))
+					style.ForegroundColor = FSlateColor(colour);
+
+				PatchBrush(Theme, parts.Background, style.BackgroundImageNormal);
+				PatchBrush(Theme, parts.HoveredBackground, style.BackgroundImageHovered);
+				PatchBrush(Theme, parts.FocusedBackground, style.BackgroundImageFocused);
+				PatchBrush(Theme, parts.ReadOnlyBackground, style.BackgroundImageReadOnly);
+				input->WidgetStyle = style;
+				input->SynchronizeProperties();
+			}
+		}
+	}
+}
+
+void UMounteaInventoryBaseUIStatics::InvalidateWidgetThemePrefixCache(const UMounteaAdvancedInventoryGlobalUIConfig* Config)
+{
+	MounteaWidgetTheme::PrefixCache.Remove(Config);
+}
+
+UMounteaAdvancedInventoryThemeConfig* UMounteaInventoryBaseUIStatics::GetWidgetTheme(UUserWidget* OwnerWidget)
+{
+	UObject* current = OwnerWidget;
+
+	while (current)
+	{
+		if (const UUserWidget* widget = Cast<UUserWidget>(current))
+		{
+			if (const auto* context = widget->GetExtension<UMounteaInventoryWidgetThemeExtension>())
+				return context->Theme;
+		}
+
+		if (const UWidget* widget = Cast<UWidget>(current))
+		{
+			if (UPanelWidget* parent = widget->GetParent())
+			{
+				current = parent;
+				continue;
+			}
+		}
+
+		current = current->GetOuter();
+	}
+
+	return nullptr;
+}
+
+bool UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(UUserWidget* OwnerWidget, UMounteaAdvancedInventoryThemeConfig* Theme)
+{
+	if (!IsValid(OwnerWidget) || !IsValid(Theme))
+		return false;
+
+	auto* context = OwnerWidget->GetExtension<UMounteaInventoryWidgetThemeExtension>();
+
+	if (context && context->Initialized && context->Theme == Theme && !OwnerWidget->IsDesignTime())
+		return true;
+
+	if (!context)
+		context = OwnerWidget->AddExtension<UMounteaInventoryWidgetThemeExtension>();
+
+	context->Theme = Theme;
+	context->Initialized = false;
+	const UMounteaAdvancedInventoryGlobalUIConfig* config = GetGlobalUIConfig();
+
+	if (!config || !OwnerWidget->WidgetTree || !OwnerWidget->WidgetTree->RootWidget)
+		return false;
+	const auto& index = MounteaWidgetTheme::GetRules(config);
+	TArray<UUserWidget*> children;
+	OwnerWidget->WidgetTree->ForEachWidget([&](UWidget* widget)
+	{
+		if (UUserWidget* child = Cast<UUserWidget>(widget))
+		{
+			children.Add(child);
+		}
+
+		const FString name = widget->GetName();
+		int32 underscore;
+
+		if (!name.FindChar(TEXT('_'), underscore) || underscore == name.Len() - 1)
+			return;
+
+		const FName prefix(*name.Left(underscore + 1));
+
+		for (UClass* widgetClass = widget->GetClass(); widgetClass; widgetClass = widgetClass->GetSuperClass())
+		{
+			const auto* rules = index.Find(widgetClass);
+
+			if (!rules)
+				continue;
+
+			if (const auto* assignment = rules->Find(prefix))
+			{
+				MounteaWidgetTheme::Apply(widget, Theme, *assignment);
+				break;
+			}
+		}
+	});
+	context->Initialized = true;
+
+	for (UUserWidget* child : children)
+	{
+		ApplyWidgetThemeByPrefix(child, Theme);
+	}
+
+	return true;
+}
 
 APlayerController* UMounteaInventoryBaseUIStatics::FindPlayerController(AActor* Actor, int SearchDepth)
 {
