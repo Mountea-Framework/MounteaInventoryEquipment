@@ -224,3 +224,4 @@ crashinfo--*
 
 # Local artwork source manifests
 /Content/UI/**/SourceManifest.json
+/Analysis
