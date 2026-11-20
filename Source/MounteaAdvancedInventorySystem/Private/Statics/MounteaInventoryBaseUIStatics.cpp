@@ -60,6 +60,30 @@ namespace MounteaWidgetTheme
 		return true;
 	}
 
+	bool ResolveTextForeground(const UMounteaAdvancedInventoryThemeConfig* Theme, const FMounteaThemeTextStyle* Type,
+		const FName OverridePaint, FLinearColor& OutColour)
+	{
+		if (!OverridePaint.IsNone())
+			return ResolvePaint(Theme, OverridePaint, OutColour);
+
+		if (!Type)
+			return false;
+
+		if (!Type->Foreground.IsNone())
+			return ResolvePaint(Theme, Type->Foreground, OutColour);
+
+		if (Theme->DefaultInk.IsNone())
+			return false;
+
+		const FLinearColor* ink = Theme->Palette.Find(Theme->DefaultInk);
+
+		if (!ink)
+			return false;
+
+		OutColour = FLinearColor(ink->R, ink->G, ink->B, 1.f);
+		return true;
+	}
+
 	void PatchBrush(const UMounteaAdvancedInventoryThemeConfig* Theme, const FName Role, FSlateBrush& Brush)
 	{
 		const FMounteaThemeBrushStyle* definition = Theme->Brushes.Find(Role);
@@ -184,9 +208,8 @@ namespace MounteaWidgetTheme
 				return;
 
 			text->SetFont(type->Font);
-			const FName foreground = Assignment.ForegroundPaint.IsNone() ? type->Foreground : Assignment.ForegroundPaint;
 
-			if (ResolvePaint(Theme, foreground, colour))
+			if (ResolveTextForeground(Theme, type, Assignment.ForegroundPaint, colour))
 				text->SetColorAndOpacity(FSlateColor(colour));
 
 			if (ResolvePaint(Theme, type->ShadowColour, colour))
@@ -270,9 +293,7 @@ namespace MounteaWidgetTheme
 				if (type)
 					style.SetFont(type->Font);
 
-				const FName foreground = parts.ForegroundPaint.IsNone() && type ? type->Foreground : parts.ForegroundPaint;
-
-				if (ResolvePaint(Theme, foreground, colour))
+				if (ResolveTextForeground(Theme, type, parts.ForegroundPaint, colour))
 					style.ForegroundColor = FSlateColor(colour);
 
 				PatchBrush(Theme, parts.Background, style.BackgroundImageNormal);

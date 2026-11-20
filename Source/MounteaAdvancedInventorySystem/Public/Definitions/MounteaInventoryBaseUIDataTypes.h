@@ -714,7 +714,7 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeTextStyle
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FSlateFontInfo Font;
 
-	/** Foreground role; None preserves the authored value. */
+	/** Foreground paint. None uses the theme default ink unless the widget rule supplies a paint. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName Foreground = NAME_None;
@@ -854,7 +854,7 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeEditableTextStyle
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName TypeRole = NAME_None;
 
-	/** ForegroundPaint role; None preserves the authored value. */
+	/** Optional foreground paint override. None uses the typography foreground. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category="Theme",
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName ForegroundPaint = NAME_None;
@@ -924,7 +924,7 @@ struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaWidgetThemeStyleAssignment
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	FName TypeRole = NAME_None;
 
-	/** ForegroundPaint role; None preserves the authored value. */
+	/** Optional foreground paint override. None uses the typography foreground. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
 		meta=(EditCondition="StyleType == EMounteaWidgetThemeStyleType::Text", EditConditionHides),
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))

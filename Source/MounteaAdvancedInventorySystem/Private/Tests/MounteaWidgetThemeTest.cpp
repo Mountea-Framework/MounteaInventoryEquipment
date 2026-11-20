@@ -47,6 +47,10 @@ bool FMounteaWidgetThemeLifetimeTest::RunTest(const FString& Parameters)
 	rule.Prefixes.Add(TEXT("TextPrimary_"));
 	rule.Style.TypeRole = TEXT("Body");
 	group.Rules.Add(rule);
+	FMounteaWidgetPrefixRule fallbackRule;
+	fallbackRule.Prefixes.Add(TEXT("TextDefault_"));
+	fallbackRule.Style.TypeRole = TEXT("Fallback");
+	group.Rules.Add(fallbackRule);
 	config->WidgetPrefixGroups.Add(group);
 	FMounteaWidgetPrefixGroup fadeGroup;
 	fadeGroup.WidgetClass = UWidget::StaticClass();
@@ -84,6 +88,8 @@ bool FMounteaWidgetThemeLifetimeTest::RunTest(const FString& Parameters)
 	FMounteaThemeTextStyle type;
 	type.Foreground = TEXT("Primary");
 	theme->Typography.Add(TEXT("Body"), type);
+	theme->Typography.Add(TEXT("Fallback"), FMounteaThemeTextStyle());
+	theme->Palette.Add(theme->DefaultInk, FLinearColor::Blue);
 	theme->GroupOpacity.Add(TEXT("Subtree"), 0.45f);
 	theme->Brushes.Add(TEXT("Panel"), FMounteaThemeBrushStyle());
 	theme->Controls.Add(TEXT("Progress"), FMounteaThemeControlStyle());
@@ -97,6 +103,8 @@ bool FMounteaWidgetThemeLifetimeTest::RunTest(const FString& Parameters)
 	auto* matched = owner->WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("textprimary_Label_More"));
 	auto* unmatched = owner->WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("TextPrimaryExtra_Label"));
 	auto* emptySuffix = owner->WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("TextPrimary_"));
+	auto* fallback = owner->WidgetTree->ConstructWidget<UTextBlock>(UTextBlock::StaticClass(), TEXT("TextDefault_Label"));
+	panel->AddChild(fallback);
 	panel->AddChild(matched);
 	panel->AddChild(unmatched);
 	panel->AddChild(emptySuffix);
@@ -120,6 +128,7 @@ bool FMounteaWidgetThemeLifetimeTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("A late tree initializes through its retained extension"), owner->GetExtension<UMounteaInventoryWidgetThemeExtension>()->Initialized);
 	const FLinearColor expected(0.3f, 0.4f, 0.5f, 0.62f);
 	TestEqual(TEXT("Whole prefix is case insensitive and paint alpha replaces palette alpha"), matched->GetColorAndOpacity().GetSpecifiedColor(), expected);
+	TestEqual(TEXT("Typography without a foreground uses the theme default ink"), fallback->GetColorAndOpacity().GetSpecifiedColor(), FLinearColor::Blue);
 	TestEqual(TEXT("A partial prefix stays authored"), unmatched->GetColorAndOpacity().GetSpecifiedColor(), authored);
 	TestEqual(TEXT("An empty suffix stays authored"), emptySuffix->GetColorAndOpacity().GetSpecifiedColor(), authored);
 	TestEqual(TEXT("Nested widget retains the screen theme"), UMounteaInventoryBaseUIStatics::GetWidgetTheme(child), theme);

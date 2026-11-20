@@ -37,6 +37,9 @@ EDataValidationResult UMounteaAdvancedInventoryThemeConfig::IsDataValid(FDataVal
 			report(FString::Printf(TEXT("Missing brush role '%s'."), *Role.ToString()));
 	};
 
+	if (!this->DefaultInk.IsNone() && !this->Palette.Contains(this->DefaultInk))
+		report(FString::Printf(TEXT("Default ink '%s' is missing from the palette."), *this->DefaultInk.ToString()));
+
 	for (const auto& palette : this->Palette)
 	{
 		const FLinearColor& colour = palette.Value;

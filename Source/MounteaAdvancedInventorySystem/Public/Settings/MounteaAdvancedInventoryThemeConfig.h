@@ -36,6 +36,10 @@ public:
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	TMap<FName, FMounteaThemePaint> Paints;
 
+	/** Palette ink for typography without a foreground paint. None keeps the widget foreground. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Typography")
+	FName DefaultInk = TEXT("Foreground");
+
 	/** Complete typography by semantic role. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Typography",
 		meta=(NoResetToDefault, ShowOnlyInnerProperties))
