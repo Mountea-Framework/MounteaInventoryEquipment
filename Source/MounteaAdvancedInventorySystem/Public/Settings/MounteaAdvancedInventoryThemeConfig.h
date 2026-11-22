@@ -13,123 +13,70 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Definitions/MounteaInventoryBaseUIDataTypes.h"
 #include "MounteaAdvancedInventoryThemeConfig.generated.h"
 
-/**
- * UMounteaAdvancedInventoryThemeConfig defines visual and audio theming for inventory user interfaces.
- * Theme configs provide color palettes, text styling, and audio assets for consistent visual presentation
- * across different UI states including normal, hovered, active, focus, and disabled appearances.
- *
- * @see [UI Theming](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
- * @see UMounteaAdvancedInventorySettingsConfig
- */
-UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Theme Config",
-		meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining colours."))
+class USoundBase;
+
+/** Semantic visual roles shared by the inventory, equipment and crafting screens. */
+UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Theme Config")
 class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryThemeConfig : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
 
-	// Background Colors
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Background")
-	FLinearColor BackgroundPrimary = FColor::FromHex("#181818");
+	/** Opaque linear source inks. Paint opacity supplies the resolved alpha. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Palette",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<FName, FLinearColor> Palette;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Background")
-	FLinearColor BackgroundSecondary = FColor::FromHex("#1e1e1e");
+	/** Semantic ink and opacity roles. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Paints",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<FName, FMounteaThemePaint> Paints;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Background")
-	FLinearColor BackgroundTertiary = FColor::FromHex("#252525");
+	/** Palette ink for typography without a foreground paint. None keeps the widget foreground. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Typography",
+		meta=(PalettePicker))
+	FName DefaultInk = TEXT("Foreground");
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Background")
-	FLinearColor BackgroundDisabled = FColor::FromHex("#3c3b3b");
+	/** Complete typography by semantic role. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Typography",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<FName, FMounteaThemeTextStyle> Typography;
 
-	// Normal State
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Normal")
-	FLinearColor PrimaryNormal = FColor::FromHex("#1a1a1a");
+	/** Decorative brush resources and paint overrides. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Brushes",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<FName, FMounteaThemeBrushStyle> Brushes;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Normal")
-	FLinearColor SecondaryNormal = FColor::FromHex("#252525");
+	/** Control states and typed native style parts. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Controls",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<FName, FMounteaThemeControlStyle> Controls;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Normal")
-	FLinearColor TertiaryNormal = FColor::FromHex("#303030");
+	/** Intentional whole-subtree fades in the inclusive range zero to one. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|GroupOpacity",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
+	TMap<FName, float> GroupOpacity;
 
-	// Hovered State
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
-	FLinearColor PrimaryHovered = FColor::FromHex("#f39237");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
-	FLinearColor PrimaryHoverBorder = FColor::FromHex("#e0e0e0");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
-	FLinearColor SecondaryHovered = FColor::FromHex("#3d3d3d");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
-	FLinearColor SecondaryHoverBorder = FColor::FromHex("#e0e0e0");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
-	FLinearColor TertiaryHovered = FColor::FromHex("#474747");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Hovered")
-	FLinearColor TertiaryHoverBorder = FColor::FromHex("#e0e0e0");
-
-	// Active State
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Active")
-	FLinearColor PrimaryActive = FColor::FromHex("#4d4d4d");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Active")
-	FLinearColor SecondaryActive = FColor::FromHex("#575757");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Active")
-	FLinearColor TertiaryActive = FColor::FromHex("#616161");
-
-	// Focus State
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Focus")
-	FLinearColor PrimaryFocus = FColor::FromHex("#666666");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Focus")
-	FLinearColor SecondaryFocus = FColor::FromHex("#707070");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Focus")
-	FLinearColor TertiaryFocus = FColor::FromHex("#7a7a7a");
-
-	// Disabled State
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Disabled")
-	FLinearColor PrimaryDisabled = FColor::FromHex("#888888");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Disabled")
-	FLinearColor SecondaryDisabled = FColor::FromHex("#929292");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "State|Disabled")
-	FLinearColor TertiaryDisabled = FColor::FromHex("#9c9c9c");
-
-	// Text Colors
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	FLinearColor PrimaryText = FColor::FromHex("#D0C8B0FF");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	FLinearColor SecondaryText = FColor::FromHex("#9C7E4AFF");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	FLinearColor TertiaryText = FColor::FromHex("#8F7443FF");
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	int PrimaryTextSize = 16;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	int SecondaryTextSize = 14;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text")
-	int TertiaryTextSize = 12;
-
-	// Accent
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Highlight")
-	FLinearColor Accent = FColor::FromHex("#9C7E4AFF");
-
-	// Audio
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Audio",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	TSoftObjectPtr<USoundBase> ButtonPressedSound;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Audio",
+		meta=(NoResetToDefault, ShowOnlyInnerProperties))
 	TSoftObjectPtr<USoundBase> ButtonHoveredSound;
+
+	/** Resolves a named paint to its palette RGB and paint opacity. Returns false for missing references. */
+	bool ResolvePaint(FName Role, FLinearColor& OutColour) const;
+
+	/** Applies the named brush replacement and resolved fill and outline paints to the supplied brush. */
+	void PatchBrush(FName Role, FSlateBrush& Brush) const;
+
+#if WITH_EDITOR
+public:
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+#endif
 };

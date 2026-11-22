@@ -17,6 +17,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MounteaInventoryBaseUIStatics.generated.h"
 
+class UMounteaAdvancedInventoryThemeConfig;
 class AActor;
 class APlayerController;
 class IMounteaAdvancedInventorySharedHUDInterface;
@@ -35,6 +36,33 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryBaseUIStatics : public
 	GENERATED_BODY()
 
 public:
+
+	/**
+	 * Applies prefix styles once per resolved theme and initializes each nested widget with the same theme.
+	 * A valid theme is retained while the tree is pending. Reusing the same theme preserves current visual state;
+	 * explicitly supplying a different theme restyles the instance. Designer preview calls may refresh the same theme.
+	 * @param OwnerWidget Widget owning the instantiated tree to style.
+	 * @param Theme Resolved owning screen theme to retain and pass to children.
+	 * @return True when the instance has completed theme initialization; false when prerequisites are unavailable.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Theme",
+		meta=(MounteaSetter),
+		meta=(DefaultToSelf="OwnerWidget"),
+		DisplayName="Apply Widget Theme By Prefix")
+	static bool ApplyWidgetThemeByPrefix(UUserWidget* OwnerWidget, UMounteaAdvancedInventoryThemeConfig* Theme);
+
+	/**
+	 * Finds the retained theme of this widget or its owning widget hierarchy.
+	 * @param OwnerWidget Widget whose screen theme is needed for dynamically created content.
+	 * @return Retained screen theme, or nullptr when the hierarchy has not been initialized.
+	 */
+	UFUNCTION(BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Theme",
+		meta=(MounteaGetter),
+		DisplayName="Get Widget Theme")
+	static UMounteaAdvancedInventoryThemeConfig* GetWidgetTheme(UUserWidget* OwnerWidget);
+
+	/** Invalidates the per-config prefix index after editor changes. */
+	static void InvalidateWidgetThemePrefixCache(const UMounteaAdvancedInventoryGlobalUIConfig* Config);
 
 	static bool IsValidBaseUIHandler(const UObject* Target);
 
@@ -258,6 +286,43 @@ public:
 		UCanvasPanel* ParentCanvas,
 		const TMap<int32, UUserWidget*>& CurrentChildren,
 		FVector2D SizeOverride = FVector2D::ZeroVector,
+		bool bSizeToContent = true);
+
+	/**
+	 * Computes upright positions on a single circular ring, using 45-degree spacing for small
+	 * groups and equal angles around the full circle for groups of eight or more.
+	 *
+	 * @param ParentCanvas Canvas containing the ingredient widgets as direct children.
+	 * @param CurrentChildren Widgets in ascending key order. Invalid children are skipped and duplicate widgets use their lowest key.
+	 * @param Radius Positive distance from the Canvas center to each widget center, in Canvas units.
+	 * @param ArcDirection Direction of the arc midpoint. A single widget lies in this direction.
+	 * @return Center-anchor offsets and zero rotations by original key, or an empty map for invalid input.
+	 */
+	UFUNCTION(BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Layout",
+		meta=(MounteaGetter),
+		DisplayName="Calculate Radial Widget Layout")
+	static TMap<int32, FMounteaTransformedWidgetPositionData> CalculateRadialWidgetLayout(
+		UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren,
+		float Radius, EMounteaRadialArcDirection ArcDirection = EMounteaRadialArcDirection::Below);
+
+	/**
+	 * Arranges direct children around the Canvas center with centered alignment and upright rotation.
+	 *
+	 * @param ParentCanvas Canvas whose center anchors the ring.
+	 * @param CurrentChildren Widgets keyed by layout order, filtered as in Calculate Radial Widget Layout.
+	 * @param Radius Positive ring radius in Canvas units.
+	 * @param ArcDirection Direction from the center toward the midpoint of the arc.
+	 * @param bSizeToContent Enables auto-sizing when true. Otherwise preserves slot sizing. Manually stretched
+	 * slots need arranged Canvas geometry to preserve their extent and are skipped until it is available.
+	 * @return True if at least one child was positioned.
+	 */
+	UFUNCTION(BlueprintCallable, Category="Mountea|Inventory & Equipment|UI|Layout",
+		meta=(MounteaSetter),
+		meta=(ExpandBoolAsExecs="ReturnValue"),
+		DisplayName="Apply Radial Widget Layout")
+	static bool ApplyRadialWidgetLayout(
+		UCanvasPanel* ParentCanvas, const TMap<int32, UUserWidget*>& CurrentChildren,
+		float Radius, EMounteaRadialArcDirection ArcDirection = EMounteaRadialArcDirection::Below,
 		bool bSizeToContent = true);
 
 private:

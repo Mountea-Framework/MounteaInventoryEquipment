@@ -1,0 +1,5869 @@
+{
+  "version": "V3",
+  "theme_asset": "/MounteaAdvancedInventorySystem/Data/Config/V3/DA_V3_Theme.DA_V3_Theme",
+  "global_ui_config": "/MounteaAdvancedInventorySystem/Data/Config/V3/DA_V3_GlobalUI.DA_V3_GlobalUI",
+  "default_ink": "Foreground",
+  "palette": {
+    "Black": {
+      "a": 1.0,
+      "b": 0.0,
+      "g": 0.0,
+      "r": 0.0
+    },
+    "Foreground": {
+      "a": 1.0,
+      "b": 0.8069519996643066,
+      "g": 0.8631569743156433,
+      "r": 0.887923002243042
+    },
+    "Ink00FFFF": {
+      "a": 1.0,
+      "b": 1.0,
+      "g": 1.0,
+      "r": 0.0
+    },
+    "InkBCBCBC": {
+      "a": 1.0,
+      "b": 0.5,
+      "g": 0.5,
+      "r": 0.5
+    },
+    "InkC0C0C0": {
+      "a": 1.0,
+      "b": 0.527114987373352,
+      "g": 0.527114987373352,
+      "r": 0.527114987373352
+    },
+    "InkF1EDE6": {
+      "a": 1.0,
+      "b": 0.7900000214576721,
+      "g": 0.8500000238418579,
+      "r": 0.8799999952316284
+    },
+    "Surface": {
+      "a": 1.0,
+      "b": 0.0033470001071691513,
+      "g": 0.0036770000588148832,
+      "r": 0.0036770000588148832
+    },
+    "White": {
+      "a": 1.0,
+      "b": 1.0,
+      "g": 1.0,
+      "r": 1.0
+    }
+  },
+  "paints": {
+    "Background": {
+      "ink": "Black",
+      "opacity": 0.4000000059604645,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.4000000059604645
+      }
+    },
+    "BackgroundBackground": {
+      "ink": "Black",
+      "opacity": 0.8299999833106995,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.8299999833106995
+      }
+    },
+    "BackgroundBackgroundWrapper": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "BorderFrameFill": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "BorderFrameMultiplier": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "BorderFrameOutline": {
+      "ink": "Foreground",
+      "opacity": 0.20000000298023224,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.20000000298023224
+      }
+    },
+    "BorderKeycapFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "BorderKeycapKeycapFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "BorderKeycapKeycapMultiplier": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "BorderKeycapKeycapOutline": {
+      "ink": "Foreground",
+      "opacity": 0.20000000298023224,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.20000000298023224
+      }
+    },
+    "BorderKeycapMultiplier": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "BorderKeycapNextFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "BorderKeycapNextMultiplier": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "BorderKeycapNextOutline": {
+      "ink": "Foreground",
+      "opacity": 0.0732399970293045,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0732399970293045
+      }
+    },
+    "BorderKeycapOutline": {
+      "ink": "Foreground",
+      "opacity": 0.0742110013961792,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0742110013961792
+      }
+    },
+    "BorderPrimaryFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "BorderPrimaryMultiplier": {
+      "ink": "Surface",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0036770000588148832,
+        "g": 0.0036770000588148832,
+        "b": 0.0033470001071691513,
+        "a": 1.0
+      }
+    },
+    "BorderPrimaryOutline": {
+      "ink": "Foreground",
+      "opacity": 0.30000001192092896,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.30000001192092896
+      }
+    },
+    "ButtonActionActionDisabledFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionActionDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonActionActionDisabledOutline": {
+      "ink": "Foreground",
+      "opacity": 0.016840999945998192,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.016840999945998192
+      }
+    },
+    "ButtonActionActionHoveredFill": {
+      "ink": "Foreground",
+      "opacity": 0.20000000298023224,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.20000000298023224
+      }
+    },
+    "ButtonActionActionHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionActionHoveredOutline": {
+      "ink": "Foreground",
+      "opacity": 0.20000000298023224,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.20000000298023224
+      }
+    },
+    "ButtonActionActionNormalFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionActionNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionActionNormalOutline": {
+      "ink": "Foreground",
+      "opacity": 0.05000000074505806,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.05000000074505806
+      }
+    },
+    "ButtonActionActionPressedFill": {
+      "ink": "Foreground",
+      "opacity": 0.017907999455928802,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.017907999455928802
+      }
+    },
+    "ButtonActionActionPressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionActionPressedOutline": {
+      "ink": "Foreground",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCancelActionDisabledFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionCancelActionDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCancelActionDisabledOutline": {
+      "ink": "Foreground",
+      "opacity": 0.016840999945998192,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.016840999945998192
+      }
+    },
+    "ButtonActionCancelActionHoveredFill": {
+      "ink": "Foreground",
+      "opacity": 0.007526999805122614,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.007526999805122614
+      }
+    },
+    "ButtonActionCancelActionHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCancelActionHoveredOutline": {
+      "ink": "Foreground",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCancelActionNormalFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionCancelActionNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCancelActionNormalOutline": {
+      "ink": "Foreground",
+      "opacity": 0.0742110013961792,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0742110013961792
+      }
+    },
+    "ButtonActionCancelActionPressedFill": {
+      "ink": "Foreground",
+      "opacity": 0.017907999455928802,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.017907999455928802
+      }
+    },
+    "ButtonActionCancelActionPressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCancelActionPressedOutline": {
+      "ink": "Foreground",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseActionDisabledFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionCloseActionDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseActionDisabledOutline": {
+      "ink": "Foreground",
+      "opacity": 0.016840999945998192,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.016840999945998192
+      }
+    },
+    "ButtonActionCloseActionHoveredFill": {
+      "ink": "Foreground",
+      "opacity": 0.007526999805122614,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.007526999805122614
+      }
+    },
+    "ButtonActionCloseActionHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseActionHoveredOutline": {
+      "ink": "Foreground",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseActionNormalFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionCloseActionNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseActionNormalOutline": {
+      "ink": "Foreground",
+      "opacity": 0.604773998260498,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.604773998260498
+      }
+    },
+    "ButtonActionCloseActionPressedFill": {
+      "ink": "Foreground",
+      "opacity": 0.017907999455928802,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.017907999455928802
+      }
+    },
+    "ButtonActionCloseActionPressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseActionPressedOutline": {
+      "ink": "Foreground",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseDisabledFill": {
+      "ink": "Foreground",
+      "opacity": 0.002067999914288521,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.002067999914288521
+      }
+    },
+    "ButtonActionCloseDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseDisabledOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonActionCloseHoveredFill": {
+      "ink": "Foreground",
+      "opacity": 0.017907999455928802,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.017907999455928802
+      }
+    },
+    "ButtonActionCloseHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseHoveredOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonActionCloseNormalFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionCloseNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionCloseNormalOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonActionClosePressedFill": {
+      "ink": "Foreground",
+      "opacity": 0.033805001527071,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.033805001527071
+      }
+    },
+    "ButtonActionClosePressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionClosePressedOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonActionDisabledFill": {
+      "ink": "Foreground",
+      "opacity": 0.002067999914288521,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.002067999914288521
+      }
+    },
+    "ButtonActionDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonActionDisabledOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonActionHoveredFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionHoveredOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonActionNormalFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonActionNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionNormalOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonActionPressedFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionPressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonActionPressedOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonCategoryDisabledFill": {
+      "ink": "Foreground",
+      "opacity": 0.002067999914288521,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.002067999914288521
+      }
+    },
+    "ButtonCategoryDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonCategoryDisabledOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonCategoryHoveredFill": {
+      "ink": "Foreground",
+      "opacity": 0.017907999455928802,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.017907999455928802
+      }
+    },
+    "ButtonCategoryHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonCategoryHoveredOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonCategoryNormalFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonCategoryNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonCategoryNormalOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonCategoryPressedFill": {
+      "ink": "Foreground",
+      "opacity": 0.033805001527071,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.033805001527071
+      }
+    },
+    "ButtonCategoryPressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonCategoryPressedOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabDisabledFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonTabDisabledOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabHoveredFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabHoveredOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabNormalFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabNormalOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabPressedFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabPressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabPressedOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabTabDisabledFill": {
+      "ink": "Foreground",
+      "opacity": 0.002067999914288521,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.002067999914288521
+      }
+    },
+    "ButtonTabTabDisabledForeground": {
+      "ink": "InkC0C0C0",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.527114987373352,
+        "g": 0.527114987373352,
+        "b": 0.527114987373352,
+        "a": 1.0
+      }
+    },
+    "ButtonTabTabDisabledOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabTabHoveredFill": {
+      "ink": "Foreground",
+      "opacity": 0.017907999455928802,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.017907999455928802
+      }
+    },
+    "ButtonTabTabHoveredForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabTabHoveredOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabTabNormalFill": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "ButtonTabTabNormalForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabTabNormalOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ButtonTabTabPressedFill": {
+      "ink": "Foreground",
+      "opacity": 0.033805001527071,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.033805001527071
+      }
+    },
+    "ButtonTabTabPressedForeground": {
+      "ink": "Ink00FFFF",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ButtonTabTabPressedOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "Divider": {
+      "ink": "Foreground",
+      "opacity": 0.20000000298023224,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.20000000298023224
+      }
+    },
+    "DividerDivider": {
+      "ink": "Foreground",
+      "opacity": 0.05000000074505806,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.05000000074505806
+      }
+    },
+    "DividerMerchantDivider": {
+      "ink": "Foreground",
+      "opacity": 0.11999999731779099,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.11999999731779099
+      }
+    },
+    "IconEquipped": {
+      "ink": "Foreground",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 1.0
+      }
+    },
+    "IconPrimary": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "IconTitle": {
+      "ink": "Foreground",
+      "opacity": 0.20000000298023224,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.20000000298023224
+      }
+    },
+    "KeyHintText": {
+      "ink": "Foreground",
+      "opacity": 0.604773998260498,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.604773998260498
+      }
+    },
+    "ProgressPrimaryBackgroundFill": {
+      "ink": "Foreground",
+      "opacity": 0.05000000074505806,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.05000000074505806
+      }
+    },
+    "ProgressPrimaryBackgroundOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ProgressPrimaryFillFill": {
+      "ink": "Foreground",
+      "opacity": 0.20000000298023224,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.20000000298023224
+      }
+    },
+    "ProgressPrimaryFillOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "ProgressPrimaryFillTint": {
+      "ink": "InkF1EDE6",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.8799999952316284,
+        "g": 0.8500000238418579,
+        "b": 0.7900000214576721,
+        "a": 1.0
+      }
+    },
+    "ProgressPrimaryMarqueeFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "ProgressPrimaryMarqueeOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "Selection": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "SelectionSelectionDiamond": {
+      "ink": "Foreground",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.0
+      }
+    },
+    "Shadow": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "SliderQuantityDisabledBarFill": {
+      "ink": "InkBCBCBC",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.5,
+        "g": 0.5,
+        "b": 0.5,
+        "a": 1.0
+      }
+    },
+    "SliderQuantityDisabledBarOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "SliderQuantityDisabledThumbFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "SliderQuantityDisabledThumbOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "SliderQuantityHoveredBarFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "SliderQuantityHoveredBarOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "SliderQuantityHoveredThumbFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "SliderQuantityHoveredThumbOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "SliderQuantityNormalBarFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "SliderQuantityNormalBarOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "SliderQuantityNormalThumbFill": {
+      "ink": "White",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+      }
+    },
+    "SliderQuantityNormalThumbOutline": {
+      "ink": "Black",
+      "opacity": 0.0,
+      "resolved_linear_rgba": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+      }
+    },
+    "TextPrimary": {
+      "ink": "Foreground",
+      "opacity": 1.0,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 1.0
+      }
+    },
+    "TextQuiet": {
+      "ink": "Foreground",
+      "opacity": 0.34368500113487244,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.34368500113487244
+      }
+    },
+    "TextSecondary": {
+      "ink": "Foreground",
+      "opacity": 0.6200000047683716,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.6200000047683716
+      }
+    },
+    "TextSupporting": {
+      "ink": "Foreground",
+      "opacity": 0.800000011920929,
+      "resolved_linear_rgba": {
+        "r": 0.887923002243042,
+        "g": 0.8631569743156433,
+        "b": 0.8069519996643066,
+        "a": 0.800000011920929
+      }
+    }
+  },
+  "typography": {
+    "ActionClose": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 16.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextQuiet",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "ActionLabel": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 133,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 12.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "Body": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 133,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 16.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextQuiet",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "Caption": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 347,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 22.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "ItemName": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 15.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "ItemNameCharacterName": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 160,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 15.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "ItemNameItemName": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 16.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "ItemNameName": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 107,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 22.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "KeyHint": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 178,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 9.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "SemiBold"
+      },
+      "foreground": "KeyHintText",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "KeyHintNext": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 9.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "SemiBold"
+      },
+      "foreground": "TextSupporting",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "ModalTitle": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 160,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 16.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "NavigationLabel": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 347,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 15.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextSecondary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "NumericQuantity": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 15.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextQuiet",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "NumericQuantityQuantitySlider": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 13.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "NumericValue": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 9.75,
+        "skew_amount": 0.0,
+        "typeface_font_name": "SemiBold"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "PrimaryLongDescription": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 13.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "KeyHintText",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "PrimaryMessage": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 12.75,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "KeyHintText",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "ScreenTitle": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 347,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 22.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "Secondary": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 267,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 10.5,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "KeyHintText",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "SecondaryNote": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 12.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "KeyHintText",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "SectionHeading": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 187,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 21.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Regular"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    },
+    "Subtitle": {
+      "font": {
+        "font_material": null,
+        "font_object": "/MounteaAdvancedInventorySystem/UI/V3/Fonts/F_BarlowCondensed.F_BarlowCondensed",
+        "force_monospaced": false,
+        "letter_spacing": 0,
+        "material_is_stencil": false,
+        "monospaced_width": 1.0,
+        "outline_settings": {
+          "apply_outline_to_drop_shadows": false,
+          "mitered_corners": false,
+          "outline_color": {
+            "a": 1.0,
+            "b": 0.0,
+            "g": 0.0,
+            "r": 0.0
+          },
+          "outline_material": null,
+          "outline_size": 0,
+          "separate_fill_alpha": false
+        },
+        "size": 13.0,
+        "skew_amount": 0.0,
+        "typeface_font_name": "Italic"
+      },
+      "foreground": "TextPrimary",
+      "shadow_colour": "Shadow",
+      "shadow_offset": {
+        "x": 1.0,
+        "y": 1.0
+      }
+    }
+  },
+  "brushes": {
+    "BorderFrame": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "BorderFrameOutline",
+      "override_brush": false,
+      "tint": "BorderFrameFill"
+    },
+    "BorderKeycap": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "BorderKeycapOutline",
+      "override_brush": false,
+      "tint": "BorderKeycapFill"
+    },
+    "BorderKeycapKeycap": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "BorderKeycapKeycapOutline",
+      "override_brush": false,
+      "tint": "BorderKeycapKeycapFill"
+    },
+    "BorderKeycapNext": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "BorderKeycapNextOutline",
+      "override_brush": false,
+      "tint": "BorderKeycapNextFill"
+    },
+    "BorderPrimary": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "BorderPrimaryOutline",
+      "override_brush": false,
+      "tint": "BorderPrimaryFill"
+    },
+    "ButtonActionActionDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionActionDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonActionActionDisabledFill"
+    },
+    "ButtonActionActionHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionActionHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonActionActionHoveredFill"
+    },
+    "ButtonActionActionNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionActionNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonActionActionNormalFill"
+    },
+    "ButtonActionActionPressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionActionPressedOutline",
+      "override_brush": false,
+      "tint": "ButtonActionActionPressedFill"
+    },
+    "ButtonActionCancelActionDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCancelActionDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCancelActionDisabledFill"
+    },
+    "ButtonActionCancelActionHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCancelActionHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCancelActionHoveredFill"
+    },
+    "ButtonActionCancelActionNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCancelActionNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCancelActionNormalFill"
+    },
+    "ButtonActionCancelActionPressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCancelActionPressedOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCancelActionPressedFill"
+    },
+    "ButtonActionCloseActionDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCloseActionDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCloseActionDisabledFill"
+    },
+    "ButtonActionCloseActionHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCloseActionHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCloseActionHoveredFill"
+    },
+    "ButtonActionCloseActionNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCloseActionNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCloseActionNormalFill"
+    },
+    "ButtonActionCloseActionPressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCloseActionPressedOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCloseActionPressedFill"
+    },
+    "ButtonActionCloseDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCloseDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCloseDisabledFill"
+    },
+    "ButtonActionCloseHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCloseHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCloseHoveredFill"
+    },
+    "ButtonActionCloseNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionCloseNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonActionCloseNormalFill"
+    },
+    "ButtonActionClosePressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionClosePressedOutline",
+      "override_brush": false,
+      "tint": "ButtonActionClosePressedFill"
+    },
+    "ButtonActionDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonActionDisabledFill"
+    },
+    "ButtonActionHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonActionHoveredFill"
+    },
+    "ButtonActionNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonActionNormalFill"
+    },
+    "ButtonActionPressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonActionPressedOutline",
+      "override_brush": false,
+      "tint": "ButtonActionPressedFill"
+    },
+    "ButtonCategoryDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonCategoryDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonCategoryDisabledFill"
+    },
+    "ButtonCategoryHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonCategoryHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonCategoryHoveredFill"
+    },
+    "ButtonCategoryNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonCategoryNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonCategoryNormalFill"
+    },
+    "ButtonCategoryPressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonCategoryPressedOutline",
+      "override_brush": false,
+      "tint": "ButtonCategoryPressedFill"
+    },
+    "ButtonTabDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonTabDisabledFill"
+    },
+    "ButtonTabHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonTabHoveredFill"
+    },
+    "ButtonTabNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonTabNormalFill"
+    },
+    "ButtonTabPressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabPressedOutline",
+      "override_brush": false,
+      "tint": "ButtonTabPressedFill"
+    },
+    "ButtonTabTabDisabled": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabTabDisabledOutline",
+      "override_brush": false,
+      "tint": "ButtonTabTabDisabledFill"
+    },
+    "ButtonTabTabHovered": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabTabHoveredOutline",
+      "override_brush": false,
+      "tint": "ButtonTabTabHoveredFill"
+    },
+    "ButtonTabTabNormal": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabTabNormalOutline",
+      "override_brush": false,
+      "tint": "ButtonTabTabNormalFill"
+    },
+    "ButtonTabTabPressed": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ButtonTabTabPressedOutline",
+      "override_brush": false,
+      "tint": "ButtonTabTabPressedFill"
+    },
+    "ProgressPrimaryBackground": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ProgressPrimaryBackgroundOutline",
+      "override_brush": false,
+      "tint": "ProgressPrimaryBackgroundFill"
+    },
+    "ProgressPrimaryFill": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ProgressPrimaryFillOutline",
+      "override_brush": false,
+      "tint": "ProgressPrimaryFillFill"
+    },
+    "ProgressPrimaryMarquee": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "ProgressPrimaryMarqueeOutline",
+      "override_brush": false,
+      "tint": "ProgressPrimaryMarqueeFill"
+    },
+    "SliderQuantityDisabledBar": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "SliderQuantityDisabledBarOutline",
+      "override_brush": false,
+      "tint": "SliderQuantityDisabledBarFill"
+    },
+    "SliderQuantityDisabledThumb": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "SliderQuantityDisabledThumbOutline",
+      "override_brush": false,
+      "tint": "SliderQuantityDisabledThumbFill"
+    },
+    "SliderQuantityHoveredBar": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "SliderQuantityHoveredBarOutline",
+      "override_brush": false,
+      "tint": "SliderQuantityHoveredBarFill"
+    },
+    "SliderQuantityHoveredThumb": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "SliderQuantityHoveredThumbOutline",
+      "override_brush": false,
+      "tint": "SliderQuantityHoveredThumbFill"
+    },
+    "SliderQuantityNormalBar": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "SliderQuantityNormalBarOutline",
+      "override_brush": false,
+      "tint": "SliderQuantityNormalBarFill"
+    },
+    "SliderQuantityNormalThumb": {
+      "brush": {
+        "draw_as": "IMAGE",
+        "image_size": {
+          "x": 32.0,
+          "y": 32.0
+        },
+        "image_type": "NO_IMAGE",
+        "margin": {
+          "bottom": 0.0,
+          "left": 0.0,
+          "right": 0.0,
+          "top": 0.0
+        },
+        "mirroring": "NO_MIRROR",
+        "outline_settings": {
+          "color": {
+            "color_use_rule": "USE_COLOR_SPECIFIED",
+            "specified_color": {
+              "a": 0.0,
+              "b": 0.0,
+              "g": 0.0,
+              "r": 0.0
+            }
+          },
+          "corner_radii": {
+            "w": 0.0,
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rounding_type": "HALF_HEIGHT_RADIUS",
+          "use_brush_transparency": false,
+          "width": 0.0
+        },
+        "resource_name": null,
+        "resource_object": null,
+        "texture_object": null,
+        "tiling": "NO_TILE",
+        "tint_color": {
+          "color_use_rule": "USE_COLOR_SPECIFIED",
+          "specified_color": {
+            "a": 1.0,
+            "b": 1.0,
+            "g": 1.0,
+            "r": 1.0
+          }
+        },
+        "unreal_export_text": "(TintColor=(SpecifiedColor=(R=1.000000,G=1.000000,B=1.000000,A=1.000000),ColorUseRule=UseColor_Specified),DrawAs=Image,Tiling=NoTile,Mirroring=NoMirror,ImageType=NoImage,ImageSize=(X=32.000000,Y=32.000000),Margin=(Left=0.000000,Top=0.000000,Right=0.000000,Bottom=0.000000),ResourceObject=None,OutlineSettings=(CornerRadii=(X=0.000000,Y=0.000000,Z=0.000000,W=0.000000),Color=(SpecifiedColor=(R=0.000000,G=0.000000,B=0.000000,A=0.000000),ColorUseRule=UseColor_Specified),Width=0.000000,RoundingType=HalfHeightRadius,bUseBrushTransparency=False),UVRegion=(Min=(X=0.000000,Y=0.000000),Max=(X=0.000000,Y=0.000000),bIsValid=False),bIsDynamicallyLoaded=False,ResourceName=\"\")"
+      },
+      "outline_tint": "SliderQuantityNormalThumbOutline",
+      "override_brush": false,
+      "tint": "SliderQuantityNormalThumbFill"
+    }
+  },
+  "controls": {
+    "ButtonAction": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonActionDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonActionDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonActionHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonActionHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonActionNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonActionNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonActionPressed",
+          "focus_decoration": null,
+          "foreground": "ButtonActionPressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ButtonActionAction": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonActionActionDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonActionActionDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonActionActionHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonActionActionHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonActionActionNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonActionActionNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonActionActionPressed",
+          "focus_decoration": null,
+          "foreground": "ButtonActionActionPressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ButtonActionCancelAction": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonActionCancelActionDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCancelActionDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonActionCancelActionHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCancelActionHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonActionCancelActionNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCancelActionNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonActionCancelActionPressed",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCancelActionPressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ButtonActionClose": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonActionCloseDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCloseDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonActionCloseHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCloseHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonActionCloseNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCloseNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonActionClosePressed",
+          "focus_decoration": null,
+          "foreground": "ButtonActionClosePressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ButtonActionCloseAction": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonActionCloseActionDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCloseActionDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonActionCloseActionHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCloseActionHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonActionCloseActionNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCloseActionNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonActionCloseActionPressed",
+          "focus_decoration": null,
+          "foreground": "ButtonActionCloseActionPressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ButtonCategory": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonCategoryDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonCategoryDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonCategoryHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonCategoryHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonCategoryNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonCategoryNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonCategoryPressed",
+          "focus_decoration": null,
+          "foreground": "ButtonCategoryPressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ButtonTab": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonTabDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonTabDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonTabHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonTabHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonTabNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonTabNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonTabPressed",
+          "focus_decoration": null,
+          "foreground": "ButtonTabPressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ButtonTabTab": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {
+        "DISABLED": {
+          "background": "ButtonTabTabDisabled",
+          "focus_decoration": null,
+          "foreground": "ButtonTabTabDisabledForeground",
+          "icon_tint": null
+        },
+        "HOVERED": {
+          "background": "ButtonTabTabHovered",
+          "focus_decoration": null,
+          "foreground": "ButtonTabTabHoveredForeground",
+          "icon_tint": null
+        },
+        "NORMAL": {
+          "background": "ButtonTabTabNormal",
+          "focus_decoration": null,
+          "foreground": "ButtonTabTabNormalForeground",
+          "icon_tint": null
+        },
+        "PRESSED": {
+          "background": "ButtonTabTabPressed",
+          "focus_decoration": null,
+          "foreground": "ButtonTabTabPressedForeground",
+          "icon_tint": null
+        }
+      }
+    },
+    "ProgressPrimary": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": "ProgressPrimaryBackground",
+        "fill": "ProgressPrimaryFill",
+        "marquee": "ProgressPrimaryMarquee"
+      },
+      "slider": {
+        "disabled_bar": null,
+        "disabled_thumb": null,
+        "hovered_bar": null,
+        "hovered_thumb": null,
+        "normal_bar": null,
+        "normal_thumb": null
+      },
+      "states": {}
+    },
+    "SliderQuantity": {
+      "editable_text": {
+        "background": null,
+        "focused_background": null,
+        "foreground_paint": null,
+        "hovered_background": null,
+        "read_only_background": null,
+        "type_role": null
+      },
+      "progress": {
+        "background": null,
+        "fill": null,
+        "marquee": null
+      },
+      "slider": {
+        "disabled_bar": "SliderQuantityDisabledBar",
+        "disabled_thumb": "SliderQuantityDisabledThumb",
+        "hovered_bar": "SliderQuantityHoveredBar",
+        "hovered_thumb": "SliderQuantityHoveredThumb",
+        "normal_bar": "SliderQuantityNormalBar",
+        "normal_thumb": "SliderQuantityNormalThumb"
+      },
+      "states": {}
+    }
+  },
+  "group_opacity": {},
+  "button_pressed_sound": null,
+  "button_hovered_sound": null,
+  "widget_prefix_groups": [
+    {
+      "rules": [
+        {
+          "prefixes": [
+            "BorderKeycap_"
+          ],
+          "style": {
+            "brush_role": "BorderKeycap",
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "BRUSH",
+            "tint_paint": "BorderKeycapMultiplier",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "BorderKeycapNext_"
+          ],
+          "style": {
+            "brush_role": "BorderKeycapNext",
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "BRUSH",
+            "tint_paint": "BorderKeycapNextMultiplier",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "BorderKeycapKeycap_"
+          ],
+          "style": {
+            "brush_role": "BorderKeycapKeycap",
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "BRUSH",
+            "tint_paint": "BorderKeycapKeycapMultiplier",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "BorderFrame_"
+          ],
+          "style": {
+            "brush_role": "BorderFrame",
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "BRUSH",
+            "tint_paint": "BorderFrameMultiplier",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "BorderPrimary_"
+          ],
+          "style": {
+            "brush_role": "BorderPrimary",
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "BRUSH",
+            "tint_paint": "BorderPrimaryMultiplier",
+            "type_role": null
+          }
+        }
+      ],
+      "widget_class": "/Script/UMG.Border"
+    },
+    {
+      "rules": [
+        {
+          "prefixes": [
+            "ButtonAction_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonAction",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ButtonActionCloseAction_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonActionCloseAction",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ButtonActionAction_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonActionAction",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ButtonActionCancelAction_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonActionCancelAction",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ButtonActionClose_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonActionClose",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ButtonTab_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonTab",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ButtonTabTab_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonTabTab",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ButtonCategory_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ButtonCategory",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        }
+      ],
+      "widget_class": "/Script/UMG.Button"
+    },
+    {
+      "rules": [
+        {
+          "prefixes": [
+            "TextAction_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ActionLabel"
+          }
+        },
+        {
+          "prefixes": [
+            "TextActionClose_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ActionClose"
+          }
+        },
+        {
+          "prefixes": [
+            "TextKeyHint_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "KeyHint"
+          }
+        },
+        {
+          "prefixes": [
+            "TextKeyHintNext_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "KeyHintNext"
+          }
+        },
+        {
+          "prefixes": [
+            "TextSecondary_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "Secondary"
+          }
+        },
+        {
+          "prefixes": [
+            "TextSecondaryNote_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "SecondaryNote"
+          }
+        },
+        {
+          "prefixes": [
+            "TextItemName_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ItemName"
+          }
+        },
+        {
+          "prefixes": [
+            "TextItemNameCharacterName_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ItemNameCharacterName"
+          }
+        },
+        {
+          "prefixes": [
+            "TextItemNameItemName_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ItemNameItemName"
+          }
+        },
+        {
+          "prefixes": [
+            "TextItemNameName_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ItemNameName"
+          }
+        },
+        {
+          "prefixes": [
+            "TextSecondaryNav_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "NavigationLabel"
+          }
+        },
+        {
+          "prefixes": [
+            "TextPrimaryTitle_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ScreenTitle"
+          }
+        },
+        {
+          "prefixes": [
+            "TextCaption_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "Caption"
+          }
+        },
+        {
+          "prefixes": [
+            "TextNumeric_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "NumericValue"
+          }
+        },
+        {
+          "prefixes": [
+            "TextNumericQuantity_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "NumericQuantity"
+          }
+        },
+        {
+          "prefixes": [
+            "TextNumericQuantityQuantitySlider_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "NumericQuantityQuantitySlider"
+          }
+        },
+        {
+          "prefixes": [
+            "TextSectionHeading_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "SectionHeading"
+          }
+        },
+        {
+          "prefixes": [
+            "TextPrimary_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "Body"
+          }
+        },
+        {
+          "prefixes": [
+            "TextPrimaryMessage_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "PrimaryMessage"
+          }
+        },
+        {
+          "prefixes": [
+            "TextPrimaryLongDescription_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "PrimaryLongDescription"
+          }
+        },
+        {
+          "prefixes": [
+            "TextModalTitle_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "ModalTitle"
+          }
+        },
+        {
+          "prefixes": [
+            "TextSubtitle_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "TEXT",
+            "tint_paint": null,
+            "type_role": "Subtitle"
+          }
+        }
+      ],
+      "widget_class": "/Script/UMG.TextBlock"
+    },
+    {
+      "rules": [
+        {
+          "prefixes": [
+            "ImageDivider_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "Divider",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageDividerDivider_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "DividerDivider",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageDividerMerchantDivider_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "DividerMerchantDivider",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageBackground_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "Background",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageBackgroundBackground_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "BackgroundBackground",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageBackgroundBackgroundWrapper_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "BackgroundBackgroundWrapper",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageIcon_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "IconPrimary",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageIconEquipped_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "IconEquipped",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageIconTitle_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "IconTitle",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageSelection_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "Selection",
+            "type_role": null
+          }
+        },
+        {
+          "prefixes": [
+            "ImageSelectionSelectionDiamond_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": null,
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "IMAGE_TINT",
+            "tint_paint": "SelectionSelectionDiamond",
+            "type_role": null
+          }
+        }
+      ],
+      "widget_class": "/Script/UMG.Image"
+    },
+    {
+      "rules": [
+        {
+          "prefixes": [
+            "ProgressPrimary_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "ProgressPrimary",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": "ProgressPrimaryFillTint",
+            "type_role": null
+          }
+        }
+      ],
+      "widget_class": "/Script/UMG.ProgressBar"
+    },
+    {
+      "rules": [
+        {
+          "prefixes": [
+            "SliderQuantity_"
+          ],
+          "style": {
+            "brush_role": null,
+            "control_role": "SliderQuantity",
+            "foreground_paint": null,
+            "group_opacity_role": null,
+            "style_type": "CONTROL",
+            "tint_paint": null,
+            "type_role": null
+          }
+        }
+      ],
+      "widget_class": "/Script/UMG.Slider"
+    }
+  ]
+}

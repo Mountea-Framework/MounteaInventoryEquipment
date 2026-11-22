@@ -3,7 +3,7 @@
 // Developed for the Mountea Framework as a free tool. This solution is provided
 // for use and sharing without charge. Redistribution is allowed under the following conditions:
 //
-// - You may use this solution in commercial products, provided the product is not 
+// - You may use this solution in commercial products, provided the product is not
 //   this solution itself (or unless significant modifications have been made to the solution).
 // - You may not resell or redistribute the original, unmodified solution.
 //
@@ -17,12 +17,13 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventoryGlobalUIConfig.generated.h"
 
+class UMounteaAdvancedInventoryThemeConfig;
 class UMaterialInterface;
 class UDataTable;
 class UUserWidget;
 
 /**
- * UMounteaAdvancedInventoryGlobalUIConfig manages global UI configuration for 
+ * UMounteaAdvancedInventoryGlobalUIConfig manages global UI configuration for
  * the Mountea Advanced Inventory & Equipment System.
  *
  * @see [UI Configuration](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/Settings)
@@ -39,6 +40,15 @@ public:
 	UMounteaAdvancedInventoryGlobalUIConfig();
 
 public:
+
+	/** Default theme shared by wrapper chrome and screens without an override. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme",
+		meta=(ForceRebuildProperty="WidgetPrefixGroups"))
+	TSoftObjectPtr<UMounteaAdvancedInventoryThemeConfig> BaseTheme;
+
+	/** Designer prefix rules shared by runtime application and editor auditing. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme")
+	TArray<FMounteaWidgetPrefixGroup> WidgetPrefixGroups;
 
 	// --- UI Inputs
 
@@ -94,6 +104,34 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications|Notification Card")
 	FVector2f NotificationCardSize = FVector2f(150.f, 60.f);
 
+	// ---- Chrome
+
+	/**
+	 * Widget class used to display the header toolbar.
+	 *
+	 * The assigned widget must implement the MounteaAdvancedInventoryHeaderToolbarWidgetInterface
+	 * to provide header-level controls and toolbar behavior for the UI.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryHeaderToolbarWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget> HeaderWidgetClass;
+
+	/**
+	 * Widget class used to display the footer toolbar.
+	 *
+	 * The assigned widget must implement the MounteaAdvancedInventoryFooterToolbarWidgetInterface
+	 * to provide footer-level controls and toolbar behavior for the UI.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Notifications",
+		meta = (MustImplement = "/Script/MounteaAdvancedInventorySystem.MounteaAdvancedInventoryFooterToolbarWidgetInterface"),
+		meta=(NoResetToDefault),
+		meta=(ForceShowPluginContent),
+		meta=(ForceShowEngineContent))
+	TSoftClassPtr<UUserWidget>FooterWidgetClass;
+
 	// ---- Fonts
 
 	/** Default font settings used across the inventory user interface (labels, counters, titles). */
@@ -144,7 +182,12 @@ public:
 	UFUNCTION(CallInEditor, Category="Default Values",
 		DisplayName="Setup Default Modals")
 	void SetDefaultModalTypes();
-	
+
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+#if WITH_EDITOR
+public:
+	virtual EDataValidationResult IsDataValid(FDataValidationContext& Context) const override;
+	void ValidateThemeRules(const UMounteaAdvancedInventoryThemeConfig* Theme, FDataValidationContext& Context) const;
 #endif
 };

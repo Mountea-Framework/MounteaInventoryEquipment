@@ -13,6 +13,7 @@
 
 #include "Modules/ModuleManager.h"
 
+class IPropertyTypeIdentifier;
 class SMounteaInventoryTemplateEditor;
 class SMounteaCraftingRecipesEditor;
 
@@ -48,6 +49,7 @@ private:
 	TArray<TSharedPtr<class FAssetTypeActions_Base>> AssetActions;
 	TArray<FName> RegisteredCustomClassLayouts;
 	TArray<FName> RegisteredCustomPropertyTypeLayouts;
+	TSharedPtr<IPropertyTypeIdentifier> ThemePickerIdentifier;
 	TSharedPtr<class FUICommandList> PluginCommands;
 	TWeakPtr<SMounteaInventoryTemplateEditor> CurrentTemplateEditor;
 	TWeakPtr<SMounteaCraftingRecipesEditor> CurrentRecipesEditor;

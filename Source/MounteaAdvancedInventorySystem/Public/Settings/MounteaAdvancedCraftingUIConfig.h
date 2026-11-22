@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Engine/DataAsset.h"
+#include "Settings/MounteaAdvancedInventoryScreenUIConfig.h"
 #include "MounteaAdvancedCraftingUIConfig.generated.h"
 
 /**
@@ -23,7 +23,7 @@
  */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Crafting UI Settings Config",
 	meta=(ShortTooltip="Configuration asset for the Mountea Inventory System defining crafting UI."))
-class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedCraftingUIConfig : public UPrimaryDataAsset
+class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedCraftingUIConfig : public UMounteaAdvancedInventoryScreenUIConfig
 {
 	GENERATED_BODY()
 	

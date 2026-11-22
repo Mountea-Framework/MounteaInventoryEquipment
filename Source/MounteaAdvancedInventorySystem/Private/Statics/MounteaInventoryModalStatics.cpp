@@ -10,6 +10,7 @@
 // For more information, visit: https://mountea.tools
 
 #include "Statics/MounteaInventoryModalStatics.h"
+#include "Statics/MounteaInventoryUIStatics.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Definitions/MounteaInventoryBaseCommands.h"
@@ -126,7 +127,14 @@ void UMounteaInventoryModalStatics::AddModalContentToModalWindow(UObject* Target
 		return;
 
 	if (Target->Implements<UMounteaAdvancedInventoryModalWidgetInterface>())
+	{
+		auto* theme = UMounteaInventoryBaseUIStatics::GetWidgetTheme(Cast<UUserWidget>(Target));
+
+		if (theme)
+			UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(ModalContentWidget, theme);
+
 		IMounteaAdvancedInventoryModalWidgetInterface::Execute_AddModalContentToModalWindow(Target, ModalContentWidget, Payload);
+	}
 }
 
 bool UMounteaInventoryModalStatics::BindToOnModalContentAddedToModalWindow(UObject* Target, const FMounteaModalContentAddedToModalWindowBinding& Binding)
@@ -219,13 +227,25 @@ UUserWidget* UMounteaInventoryModalStatics::CreateWidgetFromClass(UObject* Conte
 	if (!IsValid(Context) || !WidgetClass)
 		return nullptr;
 
+	UUserWidget* widget = nullptr;
+
 	if (APlayerController* owningPlayer = ResolveOwningPlayer(Context))
-		return CreateWidget<UUserWidget>(owningPlayer, WidgetClass);
+		widget = CreateWidget<UUserWidget>(owningPlayer, WidgetClass);
+	else if (UWorld* world = Context->GetWorld())
+		widget = CreateWidget<UUserWidget>(world, WidgetClass);
 
-	if (UWorld* world = Context->GetWorld())
-		return CreateWidget<UUserWidget>(world, WidgetClass);
+	UUserWidget* ownerWidget = Cast<UUserWidget>(Context);
 
-	return nullptr;
+	if (!ownerWidget)
+		ownerWidget = Context->GetTypedOuter<UUserWidget>();
+
+	auto* theme = UMounteaInventoryBaseUIStatics::GetWidgetTheme(ownerWidget);
+
+	if (!theme)
+		theme = UMounteaInventoryUIStatics::GetThemeConfig();
+
+	UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(widget, theme);
+	return widget;
 }
 
 APlayerController* UMounteaInventoryModalStatics::ResolveOwningPlayer(UObject* Context)

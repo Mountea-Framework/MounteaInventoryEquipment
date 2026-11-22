@@ -17,7 +17,6 @@
 #include "Engine/DataAsset.h"
 #include "MounteaAdvancedInventorySettingsConfig.generated.h"
 
-class UMounteaAdvancedInventoryThemeConfig;
 class UCommonActivatableWidget;
 
 /**
@@ -83,11 +82,6 @@ public:
 		meta=(GetKeyOptions="GetNotificationTypes"))
 	TMap<FString, FInventoryNotificationConfig> NotificationConfigs;
 
-	// --- User Interface ------------------------------
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UserInterface|Theme")
-	TSoftObjectPtr<UMounteaAdvancedInventoryThemeConfig> BaseTheme;
-	
 protected:
 
 	void ValidateInventoryTypes();

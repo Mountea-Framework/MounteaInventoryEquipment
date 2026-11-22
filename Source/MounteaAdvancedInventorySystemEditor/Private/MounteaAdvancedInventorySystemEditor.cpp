@@ -45,6 +45,7 @@
 #include "Interfaces/IMainFrameModule.h"
 #include "Interfaces/IPluginManager.h"
 #include "PropertyEditorModule.h"
+#include "DetailsCustomizations/MounteaThemePickerCustomization.h"
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 #include "Editor/SMounteaCraftingRecipesEditor.h"
@@ -220,6 +221,11 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 	// Detail Customizations
 	{
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		this->ThemePickerIdentifier = MakeShared<FMounteaThemePickerIdentifier>();
+		PropertyModule.RegisterCustomPropertyTypeLayout(FNameProperty::StaticClass()->GetFName(),
+			FOnGetPropertyTypeCustomizationInstance::CreateStatic(&FMounteaThemePickerCustomization::MakeInstance),
+			this->ThemePickerIdentifier);
+
 		RegisteredCustomPropertyTypeLayouts =
 		{
 			TEXT("MounteaJsonObjectDefinition")
@@ -338,6 +344,9 @@ void FMounteaAdvancedInventorySystemEditor::ShutdownModule()
 		if (FModuleManager::Get().IsModuleLoaded("PropertyEditor"))
 		{
 			FPropertyEditorModule& PropertyModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+			PropertyModule.UnregisterCustomPropertyTypeLayout(FNameProperty::StaticClass()->GetFName(), this->ThemePickerIdentifier);
+			this->ThemePickerIdentifier.Reset();
+
 			for (const FName& layoutName : RegisteredCustomPropertyTypeLayouts)
 				PropertyModule.UnregisterCustomPropertyTypeLayout(layoutName);
 
@@ -523,6 +532,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 				LOCTEXT("InvSubMenu_Tooltip", "📦 Mountea Advanced Inventory & Equipment tools"),
 				FNewToolMenuDelegate::CreateLambda([this](UToolMenu* subMenu)
 				{
+					// TOOLS
 					{
 						FToolMenuSection& toolsSection = subMenu->FindOrAddSection("MounteaInventory_Tools");
 						toolsSection.Label = LOCTEXT("InvTools_Label", "Mountea Inventory Tools");
@@ -550,6 +560,7 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 
 					}
 
+					// PLUGIN CONTENT
 					{
 						FToolMenuSection& contentSection = subMenu->FindOrAddSection("MounteaInventory_Content");
 						contentSection.Label = LOCTEXT("InvContent_Label", "Mountea Plugin Content");
@@ -586,7 +597,34 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							})
 						));
 					}
+					
+					// SETTINGS
+					{
+						FToolMenuSection& settingsSection = subMenu->FindOrAddSection("MounteaInventory_Settings");
+						settingsSection.Label = LOCTEXT("InvSettings_Label", "Mountea Advanced Inventory Settings");
+						settingsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+							"MounteaInventory_Settings",
+							LOCTEXT("MounteaSystemEditor_SettingsButton_Label", "Mountea Advanced Inventory Settings"),
+							LOCTEXT("MounteaSystemEditor_SettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Settings\n\n❔ Configure core Advanced Inventory system settings including default behaviors, performance options, and Advanced Inventory flow parameters. Customize your Advanced Inventory system's foundation here."),
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Settings"),
+							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&)
+							{
+								UMounteaAdvancedInventorySystemEditorStatics::OpenSettings("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
+							})
+						));
+						settingsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
+							"MounteaInventory_EditorSettings",
+							LOCTEXT("MounteaSystemEditor_EditorSettingsButton_Label", "Mountea Advanced Inventory Editor Settings"),
+							LOCTEXT("MounteaSystemEditor_EditorSettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Editor Settings\n\n❔ Customize your Advanced Inventory editor experience with settings for:TBD\n\nAll settings are saved in DefaultMounteaSettings.ini"),
+							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Settings"),
+							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&)
+							{
+								UMounteaAdvancedInventorySystemEditorStatics::OpenSettings("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
+							})
+						));
+					}
 
+					// CONFIG
 					{
 						FToolMenuSection& configSection = subMenu->FindOrAddSection("MounteaInventory_Config");
 						configSection.Label = LOCTEXT("InvConfig_Label", "Mountea Advanced Inventory Configs");
@@ -766,33 +804,9 @@ void FMounteaAdvancedInventorySystemEditor::RegisterMenus()
 							false,
 							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Config")
 						));
-					}
+					}					
 
-					{
-						FToolMenuSection& settingsSection = subMenu->FindOrAddSection("MounteaInventory_Settings");
-						settingsSection.Label = LOCTEXT("InvSettings_Label", "Mountea Advanced Inventory Settings");
-						settingsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
-							"MounteaInventory_Settings",
-							LOCTEXT("MounteaSystemEditor_SettingsButton_Label", "Mountea Advanced Inventory Settings"),
-							LOCTEXT("MounteaSystemEditor_SettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Settings\n\n❔ Configure core Advanced Inventory system settings including default behaviors, performance options, and Advanced Inventory flow parameters. Customize your Advanced Inventory system's foundation here."),
-							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Settings"),
-							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&)
-							{
-								UMounteaAdvancedInventorySystemEditorStatics::OpenSettings("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System"));
-							})
-						));
-						settingsSection.AddEntry(FToolMenuEntry::InitMenuEntry(
-							"MounteaInventory_EditorSettings",
-							LOCTEXT("MounteaSystemEditor_EditorSettingsButton_Label", "Mountea Advanced Inventory Editor Settings"),
-							LOCTEXT("MounteaSystemEditor_EditorSettingsButton_ToolTip", "⚙ Open Mountea Advanced Inventory Editor Settings\n\n❔ Customize your Advanced Inventory editor experience with settings for:TBD\n\nAll settings are saved in DefaultMounteaSettings.ini"),
-							FSlateIcon(FMounteaAdvancedInventoryEditorStyle::GetAppStyleSetName(), "MAISStyleSet.Settings"),
-							FToolMenuExecuteAction::CreateLambda([this](const FToolMenuContext&)
-							{
-								UMounteaAdvancedInventorySystemEditorStatics::OpenSettings("Project",  TEXT("Mountea Framework"), TEXT("Mountea Inventory System (Editor)"));
-							})
-						));
-					}
-
+					// LINKS
 					{
 						FToolMenuSection& linksSection = subMenu->FindOrAddSection("MounteaInventory_Links");
 						linksSection.Label = LOCTEXT("InvLinks_Label", "Mountea Inventory Links");

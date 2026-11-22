@@ -13,6 +13,7 @@
 #include "Components/MounteaCraftingParticipantUIComponent.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Statics/MounteaInventoryBaseUIStatics.h"
 #include "Definitions/MounteaInventoryBaseCommands.h"
 #include "Engine/LocalPlayer.h"
 #include "Helpers/MounteaCategoryWidgetEventHelpers.h"
@@ -132,7 +133,7 @@ bool UMounteaCraftingParticipantUIComponent::CreateCraftingWidget_Implementation
 		return true;
 	}
 	
-	const UMounteaAdvancedCraftingUIConfig* craftingUIConfig = UMounteaCraftingUIStatics::GetCraftingUISettingsConfig();
+	UMounteaAdvancedCraftingUIConfig* craftingUIConfig = UMounteaCraftingUIStatics::GetCraftingUISettingsConfig();
 	if (!craftingUIConfig)
 	{
 		LOG_ERROR(TEXT("[CreateCraftingWidget] Unable to load Crafting Config!"))
@@ -184,6 +185,8 @@ bool UMounteaCraftingParticipantUIComponent::CreateCraftingWidget_Implementation
 		LOG_ERROR(TEXT("[CreateCraftingWidget] Crafting UI must implement `MounteaAdvancedInventoryCraftingWidgetInterface`!"))
 		return false;
 	}
+
+	UMounteaInventoryBaseUIStatics::ApplyWidgetThemeByPrefix(newWidget, UMounteaInventoryUIStatics::GetThemeConfig(craftingUIConfig));
 
 	CraftingWidget = newWidget;
 
