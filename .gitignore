@@ -225,3 +225,4 @@ crashinfo--*
 # Local artwork source manifests
 /Content/UI/**/SourceManifest.json
 /Analysis
+/Tools/__pycache__
