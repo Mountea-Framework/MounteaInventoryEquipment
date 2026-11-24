@@ -120,7 +120,7 @@ struct FInventoryCategoryData
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
 		meta=(DisplayPriority=2))
-	TSoftObjectPtr<UTexture> DisplayIcon;
+	TSoftObjectPtr<UTexture2D> DisplayIcon;
 
 	/**
 	 * Defines a list of allowed Actions.
