@@ -4375,6 +4375,89 @@
     }
   },
   "group_opacity": {},
+  "category_icons": {
+    "All": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_All.T_V2_Category_All",
+      "sub_categories": {}
+    },
+    "Armors": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Armor.T_V2_Category_Armor",
+      "sub_categories": {
+        "Chest": null,
+        "Feet": null,
+        "Hands": null,
+        "Head": null,
+        "Legs": null,
+        "Shields": null
+      }
+    },
+    "Books": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Recipe.T_V2_Category_Recipe",
+      "sub_categories": {
+        "Books & grimoires": null,
+        "Maps": null,
+        "Notes & journals": null,
+        "Recipes & diagrams": null
+      }
+    },
+    "Consumables": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Consumable.T_V2_Category_Consumable",
+      "sub_categories": {
+        "Bombs": null,
+        "Food & drink": null,
+        "Potions & coatings": null,
+        "Single-use scrolls": null
+      }
+    },
+    "Favourite": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Material.T_V2_Category_Material",
+      "sub_categories": {}
+    },
+    "Keys": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Quest.T_V2_Category_Quest",
+      "sub_categories": {
+        "Chest keys": null,
+        "Door keys": null,
+        "Seals & sigils": null
+      }
+    },
+    "Materials": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Material.T_V2_Category_Material",
+      "sub_categories": {
+        "Alchemical reagents": null,
+        "Hides & animal products": null,
+        "Metals & minerals": null,
+        "Plants": null
+      }
+    },
+    "Miscellaneous": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Jewellery.T_V2_Category_Jewellery",
+      "sub_categories": {
+        "Bags & containers": null,
+        "Jewellery": null,
+        "Tools": null,
+        "Valuables": null
+      }
+    },
+    "Quest Items": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Quest.T_V2_Category_Quest",
+      "sub_categories": {
+        "Correspondence": null,
+        "Proofs & trophies": null,
+        "Relics": null
+      }
+    },
+    "Weapons": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V2/Textures/Icons/T_V2_Category_Weapon.T_V2_Category_Weapon",
+      "sub_categories": {
+        "Blades & axes": null,
+        "Bows & crossbows": null,
+        "Impact weapons": null,
+        "Spears & polearms": null,
+        "Staves & wands": null
+      }
+    }
+  },
   "button_pressed_sound": null,
   "button_hovered_sound": null,
   "widget_prefix_groups": [
