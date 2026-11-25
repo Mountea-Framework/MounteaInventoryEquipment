@@ -81,7 +81,7 @@ struct FInventoryRarity
 
 /**
  * FInventoryCategoryData contains the configuration and metadata for inventory item categories.
- * Category data defines display properties, sorting priorities, associated tags, visual icons,
+ * Category data defines display properties, sorting priorities, associated tags,
  * behavioral flags, and allowed actions for comprehensive item classification.
  *
  * @see [Item Categories](https://mountea.tools/docs/AdvancedInventoryEquipmentSystem/ItemCategories)
@@ -115,12 +115,6 @@ struct FInventoryCategoryData
 		meta=(DisplayPriority=1))
 	FGameplayTagContainer CategoryTags;
 
-	/**
-	 * Icon used in the UI to represent this category.
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Inventory Category",
-		meta=(DisplayPriority=2))
-	TSoftObjectPtr<UTexture2D> DisplayIcon;
 
 	/**
 	 * Defines a list of allowed Actions.
@@ -370,7 +364,6 @@ FORCEINLINE bool operator==(const FInventoryCategory& LHS, const FInventoryCateg
 	return LHS.CategoryData.CategoryDisplayName.EqualTo(RHS.CategoryData.CategoryDisplayName) &&
 		   LHS.CategoryData.CategoryPriority == RHS.CategoryData.CategoryPriority &&
 		   LHS.CategoryData.CategoryTags == RHS.CategoryData.CategoryTags &&
-		   LHS.CategoryData.DisplayIcon == RHS.CategoryData.DisplayIcon &&
 		   LHS.CategoryData.CategoryFlags == RHS.CategoryData.CategoryFlags;
 }
 

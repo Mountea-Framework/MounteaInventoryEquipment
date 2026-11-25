@@ -24,6 +24,8 @@
 #include "Settings/MounteaAdvancedInventoryGlobalUIConfig.h"
 #include "Settings/MounteaAdvancedInventorySettings.h"
 #include "Settings/MounteaAdvancedInventoryThemeConfig.h"
+#include "Settings/MounteaAdvancedInventoryUIConfig.h"
+#include "Engine/Texture2D.h"
 #include "Statics/MounteaInventoryBaseUIStatics.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaWidgetThemeLifetimeTest,
@@ -158,6 +160,54 @@ bool FMounteaWidgetThemeLifetimeTest::RunTest(const FString& Parameters)
 	TestEqual(TEXT("Replacement theme propagates to an existing nested widget"), childText->GetColorAndOpacity().GetSpecifiedColor(), replacementColour);
 	TestEqual(TEXT("Replacement theme propagates to a late child"), dynamicText->GetColorAndOpacity().GetSpecifiedColor(), replacementColour);
 	TestEqual(TEXT("Replacement group opacity applies"), panel->GetRenderOpacity(), 0.7f);
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMounteaThemeCategoryIconsTest,
+	"Mountea.Inventory.UI.Theme.CategoryIcons",
+	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FMounteaThemeCategoryIconsTest::RunTest(const FString& Parameters)
+{
+	auto* settings = GetMutableDefault<UMounteaAdvancedInventorySettings>();
+	const auto originalConfig = settings->GlobalUIConfig;
+	ON_SCOPE_EXIT
+	{
+		settings->GlobalUIConfig = originalConfig;
+	};
+
+	auto* config = NewObject<UMounteaAdvancedInventoryGlobalUIConfig>();
+	auto* theme = NewObject<UMounteaAdvancedInventoryThemeConfig>();
+	auto* screen = NewObject<UMounteaAdvancedInventoryUIConfig>();
+	settings->GlobalUIConfig = config;
+	config->BaseTheme = theme;
+
+	const TSoftObjectPtr<UTexture2D> parentIcon(FSoftObjectPath(TEXT("/Game/ThemeTest/Parent.Parent")));
+	const TSoftObjectPtr<UTexture2D> childIcon(FSoftObjectPath(TEXT("/Game/ThemeTest/Child.Child")));
+	const TSoftObjectPtr<UTexture2D> overrideIcon(FSoftObjectPath(TEXT("/Game/ThemeTest/Override.Override")));
+	auto& icons = theme->CategoryIcons.Add(TEXT("weapon-key"));
+	icons.Icon = parentIcon;
+	icons.SubCategories.Add(TEXT("sword-key"), childIcon);
+	icons.SubCategories.Add(TEXT("unset-key"), TSoftObjectPtr<UTexture2D>());
+
+	TestEqual(TEXT("Parent uses the active global theme"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key")), parentIcon);
+	TestEqual(TEXT("Explicit child overrides its parent"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key"), TEXT("sword-key")), childIcon);
+	TestEqual(TEXT("Unset child inherits its parent"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key"), TEXT("unset-key")), parentIcon);
+	TestEqual(TEXT("Missing child inherits its parent"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key"), TEXT("missing-key")), parentIcon);
+	TestTrue(TEXT("Missing parent returns an empty reference"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("missing-key")).IsNull());
+	TestEqual(TEXT("Empty screen override inherits global theme"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key"), FString(), screen), parentIcon);
+
+	auto* replacement = NewObject<UMounteaAdvancedInventoryThemeConfig>();
+	replacement->CategoryIcons.Add(TEXT("weapon-key")).Icon = overrideIcon;
+	screen->ThemeOverride = replacement;
+	TestEqual(TEXT("Screen theme takes precedence and supplies its own fallback"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key"), TEXT("sword-key"), screen), overrideIcon);
+
+	icons.Icon.Reset();
+	TestTrue(TEXT("Unset parent remains empty"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key"), TEXT("unset-key")).IsNull());
+	TestEqual(TEXT("Child is usable with no parent texture"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key"), TEXT("sword-key")), childIcon);
+	config->BaseTheme.Reset();
+	TestTrue(TEXT("Missing theme returns an empty reference"), UMounteaInventoryBaseUIStatics::GetCategoryIcon(TEXT("weapon-key")).IsNull());
+
 	return true;
 }
 

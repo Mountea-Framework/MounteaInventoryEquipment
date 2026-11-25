@@ -11,6 +11,7 @@
 
 
 #include "Statics/MounteaInventoryBaseUIStatics.h"
+#include "Statics/MounteaInventoryUIStatics.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetTree.h"
@@ -759,4 +760,28 @@ bool UMounteaInventoryBaseUIStatics::ApplyRadialWidgetLayout(
 	}
 
 	return appliedAny;
+}
+
+TSoftObjectPtr<UTexture2D> UMounteaInventoryBaseUIStatics::GetCategoryIcon(const FString& CategoryId,
+	const FString& SubCategoryId, UMounteaAdvancedInventoryScreenUIConfig* OptionalUIConfig)
+{
+	const auto* theme = UMounteaInventoryUIStatics::GetThemeConfig(OptionalUIConfig);
+
+	if (!theme)
+		return nullptr;
+
+	const auto* categoryIcons = theme->CategoryIcons.Find(CategoryId);
+
+	if (!categoryIcons)
+		return nullptr;
+
+	if (!SubCategoryId.IsEmpty())
+	{
+		const auto* childIcon = categoryIcons->SubCategories.Find(SubCategoryId);
+
+		if (childIcon && !childIcon->IsNull())
+			return *childIcon;
+	}
+
+	return categoryIcons->Icon;
 }

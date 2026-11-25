@@ -18,6 +18,8 @@
 #include "MounteaInventoryBaseUIStatics.generated.h"
 
 class UMounteaAdvancedInventoryThemeConfig;
+class UMounteaAdvancedInventoryScreenUIConfig;
+class UTexture2D;
 class AActor;
 class APlayerController;
 class IMounteaAdvancedInventorySharedHUDInterface;
@@ -36,6 +38,18 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaInventoryBaseUIStatics : public
 	GENERATED_BODY()
 
 public:
+
+	/**
+	 * Resolves a category texture from the selected screen theme, inheriting the parent texture for unset children.
+	 * @param CategoryId Parent category identifier from the inventory settings.
+	 * @param SubCategoryId Optional child identifier; empty resolves the parent texture.
+	 * @param OptionalUIConfig Screen configuration whose theme override takes precedence over the global theme.
+	 * @return Soft texture reference, or an empty reference when the theme or category has no texture.
+	 */
+	UFUNCTION(BlueprintPure, Category="Mountea|Inventory & Equipment|UI|Theme",
+		meta=(MounteaGetter),
+		DisplayName="Get Category Icon")
+	static TSoftObjectPtr<UTexture2D> GetCategoryIcon(const FString& CategoryId, const FString& SubCategoryId = TEXT(""), UMounteaAdvancedInventoryScreenUIConfig* OptionalUIConfig = nullptr);
 
 	/**
 	 * Applies prefix styles once per resolved theme and initializes each nested widget with the same theme.

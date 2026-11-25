@@ -17,6 +17,22 @@
 #include "MounteaAdvancedInventoryThemeConfig.generated.h"
 
 class USoundBase;
+class UTexture2D;
+
+/** Theme-owned category textures keyed by the inventory taxonomy identifiers. */
+USTRUCT(BlueprintType)
+struct MOUNTEAADVANCEDINVENTORYSYSTEM_API FMounteaThemeCategoryIcons
+{
+	GENERATED_BODY()
+
+	/** Parent category texture and fallback for children without their own texture. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Category Icons")
+	TSoftObjectPtr<UTexture2D> Icon;
+
+	/** Child texture overrides keyed by the original subcategory identifiers. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Category Icons")
+	TMap<FString, TSoftObjectPtr<UTexture2D>> SubCategories;
+};
 
 /** Semantic visual roles shared by the inventory, equipment and crafting screens. */
 UCLASS(ClassGroup=(Mountea), BlueprintType, Blueprintable, DisplayName="Inventory Theme Config")
@@ -25,6 +41,11 @@ class MOUNTEAADVANCEDINVENTORYSYSTEM_API UMounteaAdvancedInventoryThemeConfig : 
 	GENERATED_BODY()
 
 public:
+
+	/** Category textures. The editor exposes only keys from the active inventory settings. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Category Icons",
+		meta=(NoResetToDefault))
+	TMap<FString, FMounteaThemeCategoryIcons> CategoryIcons;
 
 	/** Opaque linear source inks. Paint opacity supplies the resolved alpha. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Theme|Palette",
