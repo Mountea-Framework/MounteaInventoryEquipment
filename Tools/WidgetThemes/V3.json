@@ -5160,6 +5160,89 @@
     }
   },
   "group_opacity": {},
+  "category_icons": {
+    "All": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_All.T_V4_Category_All",
+      "sub_categories": {}
+    },
+    "Armors": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_armor.T_V3_Mountea_armor",
+      "sub_categories": {
+        "Chest": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Equipment/T_Equipment_Chest.T_Equipment_Chest",
+        "Feet": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_boots.T_V3_Mountea_boots",
+        "Hands": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_gloves.T_V3_Mountea_gloves",
+        "Head": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_helm.T_V3_Mountea_helm",
+        "Legs": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_Pants.T_CategoryGlyph_Pants",
+        "Shields": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_shield.T_V3_Mountea_shield"
+      }
+    },
+    "Books": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_book.T_V3_Mountea_book",
+      "sub_categories": {
+        "Books & grimoires": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_Magic02.T_CategoryGlyph_Magic02",
+        "Maps": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_map.T_V3_Mountea_map",
+        "Notes & journals": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_pergamen01.T_CategoryGlyph_pergamen01",
+        "Recipes & diagrams": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Actions/T_V4_Action_Craft.T_V4_Action_Craft"
+      }
+    },
+    "Consumables": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Consumable.T_V4_Category_Consumable",
+      "sub_categories": {
+        "Bombs": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_Bombs.T_CategoryGlyph_Bombs",
+        "Food & drink": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_Drinks02.T_CategoryGlyph_Drinks02",
+        "Potions & coatings": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_potion.T_V3_Mountea_potion",
+        "Single-use scrolls": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_pergamen01.T_CategoryGlyph_pergamen01"
+      }
+    },
+    "Favourite": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Favourite.T_V4_Category_Favourite",
+      "sub_categories": {}
+    },
+    "Keys": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_key.T_V3_Mountea_key",
+      "sub_categories": {
+        "Chest keys": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_All.T_V4_Category_All",
+        "Door keys": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_key.T_V3_Mountea_key",
+        "Seals & sigils": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_Magic.T_CategoryGlyph_Magic"
+      }
+    },
+    "Materials": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_material.T_V3_Mountea_material",
+      "sub_categories": {
+        "Alchemical reagents": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_agent02.T_CategoryGlyph_agent02",
+        "Hides & animal products": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Skyrim_misc_leather.T_V3_Skyrim_misc_leather",
+        "Metals & minerals": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_ingot.T_V3_Mountea_ingot",
+        "Plants": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_herb.T_V3_Mountea_herb"
+      }
+    },
+    "Miscellaneous": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Miscellaneous.T_V4_Category_Miscellaneous",
+      "sub_categories": {
+        "Bags & containers": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Categories/T_V4_Category_Miscellaneous.T_V4_Category_Miscellaneous",
+        "Jewellery": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_ring.T_V3_Mountea_ring",
+        "Tools": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_CraftingMaterials.T_CategoryGlyph_CraftingMaterials",
+        "Valuables": "/MounteaAdvancedInventorySystem/UI/V4/Textures/Icons/Status/T_V4_Status_Coins.T_V4_Status_Coins"
+      }
+    },
+    "Quest Items": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_quest.T_V3_Mountea_quest",
+      "sub_categories": {
+        "Correspondence": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_pergamen01.T_CategoryGlyph_pergamen01",
+        "Proofs & trophies": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_Beastology03.T_CategoryGlyph_Beastology03",
+        "Relics": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_artefact01.T_CategoryGlyph_artefact01"
+      }
+    },
+    "Weapons": {
+      "icon": "/MounteaAdvancedInventorySystem/UI/V3/Textures/Icons/T_V3_Mountea_weapon.T_V3_Mountea_weapon",
+      "sub_categories": {
+        "Blades & axes": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_axe01.T_CategoryGlyph_axe01",
+        "Bows & crossbows": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_FiringArms02.T_CategoryGlyph_FiringArms02",
+        "Impact weapons": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_Hand.T_CategoryGlyph_Hand",
+        "Spears & polearms": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_halberd01.T_CategoryGlyph_halberd01",
+        "Staves & wands": "/MounteaAdvancedInventorySystem/UI/Shared/Textures/Icons/Categories/T_CategoryGlyph_staff01.T_CategoryGlyph_staff01"
+      }
+    }
+  },
   "button_pressed_sound": null,
   "button_hovered_sound": null,
   "widget_prefix_groups": [
