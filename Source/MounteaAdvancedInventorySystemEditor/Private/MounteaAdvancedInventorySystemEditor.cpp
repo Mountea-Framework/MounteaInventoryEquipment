@@ -46,6 +46,8 @@
 #include "Interfaces/IPluginManager.h"
 #include "PropertyEditorModule.h"
 #include "DetailsCustomizations/MounteaThemePickerCustomization.h"
+#include "DetailsCustomizations/MounteaThemeCategoryIconsCustomization.h"
+#include "Settings/MounteaAdvancedInventoryThemeConfig.h"
 
 #include "Editor/SMounteaInventoryTemplateEditor.h"
 #include "Editor/SMounteaCraftingRecipesEditor.h"
@@ -249,6 +251,10 @@ void FMounteaAdvancedInventorySystemEditor::StartupModule()
 				FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaSourceFilePathDetailsCustomization::MakeInstance)
 			);
 		}
+
+		this->RegisteredCustomClassLayouts.Add(UMounteaAdvancedInventoryThemeConfig::StaticClass()->GetFName());
+		PropertyModule.RegisterCustomClassLayout(UMounteaAdvancedInventoryThemeConfig::StaticClass()->GetFName(),
+			FOnGetDetailCustomizationInstance::CreateStatic(&FMounteaThemeCategoryIconsCustomization::MakeInstance));
 
 		PropertyModule.NotifyCustomizationModuleChanged();
 	}
